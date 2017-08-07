@@ -30,7 +30,7 @@ public:
 
         const int error = sqlite3_close(db);
         if (error != SQLITE_OK) {
-            throw Exception { error, sqlite3_errmsg(db) };
+            mbgl::Log::Error(mbgl::Event::Database, "%s (Code %i)", sqlite3_errmsg(db), error);
         }
     }
 
@@ -107,12 +107,7 @@ Database &Database::operator=(Database &&other) {
     return *this;
 }
 
-Database::~Database() {
-}
-
-Database::operator bool() const {
-    return impl.operator bool();
-}
+Database::~Database() = default;
 
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
@@ -155,12 +150,7 @@ Statement &Statement::operator=(Statement &&other) {
     return *this;
 }
 
-Statement::~Statement() {
-}
-
-Statement::operator bool() const {
-    return impl.operator bool();
-}
+Statement::~Statement() = default;
 
 template <> void Statement::bind(int offset, std::nullptr_t) {
     assert(impl);
@@ -224,10 +214,10 @@ template <> void Statement::bind(int offset, const char *value) {
 
 // We currently cannot use sqlite3_bind_blob64 / sqlite3_bind_text64 because they
 // was introduced in SQLite 3.8.7, and we need to support earlier versions:
-//    iOS 7.0: 3.7.13
+//    iOS 8.0: 3.7.13
 //    iOS 8.2: 3.8.5
 // According to http://stackoverflow.com/questions/14288128/what-version-of-sqlite-does-ios-provide,
-// the first iOS version with 3.8.7+ was 9.0, with 3.8.10.2.
+// the first iOS version with 3.8.7+ was 9.0, with 3.8.8.
 
 void Statement::bind(int offset, const char * value, std::size_t length, bool retain) {
     assert(impl);
@@ -297,6 +287,11 @@ bool Statement::run() {
     }
 }
 
+template <> bool Statement::get(int offset) {
+    assert(impl);
+    return sqlite3_column_int(impl->stmt, offset);
+}
+
 template <> int Statement::get(int offset) {
     assert(impl);
     return sqlite3_column_int(impl->stmt, offset);
@@ -322,7 +317,7 @@ template <> std::string Statement::get(int offset) {
 
 template <> std::vector<uint8_t> Statement::get(int offset) {
     assert(impl);
-    const uint8_t* begin = reinterpret_cast<const uint8_t*>(sqlite3_column_blob(impl->stmt, offset));
+    const auto* begin = reinterpret_cast<const uint8_t*>(sqlite3_column_blob(impl->stmt, offset));
     const uint8_t* end   = begin + sqlite3_column_bytes(impl->stmt, offset);
     return { begin, end };
 }
@@ -391,8 +386,8 @@ int64_t Statement::lastInsertRowId() const {
 
 uint64_t Statement::changes() const {
     assert(impl);
-    auto changes = impl->changes;
-    return (changes < 0 ? 0 : changes);
+    auto changes_ = impl->changes;
+    return (changes_ < 0 ? 0 : changes_);
 }
 
 Transaction::Transaction(Database& db_, Mode mode)

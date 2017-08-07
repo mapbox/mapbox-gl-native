@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://github.com/mapbox/earcut.hpp/archive/v0.12.1.zip'
-tag=''

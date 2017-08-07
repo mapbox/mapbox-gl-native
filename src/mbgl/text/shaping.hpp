@@ -1,31 +1,57 @@
 #pragma once
 
 #include <mbgl/text/glyph.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
-#include <mbgl/style/layers/symbol_layer_properties.hpp>
-#include <mbgl/util/optional.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
+#include <mbgl/style/types.hpp>
 
 namespace mbgl {
 
-class SpriteAtlasElement;
+class SymbolFeature;
+class BiDi;
 
 class PositionedIcon {
-    public:
-        explicit PositionedIcon() {}
-        explicit PositionedIcon(const SpriteAtlasElement& _image,
-                float _top, float _bottom, float _left, float _right) :
-            image(_image), top(_top), bottom(_bottom), left(_left), right(_right) {}
+private:
+    PositionedIcon(ImagePosition image_,
+                   float top_,
+                   float bottom_,
+                   float left_,
+                   float right_,
+                   float angle_)
+        : _image(std::move(image_)),
+          _top(top_),
+          _bottom(bottom_),
+          _left(left_),
+          _right(right_),
+          _angle(angle_) {}
 
-        optional<SpriteAtlasElement> image;
-        float top = 0;
-        float bottom = 0;
-        float left = 0;
-        float right = 0;
+    ImagePosition _image;
+    float _top;
+    float _bottom;
+    float _left;
+    float _right;
+    float _angle;
 
-        explicit operator bool() const { return image && (*image).pos.hasArea(); }
+public:
+    static PositionedIcon shapeIcon(const ImagePosition&, const std::array<float, 2>& iconOffset, const float iconRotation);
+
+    const ImagePosition& image() const { return _image; }
+    float top() const { return _top; }
+    float bottom() const { return _bottom; }
+    float left() const { return _left; }
+    float right() const { return _right; }
+    float angle() const { return _angle; }
 };
 
-PositionedIcon shapeIcon(const SpriteAtlasElement& image, const style::SymbolLayoutProperties::Evaluated&);
+const Shaping getShaping(const std::u16string& string,
+                         float maxWidth,
+                         float lineHeight,
+                         style::TextAnchorType textAnchor,
+                         style::TextJustifyType textJustify,
+                         float spacing,
+                         const Point<float>& translate,
+                         float verticalHeight,
+                         const WritingModeType,
+                         BiDi& bidi,
+                         const Glyphs& glyphs);
 
 } // namespace mbgl

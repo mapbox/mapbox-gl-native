@@ -156,6 +156,8 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
 }
 
 std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
+    assert(state.valid());
+
     const double w = state.getSize().width;
     const double h = state.getSize().height;
     return tileCover(

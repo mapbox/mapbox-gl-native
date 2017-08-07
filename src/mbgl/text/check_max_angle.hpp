@@ -4,9 +4,12 @@
 
 namespace mbgl {
 
-struct Anchor;
+class Anchor;
 
-bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float labelLength,
-        const float windowSize, const float maxAngle);
+bool checkMaxAngle(const GeometryCoordinates& line,
+                   const Anchor& anchor,
+                   const float labelLength,
+                   const float windowSize,
+                   const float maxAngle);
 
 } // namespace mbgl

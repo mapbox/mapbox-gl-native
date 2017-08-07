@@ -2,13 +2,23 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/any.hpp>
+#include <mbgl/util/immutable.hpp>
 #include <mbgl/style/types.hpp>
 
 #include <memory>
 #include <string>
 
 namespace mbgl {
+
+class FileSource;
+
 namespace style {
+
+class VectorSource;
+class RasterSource;
+class GeoJSONSource;
+class SourceObserver;
 
 /**
  * The runtime representation of a [source](https://www.mapbox.com/mapbox-gl-style-spec/#sources) from the Mapbox Style
@@ -45,21 +55,28 @@ public:
         return is<T>() ? reinterpret_cast<const T*>(this) : nullptr;
     }
 
-    const std::string& getID() const;
-
-    // Create a new source with the specified `id`. All other properties
-    // are copied from this source.
-    std::unique_ptr<Source> copy(const std::string& id) const;
-
+    SourceType getType() const;
+    std::string getID() const;
     optional<std::string> getAttribution() const;
 
     // Private implementation
     class Impl;
-    const std::unique_ptr<Impl> baseImpl;
+    Immutable<Impl> baseImpl;
 
-protected:
-    const SourceType type;
-    Source(SourceType, std::unique_ptr<Impl>);
+    Source(Immutable<Impl>);
+
+    void setObserver(SourceObserver*);
+    SourceObserver* observer = nullptr;
+
+    virtual void loadDescription(FileSource&) = 0;
+    void dumpDebugLogs() const;
+
+    bool loaded = false;
+
+    // For use in SDK bindings, which store a reference to a platform-native peer
+    // object here, so that separately-obtained references to this object share
+    // identical platform-native peers.
+    any peer;
 };
 
 } // namespace style

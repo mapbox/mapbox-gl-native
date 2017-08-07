@@ -10,19 +10,19 @@ public:
     AnnotationSource();
 
     class Impl;
+    const Impl& impl() const;
+
+private:
+    void loadDescription(FileSource&) final;
+
+    Mutable<Impl> mutableImpl() const;
 };
 
 class AnnotationSource::Impl : public style::Source::Impl {
 public:
-    Impl(Source&);
+    Impl();
 
-    void loadDescription(FileSource&) final;
-
-private:
-    uint16_t getTileSize() const final { return util::tileSize; }
-    Range<uint8_t> getZoomRange() final;
-
-    std::unique_ptr<Tile> createTile(const OverscaledTileID&, const style::UpdateParameters&) final;
+    optional<std::string> getAttribution() const final;
 };
 
 } // namespace mbgl

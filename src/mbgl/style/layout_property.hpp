@@ -1,55 +1,33 @@
 #pragma once
 
-#include <mbgl/style/property_evaluator.hpp>
-#include <mbgl/util/indexed_tuple.hpp>
+#include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/renderer/property_evaluator.hpp>
+#include <mbgl/renderer/data_driven_property_evaluator.hpp>
 
 namespace mbgl {
 namespace style {
 
-class PropertyEvaluationParameters;
-
 template <class T>
 class LayoutProperty {
 public:
-    using EvaluatorType = PropertyEvaluator<T>;
+    using TransitionableType = std::nullptr_t;
     using UnevaluatedType = PropertyValue<T>;
-    using EvaluatedType = T;
+    using EvaluatorType = PropertyEvaluator<T>;
+    using PossiblyEvaluatedType = T;
+    using Type = T;
+    static constexpr bool IsDataDriven = false;
 };
 
-template <class... Ps>
-class LayoutProperties {
+template <class T>
+class DataDrivenLayoutProperty {
 public:
-    using Properties = TypeList<Ps...>;
-    using EvaluatedTypes = TypeList<typename Ps::EvaluatedType...>;
-    using UnevaluatedTypes = TypeList<typename Ps::UnevaluatedType...>;
-
-    template <class TypeList>
-    using Tuple = IndexedTuple<Properties, TypeList>;
-
-    class Evaluated : public Tuple<EvaluatedTypes> {
-    public:
-        using Tuple<EvaluatedTypes>::Tuple;
-    };
-
-    class Unevaluated : public Tuple<UnevaluatedTypes> {
-    public:
-        using Tuple<UnevaluatedTypes>::Tuple;
-    };
-
-    template <class P>
-    auto evaluate(const PropertyEvaluationParameters& parameters) const {
-        using Evaluator = typename P::EvaluatorType;
-        return unevaluated.template get<P>()
-            .evaluate(Evaluator(parameters, P::defaultValue()));
-    }
-
-    Evaluated evaluate(const PropertyEvaluationParameters& parameters) const {
-        return Evaluated {
-            evaluate<Ps>(parameters)...
-        };
-    }
-
-    Unevaluated unevaluated;
+    using TransitionableType = std::nullptr_t;
+    using UnevaluatedType = DataDrivenPropertyValue<T>;
+    using EvaluatorType = DataDrivenPropertyEvaluator<T>;
+    using PossiblyEvaluatedType = PossiblyEvaluatedPropertyValue<T>;
+    using Type = T;
+    static constexpr bool IsDataDriven = true;
 };
 
 } // namespace style

@@ -2,7 +2,7 @@
 
 #include <mbgl/tile/tile_loader.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/style/update_parameters.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/util/tileset.hpp>
 
 #include <cassert>
@@ -12,7 +12,7 @@ namespace mbgl {
 template <typename T>
 TileLoader<T>::TileLoader(T& tile_,
                           const OverscaledTileID& id,
-                          const style::UpdateParameters& parameters,
+                          const TileParameters& parameters,
                           const Tileset& tileset)
     : tile(tile_),
       necessity(Necessity::Optional),

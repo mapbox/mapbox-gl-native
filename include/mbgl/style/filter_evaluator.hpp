@@ -31,37 +31,37 @@ public:
     }
 
     bool operator()(const EqualsFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return actual && equal(*actual, filter.value);
     }
 
     bool operator()(const NotEqualsFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return !actual || !equal(*actual, filter.value);
     }
 
     bool operator()(const LessThanFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ < rhs_; });
     }
 
     bool operator()(const LessThanEqualsFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ <= rhs_; });
     }
 
     bool operator()(const GreaterThanFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ > rhs_; });
     }
 
     bool operator()(const GreaterThanEqualsFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ >= rhs_; });
     }
 
     bool operator()(const InFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         if (!actual)
             return false;
         for (const auto& v: filter.values) {
@@ -73,7 +73,7 @@ public:
     }
 
     bool operator()(const NotInFilter& filter) const {
-        optional<Value> actual = getValue(filter.key);
+        optional<Value> actual = propertyAccessor(filter.key);
         if (!actual)
             return true;
         for (const auto& v: filter.values) {
@@ -112,30 +112,76 @@ public:
     }
 
     bool operator()(const HasFilter& filter) const {
-        return bool(getValue(filter.key));
+        return bool(propertyAccessor(filter.key));
     }
 
     bool operator()(const NotHasFilter& filter) const {
-        return !getValue(filter.key);
+        return !propertyAccessor(filter.key);
+    }
+
+
+    bool operator()(const TypeEqualsFilter& filter) const {
+        return featureType == filter.value;
+    }
+
+    bool operator()(const TypeNotEqualsFilter& filter) const {
+        return featureType != filter.value;
+    }
+
+    bool operator()(const TypeInFilter& filter) const {
+        for (const auto& v: filter.values) {
+            if (featureType == v) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool operator()(const TypeNotInFilter& filter) const {
+        for (const auto& v: filter.values) {
+            if (featureType == v) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+
+    bool operator()(const IdentifierEqualsFilter& filter) const {
+        return featureIdentifier == filter.value;
+    }
+
+    bool operator()(const IdentifierNotEqualsFilter& filter) const {
+        return featureIdentifier != filter.value;
+    }
+
+    bool operator()(const IdentifierInFilter& filter) const {
+        for (const auto& v: filter.values) {
+            if (featureIdentifier == v) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    bool operator()(const IdentifierNotInFilter& filter) const {
+        for (const auto& v: filter.values) {
+            if (featureIdentifier == v) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    bool operator()(const HasIdentifierFilter&) const {
+        return bool(featureIdentifier);
+    }
+
+    bool operator()(const NotHasIdentifierFilter&) const {
+        return !featureIdentifier;
     }
 
 private:
-    optional<Value> getValue(const std::string& key_) const {
-        if (key_ == "$type") {
-            return optional<Value>(uint64_t(featureType));
-        } else if (key_ == "$id") {
-            if (featureIdentifier) {
-                return FeatureIdentifier::visit(*featureIdentifier, [] (auto id) {
-                    return Value(std::move(id));
-                });
-            } else {
-                return optional<Value>();
-            }
-        } else {
-            return propertyAccessor(key_);
-        }
-    }
-
     template <class Op>
     struct Comparator {
         const Op& op;
@@ -198,6 +244,11 @@ inline bool Filter::operator()(const Feature& feature) const {
             return {};
         return it->second;
     });
+}
+
+template <class GeometryTileFeature>
+bool Filter::operator()(const GeometryTileFeature& feature) const {
+    return operator()(feature.getType(), feature.getID(), [&] (const auto& key) { return feature.getValue(key); });
 }
 
 template <class PropertyAccessor>

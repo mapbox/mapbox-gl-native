@@ -1,7 +1,0 @@
-{
-    "default": {
-        "log": [
-            [1, "ERROR", "ParseStyle", "Failed to parse style: style must be an object"]
-        ]
-    }
-}

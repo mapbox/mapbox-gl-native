@@ -4,8 +4,9 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
+#include <mbgl/style/conversion/data_driven_property_value.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
 
-#include <functional>
 #include <string>
 
 namespace mbgl {
@@ -13,27 +14,40 @@ namespace style {
 namespace conversion {
 
 template <class V>
-using LayoutPropertySetter = std::function<optional<Error> (Layer&, const V&)>;
+using PropertySetter = optional<Error> (*) (Layer&, const V&);
 
-template <class V>
-using PaintPropertySetter = std::function<optional<Error> (Layer&, const V&, const optional<std::string>&)>;
+template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue)>
+optional<Error> setProperty(Layer& layer, const V& value) {
+    auto* typedLayer = layer.as<L>();
+    if (!typedLayer) {
+        return Error { "layer doesn't support this property" };
+    }
 
-template <class V, class L, class T, class...Args>
-auto makePropertySetter(void (L::*setter)(PropertyValue<T>, const Args&...args)) {
-    return [setter] (Layer& layer, const V& value, const Args&...args) -> optional<Error> {
-        L* typedLayer = layer.as<L>();
-        if (!typedLayer) {
-            return Error { "layer doesn't support this property" };
-        }
+    Error error;
+    optional<PropertyValue> typedValue = convert<PropertyValue>(value, error);
+    if (!typedValue) {
+        return error;
+    }
 
-        Result<PropertyValue<T>> typedValue = convert<PropertyValue<T>>(value);
-        if (!typedValue) {
-            return typedValue.error();
-        }
+    (typedLayer->*setter)(*typedValue);
+    return {};
+}
 
-        (typedLayer->*setter)(*typedValue, args...);
-        return {};
-    };
+template <class V, class L, void (L::*setter)(const TransitionOptions&)>
+optional<Error> setTransition(Layer& layer, const V& value) {
+    auto* typedLayer = layer.as<L>();
+    if (!typedLayer) {
+        return Error { "layer doesn't support this property" };
+    }
+
+    Error error;
+    optional<TransitionOptions> transition = convert<TransitionOptions>(value, error);
+    if (!transition) {
+        return error;
+    }
+
+    (typedLayer->*setter)(*transition);
+    return {};
 }
 
 template <class V>
@@ -43,9 +57,10 @@ optional<Error> setVisibility(Layer& layer, const V& value) {
         return {};
     }
 
-    Result<VisibilityType> visibility = convert<VisibilityType>(value);
+    Error error;
+    optional<VisibilityType> visibility = convert<VisibilityType>(value, error);
     if (!visibility) {
-        return visibility.error();
+        return error;
     }
 
     layer.setVisibility(*visibility);

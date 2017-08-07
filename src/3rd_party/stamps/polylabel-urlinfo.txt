@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://github.com/mapbox/polylabel/archive/20daf8.zip'
-tag=''

@@ -5,43 +5,60 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace style {
 
+class TransitionOptions;
+
 class BackgroundLayer : public Layer {
 public:
     BackgroundLayer(const std::string& layerID);
     ~BackgroundLayer() final;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<Color> getDefaultBackgroundColor();
-    PropertyValue<Color> getBackgroundColor(const optional<std::string>& klass = {}) const;
-    void setBackgroundColor(PropertyValue<Color>, const optional<std::string>& klass = {});
+    PropertyValue<Color> getBackgroundColor() const;
+    void setBackgroundColor(PropertyValue<Color>);
+    void setBackgroundColorTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundColorTransition() const;
 
     static PropertyValue<std::string> getDefaultBackgroundPattern();
-    PropertyValue<std::string> getBackgroundPattern(const optional<std::string>& klass = {}) const;
-    void setBackgroundPattern(PropertyValue<std::string>, const optional<std::string>& klass = {});
+    PropertyValue<std::string> getBackgroundPattern() const;
+    void setBackgroundPattern(PropertyValue<std::string>);
+    void setBackgroundPatternTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundPatternTransition() const;
 
     static PropertyValue<float> getDefaultBackgroundOpacity();
-    PropertyValue<float> getBackgroundOpacity(const optional<std::string>& klass = {}) const;
-    void setBackgroundOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getBackgroundOpacity() const;
+    void setBackgroundOpacity(PropertyValue<float>);
+    void setBackgroundOpacityTransition(const TransitionOptions&);
+    TransitionOptions getBackgroundOpacityTransition() const;
 
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    BackgroundLayer(const Impl&);
-    BackgroundLayer(const BackgroundLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    BackgroundLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<BackgroundLayer>() const {
-    return type == Type::Background;
+    return getType() == LayerType::Background;
 }
 
 } // namespace style

@@ -5,6 +5,9 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
@@ -14,7 +17,7 @@ struct LineCap : LayoutProperty<LineCapType> {
     static LineCapType defaultValue() { return LineCapType::Butt; }
 };
 
-struct LineJoin : LayoutProperty<LineJoinType> {
+struct LineJoin : DataDrivenLayoutProperty<LineJoinType> {
     static constexpr const char * key = "line-join";
     static LineJoinType defaultValue() { return LineJoinType::Miter; }
 };
@@ -29,11 +32,11 @@ struct LineRoundLimit : LayoutProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct LineOpacity : PaintProperty<float> {
+struct LineOpacity : DataDrivenPaintProperty<float, attributes::a_opacity, uniforms::u_opacity> {
     static float defaultValue() { return 1; }
 };
 
-struct LineColor : PaintProperty<Color> {
+struct LineColor : DataDrivenPaintProperty<Color, attributes::a_color, uniforms::u_color> {
     static Color defaultValue() { return Color::black(); }
 };
 
@@ -45,19 +48,19 @@ struct LineTranslateAnchor : PaintProperty<TranslateAnchorType> {
     static TranslateAnchorType defaultValue() { return TranslateAnchorType::Map; }
 };
 
-struct LineWidth : PaintProperty<float> {
+struct LineWidth : DataDrivenPaintProperty<float, attributes::a_width, uniforms::u_width> {
     static float defaultValue() { return 1; }
 };
 
-struct LineGapWidth : PaintProperty<float> {
+struct LineGapWidth : DataDrivenPaintProperty<float, attributes::a_gapwidth, uniforms::u_gapwidth> {
     static float defaultValue() { return 0; }
 };
 
-struct LineOffset : PaintProperty<float> {
+struct LineOffset : DataDrivenPaintProperty<float, attributes::a_offset<1>, uniforms::u_offset> {
     static float defaultValue() { return 0; }
 };
 
-struct LineBlur : PaintProperty<float> {
+struct LineBlur : DataDrivenPaintProperty<float, attributes::a_blur, uniforms::u_blur> {
     static float defaultValue() { return 0; }
 };
 
@@ -69,14 +72,14 @@ struct LinePattern : CrossFadedPaintProperty<std::string> {
     static std::string defaultValue() { return ""; }
 };
 
-class LineLayoutProperties : public LayoutProperties<
+class LineLayoutProperties : public Properties<
     LineCap,
     LineJoin,
     LineMiterLimit,
     LineRoundLimit
 > {};
 
-class LinePaintProperties : public PaintProperties<
+class LinePaintProperties : public Properties<
     LineOpacity,
     LineColor,
     LineTranslate,

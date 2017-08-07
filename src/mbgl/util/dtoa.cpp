@@ -1,11 +1,12 @@
 #include "dtoa.hpp"
 
-#include <mbgl/util/string.hpp>
-
-// Clang on Windows 64-bits can't parse rapidjson's dtoa
+// Clang/C2 on Windows 64-bits can't parse rapidjson's dtoa
+// and it was causing the compiler to crash.
 #if !defined(_WINDOWS)
 #include <rapidjson/internal/dtoa.h>
 #endif
+
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace util {

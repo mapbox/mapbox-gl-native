@@ -6,8 +6,7 @@
 #include <cstdlib>
 #include <exception>
 
-#include <mbgl/util/dtoa.hpp>
-
+// Polyfill needed by Qt when building for Android with GCC
 #if defined(__ANDROID__) && defined(__GLIBCXX__)
 
 namespace std {
@@ -46,17 +45,9 @@ inline std::string toString(uint8_t num) {
     return std::to_string(unsigned(num));
 }
 
-inline std::string toString(float num) {
-    return dtoa(num);
-}
-
-inline std::string toString(double num) {
-    return dtoa(num);
-}
-
-inline std::string toString(long double num) {
-    return dtoa(num);
-}
+std::string toString(float);
+std::string toString(double);
+std::string toString(long double);
 
 inline std::string toString(std::exception_ptr error) {
     assert(error);

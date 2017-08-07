@@ -5,8 +5,12 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/style/tile_source_impl.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -16,6 +20,8 @@
 #include <set>
 
 namespace mbgl {
+
+using namespace style;
 
 OfflineDownload::OfflineDownload(int64_t id_,
                                  OfflineRegionDefinition&& definition_,
@@ -69,39 +75,53 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     result.requiredResourceCountIsPrecise = true;
 
     for (const auto& source : parser.sources) {
-        SourceType type = source->baseImpl->type;
+        SourceType type = source->getType();
 
-        switch (type) {
-        case SourceType::Vector:
-        case SourceType::Raster: {
-            style::TileSourceImpl* tileSource =
-                static_cast<style::TileSourceImpl*>(source->baseImpl.get());
-            const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
-            const uint16_t tileSize = tileSource->getTileSize();
-
+        auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
                 result.requiredResourceCount +=
                     definition.tileCover(type, tileSize, urlOrTileset.get<Tileset>().zoomRange).size();
             } else {
                 result.requiredResourceCount += 1;
-                const std::string& url = urlOrTileset.get<std::string>();
+                const auto& url = urlOrTileset.get<std::string>();
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
-                    result.requiredResourceCount +=
-                        definition.tileCover(type, tileSize, style::TileSourceImpl::parseTileJSON(
-                            *sourceResponse->data, url, type, tileSize).zoomRange).size();
+                    style::conversion::Error error;
+                    optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
+                    if (tileset) {
+                        result.requiredResourceCount +=
+                            definition.tileCover(type, tileSize, (*tileset).zoomRange).size();
+                    }
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
             }
+        };
+
+        switch (type) {
+        case SourceType::Vector: {
+            const auto& vectorSource = *source->as<VectorSource>();
+            handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
+            break;
+        }
+
+        case SourceType::Raster: {
+            const auto& rasterSource = *source->as<RasterSource>();
+            handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
             break;
         }
 
         case SourceType::GeoJSON: {
-            style::GeoJSONSource::Impl* geojsonSource =
-                static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
+            const auto& geojsonSource = *source->as<GeoJSONSource>();
+            if (geojsonSource.getURL()) {
+                result.requiredResourceCount += 1;
+            }
+            break;
+        }
 
-            if (geojsonSource->getURL()) {
+        case SourceType::Image: {
+            const auto& imageSource = *source->as<ImageSource>();
+            if (imageSource.getURL()) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -135,43 +155,59 @@ void OfflineDownload::activateDownload() {
         parser.parse(*styleResponse.data);
 
         for (const auto& source : parser.sources) {
-            SourceType type = source->baseImpl->type;
+            SourceType type = source->getType();
 
-            switch (type) {
-            case SourceType::Vector:
-            case SourceType::Raster: {
-                const style::TileSourceImpl* tileSource =
-                    static_cast<style::TileSourceImpl*>(source->baseImpl.get());
-                const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
-                const uint16_t tileSize = tileSource->getTileSize();
-
+            auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
                 if (urlOrTileset.is<Tileset>()) {
                     queueTiles(type, tileSize, urlOrTileset.get<Tileset>());
                 } else {
-                    const std::string& url = urlOrTileset.get<std::string>();
+                    const auto& url = urlOrTileset.get<std::string>();
                     status.requiredResourceCountIsPrecise = false;
                     status.requiredResourceCount++;
                     requiredSourceURLs.insert(url);
 
                     ensureResource(Resource::source(url), [=](Response sourceResponse) {
-                        queueTiles(type, tileSize, style::TileSourceImpl::parseTileJSON(
-                            *sourceResponse.data, url, type, tileSize));
+                        style::conversion::Error error;
+                        optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
+                        if (tileset) {
+                            util::mapbox::canonicalizeTileset(*tileset, url, type, tileSize);
+                            queueTiles(type, tileSize, *tileset);
 
-                        requiredSourceURLs.erase(url);
-                        if (requiredSourceURLs.empty()) {
-                            status.requiredResourceCountIsPrecise = true;
+                            requiredSourceURLs.erase(url);
+                            if (requiredSourceURLs.empty()) {
+                                status.requiredResourceCountIsPrecise = true;
+                            }
                         }
                     });
                 }
+            };
+
+            switch (type) {
+            case SourceType::Vector: {
+                const auto& vectorSource = *source->as<VectorSource>();
+                handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
+                break;
+            }
+
+            case SourceType::Raster: {
+                const auto& rasterSource = *source->as<RasterSource>();
+                handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
                 break;
             }
 
             case SourceType::GeoJSON: {
-                style::GeoJSONSource::Impl* geojsonSource =
-                    static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
+                const auto& geojsonSource = *source->as<GeoJSONSource>();
+                if (geojsonSource.getURL()) {
+                    queueResource(Resource::source(*geojsonSource.getURL()));
+                }
+                break;
+            }
 
-                if (geojsonSource->getURL()) {
-                    queueResource(Resource::source(*geojsonSource->getURL()));
+            case SourceType::Image: {
+                const auto& imageSource = *source->as<ImageSource>();
+                auto imageUrl = imageSource.getURL();
+                if (imageUrl && !imageUrl->empty()) {
+                    queueResource(Resource::image(*imageUrl));
                 }
                 break;
             }
@@ -252,7 +288,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
     auto workRequestsIt = requests.insert(requests.begin(), nullptr);
     *workRequestsIt = util::RunLoop::Get()->invokeCancellable([=]() {
         requests.erase(workRequestsIt);
-        
+
         auto getResourceSizeInDatabase = [&] () -> optional<int64_t> {
             if (!callback) {
                 return offlineDatabase.hasRegionResource(id, resource);
@@ -264,7 +300,7 @@ void OfflineDownload::ensureResource(const Resource& resource,
             callback(response->first);
             return response->second;
         };
-        
+
         optional<int64_t> offlineResponse = getResourceSizeInDatabase();
         if (offlineResponse) {
             status.completedResourceCount++;

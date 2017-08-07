@@ -1,10 +1,15 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/any.hpp>
+#include <mbgl/util/immutable.hpp>
+#include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 namespace mbgl {
 namespace style {
@@ -17,6 +22,7 @@ class RasterLayer;
 class BackgroundLayer;
 class CustomLayer;
 class FillExtrusionLayer;
+class LayerObserver;
 
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
@@ -35,22 +41,6 @@ class FillExtrusionLayer;
  *     auto circleLayer = std::make_unique<CircleLayer>("my-circle-layer");
  */
 class Layer : public mbgl::util::noncopyable {
-protected:
-    enum class Type {
-        Fill,
-        Line,
-        Circle,
-        Symbol,
-        Raster,
-        Background,
-        Custom,
-        FillExtrusion,
-    };
-
-    class Impl;
-    const Type type;
-    Layer(Type, std::unique_ptr<Impl>);
-
 public:
     virtual ~Layer();
 
@@ -71,7 +61,7 @@ public:
 
     // Convenience method for dynamic dispatch on the concrete layer type. Using
     // method overloading, this allows consolidation of logic common to vector-based
-    // layers (Fill, Line, Circle, or Symbol). For example:
+    // layers (Fill, FillExtrusion, Line, Circle, or Symbol). For example:
     //
     //     struct Visitor {
     //         void operator()(CustomLayer&) { ... }
@@ -83,42 +73,60 @@ public:
     //
     template <class V>
     auto accept(V&& visitor) {
-        switch (type) {
-        case Type::Fill:
-            return visitor(*as<FillLayer>());
-        case Type::Line:
-            return visitor(*as<LineLayer>());
-        case Type::Circle:
-            return visitor(*as<CircleLayer>());
-        case Type::Symbol:
-            return visitor(*as<SymbolLayer>());
-        case Type::Raster:
-            return visitor(*as<RasterLayer>());
-        case Type::Background:
-            return visitor(*as<BackgroundLayer>());
-        case Type::Custom:
-            return visitor(*as<CustomLayer>());
-        case Type::FillExtrusion:
-            return visitor(*as<FillExtrusionLayer>());
+        switch (getType()) {
+        case LayerType::Fill:
+            return std::forward<V>(visitor)(*as<FillLayer>());
+        case LayerType::Line:
+            return std::forward<V>(visitor)(*as<LineLayer>());
+        case LayerType::Circle:
+            return std::forward<V>(visitor)(*as<CircleLayer>());
+        case LayerType::Symbol:
+            return std::forward<V>(visitor)(*as<SymbolLayer>());
+        case LayerType::Raster:
+            return std::forward<V>(visitor)(*as<RasterLayer>());
+        case LayerType::Background:
+            return std::forward<V>(visitor)(*as<BackgroundLayer>());
+        case LayerType::Custom:
+            return std::forward<V>(visitor)(*as<CustomLayer>());
+        case LayerType::FillExtrusion:
+            return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
         }
+
+
+        // Not reachable, but placate GCC.
+        assert(false);
+        throw new std::runtime_error("unknown layer type");
     }
 
-    const std::string& getID() const;
+    LayerType getType() const;
+    std::string getID() const;
 
     // Visibility
     VisibilityType getVisibility() const;
-    void setVisibility(VisibilityType);
+    virtual void setVisibility(VisibilityType) = 0;
 
     // Zoom range
     float getMinZoom() const;
-    void setMinZoom(float) const;
     float getMaxZoom() const;
-    void setMaxZoom(float) const;
+    virtual void setMinZoom(float) = 0;
+    virtual void setMaxZoom(float) = 0;
 
     // Private implementation
-    const std::unique_ptr<Impl> baseImpl;
+    class Impl;
+    Immutable<Impl> baseImpl;
 
-    friend std::string layoutKey(const Layer&);
+    Layer(Immutable<Impl>);
+
+    // Create a layer, copying all properties except id and paint properties from this layer.
+    virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
+
+    LayerObserver* observer = nullptr;
+    void setObserver(LayerObserver*);
+
+    // For use in SDK bindings, which store a reference to a platform-native peer
+    // object here, so that separately-obtained references to this object share
+    // identical platform-native peers.
+    any peer;
 };
 
 } // namespace style

@@ -41,7 +41,7 @@ public:
                                const OfflineRegionMetadata&);
 
     OfflineRegionMetadata updateMetadata(const int64_t regionID, const OfflineRegionMetadata&);
-    
+
     void deleteRegion(OfflineRegion&&);
 
     // Return value is (response, stored size)
@@ -64,6 +64,7 @@ private:
     void removeExisting();
     void migrateToVersion3();
     void migrateToVersion5();
+    void migrateToVersion6();
 
     class Statement {
     public:

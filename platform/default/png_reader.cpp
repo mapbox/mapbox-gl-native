@@ -11,6 +11,24 @@ extern "C"
 #include <png.h>
 }
 
+template<size_t max, typename... Args>
+static std::string sprintf(const char *msg, Args... args) {
+    char res[max];
+    int len = snprintf(res, sizeof(res), msg, args...);
+    return std::string(res, len);
+}
+
+const static bool png_version_check __attribute__((unused)) = []() {
+    const png_uint_32 version = png_access_version_number();
+    if (version != PNG_LIBPNG_VER) {
+        throw std::runtime_error(sprintf<96>(
+            "libpng version mismatch: headers report %d.%d.%d, but library reports %d.%d.%d",
+            PNG_LIBPNG_VER / 10000, (PNG_LIBPNG_VER / 100) % 100, PNG_LIBPNG_VER % 100,
+            version / 10000, (version / 100) % 100, version % 100));
+    }
+    return true;
+}();
+
 namespace mbgl {
 
 static void user_error_fn(png_structp, png_const_charp error_msg) {
@@ -22,7 +40,7 @@ static void user_warning_fn(png_structp, png_const_charp warning_msg) {
 }
 
 static void png_read_data(png_structp png_ptr, png_bytep data, png_size_t length) {
-    std::istream* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
+    auto* fin = reinterpret_cast<std::istream*>(png_get_io_ptr(png_ptr));
     fin->read(reinterpret_cast<char*>(data), length);
     std::streamsize read_count = fin->gcount();
     if (read_count < 0 || static_cast<png_size_t>(read_count) != length)
@@ -80,7 +98,7 @@ PremultipliedImage decodePNG(const uint8_t* data, size_t size) {
     int color_type = 0;
     png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth, &color_type, nullptr, nullptr, nullptr);
 
-    UnassociatedImage image({ width, height });
+    UnassociatedImage image({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
 
     if (color_type == PNG_COLOR_TYPE_PALETTE)
         png_set_expand(png_ptr);

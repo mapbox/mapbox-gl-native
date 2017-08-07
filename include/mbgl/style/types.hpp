@@ -10,7 +10,8 @@ enum class SourceType : uint8_t {
     Raster,
     GeoJSON,
     Video,
-    Annotations
+    Annotations,
+    Image
 };
 
 namespace style {
@@ -90,6 +91,11 @@ enum class IconTextFitType : uint8_t {
     Both,
     Width,
     Height
+};
+
+enum class LightAnchorType: bool {
+    Map,
+    Viewport
 };
 
 } // namespace style

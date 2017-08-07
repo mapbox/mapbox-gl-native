@@ -3,17 +3,17 @@
 #include <mbgl/tile/tile_observer.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 #include <mbgl/style/source.hpp>
-#include <mbgl/style/update_parameters.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
+#include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
 
 RasterTile::RasterTile(const OverscaledTileID& id_,
-                       const style::UpdateParameters& parameters,
+                       const TileParameters& parameters,
                        const Tileset& tileset)
     : Tile(id_),
       loader(*this, id_, parameters, tileset),
@@ -28,6 +28,8 @@ void RasterTile::cancel() {
 }
 
 void RasterTile::setError(std::exception_ptr err) {
+    loaded = true;
+    renderable = false;
     observer->onTileError(*this, err);
 }
 
@@ -39,20 +41,34 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
     worker.invoke(&RasterTileWorker::parse, data);
 }
 
-void RasterTile::onParsed(std::unique_ptr<Bucket> result) {
+void RasterTile::onParsed(std::unique_ptr<RasterBucket> result) {
     bucket = std::move(result);
-    availableData = DataAvailability::All;
+    loaded = true;
+    renderable = bucket ? true : false;
     observer->onTileChanged(*this);
 }
 
 void RasterTile::onError(std::exception_ptr err) {
     bucket.reset();
-    availableData = DataAvailability::All;
+    loaded = true;
+    renderable = false;
     observer->onTileError(*this, err);
 }
 
-Bucket* RasterTile::getBucket(const style::Layer&) {
+void RasterTile::upload(gl::Context& context) {
+    if (bucket) {
+        bucket->upload(context);
+    }
+}
+
+Bucket* RasterTile::getBucket(const style::Layer::Impl&) const {
     return bucket.get();
+}
+
+void RasterTile::setMask(TileMask&& mask) {
+    if (bucket) {
+        bucket->setMask(std::move(mask));
+    }
 }
 
 void RasterTile::setNecessity(Necessity necessity) {

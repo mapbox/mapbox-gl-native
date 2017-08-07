@@ -47,7 +47,7 @@ private:
      */
     void ensureResource(const Resource&, std::function<void (Response)> = {});
     bool checkTileCountLimit(const Resource& resource);
-    
+
     int64_t id;
     OfflineRegionDefinition definition;
     OfflineDatabase& offlineDatabase;

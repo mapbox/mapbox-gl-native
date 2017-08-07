@@ -13,11 +13,7 @@ namespace {
 using namespace mbgl::util;
 static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-void dummyCallback(uv_async_t*, int) {}
-#else
 void dummyCallback(uv_async_t*) {}
-#endif
 
 } // namespace
 
@@ -84,13 +80,8 @@ public:
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
     switch (type) {
     case Type::New:
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-        impl->loop = uv_loop_new();
-        if (impl->loop == nullptr) {
-#else
         impl->loop = new uv_loop_t;
         if (uv_loop_init(impl->loop) != 0) {
-#endif
             throw std::runtime_error("Failed to initialize loop.");
         }
         break;
@@ -129,14 +120,10 @@ RunLoop::~RunLoop() {
     impl->async.reset();
     runOnce();
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-    uv_loop_delete(impl->loop);
-#else
     if (uv_loop_close(impl->loop) == UV_EBUSY) {
-        throw std::runtime_error("Failed to close loop.");
+        assert(false && "Failed to close loop.");
     }
     delete impl->loop;
-#endif
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {

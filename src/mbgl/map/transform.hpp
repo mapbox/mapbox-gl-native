@@ -1,10 +1,9 @@
 #pragma once
 
 #include <mbgl/map/camera.hpp>
+#include <mbgl/map/map_observer.hpp>
 #include <mbgl/map/mode.hpp>
-#include <mbgl/map/change.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/update.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/noncopyable.hpp>
@@ -18,16 +17,18 @@ namespace mbgl {
 
 class Transform : private util::noncopyable {
 public:
-    Transform(std::function<void(MapChange)> = nullptr,
+    Transform(MapObserver& = MapObserver::nullObserver(),
               ConstrainMode = ConstrainMode::HeightOnly,
               ViewportMode = ViewportMode::Default);
 
+    Transform(const TransformState &state_) : observer(MapObserver::nullObserver()), state(state_) {}
+
     // Map view
-    bool resize(Size size);
+    void resize(Size size);
 
     // Camera
     /** Returns the current camera options. */
-    CameraOptions getCameraOptions(optional<EdgeInsets>) const;
+    CameraOptions getCameraOptions(const EdgeInsets&) const;
 
     /** Instantaneously, synchronously applies the given camera options. */
     void jumpTo(const CameraOptions&);
@@ -44,74 +45,57 @@ public:
     /** Pans the map by the given amount.
         @param offset The distance to pan the map by, measured in pixels from
             top to bottom and from left to right. */
-    void moveBy(const ScreenCoordinate& offset, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, optional<EdgeInsets>, const Duration& = Duration::zero());
-    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, const Duration& = Duration::zero());
-    void setLatLngZoom(const LatLng&, double zoom, optional<EdgeInsets>, const Duration& = Duration::zero());
-    LatLng getLatLng(optional<EdgeInsets> = {}) const;
-    ScreenCoordinate getScreenCoordinate(optional<EdgeInsets> = {}) const;
+    void moveBy(const ScreenCoordinate& offset, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, const EdgeInsets&, const AnimationOptions& = {});
+    void setLatLng(const LatLng&, optional<ScreenCoordinate>, const AnimationOptions& = {});
+    void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
+    void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
+    LatLng getLatLng(const EdgeInsets& = {}) const;
+    ScreenCoordinate getScreenCoordinate(const EdgeInsets& = {}) const;
+
+    // Bounds
+
+    void setLatLngBounds(optional<LatLngBounds>);
+    void setMinZoom(double);
+    void setMaxZoom(double);
+    void setMinPitch(double);
+    void setMaxPitch(double);
 
     // Zoom
 
-    /** Scales the map, keeping the given point fixed within the view.
-        @param ds The difference in scale factors to scale the map by. */
-    void scaleBy(double ds, const Duration& = Duration::zero());
-    /** Scales the map, keeping the given point fixed within the view.
-        @param ds The difference in scale factors to scale the map by.
-        @param anchor A point relative to the top-left corner of the view.
-            If unspecified, the center point is fixed within the view. */
-    void scaleBy(double ds, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
-    /** Sets the scale factor, keeping the given point fixed within the view.
-        @param scale The new scale factor. */
-    void setScale(double scale, const Duration& = Duration::zero());
-    /** Sets the scale factor, keeping the given point fixed within the view.
-        @param scale The new scale factor.
-        @param anchor A point relative to the top-left corner of the view.
-            If unspecified, the center point is fixed within the view. */
-    void setScale(double scale, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
-    /** Sets the scale factor, keeping the center point fixed within the inset view.
-        @param scale The new scale factor.
-        @param padding The viewport padding that affects the fixed center point. */
-    void setScale(double scale, optional<EdgeInsets> padding, const Duration& = Duration::zero());
     /** Sets the zoom level, keeping the given point fixed within the view.
         @param zoom The new zoom level. */
-    void setZoom(double zoom, const Duration& = Duration::zero());
+    void setZoom(double zoom, const AnimationOptions& = {});
     /** Sets the zoom level, keeping the given point fixed within the view.
         @param zoom The new zoom level.
         @param anchor A point relative to the top-left corner of the view.
             If unspecified, the center point is fixed within the view. */
-    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
     /** Sets the zoom level, keeping the center point fixed within the inset view.
         @param zoom The new zoom level.
         @param padding The viewport padding that affects the fixed center point. */
-    void setZoom(double zoom, optional<EdgeInsets> padding, const Duration& = Duration::zero());
+    void setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the zoom level. */
     double getZoom() const;
-    /** Returns the scale factor. */
-    double getScale() const;
-
-    void setMinZoom(const double minZoom);
-    void setMaxZoom(const double maxZoom);
 
     // Angle
 
-    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const Duration& = Duration::zero());
+    void rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& = {});
     /** Sets the angle of rotation.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north. */
-    void setAngle(double angle, const Duration& = Duration::zero());
+    void setAngle(double angle, const AnimationOptions& = {});
     /** Sets the angle of rotation, keeping the given point fixed within the view.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param anchor A point relative to the top-left corner of the view. */
-    void setAngle(double angle, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void setAngle(double angle, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
     /** Sets the angle of rotation, keeping the center point fixed within the inset view.
         @param angle The new angle of rotation, measured in radians
             counterclockwise from true north.
         @param padding The viewport padding that affects the fixed center point. */
-    void setAngle(double angle, optional<EdgeInsets> padding, const Duration& = Duration::zero());
+    void setAngle(double angle, const EdgeInsets& padding, const AnimationOptions& = {});
     /** Returns the angle of rotation.
         @return The angle of rotation, measured in radians counterclockwise from
             true north. */
@@ -121,12 +105,12 @@ public:
     /** Sets the pitch angle.
         @param angle The new pitch angle, measured in radians toward the
             horizon. */
-    void setPitch(double pitch, const Duration& = Duration::zero());
+    void setPitch(double pitch, const AnimationOptions& = {});
     /** Sets the pitch angle, keeping the given point fixed within the view.
         @param angle The new pitch angle, measured in radians toward the
             horizon.
         @param anchor A point relative to the top-left corner of the view. */
-    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const Duration& = Duration::zero());
+    void setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
     double getPitch() const;
 
     // North Orientation
@@ -143,7 +127,7 @@ public:
 
     // Transitions
     bool inTransition() const;
-    Update updateTransitions(const TimePoint& now);
+    void updateTransitions(const TimePoint& now);
     TimePoint getTransitionStart() const { return transitionStart; }
     Duration getTransitionDuration() const { return transitionDuration; }
     void cancelTransitions();
@@ -163,18 +147,17 @@ public:
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
-    std::function<void(MapChange)> callback;
-
+    MapObserver& observer;
     TransformState state;
 
     void startTransition(const CameraOptions&,
                          const AnimationOptions&,
-                         std::function<Update(double)>,
+                         std::function<void(double)>,
                          const Duration&);
 
     TimePoint transitionStart;
     Duration transitionDuration;
-    std::function<Update(const TimePoint)> transitionFrameFn;
+    std::function<void(const TimePoint)> transitionFrameFn;
     std::function<void()> transitionFinishFn;
 };
 

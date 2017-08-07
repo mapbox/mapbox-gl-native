@@ -5,11 +5,14 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <mbgl/util/color.hpp>
 
 namespace mbgl {
 namespace style {
+
+class TransitionOptions;
 
 class RasterLayer : public Layer {
 public:
@@ -19,48 +22,70 @@ public:
     // Source
     const std::string& getSourceID() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static PropertyValue<float> getDefaultRasterOpacity();
-    PropertyValue<float> getRasterOpacity(const optional<std::string>& klass = {}) const;
-    void setRasterOpacity(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterOpacity() const;
+    void setRasterOpacity(PropertyValue<float>);
+    void setRasterOpacityTransition(const TransitionOptions&);
+    TransitionOptions getRasterOpacityTransition() const;
 
     static PropertyValue<float> getDefaultRasterHueRotate();
-    PropertyValue<float> getRasterHueRotate(const optional<std::string>& klass = {}) const;
-    void setRasterHueRotate(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterHueRotate() const;
+    void setRasterHueRotate(PropertyValue<float>);
+    void setRasterHueRotateTransition(const TransitionOptions&);
+    TransitionOptions getRasterHueRotateTransition() const;
 
     static PropertyValue<float> getDefaultRasterBrightnessMin();
-    PropertyValue<float> getRasterBrightnessMin(const optional<std::string>& klass = {}) const;
-    void setRasterBrightnessMin(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterBrightnessMin() const;
+    void setRasterBrightnessMin(PropertyValue<float>);
+    void setRasterBrightnessMinTransition(const TransitionOptions&);
+    TransitionOptions getRasterBrightnessMinTransition() const;
 
     static PropertyValue<float> getDefaultRasterBrightnessMax();
-    PropertyValue<float> getRasterBrightnessMax(const optional<std::string>& klass = {}) const;
-    void setRasterBrightnessMax(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterBrightnessMax() const;
+    void setRasterBrightnessMax(PropertyValue<float>);
+    void setRasterBrightnessMaxTransition(const TransitionOptions&);
+    TransitionOptions getRasterBrightnessMaxTransition() const;
 
     static PropertyValue<float> getDefaultRasterSaturation();
-    PropertyValue<float> getRasterSaturation(const optional<std::string>& klass = {}) const;
-    void setRasterSaturation(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterSaturation() const;
+    void setRasterSaturation(PropertyValue<float>);
+    void setRasterSaturationTransition(const TransitionOptions&);
+    TransitionOptions getRasterSaturationTransition() const;
 
     static PropertyValue<float> getDefaultRasterContrast();
-    PropertyValue<float> getRasterContrast(const optional<std::string>& klass = {}) const;
-    void setRasterContrast(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterContrast() const;
+    void setRasterContrast(PropertyValue<float>);
+    void setRasterContrastTransition(const TransitionOptions&);
+    TransitionOptions getRasterContrastTransition() const;
 
     static PropertyValue<float> getDefaultRasterFadeDuration();
-    PropertyValue<float> getRasterFadeDuration(const optional<std::string>& klass = {}) const;
-    void setRasterFadeDuration(PropertyValue<float>, const optional<std::string>& klass = {});
+    PropertyValue<float> getRasterFadeDuration() const;
+    void setRasterFadeDuration(PropertyValue<float>);
+    void setRasterFadeDurationTransition(const TransitionOptions&);
+    TransitionOptions getRasterFadeDurationTransition() const;
 
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    RasterLayer(const Impl&);
-    RasterLayer(const RasterLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    RasterLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<RasterLayer>() const {
-    return type == Type::Raster;
+    return getType() == LayerType::Raster;
 }
 
 } // namespace style

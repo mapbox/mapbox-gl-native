@@ -26,7 +26,9 @@ public:
     std::size_t byteSize() const { return v.size() * sizeof(Vertex); }
 
     bool empty() const { return v.empty(); }
+    void clear() { v.clear(); }
     const Vertex* data() const { return v.data(); }
+    const std::vector<Vertex>& vector() const { return v; }
 
 private:
     std::vector<Vertex> v;

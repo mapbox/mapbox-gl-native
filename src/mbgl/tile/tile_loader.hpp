@@ -10,17 +10,14 @@ class FileSource;
 class AsyncRequest;
 class Response;
 class Tileset;
-
-namespace style {
-class UpdateParameters;
-} // namespace style
+class TileParameters;
 
 template <typename T>
 class TileLoader : private util::noncopyable {
 public:
     TileLoader(T&,
                const OverscaledTileID&,
-               const style::UpdateParameters&,
+               const TileParameters&,
                const Tileset&);
     ~TileLoader();
 

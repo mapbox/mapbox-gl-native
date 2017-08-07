@@ -1,16 +1,26 @@
 #include <mbgl/style/sources/vector_source_impl.hpp>
-#include <mbgl/tile/vector_tile.hpp>
 
 namespace mbgl {
 namespace style {
 
-VectorSource::Impl::Impl(std::string id_, Source& base_, variant<std::string, Tileset> urlOrTileset_)
-    : TileSourceImpl(SourceType::Vector, std::move(id_), base_, std::move(urlOrTileset_), util::tileSize) {
+VectorSource::Impl::Impl(std::string id_)
+    : Source::Impl(SourceType::Vector, std::move(id_)) {
 }
 
-std::unique_ptr<Tile> VectorSource::Impl::createTile(const OverscaledTileID& tileID,
-                                                     const UpdateParameters& parameters) {
-    return std::make_unique<VectorTile>(tileID, base.getID(), parameters, tileset);
+VectorSource::Impl::Impl(const Impl& other, Tileset tileset_)
+    : Source::Impl(other),
+      tileset(std::move(tileset_)) {
+}
+
+optional<Tileset> VectorSource::Impl::getTileset() const {
+    return tileset;
+}
+
+optional<std::string> VectorSource::Impl::getAttribution() const {
+    if (!tileset) {
+        return {};
+    }
+    return tileset->attribution;
 }
 
 } // namespace style

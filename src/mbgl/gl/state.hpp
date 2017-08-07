@@ -1,5 +1,7 @@
 #pragma once
 
+#include <tuple>
+
 namespace mbgl {
 namespace gl {
 
@@ -12,13 +14,16 @@ namespace gl {
 //     static void Set(const Type& value);
 //     static Type Get();
 // };
-template <typename T>
+template <typename T, typename... Args>
 class State {
 public:
+    State(Args&&... args) : params(std::forward_as_tuple(::std::forward<Args>(args)...)) {
+    }
+
     void operator=(const typename T::Type& value) {
         if (*this != value) {
             setCurrentValue(value);
-            T::Set(currentValue);
+            set(std::index_sequence_for<Args...>{});
         }
     }
 
@@ -50,23 +55,15 @@ public:
     }
 
 private:
-    typename T::Type currentValue = T::Default;
-    bool dirty = true;
-};
-
-// Helper struct that stores the current state and restores it upon destruction. You should not use
-// this code normally, except for debugging purposes.
-template <typename T>
-class PreserveState {
-public:
-    PreserveState() : value(T::Get()) {
-    }
-    ~PreserveState() {
-        T::Set(value);
+    template <std::size_t... I>
+    void set(std::index_sequence<I...>) {
+        T::Set(currentValue, std::get<I>(params)...);
     }
 
 private:
-    const typename T::Type value;
+    typename T::Type currentValue = T::Default;
+    bool dirty = true;
+    const std::tuple<Args...> params;
 };
 
 } // namespace gl

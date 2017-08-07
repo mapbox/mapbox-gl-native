@@ -11,6 +11,7 @@
 #include <cstring>
 #include <cstdio>
 #include <chrono>
+#include <limits>
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
@@ -50,6 +51,15 @@ void checkDatabaseError(const QSqlDatabase &db) {
     }
 }
 
+void checkDatabaseOpenError(const QSqlDatabase &db) {
+    // Assume every error when opening the data as CANTOPEN. Qt
+    // always returns -1 for `nativeErrorCode()` on database errors.
+    QSqlError lastError = db.lastError();
+    if (lastError.type() != QSqlError::NoError) {
+        throw Exception { Exception::Code::CANTOPEN, "Error opening the database." };
+    }
+}
+
 class DatabaseImpl {
 public:
     DatabaseImpl(const char* filename, int flags) {
@@ -77,7 +87,7 @@ public:
         db->setDatabaseName(QString(filename));
 
         if (!db->open()) {
-            checkDatabaseError(*db);
+            checkDatabaseOpenError(*db);
         }
     }
 
@@ -130,13 +140,13 @@ Database &Database::operator=(Database &&other) {
 Database::~Database() {
 }
 
-Database::operator bool() const {
-    return impl.operator bool();
-}
-
 void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     assert(impl);
-    std::string timeoutStr = mbgl::util::toString(timeout.count());
+
+    // std::chrono::milliseconds.count() is a long and Qt will cast
+    // internally to int, so we need to make sure the limits apply.
+    std::string timeoutStr = mbgl::util::toString(timeout.count() & INT_MAX);
+
     QString connectOptions = impl->db->connectOptions();
     if (connectOptions.isEmpty()) {
         if (!connectOptions.isEmpty()) connectOptions.append(';');
@@ -147,7 +157,7 @@ void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     }
     impl->db->setConnectOptions(connectOptions);
     if (!impl->db->open()) {
-        checkDatabaseError(*impl->db);
+        checkDatabaseOpenError(*impl->db);
     }
 }
 
@@ -191,15 +201,7 @@ Statement &Statement::operator=(Statement &&other) {
 Statement::~Statement() {
 }
 
-Statement::operator bool() const {
-    assert(impl);
-    return impl.operator bool();
-}
-
-template void Statement::bind(int, int8_t);
-template void Statement::bind(int, int32_t);
 template void Statement::bind(int, int64_t);
-template void Statement::bind(int, uint8_t);
 
 template <typename T>
 void Statement::bind(int offset, T value) {
@@ -218,8 +220,23 @@ void Statement::bind(int offset, std::nullptr_t) {
 }
 
 template <>
+void Statement::bind(int offset, int32_t value) {
+    bind(offset, static_cast<int64_t>(value));
+}
+
+template <>
 void Statement::bind(int offset, bool value) {
     bind(offset, static_cast<int>(value));
+}
+
+template <>
+void Statement::bind(int offset, int8_t value) {
+    bind(offset, static_cast<int64_t>(value));
+}
+
+template <>
+void Statement::bind(int offset, uint8_t value) {
+    bind(offset, static_cast<int64_t>(value));
 }
 
 template <>
@@ -295,6 +312,7 @@ bool Statement::run() {
     return impl->query.next();
 }
 
+template bool Statement::get(int);
 template int Statement::get(int);
 template int64_t Statement::get(int);
 template double Statement::get(int);

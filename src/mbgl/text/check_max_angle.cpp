@@ -13,9 +13,11 @@ struct Corner {
     float angleDelta;
 };
 
-bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float labelLength,
-        const float windowSize, const float maxAngle) {
-
+bool checkMaxAngle(const GeometryCoordinates& line,
+                   const Anchor& anchor,
+                   const float labelLength,
+                   const float windowSize,
+                   const float maxAngle) {
     // horizontal labels always pass
     if (anchor.segment < 0) return true;
 
@@ -74,8 +76,6 @@ bool checkMaxAngle(const GeometryCoordinates &line, Anchor &anchor, const float 
 
     // no part of the line had an angle greater than the maximum allowed. check passes.
     return true;
-
-
 }
 
 } // namespace mbgl

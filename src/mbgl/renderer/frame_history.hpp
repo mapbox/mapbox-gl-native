@@ -22,11 +22,12 @@ public:
     bool needsAnimation(const Duration&) const;
     void bind(gl::Context&, uint32_t);
     void upload(gl::Context&, uint32_t);
+    bool isVisible(const float zoom) const;
 
 private:
     std::array<TimePoint, 256> changeTimes;
     std::array<uint8_t, 256> changeOpacities;
-    const AlphaImage opacities{ { 256, 1 } };
+    AlphaImage opacities{ { 256, 1 } };
 
     int16_t previousZoomIndex = 0;
     TimePoint previousTime;

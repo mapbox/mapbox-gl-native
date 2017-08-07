@@ -1,9 +1,0 @@
-{
-  "version": 8,
-  "sources": {
-    "mapbox": {
-      "type": "geojson",
-      "data": "asset://TEST_DATA/fixtures/geojson/point.json"
-    }
-  }
-}

@@ -2,6 +2,6 @@
 
 namespace mbgl {
 
-static_assert(sizeof(CollisionBoxProgram::Vertex) == 10, "expected CollisionBoxVertex size");
+static_assert(sizeof(CollisionBoxProgram::LayoutVertex) == 14, "expected CollisionBoxVertex size");
 
 } // namespace mbgl

@@ -8,11 +8,7 @@ namespace mbgl {
 enum class Update {
     Nothing                   = 0,
     Repaint                   = 1 << 0,
-    Classes                   = 1 << 2,
-    RecalculateStyle          = 1 << 3,
-    AnnotationStyle           = 1 << 6,
-    AnnotationData            = 1 << 7,
-    Layout                    = 1 << 8
+    AnnotationData            = 1 << 7
 };
 
 MBGL_CONSTEXPR Update operator|(Update lhs, Update rhs) {

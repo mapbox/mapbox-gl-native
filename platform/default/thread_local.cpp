@@ -1,17 +1,16 @@
-#include <mbgl/style/class_dictionary.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/thread_local.hpp>
 
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/run_loop.hpp>
+
 #include <stdexcept>
+#include <cassert>
 
 #include <pthread.h>
 
 namespace mbgl {
 namespace util {
-
-template class ThreadLocal<RunLoop>;
-template class ThreadLocal<int>;
-template class ThreadLocal<style::ClassDictionary>;
 
 template <class T>
 class ThreadLocal<T>::Impl {
@@ -30,16 +29,21 @@ ThreadLocal<T>::ThreadLocal() : impl(std::make_unique<Impl>()) {
 
 template <class T>
 ThreadLocal<T>::~ThreadLocal() {
-    delete reinterpret_cast<T *>(get());
+    // ThreadLocal will not take ownership
+    // of the pointer it is managing. The pointer
+    // needs to be explicitly cleared before we
+    // destroy this object.
+    assert(!get());
 
     if (pthread_key_delete(impl->key)) {
-        throw std::runtime_error("Failed to delete local storage key.");
+        Log::Error(Event::General, "Failed to delete local storage key.");
+        assert(false);
     }
 }
 
 template <class T>
 T* ThreadLocal<T>::get() {
-    T* ret = reinterpret_cast<T*>(pthread_getspecific(impl->key));
+    auto* ret = reinterpret_cast<T*>(pthread_getspecific(impl->key));
     if (!ret) {
         return nullptr;
     }
@@ -53,6 +57,10 @@ void ThreadLocal<T>::set(T* ptr) {
         throw std::runtime_error("Failed to set local storage.");
     }
 }
+
+template class ThreadLocal<RunLoop>;
+template class ThreadLocal<BackendScope>;
+template class ThreadLocal<int>; // For unit tests
 
 } // namespace util
 } // namespace mbgl

@@ -10,8 +10,24 @@ Mailbox::Mailbox(Scheduler& scheduler_)
     : scheduler(scheduler_) {
 }
 
+void Mailbox::close() {
+    // Block until neither receive() nor push() are in progress. Two mutexes are used because receive()
+    // must not block send(). Of the two, the receiving mutex must be acquired first, because that is
+    // the order that an actor will obtain them when it self-sends a message, and consistent lock
+    // acquisition order prevents deadlocks.
+    // The receiving mutex is recursive to allow a mailbox (and thus the actor) to close itself.
+    std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
+    std::lock_guard<std::mutex> pushingLock(pushingMutex);
+
+    closed = true;
+}
+
 void Mailbox::push(std::unique_ptr<Message> message) {
-    assert(!closing);
+    std::lock_guard<std::mutex> pushingLock(pushingMutex);
+
+    if (closed) {
+        return;
+    }
 
     std::lock_guard<std::mutex> queueLock(queueMutex);
     bool wasEmpty = queue.empty();
@@ -21,16 +37,10 @@ void Mailbox::push(std::unique_ptr<Message> message) {
     }
 }
 
-void Mailbox::close() {
-    // Block until the scheduler is guaranteed not to be executing receive().
-    std::lock_guard<std::mutex> closingLock(closingMutex);
-    closing = true;
-}
-
 void Mailbox::receive() {
-    std::lock_guard<std::mutex> closingLock(closingMutex);
+    std::lock_guard<std::recursive_mutex> receivingLock(receivingMutex);
 
-    if (closing) {
+    if (closed) {
         return;
     }
 

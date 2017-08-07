@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://github.com/mapbox/mapbox-gl-js/archive/878008.zip'
-tag=''

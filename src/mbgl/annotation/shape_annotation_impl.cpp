@@ -24,14 +24,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (!shapeTiler) {
         mapbox::geometry::feature_collection<double> features;
         features.emplace_back(ShapeAnnotationGeometry::visit(geometry(), [] (auto&& geom) {
-#if !defined(__GNUC__) || __GNUC__ >= 5
             return Feature { std::move(geom) };
-#else
-            Feature feature;
-            feature.geometry = std::move(geom);
-
-            return feature;
-#endif
         }));
         mapbox::geojsonvt::Options options;
         options.maxZoom = maxZoom;
@@ -45,7 +38,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (shapeTile.features.empty())
         return;
 
-    AnnotationTileLayer& layer = data.layers.emplace(layerID, layerID).first->second;
+    auto layer = data.addLayer(layerID);
 
     ToGeometryCollection toGeometryCollection;
     ToFeatureType toFeatureType;
@@ -60,7 +53,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             renderGeometry = fixupPolygons(renderGeometry);
         }
 
-        layer.features.emplace_back(id, featureType, renderGeometry);
+        layer->addFeature(id, featureType, renderGeometry);
     }
 }
 

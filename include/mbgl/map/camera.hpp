@@ -17,7 +17,7 @@ struct CameraOptions {
 
     /** Padding around the interior of the view that affects the frame of
         reference for `center`. */
-    optional<EdgeInsets> padding;
+    EdgeInsets padding;
 
     /** Point of reference for `zoom` and `angle`, assuming an origin at the
         top-left corner of the view. */
@@ -35,6 +35,19 @@ struct CameraOptions {
         two-dimensional map. */
     optional<double> pitch;
 };
+
+constexpr bool operator==(const CameraOptions& a, const CameraOptions& b) {
+    return a.center == b.center
+        && a.padding == b.padding
+        && a.anchor == b.anchor
+        && a.zoom == b.zoom
+        && a.angle == b.angle
+        && a.pitch == b.pitch;
+}
+
+constexpr bool operator!=(const CameraOptions& a, const CameraOptions& b) {
+    return !(a == b);
+}
 
 /** Various options for describing a transition between viewpoints with
     animation. All fields are optional; the default values depend on how this

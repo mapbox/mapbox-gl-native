@@ -55,19 +55,26 @@ public:
                 void* context);
     ~CustomLayer() final;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Private implementation
 
     class Impl;
-    Impl* impl;
+    const Impl& impl() const;
 
-    CustomLayer(const Impl&);
+    Mutable<Impl> mutableImpl() const;
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
+
     CustomLayer(const CustomLayer&) = delete;
 };
 
 template <>
-inline bool Layer::is<CustomLayer>() const {
-    return type == Type::Custom;
-}
+bool Layer::is<CustomLayer>() const;
 
 } // namespace style
 } // namespace mbgl

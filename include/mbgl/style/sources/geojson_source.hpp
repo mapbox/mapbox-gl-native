@@ -4,25 +4,11 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/optional.hpp>
 
-#include <mapbox/geojson.hpp>
-
-namespace mapbox {
-
-namespace geojsonvt {
-class GeoJSONVT;
-} // namespace geojsonvt
-
-namespace supercluster {
-class Supercluster;
-} // namespace supercluster
-
-} // namespace mapbox
-
 namespace mbgl {
-namespace style {
 
-using GeoJSONVTPointer = std::unique_ptr<mapbox::geojsonvt::GeoJSONVT>;
-using SuperclusterPointer = std::unique_ptr<mapbox::supercluster::Supercluster>;
+class AsyncRequest;
+
+namespace style {
 
 struct GeoJSONOptions {
     // GeoJSON-VT options
@@ -38,22 +24,27 @@ struct GeoJSONOptions {
 
 class GeoJSONSource : public Source {
 public:
-    GeoJSONSource(const std::string& id, const GeoJSONOptions options_ = GeoJSONOptions());
+    GeoJSONSource(const std::string& id, const GeoJSONOptions& = {});
+    ~GeoJSONSource() final;
 
     void setURL(const std::string& url);
     void setGeoJSON(const GeoJSON&);
 
     optional<std::string> getURL() const;
 
-    // Private implementation
-
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
+
+    void loadDescription(FileSource&) final;
+
+private:
+    optional<std::string> url;
+    std::unique_ptr<AsyncRequest> req;
 };
 
 template <>
 inline bool Source::is<GeoJSONSource>() const {
-    return type == SourceType::GeoJSON;
+    return getType() == SourceType::GeoJSON;
 }
 
 } // namespace style

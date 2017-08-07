@@ -1,5 +1,5 @@
 #include <mbgl/sprite/sprite_parser.hpp>
-#include <mbgl/sprite/sprite_image.hpp>
+#include <mbgl/style/image.hpp>
 
 #include <mbgl/util/logging.hpp>
 
@@ -13,13 +13,14 @@
 
 namespace mbgl {
 
-SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
-                                 const uint32_t srcX,
-                                 const uint32_t srcY,
-                                 const uint32_t width,
-                                 const uint32_t height,
-                                 const double ratio,
-                                 const bool sdf) {
+std::unique_ptr<style::Image> createStyleImage(const std::string& id,
+                                               const PremultipliedImage& image,
+                                               const uint32_t srcX,
+                                               const uint32_t srcY,
+                                               const uint32_t width,
+                                               const uint32_t height,
+                                               const double ratio,
+                                               const bool sdf) {
     // Disallow invalid parameter configurations.
     if (width <= 0 || height <= 0 || width > 1024 || height > 1024 ||
         ratio <= 0 || ratio > 10 ||
@@ -34,19 +35,10 @@ SpriteImagePtr createSpriteImage(const PremultipliedImage& image,
 
     PremultipliedImage dstImage({ width, height });
 
-    auto srcData = reinterpret_cast<const uint32_t*>(image.data.get());
-    auto dstData = reinterpret_cast<uint32_t*>(dstImage.data.get());
-
     // Copy from the source image into our individual sprite image
-    for (uint32_t y = 0; y < height; ++y) {
-        const auto dstRow = y * width;
-        const auto srcRow = (y + srcY) * image.size.width + srcX;
-        for (uint32_t x = 0; x < width; ++x) {
-            dstData[dstRow + x] = srcData[srcRow + x];
-        }
-    }
+    PremultipliedImage::copy(image, dstImage, { srcX, srcY }, { 0, 0 }, { width, height });
 
-    return std::make_unique<const SpriteImage>(std::move(dstImage), ratio, sdf);
+    return std::make_unique<style::Image>(id, std::move(dstImage), ratio, sdf);
 }
 
 namespace {
@@ -93,26 +85,19 @@ bool getBoolean(const JSValue& value, const char* name, const bool def = false) 
 
 } // namespace
 
-SpriteParseResult parseSprite(const std::string& image, const std::string& json) {
-    Sprites sprites;
-    PremultipliedImage raster;
-
-    try {
-        raster = decodeImage(image);
-    } catch (...) {
-        return std::current_exception();
-    }
+std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage, const std::string& json) {
+    const PremultipliedImage raster = decodeImage(encodedImage);
 
     JSDocument doc;
     doc.Parse<0>(json.c_str());
-
     if (doc.HasParseError()) {
         std::stringstream message;
         message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();
-        return std::make_exception_ptr(std::runtime_error(message.str()));
+        throw std::runtime_error(message.str());
     } else if (!doc.IsObject()) {
-        return std::make_exception_ptr(std::runtime_error("Sprite JSON root must be an object"));
+        throw std::runtime_error("Sprite JSON root must be an object");
     } else {
+        std::vector<std::unique_ptr<style::Image>> images;
         for (const auto& property : doc.GetObject()) {
             const std::string name = { property.name.GetString(), property.name.GetStringLength() };
             const JSValue& value = property.value;
@@ -125,15 +110,14 @@ SpriteParseResult parseSprite(const std::string& image, const std::string& json)
                 const double pixelRatio = getDouble(value, "pixelRatio", 1);
                 const bool sdf = getBoolean(value, "sdf", false);
 
-                auto sprite = createSpriteImage(raster, x, y, width, height, pixelRatio, sdf);
-                if (sprite) {
-                    sprites.emplace(name, sprite);
+                auto image = createStyleImage(name, raster, x, y, width, height, pixelRatio, sdf);
+                if (image) {
+                    images.push_back(std::move(image));
                 }
             }
         }
+        return images;
     }
-
-    return sprites;
 }
 
 } // namespace mbgl

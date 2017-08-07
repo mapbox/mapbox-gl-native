@@ -21,12 +21,12 @@ struct jpeg_stream_wrapper {
 };
 
 static void init_source(j_decompress_ptr cinfo) {
-    jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
+    auto* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
     wrap->stream->seekg(0, std::ios_base::beg);
 }
 
 static boolean fill_input_buffer(j_decompress_ptr cinfo) {
-    jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
+    auto* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
     wrap->stream->read(reinterpret_cast<char*>(&wrap->buffer[0]), BUF_SIZE);
     std::streamsize size = wrap->stream->gcount();
     wrap->manager.next_input_byte = wrap->buffer.data();
@@ -35,8 +35,8 @@ static boolean fill_input_buffer(j_decompress_ptr cinfo) {
 }
 
 static void skip(j_decompress_ptr cinfo, long count) {
-    if (count <= 0) return; //A zero or negative skip count should be treated as a no-op.
-    jpeg_stream_wrapper* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
+    if (count <= 0) return; // A zero or negative skip count should be treated as a no-op.
+    auto* wrap = reinterpret_cast<jpeg_stream_wrapper*>(cinfo->src);
 
     if (wrap->manager.bytes_in_buffer > 0 && count < static_cast<long>(wrap->manager.bytes_in_buffer))
     {
@@ -48,7 +48,7 @@ static void skip(j_decompress_ptr cinfo, long count) {
         wrap->stream->seekg(count - wrap->manager.bytes_in_buffer, std::ios_base::cur);
         // trigger buffer fill
         wrap->manager.next_input_byte = nullptr;
-        wrap->manager.bytes_in_buffer = 0; //bytes_in_buffer may be zero on return.
+        wrap->manager.bytes_in_buffer = 0; // bytes_in_buffer may be zero on return.
     }
 }
 
@@ -59,7 +59,7 @@ static void attach_stream(j_decompress_ptr cinfo, std::istream* in) {
         cinfo->src = (struct jpeg_source_mgr *)
             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT, sizeof(jpeg_stream_wrapper));
     }
-    jpeg_stream_wrapper * src = reinterpret_cast<jpeg_stream_wrapper*> (cinfo->src);
+    auto * src = reinterpret_cast<jpeg_stream_wrapper*> (cinfo->src);
     src->manager.init_source = init_source;
     src->manager.fill_input_buffer = fill_input_buffer;
     src->manager.skip_input_data = skip;

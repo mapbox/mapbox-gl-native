@@ -25,8 +25,9 @@
 #include <cmath>
 
 namespace mbgl {
+namespace matrix {
 
-void matrix::identity(mat3& out) {
+void identity(mat3& out) {
     out[0] = 1.0f;
     out[1] = 0.0f;
     out[2] = 0.0f;
@@ -38,7 +39,7 @@ void matrix::identity(mat3& out) {
     out[8] = 1.0f;
 }
 
-void matrix::translate(mat3& out, const mat3& a, double x, double y) {
+void translate(mat3& out, const mat3& a, double x, double y) {
     double a00 = a[0], a01 = a[1], a02 = a[2],
           a10 = a[3], a11 = a[4], a12 = a[5],
           a20 = a[6], a21 = a[7], a22 = a[8];
@@ -56,7 +57,7 @@ void matrix::translate(mat3& out, const mat3& a, double x, double y) {
     out[8] = x * a02 + y * a12 + a22;
 }
 
-void matrix::rotate(mat3& out, const mat3& a, double rad) {
+void rotate(mat3& out, const mat3& a, double rad) {
     double s = std::sin(rad),
           c = std::cos(rad),
           a00 = a[0],
@@ -82,7 +83,7 @@ void matrix::rotate(mat3& out, const mat3& a, double rad) {
     out[8] = a22;
 }
 
-void matrix::scale(mat3& out, const mat3& a, double x, double y) {
+void scale(mat3& out, const mat3& a, double x, double y) {
     out[0] = x * a[0];
     out[1] = x * a[1];
     out[2] = x * a[2];
@@ -94,4 +95,11 @@ void matrix::scale(mat3& out, const mat3& a, double x, double y) {
     out[8] = a[8];
 }
 
+void transformMat3f(vec3f& out, const vec3f& a, const mat3& m) {
+    out[0] = m[0] * a[0] + m[3] * a[1] + m[6] * a[2];
+    out[1] = m[1] * a[0] + m[4] * a[1] + m[7] * a[2];
+    out[2] = m[2] * a[0] + m[5] * a[1] + m[8] * a[2];
+}
+
+} // namespace matrix
 } // namespace mbgl

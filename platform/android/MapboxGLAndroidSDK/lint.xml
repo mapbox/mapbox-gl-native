@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<lint>
-    <!-- Ignore errors caused by OkHTTP -->
-    <issue id="InvalidPackage" severity="ignore">
-        <ignore path="*/okio-1.2.0.jar" />
-    </issue>
-</lint>

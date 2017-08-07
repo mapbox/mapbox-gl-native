@@ -8,7 +8,7 @@ namespace mbgl {
 
 FrameHistory::FrameHistory() {
     changeOpacities.fill(0);
-    std::fill(opacities.data.get(), opacities.data.get() + opacities.bytes(), 0);
+    opacities.fill(0);
 }
 
 void FrameHistory::record(const TimePoint& now, float zoom, const Duration& duration) {
@@ -37,16 +37,16 @@ void FrameHistory::record(const TimePoint& now, float zoom, const Duration& dura
     }
 
     for (int16_t z = 0; z <= 255; z++) {
-        std::chrono::duration<float> timeDiff = now - changeTimes[z];
-        int32_t opacityChange = (duration == Milliseconds(0) ? 1 : (timeDiff / duration)) * 255;
-        if (z <= zoomIndex) {
-            opacities.data[z] = util::min(255, changeOpacities[z] + opacityChange);
-        } else {
-            opacities.data[z] = util::max(0, changeOpacities[z] - opacityChange);
+        const std::chrono::duration<float> timeDiff = now - changeTimes[z];
+        const int32_t opacityChange = (duration == Milliseconds(0) ? 1 : (timeDiff / duration)) * 255;
+        const uint8_t opacity = z <= zoomIndex
+            ? util::min(255, changeOpacities[z] + opacityChange)
+            : util::max(0, changeOpacities[z] - opacityChange);
+        if (opacities.data[z] != opacity) {
+            opacities.data[z] = opacity;
+            dirty = true;
         }
     }
-
-    dirty = true;
 
     if (zoomIndex != previousZoomIndex) {
         previousZoomIndex = zoomIndex;
@@ -72,6 +72,10 @@ void FrameHistory::upload(gl::Context& context, uint32_t unit) {
 void FrameHistory::bind(gl::Context& context, uint32_t unit) {
     upload(context, unit);
     context.bindTexture(*texture, unit);
+}
+
+bool FrameHistory::isVisible(const float zoom) const {
+    return opacities.data[std::floor(zoom * 10)] != 0;
 }
 
 } // namespace mbgl

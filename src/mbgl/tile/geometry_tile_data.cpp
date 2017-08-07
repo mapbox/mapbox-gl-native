@@ -1,7 +1,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/tile_id.hpp>
 
-#include <clipper/clipper.hpp>
+#include <mapbox/geometry/wagyu/wagyu.hpp>
 
 namespace mbgl {
 
@@ -17,8 +17,8 @@ static double signedArea(const GeometryCoordinates& ring) {
     return sum;
 }
 
-static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
-    ClipperLib::Path result;
+static LinearRing<int32_t> toWagyuPath(const GeometryCoordinates& ring) {
+    LinearRing<int32_t> result;
     result.reserve(ring.size());
     for (const auto& p : ring) {
         result.emplace_back(p.x, p.y);
@@ -26,63 +26,29 @@ static ClipperLib::Path toClipperPath(const GeometryCoordinates& ring) {
     return result;
 }
 
-static GeometryCoordinates fromClipperPath(const ClipperLib::Path& path) {
-    GeometryCoordinates result;
-    result.reserve(path.size() + 1);
-
-    for (const auto& p : path) {
-        using Coordinate = GeometryCoordinates::coordinate_type;
-        assert(p.x >= std::numeric_limits<Coordinate>::min());
-        assert(p.x <= std::numeric_limits<Coordinate>::max());
-        assert(p.y >= std::numeric_limits<Coordinate>::min());
-        assert(p.y <= std::numeric_limits<Coordinate>::max());
-        result.emplace_back(Coordinate(p.x), Coordinate(p.y));
-    }
-
-    // Clipper does not repeat initial point, but our geometry model requires it.
-    if (!result.empty()) {
-        result.push_back(result.front());
-    }
-
-    return result;
-}
-
-static void processPolynodeBranch(ClipperLib::PolyNode* polynode, GeometryCollection& rings) {
-    // Exterior ring.
-    rings.push_back(fromClipperPath(polynode->Contour));
-    assert(signedArea(rings.back()) > 0);
-
-    // Interior rings.
-    for (auto * ring : polynode->Childs) {
-        rings.push_back(fromClipperPath(ring->Contour));
-        assert(signedArea(rings.back()) < 0);
-    }
-
-    // PolyNodes may be nested in the case of a polygon inside a hole.
-    for (auto * ring : polynode->Childs) {
-        for (auto * subRing : ring->Childs) {
-            processPolynodeBranch(subRing, rings);
+static GeometryCollection toGeometryCollection(MultiPolygon<int16_t>&& multipolygon) {
+    GeometryCollection result;
+    for (auto& polygon : multipolygon) {
+        for (auto& ring : polygon) {
+            result.emplace_back(std::move(ring));
         }
     }
+    return result;
 }
 
 GeometryCollection fixupPolygons(const GeometryCollection& rings) {
-    ClipperLib::Clipper clipper;
-    clipper.StrictlySimple(true);
+    using namespace mapbox::geometry::wagyu;
+
+    wagyu<int32_t> clipper;
 
     for (const auto& ring : rings) {
-        clipper.AddPath(toClipperPath(ring), ClipperLib::ptSubject, true);
+        clipper.add_ring(toWagyuPath(ring));
     }
 
-    ClipperLib::PolyTree polygons;
-    clipper.Execute(ClipperLib::ctUnion, polygons, ClipperLib::pftEvenOdd, ClipperLib::pftEvenOdd);
-    clipper.Clear();
+    MultiPolygon<int16_t> multipolygon;
+    clipper.execute(clip_type_union, multipolygon, fill_type_even_odd, fill_type_even_odd);
 
-    GeometryCollection result;
-    for (auto * polynode : polygons.Childs) {
-        processPolynodeBranch(polynode, result);
-    }
-    return result;
+    return toGeometryCollection(std::move(multipolygon));
 }
 
 std::vector<GeometryCollection> classifyRings(const GeometryCollection& rings) {
@@ -208,12 +174,7 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
 }
 
 Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
-#if !defined(__GNUC__) || __GNUC__ >= 5
     Feature feature { convertGeometry(geometryTileFeature, tileID) };
-#else
-    Feature feature;
-    feature.geometry = convertGeometry(geometryTileFeature, tileID);
-#endif
     feature.properties = geometryTileFeature.getProperties();
     feature.id = geometryTileFeature.getID();
     return feature;

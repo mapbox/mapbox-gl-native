@@ -83,6 +83,13 @@ inline optional<float> toNumber(const QVariant& value) {
         return {};
     }
 }
+inline optional<double> toDouble(const QVariant& value) {
+    if (value.type() == QVariant::Int || value.type() == QVariant::Double) {
+        return value.toDouble();
+    } else {
+        return {};
+    }
+}
 
 inline optional<std::string> toString(const QVariant& value) {
     if (value.type() == QVariant::String) {

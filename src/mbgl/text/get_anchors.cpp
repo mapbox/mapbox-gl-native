@@ -8,9 +8,14 @@
 
 namespace mbgl {
 
-Anchors resample(const GeometryCoordinates &line, const float offset, const float spacing,
-        const float angleWindowSize, const float maxAngle, const float labelLength, const bool continuedLine, const bool placeAtMiddle) {
-
+static Anchors resample(const GeometryCoordinates& line,
+                        const float offset,
+                        const float spacing,
+                        const float angleWindowSize,
+                        const float maxAngle,
+                        const float labelLength,
+                        const bool continuedLine,
+                        const bool placeAtMiddle) {
     const float halfLabelLength = labelLength / 2.0f;
     float lineLength = 0;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++) {
@@ -26,10 +31,10 @@ Anchors resample(const GeometryCoordinates &line, const float offset, const floa
 
     int i = 0;
     for (auto it = line.begin(), end = line.end() - 1; it != end; it++, i++) {
-        const GeometryCoordinate &a = *(it);
-        const GeometryCoordinate &b = *(it + 1);
+        const GeometryCoordinate& a = *(it);
+        const GeometryCoordinate& b = *(it + 1);
 
-        const float segmentDist = util::dist<float>(a, b);
+        const auto segmentDist = util::dist<float>(a, b);
         const float angle = util::angle_to(b, a);
 
         while (markedDistance + spacing < distance + segmentDist) {
@@ -68,11 +73,19 @@ Anchors resample(const GeometryCoordinates &line, const float offset, const floa
     return anchors;
 }
 
-Anchors getAnchors(const GeometryCoordinates &line, float spacing,
-        const float maxAngle, const float textLeft, const float textRight,
-        const float iconLeft, const float iconRight,
-        const float glyphSize, const float boxScale, const float overscaling) {
-    if (line.empty()) return {};
+Anchors getAnchors(const GeometryCoordinates& line,
+                   float spacing,
+                   const float maxAngle,
+                   const float textLeft,
+                   const float textRight,
+                   const float iconLeft,
+                   const float iconRight,
+                   const float glyphSize,
+                   const float boxScale,
+                   const float overscaling) {
+    if (line.empty()) {
+        return {};
+    }
 
     // Resample a line to get anchor points for labels and check that each
     // potential label passes text-max-angle check and has enough froom to fit

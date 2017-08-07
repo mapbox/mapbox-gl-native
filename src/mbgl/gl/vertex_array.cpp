@@ -1,22 +1,18 @@
 #include <mbgl/gl/vertex_array.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 namespace gl {
 
-ExtensionFunction<void(GLuint array)>
-    BindVertexArray({ { "GL_ARB_vertex_array_object", "glBindVertexArray" },
-                      { "GL_OES_vertex_array_object", "glBindVertexArrayOES" },
-                      { "GL_APPLE_vertex_array_object", "glBindVertexArrayAPPLE" } });
+void VertexArray::bind(Context& context, BufferID indexBuffer, const AttributeBindingArray& bindings) {
+    context.bindVertexArray = state->vertexArray;
+    state->indexBuffer = indexBuffer;
 
-ExtensionFunction<void(GLsizei n, const GLuint* arrays)>
-    DeleteVertexArrays({ { "GL_ARB_vertex_array_object", "glDeleteVertexArrays" },
-                         { "GL_OES_vertex_array_object", "glDeleteVertexArraysOES" },
-                         { "GL_APPLE_vertex_array_object", "glDeleteVertexArraysAPPLE" } });
-
-ExtensionFunction<void(GLsizei n, GLuint* arrays)>
-    GenVertexArrays({ { "GL_ARB_vertex_array_object", "glGenVertexArrays" },
-                      { "GL_OES_vertex_array_object", "glGenVertexArraysOES" },
-                      { "GL_APPLE_vertex_array_object", "glGenVertexArraysAPPLE" } });
+    for (AttributeLocation location = 0; location < MAX_ATTRIBUTES; ++location) {
+        state->bindings[location] = bindings[location];
+    }
+}
 
 } // namespace gl
 } // namespace mbgl

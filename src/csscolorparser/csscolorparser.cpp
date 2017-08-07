@@ -110,9 +110,6 @@ const NamedColor namedColors[] = {
     { "yellow", { 255, 255, 0, 1 } }, { "yellowgreen", { 154, 205, 50, 1 } }
 };
 
-const size_t namedColorCount = sizeof (namedColors) / sizeof (NamedColor);
-
-
 template <typename T>
 uint8_t clamp_css_byte(T i) {  // Clamp to integer 0 .. 255.
     i = ::round(i);  // Seems to be what Chrome does (vs truncation).
@@ -179,7 +176,7 @@ std::vector<std::string> split(const std::string& s, char delim) {
     return elems;
 }
 
-Color parse(const std::string& css_str) {
+optional<Color> parse(const std::string& css_str) {
     std::string str = css_str;
 
     // Remove all whitespace, not compliant, but should just be more accepting.
@@ -189,9 +186,9 @@ Color parse(const std::string& css_str) {
     std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 
 
-    for (size_t i = 0; i < namedColorCount; i++) {
-        if (str == namedColors[i].name) {
-            return namedColors[i].color;
+    for (const auto& namedColor : namedColors) {
+        if (str == namedColor.name) {
+            return { namedColor.color };
         }
     }
 
@@ -202,24 +199,24 @@ Color parse(const std::string& css_str) {
             if (!(iv >= 0 && iv <= 0xfff)) {
                 return {};
             } else {
-                return {
+                return {{
                     static_cast<uint8_t>(((iv & 0xf00) >> 4) | ((iv & 0xf00) >> 8)),
                     static_cast<uint8_t>((iv & 0xf0) | ((iv & 0xf0) >> 4)),
                     static_cast<uint8_t>((iv & 0xf) | ((iv & 0xf) << 4)),
                     1
-                };
+                }};
             }
         } else if (str.length() == 7) {
             int64_t iv = parseInt(str.substr(1), 16);  // TODO(deanm): Stricter parsing.
             if (!(iv >= 0 && iv <= 0xffffff)) {
                 return {};  // Covers NaN.
             } else {
-                return {
+                return {{
                     static_cast<uint8_t>((iv & 0xff0000) >> 16),
                     static_cast<uint8_t>((iv & 0xff00) >> 8),
                     static_cast<uint8_t>(iv & 0xff),
                     1
-                };
+                }};
             }
         }
 
@@ -245,12 +242,12 @@ Color parse(const std::string& css_str) {
                 }
             }
 
-            return {
+            return {{
                 parse_css_int(params[0]),
                 parse_css_int(params[1]),
                 parse_css_int(params[2]),
                 alpha
-            };
+            }};
 
         } else if (fname == "hsla" || fname == "hsl") {
             if (fname == "hsla") {
@@ -276,12 +273,12 @@ Color parse(const std::string& css_str) {
             float m2 = l <= 0.5f ? l * (s + 1.0f) : l + s - l * s;
             float m1 = l * 2.0f - m2;
 
-            return {
+            return {{
                 clamp_css_byte(css_hue_to_rgb(m1, m2, h + 1.0f / 3.0f) * 255.0f),
                 clamp_css_byte(css_hue_to_rgb(m1, m2, h) * 255.0f),
                 clamp_css_byte(css_hue_to_rgb(m1, m2, h - 1.0f / 3.0f) * 255.0f),
                 alpha
-            };
+            }};
         }
     }
 

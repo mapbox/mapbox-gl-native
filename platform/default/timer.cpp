@@ -4,19 +4,13 @@
 
 #include <uv.h>
 
-#if UV_VERSION_MAJOR == 0 && UV_VERSION_MINOR <= 10
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer, int
-#else
-#define UV_TIMER_PARAMS(timer) uv_timer_t *timer
-#endif
-
 namespace mbgl {
 namespace util {
 
 class Timer::Impl {
 public:
     Impl() : timer(new uv_timer_t) {
-        uv_loop_t* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
+        auto* loop = reinterpret_cast<uv_loop_t*>(RunLoop::getLoopHandle());
         if (uv_timer_init(loop, timer) != 0) {
             throw std::runtime_error("Failed to initialize timer.");
         }
@@ -46,7 +40,7 @@ public:
     }
 
 private:
-    static void timerCallback(UV_TIMER_PARAMS(handle)) {
+    static void timerCallback(uv_timer_t* handle) {
         reinterpret_cast<Impl*>(handle->data)->cb();
     }
 

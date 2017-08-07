@@ -1,5 +1,7 @@
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/gl/headless_display.hpp>
+#include <mbgl/gl/context.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 
 #include <cassert>
 #include <stdexcept>
@@ -7,18 +9,27 @@
 
 namespace mbgl {
 
-HeadlessBackend::HeadlessBackend() {
-    activate();
-}
+class HeadlessBackend::View {
+public:
+    View(gl::Context& context, Size size)
+        : color(context.createRenderbuffer<gl::RenderbufferType::RGBA>(size)),
+          depthStencil(context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size)),
+          framebuffer(context.createFramebuffer(color, depthStencil)) {
+    }
 
-HeadlessBackend::HeadlessBackend(std::shared_ptr<HeadlessDisplay> display_)
-        : display(std::move(display_)) {
-    activate();
+    gl::Renderbuffer<gl::RenderbufferType::RGBA> color;
+    gl::Renderbuffer<gl::RenderbufferType::DepthStencil> depthStencil;
+    gl::Framebuffer framebuffer;
+};
+
+HeadlessBackend::HeadlessBackend(Size size_)
+    : size(size_) {
 }
 
 HeadlessBackend::~HeadlessBackend() {
-    deactivate();
-    destroyContext();
+    BackendScope guard { *this };
+    view.reset();
+    context.reset();
 }
 
 void HeadlessBackend::activate() {
@@ -31,42 +42,39 @@ void HeadlessBackend::activate() {
         createContext();
     }
 
-    activateContext();
-
-    if (!extensionsLoaded) {
-        gl::InitializeExtensions(initializeExtension);
-        extensionsLoaded = true;
-    }
-}
-
-void HeadlessBackend::deactivate() {
-    deactivateContext();
-    active = false;
-}
-
-void HeadlessBackend::invalidate() {
-    assert(false);
-}
-
-void HeadlessBackend::destroyContext() {
-    assert(hasContext());
-    impl.reset();
-}
-
-void HeadlessBackend::activateContext() {
     assert(hasContext());
     impl->activateContext();
 }
 
-void HeadlessBackend::deactivateContext() {
+void HeadlessBackend::deactivate() {
     assert(hasContext());
     impl->deactivateContext();
+    active = false;
 }
 
-void HeadlessBackend::notifyMapChange(MapChange change) {
-    if (mapChangeCallback) {
-        mapChangeCallback(change);
+void HeadlessBackend::bind() {
+    gl::Context& context_ = getContext();
+
+    if (!view) {
+        view = std::make_unique<View>(context_, size);
     }
+
+    context_.bindFramebuffer = view->framebuffer.framebuffer;
+    context_.scissorTest = false;
+    context_.viewport = { 0, 0, size };
+}
+
+void HeadlessBackend::updateAssumedState() {
+    // no-op
+}
+
+void HeadlessBackend::setSize(Size size_) {
+    size = size_;
+    view.reset();
+}
+
+PremultipliedImage HeadlessBackend::readStillImage() {
+    return getContext().readFramebuffer<PremultipliedImage>(size);
 }
 
 } // namespace mbgl

@@ -4,6 +4,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -24,7 +25,7 @@ public:
 
     // Matrix
     void matrixFor(mat4&, const UnwrappedTileID&) const;
-    void getProjMatrix(mat4& matrix) const;
+    void getProjMatrix(mat4& matrix, uint16_t nearZ = 1) const;
 
     // Dimensions
     Size getSize() const;
@@ -45,14 +46,21 @@ public:
     double pixel_y() const;
 
     // Zoom
-    double getScale() const;
     double getZoom() const;
     int32_t getIntegerZoom() const;
     double getZoomFraction() const;
-    void setMinZoom(const double minZoom);
+
+    // Bounds
+    void setLatLngBounds(optional<LatLngBounds>);
+    optional<LatLngBounds> getLatLngBounds() const;
+    void setMinZoom(double);
     double getMinZoom() const;
-    void setMaxZoom(const double maxZoom);
+    void setMaxZoom(double);
     double getMaxZoom() const;
+    void setMinPitch(double);
+    double getMinPitch() const;
+    void setMaxPitch(double);
+    double getMaxPitch() const;
 
     // Rotation
     float getAngle() const;
@@ -74,13 +82,23 @@ public:
     double zoomScale(double zoom) const;
     double scaleZoom(double scale) const;
 
+    bool valid() const {
+        return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
+    }
+
+    float getCameraToTileDistance(const UnwrappedTileID&) const;
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
+    optional<LatLngBounds> bounds;
+
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
     double max_scale = std::pow(2, 20);
+    double min_pitch = 0.0;
+    double max_pitch = util::PITCH_MAX;
 
     NorthOrientation orientation = NorthOrientation::Upwards;
 

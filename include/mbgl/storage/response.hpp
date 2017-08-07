@@ -27,6 +27,10 @@ public:
     // This is set to true for 304 Not Modified responses.
     bool notModified = false;
 
+    // This is set to true when the server requested that no expired resources be used by
+    // specifying "Cache-Control: must-revalidate".
+    bool mustRevalidate = false;
+
     // The actual data of the response. Present only for non-error, non-notModified responses.
     std::shared_ptr<const std::string> data;
 
@@ -35,7 +39,13 @@ public:
     optional<std::string> etag;
 
     bool isFresh() const {
-        return !expires || *expires > util::now();
+        return expires ? *expires > util::now() : !error;
+    }
+
+    // Indicates whether we are allowed to use this response according to HTTP caching rules.
+    // It may or may not be stale.
+    bool isUsable() const {
+        return !mustRevalidate || (expires && *expires > util::now());
     }
 };
 
@@ -53,7 +63,7 @@ public:
     // An error message from the request handler, e.g. a server message or a system message
     // informing the user about the reason for the failure.
     std::string message;
-    
+
     optional<Timestamp> retryAfter;
 
 public:

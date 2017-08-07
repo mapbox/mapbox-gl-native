@@ -5,6 +5,9 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
+#include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
@@ -37,7 +40,7 @@ struct RasterFadeDuration : PaintProperty<float> {
     static float defaultValue() { return 300; }
 };
 
-class RasterPaintProperties : public PaintProperties<
+class RasterPaintProperties : public Properties<
     RasterOpacity,
     RasterHueRotate,
     RasterBrightnessMin,

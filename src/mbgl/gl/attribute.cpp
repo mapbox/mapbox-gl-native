@@ -4,25 +4,35 @@
 namespace mbgl {
 namespace gl {
 
-AttributeLocation bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
+void bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
+    if (location >= MAX_ATTRIBUTES) {
+        throw gl::Error("too many vertex attributes");
+    }
     MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
-    return location;
 }
 
-void bindAttribute(AttributeLocation location,
-                   std::size_t count,
-                   DataType type,
-                   std::size_t vertexSize,
-                   std::size_t vertexOffset,
-                   std::size_t attributeOffset) {
-    MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
-    MBGL_CHECK_ERROR(glVertexAttribPointer(
-        location,
-        static_cast<GLint>(count),
-        static_cast<GLenum>(type),
-        GL_FALSE,
-        static_cast<GLsizei>(vertexSize),
-        reinterpret_cast<GLvoid*>(attributeOffset + (vertexSize * vertexOffset))));
+std::set<std::string> getActiveAttributes(ProgramID id) {
+    std::set<std::string> activeAttributes;
+
+    GLint attributeCount;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTES, &attributeCount));
+
+    GLint maxAttributeLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_ATTRIBUTE_MAX_LENGTH, &maxAttributeLength));
+
+    std::string attributeName;
+    attributeName.resize(maxAttributeLength);
+
+    GLsizei actualLength;
+    GLint size;
+    GLenum type;
+
+    for (int32_t i = 0; i < attributeCount; i++) {
+        MBGL_CHECK_ERROR(glGetActiveAttrib(id, i, maxAttributeLength, &actualLength, &size, &type, &attributeName[0]));
+        activeAttributes.emplace(std::string(attributeName, 0, actualLength));
+    }
+
+    return activeAttributes;
 }
 
 } // namespace gl

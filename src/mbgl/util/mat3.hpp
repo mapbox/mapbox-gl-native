@@ -26,7 +26,9 @@
 
 namespace mbgl {
 
-typedef std::array<double, 9> mat3;
+using vec3 = std::array<double, 3>;
+using vec3f = std::array<float, 3>;
+using mat3 = std::array<double, 9>;
 
 namespace matrix {
 
@@ -34,6 +36,8 @@ void identity(mat3& out);
 void translate(mat3& out, const mat3& a, double x, double y);
 void rotate(mat3& out, const mat3& a, double rad);
 void scale(mat3& out, const mat3& a, double x, double y);
+
+void transformMat3f(vec3f& out, const vec3f& a, const mat3& m);
 
 } // namespace matrix
 } // namespace mbgl

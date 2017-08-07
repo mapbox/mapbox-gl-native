@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/text/glyph.hpp>
+#include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
@@ -9,39 +9,45 @@
 
 namespace mbgl {
 
-struct Anchor;
+class Anchor;
 class PositionedIcon;
 
-struct SymbolQuad {
-    explicit SymbolQuad(Point<float> tl_, Point<float> tr_, Point<float> bl_, Point<float> br_,
-            Rect<uint16_t> tex_, float anchorAngle_, float glyphAngle_, Point<float> anchorPoint_,
-            float minScale_, float maxScale_)
+class SymbolQuad {
+public:
+    SymbolQuad(Point<float> tl_,
+               Point<float> tr_,
+               Point<float> bl_,
+               Point<float> br_,
+               Rect<uint16_t> tex_,
+               WritingModeType writingMode_,
+               Point<float> glyphOffset_)
         : tl(std::move(tl_)),
         tr(std::move(tr_)),
         bl(std::move(bl_)),
         br(std::move(br_)),
         tex(std::move(tex_)),
-        anchorAngle(anchorAngle_),
-        glyphAngle(glyphAngle_),
-        anchorPoint(std::move(anchorPoint_)),
-        minScale(minScale_),
-        maxScale(maxScale_) {}
+        writingMode(writingMode_),
+        glyphOffset(glyphOffset_) {}
 
-    Point<float> tl, tr, bl, br;
+    Point<float> tl;
+    Point<float> tr;
+    Point<float> bl;
+    Point<float> br;
     Rect<uint16_t> tex;
-    float anchorAngle, glyphAngle;
-    Point<float> anchorPoint;
-    float minScale, maxScale;
+    WritingModeType writingMode;
+    Point<float> glyphOffset;
 };
 
-typedef std::vector<SymbolQuad> SymbolQuads;
+using SymbolQuads = std::vector<SymbolQuad>;
 
-SymbolQuads getIconQuads(Anchor& anchor, const PositionedIcon& shapedIcon,
-        const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
-        style::SymbolPlacementType placement, const Shaping& shapedText);
+SymbolQuad getIconQuad(const PositionedIcon& shapedIcon,
+                       const style::SymbolLayoutProperties::Evaluated&,
+                       const float layoutTextSize,
+                       const Shaping& shapedText);
 
-SymbolQuads getGlyphQuads(Anchor& anchor, const Shaping& shapedText,
-        const float boxScale, const GeometryCoordinates& line, const style::SymbolLayoutProperties::Evaluated&,
-        style::SymbolPlacementType placement, const GlyphPositions& face);
+SymbolQuads getGlyphQuads(const Shaping& shapedText,
+                          const style::SymbolLayoutProperties::Evaluated&,
+                          style::SymbolPlacementType placement,
+                          const GlyphPositionMap& positions);
 
 } // namespace mbgl

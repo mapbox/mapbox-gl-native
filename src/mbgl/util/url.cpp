@@ -66,19 +66,6 @@ std::string percentDecode(const std::string& input) {
     return decoded;
 }
 
-// Checks whether the input string contains ://, and the part before it is all alphanumeric ASCII.
-bool isURL(const std::string& input) {
-    auto it = input.begin();
-    // First character has to be alphabetic
-    if (it == input.end() || !isAlphaCharacter(*it++)) return false;
-    // The remaining characters of the scheme can be alphanumeric, or be one of +.-
-    while (it != input.end() && isSchemeCharacter(*it)) ++it;
-    // Check that :// follows
-    return (it != input.end() && *it++ == ':') &&
-           (it != input.end() && *it++ == '/') &&
-           (it != input.end() && *it++ == '/');
-}
-
 URL::URL(const std::string& str)
     : query([&]() -> Segment {
           const auto hashPos = str.find('#');
@@ -89,8 +76,10 @@ URL::URL(const std::string& str)
           return { queryPos, (hashPos != std::string::npos ? hashPos : str.size()) - queryPos };
       }()),
       scheme([&]() -> Segment {
-          auto schemeEnd = str.find(':');
-          return { 0, schemeEnd == std::string::npos || schemeEnd > query.first ? 0 : schemeEnd };
+          if (str.empty() || !isAlphaCharacter(str.front())) return { 0, 0 };
+          size_t schemeEnd = 0;
+          while (schemeEnd < query.first && isSchemeCharacter(str[schemeEnd])) ++schemeEnd;
+          return { 0, str[schemeEnd] == ':' ? schemeEnd : 0 };
       }()),
       domain([&]() -> Segment {
           auto domainPos = scheme.first + scheme.second;

@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/math/clamp.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/util/constants.hpp>
 
@@ -9,6 +10,7 @@
 #include <mapbox/geometry/box.hpp>
 
 #include <cmath>
+#include <stdexcept>
 
 namespace mbgl {
 
@@ -20,67 +22,62 @@ using ScreenLineString = mapbox::geometry::line_string<double>;
 using ScreenBox        = mapbox::geometry::box<double>;
 
 class LatLng {
+private:
+    double lat;
+    double lon;
+
 public:
-    struct null {};
-
-    double latitude;
-    double longitude;
-
     enum WrapMode : bool { Unwrapped, Wrapped };
 
-    LatLng(null) : latitude(std::numeric_limits<double>::quiet_NaN()), longitude(latitude) {}
+    LatLng(double lat_ = 0, double lon_ = 0, WrapMode mode = Unwrapped)
+        : lat(lat_), lon(lon_) {
+        if (std::isnan(lat)) {
+            throw std::domain_error("latitude must not be NaN");
+        }
+        if (std::isnan(lon)) {
+            throw std::domain_error("longitude must not be NaN");
+        }
+        if (std::abs(lat) > 90.0) {
+            throw std::domain_error("latitude must be between -90 and 90");
+        }
+        if (!std::isfinite(lon)) {
+            throw std::domain_error("longitude must not be infinite");
+        }
+        if (mode == Wrapped) {
+            wrap();
+        }
+    }
 
-    LatLng(double lat = 0, double lon = 0, WrapMode mode = Unwrapped)
-        : latitude(lat), longitude(lon) { if (mode == Wrapped) wrap(); }
+    double latitude() const { return lat; }
+    double longitude() const { return lon; }
 
-    LatLng wrapped() const { return { latitude, longitude, Wrapped }; }
+    LatLng wrapped() const { return { lat, lon, Wrapped }; }
 
     void wrap() {
-        longitude = util::wrap(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
+        lon = util::wrap(lon, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
     }
 
     // If the distance from start to end longitudes is between half and full
     // world, unwrap the start longitude to ensure the shortest path is taken.
     void unwrapForShortestPath(const LatLng& end) {
-        const double delta = std::abs(end.longitude - longitude);
+        const double delta = std::abs(end.lon - lon);
         if (delta < util::LONGITUDE_MAX || delta > util::DEGREES_MAX) return;
-        if (longitude > 0 && end.longitude < 0) longitude -= util::DEGREES_MAX;
-        else if (longitude < 0 && end.longitude > 0) longitude += util::DEGREES_MAX;
-    }
-
-    explicit operator bool() const {
-        return !(std::isnan(latitude) || std::isnan(longitude));
+        if (lon > 0 && end.lon < 0) lon -= util::DEGREES_MAX;
+        else if (lon < 0 && end.lon > 0) lon += util::DEGREES_MAX;
     }
 
     // Constructs a LatLng object with the top left position of the specified tile.
     LatLng(const CanonicalTileID& id);
     LatLng(const UnwrappedTileID& id);
-};
 
-constexpr bool operator==(const LatLng& a, const LatLng& b) {
-    return a.latitude == b.latitude && a.longitude == b.longitude;
-}
+    friend bool operator==(const LatLng& a, const LatLng& b) {
+        return a.lat == b.lat && a.lon == b.lon;
+    }
 
-constexpr bool operator!=(const LatLng& a, const LatLng& b) {
-    return !(a == b);
-}
-
-class ProjectedMeters {
-public:
-    double northing;
-    double easting;
-
-    ProjectedMeters(double n = 0, double e = 0)
-        : northing(n), easting(e) {}
-
-    explicit operator bool() const {
-        return !(std::isnan(northing) || std::isnan(easting));
+    friend bool operator!=(const LatLng& a, const LatLng& b) {
+        return !(a == b);
     }
 };
-
-constexpr bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
-    return a.northing == b.northing && a.easting == b.easting;
-}
 
 class LatLngBounds {
 public:
@@ -111,10 +108,14 @@ public:
     // Constructs a LatLngBounds object with the tile's exact boundaries.
     LatLngBounds(const CanonicalTileID&);
 
-    double south() const { return sw.latitude; }
-    double west()  const { return sw.longitude; }
-    double north() const { return ne.latitude; }
-    double east()  const { return ne.longitude; }
+    bool valid() const {
+        return (sw.latitude() <= ne.latitude()) && (sw.longitude() <= ne.longitude());
+    }
+
+    double south() const { return sw.latitude(); }
+    double west()  const { return sw.longitude(); }
+    double north() const { return ne.latitude(); }
+    double east()  const { return ne.longitude(); }
 
     LatLng southwest() const { return sw; }
     LatLng northeast() const { return ne; }
@@ -122,15 +123,25 @@ public:
     LatLng northwest() const { return LatLng(north(), west()); }
 
     LatLng center() const {
-        return LatLng((sw.latitude + ne.latitude) / 2,
-                      (sw.longitude + ne.longitude) / 2);
+        return LatLng((sw.latitude() + ne.latitude()) / 2,
+                      (sw.longitude() + ne.longitude()) / 2);
+    }
+
+    LatLng constrain(const LatLng& p) const {
+        if (contains(p)) {
+            return p;
+        }
+        return LatLng {
+            util::clamp(p.latitude(), sw.latitude(), ne.latitude()),
+            util::clamp(p.longitude(), sw.longitude(), ne.longitude())
+        };
     }
 
     void extend(const LatLng& point) {
-        if (point.latitude < sw.latitude) sw.latitude = point.latitude;
-        if (point.latitude > ne.latitude) ne.latitude = point.latitude;
-        if (point.longitude < sw.longitude) sw.longitude = point.longitude;
-        if (point.longitude > ne.longitude) ne.longitude = point.longitude;
+        sw = LatLng(std::min(point.latitude(), sw.latitude()),
+                    std::min(point.longitude(), sw.longitude()));
+        ne = LatLng(std::max(point.latitude(), ne.latitude()),
+                    std::max(point.longitude(), ne.longitude()));
     }
 
     void extend(const LatLngBounds& bounds) {
@@ -139,22 +150,22 @@ public:
     }
 
     bool isEmpty() const {
-        return sw.latitude > ne.latitude ||
-               sw.longitude > ne.longitude;
+        return sw.latitude() > ne.latitude() ||
+               sw.longitude() > ne.longitude();
     }
 
     bool contains(const LatLng& point) const {
-        return (point.latitude  >= sw.latitude  &&
-                point.latitude  <= ne.latitude  &&
-                point.longitude >= sw.longitude &&
-                point.longitude <= ne.longitude);
+        return (point.latitude()  >= sw.latitude()  &&
+                point.latitude()  <= ne.latitude()  &&
+                point.longitude() >= sw.longitude() &&
+                point.longitude() <= ne.longitude());
     }
 
     bool intersects(const LatLngBounds area) const {
-        return (area.ne.latitude  > sw.latitude  &&
-                area.sw.latitude  < ne.latitude  &&
-                area.ne.longitude > sw.longitude &&
-                area.sw.longitude < ne.longitude);
+        return (area.ne.latitude()  > sw.latitude()  &&
+                area.sw.latitude()  < ne.latitude()  &&
+                area.ne.longitude() > sw.longitude() &&
+                area.sw.longitude() < ne.longitude());
     }
 
 private:
@@ -164,17 +175,14 @@ private:
     LatLngBounds(LatLng sw_, LatLng ne_)
         : sw(std::move(sw_)), ne(std::move(ne_)) {}
 
-    friend constexpr bool operator==(const LatLngBounds&, const LatLngBounds&);
-    friend constexpr bool operator!=(const LatLngBounds&, const LatLngBounds&);
+    friend bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
+        return a.sw == b.sw && a.ne == b.ne;
+    }
+
+    friend bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
+        return !(a == b);
+    }
 };
-
-constexpr bool operator==(const LatLngBounds& a, const LatLngBounds& b) {
-    return a.sw == b.sw && a.ne == b.ne;
-}
-
-constexpr bool operator!=(const LatLngBounds& a, const LatLngBounds& b) {
-    return !(a == b);
-}
 
 // Determines the orientation of the map.
 enum class NorthOrientation : uint8_t {
@@ -186,36 +194,60 @@ enum class NorthOrientation : uint8_t {
 
 /// The distance on each side between a rectangle and a rectangle within.
 class EdgeInsets {
+private:
+    double _top;    // Number of pixels inset from the top edge.
+    double _left;   // Number of pixels inset from the left edge.
+    double _bottom; // Number of pixels inset from the bottom edge.
+    double _right;  // Number of pixels inset from the right edge.
+
 public:
-    double top = 0;     ///< Number of pixels inset from the top edge.
-    double left = 0;    ///< Number of pixels inset from the left edge.
-    double bottom = 0;  ///< Number of pixels inset from the bottom edge.
-    double right = 0;   ///< Number of pixels inset from the right edge.
+    EdgeInsets(double t_ = 0, double l_ = 0, double b_ = 0, double r_ = 0)
+        : _top(t_), _left(l_), _bottom(b_), _right(r_) {
+        if (std::isnan(_top)) {
+            throw std::domain_error("top must not be NaN");
+        }
+        if (std::isnan(_left)) {
+            throw std::domain_error("left must not be NaN");
+        }
+        if (std::isnan(_bottom)) {
+            throw std::domain_error("bottom must not be NaN");
+        }
+        if (std::isnan(_right)) {
+            throw std::domain_error("right must not be NaN");
+        }
+    }
 
-    EdgeInsets() {}
+    double top() const { return _top; }
+    double left() const { return _left; }
+    double bottom() const { return _bottom; }
+    double right() const { return _right; }
 
-    EdgeInsets(const double t, const double l, const double b, const double r)
-        : top(t), left(l), bottom(b), right(r) {}
-
-    explicit operator bool() const {
-        return !(std::isnan(top) || std::isnan(left) || std::isnan(bottom) || std::isnan(right))
-            && (top || left || bottom || right);
+    bool isFlush() const {
+        return _top == 0 && _left == 0 && _bottom == 0 && _right == 0;
     }
 
     void operator+=(const EdgeInsets& o) {
-        top += o.top;
-        left += o.left;
-        bottom += o.bottom;
-        right += o.right;
+        _top += o._top;
+        _left += o._left;
+        _bottom += o._bottom;
+        _right += o._right;
     }
 
     EdgeInsets operator+(const EdgeInsets& o) const {
         return {
-            top + o.top, left + o.left, bottom + o.bottom, right + o.right,
+            _top + o._top, _left + o._left, _bottom + o._bottom, _right + o._right,
         };
     }
 
     ScreenCoordinate getCenter(uint16_t width, uint16_t height) const;
+
+    friend bool operator==(const EdgeInsets& a, const EdgeInsets& b) {
+        return a._top == b._top && a._left == b._left && a._bottom == b._bottom && a._right == b._right;
+    }
+
+    friend bool operator!=(const EdgeInsets& a, const EdgeInsets& b) {
+        return !(a == b);
+    }
 };
 
 } // namespace mbgl

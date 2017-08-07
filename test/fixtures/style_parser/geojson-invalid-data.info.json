@@ -1,7 +1,0 @@
-{
-    "default": {
-        "log": [
-            [1, "WARNING", "ParseStyle", "GeoJSON data must be a URL or an object"]
-        ]
-    }
-}

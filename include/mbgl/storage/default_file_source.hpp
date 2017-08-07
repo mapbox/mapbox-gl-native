@@ -1,16 +1,21 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
+#include <mutex>
 
 namespace mbgl {
 
 namespace util {
 template <typename T> class Thread;
 } // namespace util
+
+class ResourceTransform;
 
 class DefaultFileSource : public FileSource {
 public:
@@ -24,17 +29,22 @@ public:
     DefaultFileSource(const std::string& cachePath,
                       const std::string& assetRoot,
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
+    DefaultFileSource(const std::string& cachePath,
+                      std::unique_ptr<FileSource>&& assetFileSource,
+                      uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
     bool supportsOptionalRequests() const override {
         return true;
     }
-    
+
     void setAPIBaseURL(const std::string&);
-    std::string getAPIBaseURL() const;
+    std::string getAPIBaseURL();
 
     void setAccessToken(const std::string&);
-    std::string getAccessToken() const;
+    std::string getAccessToken();
+
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&&);
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
@@ -113,15 +123,37 @@ public:
      */
     void setOfflineMapboxTileCountLimit(uint64_t) const;
 
+    /*
+     * Pause file request activity.
+     *
+     * If pause is called then no revalidation or network request activity
+     * will occur.
+     */
+    void pause();
+
+    /*
+     * Resume file request activity.
+     *
+     * Calling resume will unpause the file source and process any tasks that
+     * expired while the file source was paused.
+     */
+    void resume();
+
     // For testing only.
     void put(const Resource&, const Response&);
 
     class Impl;
 
 private:
-    const std::unique_ptr<util::Thread<Impl>> thread;
-    const std::unique_ptr<FileSource> assetFileSource;
-    const std::unique_ptr<FileSource> localFileSource;
+    // Shared so destruction is done on this thread
+    const std::shared_ptr<FileSource> assetFileSource;
+    const std::unique_ptr<util::Thread<Impl>> impl;
+
+    std::mutex cachedBaseURLMutex;
+    std::string cachedBaseURL = mbgl::util::API_BASE_URL;
+
+    std::mutex cachedAccessTokenMutex;
+    std::string cachedAccessToken;
 };
 
 } // namespace mbgl

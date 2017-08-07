@@ -1,3 +1,0 @@
-include ':MapboxGLAndroidSDK'
-include ':MapboxGLAndroidSDKTestApp'
-include ':MapboxGLAndroidSDKWearTestApp'

@@ -2,38 +2,64 @@
 
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
+#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
 
 BackgroundLayer::BackgroundLayer(const std::string& layerID)
-    : Layer(Type::Background, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
-    impl->id = layerID;
+    : Layer(makeMutable<Impl>(LayerType::Background, layerID, std::string())) {
 }
 
-BackgroundLayer::BackgroundLayer(const Impl& other)
-    : Layer(Type::Background, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+BackgroundLayer::BackgroundLayer(Immutable<Impl> impl_)
+    : Layer(std::move(impl_)) {
 }
 
 BackgroundLayer::~BackgroundLayer() = default;
 
-std::unique_ptr<Layer> BackgroundLayer::Impl::clone() const {
-    return std::make_unique<BackgroundLayer>(*this);
+const BackgroundLayer::Impl& BackgroundLayer::impl() const {
+    return static_cast<const Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Layer> BackgroundLayer::Impl::cloneRef(const std::string& id_) const {
-    auto result = std::make_unique<BackgroundLayer>(*this);
-    result->impl->id = id_;
-    result->impl->paint = BackgroundPaintProperties();
-    return std::move(result);
+Mutable<BackgroundLayer::Impl> BackgroundLayer::mutableImpl() const {
+    return makeMutable<Impl>(impl());
+}
+
+std::unique_ptr<Layer> BackgroundLayer::cloneRef(const std::string& id_) const {
+    auto impl_ = mutableImpl();
+    impl_->id = id_;
+    impl_->paint = BackgroundPaintProperties::Transitionable();
+    return std::make_unique<BackgroundLayer>(std::move(impl_));
 }
 
 void BackgroundLayer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
 }
 
+
+// Visibility
+
+void BackgroundLayer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->visibility = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+// Zoom range
+
+void BackgroundLayer::setMinZoom(float minZoom) {
+    auto impl_ = mutableImpl();
+    impl_->minZoom = minZoom;
+    baseImpl = std::move(impl_);
+}
+
+void BackgroundLayer::setMaxZoom(float maxZoom) {
+    auto impl_ = mutableImpl();
+    impl_->maxZoom = maxZoom;
+    baseImpl = std::move(impl_);
+}
 
 // Layout properties
 
@@ -44,45 +70,81 @@ PropertyValue<Color> BackgroundLayer::getDefaultBackgroundColor() {
     return { Color::black() };
 }
 
-PropertyValue<Color> BackgroundLayer::getBackgroundColor(const optional<std::string>& klass) const {
-    return impl->paint.get<BackgroundColor>(klass);
+PropertyValue<Color> BackgroundLayer::getBackgroundColor() const {
+    return impl().paint.template get<BackgroundColor>().value;
 }
 
-void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value, const optional<std::string>& klass) {
-    if (value == getBackgroundColor(klass))
+void BackgroundLayer::setBackgroundColor(PropertyValue<Color> value) {
+    if (value == getBackgroundColor())
         return;
-    impl->paint.set<BackgroundColor>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundColor>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void BackgroundLayer::setBackgroundColorTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundColor>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions BackgroundLayer::getBackgroundColorTransition() const {
+    return impl().paint.template get<BackgroundColor>().options;
 }
 
 PropertyValue<std::string> BackgroundLayer::getDefaultBackgroundPattern() {
     return { "" };
 }
 
-PropertyValue<std::string> BackgroundLayer::getBackgroundPattern(const optional<std::string>& klass) const {
-    return impl->paint.get<BackgroundPattern>(klass);
+PropertyValue<std::string> BackgroundLayer::getBackgroundPattern() const {
+    return impl().paint.template get<BackgroundPattern>().value;
 }
 
-void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value, const optional<std::string>& klass) {
-    if (value == getBackgroundPattern(klass))
+void BackgroundLayer::setBackgroundPattern(PropertyValue<std::string> value) {
+    if (value == getBackgroundPattern())
         return;
-    impl->paint.set<BackgroundPattern>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundPattern>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void BackgroundLayer::setBackgroundPatternTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundPattern>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions BackgroundLayer::getBackgroundPatternTransition() const {
+    return impl().paint.template get<BackgroundPattern>().options;
 }
 
 PropertyValue<float> BackgroundLayer::getDefaultBackgroundOpacity() {
     return { 1 };
 }
 
-PropertyValue<float> BackgroundLayer::getBackgroundOpacity(const optional<std::string>& klass) const {
-    return impl->paint.get<BackgroundOpacity>(klass);
+PropertyValue<float> BackgroundLayer::getBackgroundOpacity() const {
+    return impl().paint.template get<BackgroundOpacity>().value;
 }
 
-void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value, const optional<std::string>& klass) {
-    if (value == getBackgroundOpacity(klass))
+void BackgroundLayer::setBackgroundOpacity(PropertyValue<float> value) {
+    if (value == getBackgroundOpacity())
         return;
-    impl->paint.set<BackgroundOpacity>(value, klass);
-    impl->observer->onLayerPaintPropertyChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundOpacity>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void BackgroundLayer::setBackgroundOpacityTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<BackgroundOpacity>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions BackgroundLayer::getBackgroundOpacityTransition() const {
+    return impl().paint.template get<BackgroundOpacity>().options;
 }
 
 } // namespace style

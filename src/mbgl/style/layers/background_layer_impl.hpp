@@ -9,16 +9,12 @@ namespace style {
 
 class BackgroundLayer::Impl : public Layer::Impl {
 public:
-    std::unique_ptr<Layer> clone() const override;
-    std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
+    using Layer::Impl::Impl;
+
+    bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    void cascade(const CascadeParameters&) override;
-    bool evaluate(const PropertyEvaluationParameters&) override;
-
-    std::unique_ptr<Bucket> createBucket(BucketParameters&, const GeometryTileLayer&) const override;
-
-    BackgroundPaintProperties paint;
+    BackgroundPaintProperties::Transitionable paint;
 };
 
 } // namespace style

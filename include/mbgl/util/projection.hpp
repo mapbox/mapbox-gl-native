@@ -5,8 +5,35 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/math/clamp.hpp>
 
-
 namespace mbgl {
+
+class ProjectedMeters {
+private:
+    double _northing; // Distance measured northwards.
+    double _easting;  // Distance measured eastwards.
+
+public:
+    ProjectedMeters(double n_ = 0, double e_ = 0)
+        : _northing(n_), _easting(e_) {
+        if (std::isnan(_northing)) {
+            throw std::domain_error("northing must not be NaN");
+        }
+        if (std::isnan(_easting)) {
+            throw std::domain_error("easting must not be NaN");
+        }
+    }
+
+    double northing() const { return _northing; }
+    double easting() const { return _easting; }
+
+    friend bool operator==(const ProjectedMeters& a, const ProjectedMeters& b) {
+        return a._northing == b._northing && a._easting == b._easting;
+    }
+
+    friend bool operator!=(const ProjectedMeters& a, const ProjectedMeters& b) {
+        return !(a == b);
+    }
+};
 
 // Spherical Mercator projection
 // http://docs.openlayers.org/library/spherical_mercator.html
@@ -25,8 +52,8 @@ public:
     }
 
     static ProjectedMeters projectedMetersForLatLng(const LatLng& latLng) {
-        const double constrainedLatitude = util::clamp(latLng.latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
-        const double constrainedLongitude = util::clamp(latLng.longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
+        const double constrainedLatitude = util::clamp(latLng.latitude(), -util::LATITUDE_MAX, util::LATITUDE_MAX);
+        const double constrainedLongitude = util::clamp(latLng.longitude(), -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
 
         const double m = 1 - 1e-15;
         const double f = util::clamp(std::sin(util::DEG2RAD * constrainedLatitude), -m, m);
@@ -38,8 +65,8 @@ public:
     }
 
     static LatLng latLngForProjectedMeters(const ProjectedMeters& projectedMeters) {
-        double latitude = (2 * std::atan(std::exp(projectedMeters.northing / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
-        double longitude = projectedMeters.easting * util::RAD2DEG / util::EARTH_RADIUS_M;
+        double latitude = (2 * std::atan(std::exp(projectedMeters.northing() / util::EARTH_RADIUS_M)) - (M_PI / 2.0)) * util::RAD2DEG;
+        double longitude = projectedMeters.easting() * util::RAD2DEG / util::EARTH_RADIUS_M;
 
         latitude = util::clamp(latitude, -util::LATITUDE_MAX, util::LATITUDE_MAX);
         longitude = util::clamp(longitude, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
@@ -49,8 +76,8 @@ public:
 
     static Point<double> project(const LatLng& latLng, double scale) {
         return Point<double> {
-            util::LONGITUDE_MAX + latLng.longitude,
-            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude * M_PI / util::DEGREES_MAX))
+            util::LONGITUDE_MAX + latLng.longitude(),
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
         } * worldSize(scale) / util::DEGREES_MAX;
     }
 

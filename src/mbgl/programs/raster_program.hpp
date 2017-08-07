@@ -3,8 +3,9 @@
 #include <mbgl/programs/program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
-#include <mbgl/shader/raster.hpp>
+#include <mbgl/shaders/raster.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/style/layers/raster_layer_properties.hpp>
 
 namespace mbgl {
 
@@ -22,14 +23,12 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_spin_weights);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_tl_parent);
 } // namespace uniforms
 
-using RasterAttributes = gl::Attributes<
-    attributes::a_pos,
-    attributes::a_texture_pos>;
-
 class RasterProgram : public Program<
     shaders::raster,
     gl::Triangle,
-    RasterAttributes,
+    gl::Attributes<
+        attributes::a_pos,
+        attributes::a_texture_pos>,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_image0,
@@ -43,25 +42,27 @@ class RasterProgram : public Program<
         uniforms::u_spin_weights,
         uniforms::u_buffer_scale,
         uniforms::u_scale_parent,
-        uniforms::u_tl_parent>>
+        uniforms::u_tl_parent>,
+    style::RasterPaintProperties>
 {
 public:
     using Program::Program;
 
-    static Vertex vertex(Point<int16_t> p, Point<uint16_t> t) {
-        return Vertex {
-            {
+    static LayoutVertex layoutVertex(Point<int16_t> p, Point<uint16_t> t) {
+        return LayoutVertex {
+            {{
                 p.x,
                 p.y
-            },
-            {
+            }},
+            {{
                 t.x,
                 t.y
-            }
+            }}
         };
     }
 };
 
-using RasterVertex = RasterProgram::Vertex;
+using RasterLayoutVertex = RasterProgram::LayoutVertex;
+using RasterAttributes = RasterProgram::Attributes;
 
 } // namespace mbgl

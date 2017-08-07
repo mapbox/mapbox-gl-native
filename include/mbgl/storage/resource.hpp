@@ -18,7 +18,8 @@ public:
         Tile,
         Glyphs,
         SpriteImage,
-        SpriteJSON
+        SpriteJSON,
+        Image
     };
 
     struct TileData {
@@ -55,7 +56,8 @@ public:
                            const std::pair<uint16_t, uint16_t>& glyphRange);
     static Resource spriteImage(const std::string& base, float pixelRatio);
     static Resource spriteJSON(const std::string& base, float pixelRatio);
-
+    static Resource image(const std::string& url);
+    
     Kind kind;
     Necessity necessity;
     std::string url;
@@ -66,6 +68,7 @@ public:
     optional<Timestamp> priorModified = {};
     optional<Timestamp> priorExpires = {};
     optional<std::string> priorEtag = {};
+    std::shared_ptr<const std::string> priorData;
 };
 
 } // namespace mbgl

@@ -62,48 +62,4 @@ std::shared_ptr<WorkTask> WorkTask::make(Fn&& fn, Args&&... args) {
         flag);
 }
 
-namespace detail {
-template <class Tuple, size_t... Indexes>
-auto packageArgumentsAndCallback(std::shared_ptr<std::atomic<bool>> flag,
-                                 Tuple&& args,
-                                 std::index_sequence<Indexes...>) {
-    auto callback = std::get<sizeof...(Indexes)>(args);
-
-    // Create a lambda L1 that invokes another lambda L2 on the current RunLoop R, that calls
-    // the callback C. Both lambdas check the flag before proceeding. L1 needs to check the flag
-    // because if the request was cancelled, then R might have been destroyed. L2 needs to check
-    // the flag because the request may have been cancelled after L2 was invoked but before it
-    // began executing.
-
-    auto l2 = [flag, callback] (auto&&... results) {
-        if (!*flag) {
-            callback(std::forward<decltype(results)>(results)...);
-        }
-    };
-
-    auto l1 = [flag, current = util::RunLoop::Get(), l2_ = l2] (auto&&... results) {
-        if (!*flag) {
-            current->invoke(l2_, std::forward<decltype(results)>(results)...);
-        }
-    };
-
-    return std::make_tuple(std::get<Indexes>(std::forward<Tuple>(args))..., l1);
-}
-} // namespace detail
-
-template <class Fn, class... Args>
-std::shared_ptr<WorkTask> WorkTask::makeWithCallback(Fn&& fn, Args&&... args) {
-    auto flag = std::make_shared<std::atomic<bool>>();
-    *flag = false;
-
-    auto tuple = detail::packageArgumentsAndCallback(flag,
-        std::forward_as_tuple(std::forward<Args>(args)...),
-        std::make_index_sequence<sizeof...(Args) - 1>());
-
-    return std::make_shared<WorkTaskImpl<std::decay_t<Fn>, decltype(tuple)>>(
-        std::forward<Fn>(fn),
-        std::move(tuple),
-        flag);
-}
-
 } // namespace mbgl

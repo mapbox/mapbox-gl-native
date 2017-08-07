@@ -1,12 +1,15 @@
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/style/style.hpp>
-#include <mbgl/style/layer.hpp>
-#include <mbgl/style/layer_impl.hpp>
-#include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/renderer/render_style.hpp>
+#include <mbgl/renderer/render_layer.hpp>
+#include <mbgl/renderer/query.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
+#include <mbgl/style/filter.hpp>
+#include <mbgl/style/filter_evaluator.hpp>
+#include <mbgl/tile/geometry_tile.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -50,23 +53,57 @@ static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& 
     return a.sortIndex < b.sortIndex;
 }
 
+static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions,
+                                        const RenderStyle& style,
+                                        const GeometryTile& tile,
+                                        const float pixelsToTileUnits) {
+
+    // Determine the additional radius needed factoring in property functions
+    float additionalRadius = 0;
+    auto getQueryRadius = [&](const RenderLayer& layer) {
+        auto bucket = tile.getBucket(*layer.baseImpl);
+        if (bucket) {
+            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(layer) * pixelsToTileUnits);
+        }
+    };
+
+    if (queryOptions.layerIDs) {
+        for (const auto& layerID : *queryOptions.layerIDs) {
+            const RenderLayer* layer = style.getRenderLayer(layerID);
+            if (layer) {
+                getQueryRadius(*layer);
+            }
+        }
+    } else {
+        for (const RenderLayer* layer : style.getRenderLayers()) {
+            getQueryRadius(*layer);
+        }
+    }
+
+    return std::min<int16_t>(util::EXTENT, additionalRadius);
+}
+
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
         const float bearing,
         const double tileSize,
         const double scale,
-        const optional<std::vector<std::string>>& filterLayerIDs,
+        const RenderedQueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
-        const style::Style& style,
-        const CollisionTile* collisionTile) const {
+        const RenderStyle& style,
+        const CollisionTile* collisionTile,
+        const GeometryTile& tile) const {
 
-    mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-
+    // Determine query radius
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
-    const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, std::ceil(style.getQueryRadius() * pixelsToTileUnits));
+    const int16_t additionalRadius = getAdditionalQueryRadius(queryOptions, style, tile, pixelsToTileUnits);
+
+    // Query the grid index
+    mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
     std::vector<IndexedSubfeature> features = grid.query({ box.min - additionalRadius, box.max + additionalRadius });
+
 
     std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
@@ -76,7 +113,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 
     // Query symbol features, if they've been placed.
@@ -87,7 +124,7 @@ void FeatureIndex::query(
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, filterLayerIDs, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
     }
 }
 
@@ -95,15 +132,15 @@ void FeatureIndex::addFeature(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const IndexedSubfeature& indexedFeature,
     const GeometryCoordinates& queryGeometry,
-    const optional<std::vector<std::string>>& filterLayerIDs,
+    const RenderedQueryOptions& options,
     const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
-    const style::Style& style,
+    const RenderStyle& style,
     const float bearing,
     const float pixelsToTileUnits) const {
 
     auto& layerIDs = bucketLayerIDs.at(indexedFeature.bucketName);
-    if (filterLayerIDs && !vectorsIntersect(layerIDs, *filterLayerIDs)) {
+    if (options.layerIDs && !vectorsIntersect(layerIDs, *options.layerIDs)) {
         return;
     }
 
@@ -114,14 +151,18 @@ void FeatureIndex::addFeature(
     assert(geometryTileFeature);
 
     for (const auto& layerID : layerIDs) {
-        if (filterLayerIDs && !vectorContains(*filterLayerIDs, layerID)) {
+        if (options.layerIDs && !vectorContains(*options.layerIDs, layerID)) {
             continue;
         }
 
-        auto styleLayer = style.getLayer(layerID);
-        if (!styleLayer ||
-            (!styleLayer->is<style::SymbolLayer>() &&
-             !styleLayer->baseImpl->queryIntersectsGeometry(queryGeometry, geometryTileFeature->getGeometries(), bearing, pixelsToTileUnits))) {
+        auto renderLayer = style.getRenderLayer(layerID);
+        if (!renderLayer ||
+            (!renderLayer->is<RenderSymbolLayer>() &&
+             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits))) {
+            continue;
+        }
+
+        if (options.filter && !(*options.filter)(*geometryTileFeature)) {
             continue;
         }
 

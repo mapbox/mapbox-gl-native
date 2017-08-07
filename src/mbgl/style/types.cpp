@@ -11,6 +11,7 @@ MBGL_DEFINE_ENUM(SourceType, {
     { SourceType::GeoJSON, "geojson" },
     { SourceType::Video, "video" },
     { SourceType::Annotations, "annotations" },
+    { SourceType::Image, "image" },
 });
 
 MBGL_DEFINE_ENUM(VisibilityType, {
@@ -87,6 +88,11 @@ MBGL_DEFINE_ENUM(IconTextFitType, {
     { IconTextFitType::Both, "both" },
     { IconTextFitType::Width, "width" },
     { IconTextFitType::Height, "height" },
+});
+
+MBGL_DEFINE_ENUM(LightAnchorType, {
+    { LightAnchorType::Map, "map" },
+    { LightAnchorType::Viewport, "viewport" }
 });
 
 } // namespace mbgl

@@ -1,37 +1,28 @@
 #pragma once
 
 #include <mbgl/util/image.hpp>
-#include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/util/geo.hpp>
 
 #include <string>
 #include <memory>
-#include <map>
+#include <vector>
 
 namespace mbgl {
 
-class SpriteImage;
-
-using SpriteImagePtr = std::shared_ptr<const SpriteImage>;
+namespace style {
+class Image;
+} // namespace style
 
 // Extracts an individual image from a spritesheet from the given location.
-SpriteImagePtr createSpriteImage(const PremultipliedImage&,
-                                 uint32_t srcX,
-                                 uint32_t srcY,
-                                 uint32_t srcWidth,
-                                 uint32_t srcHeight,
-                                 double ratio,
-                                 bool sdf);
-
-using Sprites = std::map<std::string, SpriteImagePtr>;
-
-
-using SpriteParseResult = variant<
-    Sprites,             // success
-    std::exception_ptr>; // error
+std::unique_ptr<style::Image> createStyleImage(const std::string& id,
+                                               const PremultipliedImage&,
+                                               uint32_t srcX,
+                                               uint32_t srcY,
+                                               uint32_t srcWidth,
+                                               uint32_t srcHeight,
+                                               double ratio,
+                                               bool sdf);
 
 // Parses an image and an associated JSON file and returns the sprite objects.
-SpriteParseResult parseSprite(const std::string& image, const std::string& json);
+std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& image, const std::string& json);
 
 } // namespace mbgl

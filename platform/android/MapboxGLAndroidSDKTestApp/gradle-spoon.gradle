@@ -1,8 +1,0 @@
-println "configuring spoon"
-apply plugin: 'spoon'
-spoon {
-    // Spoon: distributes instrumentation tests to all your Androids
-    // for more  options see https://github.com/stanfy/spoon-gradle-plugin
-    grantAllPermissions = true
-    debug = true
-}

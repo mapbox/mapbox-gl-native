@@ -1,16 +1,24 @@
 #pragma once
 
+#include <mbgl/util/optional.hpp>
+
+#include <string>
+#include <vector>
+
 namespace mbgl {
 
 class ProgramParameters {
 public:
-    ProgramParameters(float pixelRatio_ = 1.0, bool overdraw_ = false)
-      : pixelRatio(pixelRatio_),
-        overdraw(overdraw_) {}
+    ProgramParameters(float pixelRatio, bool overdraw, optional<std::string> cacheDir);
 
-    float pixelRatio;
-    bool overdraw;
+    const std::string& getDefines() const;
+    optional<std::string> cachePath(const char* name) const;
+
+    ProgramParameters withAdditionalDefines(const std::vector<std::string>& defines) const;
+
+private:
+    std::string defines;
+    optional<std::string> cacheDir;
 };
 
 } // namespace mbgl
-

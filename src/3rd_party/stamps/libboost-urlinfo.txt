@@ -1,3 +1,0 @@
-repository='external project URL'
-module='https://github.com/tmpsantos/mapbox-gl-native-boost/archive/v1.60.0.zip'
-tag=''

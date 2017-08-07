@@ -4,6 +4,7 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/style/property_value.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 
 #include <cstdint>
 #include <vector>
@@ -16,10 +17,9 @@ using AnnotationIDs = std::vector<AnnotationID>;
 
 class SymbolAnnotation {
 public:
-    SymbolAnnotation() = default;
-
-    SymbolAnnotation(Point<double> geometry_, std::string icon_)
-        : geometry(std::move(geometry_)), icon(std::move(icon_)) {}
+    SymbolAnnotation(Point<double> geometry_, std::string icon_ = {})
+        : geometry(std::move(geometry_)),
+          icon(std::move(icon_)) {}
 
     Point<double> geometry;
     std::string icon;
@@ -33,42 +33,41 @@ using ShapeAnnotationGeometry = variant<
 
 class LineAnnotation {
 public:
-    LineAnnotation(ShapeAnnotationGeometry geometry_, style::PropertyValue<float> opacity_,
-                   style::PropertyValue<float> width_, style::PropertyValue<Color> color_)
-        : geometry(std::move(geometry_)), opacity(std::move(opacity_)), width(std::move(width_)), color(std::move(color_)) {}
+    LineAnnotation(ShapeAnnotationGeometry geometry_,
+                   style::DataDrivenPropertyValue<float> opacity_ = 1.0f,
+                   style::DataDrivenPropertyValue<float> width_ = 1.0f,
+                   style::DataDrivenPropertyValue<Color> color_ = Color::black())
+        : geometry(std::move(geometry_)),
+          opacity(std::move(opacity_)),
+          width(std::move(width_)),
+          color(std::move(color_)) {}
 
     ShapeAnnotationGeometry geometry;
-    style::PropertyValue<float> opacity { 1.0f };
-    style::PropertyValue<float> width { 1.0f };
-    style::PropertyValue<Color> color { Color::black() };
+    style::DataDrivenPropertyValue<float> opacity;
+    style::DataDrivenPropertyValue<float> width;
+    style::DataDrivenPropertyValue<Color> color;
 };
 
 class FillAnnotation {
 public:
-    FillAnnotation(ShapeAnnotationGeometry geometry_, style::PropertyValue<float> opacity_,
-                   style::PropertyValue<Color> color_, style::PropertyValue<Color> outlineColor_)
-        : geometry(std::move(geometry_)), opacity(std::move(opacity_)), color(std::move(color_)), outlineColor(std::move(outlineColor_)) {}
+    FillAnnotation(ShapeAnnotationGeometry geometry_,
+                   style::DataDrivenPropertyValue<float> opacity_ = 1.0f,
+                   style::DataDrivenPropertyValue<Color> color_ = Color::black(),
+                   style::DataDrivenPropertyValue<Color> outlineColor_ = {})
+        : geometry(std::move(geometry_)),
+          opacity(std::move(opacity_)),
+          color(std::move(color_)),
+          outlineColor(std::move(outlineColor_)) {}
 
     ShapeAnnotationGeometry geometry;
-    style::PropertyValue<float> opacity { 1.0f };
-    style::PropertyValue<Color> color { Color::black() };
-    style::PropertyValue<Color> outlineColor {};
-};
-
-// An annotation whose type and properties are sourced from a style layer.
-class StyleSourcedAnnotation {
-public:
-    StyleSourcedAnnotation(ShapeAnnotationGeometry geometry_, std::string layerID_)
-        : geometry(std::move(geometry_)), layerID(std::move(layerID_)) {}
-
-    ShapeAnnotationGeometry geometry;
-    std::string layerID;
+    style::DataDrivenPropertyValue<float> opacity;
+    style::DataDrivenPropertyValue<Color> color;
+    style::DataDrivenPropertyValue<Color> outlineColor;
 };
 
 using Annotation = variant<
     SymbolAnnotation,
     LineAnnotation,
-    FillAnnotation,
-    StyleSourcedAnnotation>;
+    FillAnnotation>;
 
 } // namespace mbgl

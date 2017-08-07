@@ -2,6 +2,7 @@
 
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/source.hpp>
+#include <mbgl/style/light.hpp>
 
 #include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/font_stack.hpp>
@@ -31,6 +32,9 @@ public:
     std::vector<std::unique_ptr<Source>> sources;
     std::vector<std::unique_ptr<Layer>> layers;
 
+    TransitionOptions transition;
+    Light light;
+
     std::string name;
     LatLng latLng;
     double zoom = 0;
@@ -41,6 +45,8 @@ public:
     std::vector<FontStack> fontStacks() const;
 
 private:
+    void parseTransition(const JSValue&);
+    void parseLight(const JSValue&);
     void parseSources(const JSValue&);
     void parseLayers(const JSValue&);
     void parseLayer(const std::string& id, const JSValue&, std::unique_ptr<Layer>&);

@@ -17,9 +17,9 @@ typename std::enable_if_t<std::is_floating_point<T>::value, T> log2(T x)
 // log2() is producing wrong results on ARMv5 binaries
 // running on ARMv7+ CPUs.
 #if defined(__ANDROID__)
-    return std::log(x) / M_LN2;
+    return ::log(x) / M_LN2;
 #else
-    return std::log2(x);
+    return ::log2(x);
 #endif
 }
 

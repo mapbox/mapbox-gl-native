@@ -2,7 +2,7 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/layout_property.hpp>
+#include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/feature.hpp>
@@ -103,6 +103,29 @@ void stringify(Writer& writer, const Value& v) {
 }
 
 template <class Writer>
+void stringify(Writer& writer, FeatureType type) {
+    switch (type) {
+    case FeatureType::Unknown:
+        writer.String("Unknown");
+        break;
+    case FeatureType::Point:
+        writer.String("Point");
+        break;
+    case FeatureType::LineString:
+        writer.String("LineString");
+        break;
+    case FeatureType::Polygon:
+        writer.String("Polygon");
+        break;
+    }
+}
+
+template <class Writer>
+void stringify(Writer& writer, const FeatureIdentifier& id) {
+    FeatureIdentifier::visit(id, [&] (const auto& id_) { stringify(writer, id_); });
+}
+
+template <class Writer>
 class StringifyFilter {
 public:
     Writer& writer;
@@ -156,28 +179,78 @@ public:
     }
 
     void operator()(const HasFilter& f) {
-        stringifyUnaryFilter(f, "has");
+        stringifyUnaryFilter("has", f.key);
     }
 
     void operator()(const NotHasFilter& f) {
-        stringifyUnaryFilter(f, "!has");
+        stringifyUnaryFilter("!has", f.key);
+    }
+
+    void operator()(const TypeEqualsFilter& f) {
+        stringifyBinaryFilter(f, "==", "$type");
+    }
+
+    void operator()(const TypeNotEqualsFilter& f) {
+        stringifyBinaryFilter(f, "!=", "$type");
+    }
+
+    void operator()(const TypeInFilter& f) {
+        stringifySetFilter(f, "in", "$type");
+    }
+
+    void operator()(const TypeNotInFilter& f) {
+        stringifySetFilter(f, "!in", "$type");
+    }
+
+    void operator()(const IdentifierEqualsFilter& f) {
+        stringifyBinaryFilter(f, "==", "$id");
+    }
+
+    void operator()(const IdentifierNotEqualsFilter& f) {
+        stringifyBinaryFilter(f, "!=", "$id");
+    }
+
+    void operator()(const IdentifierInFilter& f) {
+        stringifySetFilter(f, "in", "$id");
+    }
+
+    void operator()(const IdentifierNotInFilter& f) {
+        stringifySetFilter(f, "!in", "$id");
+    }
+
+    void operator()(const HasIdentifierFilter&) {
+        stringifyUnaryFilter("has", "$id");
+    }
+
+    void operator()(const NotHasIdentifierFilter&) {
+        stringifyUnaryFilter("!has", "$id");
     }
 
 private:
     template <class F>
     void stringifyBinaryFilter(const F& f, const char * op) {
+        stringifyBinaryFilter(f, op, f.key);
+    }
+
+    template <class F>
+    void stringifyBinaryFilter(const F& f, const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         stringify(writer, f.value);
         writer.EndArray();
     }
 
     template <class F>
     void stringifySetFilter(const F& f, const char * op) {
+        stringifySetFilter(f, op, f.key);
+    }
+
+    template <class F>
+    void stringifySetFilter(const F& f, const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         for (const auto& value : f.values) {
             stringify(writer, value);
         }
@@ -194,11 +267,10 @@ private:
         writer.EndArray();
     }
 
-    template <class F>
-    void stringifyUnaryFilter(const F& f, const char * op) {
+    void stringifyUnaryFilter(const char * op, const std::string& key) {
         writer.StartArray();
         writer.String(op);
-        writer.String(f.key);
+        writer.String(key);
         writer.EndArray();
     }
 };
@@ -214,20 +286,137 @@ void stringify(Writer& writer, const Undefined&) {
     writer.Null();
 }
 
-template <class Writer, class T>
-void stringify(Writer& writer, const Function<T>& f) {
-    writer.StartObject();
-    writer.Key("base");
-    writer.Double(f.getBase());
-    writer.Key("stops");
-    writer.StartArray();
-    for (const auto& stop : f.getStops()) {
+template <class Writer>
+void stringify(Writer& writer, const CategoricalValue& v) {
+    CategoricalValue::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
+}
+
+template <class Writer>
+class StringifyStops {
+public:
+    Writer& writer;
+
+    template <class T>
+    void operator()(const ExponentialStops<T>& f) {
+        writer.Key("type");
+        writer.String("exponential");
+        writer.Key("base");
+        writer.Double(f.base);
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const IntervalStops<T>& f) {
+        writer.Key("type");
+        writer.String("interval");
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const CategoricalStops<T>& f) {
+        writer.Key("type");
+        writer.String("categorical");
+        writer.Key("stops");
+        stringifyStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const IdentityStops<T>&) {
+        writer.Key("type");
+        writer.String("identity");
+    }
+
+    template <class T>
+    void operator()(const CompositeExponentialStops<T>& f) {
+        writer.Key("type");
+        writer.String("exponential");
+        writer.Key("base");
+        writer.Double(f.base);
+        writer.Key("stops");
+        stringifyCompositeStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const CompositeIntervalStops<T>& f) {
+        writer.Key("type");
+        writer.String("interval");
+        writer.Key("stops");
+        stringifyCompositeStops(f.stops);
+    }
+
+    template <class T>
+    void operator()(const CompositeCategoricalStops<T>& f) {
+        writer.Key("type");
+        writer.String("categorical");
+        writer.Key("stops");
+        stringifyCompositeStops(f.stops);
+    }
+
+private:
+    template <class K, class V>
+    void stringifyStops(const std::map<K, V>& stops) {
         writer.StartArray();
-        writer.Double(stop.first);
-        stringify(writer, stop.second);
+        for (const auto& stop : stops) {
+            writer.StartArray();
+            stringify(writer, stop.first);
+            stringify(writer, stop.second);
+            writer.EndArray();
+        }
         writer.EndArray();
     }
-    writer.EndArray();
+
+    template <class InnerStops>
+    void stringifyCompositeStops(const std::map<float, InnerStops>& stops) {
+        writer.StartArray();
+        for (const auto& outer : stops) {
+            for (const auto& inner : outer.second) {
+                writer.StartArray();
+                writer.StartObject();
+                writer.Key("zoom");
+                writer.Double(outer.first);
+                writer.Key("value");
+                stringify(writer, inner.first);
+                writer.EndObject();
+                stringify(writer, inner.second);
+                writer.EndArray();
+            }
+        }
+        writer.EndArray();
+    }
+};
+
+template <class Writer, class T>
+void stringify(Writer& writer, const CameraFunction<T>& f) {
+    writer.StartObject();
+    CameraFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    writer.EndObject();
+}
+
+template <class Writer, class T>
+void stringify(Writer& writer, const SourceFunction<T>& f) {
+    writer.StartObject();
+    writer.Key("property");
+    writer.String(f.property);
+    SourceFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    if (f.defaultValue) {
+        writer.Key("default");
+        stringify(writer, *f.defaultValue);
+    }
+    writer.EndObject();
+}
+
+template <class Writer, class T>
+void stringify(Writer& writer, const CompositeFunction<T>& f) {
+    writer.StartObject();
+    writer.Key("property");
+    writer.String(f.property);
+    CompositeFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
+    if (f.defaultValue) {
+        writer.Key("default");
+        stringify(writer, *f.defaultValue);
+    }
     writer.EndObject();
 }
 
@@ -238,17 +427,23 @@ void stringify(Writer& writer, const PropertyValue<T>& v) {
 
 template <class Property, class Writer, class T>
 void stringify(Writer& writer, const PropertyValue<T>& value) {
-    if (value) {
+    if (!value.isUndefined()) {
         writer.Key(Property::key);
         stringify(writer, value);
     }
 }
 
-template <class Writer, class... Ps>
-void stringify(Writer& writer, const LayoutProperties<Ps...>& ps) {
-    writer.StartObject();
-    util::ignore({ (stringify<Ps>(writer, ps.unevaluated.template get<Ps>()), 0)... });
-    writer.EndObject();
+template <class Writer, class T>
+void stringify(Writer& writer, const DataDrivenPropertyValue<T>& v) {
+    v.evaluate([&] (const auto& v_) { stringify(writer, v_); });
+}
+
+template <class Property, class Writer, class T>
+void stringify(Writer& writer, const DataDrivenPropertyValue<T>& value) {
+    if (!value.isUndefined()) {
+        writer.Key(Property::key);
+        stringify(writer, value);
+    }
 }
 
 } // namespace conversion

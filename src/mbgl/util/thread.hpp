@@ -1,128 +1,163 @@
 #pragma once
 
-#include <future>
-#include <thread>
-#include <atomic>
-#include <utility>
-#include <functional>
-
-#include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/thread_context.hpp>
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/mailbox.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/util/platform.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/util.hpp>
+
+#include <cassert>
+#include <future>
+#include <memory>
+#include <mutex>
+#include <queue>
+#include <string>
+#include <thread>
+#include <utility>
 
 namespace mbgl {
 namespace util {
 
-// Manages a thread with Object.
+// Manages a thread with `Object`.
 
-// Upon creation of this object, it launches a thread, creates an object of type Object in that
-// thread, and then calls .start(); on that object. When the Thread<> object is destructed, the
-// Object's .stop() function is called, and the destructor waits for thread termination. The
-// Thread<> constructor blocks until the thread and the Object are fully created, so after the
-// object creation, it's safe to obtain the Object stored in this thread.
-
-template <class Object>
-class Thread {
+// Upon creation of this object, it launches a thread and creates an object of type `Object`
+// in that thread. When the `Thread<>` object is destructed, the destructor waits
+// for thread termination. The `Thread<>` constructor blocks until the thread and
+// the `Object` are fully created, so after the object creation, it's safe to obtain the
+// `Object` stored in this thread. The thread created will always have low priority on
+// the platforms that support setting thread priority.
+//
+// The following properties make this class different from `ThreadPool`:
+//
+// - Only one thread is created.
+// - `Object` will live in a single thread, providing thread affinity.
+// - It is safe to use `ThreadLocal` in an `Object` managed by `Thread<>`
+// - A `RunLoop` is created for the `Object` thread.
+// - `Object` can use `Timer` and do asynchronous I/O, like wait for sockets events.
+//
+template<class Object>
+class Thread : public Scheduler {
 public:
     template <class... Args>
-    Thread(const ThreadContext&, Args&&... args);
-    ~Thread();
+    Thread(const std::string& name, Args&&... args) {
+        std::promise<void> running;
 
-    // Invoke object->fn(args...) asynchronously.
-    template <typename Fn, class... Args>
-    void invoke(Fn fn, Args&&... args) {
-        loop->invoke(bind(fn), std::forward<Args>(args)...);
+        thread = std::thread([&] {
+            platform::setCurrentThreadName(name);
+            platform::makeThreadLowPriority();
+
+            util::RunLoop loop_(util::RunLoop::Type::New);
+            loop = &loop_;
+
+            object = std::make_unique<Actor<Object>>(*this, std::forward<Args>(args)...);
+            running.set_value();
+
+            loop->run();
+            loop = nullptr;
+        });
+
+        running.get_future().get();
     }
 
-    // Invoke object->fn(args...) asynchronously. The final argument to fn must be a callback.
-    // The provided callback is wrapped such that it is invoked, in the current thread (which
-    // must have a RunLoop), once for each time the invocation of fn invokes the wrapper, each
-    // time forwarding the passed arguments, until such time as the AsyncRequest is cancelled.
-    template <typename Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn fn, Args&&... args) {
-        return loop->invokeWithCallback(bind(fn), std::forward<Args>(args)...);
+    ~Thread() override {
+        MBGL_VERIFY_THREAD(tid);
+
+        if (paused) {
+            resume();
+        }
+
+        std::promise<void> joinable;
+
+        // Kill the actor, so we don't get more
+        // messages posted on this scheduler after
+        // we delete the RunLoop.
+        loop->invoke([&] {
+            object.reset();
+            joinable.set_value();
+        });
+
+        joinable.get_future().get();
+
+        loop->stop();
+        thread.join();
     }
 
-    // Invoke object->fn(args...) asynchronously, but wait for the result.
-    template <typename Fn, class... Args>
-    auto invokeSync(Fn fn, Args&&... args) {
-        using R = std::result_of_t<Fn(Object, Args&&...)>;
-        std::packaged_task<R ()> task(std::bind(fn, object, args...));
-        std::future<R> future = task.get_future();
-        loop->invoke(std::move(task));
-        return future.get();
+    // Returns a non-owning reference to `Object` that
+    // can be used to send messages to `Object`. It is safe
+    // to the non-owning reference to outlive this object
+    // and be used after the `Thread<>` gets destroyed.
+    ActorRef<std::decay_t<Object>> actor() const {
+        return object->self();
+    }
+
+    // Pauses the `Object` thread. It will prevent the object to wake
+    // up from events such as timers and file descriptor I/O. Messages
+    // sent to a paused `Object` will be queued and only processed after
+    // `resume()` is called.
+    void pause() {
+        MBGL_VERIFY_THREAD(tid);
+
+        assert(!paused);
+
+        paused = std::make_unique<std::promise<void>>();
+        resumed = std::make_unique<std::promise<void>>();
+
+        auto pausing = paused->get_future();
+
+        loop->invoke([this] {
+            auto resuming = resumed->get_future();
+            paused->set_value();
+            resuming.get();
+        });
+
+        pausing.get();
+    }
+
+    // Resumes the `Object` thread previously paused by `pause()`.
+    void resume() {
+        MBGL_VERIFY_THREAD(tid);
+
+        assert(paused);
+
+        resumed->set_value();
+
+        resumed.reset();
+        paused.reset();
     }
 
 private:
-    Thread(const Thread&) = delete;
-    Thread(Thread&&) = delete;
-    Thread& operator=(const Thread&) = delete;
-    Thread& operator=(Thread&&) = delete;
+    MBGL_STORE_THREAD(tid);
 
-    template <typename Fn>
-    auto bind(Fn fn) {
-        return [fn, this] (auto &&... args) {
-            return (object->*fn)(std::forward<decltype(args)>(args)...);
-        };
-    }
-
-    template <typename P, std::size_t... I>
-    void run(P&& params, std::index_sequence<I...>);
-
-    std::promise<void> running;
-    std::promise<void> joinable;
-
-    std::thread thread;
-
-    Object* object = nullptr;
-    RunLoop* loop = nullptr;
-};
-
-template <class Object>
-template <class... Args>
-Thread<Object>::Thread(const ThreadContext& context, Args&&... args) {
-    // Note: We're using std::tuple<> to store the arguments because GCC 4.9 has a bug
-    // when expanding parameters packs captured in lambdas.
-    std::tuple<Args...> params = std::forward_as_tuple(::std::forward<Args>(args)...);
-
-    thread = std::thread([&] {
-        platform::setCurrentThreadName(context.name);
-
-        if (context.priority == ThreadPriority::Low) {
-            platform::makeThreadLowPriority();
+    void schedule(std::weak_ptr<Mailbox> mailbox) override {
+        {
+            std::lock_guard<std::mutex> lock(mutex);
+            queue.push(mailbox);
         }
 
-        run(std::move(params), std::index_sequence_for<Args...>{});
-    });
+        loop->invoke([this] { receive(); });
+    }
 
-    running.get_future().get();
-}
+    void receive() {
+        std::unique_lock<std::mutex> lock(mutex);
 
-template <class Object>
-template <typename P, std::size_t... I>
-void Thread<Object>::run(P&& params, std::index_sequence<I...>) {
-    RunLoop loop_(RunLoop::Type::New);
-    loop = &loop_;
+        auto mailbox = queue.front();
+        queue.pop();
+        lock.unlock();
 
-    Object object_(std::get<I>(std::forward<P>(params))...);
-    object = &object_;
+        Mailbox::maybeReceive(mailbox);
+    }
 
-    running.set_value();
-    loop_.run();
+    std::mutex mutex;
+    std::queue<std::weak_ptr<Mailbox>> queue;
+    std::thread thread;
+    std::unique_ptr<Actor<Object>> object;
 
-    loop = nullptr;
-    object = nullptr;
+    std::unique_ptr<std::promise<void>> paused;
+    std::unique_ptr<std::promise<void>> resumed;
 
-    joinable.get_future().get();
-}
-
-template <class Object>
-Thread<Object>::~Thread() {
-    loop->stop();
-    joinable.set_value();
-    thread.join();
-}
+    util::RunLoop* loop = nullptr;
+};
 
 } // namespace util
 } // namespace mbgl
