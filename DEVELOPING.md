@@ -110,3 +110,14 @@ constexpr bool test2(int i) {
 
 - Either remove `constexpr` specifier or replace it with `inline` in case of
   functions
+
+
+## [Polymorphic lambdas](https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68278)
+
+GCC 5.2.0 crashes with polymorphic lambdas and this version of the compiler
+is currently used in Qt Automotive. Luckily polymorphic lambdas are rarely
+used/needed but we had one incident fixed by #9665.
+
+### Workarounds
+
+- Copy & Paste™ the code.
