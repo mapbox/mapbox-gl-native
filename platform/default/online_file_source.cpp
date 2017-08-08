@@ -320,6 +320,14 @@ void OnlineFileRequest::completed(Response response) {
         resource.priorModified = response.modified;
     }
 
+    if (response.notModified && resource.priorData) {
+        // When the priorData field is set, it indicates that we had to revalidate the request and
+        // that the requestor hasn't gotten data yet. If we get a 304 response, this means that we
+        // have send the cached data to give the requestor a chance to actually obtain the data.
+        response.data = std::move(resource.priorData);
+        response.notModified = false;
+    }
+
     bool isExpired = false;
 
     if (response.expires) {
