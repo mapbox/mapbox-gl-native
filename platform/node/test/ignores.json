@@ -57,6 +57,13 @@
   "render-tests/text-letter-spacing/zoom-and-property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9668",
   "render-tests/text-max-width/property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9654",
   "render-tests/text-max-width/zoom-and-property-function": "https://github.com/mapbox/mapbox-gl-native/issues/9654",
+  "render-tests/text-pitch-alignment/auto-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-alignment/auto-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-alignment/map-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-alignment/map-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
+  "render-tests/text-pitch-scaling/line-half": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-size/composite-function-high-base": "https://github.com/mapbox/mapbox-gl-native/issues/8654",
   "render-tests/video/default": "skip - needs issue"
 }
