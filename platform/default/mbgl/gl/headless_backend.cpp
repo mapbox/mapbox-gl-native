@@ -11,9 +11,9 @@ namespace mbgl {
 
 class HeadlessBackend::View {
 public:
-    View(gl::Context& context, Size size)
-        : color(context.createRenderbuffer<gl::RenderbufferType::RGBA>(size)),
-          depthStencil(context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size)),
+    View(gl::Context& context, Size size_)
+        : color(context.createRenderbuffer<gl::RenderbufferType::RGBA>(size_)),
+          depthStencil(context.createRenderbuffer<gl::RenderbufferType::DepthStencil>(size_)),
           framebuffer(context.createFramebuffer(color, depthStencil)) {
     }
 
