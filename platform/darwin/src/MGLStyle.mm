@@ -743,6 +743,32 @@ static NSURL *MGLStyleURL_emerald;
 
         self.localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
+    [self setPreferredContentSize:nil];
+}
+
+- (void)setPreferredContentSize:(UIContentSizeCategory)preferredContentSize
+{
+    for (MGLSymbolStyleLayer *layer in self.layers) {
+        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            continue;
+        }
+        
+        MGLVectorSource *source = (MGLVectorSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
+        if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
+            continue;
+        }
+
+        if ([layer.textFontSize isKindOfClass:[MGLConstantStyleValue class]]) {
+            NSNumber *textFontSize = [(MGLConstantStyleValue<NSNumber *> *)layer.textFontSize rawValue];
+            textFontSize = [NSNumber numberWithFloat:(textFontSize.floatValue * [self sizeForContentSizeCategory:preferredContentSize])];
+            layer.textFontSize = [MGLStyleValue<NSNumber *> valueWithRawValue:textFontSize];
+        }
+    }
+}
+
+- (CGFloat)sizeForContentSizeCategory:(UIContentSizeCategory)preferredContentSize
+{
+    return 1.3;
 }
 
 @end

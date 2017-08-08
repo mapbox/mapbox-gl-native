@@ -1,4 +1,5 @@
 #import "MGLStyle.h"
+#import <UIKit/UIContentSizeCategory.h>
 
 #import "MGLStyleLayer.h"
 #import "MGLFillStyleLayer.h"
@@ -20,6 +21,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration;
+
+- (void)setPreferredContentSize:(UIContentSizeCategory)preferredContentSize;
 
 @end
 

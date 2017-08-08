@@ -563,6 +563,7 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(preferredContentSizeChanged:) name:UIContentSizeCategoryDidChangeNotification object:nil];
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
 
     // set initial position
@@ -2454,6 +2455,12 @@ public:
     [self unrotateIfNeededForGesture];
 
     UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
+}
+
+- (void)preferredContentSizeChanged:(NSNotification *)notification {
+    UIContentSizeCategory preferredContentSize = [notification.userInfo objectForKey:UIContentSizeCategoryNewValueKey];
+    [self.style setPreferredContentSize:preferredContentSize];
+    
 }
 
 #pragma mark - Geography -
