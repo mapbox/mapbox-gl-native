@@ -169,6 +169,13 @@ void Map::renderStill(StillImageCallback callback) {
     impl->onUpdate(Update::Repaint);
 }
 
+void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions, StillImageCallback callback) {
+    impl->cameraMutated = true;
+    impl->debugOptions = debugOptions;
+    impl->transform.jumpTo(camera);
+    renderStill(std::move(callback));
+}
+
 void Map::triggerRepaint() {
     impl->onUpdate(Update::Repaint);
 }
