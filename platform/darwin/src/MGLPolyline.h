@@ -43,9 +43,8 @@ NS_ASSUME_NONNULL_BEGIN
      CLLocationCoordinate2D(latitude: 35.68476, longitude: -220.24257),
      CLLocationCoordinate2D(latitude: 37.78428, longitude: -122.41310)
  ]
- 
- let polyline = MGLPolyline(coordinates: &coordinates, count: UInt(coordinates.count))
-```
+ let polyline = MGLPolyline(coordinates: coordinates, count: UInt(coordinates.count))
+ ```
 
  A polyline is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.4">LineString</a>
