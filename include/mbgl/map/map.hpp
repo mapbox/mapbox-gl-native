@@ -42,7 +42,8 @@ public:
     // Register a callback that will get called (on the render thread) when all resources have
     // been loaded and a complete render occurs.
     using StillImageCallback = std::function<void (std::exception_ptr)>;
-    void renderStill(StillImageCallback callback);
+    void renderStill(StillImageCallback);
+    void renderStill(const CameraOptions&, MapDebugOptions, StillImageCallback);
 
     // Triggers a repaint.
     void triggerRepaint();

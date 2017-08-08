@@ -357,28 +357,13 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     frontend->setSize(options.size);
     map->setSize(options.size);
 
-    if (map->getZoom() != options.zoom) {
-        map->setZoom(options.zoom);
-    }
+    mbgl::CameraOptions camera;
+    camera.center = mbgl::LatLng { options.latitude, options.longitude };
+    camera.zoom = options.zoom;
+    camera.angle = -options.bearing * mbgl::util::DEG2RAD;
+    camera.pitch = options.pitch * mbgl::util::DEG2RAD;
 
-    mbgl::LatLng latLng(options.latitude, options.longitude);
-    if (map->getLatLng() != latLng) {
-        map->setLatLng(latLng);
-    }
-
-    if (map->getBearing() != options.bearing) {
-        map->setBearing(options.bearing);
-    }
-
-    if (map->getPitch() != options.pitch) {
-        map->setPitch(options.pitch);
-    }
-
-    if (map->getDebug() != options.debugOptions) {
-        map->setDebug(options.debugOptions);
-    }
-
-    map->renderStill([this](const std::exception_ptr eptr) {
+    map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
