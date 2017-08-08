@@ -11,6 +11,9 @@ add_nodejs_module(mbgl-node
 set_target_properties("mbgl-node" PROPERTIES CXX_STANDARD 14)
 
 target_sources(mbgl-node
+    PRIVATE platform/default/async_task.cpp
+    PRIVATE platform/default/run_loop.cpp
+    PRIVATE platform/default/timer.cpp
     PRIVATE platform/node/src/node_logging.hpp
     PRIVATE platform/node/src/node_logging.cpp
     PRIVATE platform/node/src/node_map.hpp
@@ -30,16 +33,16 @@ target_compile_options(mbgl-node
 )
 
 target_include_directories(mbgl-node
+    PRIVATE include
+    PRIVATE src
     PRIVATE platform/default
 )
 
-# Use node-provided uv.h. This is not part of loop-uv.cmake because loop-uv.cmake is also
-# used by linux/config.cmake, where we need to use headers provided by mason's libuv.
+# Use node-provided uv.h
 target_include_directories(mbgl-loop-uv PUBLIC ${NODEJS_INCLUDE_DIRS})
 
 target_link_libraries(mbgl-node
     PRIVATE mbgl-core
-    PRIVATE mbgl-loop-uv
 )
 
 target_add_mason_package(mbgl-node PRIVATE geojson)
