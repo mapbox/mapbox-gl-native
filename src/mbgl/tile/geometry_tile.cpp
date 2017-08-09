@@ -17,10 +17,10 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <iostream>
 
@@ -33,7 +33,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            const TileParameters& parameters)
     : Tile(id_),
       sourceID(std::move(sourceID_)),
-      mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+      mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
