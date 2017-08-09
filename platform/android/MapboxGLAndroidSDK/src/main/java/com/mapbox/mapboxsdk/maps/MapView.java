@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
@@ -233,9 +234,8 @@ public class MapView extends FrameLayout {
   private void initialiseDrawingSurface() {
     glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
     glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-    // TODO port config chooser from native code
-    glSurfaceView.setEGLConfigChooser(8, 8, 8, 0 /** TODO: What alpha value do we need here?? */, 16, 8);
     glSurfaceView.setEGLContextClientVersion(2);
+    glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
     glSurfaceView.setRenderer(new GLSurfaceView.Renderer() {
 
       @Override
