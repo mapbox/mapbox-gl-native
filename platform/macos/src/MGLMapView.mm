@@ -105,6 +105,11 @@ typedef std::unordered_map<MGLAnnotationTag, MGLAnnotationContext> MGLAnnotation
 /// Mapping from an annotation object to an annotation tag.
 typedef std::map<id<MGLAnnotation>, MGLAnnotationTag> MGLAnnotationObjectTagMap;
 
+/// Mapping from a shape annotation object to shape layer id.
+typedef std::map<id<MGLAnnotation>, std::string> MGLShapeAnnotationObjectLayerIDMap;
+
+static NSString *const  MGLLayerIDShapeAnnotation = @"com.mapbox.annotations.shape.";
+
 /// Returns an NSImage for the default marker image.
 NSImage *MGLDefaultMarkerImage() {
     NSString *path = [[NSBundle mgl_frameworkBundle] pathForResource:MGLDefaultStyleMarkerSymbolName
@@ -168,6 +173,9 @@ public:
     MGLAnnotationObjectTagMap _annotationTagsByAnnotation;
     MGLAnnotationTag _selectedAnnotationTag;
     MGLAnnotationTag _lastSelectedAnnotationTag;
+    
+    MGLShapeAnnotationObjectLayerIDMap _shapeAnnotationLayerIDsByAnnotation;
+    MGLShape *_selectedShapeAnnotation;
     /// Size of the rectangle formed by unioning the maximum slop area around every annotation image.
     NSSize _unionedAnnotationImageSize;
     std::vector<MGLAnnotationTag> _annotationsNearbyLastClick;
@@ -293,9 +301,11 @@ public:
     _annotationImagesByIdentifier = [NSMutableDictionary dictionary];
     _annotationContextsByAnnotationTag = {};
     _annotationTagsByAnnotation = {};
+    _shapeAnnotationLayerIDsByAnnotation = {};
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _lastSelectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastClick = {};
+    
 
     // Jump to Null Island initially.
     self.automaticallyAdjustsContentInsets = YES;
@@ -1484,10 +1494,17 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
+            [self deselectShapeAnnotation:_selectedShapeAnnotation];
             [self selectAnnotation:annotation];
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
+        MGLShape *shapeAnnotation = [self shapeAnnotationForGestureRecognizer:gestureRecognizer];
+        if (shapeAnnotation) {
+            [self selectShapeAnnotation:shapeAnnotation];
+        } else {
+            [self deselectShapeAnnotation:_selectedShapeAnnotation];
+        }
     }
 }
 
@@ -1869,6 +1886,8 @@ public:
             context.annotation = annotation;
             _annotationContextsByAnnotationTag[annotationTag] = context;
             _annotationTagsByAnnotation[annotation] = annotationTag;
+            NSString *layerID = [NSString stringWithFormat:@"%@%u", MGLLayerIDShapeAnnotation, annotationTag];
+            _shapeAnnotationLayerIDsByAnnotation[annotation] = layerID.UTF8String;
 
             [(NSObject *)annotation addObserver:self forKeyPath:@"coordinates" options:0 context:(void *)(NSUInteger)annotationTag];
         } else if (![annotation isKindOfClass:[MGLMultiPolyline class]]
@@ -1996,6 +2015,7 @@ public:
 
         _annotationContextsByAnnotationTag.erase(annotationTag);
         _annotationTagsByAnnotation.erase(annotation);
+        _shapeAnnotationLayerIDsByAnnotation.erase(annotation);
 
         if ([annotation isKindOfClass:[NSObject class]] &&
             ![annotation isKindOfClass:[MGLMultiPoint class]]) {
@@ -2363,6 +2383,99 @@ public:
     if (callout) {
         callout.positioningRect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
     }
+}
+
+#pragma mark - Shape Annotation
+
+- (void)selectShapeAnnotation:(MGLShape *)shapeAnnotation
+{
+    if (!shapeAnnotation) return;
+    
+    if (shapeAnnotation == _selectedShapeAnnotation) return;
+    
+    [self deselectShapeAnnotation:_selectedShapeAnnotation];
+    
+    _selectedShapeAnnotation = shapeAnnotation;
+    
+    if ([self.delegate respondsToSelector:@selector(mapView:didSelectShapeAnnotation:)])
+    {
+        [self.delegate mapView:self didSelectShapeAnnotation:shapeAnnotation];
+    }
+}
+
+- (void)deselectShapeAnnotation:(MGLShape *)shapeAnnotation
+{
+    if (!shapeAnnotation) return;
+    
+    if (_selectedShapeAnnotation == shapeAnnotation)
+    {
+        if ([self.delegate respondsToSelector:@selector(mapView:didDeselectShapeAnnotation:)])
+        {
+            [self.delegate mapView:self didDeselectShapeAnnotation:shapeAnnotation];
+        }
+        _selectedShapeAnnotation = nil;
+    }
+    
+}
+
+- (MGLShape*)shapeAnnotationForGestureRecognizer:(NSClickGestureRecognizer*)singleTap
+{
+    NSPoint tapPoint = [singleTap locationInView:self];
+    
+    MGLAnnotationTag hitAnnotationTag = [self shapeAnnotationTagAtPoint:tapPoint];
+    
+    if (hitAnnotationTag != MGLAnnotationTagNotFound) {
+        id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
+        NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
+        if ([annotation isKindOfClass:[MGLShape class]]) {
+            return (MGLShape *)annotation;
+        }
+    }
+    
+    return nil;
+}
+
+- (MGLAnnotationTag)shapeAnnotationTagAtPoint:(NSPoint)point
+{
+    NSRect queryRect = NSInsetRect({ point, CGSizeZero },
+                                   -_unionedAnnotationImageSize.width,
+                                   -_unionedAnnotationImageSize.height);
+    queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
+                            -MGLAnnotationImagePaddingForHitTest);
+    
+    std::vector<MGLAnnotationTag> nearbyAnnotations = [self shapeAnnotationTagsInRect:queryRect];
+    
+    MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
+    
+    // Choose the first nearby annotation.
+    if (nearbyAnnotations.size())
+    {
+        hitAnnotationTag = nearbyAnnotations.front();
+    }
+    return hitAnnotationTag;
+}
+
+- (std::vector<MGLAnnotationTag>)shapeAnnotationTagsInRect:(NSRect)rect
+{
+    mbgl::ScreenBox screenBox = {
+        { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
+        { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
+    };
+    
+    std::vector<MGLAnnotationTag> nearbyAnnotations;
+    
+    mbgl::optional<std::vector<std::string>> optionalLayerIDs;
+    if (_shapeAnnotationLayerIDsByAnnotation.size()) {
+        __block std::vector<std::string> layerIDs;
+        layerIDs.reserve(_shapeAnnotationLayerIDsByAnnotation.size());
+        for (const auto &annotation : _shapeAnnotationLayerIDsByAnnotation) {
+            layerIDs.push_back(annotation.second);
+        }
+        optionalLayerIDs = layerIDs;
+        nearbyAnnotations = _mbglMap->queryShapeAnnotations(screenBox, { optionalLayerIDs });
+    }
+    
+    return nearbyAnnotations;
 }
 
 #pragma mark MGLMultiPointDelegate methods

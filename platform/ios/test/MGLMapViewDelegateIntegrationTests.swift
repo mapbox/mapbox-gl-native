@@ -78,5 +78,9 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
     func mapView(_ mapView: MGLMapView, annotation: MGLAnnotation, calloutAccessoryControlTapped control: UIControl) {}
 
     func mapView(_ mapView: MGLMapView, shouldChangeFrom oldCamera: MGLMapCamera, to newCamera: MGLMapCamera) -> Bool { return false }
+    
+    func mapView(_ mapView: MGLMapView, didSelectShapeAnnotation shapeAnnotation: MGLShape) {}
+    
+    func mapView(_ mapView: MGLMapView, didDeselectShapeAnnotation shapeAnnotation: MGLShape) {}
 
 }
