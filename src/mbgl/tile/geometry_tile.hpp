@@ -139,8 +139,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unique_ptr<CollisionTile> collisionTile;
-    
-    util::Throttler placementThrottler;
+
     float lastYStretch;
     const MapMode mode;
 
