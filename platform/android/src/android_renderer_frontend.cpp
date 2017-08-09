@@ -107,9 +107,15 @@ void AndroidRendererFrontend::render() {
     assert (renderer);
     if (!updateParameters) return;
 
+    // Activate the backend
     BackendScope backendGuard { *backend };
 
+    // Block the orchestration thread during render
     util::BlockingThreadGuard<Renderer> rendererGuard { *renderer };
+
+    // Ensure that the "current" scheduler on the render thread is
+    // actually the scheduler from the orchestration  thread
+    Scheduler::SetCurrent(renderer.get());
 
     if (framebufferSizeChanged) {
         backend->updateViewPort();
