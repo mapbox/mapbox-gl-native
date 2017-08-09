@@ -2,14 +2,7 @@
 
 #import "MGLMapView.h"
 #import "MGLUserLocation.h"
-
-const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
-const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
-
-const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
-const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
-
-#pragma mark -
+#import "MGLUserLocationHeadingBeamLayer.h"
 
 @implementation MGLFaux3DUserLocationAnnotationView
 {
@@ -18,8 +11,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     CALayer *_puckDot;
     CAShapeLayer *_puckArrow;
 
-    CALayer *_headingIndicatorLayer;
-    CAShapeLayer *_headingIndicatorMaskLayer;
+    MGLUserLocationHeadingBeamLayer *_headingIndicatorLayer;
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
@@ -56,21 +48,18 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 - (void)setTintColor:(UIColor *)tintColor
 {
+    CGColorRef newTintColor = [tintColor CGColor];
+
     if (_puckModeActivated)
     {
-        _puckArrow.fillColor = [tintColor CGColor];
+        _puckArrow.fillColor = newTintColor;
     }
     else
     {
-        if (_accuracyRingLayer)
-        {
-            _accuracyRingLayer.backgroundColor = [tintColor CGColor];
-        }
-
-        _haloLayer.backgroundColor = [tintColor CGColor];
-        _dotLayer.backgroundColor = [tintColor CGColor];
-
-        _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
+        _accuracyRingLayer.backgroundColor = newTintColor;
+        _haloLayer.backgroundColor = newTintColor;
+        _dotLayer.backgroundColor = newTintColor;
+        [_headingIndicatorLayer updateTintColor:newTintColor];
     }
 }
 
@@ -138,7 +127,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
         self.layer.sublayers = nil;
 
         _headingIndicatorLayer = nil;
-        _headingIndicatorMaskLayer = nil;
         _accuracyRingLayer = nil;
         _haloLayer = nil;
         _dotBorderLayer = nil;
@@ -232,47 +220,21 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     if (showHeadingIndicator)
     {
         _headingIndicatorLayer.hidden = NO;
+        CLLocationDirection headingAccuracy = self.userLocation.heading.headingAccuracy;
 
         // heading indicator (tinted, semi-circle)
         //
-        if ( ! _headingIndicatorLayer && self.userLocation.heading.headingAccuracy)
+        if ( ! _headingIndicatorLayer && headingAccuracy)
         {
-            CGFloat headingIndicatorSize = MGLUserLocationAnnotationHaloSize;
-
-            _headingIndicatorLayer = [CALayer layer];
-            _headingIndicatorLayer.bounds = CGRectMake(0, 0, headingIndicatorSize, headingIndicatorSize);
-            _headingIndicatorLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
-            _headingIndicatorLayer.contents = (__bridge id)[[self headingIndicatorTintedGradientImage] CGImage];
-            _headingIndicatorLayer.contentsGravity = kCAGravityBottom;
-            _headingIndicatorLayer.contentsScale = [UIScreen mainScreen].scale;
-            _headingIndicatorLayer.opacity = 0.4;
-            _headingIndicatorLayer.shouldRasterize = YES;
-            _headingIndicatorLayer.rasterizationScale = [UIScreen mainScreen].scale;
-            _headingIndicatorLayer.drawsAsynchronously = YES;
-
+            _headingIndicatorLayer = [[MGLUserLocationHeadingBeamLayer alloc] initWithUserLocationAnnotationView:self];
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+
+            _oldHeadingAccuracy = headingAccuracy;
         }
-
-        // heading indicator accuracy mask (fan-shaped)
-        //
-        if ( ! _headingIndicatorMaskLayer && self.userLocation.heading.headingAccuracy)
+        else if (_oldHeadingAccuracy != headingAccuracy)
         {
-            _headingIndicatorMaskLayer = [CAShapeLayer layer];
-            _headingIndicatorMaskLayer.frame = _headingIndicatorLayer.bounds;
-            _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-
-            // apply the mask to the halo-radius-sized gradient layer
-            _headingIndicatorLayer.mask = _headingIndicatorMaskLayer;
-
-            _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
-
-        }
-        else if (_oldHeadingAccuracy != self.userLocation.heading.headingAccuracy)
-        {
-            // recalculate the clipping mask based on updated accuracy
-            _headingIndicatorMaskLayer.path = [[self headingIndicatorClippingMask] CGPath];
-
-            _oldHeadingAccuracy = self.userLocation.heading.headingAccuracy;
+            [_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
+             _oldHeadingAccuracy = headingAccuracy;
         }
 
         if (self.userLocation.heading.trueHeading >= 0)
@@ -283,9 +245,7 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
     else
     {
         [_headingIndicatorLayer removeFromSuperlayer];
-        [_headingIndicatorMaskLayer removeFromSuperlayer];
         _headingIndicatorLayer = nil;
-        _headingIndicatorMaskLayer = nil;
     }
 
 
@@ -462,67 +422,6 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 {
     // diameter in screen points
     return self.userLocation.location.horizontalAccuracy / [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude] * 2.0;
-}
-
-- (UIImage *)headingIndicatorTintedGradientImage
-{
-    UIImage *image;
-
-    CGFloat haloRadius = MGLUserLocationAnnotationHaloSize / 2.0;
-
-    UIGraphicsBeginImageContextWithOptions(CGSizeMake(MGLUserLocationAnnotationHaloSize, haloRadius), NO, 0);
-
-    CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
-    CGContextRef context = UIGraphicsGetCurrentContext();
-
-    // gradient from the tint color to no-alpha tint color
-    CGFloat gradientLocations[] = {0.0, 1.0};
-    CGGradientRef gradient = CGGradientCreateWithColors(
-                                colorSpace,
-                                (__bridge CFArrayRef)@[
-                                    (id)[self.mapView.tintColor CGColor],
-                                    (id)[[self.mapView.tintColor colorWithAlphaComponent:0] CGColor]],
-                                gradientLocations);
-
-    // draw the gradient from the center point to the edge (full halo radius)
-    CGPoint centerPoint = CGPointMake(haloRadius, haloRadius);
-    CGContextDrawRadialGradient(context, gradient,
-                                centerPoint, 0.0,
-                                centerPoint, haloRadius,
-                                kNilOptions);
-
-    image = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-
-    CGGradientRelease(gradient);
-    CGColorSpaceRelease(colorSpace);
-
-    return image;
-}
-
-- (UIBezierPath *)headingIndicatorClippingMask
-{
-    CGFloat accuracy = self.userLocation.heading.headingAccuracy;
-
-    // size the mask using accuracy, but keep within a good display range
-    CGFloat clippingDegrees = 90 - accuracy;
-    clippingDegrees = fmin(clippingDegrees, 70); // most accurate
-    clippingDegrees = fmax(clippingDegrees, 10); // least accurate
-
-    CGRect ovalRect = CGRectMake(0, 0, MGLUserLocationAnnotationHaloSize, MGLUserLocationAnnotationHaloSize);
-    UIBezierPath *ovalPath = UIBezierPath.bezierPath;
-
-    // clip the oval to ± incoming accuracy degrees (converted to radians), from the top
-    [ovalPath addArcWithCenter:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))
-                        radius:CGRectGetWidth(ovalRect) / 2.0
-                    startAngle:MGLRadiansFromDegrees(-180 + clippingDegrees)
-                      endAngle:MGLRadiansFromDegrees(-clippingDegrees)
-                     clockwise:YES];
-
-    [ovalPath addLineToPoint:CGPointMake(CGRectGetMidX(ovalRect), CGRectGetMidY(ovalRect))];
-    [ovalPath closePath];
-
-    return ovalPath;
 }
 
 @end

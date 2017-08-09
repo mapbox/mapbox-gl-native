@@ -216,6 +216,9 @@
 		9620BB391E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */; };
 		9620BB3A1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
 		9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
+		966FCF4C1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
+		966FCF4E1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
+		966FCF4F1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -686,6 +689,8 @@
 		9660916D1E5BBFDB00A9A03B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916E1E5BBFDC00A9A03B /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916F1E5BBFDE00A9A03B /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/Localizable.strings; sourceTree = "<group>"; };
+		966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingBeamLayer.h; sourceTree = "<group>"; };
+		966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLUserLocationHeadingBeamLayer.m; sourceTree = "<group>"; };
 		968F36B41E4D0FC6003A5522 /* ja */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027241E57C76E004B8E66 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E027271E57C77A004B8E66 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1588,8 +1593,8 @@
 		DAD165841CF4D06B001FF4B9 /* Annotations */ = {
 			isa = PBXGroup;
 			children = (
-				40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */,
 				404326881D5B9B1A007111BD /* MGLAnnotationContainerView_Private.h */,
+				40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */,
 				40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */,
 				DA8848401CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h */,
 				DA8848341CBAFB8500AB86E3 /* MGLAnnotationImage.h */,
@@ -1608,6 +1613,8 @@
 				359F57451D2FDBD5005217F1 /* MGLUserLocationAnnotationView_Private.h */,
 				354B83941D2E873E005D9406 /* MGLUserLocationAnnotationView.h */,
 				354B83951D2E873E005D9406 /* MGLUserLocationAnnotationView.m */,
+				966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */,
+				966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */,
 			);
 			name = Annotations;
 			sourceTree = "<group>";
@@ -1696,6 +1703,7 @@
 				408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
 				558DE7A01E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
+				966FCF4C1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h in Headers */,
 				DA88483D1CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h in Headers */,
 				DA17BE301CC4BAC300402C41 /* MGLMapView_Private.h in Headers */,
 				DAD165781CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
@@ -2266,6 +2274,7 @@
 				35B82BFA1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
 				7E016D861D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */,
 				DA8848521CBAFB9800AB86E3 /* MGLAPIClient.m in Sources */,
+				966FCF4E1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */,
 				DA8848301CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m in Sources */,
 				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
@@ -2349,6 +2358,7 @@
 				35B82BFB1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
 				7E016D871D9E890300A29A21 /* MGLPolygon+MGLAdditions.m in Sources */,
 				DAA4E4311CBB730400178DFB /* MGLMapboxEvents.m in Sources */,
+				966FCF4F1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */,
 				DAA4E4231CBB730400178DFB /* MGLPolygon.mm in Sources */,
 				353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
