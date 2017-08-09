@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
-import android.content.res.Resources;
 import android.support.annotation.RawRes;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
@@ -13,6 +12,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
+import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
@@ -21,18 +21,13 @@ import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
+
+import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
-import static org.junit.Assert.fail;
 
 /**
  * Tests for {@link GeoJsonSource}
@@ -46,19 +41,22 @@ public class GeoJsonSourceTests extends BaseActivityTest {
   }
 
   @Test
-  public void testFeatureCollection() {
+  public void testFeatureCollection() throws Exception {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new BaseViewAction() {
 
       @Override
       public void perform(UiController uiController, View view) {
-        GeoJsonSource source = new GeoJsonSource("source", FeatureCollection
-          .fromJson(readRawResource(rule.getActivity().getResources(), R.raw.test_feature_collection)));
+        GeoJsonSource source = null;
+        try {
+          source = new GeoJsonSource("source", FeatureCollection
+            .fromJson(ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_collection)));
+        } catch (IOException exception) {
+          Timber.e(exception);
+        }
         mapboxMap.addSource(source);
-
         mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
       }
-
     });
   }
 
@@ -79,14 +77,19 @@ public class GeoJsonSourceTests extends BaseActivityTest {
   }
 
   @Test
-  public void testFeatureProperties() {
+  public void testFeatureProperties() throws IOException {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new BaseViewAction() {
 
       @Override
       public void perform(UiController uiController, View view) {
-        GeoJsonSource source = new GeoJsonSource("source",
-          readRawResource(rule.getActivity().getResources(), R.raw.test_feature_properties));
+        GeoJsonSource source = null;
+        try {
+          source = new GeoJsonSource("source",
+            ResourceUtils.readRawResource(rule.getActivity(), R.raw.test_feature_properties));
+        } catch (IOException exception) {
+          Timber.e(exception);
+        }
         mapboxMap.addSource(source);
 
         mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
@@ -141,35 +144,17 @@ public class GeoJsonSourceTests extends BaseActivityTest {
         Layer layer = new CircleLayer("layer", source.getId());
         mapboxMap.addLayer(layer);
 
-        source.setGeoJson(Feature.fromJson(
-          readRawResource(rule.getActivity().getResources(), resource)));
+        try {
+          source.setGeoJson(Feature.fromJson(ResourceUtils.readRawResource(rule.getActivity(), resource)));
+        } catch (IOException exception) {
+          Timber.e(exception);
+        }
 
         mapboxMap.removeLayer(layer);
         mapboxMap.removeSource(source);
       }
 
     });
-  }
-
-  private String readRawResource(Resources resources, @RawRes int rawResource) {
-    InputStream is = resources.openRawResource(rawResource);
-    Writer writer = new StringWriter();
-    char[] buffer = new char[1024];
-    try {
-      try {
-        Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int numRead;
-        while ((numRead = reader.read(buffer)) != -1) {
-          writer.write(buffer, 0, numRead);
-        }
-      } finally {
-        is.close();
-      }
-    } catch (IOException err) {
-      fail(err.getMessage());
-    }
-
-    return writer.toString();
   }
 
   public abstract class BaseViewAction implements ViewAction {

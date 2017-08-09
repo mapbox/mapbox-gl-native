@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.RawRes;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -15,17 +14,12 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.lang.ref.WeakReference;
 
 import timber.log.Timber;
@@ -87,7 +81,7 @@ public class StyleFileActivity extends AppCompatActivity {
     protected String doInBackground(Void... voids) {
       String styleJson = "";
       try {
-        styleJson = RawResourceReaderWriter.readRawResource(context.get(), R.raw.sat_style);
+        styleJson = ResourceUtils.readRawResource(context.get(), R.raw.sat_style);
       } catch (Exception exception) {
         Timber.e(exception, "Can't load local file style");
       }
@@ -126,7 +120,7 @@ public class StyleFileActivity extends AppCompatActivity {
         Timber.i("Writing style file to: %s", cacheStyleFile.getAbsolutePath());
         Context context = this.context.get();
         if (context != null) {
-          writeToFile(cacheStyleFile, RawResourceReaderWriter.readRawResource(context, R.raw.local_style));
+          writeToFile(cacheStyleFile, ResourceUtils.readRawResource(context, R.raw.local_style));
         }
       } catch (Exception exception) {
         Toast.makeText(context.get(), "Could not create style file in cache dir", Toast.LENGTH_SHORT).show();
@@ -152,28 +146,6 @@ public class StyleFileActivity extends AppCompatActivity {
           writer.close();
         }
       }
-    }
-  }
-
-  static class RawResourceReaderWriter {
-    static String readRawResource(Context context, @RawRes int rawResource) throws IOException {
-      String json = "";
-      if (context != null) {
-        InputStream is = context.getResources().openRawResource(rawResource);
-        Writer writer = new StringWriter();
-        char[] buffer = new char[1024];
-        try {
-          Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-          int numRead;
-          while ((numRead = reader.read(buffer)) != -1) {
-            writer.write(buffer, 0, numRead);
-          }
-        } finally {
-          is.close();
-        }
-        json = writer.toString();
-      }
-      return json;
     }
   }
 
