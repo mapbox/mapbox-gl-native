@@ -222,6 +222,16 @@ public class LatLngBounds implements Parcelable {
   }
 
   /**
+   * Constructs a LatLngBounds from doubles representing a LatLng pair.
+   * <p>
+   * This method doesn't recalculate most east or most west boundaries.
+   * </p>
+   */
+  public static LatLngBounds from(double latNorth, double lonEast, double latSouth, double lonWest) {
+    return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
+  }
+
+  /**
    * Constructs a LatLngBounds from current bounds with an additional latitude-longitude pair.
    *
    * @param latLng the latitude lognitude pair to include in the bounds.
