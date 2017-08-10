@@ -3,6 +3,7 @@
 #import "MGLMapView.h"
 #import "MGLUserLocation.h"
 #import "MGLUserLocationHeadingBeamLayer.h"
+#import "MGLUserLocationHeadingArrowLayer.h"
 
 @implementation MGLFaux3DUserLocationAnnotationView
 {
@@ -12,6 +13,7 @@
     CAShapeLayer *_puckArrow;
 
     MGLUserLocationHeadingBeamLayer *_headingIndicatorLayer;
+    //MGLUserLocationHeadingArrowLayer *_headingIndicatorLayer;
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
@@ -213,7 +215,7 @@
         [self updateFrameWithSize:MGLUserLocationAnnotationDotSize];
     }
 
-    BOOL showHeadingIndicator = self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
+    BOOL showHeadingIndicator = YES;//self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
 
     // update heading indicator
     //
@@ -227,13 +229,14 @@
         if ( ! _headingIndicatorLayer && headingAccuracy)
         {
             _headingIndicatorLayer = [[MGLUserLocationHeadingBeamLayer alloc] initWithUserLocationAnnotationView:self];
+            //_headingIndicatorLayer = [[MGLUserLocationHeadingArrowLayer alloc] initWithUserLocationAnnotationView:self];
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
 
             _oldHeadingAccuracy = headingAccuracy;
         }
         else if (_oldHeadingAccuracy != headingAccuracy)
         {
-            [_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
+            //[_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
              _oldHeadingAccuracy = headingAccuracy;
         }
 
