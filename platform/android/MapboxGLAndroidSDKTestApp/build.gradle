@@ -1,13 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion 23
+    buildToolsVersion '19.1.0'
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
+        vectorDrawables.useSupportLibrary = true
         versionCode rootProject.ext.versionCode
         versionName rootProject.ext.versionName
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -59,21 +60,17 @@ dependencies {
     compile(project(':MapboxGLAndroidSDK')) {
         transitive = true
     }
-
     // Support libraries
     compile rootProject.ext.dep.supportAppcompatV7
     compile rootProject.ext.dep.supportRecyclerView
-
     // Leak Canary
     debugCompile rootProject.ext.dep.leakCanaryDebug
     releaseCompile rootProject.ext.dep.leakCanaryRelease
     testCompile rootProject.ext.dep.leakCanaryTest
-
     // Mapbox Android Services (Java component)
     compile(rootProject.ext.dep.mapboxJavaServices) {
         transitive = true
     }
-
     // Testing dependencies
     testCompile rootProject.ext.dep.junit
     testCompile rootProject.ext.dep.mockito

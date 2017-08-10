@@ -1,9 +1,10 @@
 buildscript {
     repositories {
         jcenter()
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.1'
+        classpath 'com.android.tools.build:gradle:2.2.3'
         classpath 'com.amazonaws:aws-devicefarm-gradle-plugin:1.2'
         classpath 'com.stanfy.spoon:spoon-gradle-plugin:1.2.1'
     }
@@ -12,12 +13,18 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenLocal()
         maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
+        maven { url 'https://maven.google.com' }
+        mavenCentral()
+        flatDir {
+            dirs project(':MapboxGLAndroidSDK').file('libs')
+        }
     }
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+    gradleVersion = '2.14.1'
 }
 
 apply from: rootProject.file('dependencies.gradle')
