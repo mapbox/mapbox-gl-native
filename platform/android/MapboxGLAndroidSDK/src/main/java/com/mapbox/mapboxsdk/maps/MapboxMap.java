@@ -1088,13 +1088,34 @@ public final class MapboxMap {
   }
 
   /**
-   * Returns the map style currently displayed in the map view.
+   * Returns the map style url currently displayed in the map view.
    *
    * @return The URL of the map style
    */
   @Nullable
   public String getStyleUrl() {
     return nativeMapView.getStyleUrl();
+  }
+
+  /**
+   * Loads a new map style from a json string.
+   * <p>
+   * If the style fails to load or an invalid style URL is set, the map view will become blank.
+   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
+   * sent.
+   * </p>
+   */
+  public void setStyleJson(@NonNull String styleJson) {
+    nativeMapView.setStyleJson(styleJson);
+  }
+
+  /**
+   * Returns the map style json currently displayed in the map view.
+   *
+   * @return The json of the map style
+   */
+  public String getStyleJson() {
+    return nativeMapView.getStyleJson();
   }
 
   //
