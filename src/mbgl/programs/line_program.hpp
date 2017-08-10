@@ -31,7 +31,7 @@ MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_gl_units_to_pixels);
 } // namespace uniforms
 
 struct LineLayoutAttributes : gl::Attributes<
-    attributes::a_pos,
+    attributes::a_pos_normal,
     attributes::a_data<uint8_t, 4>>
 {};
 
@@ -52,14 +52,16 @@ public:
     /*
      * @param p vertex position
      * @param e extrude normal
-     * @param t texture normal
+     * @param round whether the vertex uses a round line cap
+     * @param up whether the line normal points up or down
      * @param dir direction of the line cap (-1/0/1)
      */
-    static LayoutVertex layoutVertex(Point<int16_t> p, Point<double> e, Point<bool> t, int8_t dir, int32_t linesofar = 0) {
+    static LayoutVertex layoutVertex(Point<int16_t> p, Point<double> e, bool round, bool up, int8_t dir, int32_t linesofar = 0) {
         return LayoutVertex {
             {{
-                static_cast<int16_t>((p.x * 2) | t.x),
-                static_cast<int16_t>((p.y * 2) | t.y)
+                p.x,
+                p.y,
+                static_cast<int16_t>(attributes::packUint8Pair(round ? 1 : 0, up ? 1 : 0))
             }},
             {{
                 // add 128 to store a byte in an unsigned byte
