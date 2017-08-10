@@ -78,8 +78,6 @@ public class Projection {
    * @return The projection of the viewing frustum in its current state.
    */
   public VisibleRegion getVisibleRegion() {
-    LatLngBounds.Builder builder = new LatLngBounds.Builder();
-
     float left = 0;
     float right = nativeMapView.getWidth();
     float top = 0;
@@ -90,12 +88,13 @@ public class Projection {
     LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
     LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
 
-    builder.include(topLeft)
-      .include(topRight)
-      .include(bottomRight)
-      .include(bottomLeft);
-
-    return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight, builder.build());
+    return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
+      LatLngBounds.from(
+        topRight.getLatitude(),
+        topRight.getLongitude(),
+        bottomLeft.getLatitude(),
+        bottomLeft.getLongitude())
+    );
   }
 
   /**
