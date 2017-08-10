@@ -810,6 +810,9 @@ public class MyLocationView extends View {
 
     private Sensor rotationVectorSensor;
     private float[] matrix = new float[9];
+    private float[] rotationVectorValue;
+    private float[] truncatedRotationVectorValue = new float[4];
+
     private float[] orientation = new float[3];
     private boolean reportMissingSensor = true;
     // Compass data
@@ -846,9 +849,8 @@ public class MyLocationView extends View {
       }
 
       if (event.sensor.getType() == Sensor.TYPE_ROTATION_VECTOR) {
-
-        // calculate the rotation matrix
-        SensorManager.getRotationMatrixFromVector(matrix, event.values);
+        rotationVectorValue = getRotationVectorFromSensorEvent(event);
+        SensorManager.getRotationMatrixFromVector(matrix, rotationVectorValue);
         SensorManager.getOrientation(matrix, orientation);
 
         magneticHeading = (float) Math.toDegrees(SensorManager.getOrientation(matrix, orientation)[0]);
@@ -862,6 +864,28 @@ public class MyLocationView extends View {
         }
 
         compassUpdateNextTimestamp = currentTime + COMPASS_UPDATE_RATE_MS;
+      }
+    }
+
+    /**
+     * Pulls out the rotation vector from a SensorEvent, with a maximum length
+     * vector of four elements to avoid potential compatibility issues.
+     *
+     * @param event the sensor event
+     * @return the events rotation vector, potentially truncated
+     */
+    @NonNull
+    float[] getRotationVectorFromSensorEvent(@NonNull SensorEvent event) {
+      if (event.values.length > 4) {
+        // On some Samsung devices SensorManager.getRotationMatrixFromVector
+        // appears to throw an exception if rotation vector has length > 4.
+        // For the purposes of this class the first 4 values of the
+        // rotation vector are sufficient (see crbug.com/335298 for details).
+        // Only affects Android 4.3
+        System.arraycopy(event.values, 0, truncatedRotationVectorValue, 0, 4);
+        return truncatedRotationVectorValue;
+      } else {
+        return event.values;
       }
     }
 
