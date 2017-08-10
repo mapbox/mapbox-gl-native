@@ -13,7 +13,7 @@
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
     <string name="activity_view_marker">View Marker API</string>
-    <string name="activity_add_remove_markers">Add/Remove marker</string>
+    <string name="activity_add_remove_markers">Zoom function with SymbolLayer</string>
     <string name="activity_info_window">Standard InfoWindow</string>
     <string name="activity_infowindow_adapter">Custom InfoWindow</string>
     <string name="activity_dynamic_infowindow_adapter">Custom Dynamic InfoWindow</string>
@@ -114,7 +114,7 @@
     <string name="description_simple_map">Shows a simple map</string>
     <string name="description_map_change">Logs map change events to Logcat</string>
     <string name="description_visibility_map">Changes visibility of map and view parent</string>
-    <string name="description_add_remove_markers">Based on zoom level</string>
+    <string name="description_add_remove_markers">Change Symbol icon when zoom levels changes</string>
     <string name="description_style_file">Use a local file as the style</string>
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
     <string name="description_marker_view_rectangle">Marker Views within a rectangle</string>
