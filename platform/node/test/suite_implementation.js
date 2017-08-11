@@ -46,7 +46,7 @@ module.exports = function (style, options, callback) {
     options.bearing = style.bearing || 0;
     options.pitch = style.pitch || 0;
 
-    map.load(style);
+    map.load(style, { defaultStyleCamera: true });
 
     applyOperations(options.operations, function() {
         map.render(options, function (err, pixels) {

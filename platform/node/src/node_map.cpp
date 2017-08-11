@@ -170,6 +170,9 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  * @function
  * @name load
  * @param {string|Object} stylesheet either an object or a JSON representation
+ * @param {Object} options
+ * @param {boolean} options.defaultStyleCamera if true, sets the default style
+ * camera
  * @returns {undefined} loads stylesheet into map
  * @throws {Error} if stylesheet is missing or invalid
  * @example
@@ -205,6 +208,21 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         nodeMap->map->getStyle().loadJSON(style);
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
+    }
+
+    if (info.Length() == 2) {
+        if (!info[1]->IsObject()) {
+            return Nan::ThrowTypeError("Second argument must be an options object");
+        }
+        auto options = Nan::To<v8::Object>(info[1]).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("defaultStyleCamera").ToLocalChecked()).FromJust()) {
+            if (!Nan::Get(options, Nan::New("defaultStyleCamera").ToLocalChecked()).ToLocalChecked()->IsBoolean()) {
+                return Nan::ThrowError("Options object 'defaultStyleCamera' property must be a boolean");
+            }
+            if (Nan::Get(options, Nan::New("cameraMutated").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                nodeMap->map->jumpTo(nodeMap->map->getStyle().getDefaultCamera());
+            }
+        }
     }
 
     nodeMap->loaded = true;
