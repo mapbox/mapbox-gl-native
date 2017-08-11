@@ -2136,10 +2136,11 @@ public:
 
 - (void)resetPosition
 {
-    CGFloat pitch = _mbglMap->getStyle().getDefaultPitch();
-    CLLocationDirection heading = mbgl::util::wrap(_mbglMap->getStyle().getDefaultBearing(), 0., 360.);
-    CLLocationDistance distance = MGLAltitudeForZoomLevel(_mbglMap->getStyle().getDefaultZoom(), pitch, 0, self.frame.size);
-    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(_mbglMap->getStyle().getDefaultLatLng())
+    auto camera = _mbglMap->getStyle().getDefaultCamera();
+    CGFloat pitch = *camera.pitch;
+    CLLocationDirection heading = mbgl::util::wrap(*camera.angle, 0., 360.);
+    CLLocationDistance distance = MGLAltitudeForZoomLevel(*camera.zoom, pitch, 0, self.frame.size);
+    self.camera = [MGLMapCamera cameraLookingAtCenterCoordinate:MGLLocationCoordinate2DFromLatLng(*camera.center)
                                                    fromDistance:distance
                                                           pitch:pitch
                                                         heading:heading];
