@@ -727,11 +727,7 @@ void Map::Impl::onStyleLoading() {
 
 void Map::Impl::onStyleLoaded() {
     if (!cameraMutated) {
-        // Zoom first because it may constrain subsequent operations.
-        map.setZoom(style->getDefaultZoom());
-        map.setLatLng(style->getDefaultLatLng());
-        map.setBearing(style->getDefaultBearing());
-        map.setPitch(style->getDefaultPitch());
+        map.jumpTo(style->getDefaultCamera());
     }
 
     annotationManager.onStyleLoaded();
