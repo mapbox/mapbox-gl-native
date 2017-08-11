@@ -107,10 +107,11 @@ void Style::Impl::parse(const std::string& json_) {
     }
 
     name = parser.name;
-    defaultLatLng = parser.latLng;
-    defaultZoom = parser.zoom;
-    defaultBearing = parser.bearing;
-    defaultPitch = parser.pitch;
+    defaultCamera.center = parser.latLng;
+    defaultCamera.zoom = parser.zoom;
+    defaultCamera.angle = parser.bearing;
+    defaultCamera.pitch = parser.pitch;
+
     setLight(std::make_unique<Light>(parser.light));
 
     spriteLoaded = false;
@@ -232,20 +233,8 @@ std::string Style::Impl::getName() const {
     return name;
 }
 
-LatLng Style::Impl::getDefaultLatLng() const {
-    return defaultLatLng;
-}
-
-double Style::Impl::getDefaultZoom() const {
-    return defaultZoom;
-}
-
-double Style::Impl::getDefaultBearing() const {
-    return defaultBearing;
-}
-
-double Style::Impl::getDefaultPitch() const {
-    return defaultPitch;
+CameraOptions Style::Impl::getDefaultCamera() const {
+    return defaultCamera;
 }
 
 std::vector<Source*> Style::Impl::getSources() {

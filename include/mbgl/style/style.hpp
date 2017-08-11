@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/style/transition_options.hpp>
+#include <mbgl/map/camera.hpp>
 #include <mbgl/util/geo.hpp>
 
 #include <string>
@@ -32,10 +33,7 @@ public:
 
     // Defaults
     std::string getName() const;
-    LatLng getDefaultLatLng() const;
-    double getDefaultZoom() const;
-    double getDefaultBearing() const;
-    double getDefaultPitch() const;
+    CameraOptions getDefaultCamera() const;
 
     // TransitionOptions
     TransitionOptions getTransitionOptions() const;

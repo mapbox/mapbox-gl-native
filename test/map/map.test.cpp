@@ -160,6 +160,21 @@ TEST(Map, Offline) {
     NetworkStatus::Set(NetworkStatus::Status::Online);
 }
 
+TEST(Map, SetStyleDefaultCamera) {
+    MapTest<> test;
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getPitch(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getBearing(), 0.0);
+    EXPECT_EQ(test.map.getLatLng(), LatLng {});
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+
+    test.map.jumpTo(test.map.getStyle().getDefaultCamera());
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.5);
+}
+
 TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 

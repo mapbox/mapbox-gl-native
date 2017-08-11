@@ -34,20 +34,8 @@ std::string Style::getName() const {
     return impl->getName();
 }
 
-LatLng Style::getDefaultLatLng() const {
-    return impl->getDefaultLatLng();
-}
-
-double Style::getDefaultZoom() const {
-    return impl->getDefaultZoom();
-}
-
-double Style::getDefaultBearing() const {
-    return impl->getDefaultBearing();
-}
-
-double Style::getDefaultPitch() const {
-    return impl->getDefaultPitch();
+CameraOptions Style::getDefaultCamera() const {
+    return impl->getDefaultCamera();
 }
 
 TransitionOptions Style::getTransitionOptions() const {
