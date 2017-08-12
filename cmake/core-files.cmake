@@ -183,7 +183,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
-    src/mbgl/renderer/render_item.hpp
     src/mbgl/renderer/render_layer.cpp
     src/mbgl/renderer/render_layer.hpp
     src/mbgl/renderer/render_light.cpp

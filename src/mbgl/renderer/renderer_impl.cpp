@@ -1,13 +1,11 @@
 #include <mbgl/renderer/renderer_impl.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
-#include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/transition_parameters.hpp>
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/render_source.hpp>
-#include <mbgl/renderer/render_item.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
@@ -296,15 +294,22 @@ void Renderer::Impl::doRender(PaintParameters& parameters) {
         parameters.context.setDirtyState();
     }
 
-    RenderData renderData;
-    const std::vector<RenderItem>& order = renderData.order;
-    const std::unordered_set<RenderSource*>& sources = renderData.sources;
-
+    std::unordered_set<RenderSource*> sources;
     for (const auto& entry : renderSources) {
         if (entry.second->isEnabled()) {
-            renderData.sources.insert(entry.second.get());
+            sources.insert(entry.second.get());
         }
     }
+
+    Color backgroundColor;
+
+    class RenderItem {
+    public:
+        RenderLayer& layer;
+        RenderSource* source;
+    };
+
+    std::vector<RenderItem> order;
 
     for (auto& layerImpl : *layerImpls) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
@@ -317,22 +322,22 @@ void Renderer::Impl::doRender(PaintParameters& parameters) {
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
             if (parameters.debugOptions & MapDebugOptions::Overdraw) {
                 // We want to skip glClear optimization in overdraw mode.
-                renderData.order.emplace_back(*layer, nullptr);
+                order.emplace_back(RenderItem { *layer, nullptr });
                 continue;
             }
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
             if (layerImpl.get() == layerImpls->at(0).get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
-                renderData.backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
+                backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
                 // This is a textured background, or not the bottommost layer. We need to render it with a quad.
-                renderData.order.emplace_back(*layer, nullptr);
+                order.emplace_back(RenderItem { *layer, nullptr });
             }
             continue;
         }
 
         if (layer->is<RenderCustomLayer>()) {
-            renderData.order.emplace_back(*layer, nullptr);
+            order.emplace_back(RenderItem { *layer, nullptr });
             continue;
         }
 
@@ -396,7 +401,7 @@ void Renderer::Impl::doRender(PaintParameters& parameters) {
             }
         }
         layer->setRenderTiles(std::move(sortedTilesForInsertion));
-        renderData.order.emplace_back(*layer, source);
+        order.emplace_back(RenderItem { *layer, source });
     }
 
     frameHistory.record(parameters.timePoint,
@@ -421,7 +426,7 @@ void Renderer::Impl::doRender(PaintParameters& parameters) {
         parameters.backend.bind();
         parameters.context.clear((parameters.debugOptions & MapDebugOptions::Overdraw)
                         ? Color::black()
-                        : renderData.backgroundColor,
+                        : backgroundColor,
                       1.0f,
                       0);
     }
