@@ -196,6 +196,9 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
         if (needsRepaint || transform.inTransition()) {
             onUpdate(Update::Repaint);
         }
+    } else if (stillImageRequest && rendererFullyLoaded) {
+        auto request = std::move(stillImageRequest);
+        request->callback(nullptr);
     }
 }
 
@@ -206,9 +209,6 @@ void Map::Impl::onDidFinishRenderingMap() {
             loading = false;
             observer.onDidFinishLoadingMap();
         }
-    } else if (stillImageRequest) {
-        auto request = std::move(stillImageRequest);
-        request->callback(nullptr);
     }
 };
 
