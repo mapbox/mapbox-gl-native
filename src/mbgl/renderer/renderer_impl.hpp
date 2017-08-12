@@ -1,18 +1,16 @@
 #pragma once
 
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
-#include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/render_light.hpp>
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/zoom_history.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
-#include <mbgl/style/image.hpp>
 
 #include <memory>
 #include <string>
@@ -20,24 +18,19 @@
 
 namespace mbgl {
 
+class RendererBackend;
+class RendererObserver;
+class RenderSource;
+class RenderLayer;
 class UpdateParameters;
-class PaintParameters;
 class RenderStaticData;
-class RenderData;
 class RenderedQueryOptions;
 class SourceQueryOptions;
-
 class FileSource;
+class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
-class Scheduler;
-
-namespace style {
-class Image;
-class Source;
-class Layer;
-} // namespace style
 
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{

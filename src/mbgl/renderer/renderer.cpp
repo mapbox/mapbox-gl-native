@@ -1,6 +1,6 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
-#include <mbgl/renderer/update_parameters.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/annotation/annotation_manager.hpp>
 
 namespace mbgl {
