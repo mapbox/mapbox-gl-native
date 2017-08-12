@@ -254,13 +254,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.context.setDirtyState();
     }
 
-    std::unordered_set<RenderSource*> sources;
-    for (const auto& entry : renderSources) {
-        if (entry.second->isEnabled()) {
-            sources.insert(entry.second.get());
-        }
-    }
-
     Color backgroundColor;
 
     class RenderItem {
@@ -397,8 +390,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         MBGL_DEBUG_GROUP(parameters.context, "clip");
 
         // Update all clipping IDs.
-        for (const auto& source : sources) {
-            source->startRender(parameters);
+        for (const auto& entry : renderSources) {
+            if (entry.second->isEnabled()) {
+                entry.second->startRender(parameters);
+            }
         }
 
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
@@ -532,8 +527,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // This guarantees that we have at least one function per tile called.
         // When only rendering layers via the stylesheet, it's possible that we don't
         // ever visit a tile during rendering.
-        for (const auto& source : sources) {
-            source->finishRender(parameters);
+        for (const auto& entry : renderSources) {
+            if (entry.second->isEnabled()) {
+                entry.second->finishRender(parameters);
+            }
         }
     }
 
