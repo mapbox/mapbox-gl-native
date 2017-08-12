@@ -8,7 +8,7 @@
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -39,23 +39,6 @@ static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& 
     return a.sortIndex < b.sortIndex;
 }
 
-static int16_t getAdditionalQueryRadius(const std::vector<const RenderLayer*>& layers,
-                                        const GeometryTile& tile,
-                                        const float pixelsToTileUnits) {
-
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-
-    for (const auto& layer : layers) {
-        auto bucket = tile.getBucket(*layer->baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer) * pixelsToTileUnits);
-        }
-    }
-
-    return std::min<int16_t>(util::EXTENT, additionalRadius);
-}
-
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
@@ -67,11 +50,11 @@ void FeatureIndex::query(
         const CanonicalTileID& tileID,
         const std::vector<const RenderLayer*>& layers,
         const CollisionTile* collisionTile,
-        const GeometryTile& tile) const {
+        const float additionalQueryRadius) const {
 
     // Determine query radius
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
-    const int16_t additionalRadius = getAdditionalQueryRadius(layers, tile, pixelsToTileUnits);
+    const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, additionalQueryRadius * pixelsToTileUnits);
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);

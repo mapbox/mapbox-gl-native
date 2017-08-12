@@ -219,6 +219,15 @@ void GeometryTile::queryRenderedFeatures(
 
     if (!featureIndex || !data) return;
 
+    // Determine the additional radius needed factoring in property functions
+    float additionalRadius = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket) {
+            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
+        }
+    }
+
     featureIndex->query(result,
                         queryGeometry,
                         transformState.getAngle(),
@@ -229,7 +238,7 @@ void GeometryTile::queryRenderedFeatures(
                         id.canonical,
                         layers,
                         collisionTile.get(),
-                        *this);
+                        additionalRadius);
 }
 
 void GeometryTile::querySourceFeatures(
