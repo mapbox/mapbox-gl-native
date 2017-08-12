@@ -1,6 +1,5 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/map/transform_state.hpp>
 
@@ -11,17 +10,19 @@ PaintParameters::PaintParameters(gl::Context& context_,
                     GLContextMode contextMode_,
                     RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
-                    RenderStyle& style,
+                    const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
-                    FrameHistory& frameHistory_)
+                    FrameHistory& frameHistory_,
+                    ImageManager& imageManager_,
+                    LineAtlas& lineAtlas_)
     : context(context_),
     backend(backend_),
     state(updateParameters.transformState),
-    evaluatedLight(style.getRenderLight().getEvaluated()),
+    evaluatedLight(evaluatedLight_),
     staticData(staticData_),
     frameHistory(frameHistory_),
-    imageManager(*style.imageManager),
-    lineAtlas(*style.lineAtlas),
+    imageManager(imageManager_),
+    lineAtlas(lineAtlas_),
     mapMode(updateParameters.mode),
     debugOptions(updateParameters.debugOptions),
     contextMode(contextMode_),
