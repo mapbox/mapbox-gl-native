@@ -373,24 +373,28 @@ RenderData RenderStyle::getRenderData(MapDebugOptions debugOptions, float angle)
 std::vector<Feature> RenderStyle::queryRenderedFeatures(const ScreenLineString& geometry,
                                                   const TransformState& transformState,
                                                   const RenderedQueryOptions& options) const {
-    std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
-
+    std::vector<const RenderLayer*> layers;
     if (options.layerIDs) {
-        std::unordered_set<std::string> sourceIDs;
         for (const auto& layerID : *options.layerIDs) {
             if (const RenderLayer* layer = getRenderLayer(layerID)) {
-                sourceIDs.emplace(layer->baseImpl->source);
-            }
-        }
-        for (const auto& sourceID : sourceIDs) {
-            if (RenderSource* renderSource = getRenderSource(sourceID)) {
-                auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, *this, options);
-                std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
+                layers.emplace_back(layer);
             }
         }
     } else {
-        for (const auto& entry : renderSources) {
-            auto sourceResults = entry.second->queryRenderedFeatures(geometry, transformState, *this, options);
+        for (const auto& entry : renderLayers) {
+            layers.emplace_back(entry.second.get());
+        }
+    }
+
+    std::unordered_set<std::string> sourceIDs;
+    for (const RenderLayer* layer : layers) {
+        sourceIDs.emplace(layer->baseImpl->source);
+    }
+
+    std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
+    for (const auto& sourceID : sourceIDs) {
+        if (RenderSource* renderSource = getRenderSource(sourceID)) {
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }

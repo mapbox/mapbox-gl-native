@@ -23,7 +23,7 @@ class DebugBucket;
 class TransformState;
 class TileObserver;
 class PlacementConfig;
-class RenderStyle;
+class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
@@ -61,7 +61,7 @@ public:
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const RenderStyle&,
+            const std::vector<const RenderLayer*>&,
             const RenderedQueryOptions& options);
 
     virtual void querySourceFeatures(

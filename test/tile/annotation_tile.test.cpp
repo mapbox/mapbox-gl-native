@@ -4,7 +4,6 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -31,7 +30,6 @@ public:
     AnnotationManager annotationManager { style };
     HeadlessBackend backend;
     BackendScope scope { backend };
-    RenderStyle renderStyle { threadPool, fileSource };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
 
@@ -93,7 +91,7 @@ TEST(AnnotationTile, Issue8289) {
     TransformState transformState;
     RenderedQueryOptions options;
 
-    tile.queryRenderedFeatures(result, queryGeometry, transformState, test.renderStyle, options);
+    tile.queryRenderedFeatures(result, queryGeometry, transformState, {}, options);
 
     EXPECT_TRUE(result.empty());
 }
