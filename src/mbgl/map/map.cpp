@@ -709,8 +709,6 @@ void Map::Impl::onUpdate(Update flags) {
         style->impl->getImageImpls(),
         style->impl->getSourceImpls(),
         style->impl->getLayerImpls(),
-        scheduler,
-        fileSource,
         annotationManager,
         prefetchZoomDelta,
         bool(stillImageRequest)
