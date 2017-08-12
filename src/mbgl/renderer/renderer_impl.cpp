@@ -273,11 +273,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
-            if (parameters.debugOptions & MapDebugOptions::Overdraw) {
-                // We want to skip glClear optimization in overdraw mode.
-                order.emplace_back(RenderItem { *layer, nullptr });
-                continue;
-            }
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
             if (layerImpl.get() == layerImpls->at(0).get() && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
