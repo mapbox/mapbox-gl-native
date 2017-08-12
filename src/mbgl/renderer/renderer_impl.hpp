@@ -57,8 +57,6 @@ public:
     void dumDebugLogs();
 
 private:
-    void doRender(PaintParameters&);
-
     bool isLoaded() const;
     bool hasTransitions() const;
 

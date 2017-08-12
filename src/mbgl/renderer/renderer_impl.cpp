@@ -243,47 +243,18 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
-
-    if (updateParameters.mode == MapMode::Continuous) {
-        if (renderState == RenderState::Never) {
-            observer->onWillStartRenderingMap();
-        }
-
-        observer->onWillStartRenderingFrame();
-
-        backend.updateAssumedState();
-
-        doRender(parameters);
-        parameters.context.performCleanup();
-
-        observer->onDidFinishRenderingFrame(
-                loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-                hasTransitions() || frameHistory.needsAnimation(util::DEFAULT_TRANSITION_DURATION)
-        );
-
-        if (!loaded) {
-            renderState = RenderState::Partial;
-        } else if (renderState != RenderState::Fully) {
-            renderState = RenderState::Fully;
-            observer->onDidFinishRenderingMap();
-        }
-    } else if (loaded) {
-        observer->onWillStartRenderingMap();
-        observer->onWillStartRenderingFrame();
-
-        backend.updateAssumedState();
-
-        doRender(parameters);
-
-        observer->onDidFinishRenderingFrame(RendererObserver::RenderMode::Full, false);
-        observer->onDidFinishRenderingMap();
-
-        // Cleanup only after signaling completion
-        parameters.context.performCleanup();
+    if (updateParameters.mode == MapMode::Still && !loaded) {
+        return;
     }
-}
 
-void Renderer::Impl::doRender(PaintParameters& parameters) {
+    if (renderState == RenderState::Never) {
+        observer->onWillStartRenderingMap();
+    }
+
+    observer->onWillStartRenderingFrame();
+
+    backend.updateAssumedState();
+
     if (parameters.contextMode == GLContextMode::Shared) {
         parameters.context.setDirtyState();
     }
@@ -606,6 +577,21 @@ void Renderer::Impl::doRender(PaintParameters& parameters) {
 
         parameters.context.bindVertexArray = 0;
     }
+
+    observer->onDidFinishRenderingFrame(
+        loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
+        updateParameters.mode == MapMode::Continuous && (hasTransitions() || frameHistory.needsAnimation(util::DEFAULT_TRANSITION_DURATION))
+    );
+
+    if (!loaded) {
+        renderState = RenderState::Partial;
+    } else if (renderState != RenderState::Fully) {
+        renderState = RenderState::Fully;
+        observer->onDidFinishRenderingMap();
+    }
+
+    // Cleanup only after signaling completion
+    parameters.context.performCleanup();
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {
