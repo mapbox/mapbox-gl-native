@@ -64,13 +64,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
 }
 
 Renderer::Impl::~Impl() {
-    BackendScope guard { backend };
-    glyphManager.reset();
-    imageManager.reset();
-    lineAtlas.reset();
-    renderSources.reset();
-    renderLayers.reset();
-    staticData.reset();
+    assert(BackendScope::exists());
 };
 
 void Renderer::Impl::setObserver(RendererObserver* observer_) {
@@ -670,7 +664,7 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
 }
 
 void Renderer::Impl::onLowMemory() {
-    BackendScope guard { backend };
+    assert(BackendScope::exists());
     backend.getContext().performCleanup();
     for (const auto& entry : renderSources) {
         entry.second->onLowMemory();
