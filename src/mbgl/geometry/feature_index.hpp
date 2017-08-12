@@ -13,7 +13,7 @@ namespace mbgl {
 
 class GeometryTile;
 class RenderedQueryOptions;
-class RenderStyle;
+class RenderLayer;
 
 class CollisionTile;
 class CanonicalTileID;
@@ -42,7 +42,7 @@ public:
             const RenderedQueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
-            const RenderStyle&,
+            const std::vector<const RenderLayer*>&,
             const CollisionTile*,
             const GeometryTile& tile) const;
 
@@ -63,7 +63,7 @@ private:
             const RenderedQueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
-            const RenderStyle&,
+            const std::vector<const RenderLayer*>&,
             const float bearing,
             const float pixelsToTileUnits) const;
 
