@@ -218,7 +218,12 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
 
 void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
     imageMap = std::move(newImageMap);
-    pendingImageDependencies.clear();
+    for (const auto& pair : imageMap) {
+        auto it = pendingImageDependencies.find(pair.first);
+        if (it != pendingImageDependencies.end()) {
+            pendingImageDependencies.erase(it);
+        }
+    }
     symbolDependenciesChanged();
 }
 

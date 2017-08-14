@@ -17,6 +17,7 @@ set(MBGL_TEST_FILES
     test/api/api_misuse.test.cpp
     test/api/custom_layer.test.cpp
     test/api/query.test.cpp
+    test/api/recycle_map.cpp
 
     # gl
     test/gl/bucket.test.cpp
