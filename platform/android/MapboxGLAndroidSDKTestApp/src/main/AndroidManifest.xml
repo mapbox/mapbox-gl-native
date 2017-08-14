@@ -305,14 +305,12 @@
         </activity>
         <activity
             android:name=".activity.maplayout.DebugModeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_debug_mode"
             android:label="@string/activity_debug_mode">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
+                android:value="@string/category_basic"/>
         </activity>
         <activity
             android:name=".activity.offline.OfflineActivity"
