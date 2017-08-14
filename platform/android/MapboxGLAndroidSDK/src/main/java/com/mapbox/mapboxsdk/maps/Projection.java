@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 
 /**
@@ -42,6 +43,20 @@ public class Projection {
 
   public void invalidateContentPadding(int[] userLocationViewPadding) {
     setContentPadding(contentPadding, userLocationViewPadding);
+  }
+
+  /**
+   * Returns the spherical Mercator projected meters for a LatLng.
+   */
+  public ProjectedMeters getProjectedMetersForLatLng(LatLng latLng) {
+    return nativeMapView.projectedMetersForLatLng(latLng);
+  }
+
+  /**
+   * Returns the LatLng for a spherical Mercator projected meters.
+   */
+  public LatLng getLatLngForProjectedMeters(ProjectedMeters projectedMeters) {
+    return nativeMapView.latLngForProjectedMeters(projectedMeters);
   }
 
   /**
