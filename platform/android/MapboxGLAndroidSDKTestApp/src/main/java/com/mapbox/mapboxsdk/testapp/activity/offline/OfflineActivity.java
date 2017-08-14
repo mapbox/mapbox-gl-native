@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.http.HttpRequestUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -68,6 +69,7 @@ public class OfflineActivity extends AppCompatActivity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    HttpRequestUtil.setLogEnabled(false);
     setContentView(R.layout.activity_offline);
 
     // You can use Mapbox.setConnected(Boolean) to manually set the connectivity
@@ -155,6 +157,7 @@ public class OfflineActivity extends AppCompatActivity
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
+    HttpRequestUtil.setLogEnabled(true);
   }
 
   @Override
