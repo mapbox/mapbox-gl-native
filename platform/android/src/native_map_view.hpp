@@ -24,6 +24,7 @@
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
 #include "style/light.hpp"
+#include "bitmap.hpp"
 
 #include <exception>
 #include <string>
@@ -252,6 +253,8 @@ public:
     void addImage(JNIEnv&, jni::String, jni::jint, jni::jint, jni::jfloat, jni::Array<jbyte>);
 
     void removeImage(JNIEnv&, jni::String);
+
+    jni::Object<Bitmap> getImage(JNIEnv&, jni::String);
 
     void setPrefetchesTiles(JNIEnv&, jni::jboolean);
 

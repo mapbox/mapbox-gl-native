@@ -473,6 +473,10 @@ public final class MapboxMap {
     nativeMapView.removeImage(name);
   }
 
+  public Bitmap getImage(@NonNull String name) {
+    return nativeMapView.getImage(name);
+  }
+
   //
   // MinZoom
   //
