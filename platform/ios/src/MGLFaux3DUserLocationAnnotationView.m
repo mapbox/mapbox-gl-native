@@ -231,10 +231,9 @@
             _headingIndicatorLayer = [[MGLUserLocationHeadingBeamLayer alloc] initWithUserLocationAnnotationView:self];
             //_headingIndicatorLayer = [[MGLUserLocationHeadingArrowLayer alloc] initWithUserLocationAnnotationView:self];
             [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
-
-            _oldHeadingAccuracy = headingAccuracy;
         }
-        else if (_oldHeadingAccuracy != headingAccuracy)
+
+        if (_oldHeadingAccuracy != headingAccuracy)
         {
             //[_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
              _oldHeadingAccuracy = headingAccuracy;
@@ -242,7 +241,13 @@
 
         if (self.userLocation.heading.trueHeading >= 0)
         {
-            _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.heading.trueHeading));
+            CGFloat rotation = -MGLRadiansFromDegrees(self.mapView.direction - self.userLocation.heading.trueHeading);
+
+            // Don't rotate if the change is imperceptible.
+            if (fabs(rotation) > MGLUserLocationHeadingUpdateThreshold)
+            {
+                _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, rotation);
+            }
         }
     }
     else
