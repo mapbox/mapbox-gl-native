@@ -133,18 +133,27 @@ SymbolQuads getGlyphQuads(const Shaping& shapedText,
         const float x2 = x1 + rect.w;
         const float y2 = y1 + rect.h;
 
-        const Point<float> center{builtInOffset.x - halfAdvance, static_cast<float>(static_cast<float>(glyph.metrics.advance) / 2.0)};
-
         Point<float> tl{x1, y1};
         Point<float> tr{x2, y1};
         Point<float> bl{x1, y2};
         Point<float> br{x2, y2};
 
-        if (positionedGlyph.angle != 0) {
-            tl = util::rotate(tl - center, positionedGlyph.angle) + center;
-            tr = util::rotate(tr - center, positionedGlyph.angle) + center;
-            bl = util::rotate(bl - center, positionedGlyph.angle) + center;
-            br = util::rotate(br - center, positionedGlyph.angle) + center;
+        if (alongLine && positionedGlyph.vertical) {
+            // Vertical-supporting glyphs are laid out in 24x24 point boxes (1 square em)
+            // In horizontal orientation, the y values for glyphs are below the midline
+            // and we use a "yOffset" of -17 to pull them up to the middle.
+            // By rotating counter-clockwise around the point at the center of the left
+            // edge of a 24x24 layout box centered below the midline, we align the center
+            // of the glyphs with the horizontal midline, so the yOffset is no longer
+            // necessary, but we also pull the glyph to the left along the x axis
+            const Point<float> center{-halfAdvance, halfAdvance};
+            const float verticalRotation = -M_PI_2;
+            const Point<float> xOffsetCorrection{5, 0};
+            
+            tl = util::rotate(tl - center, verticalRotation) + center + xOffsetCorrection;
+            tr = util::rotate(tr - center, verticalRotation) + center + xOffsetCorrection;
+            bl = util::rotate(bl - center, verticalRotation) + center + xOffsetCorrection;
+            br = util::rotate(br - center, verticalRotation) + center + xOffsetCorrection;
         }
 
         if (textRotate) {

@@ -58,13 +58,13 @@ using GlyphMap = std::map<FontStack, Glyphs>;
 
 class PositionedGlyph {
 public:
-    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, float angle_)
-        : glyph(glyph_), x(x_), y(y_), angle(angle_) {}
+    explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_)
+        : glyph(glyph_), x(x_), y(y_), vertical(vertical_) {}
 
     GlyphID glyph = 0;
     float x = 0;
     float y = 0;
-    float angle = 0;
+    bool vertical = false;
 };
 
 enum class WritingModeType : uint8_t;
