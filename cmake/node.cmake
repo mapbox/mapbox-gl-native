@@ -54,6 +54,8 @@ mbgl_platform_node()
 
 create_source_groups(mbgl-node)
 
+initialize_xcode_cxx_build_settings(mbgl-node)
+
 xcode_create_scheme(
     TARGET mbgl-node
 )
