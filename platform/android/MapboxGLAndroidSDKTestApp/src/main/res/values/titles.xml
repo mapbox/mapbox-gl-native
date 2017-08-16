@@ -61,4 +61,5 @@
     <string name="activity_bottom_sheet">Bottom sheet</string>
     <string name="activity_map_snapshotter">Map Snapshotter</string>
     <string name="activity_camera_animator">Animator animation</string>
+    <string name="activity_symbol_generator">SymbolGenerator</string>
 </resources>
