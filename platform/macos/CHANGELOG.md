@@ -1,5 +1,9 @@
 # Changelog for Mapbox macOS SDK
 
+## 0.5.2
+
+* Fixed an issue that caused querying features in a source return nil. ([#9784](https://github.com/mapbox/mapbox-gl-native/pull/9784))
+
 ## 0.5.1
 
 * Added an MGLStyle.localizesLabels property, off by default, that localizes any Mapbox Streets–sourced symbol layer into the user’s preferred language. ([#9582](https://github.com/mapbox/mapbox-gl-native/pull/9582))
