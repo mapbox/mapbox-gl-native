@@ -75,7 +75,7 @@ public class MyLocationView extends View {
   private ValueAnimator locationChangeAnimator;
   private ValueAnimator accuracyAnimator;
   private ValueAnimator directionAnimator;
-  private boolean locationChangeAnimationEnabled;
+  private boolean locationChangeAnimationEnabled = true;
 
   private ValueAnimator.AnimatorUpdateListener invalidateSelfOnUpdateListener =
     new ValueAnimator.AnimatorUpdateListener() {
