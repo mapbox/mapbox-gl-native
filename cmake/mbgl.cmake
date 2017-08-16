@@ -114,6 +114,32 @@ function(write_xcconfig_target_properties)
     )
 endfunction()
 
+# Set Xcode project build settings to be consistent with the CXX flags we're
+# using. (Otherwise, Xcode's defaults may override some of these.)
+macro(initialize_xcode_cxx_build_settings target)
+    # -Wall
+    set_xcode_property(${target} GCC_WARN_SIGN_COMPARE YES)
+    set_xcode_property(${target} GCC_WARN_UNINITIALIZED_AUTOS YES)
+    set_xcode_property(${target} GCC_WARN_UNKNOWN_PRAGMAS YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_FUNCTION YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_LABEL YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_PARAMETER YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_VARIABLE YES)
+
+    # -Wextra
+    set_xcode_property(${target} CLANG_WARN_EMPTY_BODY YES)
+    set_xcode_property(${target} GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS YES)
+
+    # -Wshadow
+    set_xcode_property(${target} GCC_WARN_SHADOW YES)
+
+    # -Wno-unknown-pragmas
+    set_xcode_property(${target} GCC_WARN_UNKNOWN_PRAGMAS YES)
+
+    # -Wnon-virtual-dtor
+    set_xcode_property(${target} GCC_WARN_NON_VIRTUAL_DESTRUCTOR YES)
+endmacro(initialize_xcode_cxx_build_settings)
+
 # CMake 3.1 does not have this yet.
 set(CMAKE_CXX14_STANDARD_COMPILE_OPTION "-std=c++14")
 set(CMAKE_CXX14_EXTENSION_COMPILE_OPTION "-std=gnu++14")

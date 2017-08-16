@@ -27,6 +27,8 @@ mbgl_platform_benchmark()
 
 create_source_groups(mbgl-benchmark)
 
+initialize_xcode_cxx_build_settings(mbgl-benchmark)
+
 xcode_create_scheme(
     TARGET mbgl-benchmark
     OPTIONAL_ARGS
