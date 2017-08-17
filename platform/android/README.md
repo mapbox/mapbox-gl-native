@@ -78,6 +78,10 @@ make aproj
 
 Open Android Studio project in `/platform/android`, run `make android-configuration` in the root folder of the project.
 
+##### Setup Checkstyle
+
+Mapbox uses specific IDE settings related to code and check style. 
+See [checkstyle guide](https://github.com/mapbox/mapbox-gl-native/wiki/Setting-up-Mapbox-checkstyle) for configuration details. 
 
 ##### Setting Mapbox Access Token
 
@@ -90,3 +94,8 @@ With the first gradle invocation, gradle will take the value of the `MAPBOX_ACCE
 Run the configuration for the `MapboxGLAndroidSDKTestApp` module and select a device or emulator to deploy on. Based on the selected device, the c++ code will be compiled for the related processor architecture. You can see the project compiling in the `View > Tool Windows > Gradle Console`. 
 
 More information about building and distributing this project in [DISTRIBUTE.md][https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/DISTRIBUTE.md].
+
+#### Symbolicating native crashes
+
+When hitting native crashes you can use ndk-stack to symbolicate crashes. 
+More information in [this](https://github.com/mapbox/mapbox-gl-native/wiki/Getting-line-numbers-from-an-Android-crash-with-ndk-stack) guide.
