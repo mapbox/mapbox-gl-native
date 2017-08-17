@@ -42,7 +42,7 @@ class PolygonContainer implements Polygons {
 
     Polygon polygon;
     List<Polygon> polygons = new ArrayList<>(count);
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       for (PolygonOptions polygonOptions : polygonOptionsList) {
         polygon = polygonOptions.getPolygon();
         if (!polygon.getPoints().isEmpty()) {
@@ -50,23 +50,12 @@ class PolygonContainer implements Polygons {
         }
       }
 
-      long[] ids = null;
-      if (nativeMapView != null) {
-        ids = nativeMapView.addPolygons(polygons);
-      }
-
-      long id = 0;
-      for (int i = 0; i < polygons.size(); i++) {
+      long[] ids = nativeMapView.addPolygons(polygons);
+      for (int i = 0; i < ids.length; i++) {
         polygon = polygons.get(i);
         polygon.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
-        polygon.setId(id);
-        annotations.put(id, polygon);
+        polygon.setId(ids[i]);
+        annotations.put(ids[i], polygon);
       }
     }
     return polygons;
