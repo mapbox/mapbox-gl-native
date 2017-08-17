@@ -187,6 +187,7 @@ static NSURL *MGLStyleURL_emerald;
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
     auto rawSource = self.mapView.mbglMap->getSource(identifier.UTF8String);
+    
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
 }
 
@@ -198,13 +199,13 @@ static NSURL *MGLStyleURL_emerald;
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
     if (auto vectorSource = rawSource->as<mbgl::style::VectorSource>()) {
-        return [[MGLVectorSource alloc] initWithRawSource:vectorSource];
+        return [[MGLVectorSource alloc] initWithRawSource:vectorSource mapView:self.mapView];
     } else if (auto geoJSONSource = rawSource->as<mbgl::style::GeoJSONSource>()) {
-        return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource];
+        return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource mapView:self.mapView];
     } else if (auto rasterSource = rawSource->as<mbgl::style::RasterSource>()) {
-        return [[MGLRasterSource alloc] initWithRawSource:rasterSource];
+        return [[MGLRasterSource alloc] initWithRawSource:rasterSource mapView:self.mapView];
     } else {
-        return [[MGLSource alloc] initWithRawSource:rawSource];
+        return [[MGLSource alloc] initWithRawSource:rawSource mapView:self.mapView];
     }
 }
 
