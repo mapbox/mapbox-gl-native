@@ -448,6 +448,7 @@ MBGL_ANDROID_ABIS += arm-v8;arm64-v8a
 MBGL_ANDROID_ABIS += x86;x86
 MBGL_ANDROID_ABIS += x86-64;x86_64
 MBGL_ANDROID_ABIS += mips;mips
+MBGL_ANDROID_ABIS += all;all
 
 MBGL_ANDROID_LOCAL_WORK_DIR = /data/local/tmp/core-tests
 MBGL_ANDROID_LIBDIR = lib$(if $(filter arm-v8 x86-64,$1),64)
@@ -603,7 +604,7 @@ android-gfxinfo:
 # Runs Android UI tests on all connected devices using Spoon
 .PHONY: run-android-ui-test-spoon
 run-android-ui-test-spoon: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis="$(MBGL_ANDROID_ACTIVE_ARCHS)" spoon
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all spoon
 
 # Generates Activity sanity tests
 .PHONY: test-code-android
