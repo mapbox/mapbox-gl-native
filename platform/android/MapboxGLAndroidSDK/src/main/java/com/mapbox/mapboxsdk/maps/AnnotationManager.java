@@ -212,22 +212,19 @@ class AnnotationManager {
       }
 
       if (markers.size() > 0) {
-        long[] ids = null;
+        long[] ids;
         if (nativeMapView != null) {
           ids = nativeMapView.addMarkers(markers);
+        } else {
+          ids = new long[markers.size()];
         }
 
-        long id = 0;
+        long id;
         Marker m;
-        for (int i = 0; i < markers.size(); i++) {
+        for (int i = 0; i < ids.length; i++) {
           m = markers.get(i);
           m.setMapboxMap(mapboxMap);
-          if (ids != null) {
-            id = ids[i];
-          } else {
-            // unit test
-            id++;
-          }
+          id = ids[i];
           m.setId(id);
           annotations.put(id, m);
         }
@@ -481,21 +478,18 @@ class AnnotationManager {
         }
       }
 
-      long[] ids = null;
+      long[] ids;
       if (nativeMapView != null) {
         ids = nativeMapView.addPolygons(polygons);
+      } else {
+        ids = new long[polygons.size()];
       }
 
-      long id = 0;
-      for (int i = 0; i < polygons.size(); i++) {
+      long id;
+      for (int i = 0; i < ids.length; i++) {
         polygon = polygons.get(i);
         polygon.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
+        id = ids[i];
         polygon.setId(id);
         shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + id);
         annotations.put(id, polygon);
@@ -555,23 +549,19 @@ class AnnotationManager {
         }
       }
 
-      long[] ids = null;
+      long[] ids;
       if (nativeMapView != null) {
         ids = nativeMapView.addPolylines(polylines);
+      } else {
+        ids = new long[polylines.size()];
       }
 
-      long id = 0;
+      long id;
       Polyline p;
-
-      for (int i = 0; i < polylines.size(); i++) {
+      for (int i = 0; i < ids.length; i++) {
         p = polylines.get(i);
         p.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
+        id = ids[i];
         p.setId(id);
         shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + id);
         annotations.put(id, p);
