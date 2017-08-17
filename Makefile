@@ -610,6 +610,10 @@ run-android-ui-test-spoon: platform/android/configuration.gradle
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
 
+# Runs checkstyle and lint on the Android code
+.PHONY: android-check
+android-check : android-checkstyle android-lint-sdk android-lint-test-app
+
 # Runs checkstyle on the Android code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/configuration.gradle
