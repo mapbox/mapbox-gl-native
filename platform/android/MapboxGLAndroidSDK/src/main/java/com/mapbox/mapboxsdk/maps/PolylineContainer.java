@@ -41,8 +41,7 @@ class PolylineContainer implements Polylines {
     int count = polylineOptionsList.size();
     Polyline polyline;
     List<Polyline> polylines = new ArrayList<>(count);
-
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       for (PolylineOptions options : polylineOptionsList) {
         polyline = options.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
@@ -50,25 +49,12 @@ class PolylineContainer implements Polylines {
         }
       }
 
-      long[] ids = null;
-      if (nativeMapView != null) {
-        ids = nativeMapView.addPolylines(polylines);
-      }
-
-      long id = 0;
-      Polyline p;
-
-      for (int i = 0; i < polylines.size(); i++) {
-        p = polylines.get(i);
-        p.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
-        p.setId(id);
-        annotations.put(id, p);
+      long[] ids = nativeMapView.addPolylines(polylines);
+      for (int i = 0; i < ids.length; i++) {
+        Polyline polylineCreated = polylines.get(i);
+        polylineCreated.setMapboxMap(mapboxMap);
+        polylineCreated.setId(ids[i]);
+        annotations.put(ids[i], polylineCreated);
       }
     }
     return polylines;
