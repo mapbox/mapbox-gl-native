@@ -2,7 +2,18 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.1.2 - August 2, 20017
+## 5.1.3 - August 18, 2017
+
+* Use separate attribute component for line normals [#9753](https://github.com/mapbox/mapbox-gl-native/pull/9753)
+* Track state of initial overlain views margins [#9391](https://github.com/mapbox/mapbox-gl-native/pull/9391)
+* Compability for Samsung devices forcing 3-4 array vector length [#9746](https://github.com/mapbox/mapbox-gl-native/pull/9746)
+* Smallest LatLngBounds when visible region crosses dateline [#9747](https://github.com/mapbox/mapbox-gl-native/pull/9747)
+* Readd ProjectMeters [#9766](https://github.com/mapbox/mapbox-gl-native/pull/9766)
+* Enable location change animation of MyLocationView by default [#9779](https://github.com/mapbox/mapbox-gl-native/pull/9779)
+* Avoid IndexOutOfBoundsException when destroying map object [#9789](https://github.com/mapbox/mapbox-gl-native/pull/9789)
+* MAS 2.2.1 [#9796](https://github.com/mapbox/mapbox-gl-native/pull/9796)
+
+## 5.1.2 - August 2, 2017
 
 * Disable program caching on Ardreno GPU 3xx, 4xx and 5xx [#9625](https://github.com/mapbox/mapbox-gl-native/pull/9625)
 * GeoJSON proguard issue [#9577](https://github.com/mapbox/mapbox-gl-native/pull/9577)
