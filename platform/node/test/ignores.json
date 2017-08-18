@@ -48,6 +48,7 @@
   "render-tests/regressions/mapbox-gl-js#4551": "skip - https://github.com/mapbox/mapbox-gl-native/issues/1350",
   "render-tests/regressions/mapbox-gl-js#4573": "skip - https://github.com/mapbox/mapbox-gl-native/issues/1350",
   "render-tests/regressions/mapbox-gl-native#7357": "https://github.com/mapbox/mapbox-gl-native/issues/7357",
+  "render-tests/regressions/mapbox-gl-native#9792": "skip - https://github.com/mapbox/mapbox-gl-native/issues/9792",
   "render-tests/runtime-styling/paint-property-fill-flat-to-extrude": "skip - https://github.com/mapbox/mapbox-gl-native/issues/6745",
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "skip - needs issue",
   "render-tests/runtime-styling/source-add-geojson-inline": "skip - needs issue",
