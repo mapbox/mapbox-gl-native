@@ -59,9 +59,6 @@ int main(int argc, char *argv[]) {
         if (opt == -1) break;
         switch (opt)
         {
-        case 0:
-            if (long_options[option_index].flag != nullptr)
-                break;
         case 'f':
             fullscreen = true;
             break;
