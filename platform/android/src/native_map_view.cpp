@@ -50,6 +50,7 @@
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
 #include "style/light.hpp"
+#include "bitmap_factory.hpp"
 
 namespace mbgl {
 namespace android {
@@ -1043,6 +1044,14 @@ void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
     map->getStyle().removeImage(jni::Make<std::string>(env, name));
 }
 
+jni::Object<Bitmap> NativeMapView::getImage(JNIEnv& env, jni::String name) {
+    const mbgl::style::Image *image = map->getStyle().getImage(jni::Make<std::string>(env, name));
+    if (image) {
+        return Bitmap::CreateBitmap(env, image->getImage());
+    } else {
+        return jni::Object<Bitmap>();
+    }
+}
 
 void NativeMapView::setPrefetchesTiles(JNIEnv&, jni::jboolean enable) {
     map->setPrefetchZoomDelta(enable ? util::DEFAULT_PREFETCH_ZOOM_DELTA : uint8_t(0));
@@ -1553,6 +1562,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeSource, "nativeRemoveSource"),
             METHOD(&NativeMapView::addImage, "nativeAddImage"),
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
+            METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
             METHOD(&NativeMapView::setPrefetchesTiles, "nativeSetPrefetchesTiles"),
             METHOD(&NativeMapView::getPrefetchesTiles, "nativeGetPrefetchesTiles")

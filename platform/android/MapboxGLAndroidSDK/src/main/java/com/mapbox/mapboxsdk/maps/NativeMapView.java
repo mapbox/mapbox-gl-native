@@ -808,6 +808,13 @@ final class NativeMapView {
     nativeRemoveImage(name);
   }
 
+  public Bitmap getImage(String name) {
+    if (isDestroyedOn("getImage")) {
+      return null;
+    }
+    return nativeGetImage(name);
+  }
+
   // Feature querying
 
   @NonNull
@@ -1077,6 +1084,8 @@ final class NativeMapView {
                                      byte[] array);
 
   private native void nativeRemoveImage(String name);
+
+  private native Bitmap nativeGetImage(String name);
 
   private native void nativeUpdatePolygon(long polygonId, Polygon polygon);
 
