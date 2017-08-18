@@ -237,10 +237,10 @@ void shapeLines(Shaping& shaping,
             const Glyph& glyph = **it->second;
             
             if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
-                shaping.positionedGlyphs.emplace_back(chr, x, y, 0);
+                shaping.positionedGlyphs.emplace_back(chr, x, y, false);
                 x += glyph.metrics.advance + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(chr, x, 0, -M_PI_2);
+                shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
                 x += verticalHeight + spacing;
             }
         }
