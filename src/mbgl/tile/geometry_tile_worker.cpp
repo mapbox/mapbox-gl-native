@@ -371,7 +371,9 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
             return true;
         }
     }
-    return !pendingImageDependencies.empty();
+
+    // Attempt placement if at least one image is ready.
+    return imageMap.empty() && !pendingImageDependencies.empty();
 }
 
 void GeometryTileWorker::attemptPlacement() {
@@ -398,6 +400,7 @@ void GeometryTileWorker::attemptPlacement() {
                                   imageMap, imageAtlas.positions);
         }
 
+        imageMap.clear();
         symbolLayoutsNeedPreparation = false;
     }
 
