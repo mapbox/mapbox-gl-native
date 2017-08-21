@@ -224,6 +224,7 @@ void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
             pendingImageDependencies.erase(it);
         }
     }
+    symbolLayoutsNeedPreparation = true;
     symbolDependenciesChanged();
 }
 
