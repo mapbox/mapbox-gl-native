@@ -78,6 +78,9 @@ void limitHoles(GeometryCollection&, uint32_t maxHoles);
 // convert from GeometryTileFeature to Feature (eventually we should eliminate GeometryTileFeature)
 Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
 
+// convert from GeometryTileFeature to Feature without geometry (eventually we should eliminate GeometryTileFeature)
+Feature convertFeatureProperties(const GeometryTileFeature&);
+
 // Fix up possibly-non-V2-compliant polygon geometry using angus clipper.
 // The result is guaranteed to have correctly wound, strictly simple rings.
 GeometryCollection fixupPolygons(const GeometryCollection&);

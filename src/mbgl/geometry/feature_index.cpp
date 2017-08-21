@@ -131,7 +131,11 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        if (!options.geometryConversion || options.geometryConversion.value()){
+            result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        } else {
+            result[layerID].push_back(convertFeatureProperties(*geometryTileFeature));
+        }
     }
 }
 

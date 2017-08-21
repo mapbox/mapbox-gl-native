@@ -180,4 +180,11 @@ Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const Can
     return feature;
 }
 
+Feature convertFeatureProperties(const GeometryTileFeature& geometryTileFeature) {
+    Feature feature { Point<double>() };
+    feature.properties = geometryTileFeature.getProperties();
+    feature.id = geometryTileFeature.getID();
+    return feature;
+}
+
 } // namespace mbgl
