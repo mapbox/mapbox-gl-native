@@ -50,7 +50,7 @@ void OfflineDatabase::ensureSchema() {
             case 3: // no-op and fall through
             case 4: migrateToVersion5(); // fall through
             case 5: return;
-            default: throw std::runtime_error("unknown schema version");
+            default: break; // downgrade, delete the database
             }
 
             removeExisting();
