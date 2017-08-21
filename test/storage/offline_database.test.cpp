@@ -737,3 +737,27 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
                                          "compressed", "accessed", "must_revalidate" }),
               databaseTableColumns("test/fixtures/offline_database/migrated.db", "resources"));
 }
+
+TEST(OfflineDatabase, DowngradeSchema) {
+    using namespace mbgl;
+
+    // v999.db is a v999 database, it should be deleted
+    // and recreated with the current schema.
+
+    deleteFile("test/fixtures/offline_database/migrated.db");
+    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v999.db"));
+
+    {
+        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+    }
+
+    EXPECT_EQ(6, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+
+    EXPECT_EQ((std::vector<std::string>{ "id", "url_template", "pixel_ratio", "z", "x", "y",
+                                         "expires", "modified", "etag", "data", "compressed",
+                                         "accessed", "must_revalidate" }),
+              databaseTableColumns("test/fixtures/offline_database/migrated.db", "tiles"));
+    EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
+                                         "compressed", "accessed", "must_revalidate" }),
+              databaseTableColumns("test/fixtures/offline_database/migrated.db", "resources"));
+}
