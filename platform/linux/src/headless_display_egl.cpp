@@ -32,6 +32,9 @@ HeadlessDisplay::Impl::Impl() {
     }
 
     const EGLint attribs[] = {
+#if MBGL_USE_GLES2
+        EGL_RENDERABLE_TYPE, EGL_OPENGL_ES2_BIT,
+#endif
         EGL_SURFACE_TYPE, EGL_PBUFFER_BIT,
         EGL_NONE
     };
