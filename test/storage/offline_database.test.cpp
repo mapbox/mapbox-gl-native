@@ -698,3 +698,27 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
     // Synchronous setting should be FULL (2) after migration to v5.
     EXPECT_EQ(2, databaseSyncMode("test/fixtures/offline_database/v5.db"));
 }
+
+TEST(OfflineDatabase, DowngradeSchema) {
+    using namespace mbgl;
+
+    // v999.db is a v999 database, it should be deleted
+    // and recreated with the current schema.
+
+    deleteFile("test/fixtures/offline_database/migrated.db");
+    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v999.db"));
+
+    {
+        OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
+    }
+
+    EXPECT_EQ(5, databaseUserVersion("test/fixtures/offline_database/migrated.db"));
+
+    EXPECT_EQ((std::vector<std::string>{ "id", "url_template", "pixel_ratio", "z", "x", "y",
+                                         "expires", "modified", "etag", "data", "compressed",
+                                         "accessed" }),
+              databaseTableColumns("test/fixtures/offline_database/migrated.db", "tiles"));
+    EXPECT_EQ((std::vector<std::string>{ "id", "url", "kind", "expires", "modified", "etag", "data",
+                                         "compressed", "accessed" }),
+              databaseTableColumns("test/fixtures/offline_database/migrated.db", "resources"));
+}
