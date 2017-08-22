@@ -10,7 +10,7 @@ RUN set -eu && \
     sudo easy_install -U pip && \
     pip install --no-cache-dir awscli && \
     mkdir -p "${ANDROID_HOME}/licenses" && \
-    (echo "8933bad161af4178b1185d1a37fbf41ea5269c55" > "${ANDROID_HOME}/licenses/android-sdk-license")
+    (echo "32aac04e59953ba273920b346f1a1e809a2578a1" > "${ANDROID_HOME}/licenses/android-sdk-license")
 
 RUN set -eu && \
     git clone --depth=1 "https://github.com/mapbox/mapbox-gl-native.git" . && \
