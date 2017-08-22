@@ -634,6 +634,17 @@ static int databaseSyncMode(const std::string& path) {
     return stmt.get<int>(0);
 }
 
+static std::vector<std::string> databaseTableColumns(const std::string& path, const std::string& name) {
+    mapbox::sqlite::Database db(path, mapbox::sqlite::ReadOnly);
+    const auto sql = std::string("pragma table_info(") + name + ")";
+    mapbox::sqlite::Statement stmt = db.prepare(sql.c_str());
+    std::vector<std::string> columns;
+    while (stmt.run()) {
+        columns.push_back(stmt.get<std::string>(1));
+    }
+    return columns;
+}
+
 TEST(OfflineDatabase, MigrateFromV2Schema) {
     using namespace mbgl;
 
