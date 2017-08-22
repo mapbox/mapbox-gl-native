@@ -525,7 +525,7 @@ android-core-test-$1: android-test-lib-$1
 	javac -sourcepath platform/android/src/test -d $(MBGL_ANDROID_CORE_TEST_DIR) -source 1.7 -target 1.7 @$(MBGL_ANDROID_CORE_TEST_DIR)/java-sources.txt
 
 	# Combine and dex
-	cd $(MBGL_ANDROID_CORE_TEST_DIR) && $(ANDROID_HOME)/build-tools/25.0.0/dx --dex --output=test.jar *.class classes.dex
+	cd $(MBGL_ANDROID_CORE_TEST_DIR) && $(ANDROID_HOME)/build-tools/19.1.0/dx --dex --output=test.jar *.class classes.dex
 
 run-android-core-test-$1-%: android-core-test-$1
 	# Ensure clean state on the device
