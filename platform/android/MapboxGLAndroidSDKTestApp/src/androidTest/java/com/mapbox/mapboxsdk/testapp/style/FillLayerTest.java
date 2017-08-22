@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -151,24 +150,6 @@ public class FillLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getFillAntialias().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getFillAntialias().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getFillAntialias().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testFillOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillOpacityTransition(options);
-        assertEquals(layer.getFillOpacityTransition(), options);
       }
     });
   }
@@ -356,24 +337,6 @@ public class FillLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testFillColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillColorTransition(options);
-        assertEquals(layer.getFillColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testFillColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -528,24 +491,6 @@ public class FillLayerTest extends BaseActivityTest {
         // Set and Get
         layer.setProperties(fillColor(Color.RED));
         assertEquals(layer.getFillColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
-  public void testFillOutlineColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-outline-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillOutlineColorTransition(options);
-        assertEquals(layer.getFillOutlineColorTransition(), options);
       }
     });
   }
@@ -710,24 +655,6 @@ public class FillLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testFillTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillTranslateTransition(options);
-        assertEquals(layer.getFillTranslateTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testFillTranslateAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -820,24 +747,6 @@ public class FillLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getFillTranslateAnchor().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getFillTranslateAnchor().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getFillTranslateAnchor().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testFillPatternTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-patternTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillPatternTransition(options);
-        assertEquals(layer.getFillPatternTransition(), options);
       }
     });
   }

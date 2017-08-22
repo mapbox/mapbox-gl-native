@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -82,24 +81,6 @@ public class RasterLayerTest extends BaseActivityTest {
         // Set
         layer.setProperties(visibility(NONE));
         assertEquals(layer.getVisibility().getValue(), NONE);
-      }
-    });
-  }
-
-  @Test
-  public void testRasterOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterOpacityTransition(options);
-        assertEquals(layer.getRasterOpacityTransition(), options);
       }
     });
   }
@@ -154,24 +135,6 @@ public class RasterLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testRasterHueRotateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-hue-rotateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterHueRotateTransition(options);
-        assertEquals(layer.getRasterHueRotateTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testRasterHueRotateAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -216,24 +179,6 @@ public class RasterLayerTest extends BaseActivityTest {
         assertEquals(ExponentialStops.class, layer.getRasterHueRotate().getFunction().getStops().getClass());
         assertEquals(0.5f, ((ExponentialStops) layer.getRasterHueRotate().getFunction().getStops()).getBase(), 0.001);
         assertEquals(1, ((ExponentialStops) layer.getRasterHueRotate().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testRasterBrightnessMinTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-brightness-minTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterBrightnessMinTransition(options);
-        assertEquals(layer.getRasterBrightnessMinTransition(), options);
       }
     });
   }
@@ -288,24 +233,6 @@ public class RasterLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testRasterBrightnessMaxTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-brightness-maxTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterBrightnessMaxTransition(options);
-        assertEquals(layer.getRasterBrightnessMaxTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testRasterBrightnessMaxAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -350,24 +277,6 @@ public class RasterLayerTest extends BaseActivityTest {
         assertEquals(ExponentialStops.class, layer.getRasterBrightnessMax().getFunction().getStops().getClass());
         assertEquals(0.5f, ((ExponentialStops) layer.getRasterBrightnessMax().getFunction().getStops()).getBase(), 0.001);
         assertEquals(1, ((ExponentialStops) layer.getRasterBrightnessMax().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testRasterSaturationTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-saturationTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterSaturationTransition(options);
-        assertEquals(layer.getRasterSaturationTransition(), options);
       }
     });
   }
@@ -422,24 +331,6 @@ public class RasterLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testRasterContrastTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-contrastTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterContrastTransition(options);
-        assertEquals(layer.getRasterContrastTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testRasterContrastAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -484,24 +375,6 @@ public class RasterLayerTest extends BaseActivityTest {
         assertEquals(ExponentialStops.class, layer.getRasterContrast().getFunction().getStops().getClass());
         assertEquals(0.5f, ((ExponentialStops) layer.getRasterContrast().getFunction().getStops()).getBase(), 0.001);
         assertEquals(1, ((ExponentialStops) layer.getRasterContrast().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testRasterFadeDurationTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("raster-fade-durationTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setRasterFadeDurationTransition(options);
-        assertEquals(layer.getRasterFadeDurationTransition(), options);
       }
     });
   }

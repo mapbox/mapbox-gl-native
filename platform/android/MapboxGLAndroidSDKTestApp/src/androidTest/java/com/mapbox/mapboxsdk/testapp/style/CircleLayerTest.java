@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -103,24 +102,6 @@ public class CircleLayerTest extends BaseActivityTest {
         final String sourceLayer = "test";
         layer.setSourceLayer(sourceLayer);
         assertEquals(layer.getSourceLayer(), sourceLayer);
-      }
-    });
-  }
-
-  @Test
-  public void testCircleRadiusTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-radiusTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleRadiusTransition(options);
-        assertEquals(layer.getCircleRadiusTransition(), options);
       }
     });
   }
@@ -308,24 +289,6 @@ public class CircleLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testCircleColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleColorTransition(options);
-        assertEquals(layer.getCircleColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testCircleColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -480,24 +443,6 @@ public class CircleLayerTest extends BaseActivityTest {
         // Set and Get
         layer.setProperties(circleColor(Color.RED));
         assertEquals(layer.getCircleColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
-  public void testCircleBlurTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-blurTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleBlurTransition(options);
-        assertEquals(layer.getCircleBlurTransition(), options);
       }
     });
   }
@@ -685,24 +630,6 @@ public class CircleLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testCircleOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleOpacityTransition(options);
-        assertEquals(layer.getCircleOpacityTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testCircleOpacityAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -880,24 +807,6 @@ public class CircleLayerTest extends BaseActivityTest {
         assertEquals(0f, stop.in.zoom, 0.001);
         assertEquals(0.3f, stop.in.value, 0.001f);
         assertEquals(0.9f, stop.out, 0.001f);
-      }
-    });
-  }
-
-  @Test
-  public void testCircleTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleTranslateTransition(options);
-        assertEquals(layer.getCircleTranslateTransition(), options);
       }
     });
   }
@@ -1096,24 +1005,6 @@ public class CircleLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testCircleStrokeWidthTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-stroke-widthTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleStrokeWidthTransition(options);
-        assertEquals(layer.getCircleStrokeWidthTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testCircleStrokeWidthAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1296,24 +1187,6 @@ public class CircleLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testCircleStrokeColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-stroke-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleStrokeColorTransition(options);
-        assertEquals(layer.getCircleStrokeColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testCircleStrokeColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1468,24 +1341,6 @@ public class CircleLayerTest extends BaseActivityTest {
         // Set and Get
         layer.setProperties(circleStrokeColor(Color.RED));
         assertEquals(layer.getCircleStrokeColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
-  public void testCircleStrokeOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("circle-stroke-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setCircleStrokeOpacityTransition(options);
-        assertEquals(layer.getCircleStrokeOpacityTransition(), options);
       }
     });
   }
