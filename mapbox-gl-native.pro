@@ -83,6 +83,7 @@ SOURCES += \
     platform/qt/src/utf.cpp \
     src/csscolorparser/csscolorparser.cpp \
     src/mbgl/actor/mailbox.cpp \
+    src/mbgl/actor/scheduler.cpp \
     src/mbgl/algorithm/generate_clip_ids.cpp \
     src/mbgl/annotation/annotation_manager.cpp \
     src/mbgl/annotation/annotation_source.cpp \

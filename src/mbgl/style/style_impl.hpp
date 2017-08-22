@@ -12,6 +12,8 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/collection.hpp>
 
+#include <mbgl/map/camera.hpp>
+
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
@@ -69,10 +71,7 @@ public:
     std::unique_ptr<Layer> removeLayer(const std::string& layerID);
 
     std::string getName() const;
-    LatLng getDefaultLatLng() const;
-    double getDefaultZoom() const;
-    double getDefaultBearing() const;
-    double getDefaultPitch() const;
+    CameraOptions getDefaultCamera() const;
 
     TransitionOptions getTransitionOptions() const;
     void setTransitionOptions(const TransitionOptions&);
@@ -117,10 +116,7 @@ private:
 
     // Defaults
     std::string name;
-    LatLng defaultLatLng;
-    double defaultZoom = 0;
-    double defaultBearing = 0;
-    double defaultPitch = 0;
+    CameraOptions defaultCamera;
 
     // SpriteLoaderObserver implementation.
     void onSpriteLoaded(std::vector<std::unique_ptr<Image>>&&) override;

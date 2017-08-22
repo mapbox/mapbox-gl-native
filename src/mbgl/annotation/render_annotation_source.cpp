@@ -38,7 +38,7 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        parameters,
                        SourceType::Annotations,
                        util::tileSize,
-                       { 0, 22 },
+                       { 0, util::DEFAULT_MAX_ZOOM },
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<AnnotationTile>(tileID, parameters);
                        });

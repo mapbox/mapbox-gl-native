@@ -383,7 +383,7 @@ ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
     if (!mailbox) {
         // Lazy constructed because this can be costly and
         // the ResourceTransform is not used by many apps.
-        mailbox = std::make_shared<Mailbox>(*util::RunLoop::Get());
+        mailbox = std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     }
 
     return ActorRef<OnlineFileRequest>(*this, mailbox);

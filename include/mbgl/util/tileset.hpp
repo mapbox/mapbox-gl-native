@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/range.hpp>
+#include <mbgl/util/constants.hpp>
 
 #include <vector>
 #include <string>
@@ -18,7 +19,7 @@ public:
     Scheme scheme;
 
     Tileset(std::vector<std::string> tiles_ = std::vector<std::string>(),
-            Range<uint8_t> zoomRange_ = { 0, 22 },
+            Range<uint8_t> zoomRange_ = { 0, util::DEFAULT_MAX_ZOOM },
             std::string attribution_ = {},
             Scheme scheme_ = Scheme::XYZ)
         : tiles(std::move(tiles_)),
