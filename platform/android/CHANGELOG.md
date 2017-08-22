@@ -5,6 +5,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 ## 5.2.0 - TBA
 
 * Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
+* Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
 * TBA
 
 ## 5.1.3 - August 18, 2017

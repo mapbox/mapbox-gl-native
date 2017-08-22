@@ -8,6 +8,10 @@
 * The previously-deprecated support for style classes has been removed. For interface compatibility, the API methods remain, but they are now non-functional.
 * Added an `overlays` property to `MGLMapView`. ([#8617](https://github.com/mapbox/mapbox-gl-native/pull/8617))
 
+### Other changes
+
+* Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
+
 ## 0.5.0
 
 This version of the Mapbox macOS SDK corresponds to version 3.6.0 of the Mapbox iOS SDK.
