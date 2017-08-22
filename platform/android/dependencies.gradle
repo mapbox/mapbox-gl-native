@@ -4,10 +4,10 @@ ext {
     compileSdkVersion = 23
     buildToolsVersion = "19.1.0"
 
-    versionCode = 11
-    versionName = "5.0.0"
+    versionCode = 12
+    versionName = "5.1.4"
 
-    mapboxServicesVersion = "2.2.0"
+    mapboxServicesVersion = "2.2.1"
     supportLibVersion = "23.4.0"
     wearableVersion = '2.0.0'
     espressoVersion = '2.2.2'
