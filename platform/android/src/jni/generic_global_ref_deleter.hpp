@@ -18,5 +18,34 @@ struct GenericGlobalRefDeleter {
     }
 };
 
+
+template < class TagType >
+class GenericWeakObjectRefDeleter;
+
+template < class TagType = jni::ObjectTag >
+using GenericUniqueWeakObject = std::unique_ptr< const jni::Object<TagType>, GenericWeakObjectRefDeleter<TagType> >;
+
+template < class TagType >
+class GenericWeakObjectRefDeleter
+{
+public:
+    using pointer = jni::PointerToValue< jni::Object<TagType> >;
+
+    void operator()(pointer p) const
+    {
+        if (p)
+        {
+            auto env = AttachEnv();
+            env->DeleteWeakGlobalRef(jni::Unwrap(p->Get()));
+        }
+    }
+};
+
+template < class TagType >
+GenericUniqueWeakObject<TagType> SeizeGenericWeakRef(JNIEnv&, jni::Object<TagType>&& object)
+{
+    return GenericUniqueWeakObject<TagType>(jni::PointerToValue<jni::Object<TagType>>(std::move(object)), GenericWeakObjectRefDeleter<TagType>());
+};
+
 } // namespace android
 } // namespace mbgl
