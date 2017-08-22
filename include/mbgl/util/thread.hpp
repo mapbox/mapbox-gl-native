@@ -61,8 +61,6 @@ public:
     }
 
     ~Thread() override {
-        MBGL_VERIFY_THREAD(tid);
-
         if (paused) {
             resume();
         }
