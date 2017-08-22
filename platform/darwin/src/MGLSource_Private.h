@@ -26,7 +26,7 @@ struct SourceWrapper {
  Initializes and returns a source with a raw pointer to the backing store,
  associated with a style.
  */
-- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource;
+- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource mapView:(nullable MGLMapView *)mapView;
 
 /**
  Initializes and returns a source with an owning pointer to the backing store,

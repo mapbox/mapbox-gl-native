@@ -27,17 +27,18 @@
     return self;
 }
 
-- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource {
+- (instancetype)initWithRawSource:(mbgl::style::Source *)rawSource mapView:(MGLMapView *)mapView {
     NSString *identifier = @(rawSource->getID().c_str());
     if (self = [self initWithIdentifier:identifier]) {
         _rawSource = rawSource;
         _rawSource->peer = SourceWrapper { self };
+        _mapView = mapView;
     }
     return self;
 }
 
 - (instancetype)initWithPendingSource:(std::unique_ptr<mbgl::style::Source>)pendingSource {
-    if (self = [self initWithRawSource:pendingSource.get()]) {
+    if (self = [self initWithRawSource:pendingSource.get() mapView:nil]) {
         _pendingSource = std::move(pendingSource);
     }
     return self;

@@ -103,6 +103,18 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "pois"))
     }
+    
+    func testMGLPolyline() {
+        //#-example-code
+        let coordinates = [
+            CLLocationCoordinate2D(latitude: 35.68476, longitude: -220.24257),
+            CLLocationCoordinate2D(latitude: 37.78428, longitude: -122.41310)
+        ]
+        let polyline = MGLPolyline(coordinates: coordinates, count: UInt(coordinates.count))
+        //#-end-example-code
+        
+        XCTAssertNotNil(polyline)
+    }
 
     func testMGLCircleStyleLayer() {
         let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
