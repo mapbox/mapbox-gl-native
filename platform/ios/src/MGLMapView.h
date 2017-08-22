@@ -597,7 +597,8 @@ MGL_EXPORT IB_DESIGNABLE
  * If the value of this property is smaller than that of the
  * minimumZoomLevel property, the behavior is undefined.
  *
- * The default maximumZoomLevel is 20.
+ * The default maximumZoomLevel is 22. The upper bound for this property
+ * is 25.5.
  */
 @property (nonatomic) double maximumZoomLevel;
 
