@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -75,24 +74,6 @@ public class BackgroundLayerTest extends BaseActivityTest {
         // Set
         layer.setProperties(visibility(NONE));
         assertEquals(layer.getVisibility().getValue(), NONE);
-      }
-    });
-  }
-
-  @Test
-  public void testBackgroundColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("background-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setBackgroundColorTransition(options);
-        assertEquals(layer.getBackgroundColorTransition(), options);
       }
     });
   }
@@ -164,24 +145,6 @@ public class BackgroundLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testBackgroundPatternTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("background-patternTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setBackgroundPatternTransition(options);
-        assertEquals(layer.getBackgroundPatternTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testBackgroundPatternAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -225,24 +188,6 @@ public class BackgroundLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getBackgroundPattern().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getBackgroundPattern().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getBackgroundPattern().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testBackgroundOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("background-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setBackgroundOpacityTransition(options);
-        assertEquals(layer.getBackgroundOpacityTransition(), options);
       }
     });
   }

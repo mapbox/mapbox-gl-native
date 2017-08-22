@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -108,24 +107,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testFillExtrusionOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionOpacityTransition(options);
-        assertEquals(layer.getFillExtrusionOpacityTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testFillExtrusionOpacityAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -170,24 +151,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
         assertEquals(ExponentialStops.class, layer.getFillExtrusionOpacity().getFunction().getStops().getClass());
         assertEquals(0.5f, ((ExponentialStops) layer.getFillExtrusionOpacity().getFunction().getStops()).getBase(), 0.001);
         assertEquals(1, ((ExponentialStops) layer.getFillExtrusionOpacity().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testFillExtrusionColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionColorTransition(options);
-        assertEquals(layer.getFillExtrusionColorTransition(), options);
       }
     });
   }
@@ -352,24 +315,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testFillExtrusionTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionTranslateTransition(options);
-        assertEquals(layer.getFillExtrusionTranslateTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testFillExtrusionTranslateAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -467,24 +412,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testFillExtrusionPatternTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-patternTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionPatternTransition(options);
-        assertEquals(layer.getFillExtrusionPatternTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testFillExtrusionPatternAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -528,24 +455,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getFillExtrusionPattern().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getFillExtrusionPattern().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getFillExtrusionPattern().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testFillExtrusionHeightTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-heightTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionHeightTransition(options);
-        assertEquals(layer.getFillExtrusionHeightTransition(), options);
       }
     });
   }
@@ -728,24 +637,6 @@ public class FillExtrusionLayerTest extends BaseActivityTest {
         assertEquals(0f, stop.in.zoom, 0.001);
         assertEquals(0.3f, stop.in.value, 0.001f);
         assertEquals(0.9f, stop.out, 0.001f);
-      }
-    });
-  }
-
-  @Test
-  public void testFillExtrusionBaseTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("fill-extrusion-baseTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setFillExtrusionBaseTransition(options);
-        assertEquals(layer.getFillExtrusionBaseTransition(), options);
       }
     });
   }

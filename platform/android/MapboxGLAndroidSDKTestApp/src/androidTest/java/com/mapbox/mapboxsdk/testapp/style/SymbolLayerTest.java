@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -2733,24 +2732,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testIconOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconOpacityTransition(options);
-        assertEquals(layer.getIconOpacityTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testIconOpacityAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -2933,24 +2914,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testIconColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconColorTransition(options);
-        assertEquals(layer.getIconColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testIconColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -3110,24 +3073,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testIconHaloColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-halo-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconHaloColorTransition(options);
-        assertEquals(layer.getIconHaloColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testIconHaloColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -3282,24 +3227,6 @@ public class SymbolLayerTest extends BaseActivityTest {
         // Set and Get
         layer.setProperties(iconHaloColor(Color.RED));
         assertEquals(layer.getIconHaloColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
-  public void testIconHaloWidthTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-halo-widthTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconHaloWidthTransition(options);
-        assertEquals(layer.getIconHaloWidthTransition(), options);
       }
     });
   }
@@ -3487,24 +3414,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testIconHaloBlurTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-halo-blurTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconHaloBlurTransition(options);
-        assertEquals(layer.getIconHaloBlurTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testIconHaloBlurAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -3687,24 +3596,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testIconTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("icon-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setIconTranslateTransition(options);
-        assertEquals(layer.getIconTranslateTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testIconTranslateAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -3797,24 +3688,6 @@ public class SymbolLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getIconTranslateAnchor().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getIconTranslateAnchor().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getIconTranslateAnchor().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testTextOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextOpacityTransition(options);
-        assertEquals(layer.getTextOpacityTransition(), options);
       }
     });
   }
@@ -4002,24 +3875,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testTextColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextColorTransition(options);
-        assertEquals(layer.getTextColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testTextColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -4179,24 +4034,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testTextHaloColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-halo-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextHaloColorTransition(options);
-        assertEquals(layer.getTextHaloColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testTextHaloColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -4351,24 +4188,6 @@ public class SymbolLayerTest extends BaseActivityTest {
         // Set and Get
         layer.setProperties(textHaloColor(Color.RED));
         assertEquals(layer.getTextHaloColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
-  public void testTextHaloWidthTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-halo-widthTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextHaloWidthTransition(options);
-        assertEquals(layer.getTextHaloWidthTransition(), options);
       }
     });
   }
@@ -4556,24 +4375,6 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testTextHaloBlurTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-halo-blurTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextHaloBlurTransition(options);
-        assertEquals(layer.getTextHaloBlurTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testTextHaloBlurAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -4751,24 +4552,6 @@ public class SymbolLayerTest extends BaseActivityTest {
         assertEquals(0f, stop.in.zoom, 0.001);
         assertEquals(0.3f, stop.in.value, 0.001f);
         assertEquals(0.9f, stop.out, 0.001f);
-      }
-    });
-  }
-
-  @Test
-  public void testTextTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("text-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setTextTranslateTransition(options);
-        assertEquals(layer.getTextTranslateTransition(), options);
       }
     });
   }

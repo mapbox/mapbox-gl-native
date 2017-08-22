@@ -33,7 +33,6 @@ import static org.junit.Assert.*;
 import static com.mapbox.mapboxsdk.style.layers.Property.*;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.*;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 
 /**
@@ -359,24 +358,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineOpacityTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-opacityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineOpacityTransition(options);
-        assertEquals(layer.getLineOpacityTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineOpacityAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -559,24 +540,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineColorTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineColorTransition(options);
-        assertEquals(layer.getLineColorTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineColorAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -736,24 +699,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineTranslateTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-translateTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineTranslateTransition(options);
-        assertEquals(layer.getLineTranslateTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineTranslateAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -846,24 +791,6 @@ public class LineLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getLineTranslateAnchor().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getLineTranslateAnchor().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getLineTranslateAnchor().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testLineWidthTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-widthTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineWidthTransition(options);
-        assertEquals(layer.getLineWidthTransition(), options);
       }
     });
   }
@@ -1051,24 +978,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineGapWidthTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-gap-widthTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineGapWidthTransition(options);
-        assertEquals(layer.getLineGapWidthTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineGapWidthAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1246,24 +1155,6 @@ public class LineLayerTest extends BaseActivityTest {
         assertEquals(0f, stop.in.zoom, 0.001);
         assertEquals(0.3f, stop.in.value, 0.001f);
         assertEquals(0.9f, stop.out, 0.001f);
-      }
-    });
-  }
-
-  @Test
-  public void testLineOffsetTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-offsetTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineOffsetTransition(options);
-        assertEquals(layer.getLineOffsetTransition(), options);
       }
     });
   }
@@ -1451,24 +1342,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineBlurTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-blurTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineBlurTransition(options);
-        assertEquals(layer.getLineBlurTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineBlurAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1651,24 +1524,6 @@ public class LineLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testLineDasharrayTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-dasharrayTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLineDasharrayTransition(options);
-        assertEquals(layer.getLineDasharrayTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testLineDasharrayAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1712,24 +1567,6 @@ public class LineLayerTest extends BaseActivityTest {
         assertEquals(CameraFunction.class, layer.getLineDasharray().getFunction().getClass());
         assertEquals(IntervalStops.class, layer.getLineDasharray().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.getLineDasharray().getFunction().getStops()).size());
-      }
-    });
-  }
-
-  @Test
-  public void testLinePatternTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("line-patternTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setLinePatternTransition(options);
-        assertEquals(layer.getLinePatternTransition(), options);
       }
     });
   }
