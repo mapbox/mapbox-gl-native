@@ -4690,29 +4690,38 @@ public:
     {
         // note that right/left device and interface orientations are opposites (see UIApplication.h)
         //
+        CLDeviceOrientation orientation;
         switch ([[UIApplication sharedApplication] statusBarOrientation])
         {
             case (UIInterfaceOrientationLandscapeLeft):
             {
-                self.locationManager.headingOrientation = CLDeviceOrientationLandscapeRight;
+                orientation = CLDeviceOrientationLandscapeRight;
                 break;
             }
             case (UIInterfaceOrientationLandscapeRight):
             {
-                self.locationManager.headingOrientation = CLDeviceOrientationLandscapeLeft;
+                orientation = CLDeviceOrientationLandscapeLeft;
                 break;
             }
             case (UIInterfaceOrientationPortraitUpsideDown):
             {
-                self.locationManager.headingOrientation = CLDeviceOrientationPortraitUpsideDown;
+                orientation = CLDeviceOrientationPortraitUpsideDown;
                 break;
             }
             case (UIInterfaceOrientationPortrait):
             default:
             {
-                self.locationManager.headingOrientation = CLDeviceOrientationPortrait;
+                orientation = CLDeviceOrientationPortrait;
                 break;
             }
+        }
+
+        // Setting the location manager's heading orientation causes it to send
+        // a heading event, which in turn makes us redraw, which kicks off a
+        // loop... so don't do that. rdar://34059173
+        if (self.locationManager.headingOrientation != orientation)
+        {
+            self.locationManager.headingOrientation = orientation;
         }
     }
 }
