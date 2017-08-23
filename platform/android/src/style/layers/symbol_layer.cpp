@@ -125,6 +125,12 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<jni::ObjectTag> SymbolLayer::getIconAnchor(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconAnchor());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
     jni::Object<jni::ObjectTag> SymbolLayer::getIconPitchAlignment(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::SymbolLayer>()->SymbolLayer::getIconPitchAlignment());
@@ -520,6 +526,7 @@ namespace android {
             METHOD(&SymbolLayer::getIconPadding, "nativeGetIconPadding"),
             METHOD(&SymbolLayer::getIconKeepUpright, "nativeGetIconKeepUpright"),
             METHOD(&SymbolLayer::getIconOffset, "nativeGetIconOffset"),
+            METHOD(&SymbolLayer::getIconAnchor, "nativeGetIconAnchor"),
             METHOD(&SymbolLayer::getIconPitchAlignment, "nativeGetIconPitchAlignment"),
             METHOD(&SymbolLayer::getTextPitchAlignment, "nativeGetTextPitchAlignment"),
             METHOD(&SymbolLayer::getTextRotationAlignment, "nativeGetTextRotationAlignment"),

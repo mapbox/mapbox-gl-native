@@ -8,6 +8,51 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ Part of the icon placed closest to the anchor.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.iconAnchor`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLIconAnchor) {
+    /**
+     The center of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorCenter,
+    /**
+     The left side of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorLeft,
+    /**
+     The right side of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorRight,
+    /**
+     The top of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTop,
+    /**
+     The bottom of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottom,
+    /**
+     The top left corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTopLeft,
+    /**
+     The top right corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTopRight,
+    /**
+     The bottom left corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottomLeft,
+    /**
+     The bottom right corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottomRight,
+};
+
+/**
  Orientation of icon when map is pitched.
 
  Values of this type are used in the `MGLSymbolStyleLayer.iconPitchAlignment`
@@ -343,6 +388,34 @@ MGL_EXPORT
 
 
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap __attribute__((unavailable("Use iconAllowsOverlap instead.")));
+
+/**
+ Part of the icon placed closest to the anchor.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLIconAnchorCenter`. Set this property to `nil`
+ to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconAnchor;
 
 /**
  If true, other symbols can be visible even if they collide with the icon.
@@ -1982,6 +2055,19 @@ MGL_EXPORT
 @interface NSValue (MGLSymbolStyleLayerAdditions)
 
 #pragma mark Working with Symbol Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLIconAnchor` enumeration.
+
+ @param iconAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconAnchor:(MGLIconAnchor)iconAnchor;
+
+/**
+ The `MGLIconAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLIconAnchor MGLIconAnchorValue;
 
 /**
  Creates a new value object containing the given `MGLIconPitchAlignment` enumeration.

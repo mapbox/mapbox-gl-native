@@ -233,6 +233,7 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                 shapedIcon = PositionedIcon::shapeIcon(
                     imagePositions.at(*feature.icon),
                     layout.evaluate<IconOffset>(zoom, feature),
+                    layout.evaluate<IconAnchor>(zoom, feature),
                     layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 if (image->second->sdf) {
                     sdfIcons = true;
