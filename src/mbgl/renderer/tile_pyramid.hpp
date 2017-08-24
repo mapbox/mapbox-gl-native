@@ -21,7 +21,7 @@ namespace mbgl {
 class PaintParameters;
 class TransformState;
 class RenderTile;
-class RenderStyle;
+class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class TileParameters;
@@ -50,7 +50,7 @@ public:
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const RenderStyle& style,
+                          const std::vector<const RenderLayer*>&,
                           const RenderedQueryOptions& options) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;

@@ -183,7 +183,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
-    src/mbgl/renderer/render_item.hpp
     src/mbgl/renderer/render_layer.cpp
     src/mbgl/renderer/render_layer.hpp
     src/mbgl/renderer/render_light.cpp
@@ -194,9 +193,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/render_source_observer.hpp
     src/mbgl/renderer/render_static_data.cpp
     src/mbgl/renderer/render_static_data.hpp
-    src/mbgl/renderer/render_style.cpp
-    src/mbgl/renderer/render_style.hpp
-    src/mbgl/renderer/render_style_observer.hpp
     src/mbgl/renderer/render_tile.cpp
     src/mbgl/renderer/render_tile.hpp
     src/mbgl/renderer/renderer.cpp

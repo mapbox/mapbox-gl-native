@@ -206,7 +206,7 @@ void TilePyramid::removeStaleTiles(const std::set<OverscaledTileID>& retain) {
 
 std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
-                                           const RenderStyle& style,
+                                           const std::vector<const RenderLayer*>& layers,
                                            const RenderedQueryOptions& options) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
@@ -249,7 +249,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
         renderTile.tile.queryRenderedFeatures(result,
                                               tileSpaceQueryGeometry,
                                               transformState,
-                                              style,
+                                              layers,
                                               options);
     }
 

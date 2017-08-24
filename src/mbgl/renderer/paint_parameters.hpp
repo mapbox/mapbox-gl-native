@@ -15,7 +15,6 @@ namespace mbgl {
 
 class RendererBackend;
 class UpdateParameters;
-class RenderStyle;
 class RenderStaticData;
 class FrameHistory;
 class Programs;
@@ -31,9 +30,11 @@ public:
                     GLContextMode,
                     RendererBackend&,
                     const UpdateParameters&,
-                    RenderStyle&,
+                    const EvaluatedLight&,
                     RenderStaticData&,
-                    FrameHistory&);
+                    FrameHistory&,
+                    ImageManager&,
+                    LineAtlas&);
 
     gl::Context& context;
     RendererBackend& backend;
