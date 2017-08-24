@@ -20,7 +20,7 @@ public:
 
 class HTTPRequest : public AsyncRequest {
 public:
-    static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/HttpRequest"; };
+    static constexpr auto Name() { return "com/mapbox/mapboxsdk/http/HTTPRequest"; };
 
     HTTPRequest(jni::JNIEnv&, const Resource&, FileSource::Callback);
     ~HTTPRequest();
@@ -61,7 +61,7 @@ void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "nativePtr",
+    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "mNativePtr",
         METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
         METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
 }
