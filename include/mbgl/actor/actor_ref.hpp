@@ -2,6 +2,7 @@
 
 #include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/message.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <memory>
 
@@ -54,6 +55,11 @@ public:
         }
 
         return future;
+    }
+    
+    template <typename Fn, class... Args>
+    std::unique_ptr<Scheduler::Scheduled> invokeDelayed(Duration timeout, Fn fn, Args&&... args, Scheduler& scheduler = *Scheduler::GetCurrent()) {
+        return scheduler.schedule(timeout, weakMailbox, actor::makeMessage(*object, fn, std::forward<Args>(args)...));
     }
 
 private:

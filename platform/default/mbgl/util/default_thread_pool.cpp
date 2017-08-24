@@ -1,14 +1,32 @@
 #include <mbgl/util/default_thread_pool.hpp>
-#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/scheduled_timer.hpp>
 
 namespace mbgl {
+    
 
 ThreadPool::ThreadPool(std::size_t count) {
+    std::promise<void> timerThreadRunning;
+    
+    timerThread = std::thread([&]() {
+        platform::setCurrentThreadName("Timer thread");
+        platform::makeThreadLowPriority();
+        
+        util::RunLoop loop(util::RunLoop::Type::New);
+        timerLoop = &loop;
+        timerThreadRunning.set_value();
+        
+        loop.run();
+    });
+    
+    timerThreadRunning.get_future().get();
+        
     threads.reserve(count);
     for (std::size_t i = 0; i < count; ++i) {
-        threads.emplace_back([this, i]() {
+        auto scheduler = this;
+        threads.emplace_back([this, scheduler, i]() {
+            Scheduler::SetCurrent(scheduler);
             platform::setCurrentThreadName(std::string{ "Worker " } + util::toString(i + 1));
 
             while (true) {
@@ -38,11 +56,16 @@ ThreadPool::~ThreadPool() {
         terminate = true;
     }
 
+    // Stop the threadpool threads
     cv.notify_all();
 
     for (auto& thread : threads) {
         thread.join();
     }
+    
+    // Stop the timer thread
+    timerLoop->stop();
+    timerThread.join();
 }
 
 void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
@@ -52,6 +75,11 @@ void ThreadPool::schedule(std::weak_ptr<Mailbox> mailbox) {
     }
 
     cv.notify_one();
+}
+    
+    
+std::unique_ptr<Scheduler::Scheduled> ThreadPool::schedule(Duration timeout, std::weak_ptr<Mailbox> mailbox, std::unique_ptr<Message> message) {
+    return std::make_unique<ScheduledTimer>(*timerLoop, timeout, std::move(mailbox), std::move(message));
 }
 
 } // namespace mbgl

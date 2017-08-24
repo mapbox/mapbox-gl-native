@@ -1,10 +1,14 @@
 #pragma once
 
+#include <mbgl/util/chrono.hpp>
+#include <mbgl/util/async_request.hpp>
+
 #include <memory>
 
 namespace mbgl {
 
 class Mailbox;
+class Message;
 
 /*
     A `Scheduler` is responsible for coordinating the processing of messages by
@@ -33,6 +37,21 @@ public:
     virtual ~Scheduler() = default;
     virtual void schedule(std::weak_ptr<Mailbox>) = 0;
 
+    /*
+     A token to the scheduled action, at the end of
+     the token's life-time, the scheduled action is
+     canceled.
+    */
+    class Scheduled : public AsyncRequest {
+    public:
+        ~Scheduled() override = default;
+        
+        virtual bool isFinished() = 0;
+    };
+    
+    // Schedule message delivery at a later time
+    virtual std::unique_ptr<Scheduled> schedule(Duration timeout, std::weak_ptr<Mailbox>, std::unique_ptr<Message>) = 0;
+    
     // Set/Get the current Scheduler for this thread
     static Scheduler* GetCurrent();
     static void SetCurrent(Scheduler*);

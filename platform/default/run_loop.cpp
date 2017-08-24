@@ -1,6 +1,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/thread_local.hpp>
+#include <mbgl/util/scheduled_timer.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
 #include <uv.h>
@@ -214,6 +215,10 @@ void RunLoop::removeWatch(int fd) {
     }
 
     uv_close(reinterpret_cast<uv_handle_t*>(&watch->poll), &Watch::onClose);
+}
+    
+std::unique_ptr<Scheduler::Scheduled> RunLoop::schedule(Duration timeout, std::weak_ptr<Mailbox> mailbox, std::unique_ptr<Message> message) {
+    return std::make_unique<ScheduledTimer>(*this, timeout, std::move(mailbox), std::move(message));
 }
 
 } // namespace util

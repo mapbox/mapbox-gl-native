@@ -1,6 +1,7 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/util/scheduled_timer.hpp>
 
 #include <QCoreApplication>
 
@@ -118,6 +119,10 @@ void RunLoop::removeWatch(int fd) {
     if (readPollIter != impl->readPoll.end()) {
         impl->readPoll.erase(readPollIter);
     }
+}
+    
+std::unique_ptr<Scheduler::Scheduled> RunLoop::schedule(Duration timeout, std::weak_ptr<Mailbox> mailbox, std::unique_ptr<Message> message) {
+    return std::make_unique<ScheduledTimer>(*this, timeout, std::move(mailbox), std::move(message));
 }
 
 }

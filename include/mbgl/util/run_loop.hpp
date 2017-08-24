@@ -62,12 +62,14 @@ public:
         push(task);
         return std::make_unique<WorkRequest>(task);
     }
-                    
+
     void schedule(std::weak_ptr<Mailbox> mailbox) override {
         invoke([mailbox] () {
             Mailbox::maybeReceive(mailbox);
         });
     }
+                    
+    std::unique_ptr<Scheduled> schedule(Duration, std::weak_ptr<Mailbox>, std::unique_ptr<Message>) override;
 
     class Impl;
 

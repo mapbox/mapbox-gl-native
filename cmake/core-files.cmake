@@ -602,13 +602,14 @@ set(MBGL_CORE_FILES
     src/mbgl/util/premultiply.cpp
     src/mbgl/util/rapidjson.hpp
     src/mbgl/util/rect.hpp
+    src/mbgl/util/scheduled_timer.cpp
+    src/mbgl/util/scheduled_timer.hpp
     src/mbgl/util/std.hpp
     src/mbgl/util/stopwatch.cpp
     src/mbgl/util/stopwatch.hpp
     src/mbgl/util/string.cpp
     src/mbgl/util/thread.hpp
     src/mbgl/util/thread_local.hpp
-    src/mbgl/util/throttler.cpp
     src/mbgl/util/throttler.hpp
     src/mbgl/util/tile_coordinate.hpp
     src/mbgl/util/tile_cover.cpp
