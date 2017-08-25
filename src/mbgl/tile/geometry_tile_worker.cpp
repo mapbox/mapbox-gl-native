@@ -216,14 +216,12 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
-    imageMap = std::move(newImageMap);
-    for (const auto& pair : imageMap) {
-        auto it = pendingImageDependencies.find(pair.first);
-        if (it != pendingImageDependencies.end()) {
-            pendingImageDependencies.erase(it);
-        }
+void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap, uint64_t imageCorrelationID_) {
+    if (imageCorrelationID != imageCorrelationID_) {
+        return; // Ignore outdated image request replies.
     }
+    imageMap = std::move(newImageMap);
+    pendingImageDependencies.clear();
     symbolDependenciesChanged();
 }
 
@@ -244,7 +242,7 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
 void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
     pendingImageDependencies = imageDependencies;
     if (!pendingImageDependencies.empty()) {
-        parent.invoke(&GeometryTile::getImages, pendingImageDependencies);
+        parent.invoke(&GeometryTile::getImages, std::make_pair(pendingImageDependencies, ++imageCorrelationID));
     }
 }
 
