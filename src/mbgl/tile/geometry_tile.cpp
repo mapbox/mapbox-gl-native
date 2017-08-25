@@ -28,6 +28,22 @@ namespace mbgl {
 
 using namespace style;
 
+/*
+   Correlation between GeometryTile and GeometryTileWorker is safeguarded by two
+   correlation schemes:
+
+   GeometryTile's 'correlationID' is used for ensuring the tile will be flagged
+   as non-pending only when the placement coming from the last operation (as in
+   'setData', 'setLayers',  'setPlacementConfig') occurs. This is important for
+   still mode rendering as we want to render only when all layout and placement
+   operations are completed.
+
+   GeometryTileWorker's 'imageCorrelationID' is used for checking whether an
+   image request reply coming from `GeometryTile` is valid. Previous image
+   request replies are ignored as they result in incomplete placement attempts
+   that could flag the tile as non-pending too early.
+ */
+
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
                            const TileParameters& parameters)
@@ -170,12 +186,12 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images) {
-    worker.invoke(&GeometryTileWorker::onImagesAvailable, std::move(images));
+void GeometryTile::onImagesAvailable(ImageMap images, uint64_t imageCorrelationID) {
+    worker.invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), imageCorrelationID);
 }
 
-void GeometryTile::getImages(ImageDependencies imageDependencies) {
-    imageManager.getImages(*this, std::move(imageDependencies));
+void GeometryTile::getImages(ImageRequestPair pair) {
+    imageManager.getImages(*this, std::move(pair));
 }
 
 void GeometryTile::upload(gl::Context& context) {

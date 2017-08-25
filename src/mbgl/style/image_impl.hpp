@@ -28,5 +28,6 @@ public:
 
 using ImageMap = std::unordered_map<std::string, Immutable<style::Image::Impl>>;
 using ImageDependencies = std::set<std::string>;
+using ImageRequestPair = std::pair<ImageDependencies, uint64_t>;
 
 } // namespace mbgl

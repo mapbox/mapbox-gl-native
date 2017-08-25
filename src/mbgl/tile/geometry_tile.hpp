@@ -40,10 +40,10 @@ public:
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
     
     void onGlyphsAvailable(GlyphMap) override;
-    void onImagesAvailable(ImageMap) override;
+    void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) override;
     
     void getGlyphs(GlyphDependencies);
-    void getImages(ImageDependencies);
+    void getImages(ImageRequestPair);
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
