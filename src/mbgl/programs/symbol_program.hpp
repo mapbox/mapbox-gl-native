@@ -68,6 +68,9 @@ struct SymbolLayoutAttributes : gl::Attributes<
                 tx,
                 ty,
                 static_cast<uint16_t>(sizeData.min * 10),
+                ),
+                mbgl::attributes::packUint8Pair(
+                   static_cast<uint8_t>(minzoom * 10),
                 static_cast<uint16_t>(sizeData.max * 10)
             }}
         };
@@ -114,8 +117,8 @@ public:
                                                     const style::DataDrivenPropertyValue<float>& sizeProperty,
                                                     const float defaultValue);
 
-    virtual Range<float> getVertexSizeData(const GeometryTileFeature& feature) = 0;
-    virtual ZoomEvaluatedSize evaluateForZoom(float currentZoom) const = 0;
+    virtual SymbolSizeAttributes::Bindings attributeBindings() const = 0;
+    virtual void populateVertexVector(const GeometryTileFeature& feature) = 0;
 
     UniformValues uniformValues(float currentZoom) const {
         const ZoomEvaluatedSize u = evaluateForZoom(currentZoom);
@@ -171,6 +174,10 @@ public:
         );
     }
     
+    SymbolSizeAttributes::Bindings attributeBindings() const override {
+        return SymbolSizeAttributes::Bindings { {} };
+    }
+
     Range<float> getVertexSizeData(const GeometryTileFeature&) override { return { 0.0f, 0.0f }; };
     
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
@@ -216,10 +223,28 @@ public:
           defaultValue(defaultValue_) {
     }
 
+    SymbolSizeAttributes::Bindings attributeBindings() const override {
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0, 1) };
+    }
+
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
         const float size = function.evaluate(feature, defaultValue);
+            }}
+        };
+        
+        vertices.emplace_back(sizeVertex);
         return { size, size };
     };
+    
+    UniformValues uniformValues(float) const override {
+        return UniformValues {
+            uniforms::u_is_size_zoom_constant::Value{ true },
+            uniforms::u_is_size_feature_constant::Value{ false },
+            uniforms::u_size_t::Value{ 0.0f },      // unused
+            uniforms::u_size::Value{ 0.0f },        // unused
+            uniforms::u_layout_size::Value{ 0.0f }  // unused
+        };
+    }
     
     ZoomEvaluatedSize evaluateForZoom(float) const override {
         const float unused = 0.0f;
@@ -242,7 +267,12 @@ public:
             return getCoveringStops(stops, tileZoom, tileZoom + 1); }))
     {}
 
+    SymbolSizeAttributes::Bindings attributeBindings() const override {
+        return SymbolSizeAttributes::Bindings { SymbolSizeAttributes::Attribute::binding(*buffer, 0) };
+    }
+    
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
+        const auto sizeVertex = Vertex {
         return {
             function.evaluate(coveringZoomStops.min, feature, defaultValue),
             function.evaluate(coveringZoomStops.max, feature, defaultValue)
@@ -322,7 +352,7 @@ public:
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
         typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
+            .concat(symbolSizeBinder.attributeBindings())
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
@@ -404,6 +434,8 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_collision_y_stretch,
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
+        uniforms::u_bearing,
+        uniforms::u_aspect_ratio,
         uniforms::u_pitch_with_map,
         uniforms::u_max_camera_distance,
         uniforms::u_rotate_symbol,

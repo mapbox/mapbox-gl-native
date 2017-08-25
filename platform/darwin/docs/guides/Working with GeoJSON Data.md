@@ -81,8 +81,10 @@ Linear ring         | `MGLPolygon.coordinates`, `MGLPolygon.interiorPolygons`
 A `Feature` object in GeoJSON corresponds to an instance of an `MGLShape`
 subclass conforming to the `MGLFeature` protocol. There is a distinct
 `MGLFeature`-conforming class for each type of geometry that a GeoJSON feature
-can contain. This allows features to be used as shapes where convenient. For
-example, some features can be added to a map view as annotations.
+can contain. This allows features to be used as raw shapes where convenient. For
+example, some features can be added to a map view as annotations. Note that
+identifiers and attributes will not be available for feature querying when a
+feature is used as an annotation.
 
 In contrast to the GeoJSON standard, it is possible for `MGLShape` subclasses
 other than `MGLPointAnnotation` to straddle the antimeridian.

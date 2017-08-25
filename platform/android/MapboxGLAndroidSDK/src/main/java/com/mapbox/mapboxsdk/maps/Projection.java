@@ -103,6 +103,11 @@ public class Projection {
     LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
     LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
 
+    builder.include(topLeft)
+      .include(topRight)
+      .include(bottomRight)
+      .include(bottomLeft);
+
     return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
       LatLngBounds.from(
         topRight.getLatitude(),

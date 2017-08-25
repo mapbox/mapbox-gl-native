@@ -1460,6 +1460,7 @@ public final class MapboxMap {
    * @param listener The callback that's invoked when the user clicks on a polygon.
    *                 To unset the callback, use null.
    */
+  @UiThread
   public void setOnPolygonClickListener(@Nullable OnPolygonClickListener listener) {
     annotationManager.setOnPolygonClickListener(listener);
   }
@@ -1470,6 +1471,7 @@ public final class MapboxMap {
    * @param listener The callback that's invoked when the user clicks on a polyline.
    *                 To unset the callback, use null.
    */
+  @UiThread
   public void setOnPolylineClickListener(@Nullable OnPolylineClickListener listener) {
     annotationManager.setOnPolylineClickListener(listener);
   }

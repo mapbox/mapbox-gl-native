@@ -150,6 +150,7 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/programs.hpp
     src/mbgl/programs/raster_program.cpp
     src/mbgl/programs/raster_program.hpp
+    src/mbgl/programs/segment.cpp
     src/mbgl/programs/segment.hpp
     src/mbgl/programs/symbol_program.cpp
     src/mbgl/programs/symbol_program.hpp
@@ -364,6 +365,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/source_observer.hpp
     src/mbgl/style/style.cpp
     src/mbgl/style/style_impl.cpp
+    src/mbgl/style/tile_source_impl.cpp
     src/mbgl/style/style_impl.hpp
     src/mbgl/style/types.cpp
 
