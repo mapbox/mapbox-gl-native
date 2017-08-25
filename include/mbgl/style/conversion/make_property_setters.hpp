@@ -52,9 +52,9 @@ auto makeLayoutPropertySetters() {
     result["text-field"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;
     result["text-font"] = &setProperty<V, SymbolLayer, PropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
     result["text-size"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextSize>;
-    result["text-max-width"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
+    result["text-max-width"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
     result["text-line-height"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;
-    result["text-letter-spacing"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLetterSpacing>;
+    result["text-letter-spacing"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextLetterSpacing>;
     result["text-justify"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<TextJustifyType>, &SymbolLayer::setTextJustify>;
     result["text-anchor"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<SymbolAnchorType>, &SymbolLayer::setTextAnchor>;
     result["text-max-angle"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxAngle>;
