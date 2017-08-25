@@ -94,10 +94,12 @@ namespace mbgl {
     }
 
 
-    Point<float> project(const Point<float>& point, const mat4& matrix) {
+    typedef std::pair<Point<float>,float> PointAndCameraDistance;
+
+    PointAndCameraDistance project(const Point<float>& point, const mat4& matrix) {
         vec4 pos = {{ point.x, point.y, 0, 1 }};
         matrix::transformMat4(pos, pos, matrix);
-        return { static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) };
+        return {{ static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) }, pos[3] };
     }
 
     float evaluateSizeForFeature(const ZoomEvaluatedSize& zoomEvaluatedSize, const PlacedSymbol& placedSymbol) {
@@ -150,9 +152,20 @@ namespace mbgl {
         NotEnoughRoom,
         NeedsFlipping
     };
+    
+    Point<float> projectTruncatedLineSegment(const Point<float>& previousTilePoint, const Point<float>& currentTilePoint, const Point<float>& previousProjectedPoint, const float minimumLength, const mat4& projectionMatrix) {
+        // We are assuming "previousTilePoint" won't project to a point within one unit of the camera plane
+        // If it did, that would mean our label extended all the way out from within the viewport to a (very distant)
+        // point near the plane of the camera. We wouldn't be able to render the label anyway once it crossed the
+        // plane of the camera.
+        const Point<float> projectedUnitVertex = project(previousTilePoint + util::unit<float>(previousTilePoint - currentTilePoint), projectionMatrix).first;
+        const Point<float> projectedUnitSegment = previousProjectedPoint - projectedUnitVertex;
+
+        return previousProjectedPoint + (projectedUnitSegment * (minimumLength / util::mag<float>(projectedUnitSegment)));
+    }
 
 	optional<PlacedGlyph> placeGlyphAlongLine(const float offsetX, const float lineOffsetX, const float lineOffsetY, const bool flip,
-            Point<float> anchorPoint, const uint16_t anchorSegment, const GeometryCoordinates& line, const mat4& labelPlaneMatrix) {
+            const Point<float>& projectedAnchorPoint, const Point<float>& tileAnchorPoint, const uint16_t anchorSegment, const GeometryCoordinates& line, const mat4& labelPlaneMatrix) {
 
         const float combinedOffsetX = flip ?
             offsetX - lineOffsetX :
@@ -172,8 +185,8 @@ namespace mbgl {
 
         int32_t currentIndex = dir > 0 ? anchorSegment : anchorSegment + 1;
 
-        Point<float> current = anchorPoint;
-        Point<float> prev = anchorPoint;
+        Point<float> current = projectedAnchorPoint;
+        Point<float> prev = projectedAnchorPoint;
         float distanceToPrev = 0.0;
         float currentSegmentDistance = 0.0;
         const float absOffsetX = std::abs(combinedOffsetX);
@@ -185,7 +198,18 @@ namespace mbgl {
             if (currentIndex < 0 || currentIndex >= static_cast<int32_t>(line.size())) return {};
 
             prev = current;
-            current = project(convertPoint<float>(line.at(currentIndex)), labelPlaneMatrix);
+            PointAndCameraDistance projection = project(convertPoint<float>(line.at(currentIndex)), labelPlaneMatrix);
+            if (projection.second > 0) {
+                current = projection.first;
+            } else {
+                // The vertex is behind the plane of the camera, so we can't project it
+                // Instead, we'll create a vertex along the line that's far enough to include the glyph
+                const Point<float> previousTilePoint = distanceToPrev == 0 ?
+                    tileAnchorPoint :
+                    convertPoint<float>(line.at(currentIndex - dir));
+                const Point<float> currentTilePoint = convertPoint<float>(line.at(currentIndex));
+                current = projectTruncatedLineSegment(previousTilePoint, currentTilePoint, prev, absOffsetX - distanceToPrev + 1, labelPlaneMatrix);
+            }
 
             distanceToPrev += currentSegmentDistance;
             currentSegmentDistance = util::dist<float>(prev, current);
@@ -211,12 +235,11 @@ namespace mbgl {
                               const mat4& posMatrix,
                               const mat4& labelPlaneMatrix,
                               const mat4& glCoordMatrix,
-                              gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
+                              gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray,
+                              const Point<float>& projectedAnchorPoint) {
         const float fontScale = fontSize / 24.0;
         const float lineOffsetX = symbol.lineOffset[0] * fontSize;
         const float lineOffsetY = symbol.lineOffset[1] * fontSize;
-
-        const Point<float> anchorPoint = project(symbol.anchorPoint, labelPlaneMatrix);
 
         std::vector<PlacedGlyph> placedGlyphs;
         if (symbol.glyphOffsets.size() > 1) {
@@ -224,16 +247,16 @@ namespace mbgl {
             const float firstGlyphOffset = symbol.glyphOffsets.front();
             const float lastGlyphOffset = symbol.glyphOffsets.back();
             
-            optional<PlacedGlyph> firstPlacedGlyph = placeGlyphAlongLine(fontScale * firstGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+            optional<PlacedGlyph> firstPlacedGlyph = placeGlyphAlongLine(fontScale * firstGlyphOffset, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
             if (!firstPlacedGlyph)
                 return PlacementResult::NotEnoughRoom;
 
-            optional<PlacedGlyph> lastPlacedGlyph = placeGlyphAlongLine(fontScale * lastGlyphOffset, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+            optional<PlacedGlyph> lastPlacedGlyph = placeGlyphAlongLine(fontScale * lastGlyphOffset, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
             if (!lastPlacedGlyph)
                 return PlacementResult::NotEnoughRoom;
 
-            const Point<float> firstPoint = project(firstPlacedGlyph->point, glCoordMatrix);
-            const Point<float> lastPoint = project(lastPlacedGlyph->point, glCoordMatrix);
+            const Point<float> firstPoint = project(firstPlacedGlyph->point, glCoordMatrix).first;
+            const Point<float> lastPoint = project(lastPlacedGlyph->point, glCoordMatrix).first;
 
             if (keepUpright && !flip &&
                 (symbol.useVerticalMode ? firstPoint.y < lastPoint.y : firstPoint.x > lastPoint.x)) {
@@ -244,7 +267,7 @@ namespace mbgl {
             for (size_t glyphIndex = 1; glyphIndex < symbol.glyphOffsets.size() - 1; glyphIndex++) {
                 const float glyphOffsetX = symbol.glyphOffsets[glyphIndex];
                 // Since first and last glyph fit on the line, we're sure that the rest of the glyphs can be placed
-                auto placedGlyph = placeGlyphAlongLine(glyphOffsetX * fontScale, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
+                auto placedGlyph = placeGlyphAlongLine(glyphOffsetX * fontScale, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment, symbol.line, labelPlaneMatrix);
                 placedGlyphs.push_back(*placedGlyph);
             }
             placedGlyphs.push_back(*lastPlacedGlyph);
@@ -252,15 +275,23 @@ namespace mbgl {
             // Only a single glyph to place
             // So, determine whether to flip based on projected angle of the line segment it's on
             if (keepUpright && !flip) {
-                const Point<float> a = project(convertPoint<float>(symbol.line.at(symbol.segment)), posMatrix);
-                const Point<float> b = project(convertPoint<float>(symbol.line.at(symbol.segment + 1)), posMatrix);
+                const Point<float> a = project(symbol.anchorPoint, posMatrix).first;
+                const Point<float> tileSegmentEnd = convertPoint<float>(symbol.line.at(symbol.segment + 1));
+                const PointAndCameraDistance projectedVertex = project(tileSegmentEnd, posMatrix);
+                // We know the anchor will be in the viewport, but the end of the line segment may be
+                // behind the plane of the camera, in which case we can use a point at any arbitrary (closer)
+                // point on the segment.
+                const Point<float> b = (projectedVertex.second > 0) ?
+                    projectedVertex.first :
+                    projectTruncatedLineSegment(symbol.anchorPoint,tileSegmentEnd, a, 1, posMatrix);
+                
                 if (symbol.useVerticalMode ? b.y > a.y : b.x < a.x) {
                     return PlacementResult::NeedsFlipping;
                 }
             }
             assert(symbol.glyphOffsets.size() == 1); // We are relying on SymbolInstance.hasText filtering out symbols without any glyphs at all
             const float glyphOffsetX = symbol.glyphOffsets.front();
-            optional<PlacedGlyph> singleGlyph = placeGlyphAlongLine(fontScale * glyphOffsetX, lineOffsetX, lineOffsetY, flip, anchorPoint, symbol.segment,
+            optional<PlacedGlyph> singleGlyph = placeGlyphAlongLine(fontScale * glyphOffsetX, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment,
                 symbol.line, labelPlaneMatrix);
             if (!singleGlyph)
                 return PlacementResult::NotEnoughRoom;
@@ -274,6 +305,7 @@ namespace mbgl {
         
         return PlacementResult::OK;
     }
+
 
     void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray, const std::vector<PlacedSymbol>& placedSymbols,
 			const mat4& posMatrix, const style::SymbolPropertyValues& values,
@@ -311,12 +343,14 @@ namespace mbgl {
             const float pitchScaledFontSize = values.pitchAlignment == style::AlignmentType::Map ?
                 fontSize * perspectiveRatio :
                 fontSize / perspectiveRatio;
+            
+            const Point<float> anchorPoint = project(placedSymbol.anchorPoint, labelPlaneMatrix).first;
 
-            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray);
+            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint);
 
             if (placeUnflipped == PlacementResult::NotEnoughRoom ||
                 (placeUnflipped == PlacementResult::NeedsFlipping &&
-                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray) == PlacementResult::NotEnoughRoom)) {
+                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint) == PlacementResult::NotEnoughRoom)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
             }
         }
