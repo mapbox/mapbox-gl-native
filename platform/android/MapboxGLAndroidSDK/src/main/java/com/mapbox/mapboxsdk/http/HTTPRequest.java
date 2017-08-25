@@ -56,13 +56,14 @@ class HTTPRequest implements Callback {
     mNativePtr = nativePtr;
 
     try {
-      // Don't try a request if we aren't connected
-      if (!Mapbox.isConnected()) {
+      HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
+      final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
+
+      // Don't try a request to remote server if we aren't connected
+      if (!Mapbox.isConnected() && !host.equals("127.0.0.1") && !host.equals("localhost")) {
         throw new NoRouteToHostException("No Internet connection available.");
       }
 
-      HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
-      final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
       if (host.equals("mapbox.com") || host.endsWith(".mapbox.com") || host.equals("mapbox.cn")
         || host.endsWith(".mapbox.cn")) {
         if (httpUrl.querySize() == 0) {
