@@ -4160,22 +4160,34 @@ public:
     {
         self.locationManager = [[CLLocationManager alloc] init];
 
-        if ([CLLocationManager instancesRespondToSelector:@selector(requestWhenInUseAuthorization)] && [CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
+        if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
         {
-            BOOL hasLocationDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"] || [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
-            if (!hasLocationDescription)
+            BOOL requiresWhenInUseUsageDescription = [NSProcessInfo.processInfo isOperatingSystemAtLeastVersion:(NSOperatingSystemVersion){11,0,0}];
+            BOOL hasWhenInUseUsageDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"];
+            BOOL hasAlwaysUsageDescription;
+            if (requiresWhenInUseUsageDescription)
             {
-                [NSException raise:@"Missing Location Services usage description" format:
-                 @"This app must have a value for NSLocationAlwaysUsageDescription or NSLocationWhenInUseUsageDescription in its Info.plist."];
+                hasAlwaysUsageDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysAndWhenInUseUsageDescription"] && hasWhenInUseUsageDescription;
+            }
+            else
+            {
+                hasAlwaysUsageDescription = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"];
             }
 
-            if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationAlwaysUsageDescription"])
+            if (hasAlwaysUsageDescription)
             {
                 [self.locationManager requestAlwaysAuthorization];
             }
-            else if ([[NSBundle mainBundle] objectForInfoDictionaryKey:@"NSLocationWhenInUseUsageDescription"])
+            else if (hasWhenInUseUsageDescription)
             {
                 [self.locationManager requestWhenInUseAuthorization];
+            }
+            else
+            {
+                NSString *suggestedUsageKeys = requiresWhenInUseUsageDescription ?
+                    @"NSLocationWhenInUseUsageDescription and (optionally) NSLocationAlwaysAndWhenInUseUsageDescription" :
+                    @"NSLocationWhenInUseUsageDescription and/or NSLocationAlwaysUsageDescription";
+                [NSException raise:@"Missing Location Services usage description" format:@"This app must have a value for %@ in its Info.plist.", suggestedUsageKeys];
             }
         }
 
