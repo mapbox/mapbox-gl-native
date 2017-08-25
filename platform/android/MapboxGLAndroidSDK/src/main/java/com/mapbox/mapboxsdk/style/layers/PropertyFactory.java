@@ -2057,11 +2057,11 @@ public class PropertyFactory {
   /**
    * The maximum line width for text wrapping.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textMaxWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textMaxWidth(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-max-width", function);
   }
 
@@ -2103,11 +2103,11 @@ public class PropertyFactory {
   /**
    * Text tracking amount.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textLetterSpacing(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textLetterSpacing(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-letter-spacing", function);
   }
 

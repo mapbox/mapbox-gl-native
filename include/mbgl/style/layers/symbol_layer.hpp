@@ -126,17 +126,17 @@ public:
     DataDrivenPropertyValue<float> getTextSize() const;
     void setTextSize(DataDrivenPropertyValue<float>);
 
-    static PropertyValue<float> getDefaultTextMaxWidth();
-    PropertyValue<float> getTextMaxWidth() const;
-    void setTextMaxWidth(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextMaxWidth();
+    DataDrivenPropertyValue<float> getTextMaxWidth() const;
+    void setTextMaxWidth(DataDrivenPropertyValue<float>);
 
     static PropertyValue<float> getDefaultTextLineHeight();
     PropertyValue<float> getTextLineHeight() const;
     void setTextLineHeight(PropertyValue<float>);
 
-    static PropertyValue<float> getDefaultTextLetterSpacing();
-    PropertyValue<float> getTextLetterSpacing() const;
-    void setTextLetterSpacing(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextLetterSpacing();
+    DataDrivenPropertyValue<float> getTextLetterSpacing() const;
+    void setTextLetterSpacing(DataDrivenPropertyValue<float>);
 
     static DataDrivenPropertyValue<TextJustifyType> getDefaultTextJustify();
     DataDrivenPropertyValue<TextJustifyType> getTextJustify() const;

@@ -736,7 +736,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.maximumTextWidth = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
                        @"Setting maximumTextWidth to a constant value should update text-max-width.");
         XCTAssertEqualObjects(layer.maximumTextWidth, constantStyleValue,
@@ -753,6 +753,29 @@
         XCTAssertEqualObjects(layer.maximumTextWidth, functionStyleValue,
                               @"maximumTextWidth should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.maximumTextWidth = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
+                       @"Setting maximumTextWidth to a source function should update text-max-width.");
+        XCTAssertEqualObjects(layer.maximumTextWidth, functionStyleValue,
+                              @"maximumTextWidth should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.maximumTextWidth = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
+                       @"Setting maximumTextWidth to a composite function should update text-max-width.");
+        XCTAssertEqualObjects(layer.maximumTextWidth, functionStyleValue,
+                              @"maximumTextWidth should round-trip composite functions.");                                                                                                          
                               
 
         layer.maximumTextWidth = nil;
@@ -760,11 +783,6 @@
                       @"Unsetting maximumTextWidth should return text-max-width to the default value.");
         XCTAssertEqualObjects(layer.maximumTextWidth, defaultStyleValue,
                               @"maximumTextWidth should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.maximumTextWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.maximumTextWidth = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // symbol-avoid-edges
@@ -1168,7 +1186,7 @@
 
         MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
         layer.textLetterSpacing = constantStyleValue;
-        mbgl::style::PropertyValue<float> propertyValue = { 0xff };
+        mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
                        @"Setting textLetterSpacing to a constant value should update text-letter-spacing.");
         XCTAssertEqualObjects(layer.textLetterSpacing, constantStyleValue,
@@ -1185,6 +1203,29 @@
         XCTAssertEqualObjects(layer.textLetterSpacing, functionStyleValue,
                               @"textLetterSpacing should round-trip camera functions.");
 
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
+        layer.textLetterSpacing = functionStyleValue;
+
+        mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
+        propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
+
+        XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
+                       @"Setting textLetterSpacing to a source function should update text-letter-spacing.");
+        XCTAssertEqualObjects(layer.textLetterSpacing, functionStyleValue,
+                              @"textLetterSpacing should round-trip source functions.");
+
+        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
+        layer.textLetterSpacing = functionStyleValue;
+
+        std::map<float, float> innerStops { {18, 0xff} };
+        mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
+
+        propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
+
+        XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
+                       @"Setting textLetterSpacing to a composite function should update text-letter-spacing.");
+        XCTAssertEqualObjects(layer.textLetterSpacing, functionStyleValue,
+                              @"textLetterSpacing should round-trip composite functions.");                                                                                                          
                               
 
         layer.textLetterSpacing = nil;
@@ -1192,11 +1233,6 @@
                       @"Unsetting textLetterSpacing should return text-letter-spacing to the default value.");
         XCTAssertEqualObjects(layer.textLetterSpacing, defaultStyleValue,
                               @"textLetterSpacing should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textLetterSpacing = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textLetterSpacing = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-line-height
