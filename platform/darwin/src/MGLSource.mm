@@ -1,7 +1,8 @@
 #import "MGLSource_Private.h"
 #import "MGLMapView_Private.h"
+#import "MGLStyle_Private.h"
 
-#include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/source.hpp>
 
 @interface MGLSource ()
@@ -52,12 +53,12 @@
     }
     
     _mapView = mapView;
-    mapView.mbglMap->addSource(std::move(_pendingSource));
+    _mapView.style.rawStyle->addSource(std::move(_pendingSource));
 }
 
 - (void)removeFromMapView:(MGLMapView *)mapView {
-    if (self.rawSource == mapView.mbglMap->getSource(self.identifier.UTF8String)) {
-        _pendingSource = mapView.mbglMap->removeSource(self.identifier.UTF8String);
+    if (self.rawSource == mapView.style.rawStyle->getSource(self.identifier.UTF8String)) {
+        _pendingSource = mapView.style.rawStyle->removeSource(self.identifier.UTF8String);
         _mapView = nil;
     }
 }
