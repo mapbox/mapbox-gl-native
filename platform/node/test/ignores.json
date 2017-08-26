@@ -40,13 +40,8 @@
   "render-tests/line-join/property-function": "https://github.com/mapbox/mapbox-gl-js/pull/5020",
   "render-tests/line-join/property-function-dasharray": "https://github.com/mapbox/mapbox-gl-js/pull/5020",
   "render-tests/regressions/mapbox-gl-js#2305": "https://github.com/mapbox/mapbox-gl-native/issues/6927",
-  "render-tests/regressions/mapbox-gl-js#2929": "skip - needs issue",
-  "render-tests/regressions/mapbox-gl-js#3010": "skip - needs issue",
   "render-tests/regressions/mapbox-gl-js#3548": "skip - needs issue",
   "render-tests/regressions/mapbox-gl-js#3682": "https://github.com/mapbox/mapbox-gl-js/issues/3682",
-  "render-tests/regressions/mapbox-gl-js#4550": "skip - https://github.com/mapbox/mapbox-gl-native/issues/1350",
-  "render-tests/regressions/mapbox-gl-js#4551": "skip - https://github.com/mapbox/mapbox-gl-native/issues/1350",
-  "render-tests/regressions/mapbox-gl-js#4573": "skip - https://github.com/mapbox/mapbox-gl-native/issues/1350",
   "render-tests/regressions/mapbox-gl-native#7357": "https://github.com/mapbox/mapbox-gl-native/issues/7357",
   "render-tests/runtime-styling/image-add-sdf": "skip - https://github.com/mapbox/mapbox-gl-native/issues/9847",
   "render-tests/runtime-styling/paint-property-fill-flat-to-extrude": "skip - https://github.com/mapbox/mapbox-gl-native/issues/6745",
@@ -68,5 +63,5 @@
   "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-scaling/line-half": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-size/composite-function-high-base": "https://github.com/mapbox/mapbox-gl-native/issues/8654",
-  "render-tests/video/default": "skip - needs issue"
+  "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601"
 }
