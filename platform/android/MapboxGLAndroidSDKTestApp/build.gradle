@@ -28,7 +28,8 @@ android {
         baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors true
-        disable  'MissingTranslation', 'GoogleAppIndexingWarning', 'UnpackedNativeCode', 'IconDipSize'
+        disable  'MissingTranslation', 'GoogleAppIndexingWarning', 'UnpackedNativeCode', 'IconDipSize', 'TypographyQuotes'
+        abortOnError false
     }
 
     buildTypes {
