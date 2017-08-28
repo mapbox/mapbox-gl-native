@@ -440,6 +440,12 @@ test-node: node
 	npm test
 	npm run test-suite
 
+.PHONY: test-node-recycle-map
+test-node-recycle-map: node
+	npm test
+	npm run test-render -- --recycle-map
+	npm run test-query
+
 #### Android targets ###########################################################
 
 MBGL_ANDROID_ABIS  = arm-v5;armeabi

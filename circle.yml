@@ -96,6 +96,12 @@ step-library:
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
+  - &run-node-tests-recycle-map
+      run:
+        name: Run node tests (recycling the map object)
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v make test-node-recycle-map
   - &run-unit-tests
       run:
         name: Run tests
@@ -114,6 +120,10 @@ step-library:
   - &upload-render-tests
       store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index.html
+        destination: render-tests
+  - &upload-render-tests-recycle-map
+      store_artifacts:
+        path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
 
 jobs:
@@ -344,9 +354,9 @@ jobs:
       - *build-node
       - *show-ccache-stats
       - *save-cache
-      - *run-node-tests
+      - *run-node-tests-recycle-map
       - *publish-node-package
-      - *upload-render-tests
+      - *upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
   linux-clang39-debug:
