@@ -13,6 +13,18 @@
 
 namespace mbgl {
 
+    MBGL_DEFINE_ENUM(MGLIconAnchor, {
+        { MGLIconAnchorCenter, "center" },
+        { MGLIconAnchorLeft, "left" },
+        { MGLIconAnchorRight, "right" },
+        { MGLIconAnchorTop, "top" },
+        { MGLIconAnchorBottom, "bottom" },
+        { MGLIconAnchorTopLeft, "top-left" },
+        { MGLIconAnchorTopRight, "top-right" },
+        { MGLIconAnchorBottomLeft, "bottom-left" },
+        { MGLIconAnchorBottomRight, "bottom-right" },
+    });
+
     MBGL_DEFINE_ENUM(MGLIconPitchAlignment, {
         { MGLIconPitchAlignmentMap, "map" },
         { MGLIconPitchAlignmentViewport, "viewport" },
@@ -164,6 +176,23 @@ namespace mbgl {
 
 - (MGLStyleValue<NSNumber *> *)iconAllowOverlap {
     return self.iconAllowsOverlap;
+}
+
+- (void)setIconAnchor:(MGLStyleValue<NSValue *> *)iconAnchor {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLIconAnchor>().toDataDrivenPropertyValue(iconAnchor);
+    self.rawLayer->setIconAnchor(mbglValue);
+}
+
+- (MGLStyleValue<NSValue *> *)iconAnchor {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getIconAnchor();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLIconAnchor>().toDataDrivenStyleValue(self.rawLayer->getDefaultIconAnchor());
+    }
+    return MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLIconAnchor>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setIconIgnoresPlacement:(MGLStyleValue<NSNumber *> *)iconIgnoresPlacement {
@@ -586,7 +615,7 @@ namespace mbgl {
 - (void)setTextAnchor:(MGLStyleValue<NSValue *> *)textAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenPropertyValue(textAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toDataDrivenPropertyValue(textAnchor);
     self.rawLayer->setTextAnchor(mbglValue);
 }
 
@@ -595,9 +624,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextAnchor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextAnchor());
+        return MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextAnchor());
     }
-    return MGLStyleValueTransformer<mbgl::style::TextAnchorType, NSValue *, mbgl::style::TextAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::SymbolAnchorType, NSValue *, mbgl::style::SymbolAnchorType, MGLTextAnchor>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextFontNames:(MGLStyleValue<NSArray<NSString *> *> *)textFontNames {
@@ -1343,6 +1372,16 @@ namespace mbgl {
 @end
 
 @implementation NSValue (MGLSymbolStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLIconAnchor:(MGLIconAnchor)iconAnchor {
+    return [NSValue value:&iconAnchor withObjCType:@encode(MGLIconAnchor)];
+}
+
+- (MGLIconAnchor)MGLIconAnchorValue {
+    MGLIconAnchor iconAnchor;
+    [self getValue:&iconAnchor];
+    return iconAnchor;
+}
 
 + (NSValue *)valueWithMGLIconPitchAlignment:(MGLIconPitchAlignment)iconPitchAlignment {
     return [NSValue value:&iconPitchAlignment withObjCType:@encode(MGLIconPitchAlignment)];

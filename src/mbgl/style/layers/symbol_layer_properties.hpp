@@ -87,6 +87,11 @@ struct IconOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
 };
 
+struct IconAnchor : DataDrivenLayoutProperty<SymbolAnchorType> {
+    static constexpr const char * key = "icon-anchor";
+    static SymbolAnchorType defaultValue() { return SymbolAnchorType::Center; }
+};
+
 struct IconPitchAlignment : LayoutProperty<AlignmentType> {
     static constexpr const char * key = "icon-pitch-alignment";
     static AlignmentType defaultValue() { return AlignmentType::Auto; }
@@ -137,9 +142,9 @@ struct TextJustify : DataDrivenLayoutProperty<TextJustifyType> {
     static TextJustifyType defaultValue() { return TextJustifyType::Center; }
 };
 
-struct TextAnchor : DataDrivenLayoutProperty<TextAnchorType> {
+struct TextAnchor : DataDrivenLayoutProperty<SymbolAnchorType> {
     static constexpr const char * key = "text-anchor";
-    static TextAnchorType defaultValue() { return TextAnchorType::Center; }
+    static SymbolAnchorType defaultValue() { return SymbolAnchorType::Center; }
 };
 
 struct TextMaxAngle : LayoutProperty<float> {
@@ -259,6 +264,7 @@ class SymbolLayoutProperties : public Properties<
     IconPadding,
     IconKeepUpright,
     IconOffset,
+    IconAnchor,
     IconPitchAlignment,
     TextPitchAlignment,
     TextRotationAlignment,

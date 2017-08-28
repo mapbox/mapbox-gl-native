@@ -1214,6 +1214,111 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testIconAnchorAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set and Get
+        layer.setProperties(iconAnchor(ICON_ANCHOR_CENTER));
+        assertEquals((String) layer.getIconAnchor().getValue(), (String) ICON_ANCHOR_CENTER);
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsCameraFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(
+            zoom(
+              interval(
+                stop(2, iconAnchor(ICON_ANCHOR_CENTER))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(CameraFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals(IntervalStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+        assertEquals(1, ((IntervalStops) layer.getIconAnchor().getFunction().getStops()).size());
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(property("FeaturePropertyA", Stops.<String>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconAnchor().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, iconAnchor(ICON_ANCHOR_CENTER))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconAnchor().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
   public void testIconPitchAlignmentAsConstant() {
     validateTestSetup();
     setupLayer();

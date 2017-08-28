@@ -148,6 +148,9 @@ global.mbglTestValue = function (property, layerType) {
             if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
                 type = 'Alignment';
             }
+            if (/^(text|icon)-anchor$/.test(originalPropertyName(property))) {
+                type = 'SymbolAnchor'
+            }
             let value = camelize(_.last(_.keys(property.values)));
             if (property['light-property']) {
                 return `mbgl::style::Light${type}Type::${value}`;
@@ -500,6 +503,9 @@ global.mbglType = function(property) {
             if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
                 type = 'Alignment';
             }
+            if (/^(text|icon)-anchor$/.test(originalPropertyName(property))) {
+                type = 'SymbolAnchor'
+            }
             return `mbgl::style::${type}Type`;
         }
         case 'color':
@@ -648,10 +654,10 @@ while ((match = exampleRegex.exec(examplesSrc)) !== null) {
     let testMethodName = match[1],
         indentation = match[2],
         exampleCode = match[3];
-    
+
     // Trim leading whitespace from the example code.
     exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
-    
+
     examples[testMethodName] = exampleCode;
 }
 
@@ -663,13 +669,13 @@ global.guideExample = function (guide, exampleId, os) {
         console.error(`MGLDocumentationExampleTests.test${testMethodName}() not found.`);
         process.exit(1);
     }
-    
+
     // Resolve conditional compilation blocks.
     example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\b\n?/gm,
                               function (m, indentation, ifOs, ifCase, elseCase) {
       return (os === ifOs ? ifCase : elseCase).replace(new RegExp('^    ', 'gm'), '');
     }).replace(/\n$/, '');
-    
+
     return '```swift\n' + example + '\n```';
 };
 
