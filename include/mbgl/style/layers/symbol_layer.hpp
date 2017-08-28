@@ -98,6 +98,10 @@ public:
     DataDrivenPropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(DataDrivenPropertyValue<std::array<float, 2>>);
 
+    static DataDrivenPropertyValue<SymbolAnchorType> getDefaultIconAnchor();
+    DataDrivenPropertyValue<SymbolAnchorType> getIconAnchor() const;
+    void setIconAnchor(DataDrivenPropertyValue<SymbolAnchorType>);
+
     static PropertyValue<AlignmentType> getDefaultIconPitchAlignment();
     PropertyValue<AlignmentType> getIconPitchAlignment() const;
     void setIconPitchAlignment(PropertyValue<AlignmentType>);
@@ -138,9 +142,9 @@ public:
     DataDrivenPropertyValue<TextJustifyType> getTextJustify() const;
     void setTextJustify(DataDrivenPropertyValue<TextJustifyType>);
 
-    static DataDrivenPropertyValue<TextAnchorType> getDefaultTextAnchor();
-    DataDrivenPropertyValue<TextAnchorType> getTextAnchor() const;
-    void setTextAnchor(DataDrivenPropertyValue<TextAnchorType>);
+    static DataDrivenPropertyValue<SymbolAnchorType> getDefaultTextAnchor();
+    DataDrivenPropertyValue<SymbolAnchorType> getTextAnchor() const;
+    void setTextAnchor(DataDrivenPropertyValue<SymbolAnchorType>);
 
     static PropertyValue<float> getDefaultTextMaxAngle();
     PropertyValue<float> getTextMaxAngle() const;

@@ -50,12 +50,12 @@ optional<TextJustifyType> IdentityStops<TextJustifyType>::evaluate(const Value& 
 }
 
 template <>
-optional<TextAnchorType> IdentityStops<TextAnchorType>::evaluate(const Value& value) const {
+optional<SymbolAnchorType> IdentityStops<SymbolAnchorType>::evaluate(const Value& value) const {
     if (!value.is<std::string>()) {
         return {};
     }
 
-    return Enum<TextAnchorType>::toEnum(value.get<std::string>());
+    return Enum<SymbolAnchorType>::toEnum(value.get<std::string>());
 }
 
 template <>

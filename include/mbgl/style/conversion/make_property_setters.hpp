@@ -45,6 +45,7 @@ auto makeLayoutPropertySetters() {
     result["icon-padding"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setIconPadding>;
     result["icon-keep-upright"] = &setProperty<V, SymbolLayer, PropertyValue<bool>, &SymbolLayer::setIconKeepUpright>;
     result["icon-offset"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<std::array<float, 2>>, &SymbolLayer::setIconOffset>;
+    result["icon-anchor"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<SymbolAnchorType>, &SymbolLayer::setIconAnchor>;
     result["icon-pitch-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setIconPitchAlignment>;
     result["text-pitch-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextPitchAlignment>;
     result["text-rotation-alignment"] = &setProperty<V, SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
@@ -55,7 +56,7 @@ auto makeLayoutPropertySetters() {
     result["text-line-height"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;
     result["text-letter-spacing"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLetterSpacing>;
     result["text-justify"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<TextJustifyType>, &SymbolLayer::setTextJustify>;
-    result["text-anchor"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<TextAnchorType>, &SymbolLayer::setTextAnchor>;
+    result["text-anchor"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<SymbolAnchorType>, &SymbolLayer::setTextAnchor>;
     result["text-max-angle"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextMaxAngle>;
     result["text-rotate"] = &setProperty<V, SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextRotate>;
     result["text-padding"] = &setProperty<V, SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextPadding>;

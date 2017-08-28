@@ -1882,6 +1882,29 @@ public class PropertyFactory {
   }
 
   /**
+   * Part of the icon placed closest to the anchor.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> iconAnchor(@Property.ICON_ANCHOR String value) {
+    return new LayoutPropertyValue<>("icon-anchor", value);
+  }
+
+
+
+  /**
+   * Part of the icon placed closest to the anchor.
+   *
+   * @param <T> the function input type
+   * @param function a wrapper function for String
+   * @return property wrapper around a String function
+   */
+  public static <T> PropertyValue<Function<T, String>> iconAnchor(Function<T, String> function) {
+    return new LayoutPropertyValue<>("icon-anchor", function);
+  }
+
+  /**
    * Orientation of icon when map is pitched.
    *
    * @param value a String value
