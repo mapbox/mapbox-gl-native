@@ -28,10 +28,15 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(ActorRef<Impl>, std::shared_ptr<FileSource> assetFileSource_, const std::string& cachePath, uint64_t maximumCacheSize)
+    Impl(ActorRef<Impl> self, std::shared_ptr<FileSource> assetFileSource_, const std::string& cachePath, uint64_t maximumCacheSize)
             : assetFileSource(assetFileSource_)
-            , localFileSource(std::make_unique<LocalFileSource>())
-            , offlineDatabase(cachePath, maximumCacheSize) {
+            , localFileSource(std::make_unique<LocalFileSource>()) {
+        // Initialize the Database asynchronously so as to not block Actor creation.
+        self.invoke(&Impl::initializeOfflineDatabase, cachePath, maximumCacheSize);
+    }
+
+    void initializeOfflineDatabase(std::string cachePath, uint64_t maximumCacheSize) {
+        offlineDatabase = std::make_unique<OfflineDatabase>(cachePath, maximumCacheSize);
     }
 
     void setAPIBaseURL(const std::string& url) {
@@ -56,7 +61,7 @@ public:
 
     void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
         try {
-            callback({}, offlineDatabase.listRegions());
+            callback({}, offlineDatabase->listRegions());
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -66,7 +71,7 @@ public:
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
         try {
-            callback({}, offlineDatabase.createRegion(definition, metadata));
+            callback({}, offlineDatabase->createRegion(definition, metadata));
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -76,7 +81,7 @@ public:
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
         try {
-            callback({}, offlineDatabase.updateMetadata(regionID, metadata));
+            callback({}, offlineDatabase->updateMetadata(regionID, metadata));
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -93,7 +98,7 @@ public:
     void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
         try {
             downloads.erase(region.getID());
-            offlineDatabase.deleteRegion(std::move(region));
+            offlineDatabase->deleteRegion(std::move(region));
             callback({});
         } catch (...) {
             callback(std::current_exception());
@@ -125,7 +130,7 @@ public:
 
             const bool hasPrior = resource.priorEtag || resource.priorModified || resource.priorExpires;
             if (!hasPrior || resource.necessity == Resource::Optional) {
-                auto offlineResponse = offlineDatabase.get(resource);
+                auto offlineResponse = offlineDatabase->get(resource);
 
                 if (resource.necessity == Resource::Optional && !offlineResponse) {
                     // Ensure there's always a response that we can send, so the caller knows that
@@ -157,7 +162,7 @@ public:
             // Get from the online file source
             if (resource.necessity == Resource::Required) {
                 tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) mutable {
-                    this->offlineDatabase.put(revalidation, onlineResponse);
+                    this->offlineDatabase->put(revalidation, onlineResponse);
                     callback(onlineResponse);
                 });
             }
@@ -169,11 +174,11 @@ public:
     }
 
     void setOfflineMapboxTileCountLimit(uint64_t limit) {
-        offlineDatabase.setOfflineMapboxTileCountLimit(limit);
+        offlineDatabase->setOfflineMapboxTileCountLimit(limit);
     }
 
     void put(const Resource& resource, const Response& response) {
-        offlineDatabase.put(resource, response);
+        offlineDatabase->put(resource, response);
     }
 
 private:
@@ -183,13 +188,13 @@ private:
             return *it->second;
         }
         return *downloads.emplace(regionID,
-            std::make_unique<OfflineDownload>(regionID, offlineDatabase.getRegionDefinition(regionID), offlineDatabase, onlineFileSource)).first->second;
+            std::make_unique<OfflineDownload>(regionID, offlineDatabase->getRegionDefinition(regionID), *offlineDatabase, onlineFileSource)).first->second;
     }
 
     // shared so that destruction is done on the creating thread
     const std::shared_ptr<FileSource> assetFileSource;
     const std::unique_ptr<FileSource> localFileSource;
-    OfflineDatabase offlineDatabase;
+    std::unique_ptr<OfflineDatabase> offlineDatabase;
     OnlineFileSource onlineFileSource;
     std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
