@@ -478,6 +478,7 @@ public:
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
+    if (@available(iOS 11.0, *)) { _logoView.accessibilityIgnoresInvertColors = YES; }
     [self addSubview:_logoView];
 
     // setup attribution
@@ -485,6 +486,7 @@ public:
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
     _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
+    if (@available(iOS 11.0, *)) { _attributionButton.accessibilityIgnoresInvertColors = YES; }
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_attributionButton];
     [_attributionButton addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:NULL];
@@ -498,11 +500,13 @@ public:
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
+    if (@available(iOS 11.0, *)) { _compassView.accessibilityIgnoresInvertColors = YES; }
     [self addSubview:_compassView];
     
     // setup scale control
     //
     _scaleBar = [[MGLScaleBar alloc] init];
+    if (@available(iOS 11.0, *)) { _scaleBar.accessibilityIgnoresInvertColors = YES; }
     [self addSubview:_scaleBar];
     
     // setup interaction
@@ -616,6 +620,7 @@ public:
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
+    if (@available(iOS 11_0, *)) { _glView.accessibilityIgnoresInvertColors = YES; }
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
