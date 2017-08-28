@@ -1,6 +1,6 @@
-#import "MGLVectorSource+MBXAdditions.h"
+#import "MGLVectorSource+MGLAdditions.h"
 
-@implementation MGLVectorSource (MBXAdditions)
+@implementation MGLVectorSource (MGLAdditions)
 
 + (NS_SET_OF(NSString *) *)mapboxStreetsLanguages {
     // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview

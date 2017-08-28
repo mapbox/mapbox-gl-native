@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "La carte n’a pas pu être chargée car une erreur inconnue est survenue.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "La carte n’a pas pu être chargée car le style ne peut pas être chargé.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "La carte n’a pas pu être chargée car le style est corrompu.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "La carte n’a pas pu être chargée car le style n’a pas été trouvé ou est incompatible.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";
