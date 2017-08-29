@@ -2,7 +2,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLVectorSource (MBXAdditions)
+@interface MGLVectorSource (MGLAdditions)
 
 + (NSString *)preferredMapboxStreetsLanguage;
 

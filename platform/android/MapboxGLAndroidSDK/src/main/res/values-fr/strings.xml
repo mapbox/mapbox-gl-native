@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Boussole. Activer pour rétablir l\'orientation de la carte vers le nord.</string>
+    <string name="mapbox_attributionsIconContentDescription">Icone d\'attribution. Activer pour montrer le dialogue d\'attribution.</string>
+    <string name="mapbox_myLocationViewContentDescription">Vue de géolocalisation. Ceci affiche votre localisation sur la carte.</string>
+    <string name="mapbox_mapActionDescription">Affichage d\'une carte créée avec Mapbox. Faites la glisser en traînant deux doigts. Zoomez ou dézoomez en écartant ou rapprochant deux doigts.</string>
+    <string name="mapbox_attributionsDialogTitle">SDK Mapbox pour Android</string>
+    <string name="mapbox_attributionTelemetryTitle">Faire de meilleures cartes Mapbox</string>
+    <string name="mapbox_attributionTelemetryMessage">Vous aidez à améliorer les cartes OpenStreetMap et Mapbox en contribuant des données d\'utilisation anonymes.</string>
+    <string name="mapbox_attributionTelemetryPositive">D\'accord</string>
+    <string name="mapbox_attributionTelemetryNegative">Pas d\'accord</string>
+    <string name="mapbox_attributionTelemetryNeutral">Plus d\'informations</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Le cadre OfflineRegionDefinition pour définir la région de navigation ne tient pas dans les limites du monde : %s</string>
+
+    </resources>
