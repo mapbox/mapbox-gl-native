@@ -18,15 +18,23 @@ NS_ASSUME_NONNULL_BEGIN
  You can add custom data to display on the map by creating feature objects and
  adding them to an `MGLShapeSource` using the
  `-[MGLShapeSource initWithIdentifier:shape:options:]` method or
- `MGLShapeSource.shape` property. Similarly, you can add `MGLPointFeature`,
- `MGLPolylineFeature`, and `MGLPolygonFeature` objects to the map as annotations
- using `-[MGLMapView addAnnotations:]` and related methods.
+ `MGLShapeSource.shape` property.
 
  In addition to adding data to the map, you can also extract data from the map:
  `-[MGLMapView visibleFeaturesAtPoint:]` and related methods return feature
  objects that correspond to features in the source. This enables you to inspect
  the properties of features in vector tiles loaded by `MGLVectorSource` objects.
  You also reuse these feature objects as overlay annotations.
+
+ While it is possible to add `MGLFeature`-conforming objects to the map as
+ annotations using `-[MGLMapView addAnnotations:]` and related methods, doing so
+ has trade-offs:
+
+ - Features added as annotations will not have `identifier` or `attributes`
+ properties when used with feature querying.
+
+ - Features added as annotations become interactive. Taps and selection can be
+ handled in `-[MGLMapViewDelegate mapView:didSelectAnnotation:]`.
  */
 @protocol MGLFeature <MGLAnnotation>
 
