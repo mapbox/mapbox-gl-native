@@ -474,7 +474,6 @@ public:
 
     // setup logo bug
     //
-//    _logoView.invert
     UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
