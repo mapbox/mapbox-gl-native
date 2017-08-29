@@ -872,8 +872,12 @@ public:
 
     if (self.compassView.alpha)
     {
-        [self updateHeadingForDeviceOrientation];
         [self updateCompass];
+    }
+
+    if (self.compassView.alpha || self.showsUserHeadingIndicator)
+    {
+        [self updateHeadingForDeviceOrientation];
     }
 
     [self updateUserLocationAnnotationView];
@@ -4195,10 +4199,7 @@ public:
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
 
-        if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
-        {
-            [self.locationManager startUpdatingHeading];
-        }
+        [self validateUserHeadingUpdating];
     }
     else if ( ! shouldEnableLocationServices && self.locationManager)
     {
@@ -4322,8 +4323,6 @@ public:
         {
             self.userTrackingState = MGLUserTrackingStatePossible;
 
-            [self.locationManager stopUpdatingHeading];
-
             // Immediately update the annotation view; other cases update inside
             // the locationManager:didUpdateLocations: method.
             [self updateUserLocationAnnotationView];
@@ -4335,8 +4334,6 @@ public:
         {
             self.userTrackingState = animated ? MGLUserTrackingStatePossible : MGLUserTrackingStateChanged;
             self.showsUserLocation = YES;
-
-            [self.locationManager stopUpdatingHeading];
 
             break;
         }
@@ -4354,10 +4351,6 @@ public:
                 [self setZoomLevel:self.currentMinimumZoom animated:YES];
             }
 
-            [self updateHeadingForDeviceOrientation];
-
-            [self.locationManager startUpdatingHeading];
-
             break;
         }
     }
@@ -4370,6 +4363,8 @@ public:
             [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
         }
     }
+
+    [self validateUserHeadingUpdating];
 
     if ([self.delegate respondsToSelector:@selector(mapView:didChangeUserTrackingMode:animated:)])
     {
@@ -4416,6 +4411,27 @@ public:
                 [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
             }
         }
+    }
+}
+
+- (void)setShowsUserHeadingIndicator:(BOOL)showsUserHeadingIndicator
+{
+    _showsUserHeadingIndicator = showsUserHeadingIndicator;
+    [self validateUserHeadingUpdating];
+}
+
+- (void)validateUserHeadingUpdating
+{
+    BOOL canShowPermanentHeadingIndicator = self.showsUserHeadingIndicator && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse;
+
+    if (self.showsUserLocation && (canShowPermanentHeadingIndicator || self.userTrackingMode == MGLUserTrackingModeFollowWithHeading))
+    {
+        [self updateHeadingForDeviceOrientation];
+        [self.locationManager startUpdatingHeading];
+    }
+    else
+    {
+        [self.locationManager stopUpdatingHeading];
     }
 }
 
@@ -4665,6 +4681,11 @@ public:
     if ( ! _showsUserLocation || self.pan.state == UIGestureRecognizerStateBegan || newHeading.headingAccuracy < 0) return;
 
     self.userLocation.heading = newHeading;
+
+    if (self.showsUserHeadingIndicator || self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
+    {
+        [self updateUserLocationAnnotationView];
+    }
 
     if ([self.delegate respondsToSelector:@selector(mapView:didUpdateUserLocation:)])
     {

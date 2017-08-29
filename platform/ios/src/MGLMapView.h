@@ -358,6 +358,23 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
 
 /**
+ A Boolean value indicating whether the user location annotation may display a
+ permanent heading indicator.
+
+ Setting this property to `YES` causes the default user location annotation to
+ always show an arrow-shaped heading indicator, if heading is available. This
+ property does not rotate the map; for that, see
+ `MGLUserTrackingModeFollowWithHeading`.
+
+ This property has no effect when `userTrackingMode` is
+ `MGLUserTrackingModeFollowWithHeading` or
+ `MGLUserTrackingModeFollowWithCourse`.
+
+ The default value of this property is `NO`.
+ */
+@property (nonatomic, assign) BOOL showsUserHeadingIndicator;
+
+/**
  Whether the map view should display a heading calibration alert when necessary.
  The default value is `YES`.
  */
