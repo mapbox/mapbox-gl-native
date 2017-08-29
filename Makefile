@@ -108,7 +108,7 @@ run-test-%: test
 run-benchmark: run-benchmark-.
 
 run-benchmark-%: benchmark
-	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$*
+	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
 
 .PHONY: node-benchmark
 node-benchmark: $(MACOS_PROJ_PATH)

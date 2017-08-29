@@ -8,7 +8,7 @@ mason_use(libpng VERSION 1.6.25)
 mason_use(libjpeg-turbo VERSION 1.5.0)
 mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
-mason_use(benchmark VERSION 1.0.0-1)
+mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
 
 # Link with libuv. This is not part of loop-uv.cmake because loop-uv.cmake is also
