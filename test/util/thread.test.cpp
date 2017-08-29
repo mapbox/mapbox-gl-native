@@ -6,7 +6,9 @@
 #include <mbgl/util/timer.hpp>
 
 #include <atomic>
+#include <chrono>
 #include <memory>
+#include <thread>
 
 using namespace mbgl;
 using namespace mbgl::util;
@@ -274,4 +276,63 @@ TEST(Thread, PauseResume) {
 
     thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
+}
+
+TEST(Thread, PauseResumeMultiThreaded) {
+    RunLoop loop;
+    
+    // Thread to be paused
+    Thread<TestWorker> test("Test");
+    
+    std::promise<void> thread1Complete;
+    auto future = thread1Complete.get_future();
+    std::thread thread1 {[&, promise = std::move(thread1Complete)]() mutable {
+        // Pause the thread
+        test.pause();
+        promise.set_value();
+    }};
+    
+    // Wait for the test thread to be paused
+    future.wait();
+    
+    std::thread thread2 {[&]() {
+        // Pause from this thread as well and resume
+        test.pause();
+        test.resume();
+    }};
+    
+    // Queue a message at the end of test thread's queue.
+    test.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
+    loop.run();
+    
+    // Wait for threads
+    thread1.join();
+    thread2.join();
+}
+
+TEST(Thread, DirectAccess) {
+    
+    Thread<TestWorker> test("Test");
+    
+    // Use the thread's object directly
+    std::atomic<bool> flag { false };
+    auto guard = std::make_unique<BlockingThreadGuard<TestWorker>>( test );
+    guard->object().send([&] { flag = true; });
+    ASSERT_TRUE(flag);
+    
+    // Ensure messages queued up are processed
+    std::atomic<bool> message1Consumed { false };
+    test.actor().invoke(&TestWorker::send, [&]() { message1Consumed = true; });
+    
+    // Release the guard
+    guard.reset();
+    
+    // Ensure messages send after releasing the guard are processed
+    std::atomic<bool> message2Consumed { false };
+    test.actor().invoke(&TestWorker::send, [&]() { message2Consumed = true; });
+    
+    while (!message1Consumed && !message2Consumed) {
+        using namespace std::chrono_literals;
+        std::this_thread::sleep_for(10ms);
+    };
 }
