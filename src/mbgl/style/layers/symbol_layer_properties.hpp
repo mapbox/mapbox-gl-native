@@ -122,7 +122,7 @@ struct TextSize : DataDrivenLayoutProperty<float> {
     static float defaultValue() { return 16; }
 };
 
-struct TextMaxWidth : LayoutProperty<float> {
+struct TextMaxWidth : DataDrivenLayoutProperty<float> {
     static constexpr const char * key = "text-max-width";
     static float defaultValue() { return 10; }
 };
@@ -132,7 +132,7 @@ struct TextLineHeight : LayoutProperty<float> {
     static float defaultValue() { return 1.2; }
 };
 
-struct TextLetterSpacing : LayoutProperty<float> {
+struct TextLetterSpacing : DataDrivenLayoutProperty<float> {
     static constexpr const char * key = "text-letter-spacing";
     static float defaultValue() { return 0; }
 };
