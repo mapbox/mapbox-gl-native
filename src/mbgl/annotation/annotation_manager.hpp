@@ -3,7 +3,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/map/update.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <mutex>
@@ -29,8 +28,13 @@ public:
     AnnotationManager(style::Style&);
     ~AnnotationManager();
 
+    enum class DataStatus {
+        NoChange = 0,
+        NeedsUpdate
+    };
+
     AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);
-    Update updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
+    DataStatus updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
     void removeAnnotation(const AnnotationID&);
 
     void addImage(std::unique_ptr<style::Image>);
@@ -53,9 +57,9 @@ private:
     void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
     void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
 
-    Update update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
-    Update update(const AnnotationID&, const LineAnnotation&, const uint8_t);
-    Update update(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    DataStatus update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
+    DataStatus update(const AnnotationID&, const LineAnnotation&, const uint8_t);
+    DataStatus update(const AnnotationID&, const FillAnnotation&, const uint8_t);
 
     void remove(const AnnotationID&);
 
