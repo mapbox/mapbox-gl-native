@@ -88,7 +88,7 @@ void Style::Impl::parse(const std::string& json_) {
     }
 
     mutated = false;
-    loaded = true;
+    loaded = false;
     json = json_;
 
     sources.clear();
@@ -118,6 +118,7 @@ void Style::Impl::parse(const std::string& json_) {
     spriteLoader->load(parser.spriteURL, scheduler, fileSource);
     glyphURL = parser.glyphURL;
 
+    loaded = true;
     observer->onStyleLoaded();
 }
 
