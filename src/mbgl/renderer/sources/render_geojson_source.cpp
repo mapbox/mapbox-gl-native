@@ -34,17 +34,22 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     GeoJSONData* data_ = impl().getData();
 
-    if (!data_) {
-        return;
-    }
-
     if (data_ != data) {
         data = data_;
         tilePyramid.cache.clear();
 
-        for (auto const& item : tilePyramid.tiles) {
-            static_cast<GeoJSONTile*>(item.second.get())->updateData(data->getTile(item.first.canonical));
+        if (data) {
+            for (auto const& item : tilePyramid.tiles) {
+                static_cast<GeoJSONTile*>(item.second.get())->updateData(data->getTile(item.first.canonical));
+            }
+        } else {
+            tilePyramid.tiles.clear();
+            tilePyramid.renderTiles.clear();
         }
+    }
+
+    if (!data) {
+        return;
     }
 
     tilePyramid.update(layers,
