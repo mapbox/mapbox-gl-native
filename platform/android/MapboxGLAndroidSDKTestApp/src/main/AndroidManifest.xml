@@ -358,6 +358,13 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
+        <activity android:name=".activity.snapshot.MapSnapshotterActivity"
+                  android:description="@string/description_map_snapshotter"
+                  android:label="@string/activity_map_snapshotter">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator"/>
+        </activity>
         <activity
             android:name=".activity.maplayout.DoubleMapActivity"
             android:description="@string/description_doublemap"

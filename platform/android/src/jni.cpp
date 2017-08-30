@@ -47,6 +47,7 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 #include "style/light.hpp"
+#include "snapshotter/map_snapshotter.hpp"
 
 namespace mbgl {
 namespace android {
@@ -177,6 +178,9 @@ void registerNatives(JavaVM *vm) {
     OfflineTilePyramidRegionDefinition::registerNative(env);
     OfflineRegionError::registerNative(env);
     OfflineRegionStatus::registerNative(env);
+
+    // Snapshotter
+    MapSnapshotter::registerNative(env);
 }
 
 } // namespace android

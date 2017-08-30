@@ -27,6 +27,24 @@ jni::Object<CameraPosition> CameraPosition::New(jni::JNIEnv &env, mbgl::CameraOp
     return CameraPosition::javaClass.New(env, constructor, LatLng::New(env, center), options.zoom.value_or(0), tilt_degrees, bearing_degrees);
 }
 
+mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, jni::Object<CameraPosition> position) {
+    static auto bearing = CameraPosition::javaClass.GetField<jni::jdouble>(env, "bearing");
+    static auto target = CameraPosition::javaClass.GetField<jni::Object<LatLng>>(env, "target");
+    static auto tilt = CameraPosition::javaClass.GetField<jni::jdouble>(env, "tilt");
+    static auto zoom = CameraPosition::javaClass.GetField<jni::jdouble>(env, "zoom");
+
+    auto center = LatLng::getLatLng(env, position.Get(env, target));
+
+    return mbgl::CameraOptions {
+            center,
+            {},
+            {},
+            position.Get(env, zoom),
+            position.Get(env, bearing) * util::DEG2RAD,
+            position.Get(env, tilt)
+    };
+}
+
 void CameraPosition::registerNative(jni::JNIEnv &env) {
     // Lookup the class
     CameraPosition::javaClass = *jni::Class<CameraPosition>::Find(env).NewGlobalRef(env).release();

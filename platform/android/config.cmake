@@ -75,6 +75,18 @@ macro(mbgl_platform_core)
         # Rendering
         PRIVATE platform/android/src/android_renderer_frontend.cpp
         PRIVATE platform/android/src/android_renderer_frontend.hpp
+
+        # Snapshots
+        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
+        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
+        PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
+        PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
+        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
+        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
+        PRIVATE platform/linux/src/headless_backend_egl.cpp
+        PRIVATE platform/linux/src/headless_display_egl.cpp
+        PRIVATE platform/android/src/snapshotter/map_snapshotter.cpp
+        PRIVATE platform/android/src/snapshotter/map_snapshotter.hpp
     )
 
     target_include_directories(mbgl-core
