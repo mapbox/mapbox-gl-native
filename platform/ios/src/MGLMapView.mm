@@ -4338,12 +4338,6 @@ public:
 
             [self.locationManager stopUpdatingHeading];
 
-            CLLocation *location = self.userLocation.location;
-            if (location && self.userLocationAnnotationView)
-            {
-                [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
-            }
-
             break;
         }
         case MGLUserTrackingModeFollowWithHeading:
@@ -4360,16 +4354,20 @@ public:
                 [self setZoomLevel:self.currentMinimumZoom animated:YES];
             }
 
-            if (self.userLocationAnnotationView)
-            {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
-            }
-
             [self updateHeadingForDeviceOrientation];
 
             [self.locationManager startUpdatingHeading];
 
             break;
+        }
+    }
+
+    if (_userTrackingMode != MGLUserTrackingModeNone)
+    {
+        CLLocation *location = self.userLocation.location;
+        if (location && self.userLocationAnnotationView)
+        {
+            [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
         }
     }
 
@@ -4411,9 +4409,11 @@ public:
         if (self.userTrackingMode == MGLUserTrackingModeFollowWithCourse)
         {
             self.userTrackingState = MGLUserTrackingStatePossible;
-            if (self.userLocation.location)
+
+            CLLocation *location = self.userLocation.location;
+            if (location)
             {
-                [self locationManager:self.locationManager didUpdateLocations:@[self.userLocation.location] animated:animated];
+                [self locationManager:self.locationManager didUpdateLocations:@[location] animated:animated];
             }
         }
     }
