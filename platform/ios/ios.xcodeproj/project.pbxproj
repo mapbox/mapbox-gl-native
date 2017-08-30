@@ -224,6 +224,7 @@
 		966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
+		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -706,6 +707,7 @@
 		96E0272C1E57C7E5004B8E66 /* fr */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272D1E57C7E6004B8E66 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272E1E57C7E7004B8E66 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1622,6 +1624,7 @@
 				966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */,
 				966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */,
 				966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */,
+				96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */,
 			);
 			name = Annotations;
 			sourceTree = "<group>";
@@ -1708,6 +1711,7 @@
 				DA8847F41CBAFA5100AB86E3 /* MGLOfflinePack.h in Headers */,
 				DA88482E1CBAFA6200AB86E3 /* NSException+MGLAdditions.h in Headers */,
 				DA8848551CBAFB9800AB86E3 /* MGLLocationManager.h in Headers */,
+				96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */,
 				408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
 				558DE7A01E5615E400C7916D /* MGLFoundation_Private.h in Headers */,

@@ -27,9 +27,13 @@ const CGFloat MGLUserLocationHeadingArrowSize = 6;
     return self;
 }
 
+- (void)updateHeadingAccuracy:(CLLocationDirection)accuracy
+{
+    // unimplemented
+}
+
 - (void)updateTintColor:(CGColorRef)color
 {
-    // redraw the raw tinted gradient
     self.fillColor = color;
 }
 

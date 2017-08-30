@@ -1,9 +1,10 @@
 #import <QuartzCore/QuartzCore.h>
 #import "MGLUserLocationAnnotationView.h"
+#import "MGLUserLocationHeadingIndicator.h"
 
-@interface MGLUserLocationHeadingBeamLayer : CALayer
+@interface MGLUserLocationHeadingBeamLayer : CALayer <MGLUserLocationHeadingIndicator>
 
-- (instancetype)initWithUserLocationAnnotationView:(MGLUserLocationAnnotationView *)userLocationView;
+- (MGLUserLocationHeadingBeamLayer *)initWithUserLocationAnnotationView:(MGLUserLocationAnnotationView *)userLocationView;
 - (void)updateHeadingAccuracy:(CLLocationDirection)accuracy;
 - (void)updateTintColor:(CGColorRef)color;
 

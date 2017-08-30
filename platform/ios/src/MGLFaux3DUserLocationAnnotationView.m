@@ -2,8 +2,9 @@
 
 #import "MGLMapView.h"
 #import "MGLUserLocation.h"
-#import "MGLUserLocationHeadingBeamLayer.h"
+#import "MGLUserLocationHeadingIndicator.h"
 #import "MGLUserLocationHeadingArrowLayer.h"
+#import "MGLUserLocationHeadingBeamLayer.h"
 
 @implementation MGLFaux3DUserLocationAnnotationView
 {
@@ -12,14 +13,13 @@
     CALayer *_puckDot;
     CAShapeLayer *_puckArrow;
 
-    MGLUserLocationHeadingBeamLayer *_headingIndicatorLayer;
-    //MGLUserLocationHeadingArrowLayer *_headingIndicatorLayer;
+    CALayer<MGLUserLocationHeadingIndicator> *_headingIndicatorLayer;
     CALayer *_accuracyRingLayer;
     CALayer *_dotBorderLayer;
     CALayer *_dotLayer;
     CALayer *_haloLayer;
 
-    double _oldHeadingAccuracy;
+    CLLocationDirection _oldHeadingAccuracy;
     CLLocationAccuracy _oldHorizontalAccuracy;
     double _oldZoom;
     double _oldPitch;
@@ -215,28 +215,43 @@
         [self updateFrameWithSize:MGLUserLocationAnnotationDotSize];
     }
 
-    BOOL showHeadingIndicator = YES;//self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
-
-    // update heading indicator
+    // heading indicator (tinted, beam or arrow)
     //
+    BOOL headingTrackingModeEnabled = self.mapView.userTrackingMode == MGLUserTrackingModeFollowWithHeading;
+    BOOL showHeadingIndicator = self.mapView.showsUserHeadingIndicator || headingTrackingModeEnabled;
+
     if (showHeadingIndicator)
     {
         _headingIndicatorLayer.hidden = NO;
         CLLocationDirection headingAccuracy = self.userLocation.heading.headingAccuracy;
 
-        // heading indicator (tinted, semi-circle)
-        //
+        if (([_headingIndicatorLayer isMemberOfClass:[MGLUserLocationHeadingBeamLayer class]] && ! headingTrackingModeEnabled) ||
+            ([_headingIndicatorLayer isMemberOfClass:[MGLUserLocationHeadingArrowLayer class]] && headingTrackingModeEnabled))
+        {
+            [_headingIndicatorLayer removeFromSuperlayer];
+            _headingIndicatorLayer = nil;
+            _oldHeadingAccuracy = -1;
+        }
+
         if ( ! _headingIndicatorLayer && headingAccuracy)
         {
-            _headingIndicatorLayer = [[MGLUserLocationHeadingBeamLayer alloc] initWithUserLocationAnnotationView:self];
-            //_headingIndicatorLayer = [[MGLUserLocationHeadingArrowLayer alloc] initWithUserLocationAnnotationView:self];
-            [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+            if (headingTrackingModeEnabled)
+            {
+                _headingIndicatorLayer = [[MGLUserLocationHeadingBeamLayer alloc] initWithUserLocationAnnotationView:self];
+                [self.layer insertSublayer:_headingIndicatorLayer below:_dotBorderLayer];
+            }
+            else
+            {
+                _headingIndicatorLayer = [[MGLUserLocationHeadingArrowLayer alloc] initWithUserLocationAnnotationView:self];
+                [self.layer addSublayer:_headingIndicatorLayer];
+                _headingIndicatorLayer.zPosition = 1;
+            }
         }
 
         if (_oldHeadingAccuracy != headingAccuracy)
         {
-            //[_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
-             _oldHeadingAccuracy = headingAccuracy;
+            [_headingIndicatorLayer updateHeadingAccuracy:headingAccuracy];
+            _oldHeadingAccuracy = headingAccuracy;
         }
 
         if (self.userLocation.heading.trueHeading >= 0)
@@ -255,7 +270,6 @@
         [_headingIndicatorLayer removeFromSuperlayer];
         _headingIndicatorLayer = nil;
     }
-
 
     // update accuracy ring (if zoom or horizontal accuracy have changed)
     //
