@@ -204,7 +204,7 @@ Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string>
     }
 
     layer->setObserver(this);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 
     return layers.add(std::move(layer), before);
 }
@@ -214,7 +214,7 @@ std::unique_ptr<Layer> Style::Impl::removeLayer(const std::string& id) {
 
     if (layer) {
         layer->setObserver(nullptr);
-        observer->onUpdate(Update::Repaint);
+        observer->onUpdate();
     }
 
     return layer;
@@ -289,13 +289,13 @@ void Style::Impl::setObserver(style::Observer* observer_) {
 void Style::Impl::onSourceLoaded(Source& source) {
     sources.update(source);
     observer->onSourceLoaded(source);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onSourceChanged(Source& source) {
     sources.update(source);
     observer->onSourceChanged(source);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
@@ -319,7 +319,7 @@ void Style::Impl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) 
         addImage(std::move(image));
     }
     spriteLoaded = true;
-    observer->onUpdate(Update::Repaint); // For *-pattern properties.
+    observer->onUpdate(); // For *-pattern properties.
 }
 
 void Style::Impl::onSpriteError(std::exception_ptr error) {
@@ -330,11 +330,11 @@ void Style::Impl::onSpriteError(std::exception_ptr error) {
 
 void Style::Impl::onLayerChanged(Layer& layer) {
     layers.update(layer);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onLightChanged(const Light&) {
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::dumpDebugLogs() const {
