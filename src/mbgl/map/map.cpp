@@ -695,14 +695,10 @@ void Map::Impl::onInvalidate() {
     onUpdate(Update::Repaint);
 }
 
-void Map::Impl::onUpdate(Update flags) {
+void Map::Impl::onUpdate(Update) {
     TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
 
     transform.updateTransitions(timePoint);
-
-    if (flags & Update::AnnotationData) {
-        annotationManager.updateData();
-    }
 
     UpdateParameters params = {
         style->impl->isLoaded(),

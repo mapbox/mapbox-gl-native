@@ -1,3 +1,4 @@
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/renderer/renderer_impl.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
@@ -71,6 +72,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (updateParameters.mode == MapMode::Still && !updateParameters.stillImageRequest) return;
     
     assert(BackendScope::exists());
+    
+    updateParameters.annotationManager.updateData();
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
 
