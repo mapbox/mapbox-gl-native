@@ -170,6 +170,9 @@ std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
  * @function
  * @name load
  * @param {string|Object} stylesheet either an object or a JSON representation
+ * @param {Object} options
+ * @param {boolean} options.defaultStyleCamera if true, sets the default style
+ * camera
  * @returns {undefined} loads stylesheet into map
  * @throws {Error} if stylesheet is missing or invalid
  * @example
@@ -205,6 +208,21 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         nodeMap->map->getStyle().loadJSON(style);
     } catch (const std::exception &ex) {
         return Nan::ThrowError(ex.what());
+    }
+
+    if (info.Length() == 2) {
+        if (!info[1]->IsObject()) {
+            return Nan::ThrowTypeError("Second argument must be an options object");
+        }
+        auto options = Nan::To<v8::Object>(info[1]).ToLocalChecked();
+        if (Nan::Has(options, Nan::New("defaultStyleCamera").ToLocalChecked()).FromJust()) {
+            if (!Nan::Get(options, Nan::New("defaultStyleCamera").ToLocalChecked()).ToLocalChecked()->IsBoolean()) {
+                return Nan::ThrowError("Options object 'defaultStyleCamera' property must be a boolean");
+            }
+            if (Nan::Get(options, Nan::New("cameraMutated").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+                nodeMap->map->jumpTo(nodeMap->map->getStyle().getDefaultCamera());
+            }
+        }
     }
 
     nodeMap->loaded = true;
@@ -357,28 +375,13 @@ void NodeMap::startRender(NodeMap::RenderOptions options) {
     frontend->setSize(options.size);
     map->setSize(options.size);
 
-    if (map->getZoom() != options.zoom) {
-        map->setZoom(options.zoom);
-    }
+    mbgl::CameraOptions camera;
+    camera.center = mbgl::LatLng { options.latitude, options.longitude };
+    camera.zoom = options.zoom;
+    camera.angle = -options.bearing * mbgl::util::DEG2RAD;
+    camera.pitch = options.pitch * mbgl::util::DEG2RAD;
 
-    mbgl::LatLng latLng(options.latitude, options.longitude);
-    if (map->getLatLng() != latLng) {
-        map->setLatLng(latLng);
-    }
-
-    if (map->getBearing() != options.bearing) {
-        map->setBearing(options.bearing);
-    }
-
-    if (map->getPitch() != options.pitch) {
-        map->setPitch(options.pitch);
-    }
-
-    if (map->getDebug() != options.debugOptions) {
-        map->setDebug(options.debugOptions);
-    }
-
-    map->renderStill([this](const std::exception_ptr eptr) {
+    map->renderStill(camera, options.debugOptions, [this](const std::exception_ptr eptr) {
         if (eptr) {
             error = std::move(eptr);
             uv_async_send(async);
