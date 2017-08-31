@@ -630,7 +630,9 @@ AnnotationID Map::addAnnotation(const Annotation& annotation) {
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    impl->onUpdate(impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom()));
+    if (impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom())) {
+        impl->onUpdate(Update::AnnotationData);
+    }
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
