@@ -524,7 +524,7 @@ public class MapView extends FrameLayout {
   //
 
   /**
-   * <p>
+   * <p>P
    * Add a callback that's invoked when the displayed map view changes.
    * </p>
    * To remove the callback, use {@link MapView#removeOnMapChangedListener(OnMapChangedListener)}.
