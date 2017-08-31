@@ -50,7 +50,7 @@ public:
 
     // StyleObserver
     void onSourceChanged(style::Source&) override;
-    void onUpdate(Update) override;
+    void onUpdate() override;
     void onStyleLoading() override;
     void onStyleLoaded() override;
     void onStyleError(std::exception_ptr) override;
@@ -166,7 +166,7 @@ void Map::renderStill(StillImageCallback callback) {
 
     impl->stillImageRequest = std::make_unique<StillImageRequest>(std::move(callback));
 
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions, StillImageCallback callback) {
@@ -177,7 +177,7 @@ void Map::renderStill(const CameraOptions& camera, MapDebugOptions debugOptions,
 }
 
 void Map::triggerRepaint() {
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 #pragma mark - Map::Impl RendererObserver
@@ -201,7 +201,7 @@ void Map::Impl::onDidFinishRenderingFrame(RenderMode renderMode, bool needsRepai
         observer.onDidFinishRenderingFrame(MapObserver::RenderMode(renderMode));
 
         if (needsRepaint || transform.inTransition()) {
-            onUpdate(Update::Repaint);
+            onUpdate();
         }
     } else if (stillImageRequest && rendererFullyLoaded) {
         auto request = std::move(stillImageRequest);
@@ -240,12 +240,12 @@ void Map::setStyle(std::unique_ptr<Style> style) {
 
 void Map::cancelTransitions() {
     impl->transform.cancelTransitions();
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setGestureInProgress(bool inProgress) {
     impl->transform.setGestureInProgress(inProgress);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 bool Map::isGestureInProgress() const {
@@ -273,19 +273,19 @@ CameraOptions Map::getCameraOptions(const EdgeInsets& padding) const {
 void Map::jumpTo(const CameraOptions& camera) {
     impl->cameraMutated = true;
     impl->transform.jumpTo(camera);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::easeTo(const CameraOptions& camera, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.easeTo(camera, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.flyTo(camera, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 #pragma mark - Position
@@ -293,7 +293,7 @@ void Map::flyTo(const CameraOptions& camera, const AnimationOptions& animation) 
 void Map::moveBy(const ScreenCoordinate& point, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.moveBy(point, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
@@ -304,13 +304,13 @@ void Map::setLatLng(const LatLng& latLng, const AnimationOptions& animation) {
 void Map::setLatLng(const LatLng& latLng, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLng(latLng, padding, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setLatLng(const LatLng& latLng, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLng(latLng, anchor, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 LatLng Map::getLatLng(const EdgeInsets& padding) const {
@@ -326,7 +326,7 @@ void Map::resetPosition(const EdgeInsets& padding) {
     camera.padding = padding;
     camera.zoom = 0;
     impl->transform.jumpTo(camera);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 
@@ -340,13 +340,13 @@ void Map::setZoom(double zoom, const AnimationOptions& animation) {
 void Map::setZoom(double zoom, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setZoom(zoom, anchor, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setZoom(double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setZoom(zoom, padding, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 double Map::getZoom() const {
@@ -361,7 +361,7 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const AnimationOption
 void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setLatLngZoom(latLng, zoom, padding, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) const {
@@ -451,7 +451,7 @@ optional<LatLngBounds> Map::getLatLngBounds() const {
 void Map::setLatLngBounds(optional<LatLngBounds> bounds) {
     impl->cameraMutated = true;
     impl->transform.setLatLngBounds(bounds);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setMinZoom(const double minZoom) {
@@ -502,7 +502,7 @@ double Map::getMaxPitch() const {
 
 void Map::setSize(const Size size) {
     impl->transform.resize(size);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 Size Map::getSize() const {
@@ -514,7 +514,7 @@ Size Map::getSize() const {
 void Map::rotateBy(const ScreenCoordinate& first, const ScreenCoordinate& second, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.rotateBy(first, second, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setBearing(double degrees, const AnimationOptions& animation) {
@@ -525,13 +525,13 @@ void Map::setBearing(double degrees, const AnimationOptions& animation) {
 void Map::setBearing(double degrees, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setAngle(-degrees * util::DEG2RAD, anchor, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::setBearing(double degrees, const EdgeInsets& padding, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setAngle(-degrees * util::DEG2RAD, padding, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 double Map::getBearing() const {
@@ -541,7 +541,7 @@ double Map::getBearing() const {
 void Map::resetNorth(const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setAngle(0, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 #pragma mark - Pitch
@@ -554,7 +554,7 @@ void Map::setPitch(double pitch, const AnimationOptions& animation) {
 void Map::setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& animation) {
     impl->cameraMutated = true;
     impl->transform.setPitch(pitch * util::DEG2RAD, anchor, animation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 double Map::getPitch() const {
@@ -565,7 +565,7 @@ double Map::getPitch() const {
 
 void Map::setNorthOrientation(NorthOrientation orientation) {
     impl->transform.setNorthOrientation(orientation);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 NorthOrientation Map::getNorthOrientation() const {
@@ -576,7 +576,7 @@ NorthOrientation Map::getNorthOrientation() const {
 
 void Map::setConstrainMode(mbgl::ConstrainMode mode) {
     impl->transform.setConstrainMode(mode);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 ConstrainMode Map::getConstrainMode() const {
@@ -587,7 +587,7 @@ ConstrainMode Map::getConstrainMode() const {
 
 void Map::setViewportMode(mbgl::ViewportMode mode) {
     impl->transform.setViewportMode(mode);
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 ViewportMode Map::getViewportMode() const {
@@ -625,26 +625,26 @@ double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
     auto result = impl->annotationManager.addAnnotation(annotation, getMaxZoom());
-    impl->onUpdate(Update::AnnotationData);
+    impl->onUpdate();
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
     if (impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom())) {
-        impl->onUpdate(Update::AnnotationData);
+        impl->onUpdate();
     }
 }
 
 void Map::removeAnnotation(AnnotationID annotation) {
     impl->annotationManager.removeAnnotation(annotation);
-    impl->onUpdate(Update::AnnotationData);
+    impl->onUpdate();
 }
 
 #pragma mark - Toggles
 
 void Map::setDebug(MapDebugOptions debugOptions) {
     impl->debugOptions = debugOptions;
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 void Map::cycleDebugOptions() {
@@ -668,7 +668,7 @@ void Map::cycleDebugOptions() {
     else
         impl->debugOptions = MapDebugOptions::TileBorders;
 
-    impl->onUpdate(Update::Repaint);
+    impl->onUpdate();
 }
 
 MapDebugOptions Map::getDebug() const {
@@ -692,10 +692,10 @@ void Map::Impl::onSourceChanged(style::Source& source) {
 }
 
 void Map::Impl::onInvalidate() {
-    onUpdate(Update::Repaint);
+    onUpdate();
 }
 
-void Map::Impl::onUpdate(Update) {
+void Map::Impl::onUpdate() {
     TimePoint timePoint = mode == MapMode::Continuous ? Clock::now() : Clock::time_point::max();
 
     transform.updateTransitions(timePoint);
