@@ -186,6 +186,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderSources.emplace(entry.first, std::move(renderSource));
     }
 
+    const bool hasImageDiff = !(imageDiff.added.empty() && imageDiff.removed.empty() && imageDiff.changed.empty());
+
     // Update all sources.
     for (const auto& source : *sourceImpls) {
         std::vector<Immutable<Layer::Impl>> filteredLayers;
@@ -203,11 +205,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 needsRendering = true;
             }
 
-            if (!needsRelayout && (
-                hasLayoutDifference(layerDiff, layer->id) ||
-                !imageDiff.added.empty() ||
-                !imageDiff.removed.empty() ||
-                !imageDiff.changed.empty())) {
+            if (!needsRelayout && (hasImageDiff || hasLayoutDifference(layerDiff, layer->id))) {
                 needsRelayout = true;
             }
 
