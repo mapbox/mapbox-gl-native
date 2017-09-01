@@ -5775,4 +5775,19 @@ private:
     self.pitchEnabled = allowsTilting;
 }
 
++ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingShowsHeading
+{
+    return [NSSet setWithObject:@"showsUserHeadingIndicator"];
+}
+
+- (BOOL)showsHeading
+{
+    return self.showsUserHeadingIndicator;
+}
+
+- (void)setShowsHeading:(BOOL)showsHeading
+{
+    self.showsUserHeadingIndicator = showsHeading;
+}
+
 @end
