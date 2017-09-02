@@ -1,5 +1,11 @@
 # Changelog for Mapbox macOS SDK
 
+## 0.5.2
+
+This version of the Mapbox macOS SDK corresponds to version 3.6.3 of the Mapbox iOS SDK.
+
+* Added support for selection of shape and polyline annotations. ([#9755](https://github.com/mapbox/mapbox-gl-native/pull/9755))
+
 ## 0.5.1
 
 This version of the Mapbox macOS SDK corresponds to version 3.6.2 of the Mapbox iOS SDK.

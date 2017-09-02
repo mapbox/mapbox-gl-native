@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added support for iOS 11 location usage descriptions. ([#9869](https://github.com/mapbox/mapbox-gl-native/pull/9869))
 * Fixed an issue where `MGLUserLocation.location` did not follow its documented initialization behavior. This property will now properly return `nil` until the user’s location has been determined. ([#9639](https://github.com/mapbox/mapbox-gl-native/pull/9639))
 * `MGLMapView`’s `minimumZoomLevel` and `maximumZoomLevel` properties are now available in Interface Builder’s Attributes inspector. ([#9729](https://github.com/mapbox/mapbox-gl-native/pull/9729))
+* Added support for selection of shape and polyline annotations. ([#9755](https://github.com/mapbox/mapbox-gl-native/pull/9755))
 
 ## 3.6.2 - August 18, 2017
 
