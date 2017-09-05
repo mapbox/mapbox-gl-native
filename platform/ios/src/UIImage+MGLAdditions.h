@@ -8,6 +8,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage;
 
+- (nullable instancetype)initWithMGLPremultipliedImage:(const mbgl::PremultipliedImage&&)mbglImage;
+
 - (std::unique_ptr<mbgl::style::Image>)mgl_styleImageWithIdentifier:(NSString *)identifier;
 
 - (mbgl::PremultipliedImage)mgl_premultipliedImage;

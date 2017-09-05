@@ -3,6 +3,7 @@
 #import "AppDelegate.h"
 #import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
+#import "MGLMapsnapshotter.h"
 
 #import "MGLStyle+MBXAdditions.h"
 #import "MGLVectorSource+MGLAdditions.h"
@@ -73,6 +74,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
     BOOL _isShowingAnimatedAnnotation;
+    
+    // Snapshotter
+    MGLMapSnapshotter* snapshotter;
 }
 
 #pragma mark Lifecycle
@@ -151,6 +155,67 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
              components[1], components[2], [MGLAccountManager accessToken],
              self.mapView.zoomLevel, camera.centerCoordinate.latitude, camera.centerCoordinate.longitude,
              camera.heading, camera.pitch]];
+}
+
+#pragma mark File methods
+
+- (IBAction)takeSnapshot:(id)sender {
+    MGLMapCamera *camera = self.mapView.camera;
+    
+    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:self.mapView.styleURL camera:camera size:self.mapView.bounds.size];
+    options.zoom = self.mapView.zoomLevel;
+    
+    // Create and start the snapshotter
+    snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    [snapshotter startWithCompletionHandler: ^(NSImage *image, NSError *error) {
+        if (error) {
+            NSLog(@"Could not load snapshot: %@", [error localizedDescription]);
+        } else {
+            NSWindow* window = [[[self windowControllers] objectAtIndex:0] window];
+    
+            NSString* newName = [[@"snapshot" stringByDeletingPathExtension] stringByAppendingPathExtension:@"png"];
+            
+            // Set the default name for the file and show the panel.
+            NSSavePanel* panel = [NSSavePanel savePanel];
+            [panel setNameFieldStringValue:newName];
+            [panel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
+                if (result == NSFileHandlingPanelOKButton) {
+                    // Write the contents in the new format.
+                    NSURL*  fileURL = [panel URL];
+                    
+                    NSBitmapImageRep *bitmapRep = nil;
+                    for (NSImageRep *imageRep in [image representations]) {
+                        if ([imageRep isKindOfClass:[NSBitmapImageRep class]]){
+                            bitmapRep = (NSBitmapImageRep *)imageRep;
+                            break; // stop on first bitmap rep we find
+                        }
+                    }
+                    
+                    if (!bitmapRep) {
+                        bitmapRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
+                        
+                    }
+                    
+                    NSString *extension = [[fileURL pathExtension] lowercaseString];
+                    NSBitmapImageFileType fileType;
+                    if ([extension isEqualToString:@"png"]) {
+                        fileType = NSPNGFileType;
+                    } else if ([extension isEqualToString:@"gif"]) {
+                        fileType =  NSGIFFileType;
+                    } else if ([extension isEqualToString:@"jpg"] || [extension isEqualToString:@"jpeg"]) {
+                        fileType =  NSJPEGFileType;
+                    } else {
+                        fileType =  NSTIFFFileType;
+                    }
+                    
+                    NSData *imageData = [bitmapRep representationUsingType:fileType properties:@{}];
+                    [imageData writeToURL:fileURL atomically:NO];
+                }
+            }];
+
+        }
+        snapshotter = nil;
+    }];
 }
 
 #pragma mark View methods
@@ -962,6 +1027,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(giveFeedback:)) {
         return YES;
+    }
+    if (menuItem.action == @selector(takeSnapshot:)) {
+        return !(snapshotter && [snapshotter isLoading]);
     }
     return NO;
 }
