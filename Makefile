@@ -594,6 +594,7 @@ run-android-ui-test-aws: platform/android/configuration.gradle
 # Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/configuration.gradle
+	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Uploads the compiled Android SDK to Maven
