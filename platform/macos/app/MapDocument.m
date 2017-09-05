@@ -182,12 +182,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         case 6:
             styleURL = [MGLStyle satelliteStreetsStyleURL];
             break;
-        case 7:
-            styleURL = [MGLStyle trafficDayStyleURL];
-            break;
-        case 8:
-            styleURL = [MGLStyle trafficNightStyleURL];
-            break;
         default:
             NSAssert(NO, @"Cannot set style from control with tag %li", (long)tag);
             break;
@@ -759,12 +753,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             case 6:
                 state = [styleURL isEqual:[MGLStyle satelliteStreetsStyleURL]];
                 break;
-            case 7:
-                state = [styleURL isEqual:[MGLStyle trafficDayStyleURL]];
-                break;
-            case 8:
-                state = [styleURL isEqual:[MGLStyle trafficNightStyleURL]];
-                break;
             default:
                 return NO;
         }
@@ -926,8 +914,6 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         [MGLStyle darkStyleURL],
         [MGLStyle satelliteStyleURL],
         [MGLStyle satelliteStreetsStyleURL],
-        [MGLStyle trafficDayStyleURL],
-        [MGLStyle trafficNightStyleURL],
     ];
     return [styleURLs indexOfObject:self.mapView.styleURL];
 }
