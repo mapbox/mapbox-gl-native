@@ -4195,7 +4195,6 @@ public:
             }
         }
 
-        self.locationManager.headingFilter = 5.0;
         self.locationManager.delegate = self;
         [self.locationManager startUpdatingLocation];
 
