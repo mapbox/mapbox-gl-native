@@ -459,10 +459,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 #endif
 
-    int indent = 0;
-
     // Actually render the layers
-    if (debug::renderTree) { Log::Info(Event::Render, "{"); indent++; }
 
     parameters.depthRangeSize = 1 - (order.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
 
@@ -472,10 +469,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.pass = RenderPass::Opaque;
         MBGL_DEBUG_GROUP(parameters.context, "opaque");
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "opaque");
-        }
-
         uint32_t i = 0;
         for (auto it = order.rbegin(); it != order.rend(); ++it, ++i) {
             parameters.currentLayer = i;
@@ -483,10 +476,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
                 it->layer.render(parameters, it->source);
             }
-        }
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
         }
     }
 
@@ -496,10 +485,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.pass = RenderPass::Translucent;
         MBGL_DEBUG_GROUP(parameters.context, "translucent");
 
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "translucent");
-        }
-
         uint32_t i = static_cast<uint32_t>(order.size()) - 1;
         for (auto it = order.begin(); it != order.end(); ++it, --i) {
             parameters.currentLayer = i;
@@ -508,13 +493,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 it->layer.render(parameters, it->source);
             }
         }
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-        }
     }
-
-    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
     // - DEBUG PASS --------------------------------------------------------------------------------
     // Renders debug overlays.
