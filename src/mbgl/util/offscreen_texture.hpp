@@ -9,21 +9,16 @@ class Context;
 class Texture;
 } // namespace gl
 
-enum class OffscreenTextureAttachment {
-    None,
-    Depth,
-};
-
 class OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
-                     Size size = { 256, 256 },
-                     OffscreenTextureAttachment type = OffscreenTextureAttachment::None);
+                     Size size = { 256, 256 });
     ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);
 
     void bind();
+    void attachRenderbuffer(gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&);
 
     PremultipliedImage readStillImage();
 

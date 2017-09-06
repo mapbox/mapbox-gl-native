@@ -4,7 +4,6 @@
 #include <mbgl/gl/index_buffer.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/offscreen_texture.hpp>
 
 #include <string>
 
@@ -26,7 +25,7 @@ public:
     SegmentVector<RasterAttributes> rasterSegments;
     SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 
-    optional<OffscreenTexture> extrusionTexture;
+    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthRenderbuffer;
 
     Programs programs;
 

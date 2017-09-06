@@ -369,6 +369,63 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.frameHistory.upload(parameters.context, 0);
     }
 
+    // - PREPARE + CLIP ------------------------------------------------------------------------------
+    {
+        MBGL_DEBUG_GROUP(parameters.context, "clip");
+
+        // Update all clipping IDs.
+        for (const auto& entry : renderSources) {
+            if (entry.second->isEnabled()) {
+                entry.second->startRender(parameters);
+            }
+        }
+    }
+
+    // - 3D PASS -------------------------------------------------------------------------------------
+    // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
+    // depth rbo between them.
+    int indent = 0;
+
+    if (debug::renderTree) {
+        Log::Info(Event::Render, "{");
+        indent++;
+    }
+
+    {
+        parameters.pass = RenderPass::Pass3D;
+        MBGL_DEBUG_GROUP(parameters.context, "3d");
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "3D");
+        }
+
+        const auto size = parameters.context.viewport.getCurrentValue().size;
+
+        if (!parameters.staticData.depthRenderbuffer ||
+            parameters.staticData.depthRenderbuffer->size != size) {
+            parameters.staticData.depthRenderbuffer =
+                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+        }
+        parameters.staticData.depthRenderbuffer->dirty = true;
+
+        uint32_t i = static_cast<uint32_t>(order.size()) - 1;
+        for (auto it = order.begin(); it != order.end(); ++it, --i) {
+            parameters.currentLayer = i;
+            if (it->layer.hasRenderPass(parameters.pass)) {
+                MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
+                it->layer.render(parameters, it->source);
+            }
+        }
+
+        parameters.backend.bind();
+
+        if (debug::renderTree) {
+            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
+        }
+    }
+
+    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
+
     // - CLEAR -------------------------------------------------------------------------------------
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
@@ -385,15 +442,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        MBGL_DEBUG_GROUP(parameters.context, "clip");
-
-        // Update all clipping IDs.
-        for (const auto& entry : renderSources) {
-            if (entry.second->isEnabled()) {
-                entry.second->startRender(parameters);
-            }
-        }
-
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
         static const style::FillPaintProperties::PossiblyEvaluated properties {};
