@@ -384,20 +384,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - 3D PASS -------------------------------------------------------------------------------------
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
-    int indent = 0;
-
-    if (debug::renderTree) {
-        Log::Info(Event::Render, "{");
-        indent++;
-    }
-
     {
         parameters.pass = RenderPass::Pass3D;
         MBGL_DEBUG_GROUP(parameters.context, "3d");
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s {", indent++ * 4, "", "3D");
-        }
 
         const auto size = parameters.context.viewport.getCurrentValue().size;
 
@@ -418,13 +407,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         parameters.backend.bind();
-
-        if (debug::renderTree) {
-            Log::Info(Event::Render, "%*s%s", --indent * 4, "", "}");
-        }
     }
-
-    if (debug::renderTree) { Log::Info(Event::Render, "}"); indent--; }
 
     // - CLEAR -------------------------------------------------------------------------------------
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
