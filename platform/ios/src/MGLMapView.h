@@ -362,8 +362,8 @@ MGL_EXPORT IB_DESIGNABLE
  permanent heading indicator.
 
  Setting this property to `YES` causes the default user location annotation to
- always show an arrow-shaped heading indicator, if heading is available. This
- property does not rotate the map; for that, see
+ appear and always show an arrow-shaped heading indicator, if heading is
+ available. This property does not rotate the map; for that, see
  `MGLUserTrackingModeFollowWithHeading`.
 
  This property has no effect when `userTrackingMode` is

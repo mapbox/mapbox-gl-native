@@ -4416,6 +4416,12 @@ public:
 - (void)setShowsUserHeadingIndicator:(BOOL)showsUserHeadingIndicator
 {
     _showsUserHeadingIndicator = showsUserHeadingIndicator;
+
+    if (_showsUserHeadingIndicator)
+    {
+        self.showsUserLocation = YES;
+    }
+
     [self validateUserHeadingUpdating];
 }
 
@@ -4423,7 +4429,7 @@ public:
 {
     BOOL canShowPermanentHeadingIndicator = self.showsUserHeadingIndicator && self.userTrackingMode != MGLUserTrackingModeFollowWithCourse;
 
-    if (self.showsUserLocation && (canShowPermanentHeadingIndicator || self.userTrackingMode == MGLUserTrackingModeFollowWithHeading))
+    if (canShowPermanentHeadingIndicator || self.userTrackingMode == MGLUserTrackingModeFollowWithHeading)
     {
         [self updateHeadingForDeviceOrientation];
         [self.locationManager startUpdatingHeading];
