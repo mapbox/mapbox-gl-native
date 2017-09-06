@@ -109,7 +109,7 @@ MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
 
 // Make sure all the styles listed in mbgl::util::default_styles::orderedStyles
 // are defined above and also declared in MGLStyle.h.
-static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
+static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
 
 // Hybrid has been renamed Satellite Streets, so the last Hybrid version is hard-coded here.
@@ -143,7 +143,7 @@ static NSURL *MGLStyleURL_trafficDay;
 }
 
 + (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version {
-    return [MGLStyle trafficDayStyleURL];
+    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-day-v" stringByAppendingFormat:@"%li", (long)version]];
 }
 
 // Traffic Night is no longer getting new versions as a default style, so the current version is hard-coded here.
@@ -157,7 +157,7 @@ static NSURL *MGLStyleURL_trafficNight;
 }
 
 + (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version {
-    return [MGLStyle trafficNightStyleURL];
+    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-night-v" stringByAppendingFormat:@"%li", (long)version]];
 }
 
 
