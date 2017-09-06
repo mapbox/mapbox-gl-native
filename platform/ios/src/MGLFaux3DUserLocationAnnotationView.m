@@ -71,7 +71,7 @@
     {
         // disable implicit animation
         [CATransaction begin];
-        [CATransaction setValue:(id)kCFBooleanTrue forKey:kCATransactionDisableActions];
+        [CATransaction setDisableActions:YES];
 
         CATransform3D t = CATransform3DRotate(CATransform3DIdentity, MGLRadiansFromDegrees(self.mapView.camera.pitch), 1.0, 0, 0);
         self.layer.sublayerTransform = t;
@@ -261,7 +261,12 @@
             // Don't rotate if the change is imperceptible.
             if (fabs(rotation) > MGLUserLocationHeadingUpdateThreshold)
             {
+                [CATransaction begin];
+                [CATransaction setDisableActions:YES];
+
                 _headingIndicatorLayer.affineTransform = CGAffineTransformRotate(CGAffineTransformIdentity, rotation);
+
+                [CATransaction commit];
             }
         }
     }
@@ -283,10 +288,10 @@
             _accuracyRingLayer.hidden = NO;
 
             // disable implicit animation of the accuracy ring, unless triggered by a change in accuracy
-            id shouldDisableActions = (_oldHorizontalAccuracy == self.userLocation.location.horizontalAccuracy) ? (id)kCFBooleanTrue : (id)kCFBooleanFalse;
+            BOOL shouldDisableActions = _oldHorizontalAccuracy == self.userLocation.location.horizontalAccuracy;
 
             [CATransaction begin];
-            [CATransaction setValue:shouldDisableActions forKey:kCATransactionDisableActions];
+            [CATransaction setDisableActions:shouldDisableActions];
 
             _accuracyRingLayer.bounds = CGRectMake(0, 0, accuracyRingSize, accuracyRingSize);
             _accuracyRingLayer.cornerRadius = accuracyRingSize / 2;
