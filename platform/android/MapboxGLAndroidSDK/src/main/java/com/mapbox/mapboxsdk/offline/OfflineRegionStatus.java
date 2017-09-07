@@ -80,7 +80,7 @@ public class OfflineRegionStatus {
    * @return true if download is complete, false if not
    */
   public boolean isComplete() {
-    return (completedResourceCount == requiredResourceCount);
+    return (completedResourceCount == requiredResourceCount) && downloadState == OfflineRegion.STATE_INACTIVE;
   }
 
   /**
