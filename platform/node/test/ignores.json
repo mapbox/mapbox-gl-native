@@ -36,6 +36,7 @@
   "render-tests/line-width/property-function": "https://github.com/mapbox/mapbox-gl-js/issues/3682#issuecomment-264348200",
   "render-tests/line-join/property-function": "https://github.com/mapbox/mapbox-gl-js/pull/5020",
   "render-tests/line-join/property-function-dasharray": "https://github.com/mapbox/mapbox-gl-js/pull/5020",
+  "render-tests/line-opacity/step-curve": "https://github.com/mapbox/mapbox-gl-native/pull/9439",
   "render-tests/regressions/mapbox-gl-js#2305": "https://github.com/mapbox/mapbox-gl-native/issues/6927",
   "render-tests/regressions/mapbox-gl-js#3548": "skip - needs issue",
   "render-tests/regressions/mapbox-gl-js#3682": "https://github.com/mapbox/mapbox-gl-js/issues/3682",
@@ -45,6 +46,7 @@
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "skip - needs issue",
   "render-tests/runtime-styling/source-add-geojson-inline": "skip - needs issue",
   "render-tests/symbol-placement/line": "needs issue",
+  "render-tests/text-font/camera-function": "https://github.com/mapbox/mapbox-gl-native/pull/9439",
   "render-tests/text-keep-upright/line-placement-true-offset": "https://github.com/mapbox/mapbox-gl-native/issues/9271",
   "render-tests/text-pitch-alignment/auto-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-alignment/auto-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
@@ -55,6 +57,6 @@
   "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-scaling/line-half": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
-  "render-tests/text-size/composite-function-high-base": "https://github.com/mapbox/mapbox-gl-native/issues/8654",
+  "render-tests/text-size/composite-expression": "https://github.com/mapbox/mapbox-gl-native/pull/9439",
   "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601"
 }
