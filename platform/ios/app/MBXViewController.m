@@ -441,8 +441,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsAnnotationsQueryAnnotations:
                     [self testQueryPointAnnotations];
-                case MBXSettingsAnnotationsCustomUserDot:
                     break;
+                case MBXSettingsAnnotationsCustomUserDot:
                     [self toggleCustomUserDot];
                     break;
                 case MBXSettingsAnnotationsRemoveAnnotations:
