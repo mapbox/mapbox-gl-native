@@ -385,8 +385,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
     {
-        parameters.pass = RenderPass::Pass3D;
         MBGL_DEBUG_GROUP(parameters.context, "3d");
+        parameters.backend.bind();
+        parameters.pass = RenderPass::Pass3D;
 
         const auto size = parameters.context.viewport.getCurrentValue().size;
 
@@ -406,7 +407,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
 
-        parameters.backend.bind();
+        // The main backend/framebuffer will be rebound in the clear step.
     }
 
     // - CLEAR -------------------------------------------------------------------------------------
