@@ -61,7 +61,8 @@ public:
             {{
                 p.x,
                 p.y,
-                static_cast<int16_t>(attributes::packUint8Pair(round ? 1 : 0, up ? 1 : 0))
+                static_cast<int16_t>(round ? 1 : 0),
+                static_cast<int16_t>(up ? 1 : -1)
             }},
             {{
                 // add 128 to store a byte in an unsigned byte
