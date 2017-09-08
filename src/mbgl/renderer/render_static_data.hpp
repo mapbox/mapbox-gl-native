@@ -26,6 +26,7 @@ public:
     SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;
 
     optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthRenderbuffer;
+    bool has3D = false;
 
     Programs programs;
 

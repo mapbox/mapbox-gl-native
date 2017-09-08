@@ -13,6 +13,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -271,6 +272,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
+        if (!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) {
+            parameters.staticData.has3D = true;
+        }
+
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
         }
@@ -384,7 +389,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - 3D PASS -------------------------------------------------------------------------------------
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
-    {
+    if (parameters.staticData.has3D) {
         MBGL_DEBUG_GROUP(parameters.context, "3d");
         parameters.backend.bind();
         parameters.pass = RenderPass::Pass3D;
