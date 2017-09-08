@@ -96,8 +96,8 @@ public:
     Framebuffer createFramebuffer(const Texture&,
                                   const Renderbuffer<RenderbufferType::DepthStencil>&);
     Framebuffer createFramebuffer(const Texture&);
-
-    void attachRenderbuffer(const Renderbuffer<RenderbufferType::DepthComponent>&);
+    Framebuffer createFramebuffer(const Texture&,
+                                  const Renderbuffer<RenderbufferType::DepthComponent>&);
 
     template <typename Image,
               TextureFormat format = Image::channels == 4 ? TextureFormat::RGBA

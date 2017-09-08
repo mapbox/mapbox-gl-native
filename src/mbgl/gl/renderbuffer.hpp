@@ -16,6 +16,15 @@ public:
     using type = std::integral_constant<RenderbufferType, renderbufferType>;
     Size size;
     UniqueRenderbuffer renderbuffer;
+
+    void shouldClear(bool clear) {
+        dirty = clear;
+    }
+    bool needsClearing() {
+        return dirty;
+    }
+
+private:
     bool dirty;
 };
 

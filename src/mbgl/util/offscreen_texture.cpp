@@ -15,11 +15,21 @@ public:
         : context(context_), size(std::move(size_)) {
         assert(!size.isEmpty());
     }
+    Impl(gl::Context& context_,
+         const Size size_,
+         gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& depth_)
+        : context(context_), size(std::move(size_)), depth(std::move(depth_)) {
+        assert(!size.isEmpty());
+    }
 
     void bind() {
         if (!framebuffer) {
             texture = context.createTexture(size, gl::TextureFormat::RGBA);
-            framebuffer = context.createFramebuffer(*texture);
+            if (depth) {
+                framebuffer = context.createFramebuffer(*texture, *depth);
+            } else {
+                framebuffer = context.createFramebuffer(*texture);
+            }
         } else {
             context.bindFramebuffer = framebuffer->framebuffer;
         }
@@ -27,13 +37,6 @@ public:
         context.activeTexture = 0;
         context.scissorTest = false;
         context.viewport = { 0, 0, size };
-    }
-
-    void attachRenderbuffer(gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer) {
-        if (!attachedRenderbuffer || attachedRenderbuffer != &renderbuffer.renderbuffer) {
-            context.attachRenderbuffer(renderbuffer);
-            attachedRenderbuffer = &renderbuffer.renderbuffer;
-        }
     }
 
     PremultipliedImage readStillImage() {
@@ -54,7 +57,7 @@ private:
     const Size size;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
-    gl::UniqueRenderbuffer* attachedRenderbuffer = nullptr;
+    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depth;
 };
 
 OffscreenTexture::OffscreenTexture(gl::Context& context,
@@ -63,15 +66,17 @@ OffscreenTexture::OffscreenTexture(gl::Context& context,
     assert(!size.isEmpty());
 }
 
+OffscreenTexture::OffscreenTexture(gl::Context& context,
+                                   const Size size,
+                                   gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer)
+    : impl(std::make_unique<Impl>(context, std::move(size), renderbuffer)) {
+    assert(!size.isEmpty());
+}
+
 OffscreenTexture::~OffscreenTexture() = default;
 
 void OffscreenTexture::bind() {
     impl->bind();
-}
-
-void OffscreenTexture::attachRenderbuffer(
-    gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& renderbuffer) {
-    impl->attachRenderbuffer(renderbuffer);
 }
 
 PremultipliedImage OffscreenTexture::readStillImage() {

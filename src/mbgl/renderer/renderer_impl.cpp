@@ -401,7 +401,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             parameters.staticData.depthRenderbuffer =
                 parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
         }
-        parameters.staticData.depthRenderbuffer->dirty = true;
+        parameters.staticData.depthRenderbuffer->shouldClear(true);
 
         uint32_t i = static_cast<uint32_t>(order.size()) - 1;
         for (auto it = order.begin(); it != order.end(); ++it, --i) {

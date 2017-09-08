@@ -13,12 +13,14 @@ class OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
                      Size size = { 256, 256 });
+    OffscreenTexture(gl::Context&,
+                     Size size,
+                     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&);
     ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);
 
     void bind();
-    void attachRenderbuffer(gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&);
 
     PremultipliedImage readStillImage();
 

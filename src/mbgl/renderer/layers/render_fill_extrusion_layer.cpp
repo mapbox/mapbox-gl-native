@@ -55,17 +55,18 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         const auto size = parameters.context.viewport.getCurrentValue().size;
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            renderTexture = OffscreenTexture(parameters.context, size);
+            renderTexture = OffscreenTexture(parameters.context, size, *parameters.staticData.depthRenderbuffer);
         }
 
         renderTexture->bind();
-        renderTexture->attachRenderbuffer(*parameters.staticData.depthRenderbuffer);
+
+        optional<float> depthClearValue = {};
+        if (parameters.staticData.depthRenderbuffer->needsClearing()) depthClearValue = 1.0;
+        // Flag the depth buffer as no longer needing to be cleared for the remainder of this pass.
+        parameters.staticData.depthRenderbuffer->shouldClear(false);
 
         parameters.context.setStencilMode(gl::StencilMode::disabled());
-        optional<float> depthClearValue = {};
-        if (parameters.staticData.depthRenderbuffer->dirty) depthClearValue = 1.0;
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
-        parameters.staticData.depthRenderbuffer->dirty = false;
 
         if (evaluated.get<FillExtrusionPattern>().from.empty()) {
             for (const RenderTile& tile : renderTiles) {
