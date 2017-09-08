@@ -565,6 +565,12 @@
                                 <connections>
                                     <action selector="addAnimatedImageSource:" target="-1" id="TuN-Pa-hTG"/>
                                 </connections>
+							</menuItem>
+                            <menuItem title="Add Graticule" id="Msk-p2-Lwt">
+                                <modifierMask key="keyEquivalentModifierMask"/>
+                                <connections>
+                                    <action selector="insertGraticuleLayer:" target="-1" id="LE5-lz-kx4"/>
+                                </connections>
                             </menuItem>
                             <menuItem title="Show All Annnotations" keyEquivalent="A" id="yMj-uM-8SN">
                                 <modifierMask key="keyEquivalentModifierMask" shift="YES" command="YES"/>
@@ -574,8 +580,8 @@
                             </menuItem>
                             <menuItem title="Remove All Annotations" id="6rC-68-vk0">
                                 <string key="keyEquivalent" base64-UTF8="YES">
-CA
-</string>
+                                CA
+                                </string>
                                 <connections>
                                     <action selector="removeAllAnnotations:" target="-1" id="6v3-0E-LsR"/>
                                 </connections>
