@@ -32,7 +32,7 @@ public:
             context.bindFramebuffer = framebuffer->framebuffer;
         }
 
-        context.activeTexture = 0;
+        context.activeTextureUnit = 0;
         context.scissorTest = false;
         context.viewport = { 0, 0, size };
     }

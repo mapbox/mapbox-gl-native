@@ -539,9 +539,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "cleanup");
 
-        parameters.context.activeTexture = 1;
+        parameters.context.activeTextureUnit = 1;
         parameters.context.texture[1] = 0;
-        parameters.context.activeTexture = 0;
+        parameters.context.activeTextureUnit = 0;
         parameters.context.texture[0] = 0;
 
         parameters.context.bindVertexArray = 0;
