@@ -481,7 +481,7 @@ Context::createTexture(const Size size, const void* data, TextureFormat format, 
 
 void Context::updateTexture(
     TextureID id, const Size size, const void* data, TextureFormat format, TextureUnit unit) {
-    activeTexture = unit;
+    activeTextureUnit = unit;
     texture[unit] = id;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
                                   size.height, 0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
@@ -495,7 +495,7 @@ void Context::bindTexture(Texture& obj,
                           TextureWrap wrapX,
                           TextureWrap wrapY) {
     if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
-        activeTexture = unit;
+        activeTextureUnit = unit;
         texture[unit] = obj.texture;
 
         if (filter != obj.filter || mipmap != obj.mipmap) {
@@ -526,7 +526,7 @@ void Context::bindTexture(Texture& obj,
     } else if (texture[unit] != obj.texture) {
         // We are checking first to avoid setting the active texture without a subsequent
         // texture bind.
-        activeTexture = unit;
+        activeTextureUnit = unit;
         texture[unit] = obj.texture;
     }
 }
@@ -558,7 +558,7 @@ void Context::setDirtyState() {
     clearStencil.setDirty();
     program.setDirty();
     lineWidth.setDirty();
-    activeTexture.setDirty();
+    activeTextureUnit.setDirty();
     pixelStorePack.setDirty();
     pixelStoreUnpack.setDirty();
 #if not MBGL_USE_GLES2

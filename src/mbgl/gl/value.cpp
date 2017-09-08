@@ -242,13 +242,13 @@ LineWidth::Type LineWidth::Get() {
     return lineWidth;
 }
 
-const constexpr ActiveTexture::Type ActiveTexture::Default;
+const constexpr ActiveTextureUnit::Type ActiveTextureUnit::Default;
 
-void ActiveTexture::Set(const Type& value) {
+void ActiveTextureUnit::Set(const Type& value) {
     MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0 + value));
 }
 
-ActiveTexture::Type ActiveTexture::Get() {
+ActiveTextureUnit::Type ActiveTextureUnit::Get() {
     GLint activeTexture;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture));
     return static_cast<Type>(activeTexture - GL_TEXTURE0);
