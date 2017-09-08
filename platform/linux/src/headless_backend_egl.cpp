@@ -34,12 +34,14 @@ struct EGLImpl : public HeadlessBackend::Impl {
     ~EGLImpl() {
         if (glSurface != EGL_NO_SURFACE) {
             if (!eglDestroySurface(display, glSurface)) {
-                throw std::runtime_error("Failed to destroy EGL surface.\n");
+                mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroySurface() returned error 0x%04x",
+                         eglGetError());
             }
             glSurface = EGL_NO_SURFACE;
         }
         if (!eglDestroyContext(display, glContext)) {
-            throw std::runtime_error("Failed to destroy EGL context.\n");
+            mbgl::Log::Error(mbgl::Event::OpenGL, "eglDestroyContext() returned error 0x%04x",
+                         eglGetError());
         }
     }
 
