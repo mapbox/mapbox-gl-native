@@ -76,6 +76,7 @@ custom_categories:
       - MGLSource
       - MGLTileSource
       - MGLImageSource
+      - MGLAbstractShapeSource
       - MGLShapeSource
       - MGLRasterSource
       - MGLVectorSource
