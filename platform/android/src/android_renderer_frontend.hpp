@@ -70,7 +70,11 @@ private:
     std::unique_ptr<AndroidRendererBackend> backend;
     std::unique_ptr<util::Thread<Renderer>> renderer;
     std::unique_ptr<RendererObserver> rendererObserver;
+
+    std::mutex updateMutex;
     std::shared_ptr<UpdateParameters> updateParameters;
+
+
     util::AsyncTask asyncInvalidate;
 
     util::RunLoop* mapRunLoop;

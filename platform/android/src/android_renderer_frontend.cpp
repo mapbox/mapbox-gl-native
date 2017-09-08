@@ -98,14 +98,27 @@ void AndroidRendererFrontend::setObserver(RendererObserver& observer) {
 }
 
 void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
-    updateParameters = std::move(params);
+    {
+        // Lock on the parameters
+        std::lock_guard<std::mutex> lock(updateMutex);
+        updateParameters = std::move(params);
+    }
     asyncInvalidate.send();
 }
 
 // Called on OpenGL thread
 void AndroidRendererFrontend::render() {
     assert (renderer);
-    if (!updateParameters) return;
+
+    std::shared_ptr<UpdateParameters> params;
+    {
+        // Lock on the parameters
+        std::unique_lock<std::mutex> lock(updateMutex);
+        if (!updateParameters) return;
+
+        // Hold on to the update parameters during render
+        params = updateParameters;
+    }
 
     // Activate the backend
     BackendScope backendGuard { *backend };
@@ -122,7 +135,7 @@ void AndroidRendererFrontend::render() {
         framebufferSizeChanged = false;
     }
 
-    rendererGuard.object().render(*updateParameters);
+    rendererGuard.object().render(*params);
 }
 
 void AndroidRendererFrontend::onLowMemory() {
