@@ -71,7 +71,7 @@ GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
 GeoJSONSource::Impl::~Impl() = default;
 
 Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
-    return { 0, options.maxzoom };
+    return { options.minzoom, options.maxzoom };
 }
 
 GeoJSONData* GeoJSONSource::Impl::getData() const {
