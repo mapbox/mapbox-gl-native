@@ -2,6 +2,7 @@
 
 #import <Mapbox/Mapbox.h>
 #import "MGLFeature_Private.h"
+#import "MGLAbstractShapeSource_Private.h"
 #import "MGLShapeSource_Private.h"
 #import "MGLSource_Private.h"
 

@@ -10,6 +10,9 @@
 		0721493F1EE200E900085505 /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07A019EB1ED662D800ACD43E /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07A019EF1ED665CD00ACD43E /* MGLImageSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07A019EC1ED662D800ACD43E /* MGLImageSource.mm */; };
 		07BA4CAC1EE21887004528F5 /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BA4CAB1EE21887004528F5 /* MGLImageSourceTests.m */; };
+		07D9474B1F6743F000E37934 /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07D947491F6741F500E37934 /* MGLAbstractShapeSource.mm */; };
+		07D9474C1F67441500E37934 /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D947481F6741F500E37934 /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07D9474D1F67441B00E37934 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D947471F6741F500E37934 /* MGLAbstractShapeSource_Private.h */; };
 		1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */; };
 		1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A01ECFB00300021D39 /* MGLLight_Private.h */; };
 		1F7454A41ECFB00300021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A11ECFB00300021D39 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -283,6 +286,9 @@
 		07A019EB1ED662D800ACD43E /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		07A019EC1ED662D800ACD43E /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		07BA4CAB1EE21887004528F5 /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLImageSourceTests.m; sourceTree = "<group>"; };
+		07D947471F6741F500E37934 /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
+		07D947481F6741F500E37934 /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
+		07D947491F6741F500E37934 /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
 		1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
 		1F7454A01ECFB00300021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A11ECFB00300021D39 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
@@ -681,6 +687,9 @@
 		3527427E1D4C242B00A1ECE6 /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				07D947481F6741F500E37934 /* MGLAbstractShapeSource.h */,
+				07D947471F6741F500E37934 /* MGLAbstractShapeSource_Private.h */,
+				07D947491F6741F500E37934 /* MGLAbstractShapeSource.mm */,
 				352742831D4C244700A1ECE6 /* MGLRasterSource.h */,
 				DA7DC9821DED647F0027472F /* MGLRasterSource_Private.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
@@ -1171,6 +1180,7 @@
 				DAE6C3861CC31E2A00DB3429 /* MGLGeometry_Private.h in Headers */,
 				DAE6C3841CC31E2A00DB3429 /* MGLAccountManager_Private.h in Headers */,
 				DAE6C3691CC31E0400DB3429 /* MGLTypes.h in Headers */,
+				07D9474D1F67441B00E37934 /* MGLAbstractShapeSource_Private.h in Headers */,
 				DAE6C3991CC31E2A00DB3429 /* NSException+MGLAdditions.h in Headers */,
 				DA8F25871D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h in Headers */,
 				4049C2A51DB6CE7F00B3F799 /* MGLPointCollection.h in Headers */,
@@ -1185,6 +1195,7 @@
 				35602BFA1D3EA99F0050646F /* MGLFillStyleLayer.h in Headers */,
 				DA35A2A41CC9EB1A00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				35C5D8491D6DD66D00E95907 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
+				07D9474C1F67441500E37934 /* MGLAbstractShapeSource.h in Headers */,
 				DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DAE6C3621CC31E0400DB3429 /* MGLOverlay.h in Headers */,
 				DAE6C3651CC31E0400DB3429 /* MGLPolyline.h in Headers */,
@@ -1461,6 +1472,7 @@
 				558DE7A71E56161C00C7916D /* MGLFoundation.mm in Sources */,
 				DAE6C39D1CC31E2A00DB3429 /* NSString+MGLAdditions.m in Sources */,
 				3598195A1E02F611008FC139 /* NSCoder+MGLAdditions.mm in Sources */,
+				07D9474B1F6743F000E37934 /* MGLAbstractShapeSource.mm in Sources */,
 				DAE6C3941CC31E2A00DB3429 /* MGLStyle.mm in Sources */,
 				DAE6C3871CC31E2A00DB3429 /* MGLGeometry.mm in Sources */,
 				3527428E1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.mm in Sources */,

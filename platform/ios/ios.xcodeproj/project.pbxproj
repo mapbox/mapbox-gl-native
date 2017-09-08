@@ -12,6 +12,9 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
+		07D947521F67488800E37934 /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07D947531F67488E00E37934 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */; };
+		07D947541F67489200E37934 /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -576,6 +579,9 @@
 		071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
+		07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
+		07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
+		07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
 		1753ED411E53CE6F00A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
 		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F0666891EC64F8E001C16D7 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
@@ -1056,6 +1062,9 @@
 		35136D491D4277EA00C20EFD /* Sources */ = {
 			isa = PBXGroup;
 			children = (
+				07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */,
+				07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */,
+				07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */,
 				071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */,
 				071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */,
 				3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */,
@@ -1738,6 +1747,7 @@
 				357FE2DD1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,
 				7E016D7E1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h in Headers */,
 				35D13AB71D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
+				07D947531F67488E00E37934 /* MGLAbstractShapeSource_Private.h in Headers */,
 				DA88488E1CBB047F00AB86E3 /* reachability.h in Headers */,
 				40F887701D7A1E58008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
@@ -1754,6 +1764,7 @@
 				DA88485A1CBAFB9800AB86E3 /* MGLUserLocation_Private.h in Headers */,
 				966FCF531F3C322400F2B6DE /* MGLUserLocationHeadingArrowLayer.h in Headers */,
 				DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */,
+				07D947521F67488800E37934 /* MGLAbstractShapeSource.h in Headers */,
 				DA8847FC1CBAFA5100AB86E3 /* MGLStyle.h in Headers */,
 				DD9BE4F71EB263C50079A3AF /* UIViewController+MGLAdditions.h in Headers */,
 				DAF0D8131DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */,
@@ -2082,6 +2093,7 @@
 				TargetAttributes = {
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = GJZR2MEM28;
 						LastSwiftMigration = 0820;
 					};
 					DA25D5B81CCD9EDE00607828 = {
@@ -2364,6 +2376,7 @@
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
+				07D947541F67489200E37934 /* MGLAbstractShapeSource.mm in Sources */,
 				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
@@ -2775,7 +2788,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2789,7 +2802,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
