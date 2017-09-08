@@ -709,8 +709,10 @@ void Context::performCleanup() {
 
     if (!abandonedTextures.empty()) {
         for (const auto id : abandonedTextures) {
-            if (activeTexture == id) {
-                activeTexture.setDirty();
+            for (auto& binding : texture) {
+                if (binding == id) {
+                    binding.setDirty();
+                }
             }
         }
         MBGL_CHECK_ERROR(glDeleteTextures(int(abandonedTextures.size()), abandonedTextures.data()));
