@@ -89,7 +89,9 @@ void Painter::renderFill(PaintParameters& parameters,
             program.get(properties).draw(
                 context,
                 drawMode,
-                depthModeForSublayer(sublayer, gl::DepthMode::ReadWrite),
+                depthModeForSublayer(sublayer, pass == RenderPass::Opaque
+                    ? gl::DepthMode::ReadWrite
+                    : gl::DepthMode::ReadOnly),
                 stencilModeForClipping(tile.clip),
                 colorModeForRenderPass(),
                 FillProgram::UniformValues {
