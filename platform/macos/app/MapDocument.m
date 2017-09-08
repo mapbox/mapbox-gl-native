@@ -50,7 +50,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     return flattenedShapes;
 }
 
-@interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, NSSplitViewDelegate, MGLMapViewDelegate>
+@interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, NSSplitViewDelegate, MGLMapViewDelegate, MGLComputedShapeSourceDataSource>
 
 @property (weak) IBOutlet NSArrayController *styleLayersArrayController;
 @property (weak) IBOutlet NSTableView *styleLayersTableView;
@@ -698,6 +698,47 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style removeLayer:layer];
 }
 
+- (IBAction)insertGraticuleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self removeGraticuleLayer:sender];
+    }];
+
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Add Graticule"];
+    }
+
+    MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"graticule"
+                                                                                options:@{MGLShapeSourceOptionMaximumZoomLevel:@14}];
+    source.dataSource = self;
+    [self.mapView.style addSource:source];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"graticule.lines"
+                                                                          source:source];
+    [self.mapView.style addLayer:lineLayer];
+    MGLSymbolStyleLayer *labelLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"graticule.labels"
+                                                                               source:source];
+    labelLayer.text = [MGLStyleValue valueWithRawValue:@"{value}"];
+    [self.mapView.style addLayer:labelLayer];
+}
+
+- (IBAction)removeGraticuleLayer:(id)sender {
+    [self.undoManager registerUndoWithTarget:self handler:^(id  _Nonnull target) {
+        [self insertGraticuleLayer:sender];
+    }];
+
+    if (!self.undoManager.isUndoing) {
+        [self.undoManager setActionName:@"Delete Graticule"];
+    }
+
+    MGLStyleLayer *layer = [self.mapView.style layerWithIdentifier:@"graticule.lines"];
+    [self.mapView.style removeLayer:layer];
+
+    layer = [self.mapView.style layerWithIdentifier:@"graticule.labels"];
+    [self.mapView.style removeLayer:layer];
+
+    MGLSource *source = [self.mapView.style sourceWithIdentifier:@"graticule"];
+    [self.mapView.style removeSource:source];
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -1011,6 +1052,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(insertCustomStyleLayer:)) {
         return ![self.mapView.style layerWithIdentifier:@"mbx-custom"];
     }
+    if (menuItem.action == @selector(insertGraticuleLayer:)) {
+        return ![self.mapView.style sourceWithIdentifier:@"graticule"];
+    }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
     }
@@ -1183,6 +1227,53 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (CGFloat)mapView:(MGLMapView *)mapView alphaForShapeAnnotation:(MGLShape *)annotation {
     return 0.8;
+}
+
+#pragma mark - MGLComputedShapeSourceDataSource
+- (NSArray<id <MGLFeature>>*)featuresInCoordinateBounds:(MGLCoordinateBounds)bounds zoomLevel:(NSUInteger)zoom {
+    double gridSpacing;
+    if(zoom >= 13) {
+        gridSpacing = 0.01;
+    } else if(zoom >= 11) {
+        gridSpacing = 0.05;
+    } else if(zoom == 10) {
+        gridSpacing = .1;
+    } else if(zoom == 9) {
+        gridSpacing = 0.25;
+    } else if(zoom == 8) {
+        gridSpacing = 0.5;
+    } else if (zoom >= 6) {
+        gridSpacing = 1;
+    } else if(zoom == 5) {
+        gridSpacing = 2;
+    } else if(zoom >= 4) {
+        gridSpacing = 5;
+    } else if(zoom == 2) {
+        gridSpacing = 10;
+    } else {
+        gridSpacing = 20;
+    }
+
+    NSMutableArray <id <MGLFeature>> * features = [NSMutableArray array];
+    CLLocationCoordinate2D coords[2];
+
+    for (double y = ceil(bounds.ne.latitude / gridSpacing) * gridSpacing; y >= floor(bounds.sw.latitude / gridSpacing) * gridSpacing; y -= gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(y, bounds.sw.longitude);
+        coords[1] = CLLocationCoordinate2DMake(y, bounds.ne.longitude);
+        MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
+        feature.attributes = @{@"value": @(y)};
+        [features addObject:feature];
+    }
+
+    for (double x = floor(bounds.sw.longitude / gridSpacing) * gridSpacing; x <= ceil(bounds.ne.longitude / gridSpacing) * gridSpacing; x += gridSpacing) {
+        coords[0] = CLLocationCoordinate2DMake(bounds.sw.latitude, x);
+        coords[1] = CLLocationCoordinate2DMake(bounds.ne.latitude, x);
+        MGLPolylineFeature *feature = [MGLPolylineFeature polylineWithCoordinates:coords count:2];
+        feature.attributes = @{@"value": @(x)};
+        [features addObject:feature];
+    }
+
+    return features;
 }
 
 @end
