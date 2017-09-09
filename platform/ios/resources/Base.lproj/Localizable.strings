@@ -34,6 +34,9 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "About this map";
 
+/* List separator */
+"LIST_SEPARATOR" = ", ";
+
 /* User-friendly error description */
 "LOAD_MAP_FAILED_DESC" = "The map failed to load because an unknown error occurred.";
 
@@ -46,8 +49,17 @@
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Map";
 
-/* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotation(s) visible";
+/* Map accessibility value; {number of visible annotations} */
+"MAP_A11Y_VALUE_ANNOTATIONS" = "%ld annotation(s) visible.";
+
+/* Map accessibility value; {list of visible places} */
+"MAP_A11Y_VALUE_PLACES" = "Places visible: %@.";
+
+/* Map accessibility value; {number of visible roads} */
+"MAP_A11Y_VALUE_ROADS" = "%ld road(s) visible.";
+
+/* Map accessibility value; {zoom level} */
+"MAP_A11Y_VALUE_ZOOM" = "Zoom %dx.";
 
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";

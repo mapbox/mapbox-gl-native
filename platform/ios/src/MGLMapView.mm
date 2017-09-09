@@ -43,6 +43,7 @@
 #import "MGLFoundation_Private.h"
 #import "MGLRendererFrontend.h"
 
+#import "MGLVectorSource+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"
@@ -2355,8 +2356,53 @@ public:
 
 - (NSString *)accessibilityValue
 {
+    NSMutableArray *facts = [NSMutableArray array];
+    
     double zoomLevel = round(self.zoomLevel + 1);
-    return [NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE", nil, nil, @"Zoom %dx\n%ld annotation(s) visible", @"Map accessibility value"), (int)zoomLevel, (long)self.accessibilityAnnotationCount];
+    [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ZOOM", nil, nil, @"Zoom %dx.", @"Map accessibility value; {zoom level}"), (int)zoomLevel]];
+    
+    NSInteger annotationCount = self.accessibilityAnnotationCount;
+    if (annotationCount) {
+        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ANNOTATIONS", nil, nil, @"%ld annotation(s) visible.", @"Map accessibility value; {number of visible annotations}"), (long)self.accessibilityAnnotationCount]];
+    }
+    
+    NSArray *placeFeatures = self.visiblePlaceFeatures;
+    if (placeFeatures.count) {
+        NSMutableArray *placesArray = [NSMutableArray arrayWithCapacity:placeFeatures.count];
+        NSMutableSet *placesSet = [NSMutableSet setWithCapacity:placeFeatures.count];
+        for (id <MGLFeature> placeFeature in placeFeatures.reverseObjectEnumerator) {
+            NSString *name = [placeFeature attributeForKey:@"name"];
+            if (![placesSet containsObject:name]) {
+                [placesArray addObject:name];
+                [placesSet addObject:name];
+            }
+            if (placesArray.count >= 3) {
+                break;
+            }
+        }
+        NSString *placesString = [placesArray componentsJoinedByString:NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator")];
+        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_PLACES", nil, nil, @"Places visible: %@.", @"Map accessibility value; {list of visible places}"), placesString]];
+    }
+    
+    NSArray *roadFeatures = self.visibleRoadFeatures;
+    if (roadFeatures.count) {
+        [facts addObject:[NSString stringWithFormat:NSLocalizedStringWithDefaultValue(@"MAP_A11Y_VALUE_ROADS", nil, nil, @"%ld road(s) visible.", @"Map accessibility value; {number of visible roads}"), roadFeatures.count]];
+    }
+    
+    NSString *value = [facts componentsJoinedByString:@" "];
+    return value;
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visiblePlaceFeatures
+{
+    NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
+    return [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+}
+
+- (NS_ARRAY_OF(id <MGLFeature>) *)visibleRoadFeatures
+{
+    NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
+    return [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
 }
 
 - (CGRect)accessibilityFrame
@@ -2390,14 +2436,9 @@ public:
 {
     if (self.calloutViewForSelectedAnnotation)
     {
-        return 2 /* selectedAnnotationCalloutView, mapViewProxyAccessibilityElement */;
+        return 2 /* calloutViewForSelectedAnnotation, mapViewProxyAccessibilityElement */;
     }
-    NSInteger count = self.accessibilityAnnotationCount + 2 /* compass, attributionButton */;
-    if (self.userLocationAnnotationView)
-    {
-        count++;
-    }
-    return count;
+    return !!self.userLocationAnnotationView + self.accessibilityAnnotationCount + self.visiblePlaceFeatures.count + 2 /* compass, attributionButton */;
 }
 
 - (NSInteger)accessibilityAnnotationCount
