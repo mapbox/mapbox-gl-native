@@ -402,6 +402,8 @@
 		DA6408D51DA4E5DA00908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408D61DA4E5DA00908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
 		DA704CBA1F6372E8004B3F28 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA704CBE1F637531004B3F28 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA704CBF1F637548004B3F28 /* hu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA7262051DEEDD460043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA7262061DEEDD460043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
 		DA737ADE1E5914AD00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
@@ -1313,6 +1315,7 @@
 				ca,
 				fi,
 				nl,
+				hu,
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1537,6 +1540,7 @@
 				DA618B161E6886E000CB7F44 /* ca */,
 				DA618B271E68926E00CB7F44 /* fi */,
 				DAE8CCAB1E6E8B72009B5CB0 /* nl */,
+				DA704CBE1F637531004B3F28 /* hu */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1585,6 +1589,7 @@
 				DA618B181E6887C600CB7F44 /* ca */,
 				DA618B2A1E6892B500CB7F44 /* fi */,
 				DAE8CCAC1E6E8B8D009B5CB0 /* nl */,
+				DA704CBF1F637548004B3F28 /* hu */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
