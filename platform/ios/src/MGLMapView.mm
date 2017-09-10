@@ -2428,24 +2428,24 @@ public:
         return self.userLocationAnnotationView;
     }
     
+    CGPoint centerPoint = self.contentCenter;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
+    }
+    
     // Visible annotations
     NSRange visibleAnnotationRange = NSMakeRange(NSMaxRange(userLocationAnnotationRange), visibleAnnotations.size());
     if (NSLocationInRange(index, visibleAnnotationRange))
     {
         std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
-        CGPoint centerPoint = self.contentCenter;
-        if (self.userTrackingMode != MGLUserTrackingModeNone)
-        {
-            centerPoint = self.userLocationAnnotationViewCenter;
-        }
-        CLLocationCoordinate2D currentCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
         std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
             CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
             CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
-            CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
-                                             coordinateA.longitude - currentCoordinate.longitude);
-            CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
-                                             coordinateB.longitude - currentCoordinate.longitude);
+            CGPoint pointA = [self convertCoordinate:coordinateA toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:coordinateB toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
             return deltaA < deltaB;
         });
         
@@ -2459,6 +2459,14 @@ public:
     NSRange visiblePlaceFeatureRange = NSMakeRange(NSMaxRange(visibleAnnotationRange), visiblePlaceFeatures.count);
     if (NSLocationInRange(index, visiblePlaceFeatureRange))
     {
+        visiblePlaceFeatures = [visiblePlaceFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+            CGPoint pointA = [self convertCoordinate:featureA.coordinate toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:featureB.coordinate toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+            return [@(deltaA) compare:@(deltaB)];
+        }];
+        
         id <MGLFeature> feature = visiblePlaceFeatures[index - visiblePlaceFeatureRange.location];
         return [self accessibilityElementForFeature:feature withIdentifier:feature.identifier];
     }
