@@ -1,6 +1,7 @@
 #import "MGLMapAccessibilityElement.h"
 #import "MGLDistanceFormatter.h"
 #import "MGLFeature.h"
+#import "MGLVectorSource+MGLAdditions.h"
 
 #import "NSBundle+MGLAdditions.h"
 
@@ -42,8 +43,9 @@
         _feature = feature;
         
         NSDictionary *attributes = feature.attributes;
-        // TODO: Localize the name.
-        self.accessibilityLabel = attributes[@"name"];
+        NSString *nameAttribute = [NSString stringWithFormat:@"name_%@",
+                                   [MGLVectorSource preferredMapboxStreetsLanguage]];
+        self.accessibilityLabel = attributes[nameAttribute];
         
         NSMutableArray *facts = [NSMutableArray array];
         
@@ -51,7 +53,9 @@
         if (attributes[@"type"]) {
             // FIXME: Unfortunately, these types aren’t a closed set that can be
             // localized, since they’re based on OpenStreetMap tags.
-            [facts addObject:[attributes[@"type"] stringByReplacingOccurrencesOfString:@"_" withString:@" "]];
+            NSString *type = [attributes[@"type"] stringByReplacingOccurrencesOfString:@"_"
+                                                                            withString:@" "];
+            [facts addObject:type];
         }
         // Announce the kind of airport, rail station, or mountain based on its
         // Maki image name.
@@ -68,7 +72,8 @@
         }
         
         if (facts.count) {
-            self.accessibilityValue = [facts componentsJoinedByString:NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator")];
+            NSString *separator = NSLocalizedStringWithDefaultValue(@"LIST_SEPARATOR", nil, nil, @", ", @"List separator");
+            self.accessibilityValue = [facts componentsJoinedByString:separator];
         }
     }
     return self;
