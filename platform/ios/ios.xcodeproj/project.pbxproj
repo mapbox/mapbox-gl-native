@@ -1125,6 +1125,8 @@
 		35599DB81D46AD7F0048254D /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */,
+				1FDD9D6E1F26936400252B09 /* MGLVectorSource+MGLAdditions.m */,
 				350098DA1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h */,
 				350098DB1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm */,
 			);
@@ -1628,8 +1630,6 @@
 		DAD165831CF4CFED001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */,
-				1FDD9D6E1F26936400252B09 /* MGLVectorSource+MGLAdditions.m */,
 				7E016D821D9E890300A29A21 /* MGLPolygon+MGLAdditions.h */,
 				7E016D831D9E890300A29A21 /* MGLPolygon+MGLAdditions.m */,
 				7E016D7C1D9E86BE00A29A21 /* MGLPolyline+MGLAdditions.h */,
