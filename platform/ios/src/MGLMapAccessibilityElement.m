@@ -13,16 +13,23 @@ typedef struct {
     MGLLocationRadians longitude;
 } MGLRadianCoordinate2D;
 
+MGLRadianCoordinate2D MGLRadianCoordinate2DMake(MGLLocationRadians latitude, MGLLocationRadians longitude) {
+    MGLRadianCoordinate2D radianCoordinate = {
+        .latitude = latitude,
+        .longitude = longitude,
+    };
+    return radianCoordinate;
+}
+
+MGLRadianCoordinate2D MGLRadianCoordinate2DFromLocationCoordinate2D(CLLocationCoordinate2D degreeCoordinate) {
+    return MGLRadianCoordinate2DMake(degreeCoordinate.latitude * M_PI / 180, degreeCoordinate.longitude * M_PI / 180);
+}
+
 /** Returns the direction from one coordinate to another. */
 CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate) {
-    MGLRadianCoordinate2D firstRadianCoordinate = {
-        firstCoordinate.latitude * M_PI / 180,
-        firstCoordinate.longitude * M_PI / 180,
-    };
-    MGLRadianCoordinate2D secondRadianCoordinate = {
-        secondCoordinate.latitude * M_PI / 180,
-        secondCoordinate.longitude * M_PI / 180,
-    };
+    // Ported from https://github.com/mapbox/turf-swift/blob/857e2e8060678ef4a7a9169d4971b0788fdffc37/Turf/Turf.swift#L23-L31
+    MGLRadianCoordinate2D firstRadianCoordinate = MGLRadianCoordinate2DFromLocationCoordinate2D(firstCoordinate);
+    MGLRadianCoordinate2D secondRadianCoordinate = MGLRadianCoordinate2DFromLocationCoordinate2D(secondCoordinate);
     
     CGFloat a = sin(secondRadianCoordinate.longitude - firstRadianCoordinate.longitude) * cos(secondRadianCoordinate.latitude);
     CGFloat b = (cos(firstRadianCoordinate.latitude) * sin(secondRadianCoordinate.latitude)
