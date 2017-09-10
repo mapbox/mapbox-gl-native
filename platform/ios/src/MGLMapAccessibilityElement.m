@@ -7,11 +7,8 @@
 
 @implementation MGLMapAccessibilityElement
 
-- (instancetype)initWithAccessibilityContainer:(id)container {
-    if (self = [super initWithAccessibilityContainer:container]) {
-        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
-    }
-    return self;
+- (UIAccessibilityTraits)accessibilityTraits {
+    return super.accessibilityTraits | UIAccessibilityTraitAdjustable;
 }
 
 - (void)accessibilityIncrement {
@@ -34,6 +31,10 @@
     return self;
 }
 
+- (UIAccessibilityTraits)accessibilityTraits {
+    return super.accessibilityTraits | UIAccessibilityTraitButton;
+}
+
 @end
 
 @implementation MGLFeatureAccessibilityElement
@@ -42,11 +43,24 @@
     if (self = [super initWithAccessibilityContainer:container]) {
         _feature = feature;
         
-        NSDictionary *attributes = feature.attributes;
         NSString *nameAttribute = [NSString stringWithFormat:@"name_%@",
                                    [MGLVectorSource preferredMapboxStreetsLanguage]];
-        self.accessibilityLabel = attributes[nameAttribute];
-        
+        self.accessibilityLabel = [feature attributeForKey:nameAttribute];
+    }
+    return self;
+}
+
+- (UIAccessibilityTraits)accessibilityTraits {
+    return super.accessibilityTraits | UIAccessibilityTraitStaticText;
+}
+
+@end
+
+@implementation MGLPlaceFeatureAccessibilityElement
+
+- (instancetype)initWithAccessibilityContainer:(id)container feature:(id<MGLFeature>)feature {
+    if (self = [super initWithAccessibilityContainer:container feature:feature]) {
+        NSDictionary *attributes = feature.attributes;
         NSMutableArray *facts = [NSMutableArray array];
         
         // Announce the kind of place or POI.

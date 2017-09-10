@@ -32,6 +32,10 @@ typedef uint32_t MGLAnnotationTag;
 
 @end
 
+/** An accessibility element representing a place feature. */
+@interface MGLPlaceFeatureAccessibilityElement : MGLFeatureAccessibilityElement
+@end
+
 /** An accessibility element representing the MGLMapView at large. */
 @interface MGLMapViewProxyAccessibilityElement : UIAccessibilityElement
 
