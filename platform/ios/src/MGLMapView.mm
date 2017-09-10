@@ -69,6 +69,7 @@
 #import "MGLAnnotationContainerView.h"
 #import "MGLAnnotationContainerView_Private.h"
 #import "MGLAttributionInfo_Private.h"
+#import "MGLMapAccessibilityElement.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -140,9 +141,6 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
-/// Unique identifier representing a single annotation in mbgl.
-typedef uint32_t MGLAnnotationTag;
-
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
@@ -165,38 +163,6 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     return { p1[0], p1[1], p2[0], p2[1] };
 }
 
-@interface MGLAnnotationAccessibilityElement : UIAccessibilityElement
-
-@property (nonatomic) MGLAnnotationTag tag;
-
-- (instancetype)initWithAccessibilityContainer:(id)container tag:(MGLAnnotationTag)identifier NS_DESIGNATED_INITIALIZER;
-
-@end
-
-@implementation MGLAnnotationAccessibilityElement
-
-- (instancetype)initWithAccessibilityContainer:(id)container tag:(MGLAnnotationTag)tag
-{
-    if (self = [super initWithAccessibilityContainer:container])
-    {
-        _tag = tag;
-        self.accessibilityTraits = UIAccessibilityTraitButton | UIAccessibilityTraitAdjustable;
-    }
-    return self;
-}
-
-- (void)accessibilityIncrement
-{
-    [self.accessibilityContainer accessibilityIncrement];
-}
-
-- (void)accessibilityDecrement
-{
-    [self.accessibilityContainer accessibilityDecrement];
-}
-
-@end
-
 /// Lightweight container for metadata about an annotation, including the annotation itself.
 class MGLAnnotationContext {
 public:
@@ -207,26 +173,6 @@ public:
     MGLAnnotationView *annotationView;
     NSString *viewReuseIdentifier;
 };
-
-/** An accessibility element representing the MGLMapView at large. */
-@interface MGLMapViewProxyAccessibilityElement : UIAccessibilityElement
-
-@end
-
-@implementation MGLMapViewProxyAccessibilityElement
-
-- (instancetype)initWithAccessibilityContainer:(id)container
-{
-    if (self = [super initWithAccessibilityContainer:container])
-    {
-        self.accessibilityTraits = UIAccessibilityTraitButton;
-        self.accessibilityLabel = [self.accessibilityContainer accessibilityLabel];
-        self.accessibilityHint = NSLocalizedStringWithDefaultValue(@"CLOSE_CALLOUT_A11Y_HINT", nil, nil, @"Returns to the map", @"Accessibility hint for closing the selected annotation’s callout view and returning to the map");
-    }
-    return self;
-}
-
-@end
 
 #pragma mark - Private -
 
@@ -328,6 +274,7 @@ public:
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
+    NS_MUTABLE_DICTIONARY_OF(id, MGLFeatureAccessibilityElement *) *_accessibilityFeaturesByIdentifier;
 
     MGLReachability *_reachability;
 }
@@ -2463,67 +2410,97 @@ public:
         }
         return nil;
     }
+    
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-
-    // Ornaments
-    if (index == 0)
+    NSArray *visiblePlaceFeatures = self.visiblePlaceFeatures;
+    
+    // Compass
+    NSUInteger compassIndex = 0;
+    if (index == compassIndex)
     {
         return self.compassView;
     }
-    if ( ! self.userLocationAnnotationView)
-    {
-        index++;
-    }
-    else if (index == 1)
+    
+    // User location annotation
+    NSRange userLocationAnnotationRange = NSMakeRange(compassIndex + 1, !!self.userLocationAnnotationView);
+    if (NSLocationInRange(index, userLocationAnnotationRange))
     {
         return self.userLocationAnnotationView;
     }
-    if (index > 0 && (NSUInteger)index == visibleAnnotations.size() + 2 /* compass, userLocationAnnotationView */)
+    
+    // Visible annotations
+    NSRange visibleAnnotationRange = NSMakeRange(NSMaxRange(userLocationAnnotationRange), visibleAnnotations.size());
+    if (NSLocationInRange(index, visibleAnnotationRange))
+    {
+        std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
+        CGPoint centerPoint = self.contentCenter;
+        if (self.userTrackingMode != MGLUserTrackingModeNone)
+        {
+            centerPoint = self.userLocationAnnotationViewCenter;
+        }
+        CLLocationCoordinate2D currentCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
+        std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+            CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+            CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+            CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                             coordinateA.longitude - currentCoordinate.longitude);
+            CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                             coordinateB.longitude - currentCoordinate.longitude);
+            return deltaA < deltaB;
+        });
+        
+        NSUInteger annotationIndex = index - visibleAnnotationRange.location;
+        MGLAnnotationTag annotationTag = visibleAnnotations[annotationIndex];
+        NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", (long)index);
+        return [self accessibilityElementForAnnotationWithTag:annotationTag];
+    }
+    
+    // Visible place features
+    NSRange visiblePlaceFeatureRange = NSMakeRange(NSMaxRange(visibleAnnotationRange), visiblePlaceFeatures.count);
+    if (NSLocationInRange(index, visiblePlaceFeatureRange))
+    {
+        id <MGLFeature> feature = visiblePlaceFeatures[index - visiblePlaceFeatureRange.location];
+        return [self accessibilityElementForFeature:feature withIdentifier:feature.identifier];
+    }
+    
+    // Attribution button
+    NSUInteger attributionButtonIndex = NSMaxRange(visiblePlaceFeatureRange);
+    if (index == attributionButtonIndex)
     {
         return self.attributionButton;
     }
+    
+    NSAssert(NO, @"Index %ld not in recognized accessibility element ranges. "
+             @"User location annotation range: %@; visible annotation range: %@; visible place feature range: %@.",
+             (long)index, NSStringFromRange(userLocationAnnotationRange),
+             NSStringFromRange(visibleAnnotationRange), NSStringFromRange(visiblePlaceFeatureRange));
+    return nil;
+}
 
-    std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
-    CGPoint centerPoint = self.contentCenter;
-    if (self.userTrackingMode != MGLUserTrackingModeNone)
-    {
-        centerPoint = self.userLocationAnnotationViewCenter;
-    }
-    CLLocationCoordinate2D currentCoordinate = [self convertPoint:centerPoint toCoordinateFromView:self];
-    std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
-        CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
-        CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
-        CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
-                                         coordinateA.longitude - currentCoordinate.longitude);
-        CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
-                                         coordinateB.longitude - currentCoordinate.longitude);
-        return deltaA < deltaB;
-    });
-
-    NSUInteger annotationIndex = MGLAnnotationTagNotFound;
-    if (index >= 0 && (NSUInteger)(index - 2) < visibleAnnotations.size())
-    {
-        annotationIndex = index - 2 /* compass, userLocationAnnotationView */;
-    }
-    MGLAnnotationTag annotationTag = visibleAnnotations[annotationIndex];
-    NSAssert(annotationTag != MGLAnnotationTagNotFound, @"Can’t get accessibility element for nonexistent or invisible annotation at index %li.", (long)index);
+/**
+ Returns an accessibility element corresponding to a visible annotation with the given tag.
+ 
+ @param annotationTag Tag of the annotation represented by the accessibility element to return.
+ */
+- (id)accessibilityElementForAnnotationWithTag:(MGLAnnotationTag)annotationTag
+{
     NSAssert(_annotationContextsByAnnotationTag.count(annotationTag), @"Missing annotation for tag %u.", annotationTag);
     MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
     id <MGLAnnotation> annotation = annotationContext.annotation;
-
+    
     // Let the annotation view serve as its own accessibility element.
     MGLAnnotationView *annotationView = annotationContext.annotationView;
     if (annotationView && annotationView.superview)
     {
         return annotationView;
     }
-
+    
     // Lazily create an accessibility element for the found annotation.
     if ( ! annotationContext.accessibilityElement)
     {
         annotationContext.accessibilityElement = [[MGLAnnotationAccessibilityElement alloc] initWithAccessibilityContainer:self tag:annotationTag];
     }
-
+    
     // Update the accessibility element.
     MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
     CGRect annotationFrame = [self frameOfImage:annotationImage.image centeredAtCoordinate:annotation.coordinate];
@@ -2534,8 +2511,7 @@ public:
     annotationFrame = CGRectUnion(annotationFrame, minimumFrame);
     CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
     annotationContext.accessibilityElement.accessibilityFrame = screenRect;
-    annotationContext.accessibilityElement.accessibilityHint = NSLocalizedStringWithDefaultValue(@"ANNOTATION_A11Y_HINT", nil, nil, @"Shows more info", @"Accessibility hint");
-
+    
     if ([annotation respondsToSelector:@selector(title)])
     {
         annotationContext.accessibilityElement.accessibilityLabel = annotation.title;
@@ -2544,8 +2520,63 @@ public:
     {
         annotationContext.accessibilityElement.accessibilityValue = annotation.subtitle;
     }
-
+    
     return annotationContext.accessibilityElement;
+}
+
+/**
+ Returns an accessibility element corresponding to the given feature.
+ 
+ @param feature An optional feature represented by the accessibility element.
+ @param identifier A feature identifier used as a fallback in case the feature
+    is unspecified and also used to cache the accessibility element.
+ */
+- (id)accessibilityElementForFeature:(id <MGLFeature>)feature withIdentifier:(id)identifier
+{
+    if (!_accessibilityFeaturesByIdentifier)
+    {
+        _accessibilityFeaturesByIdentifier = [NSMutableDictionary dictionary];
+    }
+    
+    MGLFeatureAccessibilityElement *element = identifier ? _accessibilityFeaturesByIdentifier[identifier] : nil;
+    // It isn’t possible to check here whether feature is equal to
+    // element.feature, because various attributes and even the coordinate may
+    // change from one zoom level to the next. The only constant is the
+    // identifier.
+    if (!feature)
+    {
+        feature = element.feature;
+    }
+    
+    // Lazily create an accessibility element for the found feature.
+    if (!feature)
+    {
+        NSArray *layerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
+        NSPredicate *identifierPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$id", identifier];
+        NSArray *features = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:layerIdentifiers] predicate:identifierPredicate];
+        feature = features.firstObject;
+    }
+    if (!element)
+    {
+        element = [[MGLFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
+    }
+    if (!feature)
+    {
+        return nil;
+    }
+    
+    // Update the accessibility element.
+    CGPoint center = [self convertCoordinate:feature.coordinate toPointToView:self];
+    CGRect annotationFrame = CGRectInset({center, CGSizeZero}, -MGLAnnotationAccessibilityElementMinimumSize.width / 2, -MGLAnnotationAccessibilityElementMinimumSize.width / 2);
+    CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
+    element.accessibilityFrame = screenRect;
+    
+    if (identifier)
+    {
+        _accessibilityFeaturesByIdentifier[identifier] = element;
+    }
+    
+    return element;
 }
 
 - (NSInteger)indexOfAccessibilityElement:(id)element
@@ -2555,17 +2586,24 @@ public:
         return [@[self.calloutViewForSelectedAnnotation, self.mapViewProxyAccessibilityElement]
                 indexOfObject:element];
     }
+    
+    // Compass
+    NSUInteger compassIndex = 0;
     if (element == self.compassView)
     {
-        return 0;
+        return compassIndex;
     }
+    
+    // User location annotation
+    NSRange userLocationAnnotationRange = NSMakeRange(compassIndex + 1, !!self.userLocationAnnotationView);
     if (element == self.userLocationAnnotationView)
     {
-        return 1;
+        return userLocationAnnotationRange.location;
     }
-
+    
+    // Visible annotations
     std::vector<MGLAnnotationTag> visibleAnnotations = [self annotationTagsInRect:self.bounds];
-
+    NSRange visibleAnnotationRange = NSMakeRange(NSMaxRange(userLocationAnnotationRange), visibleAnnotations.size());
     MGLAnnotationTag tag = MGLAnnotationTagNotFound;
     if ([element isKindOfClass:[MGLAnnotationView class]])
     {
@@ -2576,22 +2614,36 @@ public:
     {
         tag = [(MGLAnnotationAccessibilityElement *)element tag];
     }
-    else if (element == self.attributionButton)
+    
+    if (tag != MGLAnnotationTagNotFound)
     {
-        return !!self.userLocationAnnotationView + visibleAnnotations.size();
+        std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
+        auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(), tag);
+        if (foundElement == visibleAnnotations.end())
+        {
+            return NSNotFound;
+        }
+        return visibleAnnotationRange.location + std::distance(visibleAnnotations.begin(), foundElement);
     }
-    else
+    
+    // Visible place features
+    NSArray *visiblePlaceFeatures = self.visiblePlaceFeatures;
+    NSRange visiblePlaceFeatureRange = NSMakeRange(NSMaxRange(visibleAnnotationRange), visiblePlaceFeatures.count);
+    if ([element isKindOfClass:[MGLFeatureAccessibilityElement class]])
     {
-        return NSNotFound;
+        id <MGLFeature> feature = [(MGLFeatureAccessibilityElement *)element feature];
+        NSUInteger featureIndex = [visiblePlaceFeatures indexOfObject:feature];
+        return visiblePlaceFeatureRange.location + featureIndex;
     }
-
-    std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
-    auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(), tag);
-    if (foundElement == visibleAnnotations.end())
+    
+    // Attribution button
+    NSUInteger attributionButtonIndex = NSMaxRange(visiblePlaceFeatureRange);
+    if (element == self.attributionButton)
     {
-        return NSNotFound;
+        return attributionButtonIndex;
     }
-    return !!self.userLocationAnnotationView + std::distance(visibleAnnotations.begin(), foundElement) + 1 /* compass */;
+    
+    return NSNotFound;
 }
 
 - (MGLMapViewProxyAccessibilityElement *)mapViewProxyAccessibilityElement
@@ -5185,6 +5237,7 @@ public:
     {
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
         {
+            _accessibilityFeaturesByIdentifier = nil;
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
         }
         [self.delegate mapView:self regionDidChangeAnimated:animated];

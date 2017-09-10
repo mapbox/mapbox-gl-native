@@ -296,6 +296,10 @@
 		DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA6408D91DA4E7D300908C90 /* MGLVectorStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA6408DD1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */; };
 		DA6408DE1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */; };
+		DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
+		DA704CC31F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
+		DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */; };
+		DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */; };
 		DA72620B1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */; };
@@ -821,6 +825,8 @@
 		DA704CBC1F637405004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DA704CBD1F63746E004B3F28 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		DA704CC71F6663A3004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapAccessibilityElement.h; sourceTree = "<group>"; };
+		DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapAccessibilityElement.m; sourceTree = "<group>"; };
 		DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
 		DA737ADA1E59139D00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
@@ -1423,6 +1429,8 @@
 				35CE617F1D4165C2004F2359 /* Categories */,
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				DAD165851CF4D08B001FF4B9 /* Telemetry */,
+				DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */,
+				DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */,
 				DA8848361CBAFB8500AB86E3 /* MGLMapView.h */,
 				DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */,
 				DA8848371CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h */,
@@ -1762,6 +1770,7 @@
 				DA35A2C91CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				3510FFEA1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
+				DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */,
 				DD0902AB1DB192A800C5BDCE /* MGLNetworkConfiguration.h in Headers */,
 				DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */,
 				35D3A1E61E9BE7EB002B38EE /* MGLScaleBar.h in Headers */,
@@ -1897,6 +1906,7 @@
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
 				30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
+				DA704CC31F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */,
 				40F887711D7A1E59008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				DABFB8631CBE99E500D62B32 /* MGLOfflineRegion.h in Headers */,
 				DA35A2B21CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
@@ -2364,6 +2374,7 @@
 				DA88482A1CBAFA6200AB86E3 /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				4049C29F1DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
 				35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
+				DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */,
 				DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				3510FFFB1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
@@ -2451,6 +2462,7 @@
 				DAA4E4211CBB730400178DFB /* MGLOfflineStorage.mm in Sources */,
 				4049C2A01DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
 				35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
+				DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */,
 				DA72620E1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				3510FFFC1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
