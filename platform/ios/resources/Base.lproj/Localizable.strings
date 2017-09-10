@@ -64,6 +64,12 @@
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";
 
+/* Accessibility value indicating that a road is a divided road (dual carriageway) */
+"ROAD_DIVIDED_A11Y_VALUE" = "Divided road";
+
+/* String format for accessibility value for road feature; {route number} */
+"ROAD_REF_A11Y_FMT" = "Route %@";
+
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
 

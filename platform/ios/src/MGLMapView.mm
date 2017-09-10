@@ -275,6 +275,7 @@ public:
 
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
     NS_ARRAY_OF(id <MGLFeature>) *_visiblePlaceFeatures;
+    NS_ARRAY_OF(id <MGLFeature>) *_visibleRoadFeatures;
     NS_MUTABLE_SET_OF(MGLFeatureAccessibilityElement *) *_featureAccessibilityElements;
 
     MGLReachability *_reachability;
@@ -2353,8 +2354,12 @@ public:
 
 - (NS_ARRAY_OF(id <MGLFeature>) *)visibleRoadFeatures
 {
-    NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
-    return [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+    if (!_visibleRoadFeatures)
+    {
+        NSArray *roadStyleLayerIdentifiers = [self.style.roadStyleLayers valueForKey:@"identifier"];
+        _visibleRoadFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:roadStyleLayerIdentifiers]];
+    }
+    return _visibleRoadFeatures;
 }
 
 - (CGRect)accessibilityFrame
@@ -2390,7 +2395,7 @@ public:
     {
         return 2 /* calloutViewForSelectedAnnotation, mapViewProxyAccessibilityElement */;
     }
-    return !!self.userLocationAnnotationView + self.accessibilityAnnotationCount + self.visiblePlaceFeatures.count + 2 /* compass, attributionButton */;
+    return !!self.userLocationAnnotationView + self.accessibilityAnnotationCount + self.visiblePlaceFeatures.count + self.visibleRoadFeatures.count + 2 /* compass, attributionButton */;
 }
 
 - (NSInteger)accessibilityAnnotationCount
@@ -2472,20 +2477,39 @@ public:
         }];
         
         id <MGLFeature> feature = visiblePlaceFeatures[index - visiblePlaceFeatureRange.location];
-        return [self accessibilityElementForFeature:feature];
+        return [self accessibilityElementForPlaceFeature:feature];
+    }
+    
+    // Visible road features
+    NSArray *visibleRoadFeatures = self.visibleRoadFeatures;
+    NSRange visibleRoadFeatureRange = NSMakeRange(NSMaxRange(visiblePlaceFeatureRange), visibleRoadFeatures.count);
+    if (NSLocationInRange(index, visibleRoadFeatureRange))
+    {
+        visibleRoadFeatures = [visibleRoadFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+            CGPoint pointA = [self convertCoordinate:featureA.coordinate toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:featureB.coordinate toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+            return [@(deltaA) compare:@(deltaB)];
+        }];
+        
+        id <MGLFeature> feature = visibleRoadFeatures[index - visibleRoadFeatureRange.location];
+        return [self accessibilityElementForRoadFeature:feature];
     }
     
     // Attribution button
-    NSUInteger attributionButtonIndex = NSMaxRange(visiblePlaceFeatureRange);
+    NSUInteger attributionButtonIndex = NSMaxRange(visibleRoadFeatureRange);
     if (index == attributionButtonIndex)
     {
         return self.attributionButton;
     }
     
     NSAssert(NO, @"Index %ld not in recognized accessibility element ranges. "
-             @"User location annotation range: %@; visible annotation range: %@; visible place feature range: %@.",
+             @"User location annotation range: %@; visible annotation range: %@; "
+             @"visible place feature range: %@; visible road feature range: %@.",
              (long)index, NSStringFromRange(userLocationAnnotationRange),
-             NSStringFromRange(visibleAnnotationRange), NSStringFromRange(visiblePlaceFeatureRange));
+             NSStringFromRange(visibleAnnotationRange), NSStringFromRange(visiblePlaceFeatureRange),
+             NSStringFromRange(visibleRoadFeatureRange));
     return nil;
 }
 
@@ -2537,11 +2561,11 @@ public:
 }
 
 /**
- Returns an accessibility element corresponding to the given feature.
+ Returns an accessibility element corresponding to the given place feature.
  
- @param feature The feature represented by the accessibility element.
+ @param feature The place feature represented by the accessibility element.
  */
-- (id)accessibilityElementForFeature:(id <MGLFeature>)feature
+- (id)accessibilityElementForPlaceFeature:(id <MGLFeature>)feature
 {
     if (!_featureAccessibilityElements)
     {
@@ -2549,7 +2573,7 @@ public:
     }
     
     MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
-        return [element.feature.identifier isEqual:feature.identifier] || [element.feature isEqual:feature];
+        return (element.feature.identifier && [element.feature.identifier isEqual:feature.identifier]) || [element.feature isEqual:feature];
     }].anyObject;
     if (!element)
     {
@@ -2559,6 +2583,63 @@ public:
     CGRect annotationFrame = CGRectInset({center, CGSizeZero}, -MGLAnnotationAccessibilityElementMinimumSize.width / 2, -MGLAnnotationAccessibilityElementMinimumSize.width / 2);
     CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
     element.accessibilityFrame = screenRect;
+    
+    [_featureAccessibilityElements addObject:element];
+    
+    return element;
+}
+
+/**
+ Returns an accessibility element corresponding to the given road feature.
+ 
+ @param feature The road feature represented by the accessibility element.
+ */
+- (id)accessibilityElementForRoadFeature:(id <MGLFeature>)feature
+{
+    if (!_featureAccessibilityElements)
+    {
+        _featureAccessibilityElements = [NSMutableSet set];
+    }
+    
+    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
+        return (element.feature.identifier && [element.feature.identifier isEqual:feature.identifier]) || [element.feature isEqual:feature];
+    }].anyObject;
+    if (!element)
+    {
+        element = [[MGLRoadFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
+    }
+    
+    if ([feature isKindOfClass:[MGLShapeCollectionFeature class]])
+    {
+        feature = [(MGLShapeCollectionFeature *)feature shapes].firstObject;
+    }
+    if ([feature isKindOfClass:[MGLPointFeature class]])
+    {
+        CGPoint center = [self convertCoordinate:feature.coordinate toPointToView:self];
+        CGRect annotationFrame = CGRectInset({center, CGSizeZero}, -MGLAnnotationAccessibilityElementMinimumSize.width / 2, -MGLAnnotationAccessibilityElementMinimumSize.width / 2);
+        CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
+        element.accessibilityFrame = screenRect;
+    }
+    else if ([feature isKindOfClass:[MGLPolylineFeature class]])
+    {
+        CLLocationCoordinate2D *coordinates = [(MGLPolylineFeature *)feature coordinates];
+        NSUInteger pointCount = [(MGLPolylineFeature *)feature pointCount];
+        UIBezierPath *path = [UIBezierPath bezierPath];
+        for (NSUInteger i = 0; i < pointCount; i++)
+        {
+            CGPoint point = [self convertCoordinate:coordinates[i] toPointToView:self];
+            if (i)
+            {
+                [path addLineToPoint:point];
+            }
+            else
+            {
+                [path moveToPoint:point];
+            }
+        }
+        UIBezierPath *screenPath = UIAccessibilityConvertPathToScreenCoordinates(path, self);
+        element.accessibilityPath = screenPath;
+    }
     
     [_featureAccessibilityElements addObject:element];
     
@@ -2622,7 +2703,7 @@ public:
         if (featureIndex == NSNotFound)
         {
             featureIndex = [visiblePlaceFeatures indexOfObjectPassingTest:^BOOL (id <MGLFeature> _Nonnull visibleFeature, NSUInteger idx, BOOL * _Nonnull stop) {
-                return [visibleFeature.identifier isEqual:feature.identifier];
+                return visibleFeature.identifier && [visibleFeature.identifier isEqual:feature.identifier];
             }];
         }
         if (featureIndex == NSNotFound)
@@ -2632,8 +2713,28 @@ public:
         return visiblePlaceFeatureRange.location + featureIndex;
     }
     
+    // Visible road features
+    NSArray *visibleRoadFeatures = self.visibleRoadFeatures;
+    NSRange visibleRoadFeatureRange = NSMakeRange(NSMaxRange(visiblePlaceFeatureRange), visibleRoadFeatures.count);
+    if ([element isKindOfClass:[MGLFeatureAccessibilityElement class]])
+    {
+        id <MGLFeature> feature = [(MGLFeatureAccessibilityElement *)element feature];
+        NSUInteger featureIndex = [visibleRoadFeatures indexOfObject:feature];
+        if (featureIndex == NSNotFound)
+        {
+            featureIndex = [visibleRoadFeatures indexOfObjectPassingTest:^BOOL (id <MGLFeature> _Nonnull visibleFeature, NSUInteger idx, BOOL * _Nonnull stop) {
+                return visibleFeature.identifier && [visibleFeature.identifier isEqual:feature.identifier];
+            }];
+        }
+        if (featureIndex == NSNotFound)
+        {
+            return NSNotFound;
+        }
+        return visibleRoadFeatureRange.location + featureIndex;
+    }
+    
     // Attribution button
-    NSUInteger attributionButtonIndex = NSMaxRange(visiblePlaceFeatureRange);
+    NSUInteger attributionButtonIndex = NSMaxRange(visibleRoadFeatureRange);
     if (element == self.attributionButton)
     {
         return attributionButtonIndex;
@@ -5235,6 +5336,7 @@ public:
         {
             _featureAccessibilityElements = nil;
             _visiblePlaceFeatures = nil;
+            _visibleRoadFeatures = nil;
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
         }
         [self.delegate mapView:self regionDidChangeAnimated:animated];
