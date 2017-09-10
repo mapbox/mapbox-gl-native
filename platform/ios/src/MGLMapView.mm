@@ -274,7 +274,8 @@ public:
     BOOL _delegateHasLineWidthsForShapeAnnotations;
 
     MGLCompassDirectionFormatter *_accessibilityCompassFormatter;
-    NS_MUTABLE_DICTIONARY_OF(id, MGLFeatureAccessibilityElement *) *_accessibilityFeaturesByIdentifier;
+    NS_ARRAY_OF(id <MGLFeature>) *_visiblePlaceFeatures;
+    NS_MUTABLE_SET_OF(MGLFeatureAccessibilityElement *) *_featureAccessibilityElements;
 
     MGLReachability *_reachability;
 }
@@ -2342,8 +2343,12 @@ public:
 
 - (NS_ARRAY_OF(id <MGLFeature>) *)visiblePlaceFeatures
 {
-    NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
-    return [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+    if (!_visiblePlaceFeatures)
+    {
+        NSArray *placeStyleLayerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
+        _visiblePlaceFeatures = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:placeStyleLayerIdentifiers]];
+    }
+    return _visiblePlaceFeatures;
 }
 
 - (NS_ARRAY_OF(id <MGLFeature>) *)visibleRoadFeatures
@@ -2467,7 +2472,7 @@ public:
         }];
         
         id <MGLFeature> feature = visiblePlaceFeatures[index - visiblePlaceFeatureRange.location];
-        return [self accessibilityElementForFeature:feature withIdentifier:feature.identifier];
+        return [self accessibilityElementForFeature:feature];
     }
     
     // Attribution button
@@ -2534,54 +2539,28 @@ public:
 /**
  Returns an accessibility element corresponding to the given feature.
  
- @param feature An optional feature represented by the accessibility element.
- @param identifier A feature identifier used as a fallback in case the feature
-    is unspecified and also used to cache the accessibility element.
+ @param feature The feature represented by the accessibility element.
  */
-- (id)accessibilityElementForFeature:(id <MGLFeature>)feature withIdentifier:(id)identifier
+- (id)accessibilityElementForFeature:(id <MGLFeature>)feature
 {
-    if (!_accessibilityFeaturesByIdentifier)
+    if (!_featureAccessibilityElements)
     {
-        _accessibilityFeaturesByIdentifier = [NSMutableDictionary dictionary];
+        _featureAccessibilityElements = [NSMutableSet set];
     }
     
-    MGLFeatureAccessibilityElement *element = identifier ? _accessibilityFeaturesByIdentifier[identifier] : nil;
-    // It isn’t possible to check here whether feature is equal to
-    // element.feature, because various attributes and even the coordinate may
-    // change from one zoom level to the next. The only constant is the
-    // identifier.
-    if (!feature)
-    {
-        feature = element.feature;
-    }
-    
-    // Lazily create an accessibility element for the found feature.
-    if (!feature)
-    {
-        NSArray *layerIdentifiers = [self.style.placeStyleLayers valueForKey:@"identifier"];
-        NSPredicate *identifierPredicate = [NSPredicate predicateWithFormat:@"%K == %@", @"$id", identifier];
-        NSArray *features = [self visibleFeaturesInRect:self.bounds inStyleLayersWithIdentifiers:[NSSet setWithArray:layerIdentifiers] predicate:identifierPredicate];
-        feature = features.firstObject;
-    }
+    MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
+        return [element.feature.identifier isEqual:feature.identifier] || [element.feature isEqual:feature];
+    }].anyObject;
     if (!element)
     {
         element = [[MGLPlaceFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
     }
-    if (!feature)
-    {
-        return nil;
-    }
-    
-    // Update the accessibility element.
     CGPoint center = [self convertCoordinate:feature.coordinate toPointToView:self];
     CGRect annotationFrame = CGRectInset({center, CGSizeZero}, -MGLAnnotationAccessibilityElementMinimumSize.width / 2, -MGLAnnotationAccessibilityElementMinimumSize.width / 2);
     CGRect screenRect = UIAccessibilityConvertFrameToScreenCoordinates(annotationFrame, self);
     element.accessibilityFrame = screenRect;
     
-    if (identifier)
-    {
-        _accessibilityFeaturesByIdentifier[identifier] = element;
-    }
+    [_featureAccessibilityElements addObject:element];
     
     return element;
 }
@@ -5254,7 +5233,8 @@ public:
     {
         if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
         {
-            _accessibilityFeaturesByIdentifier = nil;
+            _featureAccessibilityElements = nil;
+            _visiblePlaceFeatures = nil;
             UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
         }
         [self.delegate mapView:self regionDidChangeAnimated:animated];
