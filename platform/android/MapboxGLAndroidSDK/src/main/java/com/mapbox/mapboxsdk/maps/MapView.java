@@ -296,6 +296,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onDestroy() {
     destroyed = true;
+    mapCallback.clearOnMapReadyCallbacks();
     nativeMapView.destroy();
     nativeMapView = null;
   }
@@ -1013,6 +1014,10 @@ public class MapView extends FrameLayout {
 
     void addOnMapReadyCallback(OnMapReadyCallback callback) {
       onMapReadyCallbackList.add(callback);
+    }
+
+    void clearOnMapReadyCallbacks() {
+      onMapReadyCallbackList.clear();
     }
   }
 }
