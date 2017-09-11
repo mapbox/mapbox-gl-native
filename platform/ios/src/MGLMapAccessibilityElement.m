@@ -143,16 +143,20 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
         }
         
         // Announce whether the road is a divided road.
-        if ([feature isKindOfClass:[MGLShapeCollectionFeature class]]) {
+        MGLPolyline *polyline;
+        if ([feature isKindOfClass:[MGLMultiPolylineFeature class]]) {
             [facts addObject:NSLocalizedStringWithDefaultValue(@"ROAD_DIVIDED_A11Y_VALUE", nil, nil, @"Divided road", @"Accessibility value indicating that a road is a divided road (dual carriageway)")];
-            feature = [(MGLShapeCollectionFeature *)feature shapes].firstObject;
+            polyline = [(MGLMultiPolylineFeature *)feature polylines].firstObject;
         }
         
         // Announce the road’s general direction.
         if ([feature isKindOfClass:[MGLPolylineFeature class]]) {
-            NSUInteger pointCount = [(MGLPolylineFeature *)feature pointCount];
+            polyline = (MGLPolylineFeature *)feature;
+        }
+        if (polyline) {
+            NSUInteger pointCount = polyline.pointCount;
             if (pointCount) {
-                CLLocationCoordinate2D *coordinates = [(MGLPolyline *)feature coordinates];
+                CLLocationCoordinate2D *coordinates = polyline.coordinates;
                 CLLocationDirection startDirection = MGLDirectionBetweenCoordinates(coordinates[pointCount - 1], coordinates[0]);
                 CLLocationDirection endDirection = MGLDirectionBetweenCoordinates(coordinates[0], coordinates[pointCount - 1]);
                 
