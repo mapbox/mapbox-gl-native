@@ -9,6 +9,7 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/style/layers/raster_layer.cpp>
 #include <mbgl/style/layers/line_layer.hpp>
 
@@ -548,3 +549,39 @@ TEST(Source, ImageSourceImageUpdate) {
 
     test.run();
 }
+
+TEST(Source, CustomGeometrySourceSetTileData) {
+    SourceTest test;
+
+    CustomGeometrySource source("source", CustomGeometrySource::Options());
+    source.loadDescription(test.fileSource);
+
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    test.renderSourceObserver.tileChanged = [&] (RenderSource& source_, const OverscaledTileID&) {
+        EXPECT_EQ("source", source_.baseImpl->id);
+        test.end();
+    };
+
+    test.renderSourceObserver.tileError = [&] (RenderSource&, const OverscaledTileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.loop.invoke([&] () {
+        // Set Tile Data
+        source.setTileData(CanonicalTileID(0, 0, 0), GeoJSON{ FeatureCollection{} });
+    });
+
+    test.run();
+}
+
