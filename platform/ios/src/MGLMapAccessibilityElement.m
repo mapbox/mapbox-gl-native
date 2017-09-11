@@ -111,11 +111,23 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
             [facts addObject:attributes[@"maki"]];
         }
         
-        NSNumber *elevation = attributes[@"elevation_m"];
-        if (elevation) {
-            MGLDistanceFormatter *formatter = [[MGLDistanceFormatter alloc] init];
+        // Announce the peak’s elevation in the preferred units.
+        if (attributes[@"elevation_m"] ?: attributes[@"elevation_ft"]) {
+            NSLengthFormatter *formatter = [[NSLengthFormatter alloc] init];
             formatter.unitStyle = NSFormattingUnitStyleLong;
-            [facts addObject:[formatter stringFromDistance:elevation.doubleValue]];
+            
+            NSNumber *elevationValue;
+            NSLengthFormatterUnit unit;
+            BOOL usesMetricSystem = ![[formatter.numberFormatter.locale objectForKey:NSLocaleMeasurementSystem]
+                                      isEqualToString:@"U.S."];
+            if (usesMetricSystem) {
+                elevationValue = attributes[@"elevation_m"];
+                unit = NSLengthFormatterUnitMeter;
+            } else {
+                elevationValue = attributes[@"elevation_ft"];
+                unit = NSLengthFormatterUnitFoot;
+            }
+            [facts addObject:[formatter stringFromValue:elevationValue.doubleValue unit:unit]];
         }
         
         if (facts.count) {
