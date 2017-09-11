@@ -198,7 +198,7 @@ private:
 #endif
 
 public:
-    State<value::ActiveTexture> activeTexture;
+    State<value::ActiveTextureUnit> activeTextureUnit;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
     State<value::ScissorTest> scissorTest;
