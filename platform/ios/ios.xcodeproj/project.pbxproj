@@ -783,6 +783,7 @@
 		DA704CBB1F637311004B3F28 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA704CBC1F637405004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DA704CBD1F63746E004B3F28 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		DA704CC71F6663A3004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
 		DA737ADA1E59139D00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
@@ -2525,6 +2526,7 @@
 				DA618B251E68920500CB7F44 /* lt */,
 				DAE9E0F11EB7BF1B001E8E8B /* es */,
 				DA704CBB1F637311004B3F28 /* ru */,
+				DA704CC71F6663A3004B3F28 /* uk */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
