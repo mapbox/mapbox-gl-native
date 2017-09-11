@@ -73,7 +73,10 @@ public:
     void onSourceChanged(mbgl::style::Source&) override;
 
     // Signal the view system, we want to redraw
-    void invalidate();
+    void requestRender();
+
+    // Request processing on the GL Thread
+    void requestProcessing();
 
     // JNI //
 
@@ -81,9 +84,10 @@ public:
     void onSurfaceCreated(jni::JNIEnv&);
 
     // Called on OpenGL Thread
-    void render(jni::JNIEnv&);
+    void process(jni::JNIEnv&);
 
-    void update(jni::JNIEnv&);
+    // Called on OpenGL Thread
+    void render(jni::JNIEnv&);
 
     void resizeView(jni::JNIEnv&, int, int);
 

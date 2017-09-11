@@ -30,13 +30,15 @@ class AndroidRendererBackend;
 
 class AndroidRendererFrontend : public RendererFrontend {
 public:
-    using InvalidateCallback = std::function<void ()>;
+    using RequestRenderCallback = std::function<void ()>;
+    using RequestProcessingCallback = std::function<void ()>;
 
     AndroidRendererFrontend(float pixelRatio,
                             mbgl::FileSource&,
                             mbgl::Scheduler&,
                             std::string programCacheDir,
-                            InvalidateCallback);
+                            RequestRenderCallback,
+                            RequestProcessingCallback);
     ~AndroidRendererFrontend() override;
 
     void reset() override;
@@ -46,6 +48,7 @@ public:
 
     // Called from OpenGL Thread
     void render();
+    void process();
 
     // Feature querying
     std::vector<Feature> queryRenderedFeatures(const ScreenCoordinate&, const RenderedQueryOptions&) const;

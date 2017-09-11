@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
+import com.mapbox.mapboxsdk.maps.renderer.RenderThread;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
@@ -52,6 +53,9 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Used for callbacks
   private MapView mapView;
 
+  // Used to schedule work on the render thread
+  private RenderThread renderThread;
+
   //Hold a reference to prevent it from being GC'd as long as it's used on the native side
   private final FileSource fileSource;
 
@@ -69,7 +73,7 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Constructors
   //
 
-  public NativeMapView(MapView mapView) {
+  public NativeMapView(final MapView mapView) {
     Context context = mapView.getContext();
     fileSource = FileSource.getInstance(context);
 
@@ -83,6 +87,10 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   //
   // Methods
   //
+
+  public void setRenderThread(RenderThread renderThread) {
+    this.renderThread = renderThread;
+  }
 
   private boolean isDestroyedOn(String callingMethod) {
     if (destroyed && !TextUtils.isEmpty(callingMethod)) {
@@ -104,7 +112,8 @@ final class NativeMapView implements GLSurfaceView.Renderer {
     if (isDestroyedOn("update")) {
       return;
     }
-    nativeUpdate();
+
+    requestRender();
   }
 
   public void render() {
@@ -864,9 +873,28 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Callbacks
   //
 
-  protected void onInvalidate() {
-    if (mapView != null) {
-      mapView.onInvalidate();
+  /**
+   * Called from JNI whenever the native map
+   * needs rendering.
+   */
+  protected void requestRender() {
+    if (renderThread != null) {
+      renderThread.requestRender();
+    }
+  }
+
+  /**
+   * Called from JNI when work needs to be processed on
+   * the Renderer Thread.
+   */
+  protected void requestProcessing() {
+    if (renderThread != null) {
+      renderThread.queueEvent(new Runnable() {
+        @Override
+        public void run() {
+          nativeProcess();
+        }
+      });
     }
   }
 
@@ -904,6 +932,8 @@ final class NativeMapView implements GLSurfaceView.Renderer {
                                        String programCacheDir);
 
   private native void nativeDestroy();
+
+  private native void nativeProcess();
 
   private native void nativeInitializeDisplay();
 
@@ -1130,9 +1160,7 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
     snapshotReadyCallback = callback;
     scheduleTakeSnapshot();
-    mapView.onInvalidate();
-    // TODO. this should do a request render
-    //render();
+    renderThread.requestRender();
   }
 
   //

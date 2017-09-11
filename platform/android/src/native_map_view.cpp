@@ -78,7 +78,8 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                                                                  *threadPool,
                                                                  jni::Make<std::string>(_env,
                                                                                         _programCacheDir),
-                                                                 [this] { this->invalidate(); });
+                                                                 [this] { this->requestRender(); },
+                                                                 [this] { this->requestProcessing(); });
 
     // Create the core map
     map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
@@ -97,15 +98,21 @@ NativeMapView::~NativeMapView() {
 }
 
 /**
- * Callback to java NativeMapView#onInvalidate().
+ * Callback to java NativeMapView#requestRender().
  *
- * Called to invalidate the View and schedule a render on the next
+ * Called to schedule a render on the next
  * runloop iteration.
  */
-void NativeMapView::invalidate() {
+void NativeMapView::requestRender() {
     android::UniqueEnv _env = android::AttachEnv();
-    static auto onInvalidate = javaClass.GetMethod<void ()>(*_env, "onInvalidate");
+    static auto onInvalidate = javaClass.GetMethod<void ()>(*_env, "requestRender");
     javaPeer->Call(*_env, onInvalidate);
+}
+
+void NativeMapView::requestProcessing() {
+    android::UniqueEnv _env = android::AttachEnv();
+    static auto requestProcessing = javaClass.GetMethod<void ()>(*_env, "requestProcessing");
+    javaPeer->Call(*_env, requestProcessing);
 }
 
 /**
@@ -195,8 +202,9 @@ void NativeMapView::render(jni::JNIEnv& ) {
     updateFps();
 }
 
-void NativeMapView::update(jni::JNIEnv&) {
-    invalidate();
+// Called from the OpenGL renderer thread
+void NativeMapView::process(jni::JNIEnv&) {
+    rendererFrontend->process();
 }
 
 void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
@@ -1004,7 +1012,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             "nativeInitialize",
             "nativeDestroy",
             METHOD(&NativeMapView::render, "nativeRender"),
-            METHOD(&NativeMapView::update, "nativeUpdate"),
+            METHOD(&NativeMapView::process, "nativeProcess"),
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
             METHOD(&NativeMapView::resizeFramebuffer, "nativeResizeFramebuffer"),
             METHOD(&NativeMapView::getStyleUrl, "nativeGetStyleUrl"),

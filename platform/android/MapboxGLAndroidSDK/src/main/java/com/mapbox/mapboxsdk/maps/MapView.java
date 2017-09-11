@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
+import com.mapbox.mapboxsdk.maps.renderer.GlSurfaceViewRenderThread;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
@@ -312,6 +313,8 @@ public class MapView extends FrameLayout {
     });
     glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     glSurfaceView.setVisibility(View.VISIBLE);
+
+    nativeMapView.setRenderThread(new GlSurfaceViewRenderThread(glSurfaceView));
   }
 
   /**
@@ -493,15 +496,6 @@ public class MapView extends FrameLayout {
   //
   // Rendering
   //
-
-  // Called when the map needs to be rerendered
-  // Called via JNI from NativeMapView
-  protected void onInvalidate() {
-    if (glSurfaceView != null) {
-      glSurfaceView.requestRender();
-    }
-    // TODO: removable? postInvalidate();
-  }
 
   @Override
   protected void onSizeChanged(int width, int height, int oldw, int oldh) {

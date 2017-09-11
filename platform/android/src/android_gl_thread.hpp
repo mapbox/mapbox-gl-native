@@ -44,20 +44,18 @@ public:
 
     // Only safe on the GL Thread
     void process() {
-        while (true) {
-            std::unique_lock<std::mutex> lock(mutex);
+        std::unique_lock<std::mutex> lock(mutex);
 
-            if (queue.empty()) {
-                return;
-            }
-
-            auto scheduled = queue.front();
-            queue.pop();
-
-            lock.unlock();
-
-            Mailbox::maybeReceive(scheduled);
+        if (queue.empty()) {
+            return;
         }
+
+        auto scheduled = queue.front();
+        queue.pop();
+
+        lock.unlock();
+
+        Mailbox::maybeReceive(scheduled);
     }
 
     // Only safe to access on the GL Thread
