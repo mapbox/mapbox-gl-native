@@ -390,6 +390,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
     if (parameters.staticData.has3D) {
+        parameters.backend.bind();
         MBGL_DEBUG_GROUP(parameters.context, "3d");
         parameters.pass = RenderPass::Pass3D;
 
