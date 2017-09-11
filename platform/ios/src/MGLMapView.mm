@@ -2573,7 +2573,7 @@ public:
     }
     
     MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
-        return (element.feature.identifier && [element.feature.identifier isEqual:feature.identifier]) || [element.feature isEqual:feature];
+        return element.feature.identifier && ![element.feature.identifier isEqual:@0] && [element.feature.identifier isEqual:feature.identifier];
     }].anyObject;
     if (!element)
     {
@@ -2602,7 +2602,7 @@ public:
     }
     
     MGLFeatureAccessibilityElement *element = [_featureAccessibilityElements objectsPassingTest:^BOOL(MGLFeatureAccessibilityElement * _Nonnull element, BOOL * _Nonnull stop) {
-        return (element.feature.identifier && [element.feature.identifier isEqual:feature.identifier]) || [element.feature isEqual:feature];
+        return element.feature.identifier && ![element.feature.identifier isEqual:@0] && [element.feature.identifier isEqual:feature.identifier];
     }].anyObject;
     if (!element)
     {
@@ -2709,6 +2709,16 @@ public:
     if (tag != MGLAnnotationTagNotFound)
     {
         std::sort(visibleAnnotations.begin(), visibleAnnotations.end());
+        std::sort(visibleAnnotations.begin(), visibleAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+            CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+            CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+            CGPoint pointA = [self convertCoordinate:coordinateA toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:coordinateB toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+            return deltaA < deltaB;
+        });
+        
         auto foundElement = std::find(visibleAnnotations.begin(), visibleAnnotations.end(), tag);
         if (foundElement == visibleAnnotations.end())
         {
@@ -2720,14 +2730,22 @@ public:
     // Visible place features
     NSArray *visiblePlaceFeatures = self.visiblePlaceFeatures;
     NSRange visiblePlaceFeatureRange = NSMakeRange(NSMaxRange(visibleAnnotationRange), visiblePlaceFeatures.count);
-    if ([element isKindOfClass:[MGLFeatureAccessibilityElement class]])
+    if ([element isKindOfClass:[MGLPlaceFeatureAccessibilityElement class]])
     {
-        id <MGLFeature> feature = [(MGLFeatureAccessibilityElement *)element feature];
+        visiblePlaceFeatures = [visiblePlaceFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+            CGPoint pointA = [self convertCoordinate:featureA.coordinate toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:featureB.coordinate toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+            return [@(deltaA) compare:@(deltaB)];
+        }];
+        
+        id <MGLFeature> feature = [(MGLPlaceFeatureAccessibilityElement *)element feature];
         NSUInteger featureIndex = [visiblePlaceFeatures indexOfObject:feature];
         if (featureIndex == NSNotFound)
         {
             featureIndex = [visiblePlaceFeatures indexOfObjectPassingTest:^BOOL (id <MGLFeature> _Nonnull visibleFeature, NSUInteger idx, BOOL * _Nonnull stop) {
-                return visibleFeature.identifier && [visibleFeature.identifier isEqual:feature.identifier];
+                return visibleFeature.identifier && ![visibleFeature.identifier isEqual:@0] && [visibleFeature.identifier isEqual:feature.identifier];
             }];
         }
         if (featureIndex == NSNotFound)
@@ -2740,14 +2758,22 @@ public:
     // Visible road features
     NSArray *visibleRoadFeatures = self.visibleRoadFeatures;
     NSRange visibleRoadFeatureRange = NSMakeRange(NSMaxRange(visiblePlaceFeatureRange), visibleRoadFeatures.count);
-    if ([element isKindOfClass:[MGLFeatureAccessibilityElement class]])
+    if ([element isKindOfClass:[MGLRoadFeatureAccessibilityElement class]])
     {
-        id <MGLFeature> feature = [(MGLFeatureAccessibilityElement *)element feature];
+        visibleRoadFeatures = [visibleRoadFeatures sortedArrayUsingComparator:^NSComparisonResult(id <MGLFeature> _Nonnull featureA, id <MGLFeature> _Nonnull featureB) {
+            CGPoint pointA = [self convertCoordinate:featureA.coordinate toPointToView:self];
+            CGPoint pointB = [self convertCoordinate:featureB.coordinate toPointToView:self];
+            CGFloat deltaA = hypot(pointA.x - centerPoint.x, pointA.y - centerPoint.y);
+            CGFloat deltaB = hypot(pointB.x - centerPoint.x, pointB.y - centerPoint.y);
+            return [@(deltaA) compare:@(deltaB)];
+        }];
+        
+        id <MGLFeature> feature = [(MGLRoadFeatureAccessibilityElement *)element feature];
         NSUInteger featureIndex = [visibleRoadFeatures indexOfObject:feature];
         if (featureIndex == NSNotFound)
         {
             featureIndex = [visibleRoadFeatures indexOfObjectPassingTest:^BOOL (id <MGLFeature> _Nonnull visibleFeature, NSUInteger idx, BOOL * _Nonnull stop) {
-                return visibleFeature.identifier && [visibleFeature.identifier isEqual:feature.identifier];
+                return visibleFeature.identifier && ![visibleFeature.identifier isEqual:@0] && [visibleFeature.identifier isEqual:feature.identifier];
             }];
         }
         if (featureIndex == NSNotFound)
