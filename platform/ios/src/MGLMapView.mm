@@ -2637,7 +2637,10 @@ public:
                 [path moveToPoint:point];
             }
         }
-        UIBezierPath *screenPath = UIAccessibilityConvertPathToScreenCoordinates(path, self);
+        CGPathRef strokedCGPath = CGPathCreateCopyByStrokingPath(path.CGPath, NULL, MGLAnnotationAccessibilityElementMinimumSize.width, kCGLineCapButt, kCGLineJoinMiter, 0);
+        UIBezierPath *strokedPath = [UIBezierPath bezierPathWithCGPath:strokedCGPath];
+        CGPathRelease(strokedCGPath);
+        UIBezierPath *screenPath = UIAccessibilityConvertPathToScreenCoordinates(strokedPath, self);
         element.accessibilityPath = screenPath;
     }
     
