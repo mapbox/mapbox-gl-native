@@ -2609,10 +2609,7 @@ public:
         element = [[MGLRoadFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
     }
     
-    if ([feature isKindOfClass:[MGLShapeCollectionFeature class]])
-    {
-        feature = [(MGLShapeCollectionFeature *)feature shapes].firstObject;
-    }
+    UIBezierPath *path;
     if ([feature isKindOfClass:[MGLPointFeature class]])
     {
         CGPoint center = [self convertCoordinate:feature.coordinate toPointToView:self];
@@ -2622,21 +2619,19 @@ public:
     }
     else if ([feature isKindOfClass:[MGLPolylineFeature class]])
     {
-        CLLocationCoordinate2D *coordinates = [(MGLPolylineFeature *)feature coordinates];
-        NSUInteger pointCount = [(MGLPolylineFeature *)feature pointCount];
-        UIBezierPath *path = [UIBezierPath bezierPath];
-        for (NSUInteger i = 0; i < pointCount; i++)
+        path = [self pathOfPolyline:(MGLPolyline *)feature];
+    }
+    else if ([feature isKindOfClass:[MGLMultiPolylineFeature class]])
+    {
+        path = [UIBezierPath bezierPath];
+        for (MGLPolyline *polyline in [(MGLMultiPolylineFeature *)feature polylines])
         {
-            CGPoint point = [self convertCoordinate:coordinates[i] toPointToView:self];
-            if (i)
-            {
-                [path addLineToPoint:point];
-            }
-            else
-            {
-                [path moveToPoint:point];
-            }
+            [path appendPath:[self pathOfPolyline:polyline]];
         }
+    }
+    
+    if (path)
+    {
         CGPathRef strokedCGPath = CGPathCreateCopyByStrokingPath(path.CGPath, NULL, MGLAnnotationAccessibilityElementMinimumSize.width, kCGLineCapButt, kCGLineJoinMiter, 0);
         UIBezierPath *strokedPath = [UIBezierPath bezierPathWithCGPath:strokedCGPath];
         CGPathRelease(strokedCGPath);
@@ -2647,6 +2642,26 @@ public:
     [_featureAccessibilityElements addObject:element];
     
     return element;
+}
+
+- (UIBezierPath *)pathOfPolyline:(MGLPolyline *)polyline
+{
+    CLLocationCoordinate2D *coordinates = polyline.coordinates;
+    NSUInteger pointCount = polyline.pointCount;
+    UIBezierPath *path = [UIBezierPath bezierPath];
+    for (NSUInteger i = 0; i < pointCount; i++)
+    {
+        CGPoint point = [self convertCoordinate:coordinates[i] toPointToView:self];
+        if (i)
+        {
+            [path addLineToPoint:point];
+        }
+        else
+        {
+            [path moveToPoint:point];
+        }
+    }
+    return path;
 }
 
 - (NSInteger)indexOfAccessibilityElement:(id)element
@@ -2669,6 +2684,12 @@ public:
     if (element == self.userLocationAnnotationView)
     {
         return userLocationAnnotationRange.location;
+    }
+    
+    CGPoint centerPoint = self.contentCenter;
+    if (self.userTrackingMode != MGLUserTrackingModeNone)
+    {
+        centerPoint = self.userLocationAnnotationViewCenter;
     }
     
     // Visible annotations
