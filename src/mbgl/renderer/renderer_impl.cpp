@@ -391,7 +391,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // depth rbo between them.
     if (parameters.staticData.has3D) {
         MBGL_DEBUG_GROUP(parameters.context, "3d");
-        parameters.backend.bind();
         parameters.pass = RenderPass::Pass3D;
 
         const auto size = parameters.context.viewport.getCurrentValue().size;
