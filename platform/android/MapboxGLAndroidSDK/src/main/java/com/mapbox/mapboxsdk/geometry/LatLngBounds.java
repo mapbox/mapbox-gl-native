@@ -450,7 +450,7 @@ public class LatLngBounds implements Parcelable {
      */
     public Builder includes(List<LatLng> latLngs) {
       for (LatLng point : latLngs) {
-        latLngList.add(point);
+        include(point);
       }
       return this;
     }
@@ -462,7 +462,9 @@ public class LatLngBounds implements Parcelable {
      * @return this
      */
     public Builder include(@NonNull LatLng latLng) {
-      latLngList.add(latLng);
+      if (!latLngList.contains(latLng)) {
+        latLngList.add(latLng);
+      }
       return this;
     }
   }
