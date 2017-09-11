@@ -12,12 +12,8 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>%d laipsniai</string>
-			<key>few</key>
-			<string>%d laipsniai</string>
 			<key>other</key>
-			<string>%d laipsnių</string>
+			<string>%d độ</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -30,12 +26,8 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>%d minutė</string>
-			<key>few</key>
-			<string>%d minutės</string>
 			<key>other</key>
-			<string>%d minučių</string>
+			<string>%d phút</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -48,12 +40,8 @@
 			<string>NSStringPluralRuleType</string>
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
-			<key>one</key>
-			<string>%d sekundė</string>
-			<key>few</key>
-			<string>%d sekundės</string>
 			<key>other</key>
-			<string>%d sekundžių</string>
+			<string>%d giây</string>
 		</dict>
 	</dict>
 </dict>

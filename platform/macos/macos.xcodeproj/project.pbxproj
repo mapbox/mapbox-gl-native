@@ -483,6 +483,7 @@
 		DACC22131CF3D3E200D220D9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature_Private.h; sourceTree = "<group>"; };
 		DACCD9C71F1F443B00BB09A1 /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DACFE7971F66EA0C00630DA8 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = vi; path = vi.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DAD165721CF4CD7A001FF4B9 /* MGLShapeCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeCollection.h; sourceTree = "<group>"; };
 		DAD165731CF4CD7A001FF4B9 /* MGLShapeCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeCollection.mm; sourceTree = "<group>"; };
 		DAE6C2E11CC304F900DB3429 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
@@ -1629,6 +1630,7 @@
 				DAE8CCAA1E6E8605009B5CB0 /* ru */,
 				DA618B151E6886DF00CB7F44 /* ca */,
 				DA618B241E6891F300CB7F44 /* lt */,
+				DACFE7971F66EA0C00630DA8 /* vi */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
