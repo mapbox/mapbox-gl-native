@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
-import android.os.Build;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
@@ -143,7 +142,7 @@ class IconManager {
     }
   }
 
-  public void iconCleanup(Icon icon) {
+  void iconCleanup(Icon icon) {
     int refCounter = iconMap.get(icon) - 1;
     if (refCounter == 0) {
       remove(icon);
@@ -155,18 +154,10 @@ class IconManager {
   private void remove(Icon icon) {
     nativeMapView.removeAnnotationIcon(icon.getId());
     iconMap.remove(icon);
-    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      recycleBitmap(icon.getBitmap());
-    }
   }
 
   private void updateIconRefCounter(Icon icon, int refCounter) {
     iconMap.put(icon, refCounter);
   }
 
-  private void recycleBitmap(Bitmap bitmap) {
-    if (!bitmap.isRecycled()) {
-      bitmap.recycle();
-    }
-  }
 }
