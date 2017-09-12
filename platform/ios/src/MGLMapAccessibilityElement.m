@@ -76,9 +76,20 @@ CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstC
     if (self = [super initWithAccessibilityContainer:container]) {
         _feature = feature;
         
-        NSString *nameAttribute = [NSString stringWithFormat:@"name_%@",
-                                   [MGLVectorSource preferredMapboxStreetsLanguage]];
-        self.accessibilityLabel = [feature attributeForKey:nameAttribute];
+        NSString *languageCode = [MGLVectorSource preferredMapboxStreetsLanguage];
+        NSString *nameAttribute = [NSString stringWithFormat:@"name_%@", languageCode];
+        NSString *name = [feature attributeForKey:nameAttribute];
+        
+        // If a feature hasn’t been translated into the preferred language, it
+        // may be in the local language, which may be written in another script.
+        // Romanize it.
+        NSLocale *locale = [NSLocale localeWithLocaleIdentifier:languageCode];
+        NSString *scriptCode = [locale objectForKey:NSLocaleScriptCode];
+        if ([scriptCode isEqualToString:@"Latn"]) {
+            name = [name stringByApplyingTransform:NSStringTransformToLatin reverse:NO];
+        }
+        
+        self.accessibilityLabel = name;
     }
     return self;
 }
