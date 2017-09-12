@@ -22,7 +22,8 @@ public class Style {
    * constants means your map style will always use the latest version and may change as we
    * improve the style
    */
-  @StringDef( {MAPBOX_STREETS, OUTDOORS, LIGHT, DARK, SATELLITE, SATELLITE_STREETS, TRAFFIC_DAY, TRAFFIC_NIGHT})
+  @StringDef( {MAPBOX_STREETS, OUTDOORS, LIGHT, DARK, SATELLITE, SATELLITE_STREETS, TRAFFIC_DAY, TRAFFIC_NIGHT,
+    NAVIGATION_GUIDANCE_DAY, NAVIGATION_GUIDANCE_NIGHT, NAVIGATION_PREVIEW_DAY, NAVIGATION_PREVIEW_NIGHT})
   @Retention(RetentionPolicy.SOURCE)
   public @interface StyleUrl {
   }
@@ -73,7 +74,10 @@ public class Style {
    * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
    * countries</a>. Using this constant means your map style will always use the latest version and
    * may change as we improve the style.
+   *
+   * @deprecated Use {@link Style#NAVIGATION_PREVIEW_DAY} and {@link Style#NAVIGATION_GUIDANCE_DAY} instead.
    */
+  @Deprecated
   public static final String TRAFFIC_DAY = "mapbox://styles/mapbox/traffic-day-v2";
 
   /**
@@ -82,6 +86,37 @@ public class Style {
    * <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select
    * countries</a>. Using this constant means your map style will always use the latest version and
    * may change as we improve the style.
+   *
+   * @deprecated Use {@link Style#NAVIGATION_PREVIEW_NIGHT} and {@link Style#NAVIGATION_GUIDANCE_NIGHT} instead.
    */
+  @Deprecated
   public static final String TRAFFIC_NIGHT = "mapbox://styles/mapbox/traffic-night-v2";
+
+  /**
+   * Navigation Preview Day: TBA.
+   * Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String NAVIGATION_PREVIEW_DAY = "mapbox://styles/mapbox/navigation-preview-day-v2";
+
+  /**
+   * Navigation Guidance Day: TBA.
+   * Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String NAVIGATION_GUIDANCE_DAY = "mapbox://styles/mapbox/navigation-guidance-day-v2";
+
+  /**
+   * Navigation Preview Night: TBA.
+   * Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String NAVIGATION_PREVIEW_NIGHT = "mapbox://styles/mapbox/navigation-preview-night-v2";
+
+  /**
+   * Navigation Guidance Night: TBA.
+   * Using this constant means your map style will always use the latest version and
+   * may change as we improve the style.
+   */
+  public static final String NAVIGATION_GUIDANCE_NIGHT = "mapbox://styles/mapbox/navigation-guidance-night-v2";
 }

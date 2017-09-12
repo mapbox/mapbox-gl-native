@@ -24,6 +24,13 @@
     <string name="mapbox_style_dark" translatable="false">mapbox://styles/mapbox/dark-v9</string>
     <string name="mapbox_style_satellite" translatable="false">mapbox://styles/mapbox/satellite-v9</string>
     <string name="mapbox_style_satellite_streets" translatable="false">mapbox://styles/mapbox/satellite-streets-v10</string>
+    <!--DEPRECATED use mapbox_style_navigation_preview_day or mapbox_style_navigation_guidance_day instead-->
     <string name="mapbox_style_traffic_day" translatable="false">mapbox://styles/mapbox/traffic-day-v2</string>
+    <!--DEPRECATED use mapbox_style_navigation_preview_night or mapbox_style_navigation_guidance_night instead-->
     <string name="mapbox_style_traffic_night" translatable="false">mapbox://styles/mapbox/traffic-night-v2</string>
+    <string name="mapbox_style_navigation_preview_day" translatable="false">mapbox://styles/mapbox/navigation-preview-day-v2</string>
+    <string name="mapbox_style_navigation_guidance_day" translatable="false">mapbox://styles/mapbox/navigation-guidance-day-v2</string>
+    <string name="mapbox_style_navigation_preview_night" translatable="false">mapbox://styles/mapbox/navigation-preview-night-v2</string>
+    <string name="mapbox_style_navigation_guidance_night" translatable="false">mapbox://styles/mapbox/navigation-guidance-night-v2</string>
+
 </resources>

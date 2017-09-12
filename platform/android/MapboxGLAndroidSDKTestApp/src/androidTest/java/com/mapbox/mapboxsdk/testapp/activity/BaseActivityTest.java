@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.support.annotation.StringRes;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResourceTimeoutException;
 import android.support.test.espresso.UiController;
@@ -110,6 +111,10 @@ public abstract class BaseActivityTest {
     public void perform(UiController uiController, View view) {
       uiController.loopMainThreadForAtLeast(loopTime);
     }
+  }
+
+  protected String getString(@StringRes int styleRes) {
+    return rule.getActivity().getResources().getString(styleRes);
   }
 }
 
