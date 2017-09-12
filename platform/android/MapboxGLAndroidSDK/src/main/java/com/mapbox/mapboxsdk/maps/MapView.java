@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.lang.annotation.Retention;
@@ -260,6 +261,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onStart() {
     ConnectivityReceiver.instance(getContext()).activate();
+    FileSource.getInstance(getContext()).activate();
     if (mapboxMap != null) {
       mapboxMap.onStart();
     }
@@ -288,6 +290,7 @@ public class MapView extends FrameLayout {
   public void onStop() {
     mapboxMap.onStop();
     ConnectivityReceiver.instance(getContext()).deactivate();
+    FileSource.getInstance(getContext()).deactivate();
   }
 
   /**

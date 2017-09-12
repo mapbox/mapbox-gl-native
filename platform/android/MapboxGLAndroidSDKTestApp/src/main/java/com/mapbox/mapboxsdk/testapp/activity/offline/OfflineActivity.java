@@ -264,6 +264,7 @@ public class OfflineActivity extends AppCompatActivity
         if (status.isComplete()) {
           // Download complete
           endProgress("Region downloaded successfully.");
+          offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
           offlineRegion.setObserver(null);
           return;
         } else if (status.isRequiredResourceCountPrecise()) {
@@ -281,11 +282,13 @@ public class OfflineActivity extends AppCompatActivity
       @Override
       public void onError(OfflineRegionError error) {
         Timber.e("onError: %s, %s", error.getReason(), error.getMessage());
+        offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
       }
 
       @Override
       public void mapboxTileCountLimitExceeded(long limit) {
         Timber.e("Mapbox tile count limit exceeded: %s", limit);
+        offlineRegion.setDownloadState(OfflineRegion.STATE_INACTIVE);
       }
     });
 

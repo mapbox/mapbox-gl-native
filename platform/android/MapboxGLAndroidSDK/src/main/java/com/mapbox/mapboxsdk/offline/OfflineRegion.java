@@ -300,10 +300,19 @@ public class OfflineRegion {
 
   /**
    * Pause or resume downloading of regional resources.
+   * <p>
+   * After a download has been completed, you are required to reset the state of the region to STATE_INACTIVE.
+   * </p>
    *
    * @param state the download state
    */
   public void setDownloadState(@DownloadState int state) {
+    if (state == STATE_ACTIVE) {
+      fileSource.activate();
+    } else {
+      fileSource.deactivate();
+    }
+
     this.state = state;
     setOfflineRegionDownloadState(state);
   }
