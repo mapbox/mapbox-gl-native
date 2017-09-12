@@ -38,7 +38,7 @@ std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(Sourc
     return result;
 }
 
-unsigned long OfflineTilePyramidRegionDefinition::tileCount(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+uint64_t OfflineTilePyramidRegionDefinition::tileCount(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
     
     const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
     unsigned long result = 0;;
