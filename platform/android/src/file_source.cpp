@@ -8,8 +8,6 @@
 #include "asset_manager_file_source.hpp"
 #include "jni/generic_global_ref_deleter.hpp"
 
-#include <string>
-
 namespace mbgl {
 namespace android {
 
@@ -64,6 +62,14 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::
     }
 }
 
+void FileSource::resume(jni::JNIEnv&) {
+    fileSource->resume();
+}
+
+void FileSource::pause(jni::JNIEnv&) {
+    fileSource->pause();
+}
+
 jni::Class<FileSource> FileSource::javaClass;
 
 FileSource* FileSource::getNativePeer(jni::JNIEnv& env, jni::Object<FileSource> jFileSource) {
@@ -93,7 +99,9 @@ void FileSource::registerNative(jni::JNIEnv& env) {
         METHOD(&FileSource::getAccessToken, "getAccessToken"),
         METHOD(&FileSource::setAccessToken, "setAccessToken"),
         METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
-        METHOD(&FileSource::setResourceTransform, "setResourceTransform")
+        METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
+        METHOD(&FileSource::resume, "resume"),
+        METHOD(&FileSource::pause, "pause")
     );
 }
 

@@ -41,6 +41,10 @@ public:
 
     void setResourceTransform(jni::JNIEnv&, jni::Object<FileSource::ResourceTransformCallback>);
 
+    void resume(jni::JNIEnv&);
+
+    void pause(jni::JNIEnv&);
+
     static jni::Class<FileSource> javaClass;
 
     static FileSource* getNativePeer(jni::JNIEnv&, jni::Object<FileSource>);
