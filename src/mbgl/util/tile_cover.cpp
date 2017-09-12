@@ -170,9 +170,9 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
 }
 
 // Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
-// Computes the projected tiles for the lower left and uppoer right points of the bounds
+// Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
-unsigned long tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_){
+uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_){
 
     auto sw = Projection::project(bounds.southwest().wrapped(), zoom, tileSize_);
     auto ne = Projection::project(bounds.northeast().wrapped(), zoom, tileSize_);
