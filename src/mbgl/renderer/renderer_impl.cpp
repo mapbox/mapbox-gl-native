@@ -68,8 +68,15 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
-    // Don't load/render anyting in still mode until explicitly requested.
-    if (updateParameters.mode == MapMode::Still && !updateParameters.stillImageRequest) return;
+    if (updateParameters.mode == MapMode::Still) {
+        // Don't load/render anyting in still mode until explicitly requested.
+        if (!updateParameters.stillImageRequest) {
+            return;
+        }
+
+        // Reset zoom history state.
+        zoomHistory.first = true;
+    }
     
     assert(BackendScope::exists());
     
