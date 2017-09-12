@@ -357,10 +357,10 @@ public class OfflineRegion {
    */
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
     if (!isDeleted) {
+      isDeleted = true;
       deleteOfflineRegion(new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
-          isDeleted = true;
           getHandler().post(new Runnable() {
             @Override
             public void run() {
@@ -375,6 +375,7 @@ public class OfflineRegion {
           getHandler().post(new Runnable() {
             @Override
             public void run() {
+              isDeleted = false;
               callback.onError(error);
             }
           });
