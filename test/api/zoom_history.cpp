@@ -62,4 +62,10 @@ TEST(API, ZoomHistory) {
     // ZoomHistory.lastIntegerZoom should be 0.
     map->setZoom(0.5);
     test::checkImage("test/fixtures/zoom_history", frontend.render(*map), 0.0002);
+
+    map->setZoom(1.0);
+    frontend.render(*map);
+
+    map->setZoom(0.5);
+    test::checkImage("test/fixtures/zoom_history", frontend.render(*map), 0.0002);
 }
