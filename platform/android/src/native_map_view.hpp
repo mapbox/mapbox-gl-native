@@ -315,6 +315,7 @@ private:
     bool snapshot = false;
     bool firstRender = true;
     double fps = 0.0;
+    std::atomic<bool> destroyed = {false};
 
     // Minimum texture size according to OpenGL ES 2.0 specification.
     int width = 64;
