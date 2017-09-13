@@ -2,7 +2,6 @@
 
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/annotation/annotation.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/image.hpp>
@@ -17,14 +16,10 @@
 
 namespace mbgl {
 
-class FileSource;
-class Scheduler;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
 namespace android {
-
-class AndroidRendererBackend;
 
 class AndroidRendererFrontend : public RendererFrontend {
 public:
@@ -51,9 +46,7 @@ public:
     void requestSnapshot(SnapshotCallback);
 
 private:
-    std::unique_ptr<RendererObserver> rendererObserver;
     MapRenderer& mapRenderer;
-
     util::RunLoop* mapRunLoop;
 
     // TODO

@@ -1,21 +1,23 @@
 #pragma once
 
-#include <mbgl/actor/actor_ref.hpp>
-#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/actor/scheduler.hpp>
-#include <mbgl/renderer/renderer.hpp>
 
 #include <memory>
 #include <utility>
 
 #include <jni/jni.hpp>
+#include <mbgl/storage/default_file_source.hpp>
 
 #include "jni/generic_global_ref_deleter.hpp"
 
 namespace mbgl {
 
+template <class>
+class ActorRef;
+class Mailbox;
 class Renderer;
 class RendererBackend;
+class RendererObserver;
 class ThreadPool;
 class UpdateParameters;
 
@@ -52,6 +54,11 @@ public:
     // Resets the renderer to clean up on the calling thread
     void reset();
 
+    // Takes the RendererObserver by shared_ptr so we
+    // don't have to make the header public. Use
+    // this instead of Renderer#setObserver directly
+    void setObserver(std::shared_ptr<RendererObserver>);
+
     // Sets the new update parameters to use on subsequent
     // renders. Be sure to trigger a render with
     // requestRender().
@@ -79,11 +86,20 @@ private:
 
 private:
     GenericUniqueWeakObject<MapRenderer> javaPeer;
+
+    float pixelRatio;
+    DefaultFileSource& fileSource;
+    std::string programCacheDir;
+
     std::shared_ptr<ThreadPool> threadPool;
+    std::shared_ptr<Mailbox> mailbox;
+
+    std::mutex initialisationMutex;
+    std::shared_ptr<RendererObserver> rendererObserver;
+
     std::unique_ptr<AndroidRendererBackend> backend;
     std::unique_ptr<Renderer> renderer;
-    std::shared_ptr<Mailbox> mailbox;
-    ActorRef<Renderer> rendererRef;
+    std::unique_ptr<ActorRef<Renderer>> rendererRef;
 
     std::shared_ptr<UpdateParameters> updateParameters;
     std::mutex updateMutex;
