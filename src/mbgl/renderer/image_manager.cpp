@@ -39,6 +39,13 @@ void ImageManager::removeImage(const std::string& id) {
 
     auto it = patterns.find(id);
     if (it != patterns.end()) {
+        // Clear pattern from the atlas image.
+        const uint32_t x = it->second.bin->x;
+        const uint32_t y = it->second.bin->y;
+        const uint32_t w = it->second.bin->w;
+        const uint32_t h = it->second.bin->h;
+        PremultipliedImage::clear(atlasImage, { x, y }, { w, h });
+
         shelfPack.unref(*it->second.bin);
         patterns.erase(it);
     }

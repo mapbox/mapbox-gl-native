@@ -5,6 +5,7 @@
 #include <mbgl/util/size.hpp>
 
 #include <string>
+#include <cstring>
 #include <memory>
 #include <algorithm>
 
@@ -89,6 +90,31 @@ public:
             std::min(size.height, size_.height)
         });
         operator=(std::move(newImage));
+    }
+
+    // Clears the rect area specified by `pt` and `size` from `dstImage`.
+    static void clear(Image& dstImg, const Point<uint32_t>& pt, const Size& size) {
+        if (size.isEmpty()) {
+            return;
+        }
+
+        if (!dstImg.valid()) {
+            throw std::invalid_argument("invalid destination for image clear");
+        }
+
+        if (size.width > dstImg.size.width ||
+            size.height > dstImg.size.height ||
+            pt.x > dstImg.size.width - size.width ||
+            pt.y > dstImg.size.height - size.height) {
+            throw std::out_of_range("out of range destination coordinates for image clear");
+        }
+
+        uint8_t* dstData = dstImg.data.get();
+
+        for (uint32_t y = 0; y < size.height; y++) {
+            const std::size_t dstOffset = (pt.y + y) * dstImg.stride() + pt.x * channels;
+            std::memset(dstData + dstOffset, 0, size.width * channels);
+        }
     }
 
     // Copy image data within `rect` from `src` to the rectangle of the same size at `pt`
