@@ -1,6 +1,7 @@
 #include "android_renderer_frontend.hpp"
 
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/thread.hpp>
@@ -63,13 +64,13 @@ AndroidRendererFrontend::~AndroidRendererFrontend() = default;
 
 void AndroidRendererFrontend::reset() {
     mapRenderer.reset();
-    rendererObserver.reset();
 }
 
 void AndroidRendererFrontend::setObserver(RendererObserver& observer) {
     assert (util::RunLoop::Get());
-    rendererObserver = std::make_unique<ForwardingRendererObserver>(*mapRunLoop, observer);
-    mapRenderer.actor().invoke(&Renderer::setObserver, rendererObserver.get());
+    // Don't call the Renderer directly, but use MapRenderer#setObserver to make sure
+    // the Renderer may be re-initialised without losing the RendererObserver reference.
+    mapRenderer.setObserver(std::make_unique<ForwardingRendererObserver>(*mapRunLoop, observer));
 }
 
 void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {

@@ -13,6 +13,10 @@ public:
     void updateAssumedState() override;
     mbgl::Size getFramebufferSize() const override;
 
+    // Ensures the current context is not
+    // cleaned up when destroyed
+    void markContextLost();
+
     void updateViewPort();
 
     void resizeFramebuffer(int width, int height);

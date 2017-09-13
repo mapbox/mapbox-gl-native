@@ -26,6 +26,7 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/filter.hpp>
+#include <mbgl/renderer/query.hpp>
 
 // Java -> C++ conversion
 #include "style/android_conversion.hpp"
