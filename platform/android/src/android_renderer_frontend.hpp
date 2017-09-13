@@ -42,6 +42,7 @@ public:
                             InvalidateCallback);
     ~AndroidRendererFrontend() override;
 
+    void initialise();
     void reset() override;
     void setObserver(RendererObserver&) override;
 
@@ -67,6 +68,11 @@ public:
     void requestSnapshot(SnapshotCallback);
 
 private:
+    float pixelRatio;
+    FileSource& fileSource;
+    Scheduler& scheduler;
+    std::string programCacheDir;
+
     std::unique_ptr<AndroidRendererBackend> backend;
     std::unique_ptr<util::Thread<Renderer>> renderer;
     std::unique_ptr<RendererObserver> rendererObserver;
@@ -74,6 +80,7 @@ private:
     std::mutex updateMutex;
     std::shared_ptr<UpdateParameters> updateParameters;
 
+    std::mutex intitialisationMutex;
 
     util::AsyncTask asyncInvalidate;
 

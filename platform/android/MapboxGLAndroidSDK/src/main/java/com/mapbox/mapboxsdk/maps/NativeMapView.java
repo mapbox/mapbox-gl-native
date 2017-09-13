@@ -903,6 +903,8 @@ final class NativeMapView implements GLSurfaceView.Renderer {
                                        float pixelRatio,
                                        String programCacheDir);
 
+  private native void nativeOnSurfaceCreated();
+
   private native void nativeDestroy();
 
   private native void nativeInitializeDisplay();
@@ -1142,6 +1144,7 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   @Override
   public void onSurfaceCreated(GL10 gl, EGLConfig config) {
     Timber.i("[%s] onSurfaceCreated", Thread.currentThread().getName());
+    nativeOnSurfaceCreated();
     //TODO: callback to map to re-create renderer?
   }
 

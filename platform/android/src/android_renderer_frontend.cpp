@@ -62,22 +62,16 @@ private:
     RendererObserver& delegate;
 };
 
-AndroidRendererFrontend::AndroidRendererFrontend(float pixelRatio,
-                                                 FileSource& fileSource,
-                                                 Scheduler& scheduler,
-                                                 std::string programCacheDir,
-                                                 InvalidateCallback invalidate)
-        : backend(std::make_unique<AndroidRendererBackend>())
-        , renderer(std::make_unique<util::Thread<Renderer>>(
-                "Orchestration Thread",
-                *backend,
-                pixelRatio,
-                fileSource,
-                scheduler,
-                GLContextMode::Unique,
-                programCacheDir
-        ))
-        , asyncInvalidate([=, invalidate=std::move(invalidate)]() {
+AndroidRendererFrontend::AndroidRendererFrontend(float pixelRatio_,
+                                                 FileSource& fileSource_,
+                                                 Scheduler& scheduler_,
+                                                 std::string programCacheDir_,
+                                                 InvalidateCallback invalidate_)
+        : pixelRatio(pixelRatio_)
+        , fileSource(fileSource_)
+        , scheduler(scheduler_)
+        , programCacheDir(programCacheDir_)
+        , asyncInvalidate([=, invalidate=std::move(invalidate_)]() {
             invalidate();
         })
         , mapRunLoop(util::RunLoop::Get()) {
@@ -90,11 +84,50 @@ void AndroidRendererFrontend::reset() {
     renderer.reset();
 }
 
+void AndroidRendererFrontend::initialise() {
+    // Lock as the initialization can come from the main thread or the GL thread first
+    std::lock_guard<std::mutex> lock(intitialisationMutex);
+
+    if (backend) {
+        // The android system will have already destroyed the underlying
+        // GL resources and an attempt to clean them up will fail
+        backend->abandonContext();
+    }
+
+    // Destroy in reverse order
+    renderer.reset();
+    backend.reset();
+
+    // Re-create
+    backend = std::make_unique<AndroidRendererBackend>();
+    renderer = std::make_unique<util::Thread<Renderer>>(
+            "Orchestration Thread",
+            *backend,
+            pixelRatio,
+            fileSource,
+            scheduler,
+            GLContextMode::Unique,
+            programCacheDir
+    );
+
+    // Set the observer on the new Renderer implementation
+    if (rendererObserver) {
+        renderer->actor().invoke(&Renderer::setObserver, rendererObserver.get());
+    }
+}
+
 void AndroidRendererFrontend::setObserver(RendererObserver& observer) {
-    assert (renderer);
     assert (util::RunLoop::Get());
+
+    // Lock as the initialization can come from the main thread or the GL thread first
+    std::lock_guard<std::mutex> lock(intitialisationMutex);
+    
     rendererObserver = std::make_unique<ForwardingRendererObserver>(*mapRunLoop, observer);
-    renderer->actor().invoke(&Renderer::setObserver, rendererObserver.get());
+
+    // Set the new observer on the Renderer implementation
+    if (renderer) {
+        renderer->actor().invoke(&Renderer::setObserver, rendererObserver.get());
+    }
 }
 
 void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {

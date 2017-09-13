@@ -1,5 +1,7 @@
 #include "android_renderer_backend.hpp"
 
+#include <mbgl/gl/context.hpp>
+
 #include <EGL/egl.h>
 
 #include <cassert>
@@ -51,5 +53,12 @@ void AndroidRendererBackend::updateAssumedState() {
     assumeViewport(0, 0, getFramebufferSize());
 }
 
+
+void AndroidRendererBackend::abandonContext() {
+    if (context) {
+        context->setCleanupOnDestruction(false);
+    }
 }
-}
+
+} // namespace android
+} // namspace mbgl

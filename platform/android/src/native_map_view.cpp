@@ -187,6 +187,10 @@ void NativeMapView::onSourceChanged(mbgl::style::Source&) {
 
 // JNI Methods //
 
+void NativeMapView::onSurfaceCreated(jni::JNIEnv&) {
+    rendererFrontend->initialise();
+}
+
 // Called from the OpenGL renderer thread
 void NativeMapView::render(jni::JNIEnv& ) {
     rendererFrontend->render();
@@ -1003,6 +1007,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::String>,
             "nativeInitialize",
             "nativeDestroy",
+            METHOD(&NativeMapView::onSurfaceCreated, "nativeOnSurfaceCreated"),
             METHOD(&NativeMapView::render, "nativeRender"),
             METHOD(&NativeMapView::update, "nativeUpdate"),
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
