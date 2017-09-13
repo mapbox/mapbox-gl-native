@@ -1,26 +1,13 @@
 #include "native_map_view.hpp"
 
-#include <cstdlib>
-#include <ctime>
-#include <cassert>
-#include <memory>
 #include <list>
-#include <tuple>
 
 #include <sys/system_properties.h>
 
-#include <EGL/egl.h>
 #include <android/native_window_jni.h>
 
-#include <jni/jni.hpp>
-
-#include <mbgl/renderer/backend_scope.hpp>
-#include <mbgl/math/minmax.hpp>
-#include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
 #include <mbgl/util/exception.hpp>
-#include <mbgl/util/geo.hpp>
-#include <mbgl/util/image.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
@@ -32,7 +19,6 @@
 
 // Java -> C++ conversion
 #include "style/android_conversion.hpp"
-#include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 
 // C++ -> Java conversion
@@ -43,13 +29,7 @@
 
 #include "jni.hpp"
 #include "attach_env.hpp"
-#include "android_renderer_frontend.hpp"
-#include "bitmap.hpp"
 #include "run_loop_impl.hpp"
-#include "java/util.hpp"
-#include "geometry/lat_lng_bounds.hpp"
-#include "map/camera_position.hpp"
-#include "style/light.hpp"
 #include "bitmap_factory.hpp"
 
 namespace mbgl {

@@ -4,16 +4,8 @@
 #include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
-#include <mbgl/actor/scheduler.hpp>
 
 #include <android/looper.h>
-
-#include <algorithm>
-#include <cassert>
-#include <functional>
-#include <memory>
-#include <stdexcept>
-#include <vector>
 
 #include <fcntl.h>
 #include <unistd.h>
