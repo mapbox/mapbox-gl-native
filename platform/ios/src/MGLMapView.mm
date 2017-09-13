@@ -471,11 +471,10 @@ public:
     _annotationViewReuseQueueByIdentifier = [NSMutableDictionary dictionary];
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
-    
+
     // setup logo
     //
-    
-    
+
     UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
