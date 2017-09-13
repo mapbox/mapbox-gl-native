@@ -5464,6 +5464,10 @@ public:
         }
     }
 
+    mbgl::Size getFramebufferSize() const override {
+        return nativeView.framebufferSize;
+    }
+
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
         [nativeView cameraWillChangeAnimated:animated];

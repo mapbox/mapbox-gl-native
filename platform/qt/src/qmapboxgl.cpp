@@ -1505,7 +1505,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
                                              static_cast<mbgl::GLContextMode>(settings.contextMode())),
             *this);
     connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
-    
+
     mapObj = std::make_unique<mbgl::Map>(
             *frontend,
             *this, sanitizedSize(size),
@@ -1528,18 +1528,18 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-mbgl::Size QMapboxGLPrivate::framebufferSize() const {
+mbgl::Size QMapboxGLPrivate::getFramebufferSize() const {
     return sanitizedSize(fbSize);
 }
 
 void QMapboxGLPrivate::updateAssumedState() {
     assumeFramebufferBinding(fbObject);
-    assumeViewport(0, 0, framebufferSize());
+    assumeViewport(0, 0, getFramebufferSize());
 }
 
 void QMapboxGLPrivate::bind() {
     setFramebufferBinding(fbObject);
-    setViewport(0, 0, framebufferSize());
+    setViewport(0, 0, getFramebufferSize());
 }
 
 void QMapboxGLPrivate::invalidate()

@@ -2883,6 +2883,10 @@ public:
         setViewport(0, 0, nativeView.framebufferSize);
     }
 
+    mbgl::Size getFramebufferSize() const override {
+        return nativeView.framebufferSize;
+    }
+
     mbgl::PremultipliedImage readStillImage() {
         return readFramebuffer(nativeView.framebufferSize);
     }

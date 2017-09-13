@@ -27,6 +27,7 @@ public:
 
     optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depthRenderbuffer;
     bool has3D = false;
+    Size backendSize;
 
     Programs programs;
 

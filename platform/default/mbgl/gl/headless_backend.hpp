@@ -15,6 +15,7 @@ public:
     ~HeadlessBackend() override;
 
     void bind() override;
+    Size getFramebufferSize() const override;
     void updateAssumedState() override;
 
     void setSize(Size);

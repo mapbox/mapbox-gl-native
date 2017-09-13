@@ -52,7 +52,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
     }
 
     if (parameters.pass == RenderPass::Pass3D) {
-        const auto size = parameters.context.viewport.getCurrentValue().size;
+        const auto& size = parameters.staticData.backendSize;
 
         if (!renderTexture || renderTexture->getSize() != size) {
             renderTexture = OffscreenTexture(parameters.context, size, *parameters.staticData.depthRenderbuffer);
@@ -125,7 +125,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
     } else if (parameters.pass == RenderPass::Translucent) {
         parameters.context.bindTexture(renderTexture->getTexture());
 
-        const auto size = parameters.context.viewport.getCurrentValue().size;
+        const auto& size = parameters.staticData.backendSize;
 
         mat4 viewportMat;
         matrix::ortho(viewportMat, 0, size.width, size.height, 0, 0, 1);

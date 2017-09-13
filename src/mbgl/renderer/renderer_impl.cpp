@@ -390,16 +390,15 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
     if (parameters.staticData.has3D) {
-        parameters.backend.bind();
+        parameters.staticData.backendSize = parameters.backend.getFramebufferSize();
+
         MBGL_DEBUG_GROUP(parameters.context, "3d");
         parameters.pass = RenderPass::Pass3D;
 
-        const auto size = parameters.context.viewport.getCurrentValue().size;
-
         if (!parameters.staticData.depthRenderbuffer ||
-            parameters.staticData.depthRenderbuffer->size != size) {
+            parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
             parameters.staticData.depthRenderbuffer =
-                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(size);
+                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
         }
         parameters.staticData.depthRenderbuffer->shouldClear(true);
 
@@ -411,8 +410,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 it->layer.render(parameters, it->source);
             }
         }
-
-        // The main backend/framebuffer will be rebound in the clear step.
     }
 
     // - CLEAR -------------------------------------------------------------------------------------
