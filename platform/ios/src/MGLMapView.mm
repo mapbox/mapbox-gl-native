@@ -472,12 +472,15 @@ public:
     _selectedAnnotationTag = MGLAnnotationTagNotFound;
     _annotationsNearbyLastTap = {};
 
-    // setup logo bug
+    // setup logo
     //
     UIImage *logo = [MGLMapView resourceImageNamed:@"mapbox"];
     _logoView = [[UIImageView alloc] initWithImage:logo];
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([_logoView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _logoView.accessibilityIgnoresInvertColors = YES; }
+#endif
     [self addSubview:_logoView];
 
     // setup attribution
@@ -485,6 +488,9 @@ public:
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
     _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([_attributionButton respondsToSelector:@selector(accessibilityIgnoresInvertColors)])  { _attributionButton.accessibilityIgnoresInvertColors = YES; }
+#endif
     [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
     [self addSubview:_attributionButton];
     [_attributionButton addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:NULL];
@@ -498,11 +504,17 @@ public:
     _compassView.accessibilityTraits = UIAccessibilityTraitButton;
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([_compassView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _compassView.accessibilityIgnoresInvertColors = YES; }
+#endif
     [self addSubview:_compassView];
     
     // setup scale control
     //
     _scaleBar = [[MGLScaleBar alloc] init];
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([_scaleBar respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _scaleBar.accessibilityIgnoresInvertColors = YES; }
+#endif
     [self addSubview:_scaleBar];
     
     // setup interaction
@@ -616,6 +628,9 @@ public:
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    if ([_glView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _glView.accessibilityIgnoresInvertColors = YES; }
+#endif
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
