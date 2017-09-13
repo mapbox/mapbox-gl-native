@@ -87,7 +87,9 @@ static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mis
 Context::Context() = default;
 
 Context::~Context() {
-    reset();
+    if (cleanupOnDestruction) {
+        reset();
+    }
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
