@@ -1,5 +1,6 @@
 #include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/math/clamp.hpp>
@@ -15,7 +16,7 @@ namespace geojsonvt = mapbox::geojsonvt;
 ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_, const uint8_t maxZoom_)
     : id(id_),
       maxZoom(maxZoom_),
-      layerID("com.mapbox.annotations.shape." + util::toString(id)) {
+      layerID(AnnotationManager::ShapeLayerID + util::toString(id)) {
 }
 
 void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, AnnotationTileData& data) {

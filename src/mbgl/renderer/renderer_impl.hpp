@@ -49,6 +49,7 @@ public:
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&) const;
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
+    std::vector<Feature> queryShapeAnnotations(const ScreenLineString&) const;
 
     void onLowMemory();
     void dumDebugLogs();
@@ -61,6 +62,8 @@ private:
 
           RenderLayer* getRenderLayer(const std::string& id);
     const RenderLayer* getRenderLayer(const std::string& id) const;
+                           
+    std::vector<Feature> queryRenderedFeatures(const ScreenLineString&, const RenderedQueryOptions&, const std::vector<const RenderLayer*>&) const;
 
     // GlyphManagerObserver implementation.
     void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
