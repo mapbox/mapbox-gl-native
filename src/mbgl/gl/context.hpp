@@ -190,7 +190,13 @@ public:
         return vertexArray.get();
     }
 
+    void setCleanupOnDestruction(bool cleanup) {
+        cleanupOnDestruction = cleanup;
+    }
+
 private:
+    bool cleanupOnDestruction = true;
+
     std::unique_ptr<extension::Debugging> debugging;
     std::unique_ptr<extension::VertexArray> vertexArray;
 #if MBGL_HAS_BINARY_PROGRAMS
