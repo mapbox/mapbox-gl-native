@@ -819,8 +819,7 @@ public:
     return nil;
 }
 
-- (void)updateConstraints
-{
+- (void)updateConstraintsPreiOS11 {
     // If we have a view controller reference and its automaticallyAdjustsScrollViewInsets
     // is set to YES, use its view as the parent for constraints. -[MGLMapView adjustContentInset]
     // already take top and bottom layout guides into account. If we don't have a reference, apply
@@ -829,7 +828,7 @@ public:
     UIViewController *viewController = self.viewControllerForLayoutGuides;
     BOOL useLayoutGuides = viewController.view && viewController.automaticallyAdjustsScrollViewInsets;
     UIView *containerView = useLayoutGuides ? viewController.view : self;
-
+    
     // compass view
     //
     [containerView removeConstraints:self.compassViewConstraints];
@@ -860,7 +859,7 @@ public:
                                      toItem:self.compassView
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1.0
-                                   constant:5.0 + self.contentInset.right]];//
+                                   constant:5.0 + self.contentInset.right]];
     
     [containerView addConstraints:self.compassViewConstraints];
     
@@ -898,7 +897,7 @@ public:
     
     [containerView addConstraints:self.scaleBarConstraints];
     
-    // logo bug
+    // logo view
     //
     [containerView removeConstraints:self.logoViewConstraints];
     [self.logoViewConstraints removeAllObjects];
@@ -964,7 +963,61 @@ public:
                                  multiplier:1
                                    constant:8 + self.contentInset.right]];
     [containerView addConstraints:self.attributionButtonConstraints];
+}
+
+- (void)updateConstraints
+{
     
+// If compiling with the iOS 11+ SDK
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+    // If safeAreaLayoutGuide API exists
+    if ( [self respondsToSelector:@selector(safeAreaLayoutGuide)] ) {
+        
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        UILayoutGuide *safeAreaLayoutGuide = self.safeAreaLayoutGuide;
+#pragma clang diagnostic pop
+        // compass view
+        [self removeConstraints:self.compassViewConstraints];
+        [self.compassViewConstraints removeAllObjects];
+        [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor
+                                                                                          constant:5.0 + self.contentInset.top]];
+        [self.compassViewConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.compassView.rightAnchor
+                                                                                          constant:8.0 + self.contentInset.right]];
+        [self addConstraints:self.compassViewConstraints];
+        
+        // scale bar view
+        [self removeConstraints:self.scaleBarConstraints];
+        [self.scaleBarConstraints removeAllObjects];
+        [self.scaleBarConstraints addObject:[self.scaleBar.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor
+                                                                                    constant:5.0 + self.contentInset.top]];
+        [self.scaleBarConstraints addObject:[self.scaleBar.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
+                                                                                     constant:8.0 + self.contentInset.left]];
+        [self addConstraints:self.scaleBarConstraints];
+        
+        // logo view
+        [self removeConstraints:self.logoViewConstraints];
+        [self.logoViewConstraints removeAllObjects];
+        [self.logoViewConstraints addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:self.logoView.bottomAnchor
+                                                                                             constant:8.0 + self.contentInset.bottom]];
+        [self.logoViewConstraints addObject:[self.logoView.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
+                                                                                     constant:8.0 + self.contentInset.left]];
+        [self addConstraints:self.logoViewConstraints];
+        
+        // attribution button
+        [self removeConstraints:self.attributionButtonConstraints];
+        [self.attributionButtonConstraints removeAllObjects];
+        [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:self.attributionButton.bottomAnchor
+                                                                                                      constant:8.0 + self.contentInset.bottom]];
+        [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.attributionButton.rightAnchor
+                                                                                               constant:8.0 + self.contentInset.right]];
+        [self addConstraints:self.attributionButtonConstraints];
+    } else {
+        [self updateConstraintsPreiOS11];
+    }
+#else
+    [self updateConstraintsPreiOS11];
+#endif
     
     [super updateConstraints];
 }
