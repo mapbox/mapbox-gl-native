@@ -18,7 +18,7 @@ public:
     Impl(gl::Context& context_,
          const Size size_,
          gl::Renderbuffer<gl::RenderbufferType::DepthComponent>& depth_)
-        : context(context_), size(std::move(size_)), depth(std::move(depth_)) {
+        : context(context_), size(std::move(size_)), depth(&depth_) {
         assert(!size.isEmpty());
     }
 
@@ -57,7 +57,7 @@ private:
     const Size size;
     optional<gl::Framebuffer> framebuffer;
     optional<gl::Texture> texture;
-    optional<gl::Renderbuffer<gl::RenderbufferType::DepthComponent>> depth;
+    gl::Renderbuffer<gl::RenderbufferType::DepthComponent>* depth = nullptr;
 };
 
 OffscreenTexture::OffscreenTexture(gl::Context& context,
