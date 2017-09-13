@@ -151,19 +151,6 @@ void NodeMap::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     info.GetReturnValue().Set(info.This());
 }
 
-std::string StringifyStyle(v8::Local<v8::Value> styleHandle) {
-    Nan::HandleScope scope;
-
-    v8::Local<v8::Object> JSON = Nan::To<v8::Object>(
-        Nan::Get(
-            Nan::GetCurrentContext()->Global(),
-            Nan::New("JSON").ToLocalChecked()
-        ).ToLocalChecked()
-    ).ToLocalChecked();
-
-    return *Nan::Utf8String(Nan::MakeCallback(JSON, "stringify", 1, &styleHandle));
-}
-
 /**
  * Load a stylesheet
  *
@@ -197,7 +184,8 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     std::string style;
 
     if (info[0]->IsObject()) {
-        style = StringifyStyle(info[0]);
+        Nan::JSON JSON;
+        style = *Nan::Utf8String(JSON.Stringify(info[0]->ToObject()).ToLocalChecked());
     } else if (info[0]->IsString()) {
         style = *Nan::Utf8String(info[0]);
     } else {
@@ -543,6 +531,10 @@ void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     if (!info[0]->IsString()) {
         return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    if (!info[1]->IsObject()) {
+        return Nan::ThrowTypeError("Second argument must be an object");
     }
 
     Error error;
