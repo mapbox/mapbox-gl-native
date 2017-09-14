@@ -18,7 +18,7 @@ public:
                          optional<bool> geometryConversion_ = true)
         : layerIDs(std::move(layerIDs_)),
           filter(std::move(filter_)),
-          geometryConversion(geometryConversion_) {}
+          geometryConversion(std::move(geometryConversion_)) {}
 
     /** layerIDs to include in the query */
     optional<std::vector<std::string>> layerIDs;
