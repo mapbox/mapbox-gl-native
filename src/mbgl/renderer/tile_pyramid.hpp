@@ -63,8 +63,6 @@ public:
 
     bool enabled = false;
 
-    void removeStaleTiles(const std::set<OverscaledTileID>&);
-
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
