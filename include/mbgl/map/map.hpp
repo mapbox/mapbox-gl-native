@@ -197,6 +197,7 @@ public:
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions& options = {});
 
     AnnotationIDs queryPointAnnotations(const ScreenBox&);
+    AnnotationIDs queryShapeAnnotations(const ScreenBox&, const RenderedQueryOptions& options = {});
 
     // Memory
     void setSourceTileCacheSize(size_t);
@@ -213,6 +214,7 @@ public:
 private:
     class Impl;
     const std::unique_ptr<Impl> impl;
+    AnnotationIDs queryAnnotations(const ScreenBox&,  const RenderedQueryOptions& options = {});
 };
 
 } // namespace mbgl

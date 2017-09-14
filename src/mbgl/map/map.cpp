@@ -854,6 +854,15 @@ std::vector<Feature> Map::querySourceFeatures(const std::string& sourceID, const
 AnnotationIDs Map::queryPointAnnotations(const ScreenBox& box) {
     RenderedQueryOptions options;
     options.layerIDs = {{ AnnotationManager::PointLayerID }};
+    return queryAnnotations(box, options);
+}
+    
+AnnotationIDs Map::queryShapeAnnotations(const ScreenBox& box, const RenderedQueryOptions& options) {
+
+    return queryAnnotations(box, options);
+}
+    
+AnnotationIDs Map::queryAnnotations(const ScreenBox& box,  const RenderedQueryOptions& options) {
     auto features = queryRenderedFeatures(box, options);
     std::set<AnnotationID> set;
     for (auto &feature : features) {

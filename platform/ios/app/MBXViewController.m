@@ -1824,4 +1824,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.hudLabel setTitle:hudString forState:UIControlStateNormal];
 }
 
+- (void)mapView:(MGLMapView *)mapView didSelectShapeAnnotation:(nonnull MGLShape *)shapeAnnotation
+{
+    NSLog(@"Did Select: %f, %f", shapeAnnotation.coordinate.latitude, shapeAnnotation.coordinate.longitude);
+}
+
+- (void)mapView:(MGLMapView *)mapView didDeselectShapeAnnotation:(nonnull MGLShape *)shapeAnnotation
+{
+    NSLog(@"Did deselect: %f, %f", shapeAnnotation.coordinate.latitude, shapeAnnotation.coordinate.longitude);
+}
+
 @end

@@ -382,6 +382,27 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapView:(MGLMapView *)mapView didDeselectAnnotation:(id <MGLAnnotation>)annotation;
 
 /**
+ Tells the delegate that one of its shape annotations was selected.
+ 
+ You can use this method to track changes in the selection state of annotations.
+ 
+ @param mapView The map view containing the annotation.
+ @param shapeAnnotation The shape annotation that was selected.
+ */
+- (void)mapView:(MGLMapView *)mapView didSelectShapeAnnotation:(MGLShape *)shapeAnnotation;
+
+/**
+ Tells the delegate that one of its shape annotations was deselected.
+ 
+ You can use this method to track changes in the selection state of annotations.
+ 
+ 
+ @param mapView The map view containing the annotation.
+ @param shapeAnnotation The shape annotation that was deselected.
+ */
+- (void)mapView:(MGLMapView *)mapView didDeselectShapeAnnotation:(MGLShape *)shapeAnnotation;
+
+/**
  Tells the delegate that one of its annotation views was selected.
 
  You can use this method to track changes in the selection state of annotation
