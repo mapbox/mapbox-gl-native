@@ -47,7 +47,7 @@ public:
 
     // Zoom
     double getZoom() const;
-    int32_t getIntegerZoom() const;
+    uint8_t getIntegerZoom() const;
     double getZoomFraction() const;
 
     // Bounds
