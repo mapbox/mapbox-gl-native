@@ -98,6 +98,8 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
  * Called through NativeMapView#destroy()
  */
 NativeMapView::~NativeMapView() {
+    destroyed = true;
+
     _terminateContext();
     _destroySurface();
     _terminateDisplay();
@@ -176,9 +178,11 @@ void NativeMapView::deactivate() {
  * May be called from any thread
  */
 void NativeMapView::invalidate() {
-    android::UniqueEnv _env = android::AttachEnv();
-    static auto onInvalidate = javaClass.GetMethod<void ()>(*_env, "onInvalidate");
-    javaPeer->Call(*_env, onInvalidate);
+    if (!destroyed) {
+        android::UniqueEnv _env = android::AttachEnv();
+        static auto onInvalidate = javaClass.GetMethod<void ()>(*_env, "onInvalidate");
+        javaPeer->Call(*_env, onInvalidate);
+    }
 }
 
 /**
@@ -187,11 +191,11 @@ void NativeMapView::invalidate() {
  * May be called from any thread
  */
 void NativeMapView::notifyMapChange(mbgl::MapChange change) {
-    assert(vm != nullptr);
-
-    android::UniqueEnv _env = android::AttachEnv();
-    static auto onMapChanged = javaClass.GetMethod<void (int)>(*_env, "onMapChanged");
-    javaPeer->Call(*_env, onMapChanged, (int) change);
+    if (!destroyed) {
+        android::UniqueEnv _env = android::AttachEnv();
+        static auto onMapChanged = javaClass.GetMethod<void (int)>(*_env, "onMapChanged");
+        javaPeer->Call(*_env, onMapChanged, (int) change);
+    }
 }
 
 void NativeMapView::onCameraWillChange(MapObserver::CameraChangeMode mode) {
