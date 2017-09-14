@@ -1,10 +1,6 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/run_loop.hpp>
-
-#include <atomic>
-#include <functional>
 
 namespace mbgl {
 namespace util {

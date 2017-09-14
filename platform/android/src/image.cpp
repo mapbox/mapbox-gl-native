@@ -1,8 +1,6 @@
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/string.hpp>
 
-#include <string>
-
 #include "attach_env.hpp"
 #include "bitmap_factory.hpp"
 

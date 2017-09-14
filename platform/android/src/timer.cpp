@@ -1,9 +1,6 @@
 #include "run_loop_impl.hpp"
 
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
-
-#include <functional>
 
 namespace mbgl {
 namespace util {

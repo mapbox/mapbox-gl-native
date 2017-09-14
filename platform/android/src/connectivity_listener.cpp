@@ -1,9 +1,6 @@
 #include "connectivity_listener.hpp"
 
 #include <mbgl/storage/network_status.hpp>
-#include <mbgl/util/logging.hpp>
-
-#include <jni/jni.hpp>
 
 namespace mbgl {
 namespace android {

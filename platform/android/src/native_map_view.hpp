@@ -293,7 +293,6 @@ private:
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 
     std::string styleUrl;
-    std::string apiKey;
 
     ANativeWindow *window = nullptr;
 
@@ -308,7 +307,6 @@ private:
     EGLDisplay display = EGL_NO_DISPLAY;
     EGLSurface surface = EGL_NO_SURFACE;
     EGLContext context = EGL_NO_CONTEXT;
-
 
     float pixelRatio;
     bool fpsEnabled = false;
