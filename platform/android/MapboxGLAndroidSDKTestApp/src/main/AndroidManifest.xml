@@ -113,6 +113,17 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.camera.CameraAnimatorActivity"
+            android:description="@string/description_camera_animator"
+            android:label="@string/activity_camera_animator">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.camera.CameraPositionActivity"
             android:description="@string/description_cameraposition"
             android:label="@string/activity_camera_position">
