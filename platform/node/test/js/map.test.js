@@ -109,6 +109,7 @@ test('Map', function(t) {
             'release',
             'cancel',
             'addSource',
+            'removeSource',
             'addLayer',
             'removeLayer',
             'addImage',

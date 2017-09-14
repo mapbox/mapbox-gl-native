@@ -53,6 +53,7 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "cancel", Cancel);
 
     Nan::SetPrototypeMethod(tpl, "addSource", AddSource);
+    Nan::SetPrototypeMethod(tpl, "removeSource", RemoveSource);
     Nan::SetPrototypeMethod(tpl, "addLayer", AddLayer);
     Nan::SetPrototypeMethod(tpl, "removeLayer", RemoveLayer);
     Nan::SetPrototypeMethod(tpl, "addImage", AddImage);
@@ -545,6 +546,24 @@ void NodeMap::AddSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     nodeMap->map->getStyle().addSource(std::move(*source));
+}
+
+void NodeMap::RemoveSource(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+
+    if (info.Length() != 1) {
+        return Nan::ThrowTypeError("One argument required");
+    }
+
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+
+    nodeMap->map->getStyle().removeSource(*Nan::Utf8String(info[0]));
 }
 
 void NodeMap::AddLayer(const Nan::FunctionCallbackInfo<v8::Value>& info) {
