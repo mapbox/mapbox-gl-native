@@ -136,9 +136,6 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
-// Context for KVO observing UILayoutGuides.
-static void * MGLLayoutGuidesUpdatedContext = &MGLLayoutGuidesUpdatedContext;
-
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
 
@@ -302,8 +299,6 @@ public:
     NSDate *_userLocationAnimationCompletionDate;
     /// True if a willChange notification has been issued for shape annotation layers and a didChange notification is pending.
     BOOL _isChangingAnnotationLayers;
-    BOOL _isObservingTopLayoutGuide;
-    BOOL _isObservingBottomLayoutGuide;
     BOOL _isWaitingForRedundantReachableNotification;
     BOOL _isTargetingInterfaceBuilder;
 
