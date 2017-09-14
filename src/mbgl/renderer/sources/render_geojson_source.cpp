@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -39,16 +40,18 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
         tilePyramid.cache.clear();
 
         if (data) {
-            for (auto const& item : tilePyramid.tiles) {
-                static_cast<GeoJSONTile*>(item.second.get())->updateData(data->getTile(item.first.canonical));
+            const uint8_t maxZ = impl().getZoomRange().max;
+            for (const auto& pair : tilePyramid.tiles) {
+                if (pair.first.canonical.z <= maxZ) {
+                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data->getTile(pair.first.canonical));
+                }
             }
-        } else {
-            tilePyramid.tiles.clear();
-            tilePyramid.renderTiles.clear();
         }
     }
 
     if (!data) {
+        tilePyramid.tiles.clear();
+        tilePyramid.renderTiles.clear();
         return;
     }
 
