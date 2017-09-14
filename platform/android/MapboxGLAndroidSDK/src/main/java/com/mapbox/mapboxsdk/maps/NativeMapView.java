@@ -4,7 +4,6 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.opengl.GLSurfaceView;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,7 +19,8 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
-import com.mapbox.mapboxsdk.maps.renderer.RenderThread;
+import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
+import com.mapbox.mapboxsdk.maps.renderer.MapRendererScheduler;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
@@ -36,13 +36,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
-
 import timber.log.Timber;
 
 // Class that wraps the native methods for convenience
-final class NativeMapView implements GLSurfaceView.Renderer {
+final class NativeMapView {
 
   // Flag to indicating destroy was called
   private boolean destroyed = false;
@@ -53,11 +50,11 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Used for callbacks
   private MapView mapView;
 
-  // Used to schedule work on the render thread
-  private RenderThread renderThread;
-
   //Hold a reference to prevent it from being GC'd as long as it's used on the native side
   private final FileSource fileSource;
+
+  // Used to schedule work on the MapRenderer Thread
+  private MapRendererScheduler scheduler;
 
   // Device density
   private final float pixelRatio;
@@ -73,24 +70,20 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Constructors
   //
 
-  public NativeMapView(final MapView mapView) {
-    Context context = mapView.getContext();
-    fileSource = FileSource.getInstance(context);
-
-    pixelRatio = context.getResources().getDisplayMetrics().density;
+  public NativeMapView(final MapView mapView, MapRenderer mapRenderer) {
+    this.scheduler = mapRenderer;
     this.mapView = mapView;
 
-    String programCacheDir = context.getCacheDir().getAbsolutePath();
-    nativeInitialize(this, fileSource, pixelRatio, programCacheDir);
+    Context context = mapView.getContext();
+    fileSource = FileSource.getInstance(context);
+    pixelRatio = context.getResources().getDisplayMetrics().density;
+
+    nativeInitialize(this, fileSource, mapRenderer, pixelRatio);
   }
 
   //
   // Methods
   //
-
-  public void setRenderThread(RenderThread renderThread) {
-    this.renderThread = renderThread;
-  }
 
   private boolean isDestroyedOn(String callingMethod) {
     if (destroyed && !TextUtils.isEmpty(callingMethod)) {
@@ -113,14 +106,7 @@ final class NativeMapView implements GLSurfaceView.Renderer {
       return;
     }
 
-    requestRender();
-  }
-
-  public void render() {
-    if (isDestroyedOn("render")) {
-      return;
-    }
-    nativeRender();
+    scheduler.requestRender();
   }
 
   public void resizeView(int width, int height) {
@@ -151,31 +137,8 @@ final class NativeMapView implements GLSurfaceView.Renderer {
         + "capping value at 65535 instead of %s", height);
       height = 65535;
     }
+
     nativeResizeView(width, height);
-  }
-
-  private void resizeFramebuffer(int fbWidth, int fbHeight) {
-    if (isDestroyedOn("resizeFramebuffer")) {
-      return;
-    }
-    if (fbWidth < 0) {
-      throw new IllegalArgumentException("fbWidth cannot be negative.");
-    }
-
-    if (fbHeight < 0) {
-      throw new IllegalArgumentException("fbHeight cannot be negative.");
-    }
-
-    if (fbWidth > 65535) {
-      throw new IllegalArgumentException(
-        "fbWidth cannot be greater than 65535.");
-    }
-
-    if (fbHeight > 65535) {
-      throw new IllegalArgumentException(
-        "fbHeight cannot be greater than 65535.");
-    }
-    nativeResizeFramebuffer(fbWidth, fbHeight);
   }
 
   public void setStyleUrl(String url) {
@@ -873,31 +836,6 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   // Callbacks
   //
 
-  /**
-   * Called from JNI whenever the native map
-   * needs rendering.
-   */
-  protected void requestRender() {
-    if (renderThread != null) {
-      renderThread.requestRender();
-    }
-  }
-
-  /**
-   * Called from JNI when work needs to be processed on
-   * the Renderer Thread.
-   */
-  protected void requestProcessing() {
-    if (renderThread != null) {
-      renderThread.queueEvent(new Runnable() {
-        @Override
-        public void run() {
-          nativeProcess();
-        }
-      });
-    }
-  }
-
   protected void onMapChanged(int rawChange) {
     if (mapView != null) {
       mapView.onMapChange(rawChange);
@@ -928,32 +866,12 @@ final class NativeMapView implements GLSurfaceView.Renderer {
 
   private native void nativeInitialize(NativeMapView nativeMapView,
                                        FileSource fileSource,
-                                       float pixelRatio,
-                                       String programCacheDir);
+                                       MapRenderer mapRenderer,
+                                       float pixelRatio);
 
   private native void nativeDestroy();
 
-  private native void nativeProcess();
-
-  private native void nativeInitializeDisplay();
-
-  private native void nativeTerminateDisplay();
-
-  private native void nativeInitializeContext();
-
-  private native void nativeTerminateContext();
-
-  private native void nativeCreateSurface(Object surface);
-
-  private native void nativeDestroySurface();
-
-  private native void nativeUpdate();
-
-  private native void nativeRender();
-
   private native void nativeResizeView(int width, int height);
-
-  private native void nativeResizeFramebuffer(int fbWidth, int fbHeight);
 
   private native void nativeSetStyleUrl(String url);
 
@@ -1160,30 +1078,7 @@ final class NativeMapView implements GLSurfaceView.Renderer {
   void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
     snapshotReadyCallback = callback;
     scheduleTakeSnapshot();
-    renderThread.requestRender();
+    scheduler.requestRender();
   }
 
-  //
-  // GLSurfaceView.Renderer
-  //
-
-  @Override
-  public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-    Timber.i("[%s] onSurfaceCreated", Thread.currentThread().getName());
-    //TODO: callback to map to re-create renderer?
-  }
-
-  @Override
-  public void onSurfaceChanged(GL10 gl, int width, int height) {
-    Timber.i("[%s] onSurfaceChanged %sx%s", Thread.currentThread().getName(), width, height);
-    // Sets the current view port to the new size.
-    gl.glViewport(0, 0, width, height);
-    resizeFramebuffer(width, height);
-    // resizeView(width, height); Done from MapView#onSizeChanged
-  }
-
-  @Override
-  public void onDrawFrame(GL10 gl) {
-    nativeRender();
-  }
 }

@@ -9,12 +9,10 @@
 
 #include <sys/system_properties.h>
 
-#include <EGL/egl.h>
 #include <android/native_window_jni.h>
 
 #include <jni/jni.hpp>
 
-#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/event.hpp>
@@ -28,7 +26,6 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/renderer/renderer.hpp>
 
 // Java -> C++ conversion
 #include "style/android_conversion.hpp"
@@ -43,8 +40,9 @@
 
 #include "jni.hpp"
 #include "attach_env.hpp"
-#include "android_renderer_backend.hpp"
+#include "map_renderer.hpp"
 #include "android_renderer_frontend.hpp"
+#include "file_source.hpp"
 #include "bitmap.hpp"
 #include "run_loop_impl.hpp"
 #include "java/util.hpp"
@@ -59,8 +57,8 @@ namespace android {
 NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::Object<NativeMapView> _obj,
                              jni::Object<FileSource> jFileSource,
-                             jni::jfloat _pixelRatio,
-                             jni::String _programCacheDir)
+                             jni::Object<MapRenderer> jMapRenderer,
+                             jni::jfloat _pixelRatio)
     : javaPeer(_obj.NewWeakGlobalRef(_env)),
       pixelRatio(_pixelRatio),
       threadPool(sharedThreadPool()) {
@@ -71,15 +69,12 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         return;
     }
 
+    // Get native peers
     mbgl::FileSource& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource);
+    MapRenderer& mapRenderer = MapRenderer::getNativePeer(_env, jMapRenderer);
 
     // Create a renderer frontend
-    rendererFrontend = std::make_unique<AndroidRendererFrontend>(pixelRatio, fileSource,
-                                                                 *threadPool,
-                                                                 jni::Make<std::string>(_env,
-                                                                                        _programCacheDir),
-                                                                 [this] { this->requestRender(); },
-                                                                 [this] { this->requestProcessing(); });
+    rendererFrontend = std::make_unique<AndroidRendererFrontend>(mapRenderer);
 
     // Create the core map
     map = std::make_unique<mbgl::Map>(*rendererFrontend, *this,
@@ -95,24 +90,6 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
 NativeMapView::~NativeMapView() {
     map.reset();
     vm = nullptr;
-}
-
-/**
- * Callback to java NativeMapView#requestRender().
- *
- * Called to schedule a render on the next
- * runloop iteration.
- */
-void NativeMapView::requestRender() {
-    android::UniqueEnv _env = android::AttachEnv();
-    static auto onInvalidate = javaClass.GetMethod<void ()>(*_env, "requestRender");
-    javaPeer->Call(*_env, onInvalidate);
-}
-
-void NativeMapView::requestProcessing() {
-    android::UniqueEnv _env = android::AttachEnv();
-    static auto requestProcessing = javaClass.GetMethod<void ()>(*_env, "requestProcessing");
-    javaPeer->Call(*_env, requestProcessing);
 }
 
 /**
@@ -194,29 +171,10 @@ void NativeMapView::onSourceChanged(mbgl::style::Source&) {
 
 // JNI Methods //
 
-// Called from the OpenGL renderer thread
-void NativeMapView::render(jni::JNIEnv& ) {
-    rendererFrontend->render();
-
-    // TODO
-    updateFps();
-}
-
-// Called from the OpenGL renderer thread
-void NativeMapView::process(jni::JNIEnv&) {
-    rendererFrontend->process();
-}
-
 void NativeMapView::resizeView(jni::JNIEnv&, int w, int h) {
     width = util::max(64, w);
     height = util::max(64, h);
     map->setSize({ static_cast<uint32_t>(width), static_cast<uint32_t>(height) });
-}
-
-void NativeMapView::resizeFramebuffer(jni::JNIEnv&, int w, int h) {
-    rendererFrontend->resizeFramebuffer(w, h);
-//    framebufferSizeChanged = true;
-//    invalidate();
 }
 
 jni::String NativeMapView::getStyleUrl(jni::JNIEnv& env) {
@@ -969,6 +927,7 @@ jni::jboolean NativeMapView::getPrefetchesTiles(JNIEnv&) {
 
 // Private methods //
 
+// TODO
 void NativeMapView::updateFps() {
     if (!fpsEnabled) {
         return;
@@ -1008,13 +967,10 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<NativeMapView>(env, NativeMapView::javaClass, "nativePtr",
-            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::jfloat, jni::String>,
+            std::make_unique<NativeMapView, JNIEnv&, jni::Object<NativeMapView>, jni::Object<FileSource>, jni::Object<MapRenderer>, jni::jfloat>,
             "nativeInitialize",
             "nativeDestroy",
-            METHOD(&NativeMapView::render, "nativeRender"),
-            METHOD(&NativeMapView::process, "nativeProcess"),
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
-            METHOD(&NativeMapView::resizeFramebuffer, "nativeResizeFramebuffer"),
             METHOD(&NativeMapView::getStyleUrl, "nativeGetStyleUrl"),
             METHOD(&NativeMapView::setStyleUrl, "nativeSetStyleUrl"),
             METHOD(&NativeMapView::getStyleJson, "nativeGetStyleJson"),
