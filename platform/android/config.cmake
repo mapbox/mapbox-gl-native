@@ -205,6 +205,10 @@ add_library(mbgl-android STATIC
     # Native map
     platform/android/src/native_map_view.cpp
     platform/android/src/native_map_view.hpp
+    platform/android/src/map_renderer.cpp
+    platform/android/src/map_renderer.hpp
+    platform/android/src/map_renderer_runnable.cpp
+    platform/android/src/map_renderer_runnable.hpp
 
     # Java core classes
     platform/android/src/java/util.cpp

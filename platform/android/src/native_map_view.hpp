@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/map/change.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
@@ -10,7 +9,6 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
-#include "file_source.hpp"
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
 #include "annotation/polyline.hpp"
@@ -37,6 +35,8 @@ namespace mbgl {
 namespace android {
 
 class AndroidRendererFrontend;
+class FileSource;
+class MapRenderer;
 
 class NativeMapView : public MapObserver {
 public:
@@ -50,8 +50,8 @@ public:
     NativeMapView(jni::JNIEnv&,
                   jni::Object<NativeMapView>,
                   jni::Object<FileSource>,
-                  jni::jfloat pixelRatio,
-                  jni::String programCacheDir);
+                  jni::Object<MapRenderer>,
+                  jni::jfloat pixelRatio);
 
     virtual ~NativeMapView();
 
@@ -72,27 +72,9 @@ public:
     void onDidFinishLoadingStyle() override;
     void onSourceChanged(mbgl::style::Source&) override;
 
-    // Signal the view system, we want to redraw
-    void requestRender();
-
-    // Request processing on the GL Thread
-    void requestProcessing();
-
     // JNI //
 
-    // Called on OpenGL Thread
-    void onSurfaceCreated(jni::JNIEnv&);
-
-    // Called on OpenGL Thread
-    void process(jni::JNIEnv&);
-
-    // Called on OpenGL Thread
-    void render(jni::JNIEnv&);
-
     void resizeView(jni::JNIEnv&, int, int);
-
-    // Called on OpenGL Thread
-    void resizeFramebuffer(jni::JNIEnv&, int, int);
 
     jni::String getStyleUrl(jni::JNIEnv&);
 
