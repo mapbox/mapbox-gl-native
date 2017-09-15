@@ -68,19 +68,17 @@ public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
         std::unique_ptr<FeatureIndex> featureIndex;
         std::unique_ptr<GeometryTileData> tileData;
-        uint64_t correlationID;
     };
-    void onLayout(LayoutResult);
+    void onLayout(LayoutResult, uint64_t correlationID);
 
     class PlacementResult {
     public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         std::unique_ptr<CollisionTile> collisionTile;
-        uint64_t correlationID;
     };
-    void onPlacement(PlacementResult);
+    void onPlacement(PlacementResult, uint64_t correlationID);
 
-    void onError(std::exception_ptr);
+    void onError(std::exception_ptr, uint64_t correlationID);
     
 protected:
     const GeometryTileData* getData() {

@@ -31,14 +31,16 @@ public:
     void cancel() override;
     Bucket* getBucket(const RenderLayer&) const override;
 
-    void onParsed(std::unique_ptr<Bucket> result);
-    void onError(std::exception_ptr);
+    void onParsed(std::unique_ptr<Bucket> result, uint64_t correlationID);
+    void onError(std::exception_ptr, uint64_t correlationID);
 
 private:
     TileLoader<RasterTile> loader;
 
     std::shared_ptr<Mailbox> mailbox;
     Actor<RasterTileWorker> worker;
+
+    uint64_t correlationID = 0;
 
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.

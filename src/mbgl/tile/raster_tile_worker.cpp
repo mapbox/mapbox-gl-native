@@ -10,17 +10,17 @@ RasterTileWorker::RasterTileWorker(ActorRef<RasterTileWorker>, ActorRef<RasterTi
     : parent(std::move(parent_)) {
 }
 
-void RasterTileWorker::parse(std::shared_ptr<const std::string> data) {
+void RasterTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID) {
     if (!data) {
-        parent.invoke(&RasterTile::onParsed, nullptr); // No data; empty tile.
+        parent.invoke(&RasterTile::onParsed, nullptr, correlationID); // No data; empty tile.
         return;
     }
 
     try {
         auto bucket = std::make_unique<RasterBucket>(util::unpremultiply(decodeImage(*data)));
-        parent.invoke(&RasterTile::onParsed, std::move(bucket));
+        parent.invoke(&RasterTile::onParsed, std::move(bucket), correlationID);
     } catch (...) {
-        parent.invoke(&RasterTile::onError, std::current_exception());
+        parent.invoke(&RasterTile::onError, std::current_exception(), correlationID);
     }
 }
 
