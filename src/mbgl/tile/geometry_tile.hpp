@@ -69,18 +69,15 @@ public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
         std::unique_ptr<FeatureIndex> featureIndex;
         std::unique_ptr<GeometryTileData> tileData;
-        uint64_t correlationID;
 
         LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
-                     std::unique_ptr<GeometryTileData> tileData_,
-                     uint64_t correlationID_)
+                     std::unique_ptr<GeometryTileData> tileData_)
             : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
               featureIndex(std::move(featureIndex_)),
-              tileData(std::move(tileData_)),
-              correlationID(correlationID_) {}
+              tileData(std::move(tileData_)) {}
     };
-    void onLayout(LayoutResult);
+    void onLayout(LayoutResult, uint64_t correlationID);
 
     class PlacementResult {
     public:
@@ -88,22 +85,19 @@ public:
         std::unique_ptr<CollisionTile> collisionTile;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
-        uint64_t correlationID;
 
         PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
                         std::unique_ptr<CollisionTile> collisionTile_,
                         optional<AlphaImage> glyphAtlasImage_,
-                        optional<PremultipliedImage> iconAtlasImage_,
-                        uint64_t correlationID_)
+                        optional<PremultipliedImage> iconAtlasImage_)
             : symbolBuckets(std::move(symbolBuckets_)),
               collisionTile(std::move(collisionTile_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
-              iconAtlasImage(std::move(iconAtlasImage_)),
-              correlationID(correlationID_) {}
+              iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
-    void onPlacement(PlacementResult);
+    void onPlacement(PlacementResult, uint64_t correlationID);
 
-    void onError(std::exception_ptr);
+    void onError(std::exception_ptr, uint64_t correlationID);
     
     float yStretch() const override;
     
