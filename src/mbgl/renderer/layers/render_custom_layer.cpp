@@ -16,7 +16,7 @@ RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
 
 RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
-    if (initialized && impl().deinitializeFn) {
+    if (initialized && !contextDestroyed && impl().deinitializeFn) {
         impl().deinitializeFn(impl().context);
     }
 }

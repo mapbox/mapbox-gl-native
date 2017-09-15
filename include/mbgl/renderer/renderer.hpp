@@ -28,6 +28,8 @@ public:
              const optional<std::string> programCacheDir = {});
     ~Renderer();
 
+    void markContextLost();
+
     void setObserver(RendererObserver*);
 
     void render(const UpdateParameters&);

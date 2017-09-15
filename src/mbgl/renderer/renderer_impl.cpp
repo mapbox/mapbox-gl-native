@@ -62,6 +62,17 @@ Renderer::Impl::Impl(RendererBackend& backend_,
 
 Renderer::Impl::~Impl() {
     assert(BackendScope::exists());
+
+    if (contextLost) {
+        // Signal all RenderCustomLayers that the context was lost
+        // before cleaning up
+        for (const auto& entry : renderLayers) {
+            RenderLayer& layer = *entry.second;
+            if (layer.is<RenderCustomLayer>()) {
+                layer.as<RenderCustomLayer>()->markContextDestroyed();
+            }
+        }
+    }
 };
 
 void Renderer::Impl::setObserver(RendererObserver* observer_) {
