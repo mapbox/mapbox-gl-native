@@ -270,66 +270,38 @@ MGL_EXPORT
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the
+ Returns the URL to version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
  style.
 
- Traffic Day color-codes roads based on live traffic congestion data. Traffic
- data is currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
- @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-trafficDayStyleURLWithVersion:` method instead. Such details may change
-    significantly from version to version.
  */
-+ (NSURL *)trafficDayStyleURL;
++ (NSURL *)trafficDayStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
 
 /**
  Returns the URL to the given version of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
  style as of publication.
-
- Traffic Day color-codes roads based on live traffic congestion data. Traffic
- data is currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
+ 
  @param version A specific version of the style.
  */
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version;
++ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
 
 /**
- Returns the URL to the current version of the
+ Returns the URL to the version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
  style.
 
- Traffic Night color-codes roads based on live traffic congestion data and is
- designed to maximize legibility in low-light situations. Traffic data is
- currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
- @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-trafficNightStyleURLWithVersion:` method instead. Such details may change
-    significantly from version to version.
  */
-+ (NSURL *)trafficNightStyleURL;
++ (NSURL *)trafficNightStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 /**
- Returns the URL to the given version of the
+ Returns the URL to to the version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
  style as of publication.
-
- Traffic Night color-codes roads based on live traffic congestion data and is
- designed to maximize legibility in low-light situations. Traffic data is
- currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
+ 
  @param version A specific version of the style.
  */
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version;
++ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 #pragma mark Accessing Metadata About the Style
 
