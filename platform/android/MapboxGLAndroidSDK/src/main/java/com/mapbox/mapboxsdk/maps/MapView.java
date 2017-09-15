@@ -125,7 +125,6 @@ public class MapView extends FrameLayout {
     myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = (ImageView) view.findViewById(R.id.logoView);
-    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -187,6 +186,7 @@ public class MapView extends FrameLayout {
       annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
+    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
     MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
