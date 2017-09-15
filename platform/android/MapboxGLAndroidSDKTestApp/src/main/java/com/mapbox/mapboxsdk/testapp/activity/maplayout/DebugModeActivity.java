@@ -32,7 +32,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
 /**
- * Test Activity showcasing the different debug modes and allows to cycle between the default map styles.
+ * Test activity showcasing the different debug modes and allows to cycle between the default map styles.
  */
 public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCallback {
 

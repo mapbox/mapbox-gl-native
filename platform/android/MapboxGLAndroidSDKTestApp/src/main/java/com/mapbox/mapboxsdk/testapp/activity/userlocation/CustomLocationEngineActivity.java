@@ -12,6 +12,9 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing using a custom location engine.
+ */
 public class CustomLocationEngineActivity extends BaseLocationActivity {
 
   private MapView mapView;
