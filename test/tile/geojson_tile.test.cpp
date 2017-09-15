@@ -109,8 +109,9 @@ TEST(GeoJSONTile, Issue9927) {
     ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
 
     // Then simulate a parsing failure and make sure that we keep it renderable in this situation
-    // as well.
-    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")));
+    // as well. We're using 3 as a correlationID since we've done two three calls that increment
+    // this counter (as part of the GeoJSONTile constructor, setLayers, and setPlacementConfig).
+    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")), 3);
     ASSERT_TRUE(tile.isRenderable());
     ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
  }
