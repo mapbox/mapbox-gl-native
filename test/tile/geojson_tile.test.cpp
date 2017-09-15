@@ -76,7 +76,7 @@ TEST(GeoJSONTile, Issue7648) {
 TEST(GeoJSONTile, Issue9927) {
     GeoJSONTileTest test;
 
-    CircleLayer layer("circle", "source");
+    test.style.addLayer(std::make_unique<CircleLayer>("circle", "source"));
 
     mapbox::geometry::feature_collection<int16_t> features;
     features.push_back(mapbox::geometry::feature<int16_t> {
@@ -85,7 +85,6 @@ TEST(GeoJSONTile, Issue9927) {
 
     GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
 
-    tile.setLayers({{ layer.baseImpl }});
     tile.setPlacementConfig({});
 
     while (!tile.isComplete()) {
@@ -93,17 +92,18 @@ TEST(GeoJSONTile, Issue9927) {
     }
 
     ASSERT_TRUE(tile.isRenderable());
-    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+    ASSERT_NE(nullptr, tile.getBucket(*test.style.getRenderLayer("circle")));
 
     // Make sure that once we've had a renderable tile and then receive erroneous data, we retain
     // the previously rendered data and keep the tile renderable.
     tile.setError(std::make_exception_ptr(std::runtime_error("Connection offline")));
     ASSERT_TRUE(tile.isRenderable());
-    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+    ASSERT_NE(nullptr, tile.getBucket(*test.style.getRenderLayer("circle")));
 
     // Then simulate a parsing failure and make sure that we keep it renderable in this situation
-    // as well.
-    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")));
+    // as well. We're using 3 as a correlationID since we've done two three calls that increment
+    // this counter (as part of the GeoJSONTile constructor, setLayers, and setPlacementConfig).
+    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")), 3);
     ASSERT_TRUE(tile.isRenderable());
-    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+    ASSERT_NE(nullptr, tile.getBucket(*test.style.getRenderLayer("circle")));
  }

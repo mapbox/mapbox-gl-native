@@ -88,7 +88,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -112,7 +112,7 @@ void GeometryTileWorker::setLayers(std::vector<std::unique_ptr<Layer>> layers_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -136,7 +136,7 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -161,7 +161,7 @@ void GeometryTileWorker::symbolDependenciesChanged() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -187,7 +187,7 @@ void GeometryTileWorker::coalesced() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -353,8 +353,7 @@ void GeometryTileWorker::redoLayout() {
         std::move(buckets),
         std::move(featureIndex),
         *data ? (*data)->clone() : nullptr,
-        correlationID
-    });
+    }, correlationID);
 
     attemptPlacement();
 }
@@ -409,9 +408,8 @@ void GeometryTileWorker::attemptPlacement() {
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
-        std::move(collisionTile),
-        correlationID
-    });
+        std::move(collisionTile),        
+    }, correlationID);
 }
 
 } // namespace mbgl

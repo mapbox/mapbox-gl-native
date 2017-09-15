@@ -37,18 +37,27 @@ void RasterTile::setData(std::shared_ptr<const std::string> data,
                              optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
-    worker.invoke(&RasterTileWorker::parse, data);
+
+    pending = true;
+    ++correlationID;
+    worker.invoke(&RasterTileWorker::parse, data, correlationID);
 }
 
-void RasterTile::onParsed(std::unique_ptr<Bucket> result) {
+void RasterTile::onParsed(std::unique_ptr<Bucket> result, const uint64_t resultCorrelationID) {
     bucket = std::move(result);
     loaded = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     renderable = bucket ? true : false;
     observer->onTileChanged(*this);
 }
 
-void RasterTile::onError(std::exception_ptr err) {
+void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
     loaded = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     observer->onTileError(*this, err);
 }
 
