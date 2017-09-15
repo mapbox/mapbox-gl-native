@@ -25,6 +25,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing how to listen to camera change events.
+ */
 public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;

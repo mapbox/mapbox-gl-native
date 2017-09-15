@@ -26,6 +26,9 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.utils.MapFragmentUtils;
 
+/**
+ * Test activity showcasing using a bottomView with a MapView and stacking map fragments below.
+ */
 public class BottomSheetActivity extends AppCompatActivity {
 
   private static final String TAG_MAIN_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.main";
