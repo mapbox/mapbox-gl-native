@@ -58,7 +58,6 @@ void GeometryTile::cancel() {
 
 void GeometryTile::setError(std::exception_ptr err) {
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
@@ -144,7 +143,6 @@ void GeometryTile::onPlacement(PlacementResult result) {
 void GeometryTile::onError(std::exception_ptr err) {
     loaded = true;
     pending = false;
-    renderable = false;
     observer->onTileError(*this, err);
 }
     

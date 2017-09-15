@@ -70,3 +70,40 @@ TEST(GeoJSONTile, Issue7648) {
         test.loop.runOnce();
     }
 }
+
+// Tests that tiles remain renderable if they have been renderable and then had an error sent to
+// them, e.g. when revalidating/refreshing the request.
+TEST(GeoJSONTile, Issue9927) {
+    GeoJSONTileTest test;
+
+    CircleLayer layer("circle", "source");
+
+    mapbox::geometry::feature_collection<int16_t> features;
+    features.push_back(mapbox::geometry::feature<int16_t> {
+        mapbox::geometry::point<int16_t>(0, 0)
+    });
+
+    GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
+
+    tile.setLayers({{ layer.baseImpl }});
+    tile.setPlacementConfig({});
+
+    while (!tile.isComplete()) {
+        test.loop.runOnce();
+    }
+
+    ASSERT_TRUE(tile.isRenderable());
+    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+
+    // Make sure that once we've had a renderable tile and then receive erroneous data, we retain
+    // the previously rendered data and keep the tile renderable.
+    tile.setError(std::make_exception_ptr(std::runtime_error("Connection offline")));
+    ASSERT_TRUE(tile.isRenderable());
+    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+
+    // Then simulate a parsing failure and make sure that we keep it renderable in this situation
+    // as well.
+    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")));
+    ASSERT_TRUE(tile.isRenderable());
+    ASSERT_NE(nullptr, tile.getBucket(*layer.baseImpl));
+ }
