@@ -66,6 +66,20 @@ TEST(RasterTile, onParsed) {
     EXPECT_TRUE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());
+
+    // Make sure that once we've had a renderable tile and then receive erroneous data, we retain
+    // the previously rendered data and keep the tile renderable.
+    tile.setError(std::make_exception_ptr(std::runtime_error("Connection offline")));
+    EXPECT_TRUE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
+
+    // Then simulate a parsing failure and make sure that we keep it renderable in this situation
+    // as well.
+    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")), 0);
+    ASSERT_TRUE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
 }
 
 TEST(RasterTile, onParsedEmpty) {

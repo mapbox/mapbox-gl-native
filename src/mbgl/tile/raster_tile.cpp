@@ -29,7 +29,6 @@ void RasterTile::cancel() {
 
 void RasterTile::setError(std::exception_ptr err) {
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
@@ -49,9 +48,7 @@ void RasterTile::onParsed(std::unique_ptr<RasterBucket> result) {
 }
 
 void RasterTile::onError(std::exception_ptr err) {
-    bucket.reset();
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
