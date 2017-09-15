@@ -113,6 +113,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
     // GL resources if this is not the first intialization and an
     // attempt to clean them up will fail
     if (backend) backend->markContextLost();
+    if (renderer) renderer->markContextLost();
 
     // Reset in opposite order
     renderer.reset();
