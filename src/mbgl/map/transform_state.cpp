@@ -132,7 +132,7 @@ double TransformState::getZoom() const {
     return scaleZoom(scale);
 }
 
-int32_t TransformState::getIntegerZoom() const {
+uint8_t TransformState::getIntegerZoom() const {
     return getZoom();
 }
 
