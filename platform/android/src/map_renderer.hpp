@@ -87,6 +87,9 @@ protected:
 private:
     // Called from the GL Thread //
 
+    // Resets the renderer
+    void resetRenderer();
+
     // Renders a frame.
     void render(JNIEnv&);
 

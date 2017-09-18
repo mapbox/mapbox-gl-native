@@ -27,8 +27,9 @@ MapRenderer::MapRenderer(jni::JNIEnv& _env, jni::Object<MapRenderer> obj,
 MapRenderer::~MapRenderer() = default;
 
 void MapRenderer::reset() {
-    assert (renderer);
-    renderer.reset();
+    // Make sure to destroy the renderer on the GL Thread
+    auto self = ActorRef<MapRenderer>(*this, mailbox);
+    self.ask(&MapRenderer::resetRenderer).wait();
 
     // Lock to make sure there is no concurrent initialisation on the gl thread
     std::lock_guard<std::mutex> lock(initialisationMutex);
@@ -90,6 +91,11 @@ void MapRenderer::requestSnapshot(SnapshotCallback callback) {
 }
 
 // Called on OpenGL thread //
+
+void MapRenderer::resetRenderer() {
+    assert (renderer);
+    renderer.reset();
+}
 
 void MapRenderer::scheduleSnapshot(std::unique_ptr<SnapshotCallback> callback) {
     snapshotCallback = std::move(callback);
