@@ -807,13 +807,6 @@ final class NativeMapView {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
-  public void scheduleTakeSnapshot() {
-    if (isDestroyedOn("scheduleTakeSnapshot")) {
-      return;
-    }
-    nativeTakeSnapshot();
-  }
-
   public void setApiBaseUrl(String baseUrl) {
     if (isDestroyedOn("setApiBaseUrl")) {
       return;
@@ -1076,9 +1069,11 @@ final class NativeMapView {
   //
 
   void addSnapshotCallback(@NonNull MapboxMap.SnapshotReadyCallback callback) {
+    if (isDestroyedOn("addSnapshotCallback")) {
+      return;
+    }
     snapshotReadyCallback = callback;
-    scheduleTakeSnapshot();
-    scheduler.requestRender();
+    nativeTakeSnapshot();
   }
 
 }

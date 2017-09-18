@@ -252,6 +252,8 @@ private:
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 
+    MapRenderer& mapRenderer;
+
     std::string styleUrl;
     std::string apiKey;
 

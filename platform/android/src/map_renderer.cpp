@@ -2,6 +2,7 @@
 
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
 
 #include <string>
 
@@ -75,7 +76,25 @@ void MapRenderer::setObserver(std::shared_ptr<RendererObserver> _rendererObserve
     }
 }
 
+void MapRenderer::requestSnapshot(SnapshotCallback callback) {
+    auto self = ActorRef<MapRenderer>(*this, mailbox);
+    self.invoke(
+            &MapRenderer::scheduleSnapshot,
+            std::make_unique<SnapshotCallback>([&, callback=std::move(callback), runloop=util::RunLoop::Get()](PremultipliedImage image) {
+                runloop->invoke([callback=std::move(callback), image=std::move(image)]() mutable {
+                    callback(std::move(image));
+                });
+                snapshotCallback.reset();
+            })
+    );
+}
+
 // Called on OpenGL thread //
+
+void MapRenderer::scheduleSnapshot(std::unique_ptr<SnapshotCallback> callback) {
+    snapshotCallback = std::move(callback);
+    requestRender();
+}
 
 void MapRenderer::render(JNIEnv&) {
     assert (renderer);
@@ -103,6 +122,12 @@ void MapRenderer::render(JNIEnv&) {
     }
 
     renderer->render(*params);
+
+    // Deliver the snapshot if requested
+    if (snapshotCallback) {
+        snapshotCallback->operator()(backend->readFramebuffer());
+        snapshotCallback.reset();
+    }
 }
 
 void MapRenderer::onSurfaceCreated(JNIEnv&) {

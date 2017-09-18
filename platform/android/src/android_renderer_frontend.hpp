@@ -4,7 +4,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/util/geo.hpp>
-#include <mbgl/util/image.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 #include <functional>
@@ -41,16 +40,9 @@ public:
     // Memory
     void onLowMemory();
 
-    // Snapshot - Callback will be called on calling thread through RunLoop
-    using SnapshotCallback = std::function<void (PremultipliedImage)>;
-    void requestSnapshot(SnapshotCallback);
-
 private:
     MapRenderer& mapRenderer;
     util::RunLoop* mapRunLoop;
-
-    // TODO
-    std::unique_ptr<SnapshotCallback> snapshotCallback;
 };
 
 } // namespace android
