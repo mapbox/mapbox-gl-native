@@ -66,7 +66,7 @@ int main(int argc, char *argv[]) {
             benchmark = true;
             break;
         case 's':
-            style = std::string("asset://") + std::string(optarg);
+            style = std::string(optarg);
             break;
         case 'x':
             longitude = atof(optarg);
@@ -123,6 +123,10 @@ int main(int argc, char *argv[]) {
     mbgl::Map map(rendererFrontend, backend, view->getSize(), view->getPixelRatio(), fileSource, threadPool);
 
     backend.setMap(&map);
+
+    if (style.find("://") == std::string::npos) {
+        style = std::string("file://") + style;
+    }
 
     // Load settings
     mbgl::Settings_JSON settings;
