@@ -13,6 +13,7 @@
 #import "MGLOfflineStorage_Private.h"
 #import "MGLGeometry_Private.h"
 #import "NSBundle+MGLAdditions.h"
+#import "MGLStyle.h"
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -20,12 +21,18 @@
 #import "NSImage+MGLAdditions.h"
 #endif
 
+const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
+
 @implementation MGLMapSnapshotOptions
 
-- (instancetype _Nonnull)initWithStyleURL:(NSURL* _Nonnull)styleURL camera:(MGLMapCamera*)camera size:(CGSize) size;
+- (instancetype _Nonnull)initWithStyleURL:(nullable NSURL*)styleURL camera:(MGLMapCamera*)camera size:(CGSize) size;
 {
     self = [super init];
     if (self) {
+        if ( !styleURL)
+        {
+            styleURL = [MGLStyle streetsStyleURLWithVersion:MGLStyleDefaultVersion];
+        }
         _styleURL = styleURL;
         _size = size;
         _camera = camera;
@@ -73,17 +80,17 @@
             cameraOptions.center = MGLLatLngFromLocationCoordinate2D(options.camera.centerCoordinate);
         }
         cameraOptions.angle = MAX(0, options.camera.heading) * mbgl::util::DEG2RAD;
-        cameraOptions.zoom = MAX(0, options.zoom);
+        cameraOptions.zoom = MAX(0, options.zoomLevel);
         cameraOptions.pitch = MAX(0, options.camera.pitch);
         
         // Region
-        mbgl::optional<mbgl::LatLngBounds> region;
-        if (!MGLCoordinateBoundsIsEmpty(options.region)) {
-            region = MGLLatLngBoundsFromCoordinateBounds(options.region);
+        mbgl::optional<mbgl::LatLngBounds> coordinateBounds;
+        if (!MGLCoordinateBoundsIsEmpty(options.coordinateBounds)) {
+            coordinateBounds = MGLLatLngBoundsFromCoordinateBounds(options.coordinateBounds);
         }
         
         // Create the snapshotter
-        mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, region);
+        mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, coordinateBounds);
     }
     return self;
 }
@@ -96,7 +103,8 @@
 - (void)startWithQueue:(dispatch_queue_t)queue completionHandler:(MGLMapSnapshotCompletionHandler)completion;
 {
     if ([self isLoading]) {
-        NSDictionary *userInfo = @{NSLocalizedDescriptionKey: @"Already started this snapshotter"};
+        NSString *errorMessage = NSLocalizedStringWithDefaultValue(@"ALREADY_STARTED_SNAPSHOTTER", nil, nil, @"Already started this snapshotter", "User-friendly error description");
+        NSDictionary *userInfo = @{NSLocalizedDescriptionKey: errorMessage};
         NSError *error = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
         dispatch_async(queue, ^{
            completion(nil, error); 
@@ -112,7 +120,7 @@
             if (mbglError) {
                 NSString *description = @(mbgl::util::toString(mbglError).c_str());
                 NSDictionary *userInfo = @{NSLocalizedDescriptionKey: description};
-                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
+                NSError *error = [NSError errorWithDomain:MGLErrorDomain code:MGLErrorCodeSnapshotFailed userInfo:userInfo];
                 
                 // Dispatch result to origin queue
                 dispatch_async(queue, ^{
@@ -130,7 +138,7 @@
                     UIGraphicsBeginImageContext(mglImage.size);
                     
                     [mglImage drawInRect:CGRectMake(0, 0, mglImage.size.width, mglImage.size.height)];
-                    [logoImage drawInRect:CGRectMake(8, mglImage.size.height - (8 + logoImage.size.height), logoImage.size.width,logoImage.size.height)];
+                    [logoImage drawInRect:CGRectMake(MGLLogoImagePosition.x, mglImage.size.height - (MGLLogoImagePosition.y + logoImage.size.height), logoImage.size.width,logoImage.size.height)];
                     UIImage *compositedImage = UIGraphicsGetImageFromCurrentImageContext();
                     
                     UIGraphicsEndImageContext();
@@ -139,7 +147,7 @@
                     NSImage *compositedImage = mglImage;
                     
                     [compositedImage lockFocus];
-                    [logoImage drawInRect:CGRectMake(8, 8, logoImage.size.width,logoImage.size.height)];
+                    [logoImage drawInRect:CGRectMake(MGLLogoImagePosition.x, MGLLogoImagePosition.y, logoImage.size.width,logoImage.size.height)];
                     [compositedImage unlockFocus];
 #endif
                     
