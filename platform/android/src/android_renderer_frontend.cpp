@@ -6,7 +6,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/run_loop.hpp>
-#include <mbgl/util/logging.hpp>
 
 #include "android_renderer_backend.hpp"
 
@@ -111,14 +110,6 @@ std::vector<Feature> AndroidRendererFrontend::queryRenderedFeatures(const Screen
 AnnotationIDs AndroidRendererFrontend::queryPointAnnotations(const ScreenBox& box) const {
     // Waits for the result from the orchestration thread and returns
     return mapRenderer.actor().ask(&Renderer::queryPointAnnotations, box).get();
-}
-
-void AndroidRendererFrontend::requestSnapshot(SnapshotCallback callback_) {
-    snapshotCallback = std::make_unique<SnapshotCallback>([callback=std::move(callback_), runloop=util::RunLoop::Get()](PremultipliedImage image){
-        runloop->invoke([&]() {
-            callback(std::move(image));
-        });
-    });
 }
 
 } // namespace android

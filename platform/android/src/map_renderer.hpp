@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/actor/scheduler.hpp>
+#include <mbgl/util/image.hpp>
 
 #include <memory>
 #include <utility>
@@ -74,6 +75,15 @@ public:
 
     void requestRender();
 
+    // Snapshot - requires a RunLoop on the calling thread
+    using SnapshotCallback = std::function<void (PremultipliedImage)>;
+    void requestSnapshot(SnapshotCallback);
+
+protected:
+    // Called from the GL Thread //
+
+    void scheduleSnapshot(std::unique_ptr<SnapshotCallback>);
+
 private:
     // Called from the GL Thread //
 
@@ -105,6 +115,8 @@ private:
     std::mutex updateMutex;
 
     bool framebufferSizeChanged = false;
+
+    std::unique_ptr<SnapshotCallback> snapshotCallback;
 };
 
 } // namespace android

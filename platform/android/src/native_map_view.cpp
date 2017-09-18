@@ -60,9 +60,10 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
                              jni::Object<FileSource> jFileSource,
                              jni::Object<MapRenderer> jMapRenderer,
                              jni::jfloat _pixelRatio)
-    : javaPeer(_obj.NewWeakGlobalRef(_env)),
-      pixelRatio(_pixelRatio),
-      threadPool(sharedThreadPool()) {
+    : javaPeer(_obj.NewWeakGlobalRef(_env))
+    , mapRenderer(MapRenderer::getNativePeer(_env, jMapRenderer))
+    , pixelRatio(_pixelRatio)
+    , threadPool(sharedThreadPool()) {
 
     // Get a reference to the JavaVM for callbacks
     if (_env.GetJavaVM(&vm) < 0) {
@@ -70,9 +71,8 @@ NativeMapView::NativeMapView(jni::JNIEnv& _env,
         return;
     }
 
-    // Get native peers
+    // Get native peer for file source
     mbgl::FileSource& fileSource = mbgl::android::FileSource::getDefaultFileSource(_env, jFileSource);
-    MapRenderer& mapRenderer = MapRenderer::getNativePeer(_env, jMapRenderer);
 
     // Create a renderer frontend
     rendererFrontend = std::make_unique<AndroidRendererFrontend>(mapRenderer);
@@ -395,7 +395,7 @@ void NativeMapView::setContentPadding(JNIEnv&, double top, double left, double b
 }
 
 void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
-    rendererFrontend->requestSnapshot([&](PremultipliedImage image) {
+    mapRenderer.requestSnapshot([&](PremultipliedImage image) {
         auto _env = android::AttachEnv();
         // Convert image to bitmap
         auto bitmap = Bitmap::CreateBitmap(*_env, std::move(image));
