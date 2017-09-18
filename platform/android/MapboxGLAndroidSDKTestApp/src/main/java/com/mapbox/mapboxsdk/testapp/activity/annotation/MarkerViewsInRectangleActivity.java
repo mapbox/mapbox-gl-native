@@ -19,6 +19,9 @@ import java.util.List;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing counting MarkerViews in a rectangle.
+ */
 public class MarkerViewsInRectangleActivity extends AppCompatActivity implements OnMapReadyCallback,
   View.OnClickListener {
 

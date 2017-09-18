@@ -11,6 +11,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing toggling the user location on the map.
+ */
 public class MyLocationToggleActivity extends BaseLocationActivity {
 
   private MapView mapView;

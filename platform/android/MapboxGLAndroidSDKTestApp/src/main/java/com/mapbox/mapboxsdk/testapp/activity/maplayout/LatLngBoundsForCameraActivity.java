@@ -16,7 +16,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
- * Test Activity showcasing restricting user gestures to a bounds around Iceland.
+ * Test activity showcasing restricting user gestures to a bounds around Iceland.
  */
 public class LatLngBoundsForCameraActivity extends AppCompatActivity implements OnMapReadyCallback {
 
