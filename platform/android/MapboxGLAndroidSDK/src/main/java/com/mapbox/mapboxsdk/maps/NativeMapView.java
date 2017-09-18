@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
-import com.mapbox.mapboxsdk.maps.renderer.MapRendererScheduler;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
@@ -54,7 +53,7 @@ final class NativeMapView {
   private final FileSource fileSource;
 
   // Used to schedule work on the MapRenderer Thread
-  private MapRendererScheduler scheduler;
+  private MapRenderer mapRenderer;
 
   // Device density
   private final float pixelRatio;
@@ -71,7 +70,7 @@ final class NativeMapView {
   //
 
   public NativeMapView(final MapView mapView, MapRenderer mapRenderer) {
-    this.scheduler = mapRenderer;
+    this.mapRenderer = mapRenderer;
     this.mapView = mapView;
 
     Context context = mapView.getContext();
@@ -106,7 +105,7 @@ final class NativeMapView {
       return;
     }
 
-    scheduler.requestRender();
+    mapRenderer.requestRender();
   }
 
   public void resizeView(int width, int height) {
@@ -510,13 +509,6 @@ final class NativeMapView {
     return nativeGetDebug();
   }
 
-  public void setEnableFps(boolean enable) {
-    if (isDestroyedOn("setEnableFps")) {
-      return;
-    }
-    nativeSetEnableFps(enable);
-  }
-
   public boolean isFullyLoaded() {
     if (isDestroyedOn("isFullyLoaded")) {
       return false;
@@ -835,13 +827,6 @@ final class NativeMapView {
     }
   }
 
-  protected void onFpsChanged(double fps) {
-    if (isDestroyedOn("OnFpsChanged")) {
-      return;
-    }
-    mapView.onFpsChanged(fps);
-  }
-
   protected void onSnapshotReady(Bitmap mapContent) {
     if (isDestroyedOn("OnSnapshotReady")) {
       return;
@@ -946,8 +931,6 @@ final class NativeMapView {
   private native void nativeCycleDebugOptions();
 
   private native boolean nativeGetDebug();
-
-  private native void nativeSetEnableFps(boolean enable);
 
   private native boolean nativeIsFullyLoaded();
 
@@ -1076,4 +1059,28 @@ final class NativeMapView {
     nativeTakeSnapshot();
   }
 
+  public void setOnFpsChangedListener(final MapboxMap.OnFpsChangedListener listener) {
+    mapRenderer.queueEvent(new Runnable() {
+
+      @Override
+      public void run() {
+        mapRenderer.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
+
+          @Override
+          public void onFpsChanged(final double fps) {
+            mapView.post(new Runnable() {
+
+              @Override
+              public void run() {
+                listener.onFpsChanged(fps);
+              }
+
+            });
+          }
+
+        });
+      }
+
+    });
+  }
 }

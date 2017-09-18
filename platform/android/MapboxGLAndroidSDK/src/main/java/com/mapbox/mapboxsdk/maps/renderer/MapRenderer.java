@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps.renderer;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
+import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import javax.microedition.khronos.egl.EGLConfig;
@@ -22,6 +23,8 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
 
   private final GLSurfaceView glSurfaceView;
 
+  private MapboxMap.OnFpsChangedListener onFpsChangedListener;
+
   public MapRenderer(Context context, GLSurfaceView glSurfaceView) {
     this.glSurfaceView = glSurfaceView;
 
@@ -31,6 +34,10 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
 
     // Initialise native peer
     nativeInitialize(this, fileSource, pixelRatio, programCacheDir);
+  }
+
+  public void setOnFpsChangedListener(MapboxMap.OnFpsChangedListener listener) {
+    onFpsChangedListener = listener;
   }
 
   @Override
@@ -65,6 +72,10 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
   @Override
   public void onDrawFrame(GL10 gl) {
     nativeRender();
+
+    if (onFpsChangedListener != null) {
+      updateFps();
+    }
   }
 
   /**
@@ -115,5 +126,20 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
   private native void nativeOnSurfaceChanged(int width, int height);
 
   private native void nativeRender();
+
+  private long frames;
+  private long timeElapsed;
+
+  private void updateFps() {
+    frames++;
+    long currentTime = System.nanoTime();
+    double fps = 0;
+    if (currentTime - timeElapsed >= 1) {
+      fps = frames / ((currentTime - timeElapsed) / 1E9);
+      onFpsChangedListener.onFpsChanged(fps);
+      timeElapsed = currentTime;
+      frames = 0;
+    }
+  }
 
 }

@@ -35,6 +35,17 @@
             app:layout_anchor="@id/bottom_sheet"
             app:layout_anchorGravity="bottom|start"/>
 
+        <TextView
+            android:id="@+id/fpsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            app:layout_anchor="@id/textZoom"
+            app:layout_anchorGravity="top"/>
+
         <android.support.v4.widget.NestedScrollView
             android:id="@+id/bottom_sheet"
             android:layout_width="match_parent"
