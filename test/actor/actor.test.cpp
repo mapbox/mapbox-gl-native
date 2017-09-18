@@ -306,6 +306,28 @@ TEST(Actor, Ask) {
     ASSERT_EQ(2, result.get());
 }
 
+TEST(Actor, AskVoid) {
+    // Ask waits for void methods
+
+    struct Test {
+        bool& executed;
+
+        Test(bool& executed_) : executed(executed_) {
+        }
+
+        void doIt() {
+            executed = true;
+        }
+    };
+
+    ThreadPool pool { 1 };
+    bool executed = false;
+    Actor<Test> actor(pool, executed);
+
+    actor.ask(&Test::doIt).get();
+    EXPECT_TRUE(executed);
+}
+
 TEST(Actor, NoSelfActorRef) {
     // Not all actors need a reference to self
     
