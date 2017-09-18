@@ -435,21 +435,6 @@ public class MapView extends FrameLayout {
     nativeMapView.onLowMemory();
   }
 
-  // Called when debug mode is enabled to update a FPS counter
-  // Called via JNI from NativeMapView
-  // Forward to any listener
-  protected void onFpsChanged(final double fps) {
-    final MapboxMap.OnFpsChangedListener listener = mapboxMap.getOnFpsChangedListener();
-    if (listener != null) {
-      post(new Runnable() {
-        @Override
-        public void run() {
-          listener.onFpsChanged(fps);
-        }
-      });
-    }
-  }
-
   /**
    * <p>
    * Loads a new map style from the specified URL.

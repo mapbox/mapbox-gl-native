@@ -406,10 +406,6 @@ void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
     });
 }
 
-void NativeMapView::enableFps(jni::JNIEnv&, jni::jboolean enable) {
-    fpsEnabled = enable;
-}
-
 jni::Object<CameraPosition> NativeMapView::getCameraPosition(jni::JNIEnv& env) {
     return CameraPosition::New(env, map->getCameraOptions(insets));
 }
@@ -457,12 +453,10 @@ void NativeMapView::setDebug(JNIEnv&, jni::jboolean debug) {
     DebugOptions debugOptions = debug ? DebugOptions::TileBorders | DebugOptions::ParseStatus | DebugOptions::Collision
                                       : DebugOptions::NoDebug;
     map->setDebug(debugOptions);
-    fpsEnabled = debug;
 }
 
 void NativeMapView::cycleDebugOptions(JNIEnv&) {
     map->cycleDebugOptions();
-    fpsEnabled = map->getDebug() != DebugOptions::NoDebug;
 }
 
 jni::jboolean NativeMapView::getDebug(JNIEnv&) {
@@ -926,36 +920,6 @@ jni::jboolean NativeMapView::getPrefetchesTiles(JNIEnv&) {
     return jni::jboolean(map->getPrefetchZoomDelta() > 0);
 }
 
-// Private methods //
-
-// TODO
-void NativeMapView::updateFps() {
-    if (!fpsEnabled) {
-        return;
-    }
-
-    static int frames = 0;
-    static int64_t timeElapsed = 0LL;
-
-    frames++;
-    struct timespec now;
-    clock_gettime(CLOCK_MONOTONIC, &now);
-    int64_t currentTime = now.tv_sec * 1000000000LL + now.tv_nsec;
-
-    if (currentTime - timeElapsed >= 1) {
-        fps = frames / ((currentTime - timeElapsed) / 1E9);
-        mbgl::Log::Info(mbgl::Event::Render, "FPS: %4.2f", fps);
-        timeElapsed = currentTime;
-        frames = 0;
-    }
-
-    assert(vm != nullptr);
-
-    android::UniqueEnv _env = android::AttachEnv();
-    static auto onFpsChanged = javaClass.GetMethod<void (double)>(*_env, "onFpsChanged");
-    javaPeer->Call(*_env, onFpsChanged, fps);
-}
-
 // Static methods //
 
 jni::Class<NativeMapView> NativeMapView::javaClass;
@@ -1004,7 +968,6 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::setVisibleCoordinateBounds, "nativeSetVisibleCoordinateBounds"),
             METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
             METHOD(&NativeMapView::scheduleSnapshot, "nativeTakeSnapshot"),
-            METHOD(&NativeMapView::enableFps, "nativeSetEnableFps"),
             METHOD(&NativeMapView::getCameraPosition, "nativeGetCameraPosition"),
             METHOD(&NativeMapView::updateMarker, "nativeUpdateMarker"),
             METHOD(&NativeMapView::addMarkers, "nativeAddMarkers"),

@@ -142,8 +142,6 @@ public:
 
     void scheduleSnapshot(jni::JNIEnv&);
 
-    void enableFps(jni::JNIEnv&, jni::jboolean enable);
-
     jni::Object<CameraPosition> getCameraPosition(jni::JNIEnv&);
 
     void updateMarker(jni::JNIEnv&, jni::jlong, jni::jdouble, jni::jdouble, jni::String);
@@ -243,10 +241,6 @@ public:
     jni::jboolean getPrefetchesTiles(JNIEnv&);
 
 private:
-
-    void updateFps();
-
-private:
     std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 
     JavaVM *vm = nullptr;
@@ -258,8 +252,6 @@ private:
     std::string apiKey;
 
     float pixelRatio;
-    bool fpsEnabled = false;
-    double fps = 0.0;
 
     // Minimum texture size according to OpenGL ES 2.0 specification.
     int width = 64;
