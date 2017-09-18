@@ -47,6 +47,9 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
+import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
+
 /**
  * <p>
  * A {@code MapView} provides an embeddable map interface.
@@ -73,6 +76,7 @@ public class MapView extends FrameLayout {
 
   private MyLocationView myLocationView;
   private CompassView compassView;
+  private PointF focalPoint;
   private ImageView attrView;
   private ImageView logoView;
 
@@ -143,7 +147,7 @@ public class MapView extends FrameLayout {
     addOnMapChangedListener(mapCallback);
 
     // callback for focal point invalidation
-    FocalPointInvalidator focalPoint = new FocalPointInvalidator(compassView);
+    final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator(createFocalPointChangeListener());
 
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
@@ -152,13 +156,15 @@ public class MapView extends FrameLayout {
     CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
 
     // callback for camera change events
-    CameraChangeDispatcher cameraChangeDispatcher = new CameraChangeDispatcher();
+    final CameraChangeDispatcher cameraChangeDispatcher = new CameraChangeDispatcher();
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalPoint, compassView, attrView, logoView);
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPoint, zoomInvalidator);
-    MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj, focalPoint);
+    UiSettings uiSettings = new UiSettings(proj, focalPointInvalidator, compassView, attrView, logoView);
+    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPointInvalidator,
+      zoomInvalidator);
+    MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj,
+      focalPointInvalidator);
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     IconManager iconManager = new IconManager(nativeMapView);
@@ -182,8 +188,9 @@ public class MapView extends FrameLayout {
     MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
+    compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
+    compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
     // inject widgets with MapboxMap
-    compassView.setMapboxMap(mapboxMap);
     myLocationView.setMapboxMap(mapboxMap);
     attrView.setOnClickListener(new AttributionDialogManager(context, mapboxMap));
 
@@ -203,6 +210,49 @@ public class MapView extends FrameLayout {
     } else {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
+  }
+
+  private FocalPointChangeListener createFocalPointChangeListener() {
+    return new FocalPointChangeListener() {
+      @Override
+      public void onFocalPointChanged(PointF pointF) {
+        focalPoint = pointF;
+      }
+    };
+  }
+
+  private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(final CameraChangeDispatcher
+                                                                                cameraChangeDispatcher) {
+    return new MapboxMap.OnCompassAnimationListener() {
+      @Override
+      public void onCompassAnimation() {
+        cameraChangeDispatcher.onCameraMove();
+      }
+
+      @Override
+      public void onCompassAnimationFinished() {
+        compassView.isAnimating(false);
+        cameraChangeDispatcher.onCameraIdle();
+      }
+    };
+  }
+
+  private OnClickListener createCompassClickListener(final CameraChangeDispatcher cameraChangeDispatcher) {
+    return new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (mapboxMap != null && compassView != null) {
+          if (focalPoint != null) {
+            mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
+          } else {
+            mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
+          }
+          cameraChangeDispatcher.onCameraMoveStarted(MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION);
+          compassView.isAnimating(true);
+          compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
+        }
+      }
+    };
   }
 
   //

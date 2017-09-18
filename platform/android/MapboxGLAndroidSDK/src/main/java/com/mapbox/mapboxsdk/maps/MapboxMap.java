@@ -513,8 +513,9 @@ public final class MapboxMap {
    * Sets the maximum zoom level the map can be displayed at.
    * </p>
    * <p>
-   *   The default maximum zoomn level is 22. The upper bound for this value is 25.5.
+   * The default maximum zoomn level is 22. The upper bound for this value is 25.5.
    * </p>
+   *
    * @param maxZoom The new maximum zoom level.
    */
   public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
@@ -2079,6 +2080,21 @@ public final class MapboxMap {
      * Called when camera movement has ended.
      */
     void onCameraIdle();
+  }
+
+  /**
+   * Interface definition for a callback to be invoked for when the compass is animating.
+   */
+  public interface OnCompassAnimationListener {
+    /**
+     * Called repeatedly as the compass continues to move after clicking on it.
+     */
+    void onCompassAnimation();
+
+    /**
+     * Called when compass animation has ended.
+     */
+    void onCompassAnimationFinished();
   }
 
   /**
