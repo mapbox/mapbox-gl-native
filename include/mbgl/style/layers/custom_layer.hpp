@@ -39,6 +39,14 @@ struct CustomLayerRenderParameters {
 using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRenderParameters&);
 
 /**
+ * Called when the system has destroyed the underlying GL context. The
+ * `CustomLayerDeinitializeFunction` will not be called in this case, however
+ * `CustomLayerInitializeFunction` will be called instead to prepare for a new render.
+ *
+ */
+using CustomLayerContextLostFunction = void (*)(void* context);
+
+/**
  * Destroy any GL state needed by the custom layer, and deallocate context, if necessary. This
  * method is called once, from the main thread, at a point when the GL context is active.
  *
@@ -51,8 +59,16 @@ public:
     CustomLayer(const std::string& id,
                 CustomLayerInitializeFunction,
                 CustomLayerRenderFunction,
+                CustomLayerContextLostFunction,
                 CustomLayerDeinitializeFunction,
                 void* context);
+
+    CustomLayer(const std::string& id,
+                CustomLayerInitializeFunction,
+                CustomLayerRenderFunction,
+                CustomLayerDeinitializeFunction,
+                void* context);
+
     ~CustomLayer() final;
 
     // Visibility
