@@ -372,13 +372,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
         parameters.frameHistory.upload(parameters.context, 0);
-    }
 
-    // - PREPARE + CLIP ------------------------------------------------------------------------------
-    {
-        MBGL_DEBUG_GROUP(parameters.context, "clip");
-
-        // Update all clipping IDs.
+        // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
                 entry.second->startRender(parameters);
