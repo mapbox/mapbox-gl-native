@@ -534,7 +534,7 @@ run-android-core-test-$1: run-android-core-test-$1-*
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
 run-android-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 # Build test app instrumentation tests apk and test app apk for specified abi
@@ -545,12 +545,12 @@ android-ui-test-$1: platform/android/configuration.gradle
 # Run test app instrumentation tests on a connected android device or emulator with specified abi
 .PHONY: run-android-ui-test-$1
 run-android-ui-test-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest
 
 # Run Java Instrumentation tests on a connected android device or emulator with specified abi and test filter
 run-android-ui-test-$1-%: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
 
 endef
