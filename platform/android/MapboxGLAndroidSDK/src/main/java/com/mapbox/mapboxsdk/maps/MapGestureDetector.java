@@ -54,8 +54,10 @@ final class MapGestureDetector {
   private boolean quickZoom;
   private boolean tiltGestureOccurred;
   private boolean scrollGestureOccurred;
+
   private boolean scaleGestureOccurred;
   private boolean recentScaleGestureOccurred;
+  private long scaleBeginTime;
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
                      TrackingSettings trackingSettings, AnnotationManager annotationManager,
@@ -144,8 +146,8 @@ final class MapGestureDetector {
     }
 
     // Check two finger gestures first
-    rotateGestureDetector.onTouchEvent(event);
     scaleGestureDetector.onTouchEvent(event);
+    rotateGestureDetector.onTouchEvent(event);
     shoveGestureDetector.onTouchEvent(event);
 
     // Handle two finger tap
@@ -428,8 +430,7 @@ final class MapGestureDetector {
    */
   private class ScaleGestureListener extends ScaleGestureDetector.SimpleOnScaleGestureListener {
 
-    long beginTime = 0;
-    float scaleFactor = 1.0f;
+    private float scaleFactor = 1.0f;
 
     // Called when two fingers first touch the screen
     @Override
@@ -438,9 +439,8 @@ final class MapGestureDetector {
         return false;
       }
 
-      scaleGestureOccurred = true;
       recentScaleGestureOccurred = true;
-      beginTime = detector.getEventTime();
+      scaleBeginTime = detector.getEventTime();
       MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
         getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
         MapboxEvent.GESTURE_PINCH_START, transform));
@@ -451,7 +451,7 @@ final class MapGestureDetector {
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
       scaleGestureOccurred = false;
-      beginTime = 0;
+      scaleBeginTime = 0;
       scaleFactor = 1.0f;
       cameraChangeDispatcher.onCameraIdle();
     }
@@ -471,7 +471,7 @@ final class MapGestureDetector {
       // Ignore short touches in case it is a tap
       // Also ignore small scales
       long time = detector.getEventTime();
-      long interval = time - beginTime;
+      long interval = time - scaleBeginTime;
       if (!scaleGestureOccurred && (interval <= ViewConfiguration.getTapTimeout())) {
         return false;
       }
@@ -517,7 +517,6 @@ final class MapGestureDetector {
         transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2),
           detector.getFocusX(), detector.getFocusY());
       }
-
       return true;
     }
   }
@@ -527,9 +526,11 @@ final class MapGestureDetector {
    */
   private class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
 
-    long beginTime = 0;
-    float totalAngle = 0.0f;
-    boolean started = false;
+    private static final long ROTATE_INVOKE_WAIT_TIME = 1500;
+
+    private long beginTime = 0;
+    private float totalAngle = 0.0f;
+    private boolean started = false;
 
     // Called when two fingers first touch the screen
     @Override
@@ -566,7 +567,7 @@ final class MapGestureDetector {
       // Also ignore small rotate
       long time = detector.getEventTime();
       long interval = time - beginTime;
-      if (!started && (interval <= ViewConfiguration.getTapTimeout())) {
+      if (!started && (interval <= ViewConfiguration.getTapTimeout() || isScaleGestureActive(time))) {
         return false;
       }
 
@@ -583,6 +584,7 @@ final class MapGestureDetector {
       if (!started) {
         return false;
       }
+
       // rotation constitutes translation of anything except the center of
       // rotation, so cancel both location and bearing tracking if required
       trackingSettings.resetTrackingModesIfRequired(true, true, false);
@@ -600,6 +602,13 @@ final class MapGestureDetector {
         transform.setBearing(bearing, detector.getFocusX(), detector.getFocusY());
       }
       return true;
+    }
+
+    private boolean isScaleGestureActive(long time) {
+      long scaleExecutionTime = time - scaleBeginTime;
+      boolean scaleGestureStarted = scaleBeginTime != 0;
+      boolean scaleOffsetTimeValid = scaleExecutionTime > ROTATE_INVOKE_WAIT_TIME;
+      return (scaleGestureStarted && scaleOffsetTimeValid) || scaleGestureOccurred;
     }
   }
 
