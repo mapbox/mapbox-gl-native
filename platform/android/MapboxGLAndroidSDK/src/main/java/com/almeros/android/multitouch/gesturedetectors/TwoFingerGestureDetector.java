@@ -54,8 +54,7 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
 
     ViewConfiguration config = ViewConfiguration.get(context);
 
-    // We divide edge slop by 2 to make rotation gesture happen more easily #6870
-    edgeSlop = config.getScaledEdgeSlop() / 2;
+    edgeSlop = config.getScaledEdgeSlop();
   }
 
   @Override
