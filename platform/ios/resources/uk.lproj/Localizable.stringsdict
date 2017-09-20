@@ -31,7 +31,7 @@
 			<key>few</key>
 			<string>Показано %d підписи</string>
 			<key>other</key>
-			<string>Показано %d підписів</string>
+			<string>Показано %d підпис(ів)</string>
 		</dict>
 	</dict>
 </dict>

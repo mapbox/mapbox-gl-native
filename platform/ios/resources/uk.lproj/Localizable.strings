@@ -59,10 +59,10 @@
 "SDK_UPDATE_AVAILABLE" = "Доступна версія %@ Mapbox iOS SDK:";
 
 /* User-friendly error description */
-"STYLE_NOT_FOUND_DESC" = "Неможливо завантажити мапу, бо неможливо знайти стиль або він не сумісний.";
+"STYLE_NOT_FOUND_DESC" = "Неможливо завантажити мапу, бо неможливо знайти стиль або він несумісний.";
 
 /* Telemetry prompt message */
-"TELEMETRY_DISABLED_MSG" = "Ви можете допомогти зробити мапи OpenStreetMap та Mapbox кращими надаючі анонімізовані дані про користування застосунком.";
+"TELEMETRY_DISABLED_MSG" = "Ви можете допомогти зробити мапи OpenStreetMap та Mapbox кращими надаючи анонімізовані дані про користування застосунком.";
 
 /* Telemetry prompt button */
 "TELEMETRY_DISABLED_OFF" = "Відмовитись";
@@ -71,7 +71,7 @@
 "TELEMETRY_DISABLED_ON" = "Брати участь";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "Ви допомагаєте робити мапи OpenStreetMap та Mapbox кращими надаючі анонімізовані дані про користування застосунком.";
+"TELEMETRY_ENABLED_MSG" = "Ви допомагаєте робити мапи OpenStreetMap та Mapbox кращими надаючи анонімізовані дані про користування застосунком.";
 
 /* Telemetry prompt button */
 "TELEMETRY_ENABLED_OFF" = "Припинити участь";
@@ -86,7 +86,7 @@
 "TELEMETRY_NAME" = "Телеметрія Mapbox";
 
 /* Telemetry prompt title */
-"TELEMETRY_TITLE" = "Робить мапи Mapbox кращими";
+"TELEMETRY_TITLE" = "Робіть мапи Mapbox кращими";
 
 /* Default user location annotation title */
 "USER_DOT_TITLE" = "Ви тут";
