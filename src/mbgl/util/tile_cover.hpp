@@ -19,7 +19,7 @@ std::vector<UnwrappedTileID> tileCover(const TransformState&, int32_t z);
 std::vector<UnwrappedTileID> tileCover(const LatLngBounds&, int32_t z);
 
 // Compute only the count of tiles needed for tileCover
-unsigned long tileCount(const LatLngBounds&, uint8_t z, uint16_t tileSize);
+uint64_t tileCount(const LatLngBounds&, uint8_t z, uint16_t tileSize);
 
 } // namespace util
 } // namespace mbgl
