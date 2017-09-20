@@ -443,7 +443,7 @@ test-node: node
 .PHONY: test-node-recycle-map
 test-node-recycle-map: node
 	npm test
-	npm run test-render -- --recycle-map
+	npm run test-render -- --recycle-map --shuffle
 	npm run test-query
 
 #### Android targets ###########################################################
