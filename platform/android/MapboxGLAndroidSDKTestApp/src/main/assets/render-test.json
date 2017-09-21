@@ -1,0 +1,145 @@
+[
+  {
+    "name": "World",
+    "width": 512,
+    "height": 512,
+    "center": [
+      0,
+      0
+    ],
+    "zoom": 0,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Brussels",
+    "width": 512,
+    "height": 512,
+    "center": [
+      50.846728,
+      4.352429
+    ],
+    "zoom": 12,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "San Francisco",
+    "width": 512,
+    "height": 512,
+    "center": [
+      37.772544,
+      -122.426622
+    ],
+    "zoom": 9,
+    "tilt": 60,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Washington DC",
+    "width": 512,
+    "height": 512,
+    "center": [
+      38.897717,
+      -77.036035
+    ],
+    "zoom": 18,
+    "tilt": 20,
+    "bearing": 180,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Ayacucho",
+    "width": 512,
+    "height": 512,
+    "center": [
+      -13.164131,
+      -74.220973
+    ],
+    "zoom": 12,
+    "tilt": 30,
+    "bearing": 270,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Bangalore",
+    "width": 512,
+    "height": 512,
+    "center": [
+      12.970020,
+      77.590421
+    ],
+    "zoom": 14,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Berlin",
+    "width": 512,
+    "height": 512,
+    "center": [
+      52.519716,
+      13.402068
+    ],
+    "zoom": 12,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Lisbon",
+    "width": 512,
+    "height": 512,
+    "center": [
+      38.722062,
+      -9.138746
+    ],
+    "zoom": 15,
+    "tilt": 45,
+    "bearing": 90,
+    "styleUrl": "mapbox://styles/mapbox/outdoors-v10"
+  },
+  {
+    "name": "Helsinki",
+    "width": 512,
+    "height": 512,
+    "center": [
+      60.171283,
+      24.933533
+    ],
+    "zoom": 12,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/streets-v10"
+  },
+  {
+    "name": "Madrid",
+    "width": 512,
+    "height": 512,
+    "center": [
+      40.417025,
+      -3.705287
+    ],
+    "zoom": 16,
+    "tilt": 35,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/light-v9"
+  },
+  {
+    "name": "London",
+    "width": 512,
+    "height": 512,
+    "center": [
+      51.508049,
+      -0.129756
+    ],
+    "zoom": 12,
+    "tilt": 0,
+    "bearing": 0,
+    "styleUrl": "mapbox://styles/mapbox/dark-v9"
+  }
+]
