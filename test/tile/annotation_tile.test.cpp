@@ -60,8 +60,7 @@ TEST(AnnotationTile, Issue8289) {
         std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::move(data),
-        0
-    });
+    }, 0);
 
     auto collisionTile = std::make_unique<CollisionTile>(PlacementConfig());
 
@@ -75,16 +74,14 @@ TEST(AnnotationTile, Issue8289) {
         std::move(collisionTile),
         {},
         {},
-        0
-    });
+    }, 0);
 
     // Simulate a second layout with empty data.
     tile.onLayout(GeometryTile::LayoutResult {
         std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::make_unique<AnnotationTileData>(),
-        0
-    });
+    }, 0);
 
     std::unordered_map<std::string, std::vector<Feature>> result;
     GeometryCoordinates queryGeometry {{ Point<int16_t>(0, 0) }};

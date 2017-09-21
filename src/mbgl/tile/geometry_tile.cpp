@@ -79,7 +79,6 @@ void GeometryTile::markObsolete() {
 
 void GeometryTile::setError(std::exception_ptr err) {
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
@@ -141,9 +140,10 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
     worker.invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
 }
 
-void GeometryTile::onLayout(LayoutResult result) {
+void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
+    (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
@@ -151,10 +151,10 @@ void GeometryTile::onLayout(LayoutResult result) {
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onPlacement(PlacementResult result) {
+void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
-    if (result.correlationID == correlationID) {
+    if (resultCorrelationID == correlationID) {
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
@@ -171,10 +171,11 @@ void GeometryTile::onPlacement(PlacementResult result) {
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onError(std::exception_ptr err) {
+void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
     loaded = true;
-    pending = false;
-    renderable = false;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     observer->onTileError(*this, err);
 }
     
