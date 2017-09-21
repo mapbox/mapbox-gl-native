@@ -462,11 +462,8 @@ Context::createFramebuffer(const Texture& color,
     }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
-    // TODO: revert this; just for debugging on CI:
-    GLuint depthInt = depthTarget.renderbuffer;
-    Log::Info(Event::General, "bound framebuffer: %d; renderbuffer name: %d", bindFramebuffer, depthInt);
     MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
-    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthInt));
+    MBGL_CHECK_ERROR(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthTarget.renderbuffer));
     checkFramebuffer();
     return { depthTarget.size, std::move(fbo) };
 }
