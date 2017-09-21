@@ -34,5 +34,6 @@
   "ZoomFunctionSymbolLayerActivity",
   "SymbolGeneratorActivity",
   "TextureViewTransparentBackgroundActivity",
-  "SimpleMapActivity"
+  "SimpleMapActivity",
+  "RenderTestActivity"
 ]
