@@ -184,7 +184,7 @@ public class MapSnapshotter {
    * Starts loading and rendering the snapshot. The callbacks will be fired
    * on the calling thread.
    *
-   * @param callback the callback to use when the snapshot is ready
+   * @param callback     the callback to use when the snapshot is ready
    * @param errorHandler the error handler to use on snapshot errors
    */
   public void start(@NonNull MapboxMap.SnapshotReadyCallback callback, ErrorHandler errorHandler) {
@@ -217,12 +217,14 @@ public class MapSnapshotter {
    * Called by JNI peer when snapshot is ready.
    * Always called on the origin (main) thread.
    *
-   * @param bitmap the generated snapshot
+   * @param snapshot the generated snapshot
    */
-  protected void onSnapshotReady(Bitmap bitmap) {
+  protected void onSnapshotReady(Snapshot snapshot) {
     if (callback != null) {
+      Bitmap bitmap = snapshot.getBitmap();
       addOverlay(bitmap);
-      callback.onSnapshotReady(bitmap);
+      Snapshot overlaidSnapshot = new Snapshot(bitmap);
+      callback.onSnapshotReady(overlaidSnapshot);
       reset();
     }
   }

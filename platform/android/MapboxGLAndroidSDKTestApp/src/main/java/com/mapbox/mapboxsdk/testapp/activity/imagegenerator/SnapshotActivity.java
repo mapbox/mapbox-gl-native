@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
@@ -51,11 +52,12 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
     final long startTime = System.nanoTime();
     mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
       @Override
-      public void onSnapshotReady(Bitmap snapshot) {
+      public void onSnapshotReady(Snapshot snapshot) {
         long endTime = System.nanoTime();
         long duration = (long) ((endTime - startTime) / 1e6);
         ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
-        snapshotView.setImageBitmap(snapshot);
+        Bitmap bitmap = snapshot.getBitmap();
+        snapshotView.setImageBitmap(bitmap);
         Toast.makeText(
           SnapshotActivity.this,
           String.format(Locale.getDefault(), "Snapshot taken in %d ms", duration),

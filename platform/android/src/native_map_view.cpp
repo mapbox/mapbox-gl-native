@@ -38,6 +38,7 @@
 #include "conversion/collection.hpp"
 #include "style/conversion/filter.hpp"
 #include "geojson/conversion/feature.hpp"
+#include "snapshotter/snapshot.hpp"
 
 #include "jni.hpp"
 #include "attach_env.hpp"
@@ -399,10 +400,11 @@ void NativeMapView::scheduleSnapshot(jni::JNIEnv&) {
         auto _env = android::AttachEnv();
         // Convert image to bitmap
         auto bitmap = Bitmap::CreateBitmap(*_env, std::move(image));
+        auto snapshot = Snapshot::New(*_env, bitmap);
 
         // invoke Mapview#OnSnapshotReady
-        static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Bitmap>)>(*_env, "onSnapshotReady");
-        javaPeer->Call(*_env, onSnapshotReady, bitmap);
+        static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Snapshot>)>(*_env, "onSnapshotReady");
+        javaPeer->Call(*_env, onSnapshotReady, snapshot);
     });
 }
 

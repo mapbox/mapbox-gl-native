@@ -38,6 +38,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -2461,7 +2462,7 @@ public final class MapboxMap {
      *
      * @param snapshot the snapshot bitmap
      */
-    void onSnapshotReady(Bitmap snapshot);
+    void onSnapshotReady(Snapshot snapshot);
   }
 
   /**

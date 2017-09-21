@@ -89,6 +89,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/linux/src/headless_display_egl.cpp
         PRIVATE platform/android/src/snapshotter/map_snapshotter.cpp
         PRIVATE platform/android/src/snapshotter/map_snapshotter.hpp
+        PRIVATE platform/android/src/snapshotter/snapshot.cpp
+        PRIVATE platform/android/src/snapshotter/snapshot.hpp
     )
 
     target_include_directories(mbgl-core

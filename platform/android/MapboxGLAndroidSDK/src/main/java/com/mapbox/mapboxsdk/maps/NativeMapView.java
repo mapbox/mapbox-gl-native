@@ -20,6 +20,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
+import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
@@ -827,14 +828,18 @@ final class NativeMapView {
     }
   }
 
-  protected void onSnapshotReady(Bitmap mapContent) {
+  protected void onSnapshotReady(Snapshot mapContent) {
     if (isDestroyedOn("OnSnapshotReady")) {
       return;
     }
 
-    Bitmap viewContent = BitmapUtils.createBitmapFromView(mapView);
-    if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
-      snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
+    Bitmap viewContentBitmap = BitmapUtils.createBitmapFromView(mapView);
+    if (snapshotReadyCallback != null && mapContent != null && mapContent.getBitmap() != null
+      && viewContentBitmap != null) {
+      Bitmap mapContentBitmap = mapContent.getBitmap();
+      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContentBitmap, viewContentBitmap);
+      Snapshot mergedSnapshot = new Snapshot(mergedBitmap);
+      snapshotReadyCallback.onSnapshotReady(mergedSnapshot);
     }
   }
 

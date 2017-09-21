@@ -10,6 +10,7 @@ import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -48,10 +49,11 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
   }
 
   @Override
-  public void onSnapshotReady(Bitmap snapshot) {
+  public void onSnapshotReady(Snapshot snapshot) {
     PrintHelper photoPrinter = new PrintHelper(this);
     photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
-    photoPrinter.printBitmap("map.jpg - mapbox print job", snapshot);
+    Bitmap bitmap = snapshot.getBitmap();
+    photoPrinter.printBitmap("map.jpg - mapbox print job", bitmap);
   }
 
   @Override
