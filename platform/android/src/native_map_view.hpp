@@ -58,6 +58,9 @@ public:
     // mbgl::RendererBackend //
 
     void bind() override;
+
+    mbgl::Size getFramebufferSize() const override;
+
     void updateAssumedState() override;
 
     // Deprecated //
@@ -281,8 +284,6 @@ private:
     void _destroySurface();
 
     EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
-
-    mbgl::Size getFramebufferSize() const;
 
     void updateFps();
 

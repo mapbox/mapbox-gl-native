@@ -20,10 +20,10 @@ public:
     explicit QMapboxGLPrivate(QMapboxGL *, const QMapboxGLSettings &, const QSize &size, qreal pixelRatio);
     virtual ~QMapboxGLPrivate();
 
-    mbgl::Size framebufferSize() const;
 
     // mbgl::RendererBackend implementation.
     void bind() final;
+    mbgl::Size getFramebufferSize() const final;
     void updateAssumedState() final;
     void activate() final {}
     void deactivate() final {}

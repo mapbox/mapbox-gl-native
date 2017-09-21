@@ -17,7 +17,6 @@
   "render-tests/debug/tile": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/extent/1024-circle": "needs investigation",
   "render-tests/extent/1024-symbol": "needs investigation",
-  "render-tests/fill-extrusion-multiple/multiple": "https://github.com/mapbox/mapbox-gl-native/issues/9894",
   "render-tests/fill-extrusion-pattern/@2x": "https://github.com/mapbox/mapbox-gl-js/issues/3327",
   "render-tests/fill-extrusion-pattern/function-2": "https://github.com/mapbox/mapbox-gl-js/issues/3327",
   "render-tests/fill-extrusion-pattern/function": "https://github.com/mapbox/mapbox-gl-js/issues/3327",
