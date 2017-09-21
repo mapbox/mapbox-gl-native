@@ -11,6 +11,7 @@ enum class RenderPass : uint8_t {
     None = 0,
     Opaque = 1 << 0,
     Translucent = 1 << 1,
+    Pass3D = 1 << 2,
 };
 
 MBGL_CONSTEXPR RenderPass operator|(RenderPass a, RenderPass b) {

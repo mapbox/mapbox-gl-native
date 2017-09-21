@@ -115,6 +115,10 @@ void NativeMapView::bind() {
     setViewport(0, 0, getFramebufferSize());
 }
 
+mbgl::Size NativeMapView::getFramebufferSize() const {
+    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
+}
+
 /**
  * From mbgl::RendererBackend.
  */
@@ -1426,10 +1430,6 @@ void NativeMapView::_destroySurface() {
         ANativeWindow_release(window);
         window = nullptr;
     }
-}
-
-mbgl::Size NativeMapView::getFramebufferSize() const {
-    return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
 }
 
 void NativeMapView::updateAssumedState() {

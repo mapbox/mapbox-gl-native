@@ -457,6 +457,9 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 Framebuffer
 Context::createFramebuffer(const Texture& color,
                            const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget) {
+    if (color.size != depthTarget.size) {
+        throw std::runtime_error("Renderbuffer size mismatch");
+    }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
     MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));

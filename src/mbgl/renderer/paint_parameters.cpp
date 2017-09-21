@@ -62,6 +62,10 @@ gl::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gl::DepthMode::Ma
     return gl::DepthMode { gl::DepthMode::LessEqual, mask, { nearDepth, farDepth } };
 }
 
+gl::DepthMode PaintParameters::depthModeFor3D(gl::DepthMode::Mask mask) const {
+    return gl::DepthMode { gl::DepthMode::LessEqual, mask, { 0.0, 1.0 } };
+}
+
 gl::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {
     return gl::StencilMode {
         gl::StencilMode::Equal { static_cast<uint32_t>(id.mask.to_ulong()) },

@@ -37,7 +37,7 @@ public:
     void invalidate();
 
     mbgl::Size getSize() const;
-    mbgl::Size getFramebufferSize() const;
+    mbgl::Size getFramebufferSize() const override;
 
     // mbgl::RendererBackend implementation
     void bind() override;

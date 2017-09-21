@@ -13,6 +13,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
+#include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -276,6 +277,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
+        if (!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) {
+            parameters.staticData.has3D = true;
+        }
+
         if (!layer->needsRendering(zoomHistory.lastZoom)) {
             continue;
         }
@@ -372,6 +377,39 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
         parameters.frameHistory.upload(parameters.context, 0);
+
+        // Update all clipping IDs + upload buckets.
+        for (const auto& entry : renderSources) {
+            if (entry.second->isEnabled()) {
+                entry.second->startRender(parameters);
+            }
+        }
+    }
+
+    // - 3D PASS -------------------------------------------------------------------------------------
+    // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
+    // depth rbo between them.
+    if (parameters.staticData.has3D) {
+        parameters.staticData.backendSize = parameters.backend.getFramebufferSize();
+
+        MBGL_DEBUG_GROUP(parameters.context, "3d");
+        parameters.pass = RenderPass::Pass3D;
+
+        if (!parameters.staticData.depthRenderbuffer ||
+            parameters.staticData.depthRenderbuffer->size != parameters.staticData.backendSize) {
+            parameters.staticData.depthRenderbuffer =
+                parameters.context.createRenderbuffer<gl::RenderbufferType::DepthComponent>(parameters.staticData.backendSize);
+        }
+        parameters.staticData.depthRenderbuffer->shouldClear(true);
+
+        uint32_t i = static_cast<uint32_t>(order.size()) - 1;
+        for (auto it = order.begin(); it != order.end(); ++it, --i) {
+            parameters.currentLayer = i;
+            if (it->layer.hasRenderPass(parameters.pass)) {
+                MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
+                it->layer.render(parameters, it->source);
+            }
+        }
     }
 
     // - CLEAR -------------------------------------------------------------------------------------
@@ -390,15 +428,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
-        MBGL_DEBUG_GROUP(parameters.context, "clip");
-
-        // Update all clipping IDs.
-        for (const auto& entry : renderSources) {
-            if (entry.second->isEnabled()) {
-                entry.second->startRender(parameters);
-            }
-        }
-
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
         static const style::FillPaintProperties::PossiblyEvaluated properties {};

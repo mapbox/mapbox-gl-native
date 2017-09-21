@@ -60,6 +60,7 @@ public:
     Programs& programs;
 
     gl::DepthMode depthModeForSublayer(uint8_t n, gl::DepthMode::Mask) const;
+    gl::DepthMode depthModeFor3D(gl::DepthMode::Mask) const;
     gl::StencilMode stencilModeForClipping(const ClipID&) const;
     gl::ColorMode colorModeForRenderPass() const;
 
