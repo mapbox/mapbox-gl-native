@@ -29,7 +29,7 @@ public class MapSnapshotter {
    *
    * @see MapSnapshotter#start(MapboxMap.SnapshotReadyCallback, ErrorHandler)
    */
-  public static interface ErrorHandler {
+  public interface ErrorHandler {
 
     /**
      * Called on error. Snapshotting will not
@@ -193,6 +193,7 @@ public class MapSnapshotter {
     }
 
     this.callback = callback;
+    this.errorHandler = errorHandler;
     nativeStart();
   }
 
