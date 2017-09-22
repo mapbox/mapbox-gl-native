@@ -584,3 +584,45 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
 
     runLoop.run();
 }
+
+TEST(Map, NoContentTiles) {
+    MapTest<DefaultFileSource> test {":memory:", "."};
+
+    using namespace std::chrono_literals;
+
+    // Insert a 204 No Content response for the 0/0/0 tile
+    Response response;
+    response.noContent = true;
+    response.expires = util::now() + 1h;
+    test.fileSource.put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
+                                       Tileset::Scheme::XYZ),
+                        response);
+
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "name": "Water",
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "background",
+        "type": "background",
+        "paint": {
+          "background-color": "red"
+        }
+      }, {
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
+    test::checkImage("test/fixtures/map/nocontent",
+                     test.frontend.render(test.map),
+                     0.0015,
+                     0.1);
+}
