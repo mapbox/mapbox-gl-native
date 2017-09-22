@@ -73,6 +73,8 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/default_thread_pool.hpp
 
         # Rendering
+        PRIVATE platform/android/src/android_renderer_backend.cpp
+        PRIVATE platform/android/src/android_renderer_backend.hpp
         PRIVATE platform/android/src/android_renderer_frontend.cpp
         PRIVATE platform/android/src/android_renderer_frontend.hpp
 
@@ -203,6 +205,10 @@ add_library(mbgl-android STATIC
     # Native map
     platform/android/src/native_map_view.cpp
     platform/android/src/native_map_view.hpp
+    platform/android/src/map_renderer.cpp
+    platform/android/src/map_renderer.hpp
+    platform/android/src/map_renderer_runnable.cpp
+    platform/android/src/map_renderer_runnable.hpp
 
     # Java core classes
     platform/android/src/java/util.cpp

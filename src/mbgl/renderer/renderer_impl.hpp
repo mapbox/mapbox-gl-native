@@ -39,6 +39,10 @@ public:
          const optional<std::string> programCacheDir);
     ~Impl() final;
 
+    void markContextLost() {
+        contextLost = true;
+    };
+
     void setObserver(RendererObserver*);
 
     void render(const UpdateParameters&);
@@ -100,6 +104,8 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
+
+    bool contextLost = false;
 };
 
 } // namespace mbgl

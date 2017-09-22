@@ -1,72 +1,115 @@
 #include "android_renderer_frontend.hpp"
 
-#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/renderer_observer.hpp>
+#include <mbgl/storage/file_source.hpp>
+#include <mbgl/util/thread.hpp>
+#include <mbgl/util/run_loop.hpp>
+
+#include "android_renderer_backend.hpp"
 
 namespace mbgl {
 namespace android {
 
-AndroidRendererFrontend::AndroidRendererFrontend(
-        std::unique_ptr<Renderer> renderer_,
-        RendererBackend& backend_,
-        InvalidateCallback invalidate)
-        : renderer(std::move(renderer_))
-        , backend(backend_)
-        , asyncInvalidate([=, invalidate=std::move(invalidate)]() {
-            invalidate();
-        }) {
+// Forwards RendererObserver signals to the given
+// Delegate RendererObserver on the given RunLoop
+class ForwardingRendererObserver : public RendererObserver {
+public:
+    ForwardingRendererObserver(util::RunLoop& mapRunLoop, RendererObserver& delegate_)
+            : mailbox(std::make_shared<Mailbox>(mapRunLoop))
+            , delegate(delegate_, mailbox) {
+    }
+
+    ~ForwardingRendererObserver() {
+        mailbox->close();
+    }
+
+    void onInvalidate() override {
+        delegate.invoke(&RendererObserver::onInvalidate);
+    }
+
+    void onResourceError(std::exception_ptr err) override {
+        delegate.invoke(&RendererObserver::onResourceError, err);
+    }
+
+    void onWillStartRenderingMap() override {
+        delegate.invoke(&RendererObserver::onWillStartRenderingMap);
+    }
+
+    void onWillStartRenderingFrame() override {
+        delegate.invoke(&RendererObserver::onWillStartRenderingFrame);
+    }
+
+    void onDidFinishRenderingFrame(RenderMode mode, bool repaintNeeded) override {
+        delegate.invoke(&RendererObserver::onDidFinishRenderingFrame, mode, repaintNeeded);
+    }
+
+    void onDidFinishRenderingMap() override {
+        delegate.invoke(&RendererObserver::onDidFinishRenderingMap);
+    }
+
+private:
+    std::shared_ptr<Mailbox> mailbox;
+    ActorRef<RendererObserver> delegate;
+};
+
+AndroidRendererFrontend::AndroidRendererFrontend(MapRenderer& mapRenderer_)
+        : mapRenderer(mapRenderer_)
+        , mapRunLoop(util::RunLoop::Get()) {
 }
 
 AndroidRendererFrontend::~AndroidRendererFrontend() = default;
 
 void AndroidRendererFrontend::reset() {
-    assert (renderer);
-    if (renderer) {
-        renderer.reset();
-    }
+    mapRenderer.reset();
 }
 
 void AndroidRendererFrontend::setObserver(RendererObserver& observer) {
-    assert (renderer);
-    renderer->setObserver(&observer);
+    assert (util::RunLoop::Get());
+    // Don't call the Renderer directly, but use MapRenderer#setObserver to make sure
+    // the Renderer may be re-initialised without losing the RendererObserver reference.
+    mapRenderer.setObserver(std::make_unique<ForwardingRendererObserver>(*mapRunLoop, observer));
 }
 
 void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
-    updateParameters = std::move(params);
-    asyncInvalidate.send();
-}
-
-void AndroidRendererFrontend::render() {
-    assert (renderer);
-    if (!updateParameters) return;
-
-    BackendScope guard { backend };
-
-    renderer->render(*updateParameters);
+    mapRenderer.update(std::move(params));
+    mapRenderer.requestRender();
 }
 
 void AndroidRendererFrontend::onLowMemory() {
-    assert (renderer);
-    renderer->onLowMemory();
+    mapRenderer.actor().invoke(&Renderer::onLowMemory);
 }
 
 std::vector<Feature> AndroidRendererFrontend::querySourceFeatures(const std::string& sourceID,
                                                                   const SourceQueryOptions& options) const {
-    return renderer->querySourceFeatures(sourceID, options);
+    // Waits for the result from the orchestration thread and returns
+    return mapRenderer.actor().ask(&Renderer::querySourceFeatures, sourceID, options).get();
 }
 
 std::vector<Feature> AndroidRendererFrontend::queryRenderedFeatures(const ScreenBox& box,
                                                                     const RenderedQueryOptions& options) const {
-    return renderer->queryRenderedFeatures(box, options);
+
+    // Select the right overloaded method
+    std::vector<Feature> (Renderer::*fn)(const ScreenBox&, const RenderedQueryOptions&) const = &Renderer::queryRenderedFeatures;
+
+    // Waits for the result from the orchestration thread and returns
+    return mapRenderer.actor().ask(fn, box, options).get();
 }
 
 std::vector<Feature> AndroidRendererFrontend::queryRenderedFeatures(const ScreenCoordinate& point,
                                                                     const RenderedQueryOptions& options) const {
-    return renderer->queryRenderedFeatures(point, options);
+
+    // Select the right overloaded method
+    std::vector<Feature> (Renderer::*fn)(const ScreenCoordinate&, const RenderedQueryOptions&) const = &Renderer::queryRenderedFeatures;
+
+    // Waits for the result from the orchestration thread and returns
+    return mapRenderer.actor().ask(fn, point, options).get();
 }
 
 AnnotationIDs AndroidRendererFrontend::queryPointAnnotations(const ScreenBox& box) const {
-    return renderer->queryPointAnnotations(box);
+    // Waits for the result from the orchestration thread and returns
+    return mapRenderer.actor().ask(&Renderer::queryPointAnnotations, box).get();
 }
 
 } // namespace android

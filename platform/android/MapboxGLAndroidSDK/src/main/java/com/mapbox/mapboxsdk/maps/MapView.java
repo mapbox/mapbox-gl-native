@@ -1,10 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
-import android.graphics.Canvas;
 import android.graphics.PointF;
-import android.graphics.SurfaceTexture;
 import android.os.Build;
+import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -16,10 +15,6 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -32,6 +27,8 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
+import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
@@ -45,10 +42,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
+import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 /**
  * <p>
@@ -72,7 +73,6 @@ public class MapView extends FrameLayout {
   private NativeMapView nativeMapView;
   private MapboxMapOptions mapboxMapOptions;
   private boolean destroyed;
-  private boolean hasSurface;
 
   private MyLocationView myLocationView;
   private CompassView compassView;
@@ -85,6 +85,8 @@ public class MapView extends FrameLayout {
   private MapZoomButtonController mapZoomButtonController;
   private Bundle savedInstanceState;
   private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
+
+  private GLSurfaceView glSurfaceView;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -123,7 +125,6 @@ public class MapView extends FrameLayout {
     myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = (ImageView) view.findViewById(R.id.logoView);
-    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -137,7 +138,7 @@ public class MapView extends FrameLayout {
         } else {
           getViewTreeObserver().removeGlobalOnLayoutListener(this);
         }
-        initialiseDrawingSurface(mapboxMapOptions);
+        initialiseDrawingSurface();
       }
     });
   }
@@ -185,6 +186,7 @@ public class MapView extends FrameLayout {
       annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
+    mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
     MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
@@ -279,17 +281,36 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private void initialiseDrawingSurface(MapboxMapOptions mapboxMapOptions) {
-    if (mapboxMapOptions.getTextureMode()) {
-      TextureView textureView = new TextureView(getContext());
-      textureView.setSurfaceTextureListener(new SurfaceTextureListener());
-      addView(textureView, 0);
-    } else {
-      SurfaceView surfaceView = (SurfaceView) findViewById(R.id.surfaceView);
-      surfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-      surfaceView.getHolder().addCallback(new SurfaceCallback());
-      surfaceView.setVisibility(View.VISIBLE);
-    }
+  private void initialiseDrawingSurface() {
+    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+    glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
+    glSurfaceView.setEGLContextClientVersion(2);
+    glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
+
+    MapRenderer mapRenderer = new MapRenderer(getContext(), glSurfaceView) {
+      @Override
+      public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+        MapView.this.post(new Runnable() {
+          @Override
+          public void run() {
+            // Initialise only once
+            if (mapboxMap == null) {
+              initialiseMap();
+              mapboxMap.onStart();
+            }
+          }
+        });
+
+        super.onSurfaceCreated(gl, config);
+      }
+    };
+
+    glSurfaceView.setRenderer(mapRenderer);
+    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
+    glSurfaceView.setVisibility(View.VISIBLE);
+
+    nativeMapView = new NativeMapView(this, mapRenderer);
+    nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
 
   /**
@@ -320,7 +341,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onResume() {
-    // replaced by onStart in v5.0.0
+    if (glSurfaceView != null) {
+      glSurfaceView.onResume();
+    }
   }
 
   /**
@@ -328,7 +351,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onPause() {
-    // replaced by onStop in v5.0.0
+    if (glSurfaceView != null) {
+      glSurfaceView.onPause();
+    }
   }
 
   /**
@@ -410,21 +435,6 @@ public class MapView extends FrameLayout {
     nativeMapView.onLowMemory();
   }
 
-  // Called when debug mode is enabled to update a FPS counter
-  // Called via JNI from NativeMapView
-  // Forward to any listener
-  protected void onFpsChanged(final double fps) {
-    final MapboxMap.OnFpsChangedListener listener = mapboxMap.getOnFpsChangedListener();
-    if (listener != null) {
-      post(new Runnable() {
-        @Override
-        public void run() {
-          listener.onFpsChanged(fps);
-        }
-      });
-    }
-  }
-
   /**
    * <p>
    * Loads a new map style from the specified URL.
@@ -468,29 +478,6 @@ public class MapView extends FrameLayout {
   // Rendering
   //
 
-  // Called when the map needs to be rerendered
-  // Called via JNI from NativeMapView
-  protected void onInvalidate() {
-    postInvalidate();
-  }
-
-  @Override
-  public void onDraw(Canvas canvas) {
-    super.onDraw(canvas);
-    if (isInEditMode()) {
-      return;
-    }
-
-    if (destroyed) {
-      return;
-    }
-
-    if (!hasSurface) {
-      return;
-    }
-    nativeMapView.render();
-  }
-
   @Override
   protected void onSizeChanged(int width, int height, int oldw, int oldh) {
     if (destroyed) {
@@ -499,103 +486,6 @@ public class MapView extends FrameLayout {
 
     if (!isInEditMode() && nativeMapView != null) {
       nativeMapView.resizeView(width, height);
-    }
-  }
-
-  private class SurfaceCallback implements SurfaceHolder.Callback {
-
-    private Surface surface;
-
-    @Override
-    public void surfaceCreated(SurfaceHolder holder) {
-      if (nativeMapView == null) {
-        nativeMapView = new NativeMapView(MapView.this);
-        nativeMapView.createSurface(surface = holder.getSurface());
-        nativeMapView.resizeView(getWidth(), getHeight());
-        initialiseMap();
-        mapboxMap.onStart();
-      } else {
-        nativeMapView.createSurface(surface = holder.getSurface());
-      }
-
-      hasSurface = true;
-    }
-
-    @Override
-    public void surfaceChanged(SurfaceHolder holder, int format, int width, int height) {
-      if (destroyed) {
-        return;
-      }
-      nativeMapView.resizeFramebuffer(width, height);
-    }
-
-    @Override
-    public void surfaceDestroyed(SurfaceHolder holder) {
-      hasSurface = false;
-
-      if (nativeMapView != null) {
-        // occurs when activity goes to background
-        nativeMapView.destroySurface();
-      }
-      surface.release();
-    }
-  }
-
-  // This class handles TextureView callbacks
-  private class SurfaceTextureListener implements TextureView.SurfaceTextureListener {
-
-    private Surface surface;
-
-    // Called when the native surface texture has been created
-    // Must do all EGL/GL ES initialization here
-    @Override
-    public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-      if (nativeMapView == null) {
-        nativeMapView = new NativeMapView(MapView.this);
-        nativeMapView.createSurface(this.surface = new Surface(surface));
-        nativeMapView.resizeFramebuffer(width, height);
-        nativeMapView.resizeView(width, height);
-        initialiseMap();
-        mapboxMap.onStart();
-      } else {
-        nativeMapView.createSurface(this.surface = new Surface(surface));
-      }
-
-      hasSurface = true;
-    }
-
-    // Called when the native surface texture has been destroyed
-    // Must do all EGL/GL ES destruction here
-    @Override
-    public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
-      hasSurface = false;
-
-      if (nativeMapView != null) {
-        nativeMapView.destroySurface();
-      }
-      this.surface.release();
-      return true;
-    }
-
-    // Called when the format or size of the native surface texture has been changed
-    // Must handle window resizing here.
-    @Override
-    public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
-      if (destroyed) {
-        return;
-      }
-
-      nativeMapView.resizeFramebuffer(width, height);
-    }
-
-    // Called when the SurfaceTexure frame is drawn to screen
-    // Must sync with UI here
-    @Override
-    public void onSurfaceTextureUpdated(SurfaceTexture surface) {
-      if (destroyed) {
-        return;
-      }
-      mapboxMap.onUpdateRegionChange();
     }
   }
 
@@ -618,7 +508,7 @@ public class MapView extends FrameLayout {
       return;
     }
 
-    if (nativeMapView != null) {
+    if (mapZoomButtonController != null) {
       mapZoomButtonController.setVisible(visibility == View.VISIBLE);
     }
   }

@@ -163,8 +163,8 @@ public class DoubleMapActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
-      super.onDestroy();
+    public void onDestroyView() {
+      super.onDestroyView();
       mapView.onDestroy();
       mapViewMini.onDestroy();
     }

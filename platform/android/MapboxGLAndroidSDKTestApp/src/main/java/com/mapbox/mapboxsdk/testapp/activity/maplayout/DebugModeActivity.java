@@ -26,6 +26,7 @@ import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.List;
+import java.util.Locale;
 
 import timber.log.Timber;
 
@@ -104,6 +105,17 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
 
     setupNavigationView(mapboxMap.getLayers());
     setupZoomView();
+    setFpsView();
+  }
+
+  private void setFpsView() {
+    final TextView fpsView = (TextView) findViewById(R.id.fpsView);
+    mapboxMap.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
+      @Override
+      public void onFpsChanged(double fps) {
+        fpsView.setText(String.format(Locale.US,"FPS: %4.2f", fps));
+      }
+    });
   }
 
   private void setupNavigationView(List<Layer> layerList) {

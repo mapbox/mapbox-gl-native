@@ -20,6 +20,10 @@ Renderer::~Renderer() {
     impl.reset();
 }
 
+void Renderer::markContextLost() {
+    impl->markContextLost();
+}
+
 void Renderer::setObserver(RendererObserver* observer) {
     impl->setObserver(observer);
 }
