@@ -6,16 +6,34 @@ typealias MGLColor = UIColor
 #elseif os(macOS)
 typealias MGLColor = NSColor
 #endif
+
+#if swift(>=3.2)
+#else
+func XCTAssertEqual<T: FloatingPoint>(_ lhs: @autoclosure () throws -> T, _ rhs: @autoclosure () throws -> T, accuracy: T) {
+    XCTAssertEqualWithAccuracy(lhs, rhs, accuracy: accuracy)
+}
+#endif
     
 extension MGLStyleValueTests {
+    
+    struct Color {
+        var red: CGFloat = 0
+        var green: CGFloat = 0
+        var blue: CGFloat = 0
+        var alpha: CGFloat = 0
+    }
+    
     func assertColorsEqualWithAccuracy(_ actual: MGLColor, _ expected: MGLColor, accuracy: Float = 1/255) {
-        var actualComponents : [CGFloat] = [0, 0, 0, 0]
-        var expectedComponents : [CGFloat] = [0, 0, 0, 0]
-        actual.getRed(&(actualComponents[0]), green: &(actualComponents[1]), blue: &(actualComponents[2]), alpha: &(actualComponents[3]))
-        expected.getRed(&(expectedComponents[0]), green: &(expectedComponents[1]), blue: &(expectedComponents[2]), alpha: &(expectedComponents[3]))
-        for (ac, ec) in zip(actualComponents, expectedComponents) {
-            XCTAssertEqualWithAccuracy(Float(ac), Float(ec), accuracy: accuracy)
-        }
+        var actualColor = Color()
+        var expectedColor = Color()
+        
+        actual.getRed(&actualColor.red, green: &actualColor.green, blue: &actualColor.blue, alpha: &actualColor.alpha)
+        expected.getRed(&expectedColor.red, green: &expectedColor.green, blue: &expectedColor.blue, alpha: &expectedColor.alpha)
+
+        XCTAssertEqual(Float(actualColor.red), Float(expectedColor.red), accuracy: accuracy)
+        XCTAssertEqual(Float(actualColor.green), Float(expectedColor.green), accuracy: accuracy)
+        XCTAssertEqual(Float(actualColor.blue), Float(expectedColor.blue), accuracy: accuracy)
+        XCTAssertEqual(Float(actualColor.alpha), Float(expectedColor.alpha), accuracy: accuracy)
     }
     
     func assertColorValuesEqual(_ actual: MGLStyleValue<MGLColor>, _ expected: MGLStyleValue<MGLColor>) {
