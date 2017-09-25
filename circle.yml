@@ -157,6 +157,7 @@ jobs:
   android-debug-arm-v7:
     docker:
       - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -246,6 +247,7 @@ jobs:
   android-release-all:
     docker:
       - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -474,6 +476,7 @@ jobs:
   linux-gcc4.9-debug:
     docker:
       - image: mbgl/ci:r4-linux-gcc-4.9
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -498,6 +501,7 @@ jobs:
   linux-gcc5-debug-coverage:
     docker:
       - image: mbgl/ci:r4-linux-gcc-5
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -525,6 +529,7 @@ jobs:
   linux-gcc5-release-qt4:
     docker:
       - image: mbgl/ci:r4-linux-gcc-5-qt-4
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -552,6 +557,7 @@ jobs:
   linux-gcc5-release-qt5:
     docker:
       - image: mbgl/ci:r4-linux-gcc-5-qt-5
+    resource_class: large      
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4

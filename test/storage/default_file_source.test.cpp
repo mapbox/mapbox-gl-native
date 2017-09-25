@@ -571,3 +571,81 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
 
     loop.run();
 }
+
+// Test that a stale cache file that has must-revalidate set will trigger a response.
+TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
+    util::RunLoop loop;
+    DefaultFileSource fs(":memory:", ".");
+
+    Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    resource.necessity = Resource::Necessity::Optional;
+
+    // using namespace std::chrono_literals;
+
+    // Put an existing value in the cache that has expired, and has must-revalidate set.
+    Response response;
+    response.data = std::make_shared<std::string>("Cached value");
+    response.modified = Timestamp(Seconds(1417392000)); // December 1, 2014
+    response.expires = Timestamp(Seconds(1417392000));
+    response.mustRevalidate = true;
+    response.etag.emplace("snowfall");
+    fs.put(resource, response);
+
+    std::unique_ptr<AsyncRequest> req;
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        ASSERT_TRUE(res.error.get());
+        EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
+        EXPECT_EQ("Cached resource is unusable", res.error->message);
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(res.expires);
+        EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
+        ASSERT_TRUE(res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.modified);
+        ASSERT_TRUE(res.etag);
+        EXPECT_EQ("snowfall", *res.etag);
+
+        resource.priorEtag = res.etag;
+        resource.priorModified = res.modified;
+        resource.priorExpires = res.expires;
+        resource.priorData = res.data;
+
+        loop.stop();
+    });
+
+    loop.run();
+
+    // Now run this request again, with the data we gathered from the previous stale/unusable
+    // request. We're replacing the data so that we can check that the DefaultFileSource doesn't
+    // attempt another database access if we already have the value.
+    resource.necessity = Resource::Necessity::Required;
+    resource.priorData = std::make_shared<std::string>("Prior value");
+
+    req = fs.request(resource, [&](Response res) {
+        req.reset();
+        ASSERT_EQ(nullptr, res.error.get());
+        // Since the data was found in the cache, we're doing a revalidation request. Yet, since
+        // this request hasn't returned data before, we're setting notModified to false in the
+        // OnlineFileSource to ensure that requestors know that this is the first time they're
+        // seeing this data.
+        EXPECT_FALSE(res.notModified);
+        ASSERT_TRUE(res.data.get());
+        // Ensure that it's the value that we manually inserted into the cache rather than the value
+        // the server returns, since we should be executing a revalidation request which doesn't
+        // return new data, only a 304 Not Modified response.
+        EXPECT_EQ("Prior value", *res.data);
+        ASSERT_TRUE(res.expires);
+        EXPECT_LE(util::now(), *res.expires);
+        EXPECT_TRUE(res.mustRevalidate);
+        ASSERT_TRUE(res.modified);
+        EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.modified);
+        ASSERT_TRUE(res.etag);
+        EXPECT_EQ("snowfall", *res.etag);
+        loop.stop();
+    });
+
+    loop.run();
+}

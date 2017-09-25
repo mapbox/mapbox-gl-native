@@ -126,9 +126,8 @@ public:
             tasks[req] = localFileSource->request(resource, callback);
         } else {
             // Try the offline database
-            Resource revalidation = resource;
-
-            const bool hasPrior = resource.priorEtag || resource.priorModified || resource.priorExpires;
+            const bool hasPrior = resource.priorEtag || resource.priorModified ||
+                                  resource.priorExpires || resource.priorData;
             if (!hasPrior || resource.necessity == Resource::Optional) {
                 auto offlineResponse = offlineDatabase->get(resource);
 
@@ -142,27 +141,34 @@ public:
                 }
 
                 if (offlineResponse) {
-                    revalidation.priorModified = offlineResponse->modified;
-                    revalidation.priorExpires = offlineResponse->expires;
-                    revalidation.priorEtag = offlineResponse->etag;
+                    resource.priorModified = offlineResponse->modified;
+                    resource.priorExpires = offlineResponse->expires;
+                    resource.priorEtag = offlineResponse->etag;
 
                     // Don't return resources the server requested not to show when they're stale.
                     // Even if we can't directly use the response, we may still use it to send a
                     // conditional HTTP request.
                     if (offlineResponse->isUsable()) {
                         callback(*offlineResponse);
+                    } else if (resource.necessity == Resource::Optional) {
+                        // Instead of the data that we got, return a not found error so that
+                        // underlying implementations know about the fact that we couldn't find
+                        // usable cache data.
+                        offlineResponse->error = std::make_unique<Response::Error>(
+                            Response::Error::Reason::NotFound, "Cached resource is unusable");
+                        callback(*offlineResponse);
                     } else {
                         // Since we can't return the data immediately, we'll have to hold on so that
                         // we can return it later in case we get a 304 Not Modified response.
-                        revalidation.priorData = offlineResponse->data;
+                        resource.priorData = offlineResponse->data;
                     }
                 }
             }
 
             // Get from the online file source
             if (resource.necessity == Resource::Required) {
-                tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) mutable {
-                    this->offlineDatabase->put(revalidation, onlineResponse);
+                tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
+                    this->offlineDatabase->put(resource, onlineResponse);
                     callback(onlineResponse);
                 });
             }
