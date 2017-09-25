@@ -204,6 +204,10 @@
 		558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 558DE79E1E5615E400C7916D /* MGLFoundation_Private.h */; };
 		558DE7A21E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
 		558DE7A31E5615E400C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE79F1E5615E400C7916D /* MGLFoundation.mm */; };
+		55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */; };
+		55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A91F79100C004B6D81 /* libmbgl-filesource.a */; };
+		55D120AA1F791015004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120AB1F791015004B6D81 /* libmbgl-filesource.a */; };
+		55D120AC1F791018004B6D81 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120AD1F791018004B6D81 /* libmbgl-loop-darwin.a */; };
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
@@ -690,6 +694,10 @@
 		556660D71E1D085500E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558DE79E1E5615E400C7916D /* MGLFoundation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFoundation_Private.h; sourceTree = "<group>"; };
 		558DE79F1E5615E400C7916D /* MGLFoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFoundation.mm; sourceTree = "<group>"; };
+		55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-loop-darwin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55D120A91F79100C004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55D120AB1F791015004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		55D120AD1F791018004B6D81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-loop-darwin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D8C9941D0F133500F42F10 /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/ios/config.xcconfig; sourceTree = "<group>"; };
 		55D8C9951D0F18CE00F42F10 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
@@ -1001,6 +1009,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAABF73D1CBC59BB005B1825 /* libmbgl-core.a in Frameworks */,
+				55D120A61F791007004B6D81 /* libmbgl-loop-darwin.a in Frameworks */,
+				55D120A81F79100C004B6D81 /* libmbgl-filesource.a in Frameworks */,
 				DA27C24E1CBB3811000B0ECD /* GLKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1010,6 +1020,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				36F1153D1D46080700878E1A /* libmbgl-core.a in Frameworks */,
+				55D120AC1F791018004B6D81 /* libmbgl-loop-darwin.a in Frameworks */,
+				55D120AA1F791015004B6D81 /* libmbgl-filesource.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1279,6 +1291,10 @@
 		DA1DC9921CB6DF24006E619F /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				55D120AD1F791018004B6D81 /* libmbgl-loop-darwin.a */,
+				55D120AB1F791015004B6D81 /* libmbgl-filesource.a */,
+				55D120A91F79100C004B6D81 /* libmbgl-filesource.a */,
+				55D120A71F791007004B6D81 /* libmbgl-loop-darwin.a */,
 				5549A0371EF1D86B00073113 /* libmbgl-core.a */,
 				36F1153B1D46080700878E1A /* libmbgl-core.a */,
 				36F1153C1D46080700878E1A /* libmbgl-platform-ios.a */,
@@ -2827,7 +2843,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2842,7 +2861,10 @@
 					"$(geometry_cflags)",
 					"$(geojson_cflags)",
 				);
-				OTHER_LDFLAGS = "$(mbgl_core_LINK_LIBRARIES)";
+				OTHER_LDFLAGS = (
+					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
 				PRODUCT_NAME = Mapbox;
 				SKIP_INSTALL = YES;
@@ -2862,7 +2884,10 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = framework/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
@@ -2877,7 +2902,10 @@
 					"$(geometry_cflags)",
 					"$(geojson_cflags)",
 				);
-				OTHER_LDFLAGS = "$(mbgl_core_LINK_LIBRARIES)";
+				OTHER_LDFLAGS = (
+					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
+				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.sdk.ios;
 				PRODUCT_NAME = Mapbox;
 				SKIP_INSTALL = YES;
@@ -2914,7 +2942,10 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
+				);
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -2928,6 +2959,7 @@
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
 				PRODUCT_NAME = Mapbox;
 				PUBLIC_HEADERS_FOLDER_PATH = Headers;
@@ -2941,7 +2973,10 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
+				);
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -2955,6 +2990,7 @@
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"$(mbgl_core_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
 				PRODUCT_NAME = Mapbox;
 				PUBLIC_HEADERS_FOLDER_PATH = Headers;

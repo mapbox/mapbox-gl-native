@@ -2,36 +2,28 @@ add_definitions(-DMBGL_USE_GLES2=1)
 
 mason_use(icu VERSION 58.1-min-size)
 
+macro(initialize_ios_target target)
+    set_xcode_property(${target} IPHONEOS_DEPLOYMENT_TARGET "8.0")
+    set_xcode_property(${target} ENABLE_BITCODE "YES")
+    set_xcode_property(${target} BITCODE_GENERATION_MODE bitcode)
+    set_xcode_property(${target} ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+
+    target_compile_options(${target}
+        PRIVATE -fobjc-arc
+    )
+endmacro()
+
+
+include(cmake/loop-darwin.cmake)
+initialize_ios_target(mbgl-loop-darwin)
+
+
 macro(mbgl_platform_core)
-    set_xcode_property(mbgl-core IPHONEOS_DEPLOYMENT_TARGET "8.0")
-    set_xcode_property(mbgl-core ENABLE_BITCODE "YES")
-    set_xcode_property(mbgl-core BITCODE_GENERATION_MODE bitcode)
-    set_xcode_property(mbgl-core ONLY_ACTIVE_ARCH $<$<CONFIG:Debug>:YES>)
+    initialize_ios_target(mbgl-core)
 
     target_sources(mbgl-core
-        # Loop
-        PRIVATE platform/darwin/src/async_task.cpp
-        PRIVATE platform/darwin/src/run_loop.cpp
-        PRIVATE platform/darwin/src/timer.cpp
-
-        # File source
-        PRIVATE platform/darwin/src/http_file_source.mm
-        PRIVATE platform/default/asset_file_source.cpp
-        PRIVATE platform/default/default_file_source.cpp
-        PRIVATE platform/default/local_file_source.cpp
-        PRIVATE platform/default/online_file_source.cpp
-
         # Default styles
         PRIVATE platform/default/mbgl/util/default_styles.hpp
-
-        # Offline
-        PRIVATE platform/default/mbgl/storage/offline.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.hpp
-        PRIVATE platform/default/mbgl/storage/offline_download.cpp
-        PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
-        PRIVATE platform/default/sqlite3.hpp
 
         # Misc
         PRIVATE platform/darwin/mbgl/storage/reachability.h
@@ -73,7 +65,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
     target_compile_options(mbgl-core
-        PRIVATE -fobjc-arc
         PRIVATE -fvisibility=hidden
     )
 
@@ -97,6 +88,27 @@ macro(mbgl_platform_core)
         PUBLIC "-framework ImageIO"
         PUBLIC "-framework MobileCoreServices"
         PUBLIC "-framework SystemConfiguration"
+    )
+endmacro()
+
+
+macro(mbgl_filesource)
+    initialize_ios_target(mbgl-filesource)
+
+    target_sources(mbgl-filesource
+        # File source
+        PRIVATE platform/darwin/src/http_file_source.mm
+
+        # Database
+        PRIVATE platform/default/sqlite3.cpp
+    )
+
+    target_compile_options(mbgl-filesource
+        PRIVATE -fvisibility=hidden
+    )
+
+    target_link_libraries(mbgl-filesource
         PUBLIC "-lsqlite3"
+        PUBLIC "-framework Foundation"
     )
 endmacro()
