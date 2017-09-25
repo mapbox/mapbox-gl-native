@@ -6,6 +6,22 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * Russian and Ukrainian localizations [#9945](https://github.com/mapbox/mapbox-gl-native/pull/9945)
 
+### 5.1.4 - September 25, 2017
+
+* Update translations [#10033](https://github.com/mapbox/mapbox-gl-native/pull/10033) & [#9945](https://github.com/mapbox/mapbox-gl-native/pull/9945)
+* Continue rendering tiles despite erros [#10012](https://github.com/mapbox/mapbox-gl-native/pull/10012)
+* Fix layer z-fighting [#9942](https://github.com/mapbox/mapbox-gl-native/pull/9942)
+* Align line vertex to 4-byte boundary [#9943](https://github.com/mapbox/mapbox-gl-native/pull/9943)
+* Bump proguard config for OkHttp [#9970](https://github.com/mapbox/mapbox-gl-native/pull/9970)
+* Remove database on schema downgrade [#9837](https://github.com/mapbox/mapbox-gl-native/pull/9837)
+* Disable rotation gesture when pinch zooming [#10026](https://github.com/mapbox/mapbox-gl-native/pull/10026)
+* Do not check if connection is local request [#9968](https://github.com/mapbox/mapbox-gl-native/pull/9968)
+* Harden offline region deletion [#9967](https://github.com/mapbox/mapbox-gl-native/pull/9967)
+* Clear out mapCallback's OnMapReadyListeners on destroy [#9957](https://github.com/mapbox/mapbox-gl-native/pull/9957)
+* Avoid adding duplicate points to bounds [#9955](https://github.com/mapbox/mapbox-gl-native/pull/9955)
+* Download is complete fix [#9913](https://github.com/mapbox/mapbox-gl-native/pull/9913)
+* MAS 2.2.3 [#9901](https://github.com/mapbox/mapbox-gl-native/pull/9901)
+
 ## 5.1.3 - August 18, 2017
 
 * Use separate attribute component for line normals [#9753](https://github.com/mapbox/mapbox-gl-native/pull/9753)
