@@ -217,14 +217,13 @@ public class MapSnapshotter {
    * Called by JNI peer when snapshot is ready.
    * Always called on the origin (main) thread.
    *
-   * @param snapshot the generated snapshot
+   * @param bitmap the generated snapshot
    */
-  protected void onSnapshotReady(Snapshot snapshot) {
+  protected void onSnapshotReady(Bitmap bitmap) {
     if (callback != null) {
-      Bitmap bitmap = snapshot.getBitmap();
       addOverlay(bitmap);
-      Snapshot overlaidSnapshot = new Snapshot(bitmap);
-      callback.onSnapshotReady(overlaidSnapshot);
+      Snapshot snapshot = new Snapshot(bitmap);
+      callback.onSnapshotReady(snapshot);
       reset();
     }
   }

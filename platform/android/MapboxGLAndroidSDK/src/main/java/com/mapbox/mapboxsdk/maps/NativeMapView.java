@@ -828,18 +828,16 @@ final class NativeMapView {
     }
   }
 
-  protected void onSnapshotReady(Snapshot mapContent) {
+  protected void onSnapshotReady(Bitmap mapContent) {
     if (isDestroyedOn("OnSnapshotReady")) {
       return;
     }
 
     Bitmap viewContentBitmap = BitmapUtils.createBitmapFromView(mapView);
-    if (snapshotReadyCallback != null && mapContent != null && mapContent.getBitmap() != null
-      && viewContentBitmap != null) {
-      Bitmap mapContentBitmap = mapContent.getBitmap();
-      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContentBitmap, viewContentBitmap);
-      Snapshot mergedSnapshot = new Snapshot(mergedBitmap);
-      snapshotReadyCallback.onSnapshotReady(mergedSnapshot);
+    if (snapshotReadyCallback != null && mapContent != null && viewContentBitmap != null) {
+      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContent, viewContentBitmap);
+      Snapshot snapshot = new Snapshot(mergedBitmap);
+      snapshotReadyCallback.onSnapshotReady(snapshot);
     }
   }
 

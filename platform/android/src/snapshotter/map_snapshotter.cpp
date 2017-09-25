@@ -1,5 +1,4 @@
 #include "map_snapshotter.hpp"
-#include "snapshot.hpp"
 
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/style/style.hpp>
@@ -70,11 +69,10 @@ void MapSnapshotter::start(JNIEnv&) {
         } else {
             // Create the bitmap
             auto bitmap = Bitmap::CreateBitmap(*_env, std::move(image));
-            auto snapshot = Snapshot::New(*_env, bitmap);
 
             // invoke callback
-            static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Snapshot>)>(*_env, "onSnapshotReady");
-            javaPeer->Call(*_env, onSnapshotReady, snapshot);
+            static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Bitmap>)>(*_env, "onSnapshotReady");
+            javaPeer->Call(*_env, onSnapshotReady, bitmap);
         }
     });
 
