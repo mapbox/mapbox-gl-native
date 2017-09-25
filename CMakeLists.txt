@@ -127,9 +127,11 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
     message(ERROR "Can't find config.cmake file for platform ${MBGL_PLATFORM}")
 endif()
 
-include(cmake/loop-uv.cmake)
-
 include(platform/${MBGL_PLATFORM}/config.cmake)
+
+if (COMMAND mbgl_filesource)
+    include(cmake/filesource.cmake)
+endif()
 
 include(cmake/core-files.cmake)
 include(cmake/core.cmake)
@@ -163,5 +165,6 @@ endif()
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     write_xcconfig_target_properties(
         mbgl-core
+        mbgl-filesource
     )
 endif()

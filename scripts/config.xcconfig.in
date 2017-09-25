@@ -3,3 +3,7 @@
 // mbgl-core
 mbgl_core_INCLUDE_DIRECTORIES = "@mbgl_core_INCLUDE_DIRECTORIES@"
 mbgl_core_LINK_LIBRARIES = "@mbgl_core_LINK_LIBRARIES@"
+
+// mbgl-filesource
+mbgl_filesource_INCLUDE_DIRECTORIES = "@mbgl_filesource_INCLUDE_DIRECTORIES@"
+mbgl_filesource_LINK_LIBRARIES = "@mbgl_filesource_LINK_LIBRARIES@"

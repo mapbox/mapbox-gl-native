@@ -65,7 +65,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node tests"
     ARGS
-        "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
+        "node_modules/.bin/tape platform/node/test/js/**/*.test.js"
 )
 
 xcode_create_scheme(

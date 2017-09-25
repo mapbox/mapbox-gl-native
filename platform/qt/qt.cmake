@@ -10,22 +10,16 @@ set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fvisibility=hidden -D__QT__")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(MBGL_QT_FILES
-    # File source
-    PRIVATE platform/default/asset_file_source.cpp
-    PRIVATE platform/default/default_file_source.cpp
-    PRIVATE platform/default/local_file_source.cpp
-    PRIVATE platform/default/online_file_source.cpp
-
-    # Offline
-    PRIVATE platform/default/mbgl/storage/offline.cpp
-    PRIVATE platform/default/mbgl/storage/offline_database.cpp
-    PRIVATE platform/default/mbgl/storage/offline_database.hpp
-    PRIVATE platform/default/mbgl/storage/offline_download.cpp
-    PRIVATE platform/default/mbgl/storage/offline_download.hpp
-    PRIVATE platform/default/sqlite3.hpp
+set(MBGL_QT_CORE_FILES
+    # Headless view
+    PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
+    PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
+    PRIVATE platform/default/mbgl/gl/headless_backend.cpp
+    PRIVATE platform/default/mbgl/gl/headless_backend.hpp
+    PRIVATE platform/default/mbgl/gl/headless_display.cpp
+    PRIVATE platform/default/mbgl/gl/headless_display.hpp
+    PRIVATE platform/qt/src/headless_backend_qt.cpp
 
     # Misc
     PRIVATE platform/default/logging_stderr.cpp
@@ -42,22 +36,24 @@ set(MBGL_QT_FILES
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
     PRIVATE platform/qt/src/async_task_impl.hpp
-    PRIVATE platform/qt/src/http_file_source.cpp
-    PRIVATE platform/qt/src/http_file_source.hpp
-    PRIVATE platform/qt/src/http_request.cpp
-    PRIVATE platform/qt/src/http_request.hpp
     PRIVATE platform/qt/src/qt_image.cpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
-    PRIVATE platform/qt/src/sqlite3.cpp
     PRIVATE platform/qt/src/string_stdlib.cpp
     PRIVATE platform/qt/src/timer.cpp
     PRIVATE platform/qt/src/timer_impl.hpp
     PRIVATE platform/qt/src/utf.cpp
 )
 
-include_directories(
-    PRIVATE platform/qt/include
+set(MBGL_QT_FILESOURCE_FILES
+    # File source
+    PRIVATE platform/qt/src/http_file_source.cpp
+    PRIVATE platform/qt/src/http_file_source.hpp
+    PRIVATE platform/qt/src/http_request.cpp
+    PRIVATE platform/qt/src/http_request.hpp
+
+    # Database
+    PRIVATE platform/qt/src/sqlite3.cpp
 )
 
 # Shared library
@@ -72,6 +68,17 @@ add_library(qmapboxgl SHARED
     platform/default/mbgl/util/default_styles.hpp
 )
 
+target_include_directories(qmapboxgl
+    PUBLIC platform/qt/include
+)
+
+target_link_libraries(qmapboxgl
+    PRIVATE mbgl-core
+    PRIVATE mbgl-filesource
+    ${MBGL_QT_CORE_LIBRARIES}
+    ${MBGL_QT_FILESOURCE_LIBRARIES}
+)
+
 # C++ app
 add_executable(mbgl-qt
     platform/qt/app/main.cpp
@@ -79,6 +86,20 @@ add_executable(mbgl-qt
     platform/qt/app/mapwindow.hpp
     platform/qt/resources/common.qrc
 )
+
+target_compile_options(qmapboxgl
+    PRIVATE -std=c++03
+)
+
+target_link_libraries(mbgl-qt
+    PRIVATE qmapboxgl
+)
+
+if(WITH_QT_4)
+    include(platform/qt/qt4.cmake)
+else()
+    include(platform/qt/qt5.cmake)
+endif()
 
 xcode_create_scheme(TARGET mbgl-qt)
 
@@ -90,22 +111,22 @@ endif()
 
 # OS specific configurations
 if (MASON_PLATFORM STREQUAL "osx" OR MASON_PLATFORM STREQUAL "ios")
-    list(APPEND MBGL_QT_FILES
+    list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/darwin/src/nsthread.mm
     )
-    list(APPEND MBGL_QT_LIBRARIES
+    list(APPEND MBGL_QT_CORE_LIBRARIES
         PRIVATE "-framework Foundation"
         PRIVATE "-framework OpenGL"
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
-    list(APPEND MBGL_QT_FILES
+    list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/default/thread.cpp
     )
-    list(APPEND MBGL_QT_LIBRARIES
+    list(APPEND MBGL_QT_CORE_LIBRARIES
         PRIVATE -lGL
     )
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
-    list(APPEND MBGL_QT_FILES
+    list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp
     )
 endif()
