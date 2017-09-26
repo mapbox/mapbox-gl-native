@@ -146,7 +146,6 @@ add_library(mbgl-android STATIC
 
     # Style conversion Java -> C++
     platform/android/src/style/android_conversion.hpp
-    platform/android/src/style/conversion/geojson.hpp
     platform/android/src/style/value.cpp
     platform/android/src/style/value.hpp
     platform/android/src/style/conversion/url_or_tileset.hpp

@@ -20,7 +20,7 @@ optional<T> convertJSON(const std::string& json, Error& error, Args&&...args) {
         return {};
     }
 
-    return convert<T, JSValue>(document, error, std::forward<Args>(args)...);
+    return convert<T>(document, error, std::forward<Args>(args)...);
 }
 
 } // namespace conversion
