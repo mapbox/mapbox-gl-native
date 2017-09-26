@@ -151,13 +151,6 @@ make darwin-update-examples
 
 `make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
 
-Before you can run unit tests of the cross-platform code on the command line, install ios-sim version 3.2.0 (not any other version):
-
-```bash
-brew tap mapbox/homebrew-ios-sim-3
-brew install mapbox/homebrew-ios-sim-3/ios-sim
-```
-
 To instead run the cross-platform tests in Xcode instead of on the command line:
 
 1. Run `make iproj` to set up the workspace.
