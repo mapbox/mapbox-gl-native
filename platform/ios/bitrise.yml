@@ -17,8 +17,6 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             brew install cmake
-            brew tap mapbox/homebrew-ios-sim-3
-            brew install mapbox/homebrew-ios-sim-3/ios-sim
         - is_debug: 'yes'
     - script:
         title: Generate Workspace
