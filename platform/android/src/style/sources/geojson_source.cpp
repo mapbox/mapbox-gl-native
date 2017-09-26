@@ -5,15 +5,15 @@
 // Java -> C++ conversion
 #include "../android_conversion.hpp"
 #include "../conversion/filter.hpp"
-#include "../conversion/geojson.hpp"
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/geojson_options.hpp>
 
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
 #include "../../geojson/conversion/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
-#include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/geojson_options.hpp>
 
 #include <string>
 
@@ -29,7 +29,7 @@ namespace android {
             return style::GeoJSONOptions();
         }
         Error error;
-        optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(Value(env, options), error);
+        optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(mbgl::android::Value(env, options), error);
         if (!result) {
             throw std::logic_error(error.message);
         }
@@ -54,7 +54,7 @@ namespace android {
 
         // Convert the jni object
         Error error;
-        optional<GeoJSON> converted = convert<GeoJSON>(Value(env, json), error);
+        optional<GeoJSON> converted = convert<GeoJSON>(mbgl::android::Value(env, json), error);
         if(!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting geo json: " + error.message);
             return;

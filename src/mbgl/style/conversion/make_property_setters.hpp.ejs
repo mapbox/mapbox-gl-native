@@ -1,0 +1,46 @@
+#pragma once
+
+// This file is generated. Edit make_property_setters.hpp.ejs, then run `make style-code`.
+
+#include <mbgl/style/conversion/property_setter.hpp>
+
+<% for (const layer of locals.layers) { -%>
+#include <mbgl/style/layers/<%- layer.type.replace('-', '_') %>_layer.hpp>
+<% } -%>
+
+#include <unordered_map>
+
+namespace mbgl {
+namespace style {
+namespace conversion {
+
+inline auto makeLayoutPropertySetters() {
+    std::unordered_map<std::string, PropertySetter> result;
+
+    result["visibility"] = &setVisibility;
+
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.layoutProperties) { -%>
+    result["<%- property.name %>"] = &setProperty<<%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
+<% } -%>
+
+<% } -%>
+    return result;
+}
+
+inline auto makePaintPropertySetters() {
+    std::unordered_map<std::string, PropertySetter> result;
+
+<% for (const layer of locals.layers) { -%>
+<% for (const property of layer.paintProperties) { -%>
+    result["<%- property.name %>"] = &setProperty<<%- camelize(layer.type) %>Layer, <%- propertyValueType(property) %>, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>>;
+    result["<%- property.name %>-transition"] = &setTransition<<%- camelize(layer.type) %>Layer, &<%- camelize(layer.type) %>Layer::set<%- camelize(property.name) %>Transition>;
+<% } -%>
+
+<% } -%>
+    return result;
+}
+
+} // namespace conversion
+} // namespace style
+} // namespace mbgl

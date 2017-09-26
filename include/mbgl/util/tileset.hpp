@@ -3,6 +3,7 @@
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <tuple>
 #include <vector>
 #include <string>
 #include <cstdint>

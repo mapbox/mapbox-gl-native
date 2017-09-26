@@ -24,8 +24,6 @@ namespace android {
 
     Value::Value(jni::JNIEnv& _env, jni::jobject* _value) : env(_env), value(_value, ObjectDeleter(env)) {}
 
-    Value::~Value() = default;
-
     bool Value::isNull() const {
         return value == nullptr;
     }
