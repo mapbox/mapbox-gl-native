@@ -10,8 +10,7 @@ namespace conversion {
 template <>
 struct Converter<Tileset> {
 public:
-    template <class V>
-    optional<Tileset> operator()(const V& value, Error& error) const {
+    optional<Tileset> operator()(const Value& value, Error& error) const {
         Tileset result;
 
         auto tiles = objectMember(value, "tiles");

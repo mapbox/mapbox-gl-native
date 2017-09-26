@@ -13,8 +13,7 @@ namespace conversion {
 template <>
 struct Converter<Light> {
 public:
-    template <class V>
-    optional<Light> operator()(const V& value, Error& error) const {
+    optional<Light> operator()(const Value& value, Error& error) const {
         if (!isObject(value)) {
             error = { "light must be an object" };
             return {};

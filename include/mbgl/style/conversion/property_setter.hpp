@@ -13,11 +13,10 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-template <class V>
-using PropertySetter = optional<Error> (*) (Layer&, const V&);
+using PropertySetter = optional<Error> (*) (Layer&, const Value&);
 
-template <class V, class L, class PropertyValue, void (L::*setter)(PropertyValue)>
-optional<Error> setProperty(Layer& layer, const V& value) {
+template <class L, class PropertyValue, void (L::*setter)(PropertyValue)>
+optional<Error> setProperty(Layer& layer, const Value& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
@@ -33,8 +32,8 @@ optional<Error> setProperty(Layer& layer, const V& value) {
     return {};
 }
 
-template <class V, class L, void (L::*setter)(const TransitionOptions&)>
-optional<Error> setTransition(Layer& layer, const V& value) {
+template <class L, void (L::*setter)(const TransitionOptions&)>
+optional<Error> setTransition(Layer& layer, const Value& value) {
     auto* typedLayer = layer.as<L>();
     if (!typedLayer) {
         return Error { "layer doesn't support this property" };
@@ -50,8 +49,7 @@ optional<Error> setTransition(Layer& layer, const V& value) {
     return {};
 }
 
-template <class V>
-optional<Error> setVisibility(Layer& layer, const V& value) {
+inline optional<Error> setVisibility(Layer& layer, const Value& value) {
     if (isUndefined(value)) {
         layer.setVisibility(VisibilityType::Visible);
         return {};

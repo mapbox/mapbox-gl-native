@@ -11,8 +11,7 @@ namespace conversion {
 
 template <class T>
 struct Converter<PropertyValue<T>> {
-    template <class V>
-    optional<PropertyValue<T>> operator()(const V& value, Error& error) const {
+    optional<PropertyValue<T>> operator()(const Value& value, Error& error) const {
         if (isUndefined(value)) {
             return PropertyValue<T>();
         } else if (isObject(value)) {

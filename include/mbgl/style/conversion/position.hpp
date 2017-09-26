@@ -12,8 +12,7 @@ namespace conversion {
 
 template <>
 struct Converter<Position> {
-    template <class V>
-    optional<Position> operator()(const V& value, Error& error) const {
+    optional<Position> operator()(const Value& value, Error& error) const {
         optional<std::array<float, 3>> spherical = convert<std::array<float, 3>>(value, error);
 
         if (!spherical) {

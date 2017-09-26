@@ -9,9 +9,7 @@ namespace conversion {
 
 template <>
 struct Converter<GeoJSONOptions> {
-
-    template <class V>
-    optional<GeoJSONOptions> operator()(const V& value, Error& error) const {
+    optional<GeoJSONOptions> operator()(const Value& value, Error& error) const {
         GeoJSONOptions options;
 
         const auto maxzoomValue = objectMember(value, "maxzoom");

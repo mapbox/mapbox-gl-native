@@ -16,8 +16,7 @@ namespace conversion {
 
 template <>
 struct Converter<bool> {
-    template <class V>
-    optional<bool> operator()(const V& value, Error& error) const {
+    optional<bool> operator()(const Value& value, Error& error) const {
         optional<bool> converted = toBool(value);
         if (!converted) {
             error = { "value must be a boolean" };
@@ -29,8 +28,7 @@ struct Converter<bool> {
 
 template <>
 struct Converter<float> {
-    template <class V>
-    optional<float> operator()(const V& value, Error& error) const {
+    optional<float> operator()(const Value& value, Error& error) const {
         optional<float> converted = toNumber(value);
         if (!converted) {
             error = { "value must be a number" };
@@ -42,8 +40,7 @@ struct Converter<float> {
 
 template <>
 struct Converter<std::string> {
-    template <class V>
-    optional<std::string> operator()(const V& value, Error& error) const {
+    optional<std::string> operator()(const Value& value, Error& error) const {
         optional<std::string> converted = toString(value);
         if (!converted) {
             error = { "value must be a string" };
@@ -55,8 +52,7 @@ struct Converter<std::string> {
 
 template <class T>
 struct Converter<T, typename std::enable_if_t<std::is_enum<T>::value>> {
-    template <class V>
-    optional<T> operator()(const V& value, Error& error) const {
+    optional<T> operator()(const Value& value, Error& error) const {
         optional<std::string> string = toString(value);
         if (!string) {
             error = { "value must be a string" };
@@ -75,8 +71,7 @@ struct Converter<T, typename std::enable_if_t<std::is_enum<T>::value>> {
 
 template <>
 struct Converter<Color> {
-    template <class V>
-    optional<Color> operator()(const V& value, Error& error) const {
+    optional<Color> operator()(const Value& value, Error& error) const {
         optional<std::string> string = toString(value);
         if (!string) {
             error = { "value must be a string" };
@@ -95,8 +90,7 @@ struct Converter<Color> {
 
 template <size_t N>
 struct Converter<std::array<float, N>> {
-    template <class V>
-    optional<std::array<float, N>> operator()(const V& value, Error& error) const {
+    optional<std::array<float, N>> operator()(const Value& value, Error& error) const {
         if (!isArray(value) || arrayLength(value) != N) {
             error = { "value must be an array of " + util::toString(N) + " numbers" };
             return {};
@@ -117,8 +111,7 @@ struct Converter<std::array<float, N>> {
 
 template <>
 struct Converter<std::vector<float>> {
-    template <class V>
-    optional<std::vector<float>> operator()(const V& value, Error& error) const {
+    optional<std::vector<float>> operator()(const Value& value, Error& error) const {
         if (!isArray(value)) {
             error = { "value must be an array" };
             return {};
@@ -142,8 +135,7 @@ struct Converter<std::vector<float>> {
 
 template <>
 struct Converter<std::vector<std::string>> {
-    template <class V>
-    optional<std::vector<std::string>> operator()(const V& value, Error& error) const {
+    optional<std::vector<std::string>> operator()(const Value& value, Error& error) const {
         if (!isArray(value)) {
             error = { "value must be an array" };
             return {};

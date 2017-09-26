@@ -11,8 +11,7 @@ namespace conversion {
 
 template <class T>
 struct Converter<DataDrivenPropertyValue<T>> {
-    template <class V>
-    optional<DataDrivenPropertyValue<T>> operator()(const V& value, Error& error) const {
+    optional<DataDrivenPropertyValue<T>> operator()(const Value& value, Error& error) const {
         if (isUndefined(value)) {
             return DataDrivenPropertyValue<T>();
         } else if (!isObject(value)) {

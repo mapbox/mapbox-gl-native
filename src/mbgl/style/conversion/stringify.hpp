@@ -98,8 +98,8 @@ void stringify(Writer& writer, const std::unordered_map<std::string, T>& m) {
 }
 
 template <class Writer>
-void stringify(Writer& writer, const Value& v) {
-    Value::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
+void stringify(Writer& writer, const mbgl::Value& v) {
+    mbgl::Value::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
 }
 
 template <class Writer>

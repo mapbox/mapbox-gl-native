@@ -10,8 +10,7 @@ namespace conversion {
 template <>
 struct Converter<TransitionOptions> {
 public:
-    template <class V>
-    optional<TransitionOptions> operator()(const V& value, Error& error) const {
+    optional<TransitionOptions> operator()(const Value& value, Error& error) const {
         if (!isObject(value)) {
             error = { "transition must be an object" };
             return {};

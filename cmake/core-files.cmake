@@ -352,6 +352,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/parser.cpp
     src/mbgl/style/parser.hpp
     src/mbgl/style/properties.hpp
+    src/mbgl/style/rapidjson_conversion.cpp
     src/mbgl/style/rapidjson_conversion.hpp
     src/mbgl/style/source.cpp
     src/mbgl/style/source_impl.cpp

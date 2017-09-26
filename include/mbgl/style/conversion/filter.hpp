@@ -11,8 +11,7 @@ namespace conversion {
 template <>
 struct Converter<Filter> {
 public:
-    template <class V>
-    optional<Filter> operator()(const V& value, Error& error) const {
+    optional<Filter> operator()(const Value& value, Error& error) const {
         if (!isArray(value)) {
             error = { "filter expression must be an array" };
             return {};
@@ -62,7 +61,7 @@ public:
     }
 
 private:
-    optional<Value> normalizeValue(const optional<Value>& value, Error& error) const {
+    optional<mbgl::Value> normalizeValue(const optional<mbgl::Value>& value, Error& error) const {
         if (!value) {
             error = { "filter expression value must be a boolean, number, or string" };
             return {};
@@ -71,8 +70,7 @@ private:
         }
     }
 
-    template <class V>
-    optional<FeatureType> toFeatureType(const V& value, Error& error) const {
+    optional<FeatureType> toFeatureType(const Value& value, Error& error) const {
         optional<std::string> type = toString(value);
         if (!type) {
             error = { "value for $type filter must be a string" };
@@ -89,9 +87,8 @@ private:
         }
     }
 
-    template <class V>
-    optional<FeatureIdentifier> toFeatureIdentifier(const V& value, Error& error) const {
-        optional<Value> identifier = toValue(value);
+    optional<FeatureIdentifier> toFeatureIdentifier(const Value& value, Error& error) const {
+        optional<mbgl::Value> identifier = toValue(value);
         if (!identifier) {
             error = { "filter expression value must be a boolean, number, or string" };
             return {};
@@ -108,8 +105,8 @@ private:
         }
     }
 
-    template <class FilterType, class IdentifierFilterType, class V>
-    optional<Filter> convertUnaryFilter(const V& value, Error& error) const {
+    template <class FilterType, class IdentifierFilterType>
+    optional<Filter> convertUnaryFilter(const Value& value, Error& error) const {
         if (arrayLength(value) < 2) {
             error = { "filter expression must have 2 elements" };
             return {};
@@ -128,8 +125,8 @@ private:
         }
     }
 
-    template <class FilterType, class TypeFilterType, class IdentifierFilterType, class V>
-    optional<Filter> convertEqualityFilter(const V& value, Error& error) const {
+    template <class FilterType, class TypeFilterType, class IdentifierFilterType>
+    optional<Filter> convertEqualityFilter(const Value& value, Error& error) const {
         if (arrayLength(value) < 3) {
             error = { "filter expression must have 3 elements" };
             return {};
@@ -158,7 +155,7 @@ private:
             return { IdentifierFilterType { *filterValue } };
 
         } else {
-            optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
+            optional<mbgl::Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
             if (!filterValue) {
                 return {};
             }
@@ -167,8 +164,8 @@ private:
         }
     }
 
-    template <class FilterType, class V>
-    optional<Filter> convertBinaryFilter(const V& value, Error& error) const {
+    template <class FilterType>
+    optional<Filter> convertBinaryFilter(const Value& value, Error& error) const {
         if (arrayLength(value) < 3) {
             error = { "filter expression must have 3 elements" };
             return {};
@@ -180,7 +177,7 @@ private:
             return {};
         }
 
-        optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
+        optional<mbgl::Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
         if (!filterValue) {
             return {};
         }
@@ -188,8 +185,8 @@ private:
         return { FilterType { *key, *filterValue } };
     }
 
-    template <class FilterType, class TypeFilterType, class IdentifierFilterType, class V>
-    optional<Filter> convertSetFilter(const V& value, Error& error) const {
+    template <class FilterType, class TypeFilterType, class IdentifierFilterType>
+    optional<Filter> convertSetFilter(const Value& value, Error& error) const {
         if (arrayLength(value) < 2) {
             error = { "filter expression must at least 2 elements" };
             return {};
@@ -226,9 +223,9 @@ private:
             return { IdentifierFilterType { std::move(values) } };
 
         } else {
-            std::vector<Value> values;
+            std::vector<mbgl::Value> values;
             for (std::size_t i = 2; i < arrayLength(value); ++i) {
-                optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
+                optional<mbgl::Value> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
                 if (!filterValue) {
                     return {};
                 }
@@ -239,8 +236,8 @@ private:
         }
     }
 
-    template <class FilterType, class V>
-    optional<Filter> convertCompoundFilter(const V& value, Error& error) const {
+    template <class FilterType>
+    optional<Filter> convertCompoundFilter(const Value& value, Error& error) const {
         std::vector<Filter> filters;
         for (std::size_t i = 1; i < arrayLength(value); ++i) {
             optional<Filter> element = operator()(arrayMember(value, i), error);

@@ -19,9 +19,7 @@ namespace conversion {
 template <>
 struct Converter<std::unique_ptr<Source>> {
 public:
-    
-    template <class V>
-    optional<std::unique_ptr<Source>> operator()(const V& value, Error& error, const std::string& id) const {
+    optional<std::unique_ptr<Source>> operator()(const Value& value, Error& error, const std::string& id) const {
         if (!isObject(value)) {
             error = { "source must be an object" };
             return {};
@@ -55,8 +53,7 @@ public:
 
 private:
     // A tile source can either specify a URL to TileJSON, or inline TileJSON.
-    template <class V>
-    optional<variant<std::string, Tileset>> convertURLOrTileset(const V& value, Error& error) const {
+    optional<variant<std::string, Tileset>> convertURLOrTileset(const Value& value, Error& error) const {
         auto urlVal = objectMember(value, "url");
         if (!urlVal) {
             optional<Tileset> tileset = convert<Tileset>(value, error);
@@ -75,9 +72,8 @@ private:
         return { *url };
     }
 
-    template <class V>
     optional<std::unique_ptr<Source>> convertRasterSource(const std::string& id,
-                                                          const V& value,
+                                                          const Value& value,
                                                           Error& error) const {
         optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
         if (!urlOrTileset) {
@@ -98,9 +94,8 @@ private:
         return { std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize) };
     }
 
-    template <class V>
     optional<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
-                                                          const V& value,
+                                                          const Value& value,
                                                           Error& error) const {
         optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
         if (!urlOrTileset) {
@@ -110,9 +105,8 @@ private:
         return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
     }
 
-    template <class V>
     optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
-                                                           const V& value,
+                                                           const Value& value,
                                                            Error& error) const {
         auto dataValue = objectMember(value, "data");
         if (!dataValue) {
@@ -142,11 +136,10 @@ private:
 
         return { std::move(result) };
     }
-    
-    template <class V>
+
     optional<std::unique_ptr<Source>> convertImageSource(const std::string& id,
-                                                        const V& value,
-                                                        Error& error) const {
+                                                         const Value& value,
+                                                         Error& error) const {
         auto urlValue = objectMember(value, "url");
         if (!urlValue) {
             error = { "Image source must have a url value" };

@@ -10,12 +10,7 @@ namespace conversion {
 template <>
 struct Converter<GeoJSON> {
 public:
-    optional<GeoJSON> operator()(const std::string&, Error&) const;
-
-    // This is explicitly specialized in the .cpp file for JSValue. It may also be explicitly
-    // specialized for SDK-specific types (e.g. mbgl::android::Value).
-    template <class V>
-    optional<GeoJSON> operator()(const V&, Error&) const;
+    optional<GeoJSON> operator()(const Value&, Error&) const;
 };
 
 } // namespace conversion

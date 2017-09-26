@@ -1,10 +1,8 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/conversion.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -13,10 +11,8 @@ using namespace mbgl::style::conversion;
 TEST(StyleConversion, Function) {
     Error error;
 
-    auto parseFunction = [&](const std::string& src) {
-        JSDocument doc;
-        doc.Parse<0>(src);
-        return convert<CameraFunction<float>, JSValue>(doc, error);
+    auto parseFunction = [&](const std::string& json) {
+        return convertJSON<CameraFunction<float>>(json, error);
     };
 
     auto fn1 = parseFunction(R"({"stops":[]})");

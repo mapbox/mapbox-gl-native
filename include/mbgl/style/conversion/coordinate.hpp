@@ -10,8 +10,7 @@ namespace conversion {
 template<>
 struct Converter<LatLng> {
 public:
-    template <class V>
-    optional<LatLng> operator() (const V& value, Error& error) const {
+    optional<LatLng> operator() (const Value& value, Error& error) const {
         if (!isArray(value) || arrayLength(value) < 2 ) {
             error = { "coordinate array must contain numeric longitude and latitude values" };
             return {};

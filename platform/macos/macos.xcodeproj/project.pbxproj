@@ -73,6 +73,7 @@
 		40B77E451DB11BC9003DA2FE /* NSArray+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 40B77E431DB11BB0003DA2FE /* NSArray+MGLAdditions.h */; };
 		40B77E461DB11BCD003DA2FE /* NSArray+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 40B77E421DB11BB0003DA2FE /* NSArray+MGLAdditions.mm */; };
 		40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */; };
+		5241C2BE1F7AFFAF00DDB20E /* MGLConversion.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5241C2BD1F7AFFAF00DDB20E /* MGLConversion.mm */; };
 		52B5D17F1E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */; };
 		52B5D1801E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */; };
 		5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
@@ -347,6 +348,7 @@
 		40B77E431DB11BB0003DA2FE /* NSArray+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSArray+MGLAdditions.h"; sourceTree = "<group>"; };
 		40E1601A1DF216E6005EA6D9 /* MGLStyleLayerTests.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayerTests.h; sourceTree = "<group>"; };
 		40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLStyleLayerTests.m; sourceTree = "<group>"; };
+		5241C2BD1F7AFFAF00DDB20E /* MGLConversion.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLConversion.mm; sourceTree = "<group>"; };
 		52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libmbgl-loop-darwin.a"; path = "cmake/Debug/libmbgl-loop-darwin.a"; sourceTree = "<group>"; };
 		556660C51E1BEA0100E2C41B /* MGLFoundation.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLFoundation.h; sourceTree = "<group>"; };
@@ -688,6 +690,7 @@
 			isa = PBXGroup;
 			children = (
 				1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */,
+				5241C2BD1F7AFFAF00DDB20E /* MGLConversion.mm */,
 				352742791D4C235C00A1ECE6 /* Categories */,
 				35136D471D42295400C20EFD /* Layers */,
 				3527427E1D4C242B00A1ECE6 /* Sources */,
@@ -717,6 +720,14 @@
 			name = "Test Helpers";
 			sourceTree = "<group>";
 		};
+		5241C2BA1F7AF16100DDB20E /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		DA839E891CC2E3400062CAFB = {
 			isa = PBXGroup;
 			children = (
@@ -726,6 +737,7 @@
 				DAE6C31E1CC308BC00DB3429 /* Frameworks */,
 				DAE6C3C41CC31F7800DB3429 /* Configuration */,
 				DA839E931CC2E3400062CAFB /* Products */,
+				5241C2BA1F7AF16100DDB20E /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -1421,6 +1433,7 @@
 				1FCDF1431F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m in Sources */,
 				DD0902B21DB1AC6400C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */,
+				5241C2BE1F7AFFAF00DDB20E /* MGLConversion.mm in Sources */,
 				DAE6C3B11CC31EF300DB3429 /* MGLAnnotationImage.m in Sources */,
 				3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */,
 				DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */,
