@@ -148,7 +148,8 @@ public class MapView extends FrameLayout {
     addOnMapChangedListener(mapCallback);
 
     // callback for focal point invalidation
-    final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator(createFocalPointChangeListener());
+    final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator();
+    focalPointInvalidator.addListener(createFocalPointChangeListener());
 
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
@@ -177,8 +178,11 @@ public class MapView extends FrameLayout {
       markerViewManager, iconManager, annotations, markers, polygons, polylines);
     Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings,
       cameraChangeDispatcher);
+
     mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationViewSettings, proj,
       registerTouchListener, annotationManager, cameraChangeDispatcher);
+    focalPointInvalidator.addListener(mapboxMap.createFocalPointChangeListener());
+
     mapCallback.attachMapboxMap(mapboxMap);
 
     // user input
@@ -817,10 +821,10 @@ public class MapView extends FrameLayout {
 
   private class FocalPointInvalidator implements FocalPointChangeListener {
 
-    private final FocalPointChangeListener[] focalPointChangeListeners;
+    private final List<FocalPointChangeListener> focalPointChangeListeners = new ArrayList<>();
 
-    FocalPointInvalidator(FocalPointChangeListener... listeners) {
-      focalPointChangeListeners = listeners;
+    void addListener(FocalPointChangeListener focalPointChangeListener) {
+      focalPointChangeListeners.add(focalPointChangeListener);
     }
 
     @Override

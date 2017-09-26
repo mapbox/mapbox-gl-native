@@ -75,6 +75,7 @@ public final class MapboxMap {
   private final OnRegisterTouchListener onRegisterTouchListener;
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
+  private PointF focalPoint;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
             MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
@@ -610,6 +611,47 @@ public final class MapboxMap {
   //
   // Camera API
   //
+
+  /**
+   * Moves the center of the screen to a latitude and longitude specified by a LatLng object. This centers the
+   * camera on the LatLng object.
+   *
+   * @param latLng Target location to change to
+   */
+  public void setLatLng(@NonNull LatLng latLng) {
+    nativeMapView.setLatLng(latLng);
+  }
+
+  /**
+   * Moves the camera viewpoint to a particular zoom level.
+   *
+   * @param zoom Zoom level to change to
+   */
+  public void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
+    if (focalPoint == null) {
+      focalPoint = new PointF(nativeMapView.getWidth() / 2, nativeMapView.getHeight() / 2);
+    }
+    nativeMapView.setZoom(zoom, focalPoint, 0);
+  }
+
+  /**
+   * Moves the camera viewpoint angle to a particular angle in degrees.
+   *
+   * @param tilt Tilt angle to change to
+   */
+  public void setTilt(@FloatRange(from = MapboxConstants.MINIMUM_TILT, to = MapboxConstants.MAXIMUM_TILT) double tilt) {
+    nativeMapView.setPitch(tilt, 0);
+  }
+
+  /**
+   * Moves the camera viewpoint direction to a particular angle in degrees.
+   *
+   * @param bearing Direction angle to change to
+   */
+  public void setBearing(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION)
+                           double bearing) {
+    nativeMapView.setBearing(bearing);
+  }
 
   /**
    * Cancels ongoing animations.
@@ -1984,6 +2026,15 @@ public final class MapboxMap {
                                              @Nullable Filter.Statement filter,
                                              @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
+  }
+
+  FocalPointChangeListener createFocalPointChangeListener() {
+    return new FocalPointChangeListener() {
+      @Override
+      public void onFocalPointChanged(PointF pointF) {
+        focalPoint = pointF;
+      }
+    };
   }
 
   //
