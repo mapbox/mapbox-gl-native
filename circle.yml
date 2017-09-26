@@ -285,7 +285,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "release-ios-v3.6.0-android-v5.1.0" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------
@@ -557,7 +557,7 @@ jobs:
   linux-gcc5-release-qt5:
     docker:
       - image: mbgl/ci:r4-linux-gcc-5-qt-5
-    resource_class: large      
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
