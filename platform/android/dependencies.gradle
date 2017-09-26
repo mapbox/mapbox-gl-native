@@ -1,14 +1,14 @@
 ext {
     minSdkVersion = 15
-    targetSdkVersion = 25
-    compileSdkVersion = 25
-    buildToolsVersion = "25.0.2"
+    targetSdkVersion = 23
+    compileSdkVersion = 23
+    buildToolsVersion = "19.1.0"
 
     versionCode = 12
     versionName = "5.1.4"
 
     mapboxServicesVersion = "2.2.1"
-    supportLibVersion = "25.3.1"
+    supportLibVersion = "23.4.0"
     wearableVersion = '2.0.0'
     espressoVersion = '2.2.2'
     testRunnerVersion = '0.5'

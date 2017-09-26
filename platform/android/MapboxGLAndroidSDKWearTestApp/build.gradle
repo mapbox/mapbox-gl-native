@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion 23
+    buildToolsVersion '23.0.3'
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
@@ -25,22 +25,23 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
 dependencies {
     compile(project(':MapboxGLAndroidSDK')) {
         transitive = true
     }
-
     // Wear
     compile rootProject.ext.dep.wearCompile
     provided rootProject.ext.dep.wearProvided
-
     // Leak Canary
     debugCompile rootProject.ext.dep.leakCanaryDebug
     releaseCompile rootProject.ext.dep.leakCanaryRelease
     testCompile rootProject.ext.dep.leakCanaryTest
-
     // Testing dependencies
     testCompile rootProject.ext.dep.junit
     testCompile rootProject.ext.dep.mockito
