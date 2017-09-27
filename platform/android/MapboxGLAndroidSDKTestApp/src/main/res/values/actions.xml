@@ -10,6 +10,7 @@
     <string name="menuitem_title_change_location_source_lost">Change to LOST location source</string>
     <string name="menuitem_title_change_location_source_mock">Change to mock location source</string>
     <string name="menuitem_title_change_location_source_null">Reset location source to null</string>
+    <string name="menuitem_change_icon_overlap">Toggle icon overlap</string>
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
     <string name="button_camera_animate">Animate</string>
