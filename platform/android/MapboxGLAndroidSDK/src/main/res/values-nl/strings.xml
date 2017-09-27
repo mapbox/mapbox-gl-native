@@ -11,4 +11,5 @@
     <string name="mapbox_attributionTelemetryNegative">Intrekken</string>
     <string name="mapbox_attributionTelemetryNeutral">Meer informatie</string>
     <string name="mapbox_offline_error_region_definition_invalid">Aangeleverde OfflineRegionDefinition past niet in de wereld omtrek: %s</string>
-</resources>
+
+    </resources>
