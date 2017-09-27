@@ -239,7 +239,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  The default value of this property is 0.
  */
-@property (nonatomic) double minimumZoomLevel;
+@property (nonatomic) IBInspectable double minimumZoomLevel;
 
 /**
  The maximum zoom level the map can be shown at.
@@ -250,7 +250,7 @@ MGL_EXPORT IB_DESIGNABLE
  The default value of this property is 22. The upper bound for this property
  is 25.5.
  */
-@property (nonatomic) double maximumZoomLevel;
+@property (nonatomic) IBInspectable double maximumZoomLevel;
 
 /**
  Changes the zoom level of the map and optionally animates the change.

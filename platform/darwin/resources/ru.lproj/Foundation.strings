@@ -1,206 +1,206 @@
 ﻿/* Clock position format, long: {hours} o’clock */
-"CLOCK_FMT_LONG" = "%@點";
+"CLOCK_FMT_LONG" = "%@ часов";
 
 /* Clock position format, medium: {hours} o’clock */
-"CLOCK_FMT_MEDIUM" = "%@點";
+"CLOCK_FMT_MEDIUM" = "%@ час.";
 
 /* Clock position format, short: {hours}:00 */
 "CLOCK_FMT_SHORT" = "%@:00";
 
 /* East, long */
-"COMPASS_E_LONG" = "東";
+"COMPASS_E_LONG" = "восток";
 
 /* East, short */
-"COMPASS_E_SHORT" = "東";
+"COMPASS_E_SHORT" = "В";
 
 /* East by north, long */
-"COMPASS_EbN_LONG" = "東微北";
+"COMPASS_EbN_LONG" = "северо-восток";
 
 /* East by north, short */
-"COMPASS_EbN_SHORT" = "東微北";
+"COMPASS_EbN_SHORT" = "СВ";
 
 /* East by south, long */
-"COMPASS_EbS_LONG" = "東微南";
+"COMPASS_EbS_LONG" = "юго-восток";
 
 /* East by south, short */
-"COMPASS_EbS_SHORT" = "東微南";
+"COMPASS_EbS_SHORT" = "ЮВ";
 
 /* East-northeast, long */
-"COMPASS_ENE_LONG" = "東北東";
+"COMPASS_ENE_LONG" = "восток-северо-восток";
 
 /* East-northeast, short */
-"COMPASS_ENE_SHORT" = "東北東";
+"COMPASS_ENE_SHORT" = "ВСВ";
 
 /* East-southeast, long */
-"COMPASS_ESE_LONG" = "東南東";
+"COMPASS_ESE_LONG" = "юго-юго-восток";
 
 /* East-southeast, short */
-"COMPASS_ESE_SHORT" = "東南東";
+"COMPASS_ESE_SHORT" = "ЮЮВ";
 
 /* North, long */
-"COMPASS_N_LONG" = "北";
+"COMPASS_N_LONG" = "север";
 
 /* North, short */
-"COMPASS_N_SHORT" = "北";
+"COMPASS_N_SHORT" = "С";
 
 /* North by east, long */
-"COMPASS_NbE_LONG" = "北微東";
+"COMPASS_NbE_LONG" = "северо-восток";
 
 /* North by east, short */
-"COMPASS_NbE_SHORT" = "北微東";
+"COMPASS_NbE_SHORT" = "СВ";
 
 /* North by west, long */
-"COMPASS_NbW_LONG" = "北微西";
+"COMPASS_NbW_LONG" = "северо-запад";
 
 /* North by west, short */
-"COMPASS_NbW_SHORT" = "北微西";
+"COMPASS_NbW_SHORT" = "СЗ";
 
 /* Northeast, long */
-"COMPASS_NE_LONG" = "東北";
+"COMPASS_NE_LONG" = "северо-восток";
 
 /* Northeast, short */
-"COMPASS_NE_SHORT" = "東北";
+"COMPASS_NE_SHORT" = "СВ";
 
 /* Northeast by east, long */
-"COMPASS_NEbE_LONG" = "東北微東";
+"COMPASS_NEbE_LONG" = "восток-северо-восток";
 
 /* Northeast by east, short */
-"COMPASS_NEbE_SHORT" = "東北微東";
+"COMPASS_NEbE_SHORT" = "ВСВ";
 
 /* Northeast by north, long */
-"COMPASS_NEbN_LONG" = "東北微北";
+"COMPASS_NEbN_LONG" = "северо-северо-восток";
 
 /* Northeast by north, short */
-"COMPASS_NEbN_SHORT" = "東北微北";
+"COMPASS_NEbN_SHORT" = "ССВ";
 
 /* North-northeast, long */
-"COMPASS_NNE_LONG" = "北北東";
+"COMPASS_NNE_LONG" = "северо-северо-восток";
 
 /* North-northeast, short */
-"COMPASS_NNE_SHORT" = "北北東";
+"COMPASS_NNE_SHORT" = "ССВ";
 
 /* North-northwest, long */
-"COMPASS_NNW_LONG" = "北北西";
+"COMPASS_NNW_LONG" = "северо-северо-запад";
 
 /* North-northwest, short */
-"COMPASS_NNW_SHORT" = "北北西";
+"COMPASS_NNW_SHORT" = "ССЗ";
 
 /* Northwest, long */
-"COMPASS_NW_LONG" = "西北";
+"COMPASS_NW_LONG" = "северо-запад";
 
 /* Northwest, short */
-"COMPASS_NW_SHORT" = "西北";
+"COMPASS_NW_SHORT" = "СЗ";
 
 /* Northwest by north, long */
-"COMPASS_NWbN_LONG" = "西北微北";
+"COMPASS_NWbN_LONG" = "северо-северо-запад";
 
 /* Northwest by north, short */
-"COMPASS_NWbN_SHORT" = "西北微北";
+"COMPASS_NWbN_SHORT" = "ССЗ";
 
 /* Northwest by west, long */
-"COMPASS_NWbW_LONG" = "西北微西";
+"COMPASS_NWbW_LONG" = "запад-северо-запад";
 
 /* Northwest by west, short */
-"COMPASS_NWbW_SHORT" = "西北微西";
+"COMPASS_NWbW_SHORT" = "ЗСЗ";
 
 /* South, long */
-"COMPASS_S_LONG" = "南";
+"COMPASS_S_LONG" = "юг";
 
 /* South, short */
-"COMPASS_S_SHORT" = "南";
+"COMPASS_S_SHORT" = "Ю";
 
 /* South by east, long */
-"COMPASS_SbE_LONG" = "南微東";
+"COMPASS_SbE_LONG" = "юго-восток";
 
 /* South by east, short */
-"COMPASS_SbE_SHORT" = "南微東";
+"COMPASS_SbE_SHORT" = "ЮВ";
 
 /* South by west, long */
-"COMPASS_SbW_LONG" = "南微西";
+"COMPASS_SbW_LONG" = "юго-запад";
 
 /* South by west, short */
-"COMPASS_SbW_SHORT" = "南微西";
+"COMPASS_SbW_SHORT" = "ЮЗ";
 
 /* Southeast, long */
-"COMPASS_SE_LONG" = "東南";
+"COMPASS_SE_LONG" = "юго-восток";
 
 /* Southeast, short */
-"COMPASS_SE_SHORT" = "東南";
+"COMPASS_SE_SHORT" = "ЮВ";
 
 /* Southeast by east, long */
-"COMPASS_SEbE_LONG" = "東南微東";
+"COMPASS_SEbE_LONG" = "восток-юго-восток";
 
 /* Southeast by east, short */
-"COMPASS_SEbE_SHORT" = "東南微東";
+"COMPASS_SEbE_SHORT" = "ВЮВ";
 
 /* Southeast by south, long */
-"COMPASS_SEbS_LONG" = "東南微南";
+"COMPASS_SEbS_LONG" = "юго-юго-восток";
 
 /* Southeast by south, short */
-"COMPASS_SEbS_SHORT" = "東南微南";
+"COMPASS_SEbS_SHORT" = "ЮЮВ";
 
 /* South-southeast, long */
-"COMPASS_SSE_LONG" = "南南東";
+"COMPASS_SSE_LONG" = "юго-юго-восток";
 
 /* South-southeast, short */
-"COMPASS_SSE_SHORT" = "南南東";
+"COMPASS_SSE_SHORT" = "ЮЮВ";
 
 /* South-southwest, long */
-"COMPASS_SSW_LONG" = "南南西";
+"COMPASS_SSW_LONG" = "юго-юго-запад";
 
 /* South-southwest, short */
-"COMPASS_SSW_SHORT" = "南南西";
+"COMPASS_SSW_SHORT" = "ЮЮЗ";
 
 /* Southwest, long */
-"COMPASS_SW_LONG" = "西南";
+"COMPASS_SW_LONG" = "юго-запад";
 
 /* Southwest, short */
-"COMPASS_SW_SHORT" = "西南";
+"COMPASS_SW_SHORT" = "ЮЗ";
 
 /* Southwest by south, long */
-"COMPASS_SWbS_LONG" = "西南微南";
+"COMPASS_SWbS_LONG" = "юго-юго-запад";
 
 /* Southwest by south, short */
-"COMPASS_SWbS_SHORT" = "西南微南";
+"COMPASS_SWbS_SHORT" = "ЮЮЗ";
 
 /* Southwest by west, long */
-"COMPASS_SWbW_LONG" = "西南微西";
+"COMPASS_SWbW_LONG" = "восток-юго-восток";
 
 /* Southwest by west, short */
-"COMPASS_SWbW_SHORT" = "西南微西";
+"COMPASS_SWbW_SHORT" = "ВЮВ";
 
 /* West, long */
-"COMPASS_W_LONG" = "西";
+"COMPASS_W_LONG" = "запад";
 
 /* West, short */
-"COMPASS_W_SHORT" = "西";
+"COMPASS_W_SHORT" = "З";
 
 /* West by north, long */
-"COMPASS_WbN_LONG" = "西微北";
+"COMPASS_WbN_LONG" = "северо-запад";
 
 /* West by north, short */
-"COMPASS_WbN_SHORT" = "西微北";
+"COMPASS_WbN_SHORT" = "СЗ";
 
 /* West by south, long */
-"COMPASS_WbS_LONG" = "西微南";
+"COMPASS_WbS_LONG" = "юго-запад";
 
 /* West by south, short */
-"COMPASS_WbS_SHORT" = "西微南";
+"COMPASS_WbS_SHORT" = "ЮГ";
 
 /* West-northwest, long */
-"COMPASS_WNW_LONG" = "西北西";
+"COMPASS_WNW_LONG" = "запад-северо-запад";
 
 /* West-northwest, short */
-"COMPASS_WNW_SHORT" = "西北西";
+"COMPASS_WNW_SHORT" = "ЗСЗ";
 
 /* West-southwest, long */
-"COMPASS_WSW_LONG" = "西南西";
+"COMPASS_WSW_LONG" = "запад-юго-запад";
 
 /* West-southwest, short */
-"COMPASS_WSW_SHORT" = "西南西";
+"COMPASS_WSW_SHORT" = "ЗЮЗ";
 
 /* Degrees format, long */
-"COORD_DEG_LONG" = "%d度";
+"COORD_DEG_LONG" = "%d градус(ов)";
 
 /* Degrees format, medium: {degrees} */
 "COORD_DEG_MEDIUM" = "%d°";
@@ -209,43 +209,43 @@
 "COORD_DEG_SHORT" = "%d°";
 
 /* Coordinate format, long: {degrees}{minutes} */
-"COORD_DM_LONG" = "%1$@度%2$@分";
+"COORD_DM_LONG" = "%1$@ и %2$@";
 
 /* Coordinate format, medium: {degrees}{minutes} */
-"COORD_DM_MEDIUM" = "%1$@度%2$@";
+"COORD_DM_MEDIUM" = "%1$@%2$@";
 
 /* Coordinate format, short: {degrees}{minutes} */
-"COORD_DM_SHORT" = "%1$@%度2$@";
+"COORD_DM_SHORT" = "%1$@%2$@";
 
 /* Coordinate format, long: {degrees}{minutes}{seconds} */
-"COORD_DMS_LONG" = "%1$@度%2$@分%3$@秒";
+"COORD_DMS_LONG" = "%1$@, %2$@, и %3$@";
 
 /* Coordinate format, medium: {degrees}{minutes}{seconds} */
-"COORD_DMS_MEDIUM" = "%1$@度%2$@分%3$@秒";
+"COORD_DMS_MEDIUM" = "%1$@%2$@%3$@";
 
 /* Coordinate format, short: {degrees}{minutes}{seconds} */
-"COORD_DMS_SHORT" = "%1$@%度2$@分%3$@秒";
+"COORD_DMS_SHORT" = "%1$@%2$@%3$@";
 
 /* East longitude format, long: {longitude} */
-"COORD_E_LONG" = "東經%@";
+"COORD_E_LONG" = "%@восточной долготы";
 
 /* East longitude format, medium: {longitude} */
-"COORD_E_MEDIUM" = "東經%@";
+"COORD_E_MEDIUM" = "%@восточной долготы";
 
 /* East longitude format, short: {longitude} */
 "COORD_E_SHORT" = "%@E";
 
 /* Coordinate pair format, long: {latitude}, {longitude} */
-"COORD_FMT_LONG" = "%1$@，%2$@";
+"COORD_FMT_LONG" = "%1$@,%2$@";
 
 /* Coordinate pair format, medium: {latitude}, {longitude} */
-"COORD_FMT_MEDIUM" = "%1$@，%2$@";
+"COORD_FMT_MEDIUM" = "%1$@, %2$@";
 
 /* Coordinate pair format, short: {latitude}, {longitude} */
-"COORD_FMT_SHORT" = "%1$@，%2$@";
+"COORD_FMT_SHORT" = "%1$@, %2$@";
 
 /* Minutes format, long */
-"COORD_MIN_LONG" = "%d分";
+"COORD_MIN_LONG" = "%d минут(а)";
 
 /* Minutes format, medium: {minutes} */
 "COORD_MIN_MEDIUM" = "%d′";
@@ -254,25 +254,25 @@
 "COORD_MIN_SHORT" = "%d′";
 
 /* North latitude format, long: {latitude} */
-"COORD_N_LONG" = "北緯%@";
+"COORD_N_LONG" = "%@северной широты";
 
 /* North latitude format, medium: {latitude} */
-"COORD_N_MEDIUM" = "北緯%@";
+"COORD_N_MEDIUM" = "%@северной широты";
 
 /* North latitude format, short: {latitude} */
 "COORD_N_SHORT" = "%@N";
 
 /* South latitude format, long: {latitude} */
-"COORD_S_LONG" = "南緯%@";
+"COORD_S_LONG" = "%@южной широты";
 
 /* South latitude format, medium: {latitude} */
-"COORD_S_MEDIUM" = "南緯%@";
+"COORD_S_MEDIUM" = "%@южной широты";
 
 /* South latitude format, short: {latitude} */
 "COORD_S_SHORT" = "%@S";
 
 /* Seconds format, long */
-"COORD_SEC_LONG" = "%d秒";
+"COORD_SEC_LONG" = "%d секунд(а)";
 
 /* Seconds format, medium: {seconds} */
 "COORD_SEC_MEDIUM" = "%d″";
@@ -281,10 +281,10 @@
 "COORD_SEC_SHORT" = "%d″";
 
 /* West longitude format, long: {longitude} */
-"COORD_W_LONG" = "西經%@";
+"COORD_W_LONG" = "%@западной долготы";
 
 /* West longitude format, medium: {longitude} */
-"COORD_W_MEDIUM" = "西經%@";
+"COORD_W_MEDIUM" = "%@западной долготы";
 
 /* West longitude format, short: {longitude} */
 "COORD_W_SHORT" = "%@W";

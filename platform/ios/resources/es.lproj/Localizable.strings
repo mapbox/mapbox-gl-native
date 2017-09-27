@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Muestra más información";
 
 /* No comment provided by engineer. */
@@ -9,6 +9,9 @@
 
 /* No comment provided by engineer. */
 "CANCEL" = "Cancelar";
+
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Regresa al mapa";
 
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Gira el mapa para hacer frente al norte";
@@ -31,6 +34,12 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Acerca de este mapa";
 
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "No se pudo cargar el mapa debido a un error desconocido.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "No se pudo cargar el mapa debido a un error de carga en el estilo.";
+
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
 
@@ -38,10 +47,19 @@
 "MAP_A11Y_LABEL" = "Mapa";
 
 /* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom %1$dx\nAnotaciones visibles: %2$ld";
+"MAP_A11Y_VALUE" = "Zoom x%1$d\nAnotaciones visibles: %2$ld";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "No se pudo cargar el mapa debido a que el estilo está dañado.";
 
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
+
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "La versión %@ de Mapbox iOS SDK está disponible:";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "No se pudo cargar el mapa debido a que no se encuentra el estilo o está incompleto.";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "Ayudas a mejorar los mapas de OpenStreetMap y Mapbox al aportar datos de uso anónimos.";

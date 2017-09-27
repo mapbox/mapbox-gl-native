@@ -9,6 +9,13 @@ source_file = platform/darwin/resources/Base.lproj/Foundation.strings
 source_lang = en
 type = STRINGS
 
+[mapbox-gl-native.foundationstringsdict-darwin]
+file_filter = platform/darwin/resources/<lang>.lproj/Foundation.stringsdict
+lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant
+source_file = platform/darwin/resources/en.lproj/Foundation.stringsdict
+source_lang = en
+type = STRINGSDICT
+
 [mapbox-gl-native.localizablestrings-ios]
 file_filter = platform/ios/resources/<lang>.lproj/Localizable.strings
 lang_map = pt_BR: pt-BR, pt_PT: pt-PT, zh_CN: zh-Hans, zh_TW: zh-Hant

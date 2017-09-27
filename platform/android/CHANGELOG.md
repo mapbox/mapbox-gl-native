@@ -23,6 +23,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Avoid adding duplicate points to bounds [#9955](https://github.com/mapbox/mapbox-gl-native/pull/9955)
 * Download is complete fix [#9913](https://github.com/mapbox/mapbox-gl-native/pull/9913)
 * MAS 2.2.3 [#9901](https://github.com/mapbox/mapbox-gl-native/pull/9901)
+* Russian and Ukrainian localizations [#9945](https://github.com/mapbox/mapbox-gl-native/pull/9945)
 
 ## 5.1.3 - August 18, 2017
 

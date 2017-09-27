@@ -370,6 +370,23 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
 
 /**
+ A Boolean value indicating whether the user location annotation may display a
+ permanent heading indicator.
+
+ Setting this property to `YES` causes the default user location annotation to
+ appear and always show an arrow-shaped heading indicator, if heading is
+ available. This property does not rotate the map; for that, see
+ `MGLUserTrackingModeFollowWithHeading`.
+
+ This property has no effect when `userTrackingMode` is
+ `MGLUserTrackingModeFollowWithHeading` or
+ `MGLUserTrackingModeFollowWithCourse`.
+
+ The default value of this property is `NO`.
+ */
+@property (nonatomic, assign) BOOL showsUserHeadingIndicator;
+
+/**
  Whether the map view should display a heading calibration alert when necessary.
  The default value is `YES`.
  */
@@ -589,7 +606,7 @@ MGL_EXPORT IB_DESIGNABLE
  *
  * The default minimumZoomLevel is 0.
  */
-@property (nonatomic) double minimumZoomLevel;
+@property (nonatomic) IBInspectable double minimumZoomLevel;
 
 /**
  * The maximum zoom level the map can be shown at.
@@ -600,7 +617,7 @@ MGL_EXPORT IB_DESIGNABLE
  * The default maximumZoomLevel is 22. The upper bound for this property
  * is 25.5.
  */
-@property (nonatomic) double maximumZoomLevel;
+@property (nonatomic) IBInspectable double maximumZoomLevel;
 
 /**
  The heading of the map, measured in degrees clockwise from true north.
@@ -1004,16 +1021,6 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *annotations;
 
 /**
- The complete list of annotations associated with the receiver that are
- currently visible.
-
- The objects in this array must adopt the `MGLAnnotation` protocol. If no
- annotations are associated with the map view or if no annotations associated
- with the map view are currently visible, the value of this property is `nil`.
- */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
-
-/**
  Adds an annotation to the map view.
 
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, `MGLShapeCollection`, and
@@ -1106,6 +1113,16 @@ MGL_EXPORT IB_DESIGNABLE
     such object exists in the reuse queue.
  */
 - (nullable __kindof MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier;
+
+/**
+ The complete list of annotations associated with the receiver that are
+ currently visible.
+
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
 
 /**
  Returns the list of annotations associated with the receiver that intersect with
@@ -1275,6 +1292,11 @@ MGL_EXPORT IB_DESIGNABLE
  visibility, use the
  `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
+
+ The returned features may also include features corresponding to annotations.
+ These features are not object-equal to the `MGLAnnotation` objects that were
+ originally added to the map. To query the map for annotations, use
+ `visibleAnnotations` or `-[MGLMapView visibleAnnotationsInRect:]`.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set

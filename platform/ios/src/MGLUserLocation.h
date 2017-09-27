@@ -20,8 +20,7 @@ MGL_EXPORT
 /**
  The current location of the device. (read-only)
 
- This property contains `nil` if the map view is not currently showing the user
- location or if the user’s location has not yet been determined.
+ This property returns `nil` if the user’s location has not yet been determined.
  */
 @property (nonatomic, readonly, nullable) CLLocation *location;
 
