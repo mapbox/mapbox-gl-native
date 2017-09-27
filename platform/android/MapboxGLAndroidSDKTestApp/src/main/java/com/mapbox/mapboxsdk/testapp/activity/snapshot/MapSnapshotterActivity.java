@@ -97,7 +97,7 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
     MapSnapshotter snapshotter = new MapSnapshotter(MapSnapshotterActivity.this, options);
 
-    snapshotter.start(new MapboxMap.SnapshotReadyCallback() {
+    snapshotter.start(new MapboxMap.MapSnapshotReadyCallback() {
       @Override
       public void onSnapshotReady(Snapshot snapshot) {
         Timber.i("Got the snapshot");

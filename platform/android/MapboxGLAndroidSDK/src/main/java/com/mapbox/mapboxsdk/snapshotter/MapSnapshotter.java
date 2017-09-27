@@ -27,7 +27,7 @@ public class MapSnapshotter {
    * Can be used to get notified of errors
    * in snapshot generation
    *
-   * @see MapSnapshotter#start(MapboxMap.SnapshotReadyCallback, ErrorHandler)
+   * @see MapSnapshotter#start(MapboxMap.MapSnapshotReadyCallback, ErrorHandler)
    */
   public interface ErrorHandler {
 
@@ -46,7 +46,7 @@ public class MapSnapshotter {
   private long nativePtr = 0;
 
   private final Context context;
-  private MapboxMap.SnapshotReadyCallback callback;
+  private MapboxMap.MapSnapshotReadyCallback callback;
   private ErrorHandler errorHandler;
 
   /**
@@ -176,7 +176,7 @@ public class MapSnapshotter {
    *
    * @param callback the callback to use when the snapshot is ready
    */
-  public void start(@NonNull MapboxMap.SnapshotReadyCallback callback) {
+  public void start(@NonNull MapboxMap.MapSnapshotReadyCallback callback) {
     this.start(callback, null);
   }
 
@@ -187,7 +187,7 @@ public class MapSnapshotter {
    * @param callback     the callback to use when the snapshot is ready
    * @param errorHandler the error handler to use on snapshot errors
    */
-  public void start(@NonNull MapboxMap.SnapshotReadyCallback callback, ErrorHandler errorHandler) {
+  public void start(@NonNull MapboxMap.MapSnapshotReadyCallback callback, ErrorHandler errorHandler) {
     if (this.callback != null) {
       throw new IllegalStateException("Snapshotter was already started");
     }

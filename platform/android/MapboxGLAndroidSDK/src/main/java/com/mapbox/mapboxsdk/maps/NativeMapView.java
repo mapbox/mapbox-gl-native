@@ -20,7 +20,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
-import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
 import com.mapbox.mapboxsdk.style.layers.Filter;
@@ -833,11 +832,10 @@ final class NativeMapView {
       return;
     }
 
-    Bitmap viewContentBitmap = BitmapUtils.createBitmapFromView(mapView);
-    if (snapshotReadyCallback != null && mapContent != null && viewContentBitmap != null) {
-      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContent, viewContentBitmap);
-      Snapshot snapshot = new Snapshot(mergedBitmap);
-      snapshotReadyCallback.onSnapshotReady(snapshot);
+    Bitmap viewContent = BitmapUtils.createBitmapFromView(mapView);
+    if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
+      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContent, viewContent);
+      snapshotReadyCallback.onSnapshotReady(mergedBitmap);
     }
   }
 
