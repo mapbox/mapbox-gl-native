@@ -18,7 +18,10 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - node6-clang39-debug
+      - node6-clang39-debug:
+          filters:
+            tags:
+              only: /node-.*/
       - linux-clang39-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
