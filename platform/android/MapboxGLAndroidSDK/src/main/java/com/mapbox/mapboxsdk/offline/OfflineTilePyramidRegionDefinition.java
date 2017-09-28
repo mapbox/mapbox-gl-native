@@ -1,5 +1,9 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 
 /**
@@ -13,7 +17,7 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  * <p>
  * pixelRatio must be ≥ 0 and should typically be 1.0 or 2.0.
  */
-public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition {
+public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
 
   private String styleURL;
   private LatLngBounds bounds;
@@ -22,7 +26,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
   private float pixelRatio;
 
   /**
-   * Constructor
+   * Constructor to create an OfflineTilePyramidDefinition from parameters.
    *
    * @param styleURL   the style
    * @param bounds     the bounds
@@ -38,6 +42,22 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.pixelRatio = pixelRatio;
+  }
+
+  /**
+   * Constructor to create an OfflineTilePyramidDefinition from a Parcel.
+   *
+   * @param parcel the parcel to create the OfflineTilePyramidDefinition from
+   */
+  public OfflineTilePyramidRegionDefinition(Parcel parcel) {
+    this.styleURL = parcel.readString();
+    this.bounds = new LatLngBounds.Builder()
+      .include(new LatLng(parcel.readDouble(), parcel.readDouble()))
+      .include(new LatLng(parcel.readDouble(), parcel.readDouble()))
+      .build();
+    this.minZoom = parcel.readDouble();
+    this.maxZoom = parcel.readDouble();
+    this.pixelRatio = parcel.readFloat();
   }
 
   /*
@@ -64,4 +84,34 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     return pixelRatio;
   }
 
+  /*
+   * Parceable
+   */
+
+  @Override
+  public int describeContents() {
+    return 0;
+  }
+
+  @Override
+  public void writeToParcel(Parcel dest, int flags) {
+    dest.writeString(styleURL);
+    dest.writeDouble(bounds.getLatNorth());
+    dest.writeDouble(bounds.getLonEast());
+    dest.writeDouble(bounds.getLatSouth());
+    dest.writeDouble(bounds.getLonWest());
+    dest.writeDouble(minZoom);
+    dest.writeDouble(maxZoom);
+    dest.writeFloat(pixelRatio);
+  }
+
+  public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
+    public OfflineTilePyramidRegionDefinition createFromParcel(Parcel in) {
+      return new OfflineTilePyramidRegionDefinition(in);
+    }
+
+    public OfflineTilePyramidRegionDefinition[] newArray(int size) {
+      return new OfflineTilePyramidRegionDefinition[size];
+    }
+  };
 }
