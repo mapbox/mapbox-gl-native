@@ -30,15 +30,32 @@ public class MapboxApplication extends Application {
   public void onCreate() {
     super.onCreate();
 
+    if (!initalizeLeakCanary()) {
+      return;
+    }
+
+    initializeLogger();
+    initializeStrictMode();
+    initializeMapbox();
+  }
+
+  private boolean initalizeLeakCanary() {
     if (LeakCanary.isInAnalyzerProcess(this)) {
       // This process is dedicated to LeakCanary for heap analysis.
       // You should not init your app in this process.
-      return;
+      return false;
     }
     LeakCanary.install(this);
+    return true;
+  }
 
-    initializeLogger();
+  private void initializeLogger() {
+    if (BuildConfig.DEBUG) {
+      Timber.plant(new DebugTree());
+    }
+  }
 
+  private void initializeStrictMode() {
     StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
       .detectDiskReads()
       .detectDiskWrites()
@@ -47,21 +64,17 @@ public class MapboxApplication extends Application {
       .build());
     StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
       .detectLeakedSqlLiteObjects()
+      .detectLeakedClosableObjects()
       .penaltyLog()
       .penaltyDeath()
       .build());
+  }
 
+  private void initializeMapbox() {
     String mapboxAccessToken = TokenUtils.getMapboxAccessToken(getApplicationContext());
     if (TextUtils.isEmpty(mapboxAccessToken) || mapboxAccessToken.equals(DEFAULT_MAPBOX_ACCESS_TOKEN)) {
       Timber.e(ACCESS_TOKEN_NOT_SET_MESSAGE);
     }
-
     Mapbox.getInstance(getApplicationContext(), mapboxAccessToken);
-  }
-
-  private void initializeLogger() {
-    if (BuildConfig.DEBUG) {
-      Timber.plant(new DebugTree());
-    }
   }
 }
