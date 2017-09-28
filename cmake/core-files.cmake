@@ -491,6 +491,7 @@ set(MBGL_CORE_FILES
     include/mbgl/tile/tile_id.hpp
     src/mbgl/tile/geojson_tile.cpp
     src/mbgl/tile/geojson_tile.hpp
+    src/mbgl/tile/geojson_tile_data.hpp
     src/mbgl/tile/geometry_tile.cpp
     src/mbgl/tile/geometry_tile.hpp
     src/mbgl/tile/geometry_tile_data.cpp
