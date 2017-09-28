@@ -31,25 +31,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/run_loop_impl.hpp
         PRIVATE platform/android/src/timer.cpp
 
-        # File source
-        PRIVATE platform/android/src/http_file_source.cpp
-        PRIVATE platform/android/src/asset_manager.hpp
-        PRIVATE platform/android/src/asset_manager_file_source.cpp
-        PRIVATE platform/android/src/asset_manager_file_source.hpp
-        PRIVATE platform/default/default_file_source.cpp
-        PRIVATE platform/default/asset_file_source.cpp
-        PRIVATE platform/default/local_file_source.cpp
-        PRIVATE platform/default/online_file_source.cpp
-
-        # Offline
-        PRIVATE platform/default/mbgl/storage/offline.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.hpp
-        PRIVATE platform/default/mbgl/storage/offline_download.cpp
-        PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
-        PRIVATE platform/default/sqlite3.hpp
-
         # Misc
         PRIVATE platform/android/src/logging_android.cpp
         PRIVATE platform/android/src/thread.cpp
@@ -95,7 +76,6 @@ macro(mbgl_platform_core)
         PUBLIC platform/default
     )
 
-    target_add_mason_package(mbgl-core PUBLIC sqlite)
     target_add_mason_package(mbgl-core PUBLIC nunicode)
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC jni.hpp)
@@ -119,6 +99,37 @@ macro(mbgl_platform_core)
         PUBLIC -lz
     )
 endmacro()
+
+
+macro(mbgl_filesource)
+    target_sources(mbgl-filesource
+        # File source
+        PRIVATE platform/android/src/http_file_source.cpp
+        PRIVATE platform/android/src/asset_manager.hpp
+        PRIVATE platform/android/src/asset_manager_file_source.cpp
+        PRIVATE platform/android/src/asset_manager_file_source.hpp
+
+        # Database
+        PRIVATE platform/default/sqlite3.cpp
+    )
+
+    target_add_mason_package(mbgl-filesource PUBLIC sqlite)
+    target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
+
+    target_compile_options(mbgl-filesource
+        PRIVATE -fvisibility=hidden
+        PRIVATE -ffunction-sections
+        PRIVATE -fdata-sections
+    )
+
+    target_link_libraries(mbgl-filesource
+        PUBLIC -llog
+        PUBLIC -landroid
+        PUBLIC -lstdc++
+        PUBLIC -latomic
+    )
+endmacro()
+
 
 ## Main library ##
 
@@ -300,6 +311,7 @@ target_compile_options(mbgl-android
 )
 
 target_link_libraries(mbgl-android
+    PUBLIC mbgl-filesource
     PUBLIC mbgl-core
 )
 

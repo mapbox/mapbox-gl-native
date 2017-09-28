@@ -11,9 +11,7 @@ mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
 
-# Link with libuv. This is not part of loop-uv.cmake because loop-uv.cmake is also
-# used by node.cmake, where we want to link with the libuv provided by node itself.
-target_add_mason_package(mbgl-loop-uv PUBLIC libuv)
+include(cmake/loop-uv.cmake)
 
 macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC mesa)
@@ -48,22 +46,6 @@ macro(mbgl_platform_core)
     endif()
 
     target_sources(mbgl-core
-        # File source
-        PRIVATE platform/default/asset_file_source.cpp
-        PRIVATE platform/default/default_file_source.cpp
-        PRIVATE platform/default/local_file_source.cpp
-        PRIVATE platform/default/http_file_source.cpp
-        PRIVATE platform/default/online_file_source.cpp
-
-        # Offline
-        PRIVATE platform/default/mbgl/storage/offline.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.hpp
-        PRIVATE platform/default/mbgl/storage/offline_download.cpp
-        PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
-        PRIVATE platform/default/sqlite3.hpp
-
         # Misc
         PRIVATE platform/default/logging_stderr.cpp
         PRIVATE platform/default/string_stdlib.cpp
@@ -96,7 +78,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default
     )
 
-    target_add_mason_package(mbgl-core PUBLIC sqlite)
     target_add_mason_package(mbgl-core PUBLIC nunicode)
     target_add_mason_package(mbgl-core PUBLIC libpng)
     target_add_mason_package(mbgl-core PUBLIC libjpeg-turbo)
@@ -105,6 +86,22 @@ macro(mbgl_platform_core)
 
     target_link_libraries(mbgl-core
         PUBLIC -lz
+    )
+endmacro()
+
+
+macro(mbgl_filesource)
+    target_sources(mbgl-filesource
+        # File source
+        PRIVATE platform/default/http_file_source.cpp
+
+        # Database
+        PRIVATE platform/default/sqlite3.cpp
+    )
+
+    target_add_mason_package(mbgl-filesource PUBLIC sqlite)
+
+    target_link_libraries(mbgl-filesource
         PUBLIC -lcurl
     )
 endmacro()
@@ -112,8 +109,11 @@ endmacro()
 
 macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
+
+    target_add_mason_package(mbgl-glfw PUBLIC libuv)
 
     add_custom_command(
         TARGET mbgl-glfw POST_BUILD
@@ -126,15 +126,21 @@ endmacro()
 
 macro(mbgl_platform_render)
     target_link_libraries(mbgl-render
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
+
+    target_add_mason_package(mbgl-render PUBLIC libuv)
 endmacro()
 
 
 macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
+
+    target_add_mason_package(mbgl-offline PUBLIC libuv)
 endmacro()
 
 
@@ -150,8 +156,11 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
+
+    target_add_mason_package(mbgl-test PUBLIC libuv)
 endmacro()
 
 
@@ -167,8 +176,11 @@ macro(mbgl_platform_benchmark)
     )
 
     target_link_libraries(mbgl-benchmark
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
+
+    target_add_mason_package(mbgl-benchmark PUBLIC libuv)
 endmacro()
 
 
