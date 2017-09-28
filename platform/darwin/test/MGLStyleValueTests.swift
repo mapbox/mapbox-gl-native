@@ -267,22 +267,50 @@ extension MGLStyleValueTests {
             options: [.defaultValue: defaultRadius]
         )
         circleStyleLayer.circleRadius = expectedCompositeCategoricalValue
-        XCTAssertEqual(circleStyleLayer.circleRadius, expectedCompositeCategoricalValue)
+        
+        var compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
+        var expectedCompositeValue = expectedCompositeCategoricalValue as! MGLCompositeStyleFunction
+        XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
+        XCTAssertEqual(compositeValue.stops as NSDictionary, radiusCompositeCategoricalStops as NSDictionary)
+        XCTAssertEqual(compositeValue.interpolationMode, expectedCompositeValue.interpolationMode)
+        XCTAssertEqual(compositeValue.defaultValue, expectedCompositeValue.defaultValue)
 
         // data-driven, composite function with inner exponential color stop values nested in outer camera stops
         let radiusCompositeExponentialOrIntervalStops: [Float: [Float: MGLStyleValue<NSNumber>]] = [
-            0: [0: smallRadius],
-            10: [200: smallRadius],
-            20: [200: largeRadius]
+            0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
+            10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
+            20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
         ]
+
+        let expectedStops = [
+            0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
+            10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
+            20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
+        ]
+        circleStyleLayer.circleRadius = MGLStyleValue<NSNumber>(
+            interpolationMode: .exponential,
+            compositeStops: [
+                0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
+                10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
+                20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
+            ],
+            attributeName: "temp",
+            options: [.defaultValue: mediumRadius]
+        )
+        
         let expectedCompositeExponentialValue = MGLStyleValue<NSNumber>(
             interpolationMode: .exponential,
             compositeStops: radiusCompositeExponentialOrIntervalStops,
             attributeName: "temp",
             options: [.defaultValue: mediumRadius]
         )
-        circleStyleLayer.circleRadius = expectedCompositeExponentialValue
-        XCTAssertEqual(circleStyleLayer.circleRadius, expectedCompositeExponentialValue)
+
+        compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
+        expectedCompositeValue = expectedCompositeExponentialValue as! MGLCompositeStyleFunction
+        XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
+        XCTAssertEqual(compositeValue.stops as NSDictionary, expectedStops as NSDictionary)
+        XCTAssertEqual(compositeValue.interpolationMode, expectedCompositeValue.interpolationMode)
+        XCTAssertEqual(compositeValue.defaultValue, expectedCompositeValue.defaultValue)
 
         // get a value back
         if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLCompositeStyleFunction<NSNumber> {
@@ -305,11 +333,30 @@ extension MGLStyleValueTests {
         // data-driven, composite function with inner interval color stop values nested in outer camera stops
         let expectedCompositeIntervalValue = MGLStyleValue<NSNumber>(
             interpolationMode: .interval,
-            compositeStops: radiusCompositeExponentialOrIntervalStops,
+            compositeStops: [
+                
+                10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
+                20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
+            ],
             attributeName: "temp",
             options: nil
         )
-        circleStyleLayer.circleRadius = expectedCompositeIntervalValue
-        XCTAssertEqual(circleStyleLayer.circleRadius, expectedCompositeIntervalValue)
+        circleStyleLayer.circleRadius = MGLStyleValue<NSNumber>(
+            interpolationMode: .interval,
+            compositeStops: [
+                0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
+                10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
+                20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
+            ],
+            attributeName: "temp",
+            options: nil
+        )
+        
+        compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
+        expectedCompositeValue = expectedCompositeIntervalValue as! MGLCompositeStyleFunction
+        XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
+        XCTAssertEqual(compositeValue.stops as NSDictionary, expectedStops as NSDictionary)
+        XCTAssertEqual(compositeValue.interpolationMode, expectedCompositeValue.interpolationMode)
+        XCTAssertEqual(compositeValue.defaultValue, expectedCompositeValue.defaultValue)
     }
 }
