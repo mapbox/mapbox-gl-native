@@ -1,14 +1,14 @@
 #import <UIKit/UIKit.h>
 #import "MGLUserLocationAnnotationView.h"
 
-const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
-const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
+extern const CGFloat MGLUserLocationAnnotationDotSize;
+extern const CGFloat MGLUserLocationAnnotationHaloSize;
 
-const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
-const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
+extern const CGFloat MGLUserLocationAnnotationPuckSize;
+extern const CGFloat MGLUserLocationAnnotationArrowSize;
 
 // Threshold in radians between heading indicator rotation updates.
-const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
+extern const CGFloat MGLUserLocationHeadingUpdateThreshold;
 
 @interface MGLFaux3DUserLocationAnnotationView : MGLUserLocationAnnotationView
 
