@@ -5,6 +5,7 @@
 - Protects against requests which throw [#9554](https://github.com/mapbox/mapbox-gl-native/pull/9554)
 - Fixed an issue around reusing a map object [#9554](https://github.com/mapbox/mapbox-gl-native/pull/9554)
 - Fixed an issue in test [#9553](https://github.com/mapbox/mapbox-gl-native/pull/9553)
+
 # 3.5.5 - July 14, 2017
 - Provide debuggable release builds for node packages [#9497](https://github.com/mapbox/mapbox-gl-native/pull/9497)
 
