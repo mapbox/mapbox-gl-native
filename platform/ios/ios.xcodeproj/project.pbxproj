@@ -2914,7 +2914,9 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				DEAD_CODE_STRIPPING = NO;
 				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				MACH_O_TYPE = mh_object;
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
@@ -2941,7 +2943,9 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				DEAD_CODE_STRIPPING = NO;
 				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				MACH_O_TYPE = mh_object;
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_CPLUSPLUSFLAGS = (
 					"$(OTHER_CFLAGS)",
