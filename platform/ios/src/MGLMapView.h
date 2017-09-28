@@ -253,6 +253,9 @@ MGL_EXPORT IB_DESIGNABLE
  A view showing legally required copyright notices and telemetry settings,
  positioned at the bottom-right of the map view.
 
+ If you choose to reimplement this view, assign the `-showAttribution:` method
+ as the action for your view to present the default notices and settings.
+
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
     <a href="https://www.mapbox.com/help/attribution/">requires</a> these
@@ -270,6 +273,15 @@ MGL_EXPORT IB_DESIGNABLE
     implementation help.
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
+
+/**
+ Show the attribution and telemetry action sheet.
+
+ This action is performed when the user taps on the attribution button provided
+ by default via the `attributionButton` property. If you implement a custom
+ attribution button, you should add this action to the button.
+ */
+- (IBAction)showAttribution:(id)sender;
 
 /**
  Support for style classes has been removed. This property always returns an empty array.
