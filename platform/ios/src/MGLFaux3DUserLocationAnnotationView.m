@@ -6,6 +6,14 @@
 #import "MGLUserLocationHeadingArrowLayer.h"
 #import "MGLUserLocationHeadingBeamLayer.h"
 
+const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
+const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
+
+const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
+const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
+
+const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
+
 @implementation MGLFaux3DUserLocationAnnotationView
 {
     BOOL _puckModeActivated;
