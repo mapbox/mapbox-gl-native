@@ -42,11 +42,11 @@ step-library:
   - &restore-cache
       restore_cache:
         keys:
-          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-          - 'v3/{{ .Environment.CIRCLE_JOB }}/master/{{ checksum ".circle-week" }}'
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/master/{{ checksum ".circle-week" }}'
   - &save-cache
       save_cache:
-        key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+        key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
         paths: [ "node_modules", "/root/.ccache", "mason_packages/.binaries" ]
 
 
