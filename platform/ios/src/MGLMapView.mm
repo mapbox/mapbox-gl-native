@@ -3943,11 +3943,6 @@ public:
 
     if (annotation == self.selectedAnnotation) return;
 
-    if (annotation != self.userLocation)
-    {
-        self.userTrackingMode = MGLUserTrackingModeNone;
-    }
-
     [self deselectAnnotation:self.selectedAnnotation animated:NO];
 
     // Add the annotation to the map if it hasn’t been added yet.
