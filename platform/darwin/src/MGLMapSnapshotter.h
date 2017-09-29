@@ -15,34 +15,41 @@ MGL_EXPORT
  Creates a set of options with the minimum required information.
  
  @param styleURL URL of the map style to snapshot. The URL may be a full HTTP or HTTPS URL,
- a Mapbox URL indicating the style’s map ID (mapbox://styles/{user}/{style}), or a path
- to a local file relative to the application’s resource path. Specify nil for the default style.
+ a Mapbox URL indicating the style’s map ID (`mapbox://styles/{user}/{style`}), or a path
+ to a local file relative to the application’s resource path. Specify `nil` for the default style.
  @param size The image size.
  */
-- (instancetype)initWithStyleURL:(nullable NSURL*)styleURL camera:(MGLMapCamera*)camera size:(CGSize)size;
+- (instancetype)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize)size;
 
 #pragma mark - Configuring the Map
 
 /**
- URL of the map style to snapshot. The URL may be a full HTTP or HTTPS URL,
- a Mapbox URL indicating the style’s map ID (mapbox://styles/{user}/{style}), or a path
- to a local file relative to the application’s resource path. Specify nil for the default style.
+ URL of the map style to snapshot.
  */
 @property (nonatomic, readonly) NSURL *styleURL;
 
 /**
- The default zoom level is 0. Overrides the altitude in the mapCamera options if set.
+ The zoom level.
+ 
+ The default zoom level is 0. If this property is non-zero and the camera property
+ is non-nil, the camera’s altitude is ignored in favor of this property’s value.
  */
 @property (nonatomic) double zoomLevel;
 
 /**
  A camera representing the viewport visible in the snapshot.
+ 
+ If this property is non-nil and the `coordinateBounds` property is set to a non-empty
+ coordinate bounds, the camera’s center coordinate and altitude are ignored in favor
+ of the `coordinateBounds` property.
  */
 @property (nonatomic) MGLMapCamera *camera;
 
 /**
- The cooordinate rectangle that encompasses the bounds to capture. Overrides the center coordinate
- in the mapCamera options if set.
+ The cooordinate rectangle that encompasses the bounds to capture.
+ 
+ If this property is non-empty and the camera property is non-nil, the camera’s
+ center coordinate and altitude are ignored in favor of this property’s value.
  */
 @property (nonatomic) MGLCoordinateBounds coordinateBounds;
 
@@ -68,7 +75,7 @@ MGL_EXPORT
  A block to processes the result or error of a snapshot request.
  
  @param snapshot The `UIImage` that was generated or `nil` if an error occurred.
- @param error The error that occured or `nil` when succesful.
+ @param error The error that occured or `nil` when successful.
  */
 typedef void (^MGLMapSnapshotCompletionHandler)(UIImage* _Nullable snapshot, NSError* _Nullable error);
 #else

@@ -22,6 +22,7 @@
 #endif
 
 const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
+const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @implementation MGLMapSnapshotOptions
 
@@ -50,9 +51,9 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
 
 @implementation MGLMapSnapshotter {
     
-    std::shared_ptr<mbgl::ThreadPool> mbglThreadPool;
-    std::unique_ptr<mbgl::MapSnapshotter> mbglMapSnapshotter;
-    std::unique_ptr<mbgl::Actor<mbgl::MapSnapshotter::Callback>> snapshotCallback;
+    std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
+    std::unique_ptr<mbgl::MapSnapshotter> _mbglMapSnapshotter;
+    std::unique_ptr<mbgl::Actor<mbgl::MapSnapshotter::Callback>> _snapshotCallback;
 }
 
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions*)options;
@@ -62,14 +63,16 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
         _loading = false;
         
         mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-        mbglThreadPool = mbgl::sharedThreadPool();
+        _mbglThreadPool = mbgl::sharedThreadPool();
         
         std::string styleURL = std::string([options.styleURL.absoluteString UTF8String]);
         
         // Size; taking into account the minimum texture size for OpenGL ES
+        // For non retina screens the ratio is 1:1 MGLSnapshotterMinimumPixelSize
+        
         mbgl::Size size = {
-            static_cast<uint32_t>(MAX(options.size.width, 64)),
-            static_cast<uint32_t>(MAX(options.size.height, 64))
+            static_cast<uint32_t>(MAX(options.size.width, MGLSnapshotterMinimumPixelSize/options.scale)),
+            static_cast<uint32_t>(MAX(options.size.height, MGLSnapshotterMinimumPixelSize/options.scale))
         };
         
         float pixelRatio = MAX(options.scale, 1);
@@ -90,7 +93,7 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
         }
         
         // Create the snapshotter
-        mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, coordinateBounds);
+        _mbglMapSnapshotter = std::make_unique<mbgl::MapSnapshotter>(*mbglFileSource, *_mbglThreadPool, styleURL, size, pixelRatio, cameraOptions, coordinateBounds);
     }
     return self;
 }
@@ -115,7 +118,7 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
     _loading = true;
     
     dispatch_async(queue, ^{
-        snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image) {
+        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image) {
             _loading = false;
             if (mbglError) {
                 NSString *description = @(mbgl::util::toString(mbglError).c_str());
@@ -158,14 +161,14 @@ const CGPoint MGLLogoImagePosition = CGPointMake(8, 8);
                 });
             }
         });
-        mbglMapSnapshotter->snapshot(snapshotCallback->self());
+        _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
     });
 }
 
 - (void)cancel;
 {
-    snapshotCallback.reset();
-    mbglMapSnapshotter.reset();
+    _snapshotCallback.reset();
+    _mbglMapSnapshotter.reset();
 }
 
 @end
