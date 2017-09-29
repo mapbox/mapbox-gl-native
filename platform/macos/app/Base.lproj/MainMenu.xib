@@ -128,7 +128,7 @@
                                     <action selector="revertDocumentToSaved:" target="-1" id="iJ3-Pv-kwq"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Save snapshot" id="vjX-0E-kLO">
+                            <menuItem title="Export Image…" id="vjX-0E-kLO">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
                                     <action selector="takeSnapshot:" target="-1" id="H06-sU-n4U"/>
