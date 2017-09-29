@@ -442,6 +442,25 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)mapView:(MGLMapView *)mapView annotationCanShowCallout:(id <MGLAnnotation>)annotation;
 
 /**
+ Returns a Boolean value indicating whether selecting the annotation resets the current
+ tracking mode.
+
+ This method is called after an annotation is selected, before any callout is
+ displayed for the annotation.
+
+ If the return value is `NO`, the map tracking mode is not changed.
+
+ If the return value is `YES`, or if this method is absent from the delegate,
+ selecting the annotation will reset the current tracking mode to MGLUserTrackingModeNone.
+
+ @param mapView The map view that has selected the annotation.
+ @param annotation The object representing the annotation.
+ @return A Boolean value indicating whether selecting the annotation should reset the tracking
+ mode.
+ */
+- (BOOL)mapView:(MGLMapView *)mapView selectingAnnotationResetsTrackingMode:(id <MGLAnnotation>)annotation;
+
+/**
  Returns a callout view to display for the given annotation.
 
  If this method is present in the delegate, it must return a new instance of a
