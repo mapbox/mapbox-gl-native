@@ -12,7 +12,14 @@
 
 - (NSString *)mgl_titleCasedStringWithLocale:(NSLocale *)locale {
     NSMutableString *string = self.mutableCopy;
-    [string enumerateLinguisticTagsInRange:string.mgl_wholeRange scheme:NSLinguisticTagSchemeLexicalClass options:0 orthography:nil usingBlock:^(NSString * _Nonnull tag, NSRange tokenRange, NSRange sentenceRange, BOOL * _Nonnull stop) {
+    NSOrthography *orthography;
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+    if ([NSOrthography respondsToSelector:@selector(defaultOrthographyForLanguage:)]) {
+        orthography = [NSOrthography defaultOrthographyForLanguage:locale.localeIdentifier];
+    }
+#pragma clang diagnostic pop
+    [string enumerateLinguisticTagsInRange:string.mgl_wholeRange scheme:NSLinguisticTagSchemeLexicalClass options:0 orthography:orthography usingBlock:^(NSString * _Nonnull tag, NSRange tokenRange, NSRange sentenceRange, BOOL * _Nonnull stop) {
         NSString *word = [string substringWithRange:tokenRange];
         if (word.length > 3
             || !([tag isEqualToString:NSLinguisticTagConjunction]
