@@ -4,6 +4,8 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -48,6 +50,9 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private MapboxMap mapboxMap;
   private GeoJsonSource source;
 
+  private boolean isInitialPosition = true;
+  private boolean isSelected = false;
+
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -59,15 +64,15 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       @Override
       public void onMapReady(@NonNull final MapboxMap map) {
         mapboxMap = map;
-        updateSource(false);
+        updateSource();
         addLayer();
         addMapClickListener();
       }
     });
   }
 
-  private void updateSource(boolean selected) {
-    FeatureCollection featureCollection = createFeatureCollection(selected);
+  private void updateSource() {
+    FeatureCollection featureCollection = createFeatureCollection();
     if (source != null) {
       source.setGeoJson(featureCollection);
     } else {
@@ -76,11 +81,15 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     }
   }
 
-  private FeatureCollection createFeatureCollection(boolean selected) {
-    Point point = Point.fromCoordinates(Position.fromCoordinates(-74.016181, 40.701745));
+  private FeatureCollection createFeatureCollection() {
+    Position position = isInitialPosition
+      ? Position.fromCoordinates(-74.01618140, 40.701745)
+      : Position.fromCoordinates(-73.988097, 40.749864);
+
+    Point point = Point.fromCoordinates(position);
     Feature feature = Feature.fromGeometry(point);
     JsonObject properties = new JsonObject();
-    properties.addProperty(KEY_PROPERTY_SELECTED, selected);
+    properties.addProperty(KEY_PROPERTY_SELECTED, isSelected);
     feature.setProperties(properties);
     return FeatureCollection.fromFeatures(new Feature[] {feature});
   }
@@ -118,13 +127,29 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
         List<Feature> featureList = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
         if (!featureList.isEmpty()) {
           Feature feature = featureList.get(0);
-          boolean isSelected = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
-          updateSource(!isSelected);
+          boolean selectedNow = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
+          isSelected = !selectedNow;
+          updateSource();
         } else {
           Timber.e("No features found");
         }
       }
     });
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_symbols, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (mapboxMap != null && item.getItemId() == R.id.menu_action_change_location) {
+      isInitialPosition = !isInitialPosition;
+      updateSource();
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
