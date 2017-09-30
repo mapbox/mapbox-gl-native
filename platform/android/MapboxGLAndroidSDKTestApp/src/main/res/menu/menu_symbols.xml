@@ -5,4 +5,8 @@
         android:id="@+id/menu_action_change_location"
         android:title="@string/menuitem_change_location"
         app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_action_toggle_source"
+        android:title="@string/menuitem_toggle_symbol_layer_visibility"
+        app:showAsAction="never"/>
 </menu>
