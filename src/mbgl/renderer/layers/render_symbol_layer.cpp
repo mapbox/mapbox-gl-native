@@ -4,7 +4,6 @@
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -80,8 +79,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         SymbolBucket& bucket = *reinterpret_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl));
 
         const auto& layout = bucket.layout;
-
-        parameters.frameHistory.bind(parameters.context, 1);
 
         auto draw = [&] (auto& program,
                          auto&& uniformValues,
