@@ -8,6 +8,7 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/map/camera.hpp>
+#include <mbgl/util/geometry.hpp>
 
 #include <cstdint>
 #include <string>
@@ -66,6 +67,10 @@ public:
     void jumpTo(const CameraOptions&);
     void easeTo(const CameraOptions&, const AnimationOptions&);
     void flyTo(const CameraOptions&, const AnimationOptions&);
+    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&, optional<double> bearing = {}) const;
+    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&, optional<double> bearing = {}) const;
+    CameraOptions cameraForGeometry(const Geometry<double>&, const EdgeInsets&, optional<double> bearing = {}) const;
+    LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
 
     // Position
     void moveBy(const ScreenCoordinate&, const AnimationOptions& = {});
@@ -82,9 +87,6 @@ public:
     double getZoom() const;
     void setLatLngZoom(const LatLng&, double zoom, const AnimationOptions& = {});
     void setLatLngZoom(const LatLng&, double zoom, const EdgeInsets&, const AnimationOptions& = {});
-    CameraOptions cameraForLatLngBounds(const LatLngBounds&, const EdgeInsets&) const;
-    CameraOptions cameraForLatLngs(const std::vector<LatLng>&, const EdgeInsets&) const;
-    LatLngBounds latLngBoundsForCamera(const CameraOptions&) const;
     void resetZoom();
 
     // Bounds

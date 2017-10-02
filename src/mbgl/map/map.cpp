@@ -364,27 +364,27 @@ void Map::setLatLngZoom(const LatLng& latLng, double zoom, const EdgeInsets& pad
     impl->onUpdate();
 }
 
-CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding) const {
+CameraOptions Map::cameraForLatLngBounds(const LatLngBounds& bounds, const EdgeInsets& padding, optional<double> bearing) const {
     return cameraForLatLngs({
         bounds.northwest(),
         bounds.southwest(),
         bounds.southeast(),
         bounds.northeast(),
-    }, padding);
+    }, padding, bearing);
 }
 
-CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding) const {
+CameraOptions cameraForLatLngs(const std::vector<LatLng>& latLngs, const Transform& transform, const EdgeInsets& padding) {
     CameraOptions options;
     if (latLngs.empty()) {
         return options;
     }
-
+    Size size = transform.getState().getSize();
     // Calculate the bounds of the possibly rotated shape with respect to the viewport.
     ScreenCoordinate nePixel = {-INFINITY, -INFINITY};
     ScreenCoordinate swPixel = {INFINITY, INFINITY};
-    double viewportHeight = getSize().height;
+    double viewportHeight = size.height;
     for (LatLng latLng : latLngs) {
-        ScreenCoordinate pixel = impl->transform.latLngToScreenCoordinate(latLng);
+        ScreenCoordinate pixel = transform.latLngToScreenCoordinate(latLng);
         swPixel.x = std::min(swPixel.x, pixel.x);
         nePixel.x = std::max(nePixel.x, pixel.x);
         swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
@@ -396,14 +396,14 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     // Calculate the zoom level.
     double minScale = INFINITY;
     if (width > 0 || height > 0) {
-        double scaleX = double(getSize().width) / width;
-        double scaleY = double(getSize().height) / height;
+        double scaleX = double(size.width) / width;
+        double scaleY = double(size.height) / height;
         scaleX -= (padding.left() + padding.right()) / width;
         scaleY -= (padding.top() + padding.bottom()) / height;
         minScale = util::min(scaleX, scaleY);
     }
-    double zoom = getZoom() + util::log2(minScale);
-    zoom = util::clamp(zoom, getMinZoom(), getMaxZoom());
+    double zoom = transform.getZoom() + util::log2(minScale);
+    zoom = util::clamp(zoom, transform.getState().getMinZoom(), transform.getState().getMaxZoom());
 
     // Calculate the center point of a virtual bounds that is extended in all directions by padding.
     ScreenCoordinate centerPixel = nePixel + swPixel;
@@ -421,9 +421,32 @@ CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const Ed
     // CameraOptions origin is at the top-left corner.
     centerPixel.y = viewportHeight - centerPixel.y;
 
-    options.center = latLngForPixel(centerPixel);
+    options.center = transform.screenCoordinateToLatLng(centerPixel);
     options.zoom = zoom;
     return options;
+}
+
+CameraOptions Map::cameraForLatLngs(const std::vector<LatLng>& latLngs, const EdgeInsets& padding, optional<double> bearing) const {
+    if(bearing) {
+        double angle = -*bearing * util::DEG2RAD;  // Convert to radians
+        Transform transform(impl->transform.getState());
+        transform.setAngle(angle);
+        CameraOptions options = mbgl::cameraForLatLngs(latLngs, transform, padding);
+        options.angle = angle;
+        return options;
+    } else {
+        return mbgl::cameraForLatLngs(latLngs, impl->transform, padding);
+    }
+}
+
+CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const EdgeInsets& padding, optional<double> bearing) const {
+
+    std::vector<LatLng> latLngs;
+    forEachPoint(geometry, [&](const Point<double>& pt) {
+        latLngs.push_back({ pt.y, pt.x });
+    });
+    return cameraForLatLngs(latLngs, padding, bearing);
+
 }
 
 LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {
