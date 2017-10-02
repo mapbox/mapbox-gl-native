@@ -38,10 +38,6 @@ public:
 
 class CollisionFeature {
 public:
-    enum class AlignmentType : bool {
-        Straight = false,
-        Curved
-    };
 
     // for text
     CollisionFeature(const GeometryCoordinates& line,
@@ -51,7 +47,7 @@ public:
                      const float padding,
                      const style::SymbolPlacementType placement,
                      const IndexedSubfeature& indexedFeature_)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, AlignmentType::Curved) {}
+        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_) {}
 
     // for icons
     CollisionFeature(const GeometryCoordinates& line,
@@ -66,7 +62,7 @@ public:
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
-                           boxScale, padding, placement, indexedFeature_, AlignmentType::Straight) {}
+                           boxScale, padding, placement, indexedFeature_) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
@@ -77,8 +73,7 @@ public:
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType,
-                     IndexedSubfeature,
-                     const AlignmentType);
+                     IndexedSubfeature);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
