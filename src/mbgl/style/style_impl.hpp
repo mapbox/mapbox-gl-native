@@ -18,6 +18,8 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/geo.hpp>
 
+#include <mbgl/text/cross_tile_symbol_index.hpp>
+
 #include <memory>
 #include <string>
 #include <vector>

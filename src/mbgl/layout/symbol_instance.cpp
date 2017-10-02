@@ -23,7 +23,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::array<float, 2> iconOffset_,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
-                               const std::size_t featureIndex_) :
+                               const std::size_t featureIndex_,
+                               const std::u16string& key_) :
     anchor(anchor_),
     line(line_),
     index(index_),
@@ -35,7 +36,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
     featureIndex(featureIndex_),
     textOffset(textOffset_),
-    iconOffset(iconOffset_) {
+    iconOffset(iconOffset_),
+    key(key_) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {

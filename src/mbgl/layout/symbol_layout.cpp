@@ -321,7 +321,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                 addToBuffers, symbolInstances.size(),
                 textBoxScale, textPadding, textPlacement, textOffset,
                 iconBoxScale, iconPadding, iconPlacement, iconOffset,
-                glyphPositionMap, indexedFeature, index);
+                glyphPositionMap, indexedFeature, index, feature.text ? *feature.text : std::u16string{});
     };
     
     const auto& type = feature.getType();
