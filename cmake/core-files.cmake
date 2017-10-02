@@ -177,6 +177,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp
+    src/mbgl/renderer/placement_state.hpp
+    src/mbgl/renderer/placement_state.cpp
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
