@@ -252,7 +252,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         updateParameters,
         renderLight.getEvaluated(),
         *staticData,
-        frameHistory,
         *imageManager,
         *lineAtlas
     };
@@ -376,10 +375,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
-    frameHistory.record(parameters.timePoint,
-                        parameters.state.getZoom(),
-                        parameters.mapMode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Milliseconds(0));
-
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -387,8 +382,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
-        parameters.frameHistory.upload(parameters.context, 0);
-
+        
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
@@ -594,7 +588,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        updateParameters.mode == MapMode::Continuous && (hasTransitions() || frameHistory.needsAnimation(util::DEFAULT_TRANSITION_DURATION))
+        updateParameters.mode == MapMode::Continuous && (hasTransitions())
     );
 
     if (!loaded) {

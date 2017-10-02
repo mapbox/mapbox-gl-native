@@ -3,7 +3,6 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/math.hpp>
 
