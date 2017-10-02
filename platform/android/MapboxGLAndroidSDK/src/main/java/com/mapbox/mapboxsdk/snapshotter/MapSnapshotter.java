@@ -184,7 +184,7 @@ public class MapSnapshotter {
    * Starts loading and rendering the snapshot. The callbacks will be fired
    * on the calling thread.
    *
-   * @param callback the callback to use when the snapshot is ready
+   * @param callback     the callback to use when the snapshot is ready
    * @param errorHandler the error handler to use on snapshot errors
    */
   public void start(@NonNull MapboxMap.SnapshotReadyCallback callback, ErrorHandler errorHandler) {
@@ -198,11 +198,41 @@ public class MapSnapshotter {
   }
 
   /**
+   * Updates the snapshotter with a new size
+   *
+   * @param width  the width
+   * @param height the height
+   */
+  public native void setSize(int width, int height);
+
+  /**
+   * Updates the snapshotter with a new {@link CameraPosition}
+   *
+   * @param cameraPosition the camera position
+   */
+  public native void setCameraPosition(CameraPosition cameraPosition);
+
+  /**
+   * Updates the snapshotter with a new {@link LatLngBounds}
+   *
+   * @param region the region
+   */
+  public native void setRegion(LatLngBounds region);
+
+  /**
+   * Updates the snapshotter with a new style url
+   *
+   * @param styleUrl the style url
+   */
+  public native void setStyleUrl(String styleUrl);
+
+
+  /**
    * Must be called in on the thread
    * the object was created on.
    */
   public void cancel() {
-    callback = null;
+    reset();
     nativeCancel();
   }
 

@@ -81,9 +81,26 @@ void MapSnapshotter::start(JNIEnv&) {
 
 void MapSnapshotter::cancel(JNIEnv&) {
     MBGL_VERIFY_THREAD(tid);
-
     snapshotCallback.reset();
-    snapshotter.reset();
+}
+
+
+void MapSnapshotter::setStyleUrl(JNIEnv& env, jni::String styleURL) {
+    snapshotter->setStyleURL(jni::Make<std::string>(env, styleURL));
+}
+
+void MapSnapshotter::setSize(JNIEnv&, jni::jint width, jni::jint height) {
+    auto size = mbgl::Size { static_cast<uint32_t>(width), static_cast<uint32_t>(height) };
+    snapshotter->setSize(size);
+}
+
+void MapSnapshotter::setCameraPosition(JNIEnv& env, jni::Object<CameraPosition> position) {
+    auto options = CameraPosition::getCameraOptions(env, position);
+    snapshotter->setCameraOptions(options);
+}
+
+void MapSnapshotter::setRegion(JNIEnv& env, jni::Object<LatLngBounds> region) {
+    snapshotter->setRegion(LatLngBounds::getLatLngBounds(env, region));
 }
 
 // Static methods //
@@ -101,6 +118,10 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
                                             std::make_unique<MapSnapshotter, JNIEnv&, jni::Object<MapSnapshotter>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jint, jni::String, jni::Object<LatLngBounds>, jni::Object<CameraPosition>, jni::String>,
                                            "nativeInitialize",
                                            "finalize",
+                                            METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),
+                                            METHOD(&MapSnapshotter::setSize, "setSize"),
+                                            METHOD(&MapSnapshotter::setCameraPosition, "setCameraPosition"),
+                                            METHOD(&MapSnapshotter::setRegion, "setRegion"),
                                             METHOD(&MapSnapshotter::start, "nativeStart"),
                                             METHOD(&MapSnapshotter::cancel, "nativeCancel")
     );
