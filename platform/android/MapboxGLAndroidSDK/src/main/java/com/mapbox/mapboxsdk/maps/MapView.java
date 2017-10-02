@@ -27,7 +27,7 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
+import com.mapbox.mapboxsdk.maps.renderer.GLSurfaceViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
@@ -87,7 +87,7 @@ public class MapView extends FrameLayout {
   private Bundle savedInstanceState;
   private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
-  private GLSurfaceView glSurfaceView;
+  private MapRenderer mapRenderer;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -290,12 +290,10 @@ public class MapView extends FrameLayout {
   }
 
   private void initialiseDrawingSurface() {
-    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+    GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
     glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-    glSurfaceView.setEGLContextClientVersion(2);
-    glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
 
-    MapRenderer mapRenderer = new MapRenderer(getContext(), glSurfaceView) {
+    GLSurfaceViewMapRenderer mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView) {
       @Override
       public void onSurfaceCreated(GL10 gl, EGLConfig config) {
         MapView.this.post(new Runnable() {
@@ -313,10 +311,9 @@ public class MapView extends FrameLayout {
       }
     };
 
-    glSurfaceView.setRenderer(mapRenderer);
-    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
     glSurfaceView.setVisibility(View.VISIBLE);
 
+    this.mapRenderer = mapRenderer;
     nativeMapView = new NativeMapView(this, mapRenderer);
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
@@ -352,8 +349,8 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onResume() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onResume();
+    if (mapRenderer != null) {
+      mapRenderer.onResume();
     }
   }
 
@@ -362,8 +359,8 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onPause() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onPause();
+    if (mapRenderer != null) {
+      mapRenderer.onPause();
     }
   }
 
