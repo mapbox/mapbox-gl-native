@@ -76,6 +76,7 @@ std::string MapSnapshotter::Impl::getStyleURL() const {
 
 void MapSnapshotter::Impl::setSize(Size size) {
     map.setSize(size);
+    frontend.setSize(size);
 }
 
 Size MapSnapshotter::Impl::getSize() const {

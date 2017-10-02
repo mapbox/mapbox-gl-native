@@ -60,6 +60,7 @@
     <string name="description_animated_image_source">Shows how to animate georeferenced images</string>
     <string name="description_bottom_sheet">Show 2 MapView on screen with a bottom sheet</string>
     <string name="description_map_snapshotter">Show a static bitmap taken with the MapSnapshotter</string>
+    <string name="description_map_snapshotter_reuse">Show how to reuse a MapSnapshotter instance</string>
     <string name="description_camera_animator">Use Android SDK Animators to animate camera position changes</string>
     <string name="description_symbol_generator">Use Android SDK Views as symbols</string>
 </resources>
