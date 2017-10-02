@@ -5,6 +5,7 @@
 #include <mbgl/util/optional.hpp>
 
 #include <exception>
+#include <memory>
 #include <string>
 #include <functional>
 
@@ -15,6 +16,10 @@ struct CameraOptions;
 class FileSource;
 class Size;
 class LatLngBounds;
+
+namespace style {
+class Style;
+} // namespace style
 
 class MapSnapshotter {
 public:
@@ -28,6 +33,18 @@ public:
                    const optional<std::string> cacheDir = {});
 
     ~MapSnapshotter();
+
+    void setStyleURL(const std::string& styleURL);
+    std::string getStyleURL() const;
+
+    void setSize(const Size&);
+    Size getSize() const;
+
+    void setCameraOptions(const CameraOptions&);
+    CameraOptions getCameraOptions() const;
+
+    void setRegion(const LatLngBounds&);
+    LatLngBounds getRegion() const;
 
     using Callback = std::function<void (std::exception_ptr, PremultipliedImage)>;
     void snapshot(ActorRef<Callback>);
