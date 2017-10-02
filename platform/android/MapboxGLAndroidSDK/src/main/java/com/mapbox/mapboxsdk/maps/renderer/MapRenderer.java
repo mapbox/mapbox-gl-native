@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.maps.renderer;
 
 import android.content.Context;
-import android.opengl.GLSurfaceView;
+import android.support.annotation.CallSuper;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
@@ -16,17 +16,14 @@ import javax.microedition.khronos.opengles.GL10;
  * render on the one end and acts as a scheduler to request work to
  * be performed on the GL thread on the other.
  */
-public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler {
+public abstract class MapRenderer implements MapRendererScheduler {
 
   // Holds the pointer to the native peer after initialisation
   private long nativePtr = 0;
 
-  private final GLSurfaceView glSurfaceView;
-
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  public MapRenderer(Context context, GLSurfaceView glSurfaceView) {
-    this.glSurfaceView = glSurfaceView;
+  public MapRenderer(Context context) {
 
     FileSource fileSource = FileSource.getInstance(context);
     float pixelRatio = context.getResources().getDisplayMetrics().density;
@@ -36,17 +33,26 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
     nativeInitialize(this, fileSource, pixelRatio, programCacheDir);
   }
 
+  public void onPause() {
+    // Implement if needed
+  }
+
+  public void onResume() {
+    // Implement if needed
+  }
+
+
   public void setOnFpsChangedListener(MapboxMap.OnFpsChangedListener listener) {
     onFpsChangedListener = listener;
   }
 
-  @Override
-  public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+  @CallSuper
+  protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
     nativeOnSurfaceCreated();
   }
 
-  @Override
-  public void onSurfaceChanged(GL10 gl, int width, int height) {
+  @CallSuper
+  protected void onSurfaceChanged(GL10 gl, int width, int height) {
     if (width < 0) {
       throw new IllegalArgumentException("fbWidth cannot be negative.");
     }
@@ -69,35 +75,13 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
     nativeOnSurfaceChanged(width, height);
   }
 
-  @Override
-  public void onDrawFrame(GL10 gl) {
+  @CallSuper
+  protected void onDrawFrame(GL10 gl) {
     nativeRender();
 
     if (onFpsChangedListener != null) {
       updateFps();
     }
-  }
-
-  /**
-   * May be called from any thread.
-   * <p>
-   * Called from the renderer frontend to schedule a render.
-   */
-  @Override
-  public void requestRender() {
-    glSurfaceView.requestRender();
-  }
-
-  /**
-   * May be called from any thread.
-   * <p>
-   * Schedules work to be performed on the MapRenderer thread.
-   *
-   * @param runnable the runnable to execute
-   */
-  @Override
-  public void queueEvent(Runnable runnable) {
-    glSurfaceView.queueEvent(runnable);
   }
 
   /**
@@ -109,6 +93,7 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
    * @param runnable the runnable to execute
    * @see MapRendererRunnable
    */
+  @CallSuper
   void queueEvent(MapRendererRunnable runnable) {
     this.queueEvent((Runnable) runnable);
   }
@@ -118,6 +103,7 @@ public class MapRenderer implements GLSurfaceView.Renderer, MapRendererScheduler
                                        float pixelRatio,
                                        String programCacheDir);
 
+  @CallSuper
   @Override
   protected native void finalize() throws Throwable;
 
