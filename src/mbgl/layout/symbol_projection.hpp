@@ -8,7 +8,6 @@ namespace mbgl {
 
     class TransformState;
     class RenderTile;
-    class FrameHistory;
     class SymbolSizeBinder;
     class PlacedSymbol;
     namespace style {
