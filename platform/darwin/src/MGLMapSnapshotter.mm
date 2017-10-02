@@ -156,11 +156,21 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     UIGraphicsEndImageContext();
 #else
                     NSImage *logoImage = [[NSImage alloc] initWithContentsOfFile:[[NSBundle mgl_frameworkBundle] pathForResource:@"mapbox" ofType:@"pdf"]];
-                    NSImage *compositedImage = mglImage;
+                    NSImage *sourceImage = mglImage;
+                    
+                    NSSize targetSize = NSMakeSize(self.options.size.width, self.options.size.height);
+                    NSRect targetFrame = NSMakeRect(0, 0, targetSize.width, targetSize.height);
+                    NSImage *compositedImage = nil;
+                    NSImageRep *sourceImageRep = [sourceImage bestRepresentationForRect:targetFrame
+                                                                                context:nil
+                                                                                  hints:nil];
+                    compositedImage = [[NSImage alloc] initWithSize:targetSize];
                     
                     [compositedImage lockFocus];
+                    [sourceImageRep drawInRect: targetFrame];
                     [logoImage drawInRect:CGRectMake(MGLLogoImagePosition.x, MGLLogoImagePosition.y, logoImage.size.width,logoImage.size.height)];
                     [compositedImage unlockFocus];
+                    
 #endif
                     
                     // Dispatch result to origin queue
