@@ -60,6 +60,7 @@
     <string name="activity_animated_image_source">Animated Image Source</string>
     <string name="activity_bottom_sheet">Bottom sheet</string>
     <string name="activity_map_snapshotter">Map Snapshotter</string>
+    <string name="activity_map_snapshotter_reuse">Map Snapshotter Reuse</string>
     <string name="activity_camera_animator">Animator animation</string>
     <string name="activity_symbol_generator">SymbolGenerator</string>
 </resources>
