@@ -134,8 +134,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     values,
                                     tile,
                                     *bucket.iconSizeBinder,
-                                    parameters.state,
-                                    parameters.frameHistory);
+                                    parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
             }
@@ -196,8 +195,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     values,
                                     tile,
                                     *bucket.textSizeBinder,
-                                    parameters.state,
-                                    parameters.frameHistory);
+                                    parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
             }
