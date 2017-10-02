@@ -40,6 +40,14 @@ public:
 
     ~MapSnapshotter();
 
+    void setStyleUrl(JNIEnv&, jni::String styleURL);
+
+    void setSize(JNIEnv&, jni::jint width, jni::jint height);
+
+    void setCameraPosition(JNIEnv&, jni::Object<CameraPosition> position);
+
+    void setRegion(JNIEnv&, jni::Object<LatLngBounds> region);
+
     void start(JNIEnv&);
 
     void cancel(JNIEnv&);
