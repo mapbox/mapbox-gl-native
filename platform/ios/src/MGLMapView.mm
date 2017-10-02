@@ -503,7 +503,7 @@ public:
 #if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
     if ([_attributionButton respondsToSelector:@selector(accessibilityIgnoresInvertColors)])  { _attributionButton.accessibilityIgnoresInvertColors = YES; }
 #endif
-    [_attributionButton addTarget:self action:@selector(showAttribution) forControlEvents:UIControlEventTouchUpInside];
+    [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
     _attributionButtonConstraints = [NSMutableArray array];
@@ -2025,7 +2025,7 @@ public:
 
 #pragma mark - Attribution -
 
-- (void)showAttribution
+- (void)showAttribution:(__unused id)sender
 {
     NSString *title = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title");
     UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:title

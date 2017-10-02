@@ -253,6 +253,9 @@ MGL_EXPORT IB_DESIGNABLE
  A view showing legally required copyright notices and telemetry settings,
  positioned at the bottom-right of the map view.
 
+ If you choose to reimplement this view, assign the `-showAttribution:` method
+ as the action for your view to present the default notices and settings.
+
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
     <a href="https://www.mapbox.com/help/attribution/">requires</a> these
@@ -272,23 +275,24 @@ MGL_EXPORT IB_DESIGNABLE
 @property (nonatomic, readonly) UIButton *attributionButton;
 
 /**
- Support for style classes has been removed. This property always returns an empty array.
+ Show the attribution and telemetry action sheet.
+
+ This action is performed when the user taps on the attribution button provided
+ by default via the `attributionButton` property. If you implement a custom
+ attribution button, you should add this action to the button.
  */
+- (IBAction)showAttribution:(id)sender;
+
+/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
 @property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
-/**
- Support for style classes has been removed. This property always returns NO.
- */
+/// :nodoc: Support for style classes has been removed. This property always returns NO.
 - (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
-/**
- Support for style classes has been removed. This property is a no-op.
- */
+/// :nodoc: Support for style classes has been removed. This property is a no-op.
 - (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
-/**
- Support for style classes has been removed. This property is a no-op.
- */
+/// :nodoc: Support for style classes has been removed. This property is a no-op.
 - (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 #pragma mark Displaying the User’s Location
