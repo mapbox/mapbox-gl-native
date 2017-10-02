@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLAnnotationImage;
 @class MGLMapCamera;
 @class MGLStyle;
+@class MGLShape;
 
 @protocol MGLAnnotation;
 @protocol MGLMapViewDelegate;
@@ -322,6 +323,24 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
+ /**
+ Moves the viewpoint to a different location with respect to the map with an
+ optional transition duration and timing function.
+ 
+ @param camera The new viewpoint.
+ @param duration The amount of time, measured in seconds, that the transition
+ animation should take. Specify `0` to jump to the new viewpoint
+ instantaneously.
+ @param function A timing function used for the animation. Set this parameter to
+ `nil` for a transition that matches most system animations. If the duration
+ is `0`, this parameter is ignored.
+ @param edgePadding The minimum padding (in screen points) that would be visible
+ around the returned camera object if it were set as the receiver’s camera.
+  @param completion The block to execute after the animation finishes.
+ */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(NSEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion;
+
+
 /**
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and a default duration based on the length of the flight
@@ -455,6 +474,20 @@ MGL_EXPORT IB_DESIGNABLE
     direction and pitch.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given shape, with the specified direction,
+ optionally with some additional padding on each side.
+
+ @param shape The shape to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high 
+    (close to the ground) as possible while still including the entire shape. The
+    camera object uses the current pitch.
+ */
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(double)direction edgePadding:(NSEdgeInsets)insets;
 
 /**
  A Boolean value indicating whether the receiver automatically adjusts its
