@@ -10,6 +10,14 @@ namespace mbgl {
 class Anchor;
 class IndexedSubfeature;
 
+class OpacityState {
+    public:
+        OpacityState() : opacity(0), targetOpacity(0) {}
+        float opacity;
+        float targetOpacity;
+        TimePoint time;
+};
+
 class SymbolInstance {
 public:
     SymbolInstance(Anchor& anchor,
@@ -30,7 +38,8 @@ public:
                    const std::array<float, 2> iconOffset,
                    const GlyphPositionMap&,
                    const IndexedSubfeature&,
-                   const std::size_t featureIndex);
+                   const std::size_t featureIndex,
+                   const std::u16string& key);
 
     Anchor anchor;
     GeometryCoordinates line;
@@ -45,6 +54,10 @@ public:
     std::size_t featureIndex;
     std::array<float, 2> textOffset;
     std::array<float, 2> iconOffset;
+    std::u16string key;
+    bool isDuplicate;
+    OpacityState iconOpacityState;
+    OpacityState textOpacityState;
 };
 
 } // namespace mbgl
