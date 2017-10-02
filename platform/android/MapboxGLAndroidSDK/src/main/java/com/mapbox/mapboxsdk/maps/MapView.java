@@ -386,6 +386,10 @@ public class MapView extends FrameLayout {
     mapCallback.clearOnMapReadyCallbacks();
     nativeMapView.destroy();
     nativeMapView = null;
+
+    if (mapRenderer != null) {
+      mapRenderer.onDestroy();
+    }
   }
 
   @Override

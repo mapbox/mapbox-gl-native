@@ -41,6 +41,9 @@ public abstract class MapRenderer implements MapRendererScheduler {
     // Implement if needed
   }
 
+  public void onDestroy() {
+    // Implement if needed
+  }
 
   public void setOnFpsChangedListener(MapboxMap.OnFpsChangedListener listener) {
     onFpsChangedListener = listener;
