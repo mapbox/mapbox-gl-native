@@ -109,6 +109,32 @@ TEST(Map, LatLngBoundsToCamera) {
 
     CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {});
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.55467, 1e-5);
+}
+
+TEST(Map, LatLngBoundsToCameraWithAngle) {
+    MapTest<> test;
+
+    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+
+    LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35);
+    ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.21385, 1e-5);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD);
+}
+
+TEST(Map, LatLngsToCamera) {
+    MapTest<> test;
+
+    std::vector<LatLng> latLngs{{ 40.712730, 74.005953 }, {15.68169,73.499857}, {30.82678, 83.4082}};
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -23 * util::DEG2RAD);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 2.75434, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
 }
 
 TEST(Map, CameraToLatLngBounds) {

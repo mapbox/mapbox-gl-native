@@ -2,6 +2,7 @@
 
 #include <mapbox/geometry/geometry.hpp>
 #include <mapbox/geometry/point_arithmetic.hpp>
+#include <mapbox/geometry/for_each_point.hpp>
 
 namespace mbgl {
 
@@ -57,5 +58,10 @@ struct ToFeatureType {
     template <class T>
     FeatureType operator()(const mapbox::geometry::geometry_collection<T> &) const { return FeatureType::Unknown; }
 };
+
+template <class T, typename F>
+auto forEachPoint(const Geometry<T>& g, F f) {
+    mapbox::geometry::for_each_point(g, f);
+}
 
 } // namespace mbgl
