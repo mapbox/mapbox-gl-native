@@ -27,6 +27,9 @@ class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
+class CollisionIndex;
+struct CollisionFadeTimes;
+
 namespace gl {
 class Context;
 } // namespace gl
@@ -56,6 +59,10 @@ public:
     virtual void setPlacementConfig(const PlacementConfig&) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
+
+    // TODO: Implement
+    virtual void placeLayer(const bool, CollisionIndex& , const style::Layer::Impl&) {};
+    virtual void commitPlacement(const CollisionIndex&, CollisionFadeTimes&) {};
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,

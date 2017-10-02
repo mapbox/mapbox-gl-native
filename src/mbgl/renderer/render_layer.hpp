@@ -86,6 +86,9 @@ protected:
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
 
+    // TODO: Placement needs access to the renderTiles -- figure out how best to coordinate
+    friend class LayerPlacementState;
+
     //Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
 
