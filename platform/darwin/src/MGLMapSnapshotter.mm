@@ -110,13 +110,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 - (void)startWithQueue:(dispatch_queue_t)queue completionHandler:(MGLMapSnapshotCompletionHandler)completion;
 {
     if ([self isLoading]) {
-        NSString *errorMessage = NSLocalizedStringWithDefaultValue(@"ALREADY_STARTED_SNAPSHOTTER", nil, nil, @"Already started this snapshotter", "User-friendly error description");
-        NSDictionary *userInfo = @{NSLocalizedDescriptionKey: errorMessage};
-        NSError *error = [NSError errorWithDomain:MGLErrorDomain code:1 userInfo:userInfo];
-        dispatch_async(queue, ^{
-           completion(nil, error); 
-        });
-        return;
+        [NSException raise:@"MGLAlreadyStartedSnapshotterException"
+                    format:@"Already started this snapshotter."];
     }
     
     _loading = true;
