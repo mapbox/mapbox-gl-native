@@ -4,12 +4,15 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuItem;
 
 import com.google.gson.JsonObject;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -30,6 +33,7 @@ import static com.mapbox.mapboxsdk.style.functions.stops.Stops.interval;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
 /**
  * Test activity showcasing changing the icon with a zoom function and adding selection state to a SymbolLayer.
@@ -47,6 +51,11 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private MapView mapView;
   private MapboxMap mapboxMap;
   private GeoJsonSource source;
+  private SymbolLayer layer;
+
+  private boolean isInitialPosition = true;
+  private boolean isSelected = false;
+  private boolean showingSymbolLayer = true;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -59,15 +68,15 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       @Override
       public void onMapReady(@NonNull final MapboxMap map) {
         mapboxMap = map;
-        updateSource(false);
+        updateSource();
         addLayer();
         addMapClickListener();
       }
     });
   }
 
-  private void updateSource(boolean selected) {
-    FeatureCollection featureCollection = createFeatureCollection(selected);
+  private void updateSource() {
+    FeatureCollection featureCollection = createFeatureCollection();
     if (source != null) {
       source.setGeoJson(featureCollection);
     } else {
@@ -76,17 +85,37 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     }
   }
 
-  private FeatureCollection createFeatureCollection(boolean selected) {
-    Point point = Point.fromCoordinates(Position.fromCoordinates(-74.016181, 40.701745));
+  private void toggleSymbolLayerVisibility() {
+    if(mapboxMap != null) {
+      if (showingSymbolLayer) {
+        layer.setProperties(
+                visibility(Property.NONE)
+        );
+        showingSymbolLayer = false;
+      } else {
+        layer.setProperties(
+                visibility(Property.VISIBLE)
+        );
+        showingSymbolLayer = true;
+      }
+    }
+  }
+
+  private FeatureCollection createFeatureCollection() {
+    Position position = isInitialPosition
+      ? Position.fromCoordinates(-74.01618140, 40.701745)
+      : Position.fromCoordinates(-73.988097, 40.749864);
+
+    Point point = Point.fromCoordinates(position);
     Feature feature = Feature.fromGeometry(point);
     JsonObject properties = new JsonObject();
-    properties.addProperty(KEY_PROPERTY_SELECTED, selected);
+    properties.addProperty(KEY_PROPERTY_SELECTED, isSelected);
     feature.setProperties(properties);
     return FeatureCollection.fromFeatures(new Feature[] {feature});
   }
 
   private void addLayer() {
-    SymbolLayer layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
+    layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       iconImage(
         zoom(
@@ -119,12 +148,31 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
         if (!featureList.isEmpty()) {
           Feature feature = featureList.get(0);
           boolean isSelected = feature.getBooleanProperty(KEY_PROPERTY_SELECTED);
-          updateSource(!isSelected);
+          ZoomFunctionSymbolLayerActivity.this.isSelected = !isSelected;
+          updateSource();
         } else {
           Timber.e("No features found");
         }
       }
     });
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.menu_symbols, menu);
+    return true;
+  }
+
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    if (mapboxMap != null && item.getItemId() == R.id.menu_action_change_location) {
+      isInitialPosition = !isInitialPosition;
+      updateSource();
+    }
+    if (mapboxMap != null && item.getItemId() == R.id.menu_action_toggle_source) {
+      toggleSymbolLayerVisibility();
+    }
+    return super.onOptionsItemSelected(item);
   }
 
   @Override
