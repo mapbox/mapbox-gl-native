@@ -221,6 +221,17 @@ final class Transform implements MapView.OnMapChangedListener {
     }
   }
 
+  void zoom(boolean zoomIn, @NonNull PointF focalPoint,long duration) {
+    CameraPosition cameraPosition = invalidateCameraPosition();
+    if (cameraPosition != null) {
+      int newZoom = (int) Math.round(cameraPosition.zoom + (zoomIn ? 1 : -1));
+      setZoom(newZoom, focalPoint, duration);
+    } else {
+      // we are not transforming, notify about being idle
+      cameraChangeDispatcher.onCameraIdle();
+    }
+  }
+
   void setZoom(double zoom, @NonNull PointF focalPoint) {
     setZoom(zoom, focalPoint, 0);
   }
