@@ -147,7 +147,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 #if TARGET_OS_IPHONE
                     UIImage *logoImage = [UIImage imageNamed:@"mapbox" inBundle:[NSBundle mgl_frameworkBundle] compatibleWithTraitCollection:nil];
                     
-                    UIGraphicsBeginImageContextWithOptions(mglImage.size, NO, [UIScreen mainScreen].scale);
+                    UIGraphicsBeginImageContextWithOptions(mglImage.size, NO, self.options.scale);
                     
                     [mglImage drawInRect:CGRectMake(0, 0, mglImage.size.width, mglImage.size.height)];
                     [logoImage drawInRect:CGRectMake(MGLLogoImagePosition.x, mglImage.size.height - (MGLLogoImagePosition.y + logoImage.size.height), logoImage.size.width,logoImage.size.height)];
