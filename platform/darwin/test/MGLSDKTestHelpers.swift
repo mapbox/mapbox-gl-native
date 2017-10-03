@@ -25,7 +25,8 @@ extension MGLSDKTestHelpers {
         let methodDescriptionList: UnsafeMutablePointer<objc_method_description>! = protocol_copyMethodDescriptionList(p, false, true, &methodCount)
         for i in 0..<Int(methodCount) {
             let description: objc_method_description = methodDescriptionList[i]
-            methods.insert(description.name.description)
+            XCTAssertNotNil(description.name?.description)
+            methods.insert(description.name!.description)
         }
         free(methodDescriptionList)
         return methods
