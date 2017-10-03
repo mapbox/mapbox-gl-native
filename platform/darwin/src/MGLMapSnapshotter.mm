@@ -74,10 +74,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         
         // Size; taking into account the minimum texture size for OpenGL ES
         // For non retina screens the ratio is 1:1 MGLSnapshotterMinimumPixelSize
-        
         mbgl::Size size = {
-            static_cast<uint32_t>(MAX(options.size.width, MGLSnapshotterMinimumPixelSize/options.scale)),
-            static_cast<uint32_t>(MAX(options.size.height, MGLSnapshotterMinimumPixelSize/options.scale))
+            static_cast<uint32_t>(MAX(options.size.width, MGLSnapshotterMinimumPixelSize)),
+            static_cast<uint32_t>(MAX(options.size.height, MGLSnapshotterMinimumPixelSize))
         };
         
         float pixelRatio = MAX(options.scale, 1);

@@ -56,9 +56,8 @@ MGL_EXPORT
 #pragma mark - Configuring the Image
 
 /**
- The size of the output image.
+ The size of the output image, measured in points.
  
- The image may be no less than 64 pixels wide and no less than 64 pixels tall.
  */
 @property (nonatomic, readonly) CGSize size;
 
