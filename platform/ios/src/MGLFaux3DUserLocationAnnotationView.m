@@ -10,7 +10,7 @@ const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
-const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
+const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.5;
 
 const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
@@ -180,6 +180,10 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
         _puckArrow.shouldRasterize = YES;
         _puckArrow.rasterizationScale = [UIScreen mainScreen].scale;
         _puckArrow.drawsAsynchronously = YES;
+
+        _puckArrow.lineJoin = @"round";
+        _puckArrow.lineWidth = 1.f;
+        _puckArrow.strokeColor = _puckArrow.fillColor;
 
         [self.layer addSublayer:_puckArrow];
     }
