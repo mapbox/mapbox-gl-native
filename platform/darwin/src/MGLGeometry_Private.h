@@ -138,3 +138,5 @@ NS_INLINE MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGL
                                                          cos(distance) - sin(coordinate.latitude) * sin(otherLatitude));
     return MGLRadianCoordinate2DMake(otherLatitude, otherLongitude);
 }
+
+CGPoint MGLPointRounded(CGPoint point);

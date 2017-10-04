@@ -3379,7 +3379,7 @@ public:
                 {
                     annotationViewsForAnnotation[annotationValue] = annotationView;
                     annotationView.annotation = annotation;
-                    annotationView.center = [self convertCoordinate:annotation.coordinate toPointToView:self];
+                    annotationView.center = MGLPointRounded([self convertCoordinate:annotation.coordinate toPointToView:self]);
                     [newAnnotationViews addObject:annotationView];
 
                     MGLAnnotationImage *annotationImage = self.invisibleAnnotationImage;
@@ -3805,7 +3805,7 @@ public:
                         return true;
                     }
 
-                    CGPoint calloutAnchorPoint = [self convertCoordinate:annotation.coordinate toPointToView:self];
+                    CGPoint calloutAnchorPoint = MGLPointRounded([self convertCoordinate:annotation.coordinate toPointToView:self]);
                     CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -CGRectGetWidth(annotationView.frame) / 2, -CGRectGetHeight(annotationView.frame) / 2);
                     annotationRect = UIEdgeInsetsInsetRect(frame, annotationView.alignmentRectInsets);
                 }
@@ -4143,7 +4143,7 @@ public:
 /// image centered at the given coordinate.
 - (CGRect)frameOfImage:(UIImage *)image centeredAtCoordinate:(CLLocationCoordinate2D)coordinate
 {
-    CGPoint calloutAnchorPoint = [self convertCoordinate:coordinate toPointToView:self];
+    CGPoint calloutAnchorPoint = MGLPointRounded([self convertCoordinate:coordinate toPointToView:self]);
     CGRect frame = CGRectInset({ calloutAnchorPoint, CGSizeZero }, -image.size.width / 2, -image.size.height / 2);
     return UIEdgeInsetsInsetRect(frame, image.alignmentRectInsets);
 }
@@ -4582,7 +4582,6 @@ public:
     if (_showsUserHeadingIndicator)
     {
         self.showsUserLocation = YES;
-
     }
     [self validateUserHeadingUpdating];
 }
@@ -5288,7 +5287,7 @@ public:
 
         if (annotationView)
         {
-            annotationView.center = [self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self];
+            annotationView.center = MGLPointRounded([self convertCoordinate:annotationContext.annotation.coordinate toPointToView:self]);
         }
     }
 
@@ -5406,7 +5405,7 @@ public:
     }
     else
     {
-        userPoint = [self convertCoordinate:self.userLocation.coordinate toPointToView:self];
+        userPoint = MGLPointRounded([self convertCoordinate:self.userLocation.coordinate toPointToView:self]);
     }
 
     if ( ! annotationView.superview)
