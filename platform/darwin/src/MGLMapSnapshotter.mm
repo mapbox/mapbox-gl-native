@@ -133,6 +133,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                 MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image) scale:self.options.scale];
 #else
                 MGLImage *mglImage = [[MGLImage alloc] initWithMGLPremultipliedImage:std::move(image)];
+                mglImage.size = NSMakeSize(mglImage.size.width / self.options.scale,
+                                           mglImage.size.height / self.options.scale);
 #endif
                 
                 // Process image watermark in a work queue
