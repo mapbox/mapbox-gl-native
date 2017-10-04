@@ -89,6 +89,26 @@ typedef void (^MGLMapSnapshotCompletionHandler)(NSImage* _Nullable snapshot, NSE
 
 /**
  An immutable utility object for capturing map-based images.
+ 
+ ### Example
+ 
+ ```swift
+ var camera = MGLMapCamera()
+ camera.centerCoordinate = CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365)
+ camera.pitch = 20
+ 
+ var options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+ options.zoomLevel = 10
+ 
+ var snapshotter = MGLMapSnapshotter(options: options)
+ snapshotter.start { (image, error) in
+   if error {
+     // error handler
+   } else {
+     // image handler
+   }
+ }
+ ```
  */
 MGL_EXPORT
 @interface MGLMapSnapshotter : NSObject
