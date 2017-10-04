@@ -18,27 +18,27 @@
 
 @implementation MBXSnapshotsViewController {
     // Top row
-    MGLMapSnapshotter* snapshotterTL;
-    MGLMapSnapshotter* snapshotterTM;
-    MGLMapSnapshotter* snapshotterTR;
+    MGLMapSnapshotter* topLeftSnapshotter;
+    MGLMapSnapshotter* topCenterSnapshotter;
+    MGLMapSnapshotter* topRightSnapshotter;
     
     // Bottom row
-    MGLMapSnapshotter* snapshotterBL;
-    MGLMapSnapshotter* snapshotterBM;
-    MGLMapSnapshotter* snapshotterBR;
+    MGLMapSnapshotter* bottomLeftSnapshotter;
+    MGLMapSnapshotter* bottomCenterSnapshotter;
+    MGLMapSnapshotter* bottomRightSnapshotter;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
 
     // Start snapshotters
-    snapshotterTL = [self startSnapshotterForImageView:_snapshotImageViewTL coordinates:CLLocationCoordinate2DMake(37.7184, -122.4365)];
-    snapshotterTM = [self startSnapshotterForImageView:_snapshotImageViewTM coordinates:CLLocationCoordinate2DMake(38.8936, -77.0146)];
-    snapshotterTR = [self startSnapshotterForImageView:_snapshotImageViewTR coordinates:CLLocationCoordinate2DMake(-13.1356, -74.2442)];
+    topLeftSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewTL coordinates:CLLocationCoordinate2DMake(37.7184, -122.4365)];
+    topCenterSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewTM coordinates:CLLocationCoordinate2DMake(38.8936, -77.0146)];
+    topRightSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewTR coordinates:CLLocationCoordinate2DMake(-13.1356, -74.2442)];
 
-    snapshotterBL = [self startSnapshotterForImageView:_snapshotImageViewBL coordinates:CLLocationCoordinate2DMake(52.5072, 13.4247)];
-    snapshotterBM = [self startSnapshotterForImageView:_snapshotImageViewBM coordinates:CLLocationCoordinate2DMake(60.2118, 24.6754)];
-    snapshotterBR = [self startSnapshotterForImageView:_snapshotImageViewBR coordinates:CLLocationCoordinate2DMake(31.2780, 121.4286)];
+    bottomLeftSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewBL coordinates:CLLocationCoordinate2DMake(52.5072, 13.4247)];
+    bottomCenterSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewBM coordinates:CLLocationCoordinate2DMake(60.2118, 24.6754)];
+    bottomRightSnapshotter = [self startSnapshotterForImageView:_snapshotImageViewBR coordinates:CLLocationCoordinate2DMake(31.2780, 121.4286)];
 }
 
 - (MGLMapSnapshotter*) startSnapshotterForImageView:(UIImageView*) imageView coordinates:(CLLocationCoordinate2D) coordinates  {
@@ -46,8 +46,8 @@
     MGLMapCamera* mapCamera = [[MGLMapCamera alloc] init];
     mapCamera.pitch = 20;
     mapCamera.centerCoordinate = coordinates;
-    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:[NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"] camera:mapCamera size:CGSizeMake(imageView.frame.size.width, imageView.frame.size.height)];
-    options.zoom = 10;
+    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:[MGLStyle satelliteStreetsStyleURL] camera:mapCamera size:CGSizeMake(imageView.frame.size.width, imageView.frame.size.height)];
+    options.zoomLevel = 10;
     
     // Create and start the snapshotter
     MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];

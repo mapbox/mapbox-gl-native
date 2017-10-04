@@ -22,14 +22,14 @@
     return self;
 }
 
-- (nullable instancetype)initWithMGLPremultipliedImage:(const mbgl::PremultipliedImage&&)mbglImage
+- (nullable instancetype)initWithMGLPremultipliedImage:(const mbgl::PremultipliedImage&&)mbglImage scale:(CGFloat)scale
 {
     CGImageRef image = CGImageFromMGLPremultipliedImage(mbglImage.clone());
     if (!image) {
         return nil;
     }
 
-    self = [self initWithCGImage:image scale:1.0 orientation:UIImageOrientationUp];
+    self = [self initWithCGImage:image scale:scale orientation:UIImageOrientationUp];
     
     CGImageRelease(image);
     return self;
