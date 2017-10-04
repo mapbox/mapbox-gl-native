@@ -467,6 +467,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/check_max_angle.hpp
     src/mbgl/text/collision_feature.cpp
     src/mbgl/text/collision_feature.hpp
+    src/mbgl/text/collision_index.cpp
+    src/mbgl/text/collision_index.hpp
     src/mbgl/text/collision_tile.cpp
     src/mbgl/text/collision_tile.hpp
     src/mbgl/text/cross_tile_symbol_index.cpp
