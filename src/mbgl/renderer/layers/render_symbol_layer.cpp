@@ -104,6 +104,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 std::move(uniformValues),
                 *buffers.vertexBuffer,
                 *buffers.dynamicVertexBuffer,
+                *buffers.opacityVertexBuffer,
                 *symbolSizeBinder,
                 *buffers.indexBuffer,
                 buffers.segments,

@@ -75,15 +75,21 @@ struct SymbolLayoutAttributes : gl::Attributes<
 };
 
 struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_pos> {
-    static Vertex vertex(Point<float> anchorPoint, float labelAngle, float labelminzoom) {
+    static Vertex vertex(Point<float> anchorPoint, float labelAngle) {
         return Vertex {
             {{
                  anchorPoint.x,
                  anchorPoint.y,
-                 static_cast<float>(mbgl::attributes::packUint8Pair(
-                         static_cast<uint8_t>(std::fmod(labelAngle + 2 * M_PI, 2 * M_PI) / (2 * M_PI) * 255),
-                         static_cast<uint8_t>(labelminzoom * 10)))
+                 labelAngle
              }}
+        };
+    }
+};
+
+struct SymbolOpacityAttributes : gl::Attributes<attributes::a_fade_opacity> {
+    static Vertex vertex(float targetOpacity, float opacity) {
+        return Vertex {
+            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(targetOpacity == 1.0 ? 1 : 0)) }}
         };
     }
 };
@@ -276,7 +282,7 @@ public:
     using LayoutAttributes = LayoutAttrs;
     using LayoutVertex = typename LayoutAttributes::Vertex;
     
-    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, SymbolDynamicLayoutAttributes>;
+    using LayoutAndSizeAttributes = gl::ConcatenateAttributes<LayoutAttributes, gl::ConcatenateAttributes<SymbolDynamicLayoutAttributes, SymbolOpacityAttributes>>;
 
     using PaintProperties = PaintProps;
     using PaintPropertyBinders = typename PaintProperties::Binders;
@@ -310,6 +316,7 @@ public:
               const UniformValues& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
+              const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
               const SymbolSizeBinder& symbolSizeBinder,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
@@ -323,6 +330,7 @@ public:
 
         typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
             .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
+            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
         for (auto& segment : segments) {
@@ -359,9 +367,8 @@ class SymbolIconProgram : public SymbolProgram<
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_texture,
-        uniforms::u_fadetexture,
+        uniforms::u_fade_change,
         uniforms::u_is_text,
-        uniforms::u_collision_y_stretch,
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
@@ -399,9 +406,8 @@ class SymbolSDFProgram : public SymbolProgram<
         uniforms::u_extrude_scale,
         uniforms::u_texsize,
         uniforms::u_texture,
-        uniforms::u_fadetexture,
+        uniforms::u_fade_change,
         uniforms::u_is_text,
-        uniforms::u_collision_y_stretch,
         uniforms::u_camera_to_center_distance,
         uniforms::u_pitch,
         uniforms::u_pitch_with_map,
@@ -423,9 +429,8 @@ public:
             uniforms::u_extrude_scale,
             uniforms::u_texsize,
             uniforms::u_texture,
-            uniforms::u_fadetexture,
+            uniforms::u_fade_change,
             uniforms::u_is_text,
-            uniforms::u_collision_y_stretch,
             uniforms::u_camera_to_center_distance,
             uniforms::u_pitch,
             uniforms::u_pitch_with_map,            

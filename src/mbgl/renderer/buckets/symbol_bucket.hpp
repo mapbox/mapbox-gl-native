@@ -70,12 +70,14 @@ public:
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
+        gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolTextAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<SymbolOpacityAttributes::Vertex>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
     
@@ -84,6 +86,7 @@ public:
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
+        gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolIconAttributes> segments;
         std::vector<PlacedSymbol> placedSymbols;
@@ -91,6 +94,7 @@ public:
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<SymbolOpacityAttributes::Vertex>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
