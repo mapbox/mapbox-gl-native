@@ -121,9 +121,9 @@ namespace mbgl {
         return inPaddedViewport;
     }
 
-    void addDynamicAttributes(const Point<float>& anchorPoint, const float angle, const float placementZoom,
+    void addDynamicAttributes(const Point<float>& anchorPoint, const float angle,
             gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
-        auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, angle, placementZoom);
+        auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(anchorPoint, angle);
         dynamicVertexArray.emplace_back(dynamicVertex);
         dynamicVertexArray.emplace_back(dynamicVertex);
         dynamicVertexArray.emplace_back(dynamicVertex);
@@ -133,7 +133,7 @@ namespace mbgl {
     void hideGlyphs(size_t numGlyphs, gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray) {
         const Point<float> offscreenPoint = { -INFINITY, -INFINITY };
         for (size_t i = 0; i < numGlyphs; i++) {
-            addDynamicAttributes(offscreenPoint, 0, 25, dynamicVertexArray);
+            addDynamicAttributes(offscreenPoint, 0, dynamicVertexArray);
         }
     }
 
@@ -339,7 +339,7 @@ namespace mbgl {
         }
 
         for (auto& placedGlyph : placedGlyphs) {
-            addDynamicAttributes(placedGlyph.point, placedGlyph.angle, symbol.placementZoom, dynamicVertexArray);
+            addDynamicAttributes(placedGlyph.point, placedGlyph.angle, dynamicVertexArray);
         }
         
         return PlacementResult::OK;
