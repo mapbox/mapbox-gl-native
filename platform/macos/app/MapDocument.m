@@ -162,50 +162,49 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)takeSnapshot:(id)sender {
     MGLMapCamera *camera = self.mapView.camera;
     
-    MGLMapSnapshotOptions* options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:self.mapView.styleURL camera:camera size:self.mapView.bounds.size];
-    options.zoom = self.mapView.zoomLevel;
+    MGLMapSnapshotOptions *options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:self.mapView.styleURL camera:camera size:self.mapView.bounds.size];
+    options.zoomLevel = self.mapView.zoomLevel;
     
     // Create and start the snapshotter
     snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
-    [snapshotter startWithCompletionHandler: ^(NSImage *image, NSError *error) {
+    [snapshotter startWithCompletionHandler:^(NSImage *image, NSError *error) {
         if (error) {
-            NSLog(@"Could not load snapshot: %@", [error localizedDescription]);
+            NSLog(@"Could not load snapshot: %@", error.localizedDescription);
         } else {
-            NSWindow* window = [[[self windowControllers] objectAtIndex:0] window];
-    
-            NSString* newName = [[@"snapshot" stringByDeletingPathExtension] stringByAppendingPathExtension:@"png"];
-            
             // Set the default name for the file and show the panel.
-            NSSavePanel* panel = [NSSavePanel savePanel];
-            [panel setNameFieldStringValue:newName];
-            [panel beginSheetModalForWindow:window completionHandler:^(NSInteger result){
+            NSSavePanel *panel = [NSSavePanel savePanel];
+            panel.nameFieldStringValue = [self.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
+            panel.allowedFileTypes = [@[(NSString *)kUTTypePNG] arrayByAddingObjectsFromArray:[NSBitmapImageRep imageUnfilteredTypes]];
+            
+            [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
                 if (result == NSFileHandlingPanelOKButton) {
                     // Write the contents in the new format.
-                    NSURL*  fileURL = [panel URL];
+                    NSURL *fileURL = panel.URL;
                     
-                    NSBitmapImageRep *bitmapRep = nil;
-                    for (NSImageRep *imageRep in [image representations]) {
-                        if ([imageRep isKindOfClass:[NSBitmapImageRep class]]){
+                    NSBitmapImageRep *bitmapRep;
+                    for (NSImageRep *imageRep in image.representations) {
+                        if ([imageRep isKindOfClass:[NSBitmapImageRep class]]) {
                             bitmapRep = (NSBitmapImageRep *)imageRep;
                             break; // stop on first bitmap rep we find
                         }
                     }
                     
                     if (!bitmapRep) {
-                        bitmapRep = [NSBitmapImageRep imageRepWithData:[image TIFFRepresentation]];
-                        
+                        bitmapRep = [NSBitmapImageRep imageRepWithData:image.TIFFRepresentation];
                     }
                     
-                    NSString *extension = [[fileURL pathExtension] lowercaseString];
-                    NSBitmapImageFileType fileType;
-                    if ([extension isEqualToString:@"png"]) {
+                    CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileURL.pathExtension, NULL /* inConformingToUTI */);
+                    NSBitmapImageFileType fileType = NSTIFFFileType;
+                    if (UTTypeConformsTo(uti, kUTTypePNG)) {
                         fileType = NSPNGFileType;
-                    } else if ([extension isEqualToString:@"gif"]) {
-                        fileType =  NSGIFFileType;
-                    } else if ([extension isEqualToString:@"jpg"] || [extension isEqualToString:@"jpeg"]) {
-                        fileType =  NSJPEGFileType;
-                    } else {
-                        fileType =  NSTIFFFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeGIF)) {
+                        fileType = NSGIFFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeJPEG2000)) {
+                        fileType = NSJPEG2000FileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeJPEG)) {
+                        fileType = NSJPEGFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeBMP)) {
+                        fileType = NSBitmapImageFileTypeBMP;
                     }
                     
                     NSData *imageData = [bitmapRep representationUsingType:fileType properties:@{}];
