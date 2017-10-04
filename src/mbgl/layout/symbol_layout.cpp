@@ -478,7 +478,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
 
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
-                        bucket->text, sizeData, symbol, placementZoom,
+                        bucket->text, sizeData, symbol,
                         keepUpright, textPlacement, symbolInstance.anchor, bucket->text.placedSymbols.back());
                 }
             }
@@ -492,7 +492,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, placementZoom, false, symbolInstance.line);
                 addSymbol(
-                    bucket->icon, sizeData, *symbolInstance.iconQuad, placementZoom,
+                    bucket->icon, sizeData, *symbolInstance.iconQuad,
                     keepUpright, iconPlacement, symbolInstance.anchor, bucket->icon.placedSymbols.back());
             }
         }
@@ -514,7 +514,6 @@ template <typename Buffer>
 void SymbolLayout::addSymbol(Buffer& buffer,
                              const Range<float> sizeData,
                              const SymbolQuad& symbol,
-                             const float placementZoom,
                              const bool keepUpright,
                              const style::SymbolPlacementType placement,
                              const Anchor& labelAnchor,
@@ -548,11 +547,17 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData));
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData));
     
-    auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(labelAnchor.point, 0, placementZoom);
+    auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(labelAnchor.point, 0);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
+    
+    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0); // TODO
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
 
     // add the two triangles, referencing the four coordinates we just inserted.
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);
