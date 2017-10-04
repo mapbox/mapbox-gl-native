@@ -70,6 +70,8 @@ public:
     void addLayer(std::unique_ptr<Layer>, const optional<std::string>& beforeLayerID = {});
     std::unique_ptr<Layer> removeLayer(const std::string& layerID);
 
+    bool isLoaded() const;
+
     // Private implementation
     class Impl;
     const std::unique_ptr<Impl> impl;
