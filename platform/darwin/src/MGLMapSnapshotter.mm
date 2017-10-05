@@ -14,6 +14,11 @@
 #import "MGLGeometry_Private.h"
 #import "NSBundle+MGLAdditions.h"
 #import "MGLStyle.h"
+#import "MGLStyle_Private.h"
+#import "MGLAttributionButton.h"
+#import "MGLAttributionInfo.h"
+
+#import <QuartzCore/QuartzCore.h>
 
 #if TARGET_OS_IPHONE
 #import "UIImage+MGLAdditions.h"
@@ -178,6 +183,105 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
         });
         _mbglMapSnapshotter->snapshot(_snapshotCallback->self());
     });
+}
+
+- (NSView *)attributionView
+{
+    NSView *attributionView = [[NSView alloc] initWithFrame:NSZeroRect];
+    attributionView.wantsLayer = YES;
+    
+    // Make the background and foreground translucent to be unobtrusive.
+    attributionView.layer.opacity = 0.6;
+    
+    // Blur the background to prevent text underneath the view from running into
+    // the text in the view, rendering it illegible.
+    CIFilter *attributionBlurFilter = [CIFilter filterWithName:@"CIGaussianBlur"];
+    [attributionBlurFilter setDefaults];
+    
+    // Brighten the background. This is similar to applying a translucent white
+    // background on the view, but the effect is a bit more subtle and works
+    // well with the blur above.
+    CIFilter *attributionColorFilter = [CIFilter filterWithName:@"CIColorControls"];
+    [attributionColorFilter setDefaults];
+    [attributionColorFilter setValue:@(0.1) forKey:kCIInputBrightnessKey];
+    
+    // Apply the background effects and a standard button corner radius.
+    attributionView.backgroundFilters = @[attributionColorFilter, attributionBlurFilter];
+    attributionView.layer.cornerRadius = 4;
+    
+    attributionView.translatesAutoresizingMaskIntoConstraints = NO;
+    
+    [self updateAttributionView:attributionView];
+    
+    return attributionView;
+}
+
+- (void)updateAttributionView:(NSView *)view
+{
+    NSView *attributionView = self.attributionView;
+    for (NSView *button in attributionView.subviews) {
+        [button removeConstraints:button.constraints];
+    }
+    attributionView.subviews = @[];
+    [attributionView removeConstraints:attributionView.constraints];
+    
+    // Make the whole string mini by default.
+    // Force links to be black, because the default blue is distracting.
+    CGFloat miniSize = [NSFont systemFontSizeForControlSize:NSMiniControlSize];
+    NSArray *attributionInfos = [self.style attributionInfosWithFontSize:miniSize linkColor:[NSColor blackColor]];
+    for (MGLAttributionInfo *info in attributionInfos) {
+        // Feedback links are added to the Help menu.
+        if (info.feedbackLink) {
+            continue;
+        }
+        
+        // For each attribution, add a borderless button that responds to clicks
+        // and feels like a hyperlink.
+        NSButton *button = [[MGLAttributionButton alloc] initWithAttributionInfo:info];
+        button.controlSize = NSMiniControlSize;
+        button.translatesAutoresizingMaskIntoConstraints = NO;
+        
+        // Set the new button flush with the buttom of the container and to the
+        // right of the previous button, with standard spacing. If there is no
+        // previous button, align to the container instead.
+        NSView *previousView = attributionView.subviews.lastObject;
+        [attributionView addSubview:button];
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:button
+                                      attribute:NSLayoutAttributeBottom
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:attributionView
+                                      attribute:NSLayoutAttributeBottom
+                                     multiplier:1
+                                       constant:0]];
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:button
+                                      attribute:NSLayoutAttributeLeading
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:previousView ? previousView : attributionView
+                                      attribute:previousView ? NSLayoutAttributeTrailing : NSLayoutAttributeLeading
+                                     multiplier:1
+                                       constant:8]];
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:button
+                                      attribute:NSLayoutAttributeTop
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:attributionView
+                                      attribute:NSLayoutAttributeTop
+                                     multiplier:1
+                                       constant:0]];
+    }
+    
+    if (attributionInfos.count) {
+        [attributionView addConstraint:
+         [NSLayoutConstraint constraintWithItem:attributionView
+                                      attribute:NSLayoutAttributeTrailing
+                                      relatedBy:NSLayoutRelationEqual
+                                         toItem:attributionView.subviews.lastObject
+                                      attribute:NSLayoutAttributeTrailing
+                                     multiplier:1
+                                       constant:8]];
+    }
 }
 
 - (void)cancel;
