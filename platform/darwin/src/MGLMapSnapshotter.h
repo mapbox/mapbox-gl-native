@@ -46,7 +46,7 @@ MGL_EXPORT
 @property (nonatomic) MGLMapCamera *camera;
 
 /**
- The cooordinate rectangle that encompasses the bounds to capture.
+ The coordinate rectangle that encompasses the bounds to capture.
  
  If this property is non-empty and the camera property is non-nil, the camera’s
  center coordinate and altitude are ignored in favor of this property’s value.
@@ -137,6 +137,44 @@ MGL_EXPORT
  snapshot, create a new `MGLMapSnapshotter` object.
  */
 - (void)cancel;
+
+/**
+ The zoom level.
+ 
+ The default zoom level is 0. This overwrites the camera zoom level if set.
+ */
+@property (nonatomic) double zoomLevel;
+
+/**
+ A camera representing the viewport visible in the snapshot.
+ 
+ If this property is non-nil and the `coordinateBounds` property is set to a non-empty
+ coordinate bounds, the camera’s center coordinate and altitude are ignored in favor
+ of the `coordinateBounds` property.
+ */
+@property (nonatomic) MGLMapCamera *camera;
+
+/**
+ The coordinate rectangle that encompasses the bounds to capture.
+ 
+ If this property is non-empty and the camera property is non-nil, the camera’s
+ center coordinate and altitude are ignored in favor of this property’s value.
+ */
+@property (nonatomic) MGLCoordinateBounds coordinateBounds;
+
+/**
+ URL of the map style to snapshot.
+ 
+ The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
+ map ID (`mapbox://styles/{user}/{style`}), or a path to a local file relative
+ to the application’s resource path. Specify `nil` for the default style.
+ */
+@property (nonatomic) NSURL* styleURL;
+
+/**
+ The size of the output image, measured in points.
+ */
+@property (nonatomic) CGSize size;
 
 /**
  Indicates whether as snapshot is currently being generated.
