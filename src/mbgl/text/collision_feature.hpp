@@ -11,10 +11,8 @@ namespace mbgl {
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
-
-    float adjustedMaxScale(const std::array<float, 4>& rotationMatrix, const float yStretch) const;
+    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _tileUnitDistanceToAnchor = 0) :
+        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), tileUnitDistanceToAnchor(_tileUnitDistanceToAnchor) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
@@ -28,12 +26,24 @@ public:
     float x2;
     float y2;
 
-    // the box is only valid for scales < maxScale.
-    // The box does not block other boxes at scales >= maxScale;
-    float maxScale;
+    // TODO Where's the right place to store the projected bounding box?
+    float px1;
+    float py1;
+    float px2;
+    float py2;
+    // Placeholder for center of circles (can be derived from bounding box)
+    float px;
+    float py;
+    bool used;
 
-    // the scale at which the label can first be shown
-    float placementScale = 0.0f;
+    float tileUnitDistanceToAnchor;
+
+    
+    // TODO Placeholders for old collision tiles
+    float maxScale;
+    float placementScale;
+    float adjustedMaxScale(const std::array<float, 4>& , const float) const { return 1; }
+
 };
 
 class CollisionFeature {
@@ -77,6 +87,7 @@ public:
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
+    bool alongLine;
 
 private:
     void bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
