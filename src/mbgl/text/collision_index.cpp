@@ -1,12 +1,14 @@
 #include <mbgl/text/collision_index.hpp>
+#include <mbgl/layout/symbol_instance.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/util/intersection_tests.hpp>
-
 #include <mbgl/layout/symbol_projection.hpp>
+
+#include <mbgl/renderer/buckets/symbol_bucket.hpp> // For PlacedSymbol: pull out to another location
 
 #include <mapbox/geometry/envelope.hpp>
 #include <mapbox/geometry/multi_point.hpp>
@@ -47,40 +49,162 @@ float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, 
         (incidenceStretch - 1) * lastSegmentTile * std::abs(std::sin(lastSegmentAngle));
 }
 
-Box CollisionIndex::getTreeBox(const CollisionBox& box, const mat4& posMatrix, const float textPixelRatio) const {
-    const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
-    const float tileToViewport = textPixelRatio * projectedPoint.second;
-    const float tlX = box.x1 / tileToViewport + projectedPoint.first.x;
-    const float tlY = box.y1 / tileToViewport + projectedPoint.first.y;
-    const float brX = box.x2 / tileToViewport + projectedPoint.first.x;
-    const float brY = box.y2 / tileToViewport + projectedPoint.first.y;
-
+Box CollisionIndex::getTreeBox(const CollisionBox& box) const {
     return Box{
-        CollisionPoint{ tlX, tlY },
-        CollisionPoint{ brX, brY }
+        CollisionPoint{ box.px1, box.py1 },
+        CollisionPoint{ box.px2, box.py2 }
     };
 }
 
-// TODO: add circle support
-bool CollisionIndex::placeFeature(const CollisionFeature& feature, bool allowOverlap, const mat4& posMatrix, const float textPixelRatio) {
-    for (auto& box : feature.boxes) {
-        const auto projectedBox = getTreeBox(box, posMatrix, textPixelRatio);
+bool CollisionIndex::placeFeature(CollisionFeature& feature,
+                                      const mat4& posMatrix,
+                                      const mat4& labelPlaneMatrix,
+                                      const float textPixelRatio,
+                                      PlacedSymbol& symbol,
+                                      const float scale,
+                                      const float fontSize,
+                                      const bool allowOverlap,
+                                      const bool pitchWithMap,
+                                      const bool collisionDebug) {
+    if (!feature.alongLine) {
+        CollisionBox& box = feature.boxes.front();
+        const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
+        const float tileToViewport = textPixelRatio * projectedPoint.second;
+        box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
+        box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
+        box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
+        box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
+    
+        if (!allowOverlap) {
+            if (tree.qbegin(bgi::intersects(getTreeBox(box))) != tree.qend()) {
+                return false;
+            }
+        }
+
+        return true;
+    } else {
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug);
+    }
+}
+
+bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
+                                      const mat4& posMatrix,
+                                      const mat4& labelPlaneMatrix,
+                                      const float textPixelRatio,
+                                      PlacedSymbol& symbol,
+                                      const float scale,
+                                      const float fontSize,
+                                      const bool allowOverlap,
+                                      const bool pitchWithMap,
+                                      const bool collisionDebug) {
+
+    const auto tileUnitAnchorPoint = symbol.anchorPoint;
+    const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
+
+    const float fontScale = fontSize / 24;
+    const float lineOffsetX = symbol.lineOffset[0] * fontSize;
+    const float lineOffsetY = symbol.lineOffset[1] * fontSize;
+
+    const auto labelPlaneAnchorPoint = project(tileUnitAnchorPoint, labelPlaneMatrix).first;
+
+    const auto firstAndLastGlyph = placeFirstAndLastGlyph(
+        fontScale,
+        lineOffsetX,
+        lineOffsetY,
+        /*flip*/ false,
+        labelPlaneAnchorPoint,
+        tileUnitAnchorPoint,
+        symbol,
+        labelPlaneMatrix,
+        /*return tile distance*/ true);
+
+    bool collisionDetected = false;
+
+    const auto tileToViewport = projectedAnchor.first * textPixelRatio;
+    // equivalent to pixel_to_tile_units
+    const auto pixelsToTileUnits = tileToViewport / scale;
+
+    float firstTileDistance = 0, lastTileDistance = 0;
+    if (firstAndLastGlyph) {
+        firstTileDistance = approximateTileDistance(*(firstAndLastGlyph->first.tileDistance), firstAndLastGlyph->first.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);
+        lastTileDistance = approximateTileDistance(*(firstAndLastGlyph->second.tileDistance), firstAndLastGlyph->second.angle, pixelsToTileUnits, projectedAnchor.second, pitchWithMap);
+    }
+
+    bool atLeastOneCirclePlaced = false;
+    for (size_t i = 0; i < feature.boxes.size(); i++) {
+        CollisionBox& circle = feature.boxes[i];
+        const float boxDistanceToAnchor = circle.tileUnitDistanceToAnchor;
+        if (!firstAndLastGlyph ||
+            (boxDistanceToAnchor < -firstTileDistance) ||
+            (boxDistanceToAnchor > lastTileDistance)) {
+            // The label either doesn't fit on its line or we
+            // don't need to use this circle because the label
+            // doesn't extend this far. Either way, mark the circle unused.
+            circle.used = false;
+            continue;
+        }
+
+        const auto projectedPoint = projectPoint(posMatrix, circle.anchor);
+        const float tileUnitRadius = (circle.x2 - circle.x1) / 2;
+        const float radius = tileUnitRadius / tileToViewport;
+
+        if (atLeastOneCirclePlaced) {
+            const CollisionBox& previousCircle = feature.boxes[i - 1];
+            const float dx = projectedPoint.x - previousCircle.px;
+            const float dy = projectedPoint.y - previousCircle.py;
+            // The circle edges touch when the distance between their centers is 2x the radius
+            // When the distance is 1x the radius, they're doubled up, and we could remove
+            // every other circle while keeping them all in touch.
+            // We actually start removing circles when the distance is √2x the radius:
+            //  thinning the number of circles as much as possible is a major performance win,
+            //  and the small gaps introduced don't make a very noticeable difference.
+            const bool placedTooDensely = radius * radius * 2 > dx * dx + dy * dy;
+            if (placedTooDensely) {
+                const bool atLeastOneMoreCircle = (i + 1) < feature.boxes.size();
+                if (atLeastOneMoreCircle) {
+                    const CollisionBox& nextCircle = feature.boxes[i + 1];
+                    const float nextBoxDistanceToAnchor = nextCircle.tileUnitDistanceToAnchor;
+                    if ((nextBoxDistanceToAnchor > -firstTileDistance) &&
+                    (nextBoxDistanceToAnchor < lastTileDistance)) {
+                        // Hide significantly overlapping circles, unless this is the last one we can
+                        // use, in which case we want to keep it in place even if it's tightly packed
+                        // with the one before it.
+                        circle.used = false;
+                        continue;
+                    }
+                }
+            }
+        }
+
+        atLeastOneCirclePlaced = true;
+        circle.px1 = projectedPoint.x - radius;
+        circle.px2 = projectedPoint.x + radius;
+        circle.py1 = projectedPoint.y - radius;
+        circle.py2 = projectedPoint.y + radius;
+        
+        circle.used = true;
 
         if (!allowOverlap) {
-            for (auto it = tree.qbegin(bgi::intersects(projectedBox)); it != tree.qend(); ++it) {
-                return false;
+            if (tree.qbegin(bgi::intersects(getTreeBox(circle))) != tree.qend()) {
+                if (!collisionDebug) {
+                    return false;
+                } else {
+                    // Don't early exit if we're showing the debug circles because we still want to calculate
+                    // which circles are in use
+                    collisionDetected = true;
+                }
             }
         }
     }
 
-    return true;
+    return collisionDetected;
 }
 
-// TODO: don't duplicate projection that just happened in placeFeature
-void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement, const mat4& posMatrix, const float textPixelRatio) {
+
+void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement) {
     std::vector<CollisionTreeBox> treeBoxes;
     for (auto& box : feature.boxes) {
-        treeBoxes.emplace_back(getTreeBox(box, posMatrix, textPixelRatio), box, feature.indexedFeature);
+        treeBoxes.emplace_back(getTreeBox(box), box, feature.indexedFeature);
     }
     
     if (ignorePlacement) {
@@ -145,6 +269,15 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     queryTree(ignoredTree);
 
     return result;
+}
+
+std::pair<float,float> CollisionIndex::projectAnchor(const mat4& posMatrix, const Point<float>& point) const {
+    vec4 p = {{ point.x, point.y, 0, 1 }};
+    matrix::transformMat4(p, p, posMatrix);
+    return std::make_pair(
+        0.5 + 0.5 * (p[3] / transformState.getCameraToCenterDistance()),
+        p[3]
+    );
 }
 
 std::pair<Point<float>,float> CollisionIndex::projectAndGetPerspectiveRatio(const mat4& posMatrix, const Point<float>& point) const {

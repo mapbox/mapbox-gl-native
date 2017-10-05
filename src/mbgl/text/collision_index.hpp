@@ -39,6 +39,7 @@ using CollisionTreeBox = std::tuple<Box, CollisionBox, IndexedSubfeature>;
 using Tree = bgi::rtree<CollisionTreeBox, bgi::linear<16, 4>>;
 
 class IndexedSubfeature;
+class PlacedSymbol;
 
 struct TileDistance;
 
@@ -46,17 +47,39 @@ class CollisionIndex {
 public:
     explicit CollisionIndex(const TransformState&);
 
-    bool placeFeature(const CollisionFeature&, bool allowOverlap, const mat4& posMatrix, const float textPixelRatio);
-    void insertFeature(CollisionFeature& feature, bool ignorePlacement, const mat4& posMatrix, const float textPixelRatio);
+    bool placeFeature(CollisionFeature& feature,
+                                      const mat4& posMatrix,
+                                      const mat4& labelPlaneMatrix,
+                                      const float textPixelRatio,
+                                      PlacedSymbol& symbol,
+                                      const float scale,
+                                      const float fontSize,
+                                      const bool allowOverlap,
+                                      const bool pitchWithMap,
+                                      const bool collisionDebug);
+
+    void insertFeature(CollisionFeature& feature, bool ignorePlacement);
 
     std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const UnwrappedTileID& tileID, const float textPixelRatio) const;
 
     
 private:
-    Box getTreeBox(const CollisionBox& box, const mat4& posMatrix, const float textPixelRatio) const;
+    bool placeLineFeature(CollisionFeature& feature,
+                                  const mat4& posMatrix,
+                                  const mat4& labelPlaneMatrix,
+                                  const float textPixelRatio,
+                                  PlacedSymbol& symbol,
+                                  const float scale,
+                                  const float fontSize,
+                                  const bool allowOverlap,
+                                  const bool pitchWithMap,
+                                  const bool collisionDebug);
+
+    Box getTreeBox(const CollisionBox& box) const;
     
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);
     
+    std::pair<float,float> projectAnchor(const mat4& posMatrix, const Point<float>& point) const;
     std::pair<Point<float>,float> projectAndGetPerspectiveRatio(const mat4& posMatrix, const Point<float>& point) const;
     Point<float> projectPoint(const mat4& posMatrix, const Point<float>& point) const;
 

@@ -92,9 +92,6 @@ namespace mbgl {
         return m;
     }
 
-
-    typedef std::pair<Point<float>,float> PointAndCameraDistance;
-
     PointAndCameraDistance project(const Point<float>& point, const mat4& matrix) {
         vec4 pos = {{ point.x, point.y, 0, 1 }};
         matrix::transformMat4(pos, pos, matrix);
