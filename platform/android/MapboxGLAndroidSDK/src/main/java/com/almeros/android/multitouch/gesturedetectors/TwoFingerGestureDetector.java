@@ -54,7 +54,9 @@ public abstract class TwoFingerGestureDetector extends BaseGestureDetector {
 
     ViewConfiguration config = ViewConfiguration.get(context);
 
-    edgeSlop = config.getScaledEdgeSlop();
+    // lowering the edgeSlop allows to execute gesture faster
+    // https://github.com/mapbox/mapbox-gl-native/issues/10102
+    edgeSlop = config.getScaledEdgeSlop() / 3.0f;
   }
 
   @Override

@@ -382,6 +382,10 @@ public class MapView extends FrameLayout {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
+    if (!isMapInitialized()) {
+      return super.onTouchEvent(event);
+    }
+
     if (event.getAction() == MotionEvent.ACTION_DOWN) {
       mapZoomButtonController.setVisible(true);
     }
@@ -471,7 +475,7 @@ public class MapView extends FrameLayout {
     if (destroyed) {
       return;
     }
-    if (nativeMapView == null) {
+    if (!isMapInitialized()) {
       mapboxMapOptions.styleUrl(url);
       return;
     }
@@ -488,7 +492,7 @@ public class MapView extends FrameLayout {
       return;
     }
 
-    if (!isInEditMode() && nativeMapView != null) {
+    if (!isInEditMode() && isMapInitialized()) {
       nativeMapView.resizeView(width, height);
     }
   }
@@ -572,6 +576,10 @@ public class MapView extends FrameLayout {
         mapCallback.addOnMapReadyCallback(callback);
       }
     }
+  }
+
+  private boolean isMapInitialized() {
+    return nativeMapView != null;
   }
 
   MapboxMap getMapboxMap() {

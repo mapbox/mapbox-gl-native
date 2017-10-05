@@ -526,10 +526,10 @@ final class MapGestureDetector {
    */
   private class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
 
-    private static final long ROTATE_INVOKE_WAIT_TIME = 1500;
+    private static final long ROTATE_INVOKE_WAIT_TIME = 750;
+    private static final float ROTATE_INVOKE_ANGLE = 17.5f;
 
     private long beginTime = 0;
-    private float totalAngle = 0.0f;
     private boolean started = false;
 
     // Called when two fingers first touch the screen
@@ -551,7 +551,6 @@ final class MapGestureDetector {
     public void onRotateEnd(RotateGestureDetector detector) {
       // notify camera change listener
       beginTime = 0;
-      totalAngle = 0.0f;
       started = false;
     }
 
@@ -573,8 +572,8 @@ final class MapGestureDetector {
 
       // If rotate is large enough ignore a tap
       // Also is zoom already started, don't rotate
-      totalAngle += detector.getRotationDegreesDelta();
-      if (totalAngle > 35.0f || totalAngle < -35.0f) {
+      float angle = detector.getRotationDegreesDelta();
+      if (Math.abs(angle) >= ROTATE_INVOKE_ANGLE) {
         MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
           getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
           MapboxEvent.GESTURE_ROTATION_START, transform));
@@ -589,9 +588,8 @@ final class MapGestureDetector {
       // rotation, so cancel both location and bearing tracking if required
       trackingSettings.resetTrackingModesIfRequired(true, true, false);
 
-      // Get rotate value
-      double bearing = transform.getRawBearing();
-      bearing += detector.getRotationDegreesDelta();
+      // Calculate map bearing value
+      double bearing = transform.getRawBearing() + angle;
 
       // Rotate the map
       if (focalPoint != null) {
