@@ -123,12 +123,12 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
 
         switch (state) {
         case Idle:
-            attemptPlacement();
+            //attemptPlacement();
             coalesce();
             break;
 
         case Coalescing:
-            state = NeedPlacement;
+            //state = NeedPlacement;
             break;
 
         case NeedPlacement:

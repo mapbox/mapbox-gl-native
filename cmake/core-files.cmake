@@ -177,8 +177,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/paint_parameters.hpp
     src/mbgl/renderer/paint_property_binder.hpp
     src/mbgl/renderer/paint_property_statistics.hpp
-    src/mbgl/renderer/placement_state.hpp
-    src/mbgl/renderer/placement_state.cpp
     src/mbgl/renderer/possibly_evaluated_property_value.hpp
     src/mbgl/renderer/property_evaluation_parameters.hpp
     src/mbgl/renderer/property_evaluator.hpp
@@ -485,6 +483,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
+    src/mbgl/text/placement.cpp
+    src/mbgl/text/placement.hpp
     src/mbgl/text/placement_config.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp

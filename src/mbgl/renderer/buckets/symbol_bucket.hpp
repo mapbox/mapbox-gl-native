@@ -10,6 +10,7 @@
 #include <mbgl/text/glyph_range.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/layout/symbol_feature.hpp>
+#include <mbgl/layout/symbol_instance.hpp>
 
 #include <vector>
 
@@ -49,7 +50,8 @@ public:
                  const style::DataDrivenPropertyValue<float>& iconSize,
                  float zoom,
                  bool sdfIcons,
-                 bool iconsNeedLinear);
+                 bool iconsNeedLinear,
+                 const std::vector<SymbolInstance>&);
 
     void upload(gl::Context&) override;
     bool hasData() const override;
@@ -60,6 +62,8 @@ public:
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
+
+    std::vector<SymbolInstance> symbolInstances;
 
     std::map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,

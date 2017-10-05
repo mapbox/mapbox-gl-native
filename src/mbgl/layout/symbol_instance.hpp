@@ -5,18 +5,11 @@
 #include <mbgl/text/collision_feature.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 
+
 namespace mbgl {
 
 class Anchor;
 class IndexedSubfeature;
-
-class OpacityState {
-    public:
-        OpacityState() : opacity(0), targetOpacity(0) {}
-        float opacity;
-        float targetOpacity;
-        TimePoint time;
-};
 
 class SymbolInstance {
 public:
@@ -56,8 +49,11 @@ public:
     std::array<float, 2> iconOffset;
     std::u16string key;
     bool isDuplicate;
-    OpacityState iconOpacityState;
-    OpacityState textOpacityState;
+    bool placedText;
+    bool placedIcon;
+    std::vector<size_t> placedTextIndices; // TODO clean this up 
+    std::vector<size_t> placedIconIndices;
+    uint32_t crossTileID = 0;
 };
 
 } // namespace mbgl

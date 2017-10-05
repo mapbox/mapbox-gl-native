@@ -44,6 +44,9 @@ public:
     std::map<std::string,
         std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
 
+    const std::string bucketName;
+    std::vector<SymbolInstance> symbolInstances;
+
 private:
     void addFeature(const size_t,
                     const SymbolFeature&,
@@ -69,7 +72,6 @@ private:
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
-    const std::string bucketName;
     const float overscaling;
     const float zoom;
     const MapMode mode;
@@ -86,7 +88,6 @@ private:
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
 
-    std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread
