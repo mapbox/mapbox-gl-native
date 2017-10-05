@@ -13,7 +13,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
                                    IndexedSubfeature indexedFeature_)
-        : indexedFeature(std::move(indexedFeature_)) {
+        : indexedFeature(std::move(indexedFeature_))
+        , alongLine(placement == style::SymbolPlacementType::Line) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
 
     const float y1 = top * boxScale - padding;
@@ -21,7 +22,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
     const float x1 = left * boxScale - padding;
     const float x2 = right * boxScale + padding;
 
-    if (placement == style::SymbolPlacementType::Line) {
+    if (alongLine) {
         float height = y2 - y1;
         const double length = x2 - x1;
 
@@ -32,7 +33,7 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
         bboxifyLabel(line, anchorPoint, anchor.segment, length, height);
     } else {
-        boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2, std::numeric_limits<float>::infinity());
+        boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
     }
 }
 
@@ -114,47 +115,18 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             p0.x + segmentBoxDistance / segmentLength * (p1.x - p0.x),
             p0.y + segmentBoxDistance / segmentLength * (p1.y - p0.y)
         };
+        
+        // If the box is within boxSize of the anchor, force the box to be used
+        // (so even 0-width labels use at least one box)
+        // Otherwise, the .8 multiplication gives us a little bit of conservative
+        // padding in choosing which boxes to use (see CollisionIndex#placedCollisionCircles)
+        const float paddedAnchorDistance = std::abs(boxDistanceToAnchor - firstBoxOffset) < step ?
+            0 :
+            (boxDistanceToAnchor - firstBoxOffset) * 0.8;
 
-        // Distance from label anchor point to inner (towards center) edge of this box
-        // The tricky thing here is that box positioning doesn't change with scale,
-        // but box size does change with scale.
-        // Technically, distanceToInnerEdge should be:
-        // Math.max(Math.abs(boxDistanceToAnchor - firstBoxOffset) - (step / scale), 0);
-        // But using that formula would make solving for maxScale more difficult, so we
-        // approximate with scale=2.
-        // This makes our calculation spot-on at scale=2, and on the conservative side for
-        // lower scales
-        const float distanceToInnerEdge = std::max(std::fabs(boxDistanceToAnchor - firstBoxOffset) - step / 2, 0.0f);
-        float maxScale = util::division(labelLength / 2, distanceToInnerEdge, std::numeric_limits<float>::infinity());
-
-        // The box maxScale calculations are designed to be conservative on collisions in the scale range
-        // [1,2]. At scale=1, each box has 50% overlap, and at scale=2, the boxes are lined up edge
-        // to edge (beyond scale 2, gaps start to appear, which could potentially allow missed collisions).
-        // We add "pitch padding" boxes to the left and right to handle effective underzooming
-        // (scale < 1) when labels are in the distance. The overlap approximation could cause us to use
-        // these boxes when the scale is greater than 1, but we prevent that because we know
-        // they're only necessary for scales less than one.
-        // This preserves the pre-pitch-padding behavior for unpitched maps.
-        if (i < 0 || i >= nBoxes) {
-            maxScale = std::min(maxScale, 0.99f);
-        }
-
-        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, maxScale);
+        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance);
     }
 }
 
-float CollisionBox::adjustedMaxScale(const std::array<float, 4>& rotationMatrix, const float yStretch) const {
-    // When the map is pitched the distance covered by a line changes.
-    // Adjust the max scale by (approximatePitchedLength / approximateRegularLength)
-    // to compensate for this.
-    const Point<float> rotatedOffset = util::matrixMultiply(rotationMatrix, offset);
-    const float xSqr = rotatedOffset.x * rotatedOffset.x;
-    const float ySqr = rotatedOffset.y * rotatedOffset.y;
-    const float yStretchSqr = ySqr * yStretch * yStretch;
-    const float adjustmentFactor = xSqr + ySqr != 0 ?
-        std::sqrt((xSqr + yStretchSqr) / (xSqr + ySqr)) :
-        1.0f;
-    return maxScale * adjustmentFactor;
-}
 
 } // namespace mbgl
