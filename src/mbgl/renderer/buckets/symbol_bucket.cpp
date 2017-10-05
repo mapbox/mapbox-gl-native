@@ -16,10 +16,12 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            const style::DataDrivenPropertyValue<float>& iconSize,
                            float zoom,
                            bool sdfIcons_,
-                           bool iconsNeedLinear_)
+                           bool iconsNeedLinear_,
+                           const std::vector<SymbolInstance>& symbolInstances_)
     : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
+      symbolInstances(symbolInstances_), // TODO maybe not copy
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
     
@@ -45,7 +47,7 @@ void SymbolBucket::upload(gl::Context& context) {
     if (hasIconData()) {
         icon.vertexBuffer = context.createVertexBuffer(std::move(icon.vertices));
         icon.dynamicVertexBuffer = context.createVertexBuffer(std::move(icon.dynamicVertices), gl::BufferUsage::StreamDraw);
-        icon.opacityVertexBuffer = context.createVertexBuffer(std::move(text.opacityVertices), gl::BufferUsage::StreamDraw);
+        icon.opacityVertexBuffer = context.createVertexBuffer(std::move(icon.opacityVertices), gl::BufferUsage::StreamDraw);
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
     }
 

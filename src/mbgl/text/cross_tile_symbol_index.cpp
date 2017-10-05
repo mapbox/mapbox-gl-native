@@ -18,8 +18,8 @@ TileLayerIndex::TileLayerIndex(OverscaledTileID coord, std::shared_ptr<std::vect
             // If we don't pick up an opacity from our parent or child tiles
             // Reset so that symbols in cached tiles fade in the same
             // way as freshly loaded tiles
-            symbolInstance.textOpacityState = OpacityState();
-            symbolInstance.iconOpacityState = OpacityState();
+            //symbolInstance.textOpacityState = OpacityState();
+            //symbolInstance.iconOpacityState = OpacityState();
         }
     }
 
@@ -139,8 +139,8 @@ void CrossTileSymbolLayerIndex::blockLabels(TileLayerIndex& childIndex, TileLaye
                     // If the child label is the one being added to the index,
                     // copy the parent's opacity to the child
                     if (copyParentOpacity) {
-                        symbolInstance.textOpacityState = parentSymbolInstance->textOpacityState;
-                        symbolInstance.iconOpacityState = parentSymbolInstance->iconOpacityState;
+                        //symbolInstance.textOpacityState = parentSymbolInstance->textOpacityState;
+                        //symbolInstance.iconOpacityState = parentSymbolInstance->iconOpacityState;
                     }
                 }
             }
@@ -157,8 +157,8 @@ void CrossTileSymbolLayerIndex::unblockLabels(TileLayerIndex& childIndex, TileLa
             if (parentSymbolInstance) {
                 // this label is now unblocked, copy its opacity state
                 parentSymbolInstance->isDuplicate = false;
-                parentSymbolInstance->textOpacityState = symbolInstance.textOpacityState;
-                parentSymbolInstance->iconOpacityState = symbolInstance.iconOpacityState;
+                //parentSymbolInstance->textOpacityState = symbolInstance.textOpacityState;
+                //parentSymbolInstance->iconOpacityState = symbolInstance.iconOpacityState;
 
                 // mark child as duplicate so that it doesn't unblock further tiles at lower res
                 // in the remaining calls to unblockLabels before it's fully removed

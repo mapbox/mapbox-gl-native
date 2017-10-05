@@ -37,7 +37,9 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     featureIndex(featureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),
-    key(key_) {
+    key(key_),
+    placedText(false),
+    placedIcon(false) {
 
     // Create the quads used for rendering the icon and glyphs.
     if (addToBuffers) {

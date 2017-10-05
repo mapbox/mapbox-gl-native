@@ -43,8 +43,8 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : sourceLayer(std::move(sourceLayer_)),
-      bucketName(layers.at(0)->getID()),
+    : bucketName(layers.at(0)->getID()),
+      sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
       mode(parameters.mode),
@@ -393,7 +393,7 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
 }
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) {
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear);
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, symbolInstances);
 
     // Calculate which labels can be shown and when they can be shown and
     // create the bufers used for rendering.
@@ -427,7 +427,8 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
         });
     }
 
-    for (SymbolInstance &symbolInstance : symbolInstances) {
+    // this iterates over the *bucket's* symbol instances so that it can set the placedsymbol index. TODO cleanup
+    for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
@@ -475,6 +476,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                 const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
                 bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.textOffset, placementZoom, useVerticalMode, symbolInstance.line);
+                symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
 
                 for (const auto& symbol : symbolInstance.glyphQuads) {
                     addSymbol(
@@ -491,6 +493,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
                 const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, placementZoom, false, symbolInstance.line);
+                symbolInstance.placedIconIndices.push_back(bucket->icon.placedSymbols.size() - 1);
                 addSymbol(
                     bucket->icon, sizeData, *symbolInstance.iconQuad,
                     keepUpright, iconPlacement, symbolInstance.anchor, bucket->icon.placedSymbols.back());

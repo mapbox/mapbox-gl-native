@@ -10,6 +10,7 @@
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 
 #include <atomic>
 #include <memory>
@@ -38,7 +39,7 @@ public:
 
     void setPlacementConfig(const PlacementConfig&) override;
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
-    
+
     void onGlyphsAvailable(GlyphMap) override;
     void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) override;
     
@@ -132,6 +133,7 @@ private:
     optional<PremultipliedImage> iconAtlasImage;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
+    std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayouts;
     std::unique_ptr<CollisionTile> collisionTile;
 
     float lastYStretch;
