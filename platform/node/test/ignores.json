@@ -55,5 +55,22 @@
   "render-tests/text-pitch-alignment/viewport-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-scaling/line-half": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-size/composite-expression": "https://github.com/mapbox/mapbox-gl-native/pull/9439",
-  "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601"
+  "render-tests/video/default": "skip - https://github.com/mapbox/mapbox-gl-native/issues/601",
+  "render-tests/heatmap-color/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-color/expression": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-color/function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-intensity/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-intensity/function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-intensity/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-opacity/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-opacity/function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-opacity/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-radius/antimeridian": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-radius/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-radius/function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-radius/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-radius/pitch30": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-weight/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-weight/identity-property-function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/heatmap-weight/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146"
 }
