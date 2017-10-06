@@ -58,7 +58,7 @@ private:
 
     std::unordered_map<FontStack, Entry, FontStackHash> entries;
 
-    GlyphRequest& requestRange(Entry&, const FontStack&, const GlyphRange&);
+    void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);
     void notify(GlyphRequestor&, const GlyphDependencies&);
 
