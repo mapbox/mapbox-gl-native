@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.os.Build;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -47,9 +47,9 @@ import javax.microedition.khronos.opengles.GL10;
 
 import timber.log.Timber;
 
+import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
-import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 /**
  * <p>
@@ -382,7 +382,7 @@ public class MapView extends FrameLayout {
 
   @Override
   public boolean onTouchEvent(MotionEvent event) {
-    if (!isMapInitialized()) {
+    if (!isMapInitialized() || !isZoomButtonControllerInitialized()) {
       return super.onTouchEvent(event);
     }
 
@@ -419,6 +419,10 @@ public class MapView extends FrameLayout {
 
   @Override
   public boolean onHoverEvent(MotionEvent event) {
+    if (!isZoomButtonControllerInitialized()) {
+      return super.onHoverEvent(event);
+    }
+
     switch (event.getActionMasked()) {
       case MotionEvent.ACTION_HOVER_ENTER:
       case MotionEvent.ACTION_HOVER_MOVE:
@@ -506,7 +510,9 @@ public class MapView extends FrameLayout {
   @CallSuper
   protected void onDetachedFromWindow() {
     super.onDetachedFromWindow();
-    mapZoomButtonController.setVisible(false);
+    if (isZoomButtonControllerInitialized()) {
+      mapZoomButtonController.setVisible(false);
+    }
   }
 
   // Called when view is hidden and shown
@@ -516,7 +522,7 @@ public class MapView extends FrameLayout {
       return;
     }
 
-    if (mapZoomButtonController != null) {
+    if (isZoomButtonControllerInitialized()) {
       mapZoomButtonController.setVisible(visibility == View.VISIBLE);
     }
   }
@@ -580,6 +586,10 @@ public class MapView extends FrameLayout {
 
   private boolean isMapInitialized() {
     return nativeMapView != null;
+  }
+
+  private boolean isZoomButtonControllerInitialized() {
+    return mapZoomButtonController != null;
   }
 
   MapboxMap getMapboxMap() {
