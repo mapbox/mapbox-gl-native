@@ -25,8 +25,10 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="3pC-z4-awr" customClass="MGLMapView">
                                 <rect key="frame" x="110" y="68" width="1700" height="944"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <gestureRecognizers/>
                                 <connections>
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="R5G-s2-6ua"/>
+                                    <outletCollection property="gestureRecognizers" destination="NIw-pr-3Xt" appends="YES" id="WYu-GK-C9r"/>
                                 </connections>
                             </view>
                         </subviews>
@@ -44,6 +46,12 @@
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="NIw-pr-3Xt">
+                    <pressTypeMask key="allowedPressTypes" playPause="YES"/>
+                    <connections>
+                        <action selector="startWorldTour:" destination="BYZ-38-t0r" id="W4s-ZY-cVe"/>
+                    </connections>
+                </tapGestureRecognizer>
             </objects>
         </scene>
     </scenes>
