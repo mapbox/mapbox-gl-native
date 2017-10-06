@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
@@ -27,7 +28,7 @@ public class OfflineManager {
   //
 
   static {
-    LibraryLoader.load();
+    LibraryLoader.load(Mapbox.getApplicationContext());
   }
 
   // Native peer pointer
