@@ -419,7 +419,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      if (tiltGestureOccurred) {
+      if (tiltGestureOccurred || scaleGestureOccurred) {
         return false;
       }
 
@@ -476,9 +476,14 @@ final class MapGestureDetector {
     @Override
     public void onScaleEnd(ScaleGestureDetector detector) {
       double velocityXY = Math.abs(velocityTracker.getYVelocity()) + Math.abs(velocityTracker.getXVelocity());
-      if (velocityXY > MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING) {
+      if (velocityXY > MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING / 2) {
         long animationTime = (long)(Math.log(velocityXY) * 66);
-        transform.zoom(wasZoomingIn, new PointF(detector.getFocusX(), detector.getFocusY()), animationTime);
+        double zoomAddition = (float) (Math.log(velocityXY) / 7.7);
+        if (!wasZoomingIn) {
+          zoomAddition = -zoomAddition;
+        }
+        scaleGestureOccurred = true;
+        transform.zoom(zoomAddition, new PointF(detector.getFocusX(), detector.getFocusY()), animationTime);
         handler.postDelayed(new Runnable() {
           @Override
           public void run() {
@@ -509,7 +514,7 @@ final class MapGestureDetector {
       // Also ignore small scales
       long time = detector.getEventTime();
       long interval = time - scaleBeginTime;
-      if (!scaleGestureOccurred && (interval <= ViewConfiguration.getTapTimeout())) {
+      if (!scaleGestureOccurred && (interval <= ViewConfiguration.getTapTimeout() / 3)) {
         return false;
       }
 
