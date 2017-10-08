@@ -62,7 +62,7 @@ public:
     void setApiBaseUrl(const QString &);
 
     std::function<std::string(const std::string &&)> resourceTransform() const;
-    void setResourceTransform(std::function<std::string(const std::string &&)> &);
+    void setResourceTransform(const std::function<std::string(const std::string &&)> &);
 
 private:
     GLContextMode m_contextMode;

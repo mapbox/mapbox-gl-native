@@ -378,7 +378,7 @@ std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTran
     used add or remove custom parameters, or reroute certain requests to other
     servers or endpoints.
 */
-void QMapboxGLSettings::setResourceTransform(std::function<std::string(const std::string &&)> &transform)
+void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &&)> &transform)
 {
     m_resourceTransform = transform;
 }
