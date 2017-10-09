@@ -63,6 +63,8 @@ final class MapGestureDetector {
 
   private VelocityTracker velocityTracker = null;
   private boolean wasZoomingIn = false;
+  private boolean wasClockwiseRotating = false;
+  private boolean rotateGestureOccurred = false;
   private final Handler handler = new Handler();
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
@@ -193,7 +195,8 @@ final class MapGestureDetector {
         boolean inProgress = rotateGestureDetector.isInProgress()
           || scaleGestureDetector.isInProgress()
           || shoveGestureDetector.isInProgress()
-          || scaleGestureOccurred;
+          || scaleGestureOccurred
+          || rotateGestureOccurred;
 
         if (twoTap && isTap && !inProgress) {
           if (focalPoint != null) {
@@ -419,7 +422,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      if (tiltGestureOccurred || scaleGestureOccurred) {
+      if (tiltGestureOccurred || scaleGestureOccurred || rotateGestureOccurred) {
         return false;
       }
 
@@ -477,17 +480,19 @@ final class MapGestureDetector {
     public void onScaleEnd(ScaleGestureDetector detector) {
       double velocityXY = Math.abs(velocityTracker.getYVelocity()) + Math.abs(velocityTracker.getXVelocity());
       if (velocityXY > MapboxConstants.VELOCITY_THRESHOLD_IGNORE_FLING / 2) {
-        long animationTime = (long)(Math.log(velocityXY) * 66);
+        long animationTime = (long)(Math.log(velocityXY) * 88);
         double zoomAddition = (float) (Math.log(velocityXY) / 7.7);
         if (!wasZoomingIn) {
           zoomAddition = -zoomAddition;
         }
-        scaleGestureOccurred = true;
         transform.zoom(zoomAddition, new PointF(detector.getFocusX(), detector.getFocusY()), animationTime);
         handler.postDelayed(new Runnable() {
           @Override
           public void run() {
             scaleGestureOccurred = false;
+            scaleBeginTime = 0;
+            scaleFactor = 1.0f;
+            cameraChangeDispatcher.onCameraIdle();
           }
         }, animationTime);
       } else {
@@ -506,7 +511,8 @@ final class MapGestureDetector {
         return super.onScale(detector);
       }
 
-      if (tiltGestureOccurred) {
+      wasZoomingIn = (Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2)) >= 0;
+      if (tiltGestureOccurred || rotateGestureOccurred) {
         return false;
       }
 
@@ -542,7 +548,6 @@ final class MapGestureDetector {
 
       trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
       // Scale the map
-      wasZoomingIn = (Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2)) >= 0;
       if (focalPoint != null) {
         // arround user provided focal point
         transform.zoomBy(Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2), focalPoint.x, focalPoint.y);
@@ -592,10 +597,35 @@ final class MapGestureDetector {
     // Called when the fingers leave the screen
     @Override
     public void onRotateEnd(RotateGestureDetector detector) {
-      // notify camera change listener
-      beginTime = 0;
-      totalAngle = 0.0f;
-      started = false;
+      double angularVelocity = ((detector.getFocusX() * velocityTracker.getYVelocity())
+              + (detector.getFocusY() * velocityTracker.getXVelocity()))
+              / (Math.pow(detector.getFocusX(), 2) + Math.pow(detector.getFocusY(), 2));
+      if (Math.abs(angularVelocity) > 0.001 && rotateGestureOccurred) {
+        long animationTime = (long) (Math.abs(angularVelocity) * 333);
+        double rotateAddition = Math.abs(angularVelocity) * 33;
+        if (!wasClockwiseRotating) {
+          rotateAddition = -rotateAddition;
+        }
+        totalAngle += rotateAddition;
+        transform.setBearing(transform.getRawBearing() + rotateAddition, detector.getFocusX(), detector.getFocusY(),
+                animationTime);
+        handler.postDelayed(new Runnable() {
+          @Override
+          public void run() {
+            // notify camera change listener
+            beginTime = 0;
+            totalAngle = 0.0f;
+            started = false;
+            rotateGestureOccurred = false;
+          }
+        }, animationTime);
+      } else {
+        // notify camera change listener
+        beginTime = 0;
+        totalAngle = 0.0f;
+        started = false;
+        rotateGestureOccurred = false;
+      }
     }
 
     // Called each time one of the two fingers moves
@@ -627,6 +657,8 @@ final class MapGestureDetector {
       if (!started) {
         return false;
       }
+      wasClockwiseRotating = detector.getRotationDegreesDelta() > 0;
+      rotateGestureOccurred = true;
 
       // rotation constitutes translation of anything except the center of
       // rotation, so cancel both location and bearing tracking if required
