@@ -425,6 +425,9 @@ public class MapView extends FrameLayout {
 
   @Override
   public boolean onGenericMotionEvent(MotionEvent event) {
+    if (mapGestureDetector == null) {
+      return super.onGenericMotionEvent(event);
+    }
     return mapGestureDetector.onGenericMotionEvent(event) || super.onGenericMotionEvent(event);
   }
 
