@@ -489,6 +489,7 @@ set(MBGL_CORE_FILES
 
     # tile
     include/mbgl/tile/tile_id.hpp
+    include/mbgl/tile/tile_necessity.hpp
     src/mbgl/tile/geojson_tile.cpp
     src/mbgl/tile/geojson_tile.hpp
     src/mbgl/tile/geojson_tile_data.hpp

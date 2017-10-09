@@ -126,47 +126,41 @@ public:
             tasks[req] = localFileSource->request(resource, callback);
         } else {
             // Try the offline database
-            const bool hasPrior = resource.priorEtag || resource.priorModified ||
-                                  resource.priorExpires || resource.priorData;
-            if (!hasPrior || resource.necessity == Resource::Optional) {
+            if (resource.hasLoadingMethod(Resource::LoadingMethod::Cache)) {
                 auto offlineResponse = offlineDatabase->get(resource);
 
-                if (resource.necessity == Resource::Optional && !offlineResponse) {
-                    // Ensure there's always a response that we can send, so the caller knows that
-                    // there's no optional data available in the cache.
-                    offlineResponse.emplace();
-                    offlineResponse->noContent = true;
-                    offlineResponse->error = std::make_unique<Response::Error>(
-                            Response::Error::Reason::NotFound, "Not found in offline database");
-                }
-
-                if (offlineResponse) {
+                if (resource.loadingMethod == Resource::LoadingMethod::CacheOnly) {
+                    if (!offlineResponse) {
+                        // Ensure there's always a response that we can send, so the caller knows that
+                        // there's no optional data available in the cache, when it's the only place
+                        // we're supposed to load from.
+                        offlineResponse.emplace();
+                        offlineResponse->noContent = true;
+                        offlineResponse->error = std::make_unique<Response::Error>(
+                                Response::Error::Reason::NotFound, "Not found in offline database");
+                    } else if (!offlineResponse->isUsable()) {
+                        // Don't return resources the server requested not to show when they're stale.
+                        // Even if we can't directly use the response, we may still use it to send a
+                        // conditional HTTP request, which is why we're saving it above.
+                        offlineResponse->error = std::make_unique<Response::Error>(
+                            Response::Error::Reason::NotFound, "Cached resource is unusable");
+                    }
+                    callback(*offlineResponse);
+                } else if (offlineResponse) {
+                    // Copy over the fields so that we can use them when making a refresh request.
                     resource.priorModified = offlineResponse->modified;
                     resource.priorExpires = offlineResponse->expires;
                     resource.priorEtag = offlineResponse->etag;
+                    resource.priorData = offlineResponse->data;
 
-                    // Don't return resources the server requested not to show when they're stale.
-                    // Even if we can't directly use the response, we may still use it to send a
-                    // conditional HTTP request.
                     if (offlineResponse->isUsable()) {
                         callback(*offlineResponse);
-                    } else if (resource.necessity == Resource::Optional) {
-                        // Instead of the data that we got, return a not found error so that
-                        // underlying implementations know about the fact that we couldn't find
-                        // usable cache data.
-                        offlineResponse->error = std::make_unique<Response::Error>(
-                            Response::Error::Reason::NotFound, "Cached resource is unusable");
-                        callback(*offlineResponse);
-                    } else {
-                        // Since we can't return the data immediately, we'll have to hold on so that
-                        // we can return it later in case we get a 304 Not Modified response.
-                        resource.priorData = offlineResponse->data;
                     }
                 }
             }
 
             // Get from the online file source
-            if (resource.necessity == Resource::Required) {
+            if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
                 tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
                     this->offlineDatabase->put(resource, onlineResponse);
                     callback(onlineResponse);

@@ -24,11 +24,11 @@ public:
     // not be executed.
     virtual std::unique_ptr<AsyncRequest> request(const Resource&, Callback) = 0;
 
-    // When a file source supports optional requests, it must return true.
-    // Optional requests are requests that aren't as urgent, but could be useful, e.g.
+    // When a file source supports consulting a local cache only, it must return true.
+    // Cache-only requests are requests that aren't as urgent, but could be useful, e.g.
     // to cover part of the map while loading. The FileSource should only do cheap actions to
     // retrieve the data, e.g. load it from a cache, but not from the internet.
-    virtual bool supportsOptionalRequests() const {
+    virtual bool supportsCacheOnlyRequests() const {
         return false;
     }
 };

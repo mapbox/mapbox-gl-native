@@ -121,7 +121,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
 
-    auto retainTileFn = [&](Tile& tile, Resource::Necessity necessity) -> void {
+    auto retainTileFn = [&](Tile& tile, TileNecessity necessity) -> void {
         if (retain.emplace(tile.id).second) {
             tile.setNecessity(necessity);
         }
@@ -179,7 +179,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         while (tilesIt != tiles.end()) {
             if (retainIt == retain.end() || tilesIt->first < *retainIt) {
                 if (!needsRelayout) {
-                    tilesIt->second->setNecessity(Tile::Necessity::Optional);
+                    tilesIt->second->setNecessity(TileNecessity::Optional);
                     cache.add(tilesIt->first, std::move(tilesIt->second));
                 }
                 tiles.erase(tilesIt++);

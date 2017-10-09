@@ -15,8 +15,6 @@ public:
                 mapbox::geometry::feature_collection<int16_t>);
 
     void updateData(mapbox::geometry::feature_collection<int16_t>);
-
-    void setNecessity(Necessity) final;
     
     void querySourceFeatures(
         std::vector<Feature>& result,
