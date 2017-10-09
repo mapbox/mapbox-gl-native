@@ -51,11 +51,11 @@
     
     // Create and start the snapshotter
     MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
-    [snapshotter startWithCompletionHandler: ^(UIImage *image, NSError *error) {
+    [snapshotter startWithCompletionHandler: ^(MGLMapSnapshot* snapshot, NSError *error) {
         if (error) {
             NSLog(@"Could not load snapshot: %@", [error localizedDescription]);
         } else {
-            imageView.image = image;
+            imageView.image = snapshot.image;
         }
     }];
     
