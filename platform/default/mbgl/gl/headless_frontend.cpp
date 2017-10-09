@@ -1,6 +1,8 @@
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/update_parameters.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/run_loop.hpp>
 
 namespace mbgl {
@@ -81,6 +83,14 @@ PremultipliedImage HeadlessFrontend::render(Map& map) {
     }
 
     return result;
+}
+
+optional<TransformState> HeadlessFrontend::getTransformState() const {
+    if (updateParameters) {
+        return updateParameters->transformState;
+    } else {
+        return {};
+    }
 }
 
 } // namespace mbgl
