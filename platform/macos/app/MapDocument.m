@@ -167,7 +167,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     
     // Create and start the snapshotter
     snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
-    [snapshotter startWithCompletionHandler:^(NSImage *image, NSError *error) {
+    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot *snapshot, NSError *error) {
         if (error) {
             NSLog(@"Could not load snapshot: %@", error.localizedDescription);
         } else {
@@ -182,7 +182,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
                     NSURL *fileURL = panel.URL;
                     
                     NSBitmapImageRep *bitmapRep;
-                    for (NSImageRep *imageRep in image.representations) {
+                    for (NSImageRep *imageRep in snapshot.image.representations) {
                         if ([imageRep isKindOfClass:[NSBitmapImageRep class]]) {
                             bitmapRep = (NSBitmapImageRep *)imageRep;
                             break; // stop on first bitmap rep we find
@@ -190,7 +190,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
                     }
                     
                     if (!bitmapRep) {
-                        bitmapRep = [NSBitmapImageRep imageRepWithData:image.TIFFRepresentation];
+                        bitmapRep = [NSBitmapImageRep imageRepWithData:snapshot.image.TIFFRepresentation];
                     }
                     
                     CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileURL.pathExtension, NULL /* inConformingToUTI */);
