@@ -3,9 +3,11 @@
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/map/map.hpp>
+#include <mbgl/map/transform_state.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/util/event.hpp>
+#include <mbgl/map/transform.hpp>
 
 namespace mbgl {
 
@@ -62,7 +64,24 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
 
 void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback) {
     map.renderStill([this, callback = std::move(callback)] (std::exception_ptr error) mutable {
-        callback.invoke(&MapSnapshotter::Callback::operator(), error, error ? PremultipliedImage() : frontend.readStillImage());
+
+        // Create lambda that captures the current transform state
+        // and can be used to translate for geographic to screen
+        // coordinates
+        assert (frontend.getTransformState());
+        PointForFn pointForFn { [=, center=map.getLatLng(), transformState = *frontend.getTransformState()] (const LatLng& latLng) {
+            LatLng unwrappedLatLng = latLng.wrapped();
+            unwrappedLatLng.unwrapForShortestPath(center);
+            Transform transform { transformState };
+            return transform.latLngToScreenCoordinate(unwrappedLatLng);
+        }};
+
+        callback.invoke(
+                &MapSnapshotter::Callback::operator(),
+                error,
+                error ? PremultipliedImage() : frontend.readStillImage(),
+                std::move(pointForFn)
+        );
     });
 }
 
