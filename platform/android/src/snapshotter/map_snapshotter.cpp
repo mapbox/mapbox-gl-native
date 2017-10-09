@@ -8,7 +8,7 @@
 #include <mbgl/actor/scheduler.hpp>
 
 #include "../attach_env.hpp"
-#include "../bitmap.hpp"
+#include "map_snapshot.hpp"
 
 namespace mbgl {
 namespace android {
@@ -58,7 +58,7 @@ MapSnapshotter::~MapSnapshotter() = default;
 void MapSnapshotter::start(JNIEnv&) {
     MBGL_VERIFY_THREAD(tid);
 
-    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(*Scheduler::GetCurrent(), [this](std::exception_ptr err, PremultipliedImage image) {
+    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(*Scheduler::GetCurrent(), [this](std::exception_ptr err, PremultipliedImage image, mbgl::MapSnapshotter::PointForFn pointForFn) {
         MBGL_VERIFY_THREAD(tid);
         android::UniqueEnv _env = android::AttachEnv();
 
@@ -67,12 +67,12 @@ void MapSnapshotter::start(JNIEnv&) {
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
             javaPeer->Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
         } else {
-            // Create the bitmap
-            auto bitmap = Bitmap::CreateBitmap(*_env, std::move(image));
+            // Create the wrapper
+            auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, pointForFn);
 
             // invoke callback
-            static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<Bitmap>)>(*_env, "onSnapshotReady");
-            javaPeer->Call(*_env, onSnapshotReady, bitmap);
+            static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");
+            javaPeer->Call(*_env, onSnapshotReady, mapSnapshot);
         }
     });
 
