@@ -50,6 +50,7 @@
 #include "style/sources/sources.hpp"
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
+#include "snapshotter/map_snapshot.hpp"
 
 namespace mbgl {
 namespace android {
@@ -186,6 +187,7 @@ void registerNatives(JavaVM *vm) {
 
     // Snapshotter
     MapSnapshotter::registerNative(env);
+    MapSnapshot::registerNative(env);
 }
 
 } // namespace android

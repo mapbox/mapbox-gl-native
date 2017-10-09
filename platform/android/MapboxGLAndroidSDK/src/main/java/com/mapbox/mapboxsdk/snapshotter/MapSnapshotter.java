@@ -12,7 +12,6 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 /**
@@ -24,10 +23,26 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 public class MapSnapshotter {
 
   /**
+   * Get notified on snapshot completion.
+   *
+   * @see MapSnapshotter#start(SnapshotReadyCallback, ErrorHandler)
+   */
+  public interface SnapshotReadyCallback {
+
+    /**
+     * Called when the snapshot is complete.
+     *
+     * @param snapshot the snapshot
+     */
+    void onSnapshotReady(MapSnapshot snapshot);
+
+  }
+
+  /**
    * Can be used to get notified of errors
    * in snapshot generation
    *
-   * @see MapSnapshotter#start(MapboxMap.SnapshotReadyCallback, ErrorHandler)
+   * @see MapSnapshotter#start(SnapshotReadyCallback, ErrorHandler)
    */
   public interface ErrorHandler {
 
@@ -46,7 +61,7 @@ public class MapSnapshotter {
   private long nativePtr = 0;
 
   private final Context context;
-  private MapboxMap.SnapshotReadyCallback callback;
+  private SnapshotReadyCallback callback;
   private ErrorHandler errorHandler;
 
   /**
@@ -176,7 +191,7 @@ public class MapSnapshotter {
    *
    * @param callback the callback to use when the snapshot is ready
    */
-  public void start(@NonNull MapboxMap.SnapshotReadyCallback callback) {
+  public void start(@NonNull SnapshotReadyCallback callback) {
     this.start(callback, null);
   }
 
@@ -187,7 +202,7 @@ public class MapSnapshotter {
    * @param callback     the callback to use when the snapshot is ready
    * @param errorHandler the error handler to use on snapshot errors
    */
-  public void start(@NonNull MapboxMap.SnapshotReadyCallback callback, ErrorHandler errorHandler) {
+  public void start(@NonNull SnapshotReadyCallback callback, ErrorHandler errorHandler) {
     if (this.callback != null) {
       throw new IllegalStateException("Snapshotter was already started");
     }
@@ -247,12 +262,12 @@ public class MapSnapshotter {
    * Called by JNI peer when snapshot is ready.
    * Always called on the origin (main) thread.
    *
-   * @param bitmap the generated snapshot
+   * @param snapshot the generated snapshot
    */
-  protected void onSnapshotReady(Bitmap bitmap) {
+  protected void onSnapshotReady(MapSnapshot snapshot) {
     if (callback != null) {
-      addOverlay(bitmap);
-      callback.onSnapshotReady(bitmap);
+      addOverlay(snapshot.getBitmap());
+      callback.onSnapshotReady(snapshot);
       reset();
     }
   }
