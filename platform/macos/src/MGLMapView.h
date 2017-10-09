@@ -487,7 +487,7 @@ MGL_EXPORT IB_DESIGNABLE
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
  */
-- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(double)direction edgePadding:(NSEdgeInsets)insets;
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets;
 
 /**
  A Boolean value indicating whether the receiver automatically adjusts its

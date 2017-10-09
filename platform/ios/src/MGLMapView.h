@@ -901,7 +901,7 @@ MGL_EXPORT IB_DESIGNABLE
     (close to the ground) as possible while still including the entire shape. The
     camera object uses the current pitch.
  */
-- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(double)direction edgePadding:(UIEdgeInsets)insets;
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the point in this view’s coordinate system on which to "anchor" in
