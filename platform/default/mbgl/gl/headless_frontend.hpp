@@ -14,6 +14,7 @@ class Scheduler;
 class Renderer;
 class RendererBackend;
 class Map;
+class TransformState;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
@@ -33,6 +34,8 @@ public:
 
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);
+
+    optional<TransformState> getTransformState() const;
 
 private:
     Size size;
