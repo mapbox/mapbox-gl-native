@@ -14,8 +14,6 @@ public:
     AnnotationTile(const OverscaledTileID&, const TileParameters&);
     ~AnnotationTile() override;
 
-    void setNecessity(Necessity) final;
-
 private:
     AnnotationManager& annotationManager;
 };

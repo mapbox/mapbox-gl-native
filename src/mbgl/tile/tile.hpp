@@ -6,6 +6,7 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_necessity.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
@@ -38,14 +39,7 @@ public:
 
     void setObserver(TileObserver* observer);
 
-    // Tiles can have two states: optional or required.
-    // - optional means that only low-cost actions should be taken to obtain the data
-    //   (e.g. load from cache, but accept stale data)
-    // - required means that every effort should be taken to obtain the data (e.g. load
-    //   from internet and keep the data fresh if it expires)
-    using Necessity = Resource::Necessity;
-
-    virtual void setNecessity(Necessity) = 0;
+    virtual void setNecessity(TileNecessity) {}
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
@@ -68,11 +62,11 @@ public:
             std::vector<Feature>& result,
             const SourceQueryOptions&);
 
-    void setTriedOptional();
+    void setTriedCache();
 
     // Returns true when the tile source has received a first response, regardless of whether a load
     // error occurred or actual data was loaded.
-    bool hasTriedOptional() const {
+    bool hasTriedCache() const {
         return triedOptional;
     }
 
