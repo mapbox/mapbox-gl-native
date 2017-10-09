@@ -49,6 +49,33 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 
 @end
 
+@interface MGLMapSnapshot()
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn;
+
+@property (nonatomic) CGFloat scale;
+@end
+
+@implementation MGLMapSnapshot {
+    mbgl::MapSnapshotter::PointForFn _pointForFn;
+}
+- (instancetype)initWithImage:(nullable MGLImage *)image scale:(CGFloat)scale pointForFn:(mbgl::MapSnapshotter::PointForFn)pointForFn
+{
+    self = [super init];
+    if (self) {
+        _pointForFn = std::move(pointForFn);
+        _scale = scale;
+        _image = image;
+    }
+    return self;
+}
+
+- (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
+{
+    mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
+    return CGPointMake(sc.x * self.scale, sc.y * self.scale);
+}
+@end
+
 @interface MGLMapSnapshotter()
 @property (nonatomic) MGLMapSnapshotOptions *options;
 @end
@@ -117,7 +144,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _loading = true;
     
     dispatch_async(queue, ^{
-        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image) {
+        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::PointForFn pointForFn) {
             _loading = false;
             if (mbglError) {
                 NSString *description = @(mbgl::util::toString(mbglError).c_str());
@@ -171,7 +198,8 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     
                     // Dispatch result to origin queue
                     dispatch_async(queue, ^{
-                        completion(compositedImage, nil);
+                        MGLMapSnapshot* snapshot = [[MGLMapSnapshot alloc] initWithImage:compositedImage scale:self.options.scale pointForFn:pointForFn];
+                        completion(snapshot, nil);
                     });
                 });
             }
@@ -189,7 +217,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 - (NSURL *)styleURL
 {
     NSString *styleURLString = @(_mbglMapSnapshotter->getStyleURL().c_str());
-    return styleURLString && styleURLString.length > 0 ? [NSURL URLWithString:styleURLString] : nil;
+    return styleURLString.length ? [NSURL URLWithString:styleURLString] : nil;
 }
 
 - (void)setStyleURL:(NSURL *)url
