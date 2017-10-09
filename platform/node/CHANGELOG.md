@@ -1,3 +1,6 @@
+# 3.5.7 - October 9, 2017
+- Fixed an issue causing synchronous resource requests to stall [#10153](https://github.com/mapbox/mapbox-gl-native/pull/10153)
+
 # 3.5.6 - September 29, 2017
 - Protects against requests which throw [#9554](https://github.com/mapbox/mapbox-gl-native/pull/9554)
 - Fixed an issue around reusing a map object [#9554](https://github.com/mapbox/mapbox-gl-native/pull/9554)
