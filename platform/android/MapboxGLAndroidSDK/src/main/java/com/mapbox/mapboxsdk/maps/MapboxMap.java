@@ -44,6 +44,7 @@ import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.commons.geojson.Feature;
+import com.mapbox.services.commons.geojson.Geometry;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
@@ -1660,6 +1661,30 @@ public final class MapboxMap {
 
     // get padded camera position from LatLngBounds
     CameraPosition cameraPosition = nativeMapView.getCameraForLatLngBounds(latLngBounds);
+
+    // reset map padding
+    setPadding(mapPadding);
+    return cameraPosition;
+  }
+
+  /**
+   * Get a camera position that fits a provided shape with a given bearing and padding.
+   *
+   * @param geometry     the geometry to constrain the map with
+   * @param bearing      the bearing at which to compute the geometry's bounds
+   * @param padding      the padding to apply to the bounds
+   * @return the camera position that fits the bounds and padding
+   */
+  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
+    // calculate and set additional bounds padding
+    int[] mapPadding = getPadding();
+    for (int i = 0; i < padding.length; i++) {
+      padding[i] = mapPadding[i] + padding[i];
+    }
+    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+
+    // get padded camera position from LatLngBounds
+    CameraPosition cameraPosition = nativeMapView.getCameraForGeometry(geometry, bearing);
 
     // reset map padding
     setPadding(mapPadding);

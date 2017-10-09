@@ -15,6 +15,7 @@
 #include "graphics/pointf.hpp"
 #include "graphics/rectf.hpp"
 #include "geojson/feature.hpp"
+#include "geojson/geometry.hpp"
 #include "geometry/lat_lng.hpp"
 #include "geometry/projected_meters.hpp"
 #include "style/layers/layers.hpp"
@@ -103,6 +104,8 @@ public:
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
     jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
+
+    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double bearing);
 
     void setReachability(jni::JNIEnv&, jni::jboolean);
 
