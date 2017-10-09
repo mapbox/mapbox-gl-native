@@ -251,7 +251,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -281,7 +281,7 @@ TEST(DefaultFileSource, OptionalExpired) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -327,7 +327,7 @@ TEST(DefaultFileSource, OptionalNotFound) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
-    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::Optional };
+    const Resource optionalResource { Resource::Unknown, "http://127.0.0.1:3000/test", {}, Resource::LoadingMethod::CacheOnly };
 
     using namespace std::chrono_literals;
 
@@ -348,13 +348,13 @@ TEST(DefaultFileSource, OptionalNotFound) {
     loop.run();
 }
 
-// Test that we can make a request with etag data that doesn't first try to load
-// from cache like a regular request
+// Test that a network only request doesn't attempt to load data from the cache.
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorEtag.emplace("snowfall");
 
     using namespace std::chrono_literals;
@@ -383,13 +383,13 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
     loop.run();
 }
 
-// Test that we can make a request with etag data that doesn't first try to load
-// from cache like a regular request
+// Test that a network only request doesn't attempt to load data from the cache.
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorEtag.emplace("sunshine");
 
     using namespace std::chrono_literals;
@@ -418,15 +418,13 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
     loop.run();
 }
 
-// Test that we can make a request that doesn't first try to load
-// from cache like a regular request.
+// Test that a network only request doesn't attempt to load data from the cache.
 TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
     util::RunLoop loop;
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
-    // Setting any prior field results in skipping the cache.
-    resource.priorExpires.emplace(Seconds(0));
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
 
     using namespace std::chrono_literals;
 
@@ -461,6 +459,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorModified.emplace(Seconds(1420070400)); // January 1, 2015
 
     using namespace std::chrono_literals;
@@ -496,6 +495,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-modified" };
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorModified.emplace(Seconds(1417392000)); // December 1, 2014
 
     using namespace std::chrono_literals;
@@ -578,7 +578,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     DefaultFileSource fs(":memory:", ".");
 
     Resource resource { Resource::Unknown, "http://127.0.0.1:3000/revalidate-same" };
-    resource.necessity = Resource::Necessity::Optional;
+    resource.loadingMethod = Resource::LoadingMethod::CacheOnly;
 
     // using namespace std::chrono_literals;
 
@@ -621,7 +621,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     // Now run this request again, with the data we gathered from the previous stale/unusable
     // request. We're replacing the data so that we can check that the DefaultFileSource doesn't
     // attempt another database access if we already have the value.
-    resource.necessity = Resource::Necessity::Required;
+    resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
     resource.priorData = std::make_shared<std::string>("Prior value");
 
     req = fs.request(resource, [&](Response res) {

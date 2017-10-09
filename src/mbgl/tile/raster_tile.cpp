@@ -32,12 +32,12 @@ void RasterTile::setError(std::exception_ptr err) {
     observer->onTileError(*this, err);
 }
 
-void RasterTile::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified_,
-                             optional<Timestamp> expires_) {
+void RasterTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
+}
 
+void RasterTile::setData(std::shared_ptr<const std::string> data) {
     pending = true;
     ++correlationID;
     worker.invoke(&RasterTileWorker::parse, data, correlationID);
@@ -77,7 +77,7 @@ void RasterTile::setMask(TileMask&& mask) {
     }
 }
 
-void RasterTile::setNecessity(Necessity necessity) {
+void RasterTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 

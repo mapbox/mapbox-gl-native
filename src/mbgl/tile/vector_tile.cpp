@@ -12,16 +12,16 @@ VectorTile::VectorTile(const OverscaledTileID& id_,
     : GeometryTile(id_, sourceID_, parameters), loader(*this, id_, parameters, tileset) {
 }
 
-void VectorTile::setNecessity(Necessity necessity) {
+void VectorTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 
-void VectorTile::setData(std::shared_ptr<const std::string> data_,
-                         optional<Timestamp> modified_,
-                         optional<Timestamp> expires_) {
+void VectorTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
+}
 
+void VectorTile::setData(std::shared_ptr<const std::string> data_) {
     GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
 }
 
