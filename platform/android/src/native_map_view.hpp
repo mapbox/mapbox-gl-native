@@ -95,11 +95,7 @@ public:
 
     void initializeDisplay(jni::JNIEnv&);
 
-    void terminateDisplay(jni::JNIEnv&);
-
     void initializeContext(jni::JNIEnv&);
-
-    void terminateContext(jni::JNIEnv&);
 
     void createSurface(jni::JNIEnv&, jni::Object<>);
 

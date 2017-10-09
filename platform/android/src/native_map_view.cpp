@@ -261,16 +261,8 @@ void NativeMapView::initializeDisplay(jni::JNIEnv&) {
     _initializeDisplay();
 }
 
-void NativeMapView::terminateDisplay(jni::JNIEnv&) {
-    _terminateDisplay();
-}
-
 void NativeMapView::initializeContext(jni::JNIEnv&) {
     _initializeContext();
-}
-
-void NativeMapView::terminateContext(jni::JNIEnv&) {
-    _terminateContext();
 }
 
 void NativeMapView::createSurface(jni::JNIEnv& env, jni::Object<> _surface) {
@@ -1471,9 +1463,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::resizeView, "nativeResizeView"),
             METHOD(&NativeMapView::resizeFramebuffer, "nativeResizeFramebuffer"),
             METHOD(&NativeMapView::initializeDisplay, "nativeInitializeDisplay"),
-            METHOD(&NativeMapView::terminateDisplay, "nativeTerminateDisplay"),
             METHOD(&NativeMapView::initializeContext, "nativeInitializeContext"),
-            METHOD(&NativeMapView::terminateContext, "nativeTerminateContext"),
             METHOD(&NativeMapView::createSurface, "nativeCreateSurface"),
             METHOD(&NativeMapView::destroySurface, "nativeDestroySurface"),
             METHOD(&NativeMapView::getStyleUrl, "nativeGetStyleUrl"),

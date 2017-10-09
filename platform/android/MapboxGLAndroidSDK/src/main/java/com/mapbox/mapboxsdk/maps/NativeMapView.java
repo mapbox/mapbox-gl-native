@@ -130,25 +130,11 @@ final class NativeMapView {
     nativeInitializeDisplay();
   }
 
-  public void terminateDisplay() {
-    if (isDestroyedOn("terminateDisplay")) {
-      return;
-    }
-    nativeTerminateDisplay();
-  }
-
   public void initializeContext() {
     if (isDestroyedOn("initializeContext")) {
       return;
     }
     nativeInitializeContext();
-  }
-
-  public void terminateContext() {
-    if (isDestroyedOn("terminateContext")) {
-      return;
-    }
-    nativeTerminateContext();
   }
 
   public void createSurface(Surface surface) {
@@ -952,11 +938,7 @@ final class NativeMapView {
 
   private native void nativeInitializeDisplay();
 
-  private native void nativeTerminateDisplay();
-
   private native void nativeInitializeContext();
-
-  private native void nativeTerminateContext();
 
   private native void nativeCreateSurface(Object surface);
 
