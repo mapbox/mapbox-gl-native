@@ -261,9 +261,6 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onDestroy() {
     destroyed = true;
-    nativeMapView.terminateContext();
-    nativeMapView.terminateDisplay();
-    nativeMapView.destroySurface();
     mapCallback.clearOnMapReadyCallbacks();
     nativeMapView.destroy();
     nativeMapView = null;
