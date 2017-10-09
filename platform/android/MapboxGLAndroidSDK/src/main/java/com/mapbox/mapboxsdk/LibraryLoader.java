@@ -4,6 +4,8 @@ import android.content.Context;
 
 import java.io.File;
 
+import timber.log.Timber;
+
 /**
  * Centralises the knowledge about "mapbox-gl" library loading.
  */
@@ -13,13 +15,14 @@ public class LibraryLoader {
 
   /**
    * Loads "libmapbox-gl.so" native shared library.
-   * @param context The application context
    */
-  public static void load(Context context) {
+  public static void load() {
     try {
       System.loadLibrary("mapbox-gl");
     } catch (UnsatisfiedLinkError error) {
+      Context context = Mapbox.getApplicationContext();
       if (context != null) {
+        Timber.d("Loading %s from internal storage.", LIBRARY_NAME);
         System.load(getLibraryLocation(context).getAbsolutePath());
       }
     }

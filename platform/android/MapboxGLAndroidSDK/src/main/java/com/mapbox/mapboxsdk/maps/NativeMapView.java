@@ -11,7 +11,6 @@ import android.text.TextUtils;
 import android.util.DisplayMetrics;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
-import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.Polygon;
@@ -63,7 +62,7 @@ final class NativeMapView {
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
   static {
-    LibraryLoader.load(Mapbox.getApplicationContext());
+    LibraryLoader.load();
   }
 
   //

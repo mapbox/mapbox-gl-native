@@ -7,7 +7,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
-import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
@@ -25,7 +24,7 @@ public class OfflineRegion {
   //
 
   static {
-    LibraryLoader.load(Mapbox.getApplicationContext());
+    LibraryLoader.load();
   }
 
   // Members

@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.net;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
-import com.mapbox.mapboxsdk.Mapbox;
 
 /**
  * Updates the native library's connectivity state
@@ -9,7 +8,7 @@ import com.mapbox.mapboxsdk.Mapbox;
 class NativeConnectivityListener implements ConnectivityListener {
 
   static {
-    LibraryLoader.load(Mapbox.getApplicationContext());
+    LibraryLoader.load();
   }
 
   private long nativePtr;
