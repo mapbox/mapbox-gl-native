@@ -29,6 +29,7 @@ import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.services.commons.geojson.Feature;
+import com.mapbox.services.commons.geojson.Geometry;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -230,6 +231,13 @@ final class NativeMapView {
       return null;
     }
     return nativeGetCameraForLatLngBounds(latLngBounds);
+  }
+
+  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing) {
+    if (isDestroyedOn("getCameraForGeometry")) {
+      return null;
+    }
+    return nativeGetCameraForGeometry(geometry, bearing);
   }
 
   public void resetPosition() {
@@ -872,6 +880,8 @@ final class NativeMapView {
   private native LatLng nativeGetLatLng();
 
   private native CameraPosition nativeGetCameraForLatLngBounds(LatLngBounds latLngBounds);
+
+  private native CameraPosition nativeGetCameraForGeometry(Geometry geometry, double bearing);
 
   private native void nativeResetPosition();
 

@@ -59,6 +59,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - build release package once during ci build [#9351](https://github.com/mapbox/mapbox-gl-native/pull/9351)
 * Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
 * Increased the default maximum zoom level from 20 to 22. [#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835)
+* Added `MapboxMap.getCameraForGeometry()` to get a camera with zoom level and center coordinate computed to fit a shape. ([#10107](https://github.com/mapbox/mapbox-gl-native/pull/10107))
 
 ### 5.1.4 - September 25, 2017
 
