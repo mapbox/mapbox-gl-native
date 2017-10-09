@@ -22,12 +22,11 @@ public:
                    const Tileset&);
     ~RasterTile() final;
 
-    void setNecessity(Necessity) final;
+    void setNecessity(TileNecessity) final;
 
     void setError(std::exception_ptr);
-    void setData(std::shared_ptr<const std::string> data,
-                 optional<Timestamp> modified_,
-                 optional<Timestamp> expires_);
+    void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
+    void setData(std::shared_ptr<const std::string> data);
 
     void cancel() override;
 

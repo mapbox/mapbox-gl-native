@@ -21,12 +21,10 @@ public:
                const Tileset&);
     ~TileLoader();
 
-    using Necessity = Resource::Necessity;
-
-    void setNecessity(Necessity newNecessity) {
+    void setNecessity(TileNecessity newNecessity) {
         if (newNecessity != necessity) {
             necessity = newNecessity;
-            if (necessity == Necessity::Required) {
+            if (necessity == TileNecessity::Required) {
                 makeRequired();
             } else {
                 makeOptional();
@@ -45,12 +43,12 @@ private:
     // an up-to-date version or load new data
     void makeOptional();
 
-    void loadOptional();
+    void loadFromCache();
     void loadedData(const Response&);
-    void loadRequired();
+    void loadFromNetwork();
 
     T& tile;
-    Necessity necessity;
+    TileNecessity necessity;
     Resource resource;
     FileSource& fileSource;
     std::unique_ptr<AsyncRequest> request;
