@@ -210,6 +210,10 @@ final class Transform implements MapView.OnMapChangedListener {
     return cameraPosition.zoom;
   }
 
+  double getRawZoom() {
+    return mapView.getZoom();
+  }
+
   void zoom(boolean zoomIn, @NonNull PointF focalPoint) {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
@@ -221,7 +225,7 @@ final class Transform implements MapView.OnMapChangedListener {
     }
   }
 
-  void zoom(double zoomAddition, @NonNull PointF focalPoint,long duration) {
+  void zoom(double zoomAddition, @NonNull PointF focalPoint, long duration) {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
       int newZoom = (int) Math.round(cameraPosition.zoom + zoomAddition);
