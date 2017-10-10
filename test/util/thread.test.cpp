@@ -275,3 +275,57 @@ TEST(Thread, PauseResume) {
     thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
 }
+
+TEST(Thread, MultiplePauseResumeCalls) {
+    RunLoop loop;
+
+    Thread<TestWorker> thread("Test");
+
+    // Test if multiple pause calls work
+    thread.pause();
+    thread.pause();
+    thread.resume();
+    thread.resume();
+
+    thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
+    loop.run();
+}
+
+TEST(Thread, TestImmediatePause) {
+    using namespace std::chrono_literals;
+
+    RunLoop loop;
+
+    Thread<TestWorker> thread("Test");
+
+    std::promise<void> resume;
+    auto resumed = resume.get_future();
+
+    std::atomic<bool> ending { false };
+
+    thread.pause();
+    thread.actor().invoke(&TestWorker::send, [&] {
+        resume.set_value();
+
+        // Make sure we have some time to process the pause() call.
+        std::this_thread::sleep_for(300ms);
+    });
+
+    // We're scheduling a second action right after, before calling pause. Ensure that it never
+    // gets called.
+    thread.actor().invoke(&TestWorker::send, [&] {
+        EXPECT_TRUE(ending) << "callback called without ending";
+    });
+
+    thread.resume();
+    resumed.get();
+    thread.pause();
+
+    Timer timer;
+    timer.start(600ms, Duration::zero(), [&] {
+        ending = true;
+        loop.stop();
+    });
+
+    loop.run();
+}

@@ -61,9 +61,7 @@ public:
     }
 
     ~Thread() override {
-        if (paused) {
-            resume();
-        }
+        resume();
 
         std::promise<void> joinable;
 
@@ -94,34 +92,12 @@ public:
     // sent to a paused `Object` will be queued and only processed after
     // `resume()` is called.
     void pause() {
-        MBGL_VERIFY_THREAD(tid);
-
-        assert(!paused);
-
-        paused = std::make_unique<std::promise<void>>();
-        resumed = std::make_unique<std::promise<void>>();
-
-        auto pausing = paused->get_future();
-
-        loop->invoke([this] {
-            auto resuming = resumed->get_future();
-            paused->set_value();
-            resuming.get();
-        });
-
-        pausing.get();
+        loop->pause();
     }
 
     // Resumes the `Object` thread previously paused by `pause()`.
     void resume() {
-        MBGL_VERIFY_THREAD(tid);
-
-        assert(paused);
-
-        resumed->set_value();
-
-        resumed.reset();
-        paused.reset();
+        loop->resume();
     }
 
 private:
@@ -133,9 +109,6 @@ private:
 
     std::thread thread;
     std::unique_ptr<Actor<Object>> object;
-
-    std::unique_ptr<std::promise<void>> paused;
-    std::unique_ptr<std::promise<void>> resumed;
 
     util::RunLoop* loop = nullptr;
 };

@@ -52,8 +52,7 @@ LOOP_HANDLE RunLoop::getLoopHandle() {
     return nullptr;
 }
 
-void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(task); });
+void RunLoop::wake() {
     impl->async->send();
 }
 
