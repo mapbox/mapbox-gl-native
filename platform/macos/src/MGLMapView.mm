@@ -1272,7 +1272,7 @@ public:
     return [self cameraForCameraOptions:cameraOptions];
 }
 
-- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(double)direction edgePadding:(NSEdgeInsets)insets {
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets {
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
 
