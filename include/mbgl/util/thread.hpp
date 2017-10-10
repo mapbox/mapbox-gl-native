@@ -128,26 +128,9 @@ private:
     MBGL_STORE_THREAD(tid);
 
     void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        {
-            std::lock_guard<std::mutex> lock(mutex);
-            queue.push(mailbox);
-        }
-
-        loop->invoke([this] { receive(); });
+        loop->schedule(mailbox);
     }
 
-    void receive() {
-        std::unique_lock<std::mutex> lock(mutex);
-
-        auto mailbox = queue.front();
-        queue.pop();
-        lock.unlock();
-
-        Mailbox::maybeReceive(mailbox);
-    }
-
-    std::mutex mutex;
-    std::queue<std::weak_ptr<Mailbox>> queue;
     std::thread thread;
     std::unique_ptr<Actor<Object>> object;
 
