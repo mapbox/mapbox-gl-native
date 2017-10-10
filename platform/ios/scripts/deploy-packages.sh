@@ -58,17 +58,17 @@ BINARY_DIRECTORY=${BINARY_DIRECTORY:-build/ios/deploy}
 GITHUB_RELEASE=${GITHUB_RELEASE:-true}
 PUBLISH_PRE_FLAG=''
 
+if [[ -z `which github-release` ]]; then
+    step "Installing github-release…"
+    brew install github-release
+    if [ -z `which github-release` ]; then
+        echo "Unable to install github-release. See: https://github.com/aktau/github-release"
+        exit 1
+    fi
+fi
+
 if [[ ${GITHUB_RELEASE} = "true" ]]; then
     GITHUB_RELEASE=true # Assign bool, not just a string
-
-    if [[ -z `which github-release` ]]; then
-        step "Installing github-release…"
-        brew install github-release
-        if [ -z `which github-release` ]; then
-            echo "Unable to install github-release. See: https://github.com/aktau/github-release"
-            exit 1
-        fi
-    fi
 fi
 
 if [[ -z ${VERSION_TAG} ]]; then
@@ -83,7 +83,7 @@ if [[ $( echo ${VERSION_TAG} | grep --invert-match ios-v ) ]]; then
     exit 1
 fi
 
-if [[ $( curl --head https://api.github.com/repos/${GITHUB_USER}/${GITHUB_REPO}/releases/tags/${VERSION_TAG} | head -n 1 | grep -c "404 Not Found") == 0 ]]; then
+if github-release info --tag ${VERSION_TAG} | grep --quiet "draft: ✗"; then
     echo "Error: ${VERSION_TAG} has already been published on GitHub"
     echo "See: https://github.com/${GITHUB_USER}/${GITHUB_REPO}/releases/tag/${VERSION_TAG}"
     exit 1
