@@ -97,6 +97,9 @@ mapbox-gl-native > platform > android
 Once you open it in Android Studio and switch to the Android view in the left-hand sidebar,  you should see the `MapboxGLAndroidSDK` and `MapboxGLAndroidSDKTestApp` folders.
 
 
+Alternatively, you can use the Terminal application to open the project in Android Studio. Open your Terminal application, navigate to this repository's root folder, and run the `make aproj` command.
+
+
 ##### macOS
 
 Execute the following to generate the required build files and open the project with Android Studio:
