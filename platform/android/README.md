@@ -18,8 +18,10 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 #### Using the SDK snapshot
 
-Instead of using the latest stable release of the Mapbox Android SDK, you can use the nightly build/"snapshot" or the beta version if there is one available. If you'd like to use a snapshot build,  your Android project's gradle file should
-have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
+
+
+
+Instead of using the latest stable release of the Mapbox Android SDK, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
 
 ```java
 // Mapbox SDK dependency
