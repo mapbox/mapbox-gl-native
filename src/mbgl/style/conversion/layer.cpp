@@ -14,7 +14,7 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-static optional<Error> setLayoutProperty(Layer& layer, const std::string& name, const Value& value) {
+optional<Error> setLayoutProperty(Layer& layer, const std::string& name, const Value& value) {
     static const auto setters = makeLayoutPropertySetters();
     auto it = setters.find(name);
     if (it == setters.end()) {
@@ -23,7 +23,7 @@ static optional<Error> setLayoutProperty(Layer& layer, const std::string& name, 
     return it->second(layer, value);
 }
 
-static optional<Error> setPaintProperty(Layer& layer, const std::string& name, const Value& value) {
+optional<Error> setPaintProperty(Layer& layer, const std::string& name, const Value& value) {
     static const auto setters = makePaintPropertySetters();
     auto it = setters.find(name);
     if (it == setters.end()) {
