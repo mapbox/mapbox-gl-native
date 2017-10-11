@@ -66,11 +66,6 @@ dependencies {
         exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-sdk'
     }
 
-    // Location Layer Plugin
-    compile ('com.mapbox.mapboxsdk:mapbox-android-plugin-locationlayer:0.1.0@aar') {
-        exclude group: 'com.mapbox.mapboxsdk', module: 'mapbox-android-sdk'
-    }
-
     // Leak Canary
     debugCompile rootProject.ext.dep.leakCanaryDebug
     releaseCompile rootProject.ext.dep.leakCanaryRelease
