@@ -34,7 +34,8 @@ MGL_EXPORT
  The heading of the user location. (read-only)
 
  This property is `nil` if the user location tracking mode is not
- `MGLUserTrackingModeFollowWithHeading`.
+ `MGLUserTrackingModeFollowWithHeading` or if
+ `MGLMapView.showsUserHeadingIndicator` is disabled.
  */
 @property (nonatomic, readonly, nullable) CLHeading *heading;
 
