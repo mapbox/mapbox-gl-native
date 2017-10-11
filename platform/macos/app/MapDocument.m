@@ -3,9 +3,10 @@
 #import "AppDelegate.h"
 #import "LimeGreenStyleLayer.h"
 #import "DroppedPinAnnotation.h"
+#import "MGLMapsnapshotter.h"
 
 #import "MGLStyle+MBXAdditions.h"
-#import "MGLVectorSource+MBXAdditions.h"
+#import "MGLVectorSource+MGLAdditions.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -73,6 +74,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
     BOOL _isShowingAnimatedAnnotation;
+    
+    // Snapshotter
+    MGLMapSnapshotter* snapshotter;
 }
 
 #pragma mark Lifecycle
@@ -153,6 +157,66 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
              camera.heading, camera.pitch]];
 }
 
+#pragma mark File methods
+
+- (IBAction)takeSnapshot:(id)sender {
+    MGLMapCamera *camera = self.mapView.camera;
+    
+    MGLMapSnapshotOptions *options = [[MGLMapSnapshotOptions alloc] initWithStyleURL:self.mapView.styleURL camera:camera size:self.mapView.bounds.size];
+    options.zoomLevel = self.mapView.zoomLevel;
+    
+    // Create and start the snapshotter
+    snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    [snapshotter startWithCompletionHandler:^(NSImage *image, NSError *error) {
+        if (error) {
+            NSLog(@"Could not load snapshot: %@", error.localizedDescription);
+        } else {
+            // Set the default name for the file and show the panel.
+            NSSavePanel *panel = [NSSavePanel savePanel];
+            panel.nameFieldStringValue = [self.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
+            panel.allowedFileTypes = [@[(NSString *)kUTTypePNG] arrayByAddingObjectsFromArray:[NSBitmapImageRep imageUnfilteredTypes]];
+            
+            [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
+                if (result == NSFileHandlingPanelOKButton) {
+                    // Write the contents in the new format.
+                    NSURL *fileURL = panel.URL;
+                    
+                    NSBitmapImageRep *bitmapRep;
+                    for (NSImageRep *imageRep in image.representations) {
+                        if ([imageRep isKindOfClass:[NSBitmapImageRep class]]) {
+                            bitmapRep = (NSBitmapImageRep *)imageRep;
+                            break; // stop on first bitmap rep we find
+                        }
+                    }
+                    
+                    if (!bitmapRep) {
+                        bitmapRep = [NSBitmapImageRep imageRepWithData:image.TIFFRepresentation];
+                    }
+                    
+                    CFStringRef uti = UTTypeCreatePreferredIdentifierForTag(kUTTagClassFilenameExtension, (__bridge CFStringRef)fileURL.pathExtension, NULL /* inConformingToUTI */);
+                    NSBitmapImageFileType fileType = NSTIFFFileType;
+                    if (UTTypeConformsTo(uti, kUTTypePNG)) {
+                        fileType = NSPNGFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeGIF)) {
+                        fileType = NSGIFFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeJPEG2000)) {
+                        fileType = NSJPEG2000FileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeJPEG)) {
+                        fileType = NSJPEGFileType;
+                    } else if (UTTypeConformsTo(uti, kUTTypeBMP)) {
+                        fileType = NSBitmapImageFileTypeBMP;
+                    }
+                    
+                    NSData *imageData = [bitmapRep representationUsingType:fileType properties:@{}];
+                    [imageData writeToURL:fileURL atomically:NO];
+                }
+            }];
+
+        }
+        snapshotter = nil;
+    }];
+}
+
 #pragma mark View methods
 
 - (IBAction)showStyle:(id)sender {
@@ -183,10 +247,10 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             styleURL = [MGLStyle satelliteStreetsStyleURL];
             break;
         case 7:
-            styleURL = [MGLStyle trafficDayStyleURL];
+            styleURL = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"];
             break;
         case 8:
-            styleURL = [MGLStyle trafficNightStyleURL];
+            styleURL = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"];
             break;
         default:
             NSAssert(NO, @"Cannot set style from control with tag %li", (long)tag);
@@ -344,52 +408,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)updateLabels {
-    MGLStyle *style = self.mapView.style;
-    NSString *preferredLanguage = _isLocalizingLabels ? [MGLVectorSource preferredMapboxStreetsLanguage] : nil;
-    NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
-    for (MGLSymbolStyleLayer *layer in style.layers) {
-        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-            continue;
-        }
-
-        MGLVectorSource *source = (MGLVectorSource *)[style sourceWithIdentifier:layer.sourceIdentifier];
-        if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
-            continue;
-        }
-
-        NSDictionary *localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier];
-        if (!localizedKeysByKey) {
-            localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier] = [source localizedKeysByKeyForPreferredLanguage:preferredLanguage];
-        }
-
-        NSString *(^stringByLocalizingString)(NSString *) = ^ NSString * (NSString *string) {
-            NSMutableString *localizedString = string.mutableCopy;
-            [localizedKeysByKey enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull localizedKey, BOOL * _Nonnull stop) {
-                NSAssert([key isKindOfClass:[NSString class]], @"key is not a string");
-                NSAssert([localizedKey isKindOfClass:[NSString class]], @"localizedKey is not a string");
-                [localizedString replaceOccurrencesOfString:[NSString stringWithFormat:@"{%@}", key]
-                                                 withString:[NSString stringWithFormat:@"{%@}", localizedKey]
-                                                    options:0
-                                                      range:NSMakeRange(0, localizedString.length)];
-            }];
-            return localizedString;
-        };
-
-        if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
-            NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
-            layer.text = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
-        }
-        else if ([layer.text isKindOfClass:[MGLCameraStyleFunction class]]) {
-            MGLCameraStyleFunction *function = (MGLCameraStyleFunction<NSString *> *)layer.text;
-            NSMutableDictionary *stops = function.stops.mutableCopy;
-            [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber *zoomLevel, MGLConstantStyleValue<NSString *> *stop, BOOL *done) {
-                NSString *textField = stop.rawValue;
-                stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:stringByLocalizingString(textField)];
-            }];
-            function.stops = stops;
-            layer.text = function;
-        }
-    }
+    self.mapView.style.localizesLabels = _isLocalizingLabels;
 }
 
 - (void)applyPendingState {
@@ -854,10 +873,10 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
                 state = [styleURL isEqual:[MGLStyle satelliteStreetsStyleURL]];
                 break;
             case 7:
-                state = [styleURL isEqual:[MGLStyle trafficDayStyleURL]];
+                state = [styleURL isEqual:[NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"]];
                 break;
             case 8:
-                state = [styleURL isEqual:[MGLStyle trafficNightStyleURL]];
+                state = [styleURL isEqual:[NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"]];
                 break;
             default:
                 return NO;
@@ -1007,6 +1026,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(giveFeedback:)) {
         return YES;
+    }
+    if (menuItem.action == @selector(takeSnapshot:)) {
+        return !(snapshotter && [snapshotter isLoading]);
     }
     return NO;
 }

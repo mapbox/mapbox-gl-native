@@ -50,19 +50,16 @@ class Actor : public util::noncopyable {
 public:
 
     // Enabled for Objects with a constructor taking ActorRef<Object> as the first parameter
-    template <typename U = Object, class... Args,
-            typename std::enable_if<std::is_constructible<U, ActorRef<Object>, Args...>::value>::type...>
+    template <typename U = Object, class... Args, typename std::enable_if<std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
     Actor(Scheduler& scheduler, Args&&... args_)
             : mailbox(std::make_shared<Mailbox>(scheduler)),
               object(self(), std::forward<Args>(args_)...) {
     }
 
     // Enabled for plain Objects
-    template <typename U = Object, class... Args,
-            typename std::enable_if<!std::is_constructible<U, ActorRef<Object>, Args...>::value>::type...>
-    Actor(Scheduler& scheduler, Args&&... args_)
-            : mailbox(std::make_shared<Mailbox>(scheduler)),
-              object(std::forward<Args>(args_)...) {
+    template<typename U = Object, class... Args, typename std::enable_if<!std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
+    Actor(Scheduler& scheduler, Args&& ... args_)
+            : mailbox(std::make_shared<Mailbox>(scheduler)), object(std::forward<Args>(args_)...) {
     }
 
     ~Actor() {

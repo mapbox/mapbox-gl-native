@@ -62,6 +62,28 @@ TEST(ActorRef, Ask) {
     EXPECT_EQ(30, ref.ask(&Test::echo, 30).get());
 }
 
+TEST(ActorRef, AskVoid) {
+    // Ask waits for void methods
+    
+    struct Test {
+        bool& executed;
+        
+        Test(bool& executed_) : executed(executed_) {
+        }
+        
+        void doIt() {
+            executed = true;
+        }
+    };
+    
+    ThreadPool pool { 1 };
+    bool executed = false;
+    Actor<Test> actor(pool, executed);
+    ActorRef<Test> ref = actor.self();
+    
+    ref.ask(&Test::doIt).get();
+    EXPECT_TRUE(executed);
+}
 
 TEST(ActorRef, AskOnDestroyedActor) {
     // Tests behavior when calling ask() after the

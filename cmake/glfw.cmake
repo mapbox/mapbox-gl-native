@@ -34,6 +34,8 @@ mbgl_platform_glfw()
 
 create_source_groups(mbgl-glfw)
 
+initialize_xcode_cxx_build_settings(mbgl-glfw)
+
 xcode_create_scheme(
     TARGET mbgl-glfw
     OPTIONAL_ARGS

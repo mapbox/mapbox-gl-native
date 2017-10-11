@@ -8,7 +8,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -23,6 +22,12 @@ import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity showcasing having 2 maps on top of each other.
+ * <p>
+ * The small map is using the `mapbox_enableZMediaOverlay="true"` configuration
+ * </p>
+ */
 public class DoubleMapActivity extends AppCompatActivity {
 
   private static final String TAG_FRAGMENT = "map";
@@ -45,11 +50,11 @@ public class DoubleMapActivity extends AppCompatActivity {
   public void setMapboxMap(MapboxMap map) {
     // we need to set mapboxmap on the parent activity,
     // for auto-generated ui tests
-
     mapboxMap = map;
     mapboxMap.setStyleUrl(Style.DARK);
     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
     try {
+      mapboxMap.setMyLocationEnabled(true);
       TrackingSettings settings = mapboxMap.getTrackingSettings();
       settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
     } catch (SecurityException securityException) {
@@ -58,6 +63,9 @@ public class DoubleMapActivity extends AppCompatActivity {
     }
   }
 
+  /**
+   * Custom fragment containing 2 MapViews.
+   */
   public static class DoubleMapFragment extends Fragment {
 
     private DoubleMapActivity activity;
@@ -107,6 +115,7 @@ public class DoubleMapActivity extends AppCompatActivity {
           uiSettings.setLogoEnabled(false);
 
           try {
+            mapboxMap.setMyLocationEnabled(true);
             TrackingSettings settings = mapboxMap.getTrackingSettings();
             settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
           } catch (SecurityException securityException) {
@@ -123,9 +132,6 @@ public class DoubleMapActivity extends AppCompatActivity {
           });
         }
       });
-
-      SurfaceView surfaceViewMini = (SurfaceView) mapViewMini.findViewById(R.id.surfaceView);
-      surfaceViewMini.setZOrderMediaOverlay(true);
     }
 
     @Override
@@ -157,8 +163,8 @@ public class DoubleMapActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onDestroy() {
-      super.onDestroy();
+    public void onDestroyView() {
+      super.onDestroyView();
       mapView.onDestroy();
       mapViewMini.onDestroy();
     }

@@ -325,7 +325,9 @@ size_t HTTPRequest::headerCallback(char *const buffer, const size_t size, const 
         baton->response->etag = std::string(buffer + begin, length - begin - 2); // remove \r\n
     } else if ((begin = headerMatches("cache-control: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
-        baton->response->expires = http::CacheControl::parse(value.c_str()).toTimePoint();
+        const auto cc = http::CacheControl::parse(value.c_str());
+        baton->response->expires = cc.toTimePoint();
+        baton->response->mustRevalidate = cc.mustRevalidate;
     } else if ((begin = headerMatches("expires: ", buffer, length)) != std::string::npos) {
         const std::string value { buffer + begin, length - begin - 2 }; // remove \r\n
         baton->response->expires = Timestamp{ Seconds(curl_getdate(value.c_str(), nullptr)) };

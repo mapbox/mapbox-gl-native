@@ -108,7 +108,7 @@ run-test-%: test
 run-benchmark: run-benchmark-.
 
 run-benchmark-%: benchmark
-	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$*
+	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
 
 .PHONY: node-benchmark
 node-benchmark: $(MACOS_PROJ_PATH)
@@ -440,6 +440,12 @@ test-node: node
 	npm test
 	npm run test-suite
 
+.PHONY: test-node-recycle-map
+test-node-recycle-map: node
+	npm test
+	npm run test-render -- --recycle-map --shuffle
+	npm run test-query
+
 #### Android targets ###########################################################
 
 MBGL_ANDROID_ABIS  = arm-v5;armeabi
@@ -528,7 +534,7 @@ run-android-core-test-$1: run-android-core-test-$1-*
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
 run-android-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 # Build test app instrumentation tests apk and test app apk for specified abi
@@ -539,12 +545,12 @@ android-ui-test-$1: platform/android/configuration.gradle
 # Run test app instrumentation tests on a connected android device or emulator with specified abi
 .PHONY: run-android-ui-test-$1
 run-android-ui-test-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest
 
 # Run Java Instrumentation tests on a connected android device or emulator with specified abi and test filter
 run-android-ui-test-$1-%: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
 
 endef
@@ -588,6 +594,7 @@ run-android-ui-test-aws: platform/android/configuration.gradle
 # Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/configuration.gradle
+	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Uploads the compiled Android SDK to Maven
@@ -609,6 +616,10 @@ run-android-ui-test-spoon: platform/android/configuration.gradle
 .PHONY: test-code-android
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
+
+# Runs checkstyle and lint on the Android code
+.PHONY: android-check
+android-check : android-checkstyle android-lint-sdk android-lint-test-app
 
 # Runs checkstyle on the Android code
 .PHONY: android-checkstyle

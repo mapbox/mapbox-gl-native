@@ -1214,6 +1214,111 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testIconAnchorAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set and Get
+        layer.setProperties(iconAnchor(ICON_ANCHOR_CENTER));
+        assertEquals((String) layer.getIconAnchor().getValue(), (String) ICON_ANCHOR_CENTER);
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsCameraFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(
+            zoom(
+              interval(
+                stop(2, iconAnchor(ICON_ANCHOR_CENTER))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(CameraFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals(IntervalStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+        assertEquals(1, ((IntervalStops) layer.getIconAnchor().getFunction().getStops()).size());
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(property("FeaturePropertyA", Stops.<String>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconAnchor().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testIconAnchorAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("icon-anchor");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          iconAnchor(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, iconAnchor(ICON_ANCHOR_CENTER))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getIconAnchor());
+        assertNotNull(layer.getIconAnchor().getFunction());
+        assertEquals(SourceFunction.class, layer.getIconAnchor().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getIconAnchor().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getIconAnchor().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
   public void testIconPitchAlignmentAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1742,6 +1847,139 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testTextMaxWidthAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-max-width");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textMaxWidth(property("FeaturePropertyA", Stops.<Float>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getTextMaxWidth());
+        assertNotNull(layer.getTextMaxWidth().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextMaxWidth().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextMaxWidth().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getTextMaxWidth().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextMaxWidthAsExponentialSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-max-width");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textMaxWidth(
+            property(
+              "FeaturePropertyA",
+              exponential(
+                stop(0.3f, textMaxWidth(0.3f))
+              ).withBase(0.5f)
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextMaxWidth());
+        assertNotNull(layer.getTextMaxWidth().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextMaxWidth().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextMaxWidth().getFunction()).getProperty());
+        assertEquals(ExponentialStops.class, layer.getTextMaxWidth().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextMaxWidthAsCategoricalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-max-width");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textMaxWidth(
+            property(
+              "FeaturePropertyA",
+              categorical(
+                stop(1.0f, textMaxWidth(0.3f))
+              )
+            ).withDefaultValue(textMaxWidth(0.3f))
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextMaxWidth());
+        assertNotNull(layer.getTextMaxWidth().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextMaxWidth().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextMaxWidth().getFunction()).getProperty());
+        assertEquals(CategoricalStops.class, layer.getTextMaxWidth().getFunction().getStops().getClass());
+        assertNotNull(((SourceFunction) layer.getTextMaxWidth().getFunction()).getDefaultValue());
+        assertNotNull(((SourceFunction) layer.getTextMaxWidth().getFunction()).getDefaultValue().getValue());
+        assertEquals(0.3f, ((SourceFunction) layer.getTextMaxWidth().getFunction()).getDefaultValue().getValue());
+      }
+    });
+
+  }
+
+  @Test
+  public void testTextMaxWidthAsCompositeFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-max-width");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textMaxWidth(
+            composite(
+              "FeaturePropertyA",
+              exponential(
+                stop(0, 0.3f, textMaxWidth(0.9f))
+              ).withBase(0.5f)
+            ).withDefaultValue(textMaxWidth(0.3f))
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextMaxWidth());
+        assertNotNull(layer.getTextMaxWidth().getFunction());
+        assertEquals(CompositeFunction.class, layer.getTextMaxWidth().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getTextMaxWidth().getFunction()).getProperty());
+        assertEquals(ExponentialStops.class, layer.getTextMaxWidth().getFunction().getStops().getClass());
+        assertEquals(1, ((ExponentialStops) layer.getTextMaxWidth().getFunction().getStops()).size());
+
+        ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+          (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getTextMaxWidth().getFunction().getStops();
+        Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+        assertEquals(0f, stop.in.zoom, 0.001);
+        assertEquals(0.3f, stop.in.value, 0.001f);
+        assertEquals(0.9f, stop.out, 0.001f);
+      }
+    });
+  }
+
+  @Test
   public void testTextLineHeightAsConstant() {
     validateTestSetup();
     setupLayer();
@@ -1835,6 +2073,139 @@ public class SymbolLayerTest extends BaseActivityTest {
         assertEquals(ExponentialStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
         assertEquals(0.5f, ((ExponentialStops) layer.getTextLetterSpacing().getFunction().getStops()).getBase(), 0.001);
         assertEquals(1, ((ExponentialStops) layer.getTextLetterSpacing().getFunction().getStops()).size());
+      }
+    });
+  }
+
+  @Test
+  public void testTextLetterSpacingAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-letter-spacing");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textLetterSpacing(property("FeaturePropertyA", Stops.<Float>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getTextLetterSpacing());
+        assertNotNull(layer.getTextLetterSpacing().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextLetterSpacing().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextLetterSpacing().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextLetterSpacingAsExponentialSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-letter-spacing");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textLetterSpacing(
+            property(
+              "FeaturePropertyA",
+              exponential(
+                stop(0.3f, textLetterSpacing(0.3f))
+              ).withBase(0.5f)
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextLetterSpacing());
+        assertNotNull(layer.getTextLetterSpacing().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextLetterSpacing().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextLetterSpacing().getFunction()).getProperty());
+        assertEquals(ExponentialStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextLetterSpacingAsCategoricalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-letter-spacing");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textLetterSpacing(
+            property(
+              "FeaturePropertyA",
+              categorical(
+                stop(1.0f, textLetterSpacing(0.3f))
+              )
+            ).withDefaultValue(textLetterSpacing(0.3f))
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextLetterSpacing());
+        assertNotNull(layer.getTextLetterSpacing().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextLetterSpacing().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextLetterSpacing().getFunction()).getProperty());
+        assertEquals(CategoricalStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
+        assertNotNull(((SourceFunction) layer.getTextLetterSpacing().getFunction()).getDefaultValue());
+        assertNotNull(((SourceFunction) layer.getTextLetterSpacing().getFunction()).getDefaultValue().getValue());
+        assertEquals(0.3f, ((SourceFunction) layer.getTextLetterSpacing().getFunction()).getDefaultValue().getValue());
+      }
+    });
+
+  }
+
+  @Test
+  public void testTextLetterSpacingAsCompositeFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-letter-spacing");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textLetterSpacing(
+            composite(
+              "FeaturePropertyA",
+              exponential(
+                stop(0, 0.3f, textLetterSpacing(0.9f))
+              ).withBase(0.5f)
+            ).withDefaultValue(textLetterSpacing(0.3f))
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextLetterSpacing());
+        assertNotNull(layer.getTextLetterSpacing().getFunction());
+        assertEquals(CompositeFunction.class, layer.getTextLetterSpacing().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((CompositeFunction) layer.getTextLetterSpacing().getFunction()).getProperty());
+        assertEquals(ExponentialStops.class, layer.getTextLetterSpacing().getFunction().getStops().getClass());
+        assertEquals(1, ((ExponentialStops) layer.getTextLetterSpacing().getFunction().getStops()).size());
+
+        ExponentialStops<Stop.CompositeValue<Float, Float>, Float> stops =
+          (ExponentialStops<Stop.CompositeValue<Float, Float>, Float>) layer.getTextLetterSpacing().getFunction().getStops();
+        Stop<Stop.CompositeValue<Float, Float>, Float> stop = stops.iterator().next();
+        assertEquals(0f, stop.in.zoom, 0.001);
+        assertEquals(0.3f, stop.in.value, 0.001f);
+        assertEquals(0.9f, stop.out, 0.001f);
       }
     });
   }

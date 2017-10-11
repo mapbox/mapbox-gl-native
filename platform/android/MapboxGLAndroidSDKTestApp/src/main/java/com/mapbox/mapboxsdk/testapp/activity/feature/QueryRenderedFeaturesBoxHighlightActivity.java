@@ -46,6 +46,15 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
       @Override
       public void onMapReady(final MapboxMap mapboxMap) {
         QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
+
+        // Add layer / source
+        final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
+        mapboxMap.addSource(source);
+        mapboxMap.addLayer(
+          new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+            .withProperties(fillColor(Color.RED))
+        );
+
         selectionBox.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View view) {
@@ -53,7 +62,7 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i(String.format("Querying box %s for buildings", box));
+            Timber.i("Querying box %s for buildings", box);
             List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
 
             // Show count
@@ -62,17 +71,8 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
               String.format("%s features in box", features.size()),
               Toast.LENGTH_SHORT).show();
 
-            // remove layer / source if already added
-            mapboxMap.removeSource("highlighted-shapes-source");
-            mapboxMap.removeLayer("highlighted-shapes-layer");
-
-            // Add layer / source
-            mapboxMap.addSource(
-              new GeoJsonSource("highlighted-shapes-source",
-                FeatureCollection.fromFeatures(features))
-            );
-            mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
-              .withProperties(fillColor(Color.RED)));
+            // Update source data
+            source.setGeoJson(FeatureCollection.fromFeatures(features));
           }
         });
       }

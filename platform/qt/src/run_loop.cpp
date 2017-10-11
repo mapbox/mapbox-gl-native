@@ -1,19 +1,12 @@
 #include "run_loop_impl.hpp"
 
-#include <mbgl/util/thread_local.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <QCoreApplication>
 
 #include <cassert>
 #include <functional>
 #include <utility>
-
-namespace {
-
-using namespace mbgl::util;
-static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
-
-}
 
 namespace mbgl {
 namespace util {
@@ -27,7 +20,8 @@ void RunLoop::Impl::onWriteEvent(int fd) {
 }
 
 RunLoop* RunLoop::Get() {
-    return current.get();
+    assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
+    return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
@@ -42,14 +36,14 @@ RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>()) {
 
     impl->type = type;
 
-    current.set(this);
+    Scheduler::SetCurrent(this);
     impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }
 
 RunLoop::~RunLoop() {
     MBGL_VERIFY_THREAD(tid);
 
-    current.set(nullptr);
+    Scheduler::SetCurrent(nullptr);
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {

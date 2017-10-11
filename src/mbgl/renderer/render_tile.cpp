@@ -74,27 +74,6 @@ void RenderTile::finishRender(PaintParameters& parameters) {
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
 
-    auto draw = [&] (Color color, const auto& vertexBuffer, const auto& indexBuffer, const auto& segments, auto drawMode) {
-        parameters.programs.debug.draw(
-            parameters.context,
-            drawMode,
-            gl::DepthMode::disabled(),
-            parameters.stencilModeForClipping(clip),
-            gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-                uniforms::u_matrix::Value{ matrix },
-                uniforms::u_color::Value{ color }
-            },
-            vertexBuffer,
-            indexBuffer,
-            segments,
-            paintAttibuteData,
-            properties,
-            parameters.state.getZoom(),
-            "debug"
-        );
-    };
-
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
             tile.debugBucket->complete != tile.isComplete() ||
@@ -106,25 +85,64 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 tile.expires, parameters.debugOptions, parameters.context);
         }
 
-        draw(Color::white(),
-             *tile.debugBucket->vertexBuffer,
-             *tile.debugBucket->indexBuffer,
-             tile.debugBucket->segments,
-             gl::Lines { 4.0f * parameters.pixelRatio });
+        parameters.programs.debug.draw(
+            parameters.context,
+            gl::Lines { 4.0f * parameters.pixelRatio },
+            gl::DepthMode::disabled(),
+            parameters.stencilModeForClipping(clip),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+                uniforms::u_matrix::Value{ matrix },
+                uniforms::u_color::Value{ Color::white() }
+            },
+            *tile.debugBucket->vertexBuffer,
+            *tile.debugBucket->indexBuffer,
+            tile.debugBucket->segments,
+            paintAttibuteData,
+            properties,
+            parameters.state.getZoom(),
+            "debug"
+        );
 
-        draw(Color::black(),
-             *tile.debugBucket->vertexBuffer,
-             *tile.debugBucket->indexBuffer,
-             tile.debugBucket->segments,
-             gl::Lines { 2.0f * parameters.pixelRatio });
+        parameters.programs.debug.draw(
+            parameters.context,
+            gl::Lines { 2.0f * parameters.pixelRatio },
+            gl::DepthMode::disabled(),
+            parameters.stencilModeForClipping(clip),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+                uniforms::u_matrix::Value{ matrix },
+                uniforms::u_color::Value{ Color::black() }
+            },
+            *tile.debugBucket->vertexBuffer,
+            *tile.debugBucket->indexBuffer,
+            tile.debugBucket->segments,
+            paintAttibuteData,
+            properties,
+            parameters.state.getZoom(),
+            "debug"
+        );
     }
 
     if (parameters.debugOptions & MapDebugOptions::TileBorders) {
-        draw(Color::red(),
-             parameters.staticData.tileVertexBuffer,
-             parameters.staticData.tileBorderIndexBuffer,
-             parameters.staticData.tileBorderSegments,
-             gl::LineStrip { 4.0f * parameters.pixelRatio });
+        parameters.programs.debug.draw(
+            parameters.context,
+            gl::LineStrip { 4.0f * parameters.pixelRatio },
+            gl::DepthMode::disabled(),
+            parameters.stencilModeForClipping(clip),
+            gl::ColorMode::unblended(),
+            DebugProgram::UniformValues {
+                uniforms::u_matrix::Value{ matrix },
+                uniforms::u_color::Value{ Color::red() }
+            },
+            parameters.staticData.tileVertexBuffer,
+            parameters.staticData.tileBorderIndexBuffer,
+            parameters.staticData.tileBorderSegments,
+            paintAttibuteData,
+            properties,
+            parameters.state.getZoom(),
+            "debug"
+        );
     }
 }
 

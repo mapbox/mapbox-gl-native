@@ -9,5 +9,6 @@
     android:paddingLeft="24dp"
     android:paddingRight="24dp"
     android:textAllCaps="true"
+    android:textIsSelectable="false"
     android:textAppearance="?android:attr/textAppearanceButton"
     android:textColor="@color/mapbox_blue"/>

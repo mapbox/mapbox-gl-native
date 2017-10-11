@@ -27,6 +27,7 @@ varying lowp float base;
 uniform lowp float u_base;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_height
 uniform lowp float a_height_t;
 attribute lowp vec2 a_height;
@@ -34,6 +35,7 @@ varying lowp float height;
 #else
 uniform lowp float u_height;
 #endif
+
 
 
 #ifndef HAS_UNIFORM_u_color
@@ -44,25 +46,29 @@ varying highp vec4 color;
 uniform highp vec4 u_color;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifndef HAS_UNIFORM_u_base
     base = unpack_mix_vec2(a_base, a_base_t);
 #else
     lowp float base = u_base;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_height
     height = unpack_mix_vec2(a_height, a_height_t);
 #else
     lowp float height = u_height;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_color
     color = unpack_mix_vec4(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
+
 
     base = max(0.0, base);
     height = max(0.0, height);
@@ -113,11 +119,13 @@ varying lowp float base;
 uniform lowp float u_base;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_height
 varying lowp float height;
 #else
 uniform lowp float u_height;
 #endif
+
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -125,19 +133,23 @@ varying highp vec4 color;
 uniform highp vec4 u_color;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifdef HAS_UNIFORM_u_base
     lowp float base = u_base;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_height
     lowp float height = u_height;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_color
     highp vec4 color = u_color;
 #endif
+
 
     gl_FragColor = v_color;
 

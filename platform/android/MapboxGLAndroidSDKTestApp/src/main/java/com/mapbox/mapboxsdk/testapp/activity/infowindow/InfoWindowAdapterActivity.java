@@ -18,6 +18,9 @@ import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarkerOptions;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
+/**
+ * Test activity showcasing using an InfoWindowAdapter to provide a custom InfoWindow content.
+ */
 public class InfoWindowAdapterActivity extends AppCompatActivity {
 
   private MapView mapView;

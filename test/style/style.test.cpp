@@ -28,27 +28,27 @@ TEST(Style, Properties) {
 
     style.loadJSON(R"STYLE({"center": [10, 20]})STYLE");
     ASSERT_EQ("", style.getName());
-    ASSERT_EQ((LatLng{20, 10}), style.getDefaultLatLng());
+    ASSERT_EQ((LatLng{20, 10}), *style.getDefaultCamera().center);
 
     style.loadJSON(R"STYLE({"bearing": 24})STYLE");
     ASSERT_EQ("", style.getName());
-    ASSERT_EQ((LatLng{0, 0}), style.getDefaultLatLng());
-    ASSERT_EQ(24, style.getDefaultBearing());
+    ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
+    ASSERT_EQ(24, *style.getDefaultCamera().angle);
 
     style.loadJSON(R"STYLE({"zoom": 13.3})STYLE");
     ASSERT_EQ("", style.getName());
-    ASSERT_EQ(13.3, style.getDefaultZoom());
+    ASSERT_EQ(13.3, *style.getDefaultCamera().zoom);
 
     style.loadJSON(R"STYLE({"pitch": 60})STYLE");
     ASSERT_EQ("", style.getName());
-    ASSERT_EQ(60, style.getDefaultPitch());
+    ASSERT_EQ(60, *style.getDefaultCamera().pitch);
 
     style.loadJSON(R"STYLE({"name": 23, "center": {}, "bearing": "north", "zoom": null, "pitch": "wide"})STYLE");
     ASSERT_EQ("", style.getName());
-    ASSERT_EQ((LatLng{0, 0}), style.getDefaultLatLng());
-    ASSERT_EQ(0, style.getDefaultBearing());
-    ASSERT_EQ(0, style.getDefaultZoom());
-    ASSERT_EQ(0, style.getDefaultPitch());
+    ASSERT_EQ(LatLng {}, *style.getDefaultCamera().center);
+    ASSERT_EQ(0, *style.getDefaultCamera().zoom);
+    ASSERT_EQ(0, *style.getDefaultCamera().angle);
+    ASSERT_EQ(0, *style.getDefaultCamera().pitch);
 }
 
 TEST(Style, DuplicateSource) {

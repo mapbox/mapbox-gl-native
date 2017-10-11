@@ -312,6 +312,7 @@ bool Statement::run() {
     return impl->query.next();
 }
 
+template bool Statement::get(int);
 template int Statement::get(int);
 template int64_t Statement::get(int);
 template double Statement::get(int);

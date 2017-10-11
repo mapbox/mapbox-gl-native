@@ -1,0 +1,27 @@
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Egy ismeretlen hiba miatt nem sikerült betölteni a térképet.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílus nem tölthető be.";
+
+/* Accessibility title */
+"MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílus hibás.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Nem sikerült betölteni a térképet, mert a stílus nem található vagy inkompatibilis.";
+
+/* Label of Zoom In button */
+"ZOOM_IN_LABEL" = "+";
+
+/* Tooltip of Zoom In button */
+"ZOOM_IN_TOOLTIP" = "Nagyítás";
+
+/* Label of Zoom Out button; U+2212 MINUS SIGN */
+"ZOOM_OUT_LABEL" = "−";
+
+/* Tooltip of Zoom Out button */
+"ZOOM_OUT_TOOLTIP" = "Kicsinyítés";
+

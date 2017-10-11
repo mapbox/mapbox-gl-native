@@ -25,12 +25,11 @@ android {
     }
 
     lintOptions {
-        baseline file("lint-baseline.xml")
+        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors true
-        disable 'MissingTranslation'
-        disable 'IconDensities'
-        disable 'InvalidPackage'
+        disable  'MissingTranslation', 'GoogleAppIndexingWarning', 'UnpackedNativeCode', 'IconDipSize', 'TypographyQuotes'
+        abortOnError false
     }
 
     buildTypes {
@@ -64,7 +63,6 @@ dependencies {
     // Leak Canary
     debugCompile rootProject.ext.dep.leakCanaryDebug
     releaseCompile rootProject.ext.dep.leakCanaryRelease
-    testCompile rootProject.ext.dep.leakCanaryTest
 
     // Mapbox Android Services (Java component)
     compile(rootProject.ext.dep.mapboxJavaServices) {

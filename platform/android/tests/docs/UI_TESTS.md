@@ -61,7 +61,7 @@ You can generate JaCoCo reports from espresso tests by
 ## Running Espresso test automatically on AWS Device Farm
 To run tests on AWS device farm you need to execute `./gradlew -Pmapbox.abis=none devicefarmUpload`.
 You can configure the different steps in the testapp `build.gradle`.
-AWS credentials are found in bitrise.
+AWS credentials are found in CircleCI.
 
 
 

@@ -20,6 +20,7 @@ varying highp vec4 color;
 uniform highp vec4 u_color;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
@@ -28,19 +29,22 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifndef HAS_UNIFORM_u_color
     color = unpack_mix_vec4(a_color, a_color_t);
 #else
     highp vec4 color = u_color;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
+
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 }
@@ -54,21 +58,25 @@ varying highp vec4 color;
 uniform highp vec4 u_color;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
 #else
 uniform lowp float u_opacity;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifdef HAS_UNIFORM_u_color
     highp vec4 color = u_color;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_opacity
     lowp float opacity = u_opacity;
 #endif
+
 
     gl_FragColor = color * opacity;
 

@@ -1,9 +1,9 @@
 #include "file_source.hpp"
 
 #include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #include "asset_manager_file_source.hpp"
 #include "jni/generic_global_ref_deleter.hpp"
@@ -45,7 +45,7 @@ void FileSource::setAPIBaseUrl(jni::JNIEnv& env, jni::String url) {
 
 void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::ResourceTransformCallback> transformCallback) {
     if (transformCallback) {
-        resourceTransform = std::make_unique<Actor<ResourceTransform>>(*util::RunLoop::Get(),
+        resourceTransform = std::make_unique<Actor<ResourceTransform>>(*Scheduler::GetCurrent(),
             // Capture the ResourceTransformCallback object as a managed global into
             // the lambda. It is released automatically when we're setting a new ResourceTransform in
             // a subsequent call.

@@ -98,6 +98,10 @@ public:
     DataDrivenPropertyValue<std::array<float, 2>> getIconOffset() const;
     void setIconOffset(DataDrivenPropertyValue<std::array<float, 2>>);
 
+    static DataDrivenPropertyValue<SymbolAnchorType> getDefaultIconAnchor();
+    DataDrivenPropertyValue<SymbolAnchorType> getIconAnchor() const;
+    void setIconAnchor(DataDrivenPropertyValue<SymbolAnchorType>);
+
     static PropertyValue<AlignmentType> getDefaultIconPitchAlignment();
     PropertyValue<AlignmentType> getIconPitchAlignment() const;
     void setIconPitchAlignment(PropertyValue<AlignmentType>);
@@ -122,25 +126,25 @@ public:
     DataDrivenPropertyValue<float> getTextSize() const;
     void setTextSize(DataDrivenPropertyValue<float>);
 
-    static PropertyValue<float> getDefaultTextMaxWidth();
-    PropertyValue<float> getTextMaxWidth() const;
-    void setTextMaxWidth(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextMaxWidth();
+    DataDrivenPropertyValue<float> getTextMaxWidth() const;
+    void setTextMaxWidth(DataDrivenPropertyValue<float>);
 
     static PropertyValue<float> getDefaultTextLineHeight();
     PropertyValue<float> getTextLineHeight() const;
     void setTextLineHeight(PropertyValue<float>);
 
-    static PropertyValue<float> getDefaultTextLetterSpacing();
-    PropertyValue<float> getTextLetterSpacing() const;
-    void setTextLetterSpacing(PropertyValue<float>);
+    static DataDrivenPropertyValue<float> getDefaultTextLetterSpacing();
+    DataDrivenPropertyValue<float> getTextLetterSpacing() const;
+    void setTextLetterSpacing(DataDrivenPropertyValue<float>);
 
     static DataDrivenPropertyValue<TextJustifyType> getDefaultTextJustify();
     DataDrivenPropertyValue<TextJustifyType> getTextJustify() const;
     void setTextJustify(DataDrivenPropertyValue<TextJustifyType>);
 
-    static DataDrivenPropertyValue<TextAnchorType> getDefaultTextAnchor();
-    DataDrivenPropertyValue<TextAnchorType> getTextAnchor() const;
-    void setTextAnchor(DataDrivenPropertyValue<TextAnchorType>);
+    static DataDrivenPropertyValue<SymbolAnchorType> getDefaultTextAnchor();
+    DataDrivenPropertyValue<SymbolAnchorType> getTextAnchor() const;
+    void setTextAnchor(DataDrivenPropertyValue<SymbolAnchorType>);
 
     static PropertyValue<float> getDefaultTextMaxAngle();
     PropertyValue<float> getTextMaxAngle() const;

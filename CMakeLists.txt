@@ -48,18 +48,18 @@ mason_use(any VERSION 8fef1e9 HEADER_ONLY)
 mason_use(unique_resource VERSION cba309e HEADER_ONLY)
 mason_use(rapidjson VERSION 1.1.0 HEADER_ONLY)
 mason_use(boost VERSION 1.62.0 HEADER_ONLY)
-mason_use(geojsonvt VERSION 6.2.0 HEADER_ONLY)
-mason_use(supercluster VERSION 0.2.1 HEADER_ONLY)
+mason_use(geojsonvt VERSION 6.3.0 HEADER_ONLY)
+mason_use(supercluster VERSION 0.2.2 HEADER_ONLY)
 mason_use(kdbush VERSION 0.1.1-1 HEADER_ONLY)
 mason_use(earcut VERSION 0.12.3 HEADER_ONLY)
 mason_use(protozero VERSION 1.5.2 HEADER_ONLY)
 mason_use(pixelmatch VERSION 0.10.0 HEADER_ONLY)
-mason_use(geojson VERSION 0.4.0 HEADER_ONLY)
-mason_use(polylabel VERSION 1.0.2 HEADER_ONLY)
-mason_use(wagyu VERSION 0.4.1 HEADER_ONLY)
-mason_use(shelf-pack VERSION 2.1.0 HEADER_ONLY)
+mason_use(geojson VERSION 0.4.2 HEADER_ONLY)
+mason_use(polylabel VERSION 1.0.3 HEADER_ONLY)
+mason_use(wagyu VERSION 0.4.3 HEADER_ONLY)
+mason_use(shelf-pack VERSION 2.1.1 HEADER_ONLY)
 mason_use(cheap-ruler VERSION 2.5.3 HEADER_ONLY)
-mason_use(vector-tile VERSION 1.0.0-rc6 HEADER_ONLY)
+mason_use(vector-tile VERSION 1.0.0-rc7 HEADER_ONLY)
 
 add_definitions(-DRAPIDJSON_HAS_STDSTRING=1)
 
@@ -127,9 +127,11 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
     message(ERROR "Can't find config.cmake file for platform ${MBGL_PLATFORM}")
 endif()
 
-include(cmake/loop-uv.cmake)
-
 include(platform/${MBGL_PLATFORM}/config.cmake)
+
+if (COMMAND mbgl_filesource)
+    include(cmake/filesource.cmake)
+endif()
 
 include(cmake/core-files.cmake)
 include(cmake/core.cmake)
@@ -163,5 +165,6 @@ endif()
 if(CMAKE_GENERATOR STREQUAL "Xcode")
     write_xcconfig_target_properties(
         mbgl-core
+        mbgl-filesource
     )
 endif()

@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.RawRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,14 +17,9 @@ import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 
 import timber.log.Timber;
 
@@ -355,7 +349,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     // Add a source
     Source source;
     try {
-      source = new GeoJsonSource("amsterdam-parks-source", readRawResource(R.raw.amsterdam));
+      source = new GeoJsonSource("amsterdam-parks-source", ResourceUtils.readRawResource(this, R.raw.amsterdam));
       mapboxMap.addSource(source);
     } catch (IOException ioException) {
       Toast.makeText(
@@ -374,22 +368,5 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
         fillAntialias(true)
       )
     );
-  }
-
-  private String readRawResource(@RawRes int rawResource) throws IOException {
-    InputStream is = getResources().openRawResource(rawResource);
-    Writer writer = new StringWriter();
-    char[] buffer = new char[1024];
-    try {
-      Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-      int numRead;
-      while ((numRead = reader.read(buffer)) != -1) {
-        writer.write(buffer, 0, numRead);
-      }
-    } finally {
-      is.close();
-    }
-
-    return writer.toString();
   }
 }

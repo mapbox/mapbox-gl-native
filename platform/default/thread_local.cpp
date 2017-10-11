@@ -58,8 +58,8 @@ void ThreadLocal<T>::set(T* ptr) {
     }
 }
 
-template class ThreadLocal<RunLoop>;
 template class ThreadLocal<BackendScope>;
+template class ThreadLocal<Scheduler>;
 template class ThreadLocal<int>; // For unit tests
 
 } // namespace util

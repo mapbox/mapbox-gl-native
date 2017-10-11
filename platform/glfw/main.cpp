@@ -34,16 +34,17 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
+    // Load settings
+    mbgl::Settings_JSON settings;
+
     bool fullscreen = false;
     bool benchmark = false;
     std::string style;
-    double latitude = 0, longitude = 0;
-    double bearing = 0, zoom = 1, pitch = 0;
-    bool skipConfig = false;
 
     const struct option long_options[] = {
         {"fullscreen", no_argument, nullptr, 'f'},
         {"benchmark", no_argument, nullptr, 'b'},
+        {"offline", no_argument, nullptr, 'o'},
         {"style", required_argument, nullptr, 's'},
         {"lon", required_argument, nullptr, 'x'},
         {"lat", required_argument, nullptr, 'y'},
@@ -59,37 +60,32 @@ int main(int argc, char *argv[]) {
         if (opt == -1) break;
         switch (opt)
         {
-        case 0:
-            if (long_options[option_index].flag != nullptr)
-                break;
         case 'f':
             fullscreen = true;
             break;
         case 'b':
             benchmark = true;
             break;
+        case 'o':
+            settings.online = false;
+            break;
         case 's':
-            style = std::string("asset://") + std::string(optarg);
+            style = std::string(optarg);
             break;
         case 'x':
-            longitude = atof(optarg);
-            skipConfig = true;
+            settings.longitude = atof(optarg);
             break;
         case 'y':
-            latitude = atof(optarg);
-            skipConfig = true;
+            settings.latitude = atof(optarg);
             break;
         case 'z':
-            zoom = atof(optarg);
-            skipConfig = true;
+            settings.zoom = atof(optarg);
             break;
         case 'r':
-            bearing = atof(optarg);
-            skipConfig = true;
+            settings.bearing = atof(optarg);
             break;
         case 'p':
-            pitch = atof(optarg);
-            skipConfig = true;
+            settings.pitch = atof(optarg);
             break;
         default:
             break;
@@ -112,6 +108,10 @@ int main(int argc, char *argv[]) {
     view = &backend;
 
     mbgl::DefaultFileSource fileSource("/tmp/mbgl-cache.db", ".");
+    if (!settings.online) {
+        fileSource.setOnlineStatus(false);
+        mbgl::Log::Warning(mbgl::Event::Setup, "Application is offline. Press `O` to toggle online status.");
+    }
 
     // Set access token if present
     const char *token = getenv("MAPBOX_ACCESS_TOKEN");
@@ -127,20 +127,20 @@ int main(int argc, char *argv[]) {
 
     backend.setMap(&map);
 
-    // Load settings
-    mbgl::Settings_JSON settings;
-
-    if (skipConfig) {
-        map.setLatLngZoom(mbgl::LatLng(latitude, longitude), zoom);
-        map.setBearing(bearing);
-        map.setPitch(pitch);
-        mbgl::Log::Info(mbgl::Event::General, "Location: %f/%f (z%.2f, %.2f deg)", latitude, longitude, zoom, bearing);
-    } else {
-        map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
-        map.setBearing(settings.bearing);
-        map.setPitch(settings.pitch);
-        map.setDebug(mbgl::MapDebugOptions(settings.debug));
+    if (!style.empty() && style.find("://") == std::string::npos) {
+        style = std::string("file://") + style;
     }
+
+    map.setLatLngZoom(mbgl::LatLng(settings.latitude, settings.longitude), settings.zoom);
+    map.setBearing(settings.bearing);
+    map.setPitch(settings.pitch);
+    map.setDebug(mbgl::MapDebugOptions(settings.debug));
+
+    view->setOnlineStatusCallback([&settings, &fileSource]() {
+        settings.online = !settings.online;
+        fileSource.setOnlineStatus(settings.online);
+        mbgl::Log::Info(mbgl::Event::Setup, "Application is %s. Press `O` to toggle online status.", settings.online ? "online" : "offline");
+    });
 
     view->setChangeStyleCallback([&map] () {
         static uint8_t currentStyleIndex;
@@ -193,9 +193,7 @@ int main(int argc, char *argv[]) {
     settings.bearing = map.getBearing();
     settings.pitch = map.getPitch();
     settings.debug = mbgl::EnumType(map.getDebug());
-    if (!skipConfig) {
-        settings.save();
-    }
+    settings.save();
     mbgl::Log::Info(mbgl::Event::General,
                     R"(Exit location: --lat="%f" --lon="%f" --zoom="%f" --bearing "%f")",
                     settings.latitude, settings.longitude, settings.zoom, settings.bearing);

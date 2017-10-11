@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -15,6 +16,8 @@ import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 
+import timber.log.Timber;
+
 /**
  * The entry point to initialize the Mapbox Android SDK.
  * <p>
@@ -26,6 +29,7 @@ import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 @UiThread
 public final class Mapbox {
 
+  @SuppressLint("StaticFieldLeak")
   private static Mapbox INSTANCE;
   private Context context;
   private String accessToken;
@@ -49,8 +53,14 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken, new LocationSource(appContext));
       LocationEngine locationEngine = new LocationSource(appContext);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
-      MapboxTelemetry.getInstance().initialize(
-        appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+
+      try {
+        MapboxTelemetry.getInstance().initialize(
+          appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+      } catch (Exception exception) {
+        Timber.e(exception, "Unable to instantiate Mapbox telemetry");
+      }
+
       ConnectivityReceiver.instance(appContext);
     }
     return INSTANCE;

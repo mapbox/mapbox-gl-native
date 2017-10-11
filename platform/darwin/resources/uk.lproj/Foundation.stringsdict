@@ -16,10 +16,8 @@
 			<string>%d градус</string>
 			<key>few</key>
 			<string>%d градуси</string>
-			<key>many</key>
-			<string>%d градусів</string>
 			<key>other</key>
-			<string>%d градуса</string>
+			<string>%d градусів</string>
 		</dict>
 	</dict>
 	<key>COORD_MIN_LONG</key>
@@ -33,13 +31,11 @@
 			<key>NSStringFormatValueTypeKey</key>
 			<string>d</string>
 			<key>one</key>
-			<string>%d мінута</string>
+			<string>%d хвилина</string>
 			<key>few</key>
-			<string>%d мінути</string>
-			<key>many</key>
-			<string>%d мінут</string>
+			<string>%d хвилини</string>
 			<key>other</key>
-			<string>%d мінути</string>
+			<string>%d хвилин</string>
 		</dict>
 	</dict>
 	<key>COORD_SEC_LONG</key>
@@ -56,10 +52,8 @@
 			<string>%d секунда</string>
 			<key>few</key>
 			<string>%d секунди</string>
-			<key>many</key>
-			<string>%d секунд</string>
 			<key>other</key>
-			<string>%d секунди</string>
+			<string>%d секунд</string>
 		</dict>
 	</dict>
 </dict>

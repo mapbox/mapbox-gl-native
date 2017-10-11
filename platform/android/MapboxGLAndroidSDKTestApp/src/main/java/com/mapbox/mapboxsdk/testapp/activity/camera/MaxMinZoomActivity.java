@@ -13,6 +13,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing using maximum and minimum zoom levels to restrict camera movement.
+ */
 public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;

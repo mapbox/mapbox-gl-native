@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.annotation.RawRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -32,16 +31,11 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.style.sources.TileSet;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -285,7 +279,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     // Add a source
     Source source;
     try {
-      source = new GeoJsonSource("amsterdam-spots", readRawResource(R.raw.amsterdam));
+      source = new GeoJsonSource("amsterdam-spots", ResourceUtils.readRawResource(this, R.raw.amsterdam));
     } catch (IOException ioException) {
       Toast.makeText(
         RuntimeStyleActivity.this,
@@ -317,12 +311,12 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     layer = mapboxMap.getLayerAs("parksLayer");
     // And get some properties
     PropertyValue<Boolean> fillAntialias = layer.getFillAntialias();
-    Timber.d("Fill anti alias: " + fillAntialias.getValue());
+    Timber.d("Fill anti alias: %s", fillAntialias.getValue());
     layer.setProperties(fillTranslateAnchor(FILL_TRANSLATE_ANCHOR_MAP));
     PropertyValue<String> fillTranslateAnchor = layer.getFillTranslateAnchor();
-    Timber.d("Fill translate anchor: " + fillTranslateAnchor.getValue());
+    Timber.d("Fill translate anchor: %s", fillTranslateAnchor.getValue());
     PropertyValue<String> visibility = layer.getVisibility();
-    Timber.d("Visibility: " + visibility.getValue());
+    Timber.d("Visibility: %s", visibility.getValue());
 
     // Get a good look at it all
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(12));
@@ -332,7 +326,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     // Load some data
     FeatureCollection parks;
     try {
-      String json = readRawResource(R.raw.amsterdam);
+      String json = ResourceUtils.readRawResource(this, R.raw.amsterdam);
       parks = FeatureCollection.fromJson(json);
     } catch (IOException ioException) {
       Toast.makeText(
@@ -477,31 +471,14 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     Function<Float, String> function = (Function<Float, String>) fillColor.getFunction();
     if (function != null) {
       ExponentialStops<Float, String> stops = (ExponentialStops) function.getStops();
-      Timber.d("Fill color base: " + stops.getBase());
-      Timber.d("Fill color #stops: " + stops.size());
+      Timber.d("Fill color base: %s", stops.getBase());
+      Timber.d("Fill color #stops: %s", stops.size());
       if (function.getStops() != null) {
         for (Stop<Float, String> stop : stops) {
-          Timber.d("Fill color #stops: " + stop);
+          Timber.d("Fill color #stops: %s", stop);
         }
       }
     }
-  }
-
-  private String readRawResource(@RawRes int rawResource) throws IOException {
-    InputStream is = getResources().openRawResource(rawResource);
-    Writer writer = new StringWriter();
-    char[] buffer = new char[1024];
-    try {
-      Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-      int numRead;
-      while ((numRead = reader.read(buffer)) != -1) {
-        writer.write(buffer, 0, numRead);
-      }
-    } finally {
-      is.close();
-    }
-
-    return writer.toString();
   }
 
   private void addCustomTileSource() {

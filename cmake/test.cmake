@@ -41,6 +41,8 @@ mbgl_platform_test()
 
 create_source_groups(mbgl-test)
 
+initialize_xcode_cxx_build_settings(mbgl-test)
+
 xcode_create_scheme(
     TARGET mbgl-test
     OPTIONAL_ARGS

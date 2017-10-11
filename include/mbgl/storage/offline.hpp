@@ -31,12 +31,14 @@ public:
 
     /* Private */
     std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
-
+    uint64_t tileCount(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
     const std::string styleURL;
     const LatLngBounds bounds;
     const double minZoom;
     const double maxZoom;
     const float pixelRatio;
+private:
+    Range<uint8_t> coveringZoomRange(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
 };
 
 /*

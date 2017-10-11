@@ -3,32 +3,14 @@ set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 mason_use(glfw VERSION 2017-07-13-67c9155)
 mason_use(boost_libprogram_options VERSION 1.62.0)
 mason_use(gtest VERSION 1.8.0)
-mason_use(benchmark VERSION 1.0.0-1)
+mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
 
+include(cmake/loop-uv.cmake)
 include(cmake/loop-darwin.cmake)
 
 macro(mbgl_platform_core)
     target_sources(mbgl-core
-        # File source
-        PRIVATE platform/darwin/src/http_file_source.mm
-        PRIVATE platform/default/asset_file_source.cpp
-        PRIVATE platform/default/default_file_source.cpp
-        PRIVATE platform/default/local_file_source.cpp
-        PRIVATE platform/default/online_file_source.cpp
-
-        # Default styles
-        PRIVATE platform/default/mbgl/util/default_styles.hpp
-
-        # Offline
-        PRIVATE platform/default/mbgl/storage/offline.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.cpp
-        PRIVATE platform/default/mbgl/storage/offline_database.hpp
-        PRIVATE platform/default/mbgl/storage/offline_download.cpp
-        PRIVATE platform/default/mbgl/storage/offline_download.hpp
-        PRIVATE platform/default/sqlite3.cpp
-        PRIVATE platform/default/sqlite3.hpp
-
         # Misc
         PRIVATE platform/darwin/mbgl/storage/reachability.h
         PRIVATE platform/darwin/mbgl/storage/reachability.m
@@ -52,6 +34,10 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/headless_backend_cgl.cpp
         PRIVATE platform/default/mbgl/gl/headless_display.hpp
         PRIVATE platform/darwin/src/headless_display_cgl.cpp
+
+        # Snapshotting
+        PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
+        PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
 
         # Thread pool
         PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
@@ -82,23 +68,47 @@ macro(mbgl_platform_core)
         PUBLIC "-framework ImageIO"
         PUBLIC "-framework CoreServices"
         PUBLIC "-framework SystemConfiguration"
+    )
+endmacro()
+
+
+macro(mbgl_filesource)
+    target_sources(mbgl-filesource
+        # File source
+        PRIVATE platform/darwin/src/http_file_source.mm
+
+        # Database
+        PRIVATE platform/default/sqlite3.cpp
+    )
+
+    target_compile_options(mbgl-filesource
+        PRIVATE -fobjc-arc
+        PRIVATE -fvisibility=hidden
+    )
+
+    target_link_libraries(mbgl-filesource
         PUBLIC "-lsqlite3"
+        PUBLIC "-framework Foundation"
     )
 endmacro()
 
 
 macro(mbgl_platform_glfw)
     target_link_libraries(mbgl-glfw
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
+
     target_compile_options(mbgl-glfw
         PRIVATE -fvisibility=hidden
     )
+
 endmacro()
 
 
 macro(mbgl_platform_render)
     target_link_libraries(mbgl-render
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
     target_compile_options(mbgl-render
@@ -109,6 +119,7 @@ endmacro()
 
 macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
     target_compile_options(mbgl-offline
@@ -133,6 +144,7 @@ macro(mbgl_platform_test)
     )
 
     target_link_libraries(mbgl-test
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
 endmacro()
@@ -153,6 +165,7 @@ macro(mbgl_platform_benchmark)
     )
 
     target_link_libraries(mbgl-benchmark
+        PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
 endmacro()

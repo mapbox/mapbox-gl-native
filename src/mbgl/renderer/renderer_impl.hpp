@@ -1,11 +1,16 @@
 #pragma once
 
 #include <mbgl/renderer/renderer.hpp>
-#include <mbgl/renderer/renderer_backend.hpp>
-#include <mbgl/renderer/renderer_observer.hpp>
-#include <mbgl/renderer/render_style_observer.hpp>
+#include <mbgl/renderer/render_source_observer.hpp>
+#include <mbgl/renderer/render_light.hpp>
 #include <mbgl/renderer/frame_history.hpp>
+#include <mbgl/style/image.hpp>
+#include <mbgl/style/source.hpp>
+#include <mbgl/style/layer.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/map/zoom_history.hpp>
+#include <mbgl/map/mode.hpp>
+#include <mbgl/text/glyph_manager_observer.hpp>
 
 #include <memory>
 #include <string>
@@ -13,16 +18,30 @@
 
 namespace mbgl {
 
+class RendererBackend;
+class RendererObserver;
+class RenderSource;
+class RenderLayer;
 class UpdateParameters;
-class PaintParameters;
-class RenderStyle;
 class RenderStaticData;
+class RenderedQueryOptions;
+class SourceQueryOptions;
+class FileSource;
+class Scheduler;
+class GlyphManager;
+class ImageManager;
+class LineAtlas;
 
-class Renderer::Impl : public RenderStyleObserver {
+class Renderer::Impl : public GlyphManagerObserver,
+                       public RenderSourceObserver{
 public:
     Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
          const optional<std::string> programCacheDir);
     ~Impl() final;
+
+    void markContextLost() {
+        contextLost = true;
+    };
 
     void setObserver(RendererObserver*);
 
@@ -34,16 +53,28 @@ public:
     void onLowMemory();
     void dumDebugLogs();
 
-    // RenderStyleObserver implementation
-    void onInvalidate() override;
-    void onResourceError(std::exception_ptr) override;
-
 private:
-    void doRender(PaintParameters&);
+    bool isLoaded() const;
+    bool hasTransitions() const;
+
+    RenderSource* getRenderSource(const std::string& id) const;
+
+          RenderLayer* getRenderLayer(const std::string& id);
+    const RenderLayer* getRenderLayer(const std::string& id) const;
+
+    // GlyphManagerObserver implementation.
+    void onGlyphsError(const FontStack&, const GlyphRange&, std::exception_ptr) override;
+
+    // RenderSourceObserver implementation.
+    void onTileChanged(RenderSource&, const OverscaledTileID&) override;
+    void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
     friend class Renderer;
 
     RendererBackend& backend;
+    Scheduler& scheduler;
+    FileSource& fileSource;
+
     RendererObserver* observer;
 
     const GLContextMode contextMode;
@@ -58,10 +89,23 @@ private:
 
     RenderState renderState = RenderState::Never;
     FrameHistory frameHistory;
+    ZoomHistory zoomHistory;
     TransformState transformState;
 
-    std::unique_ptr<RenderStyle> renderStyle;
+    std::unique_ptr<GlyphManager> glyphManager;
+    std::unique_ptr<ImageManager> imageManager;
+    std::unique_ptr<LineAtlas> lineAtlas;
     std::unique_ptr<RenderStaticData> staticData;
+
+    Immutable<std::vector<Immutable<style::Image::Impl>>> imageImpls;
+    Immutable<std::vector<Immutable<style::Source::Impl>>> sourceImpls;
+    Immutable<std::vector<Immutable<style::Layer::Impl>>> layerImpls;
+
+    std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
+    std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
+    RenderLight renderLight;
+
+    bool contextLost = false;
 };
 
 } // namespace mbgl

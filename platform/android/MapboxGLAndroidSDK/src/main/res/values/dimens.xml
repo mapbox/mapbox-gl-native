@@ -2,17 +2,8 @@
 <resources>
     <dimen name="mapbox_infowindow_tipview_width">8dp</dimen>
     <dimen name="mapbox_infowindow_margin">8dp</dimen>
-    <dimen name="mapbox_infowindow_offset">-2dp</dimen>
-    <dimen name="mapbox_infowindow_line_width">1.5dp</dimen>
-    <dimen name="mapbox_attribution_icon_left_padding">@dimen/mapbox_two_dp</dimen>
-    <dimen name="mapbox_attribution_icon_top_padding">@dimen/mapbox_two_dp</dimen>
-    <dimen name="mapbox_attribution_icon_right_padding">@dimen/mapbox_two_dp</dimen>
-    <dimen name="mapbox_attribution_icon_bottom_padding">@dimen/mapbox_two_dp</dimen>
-    <dimen name="mapbox_two_dp">2dp</dimen>
     <dimen name="mapbox_four_dp">4dp</dimen>
     <dimen name="mapbox_eight_dp">8dp</dimen>
-    <dimen name="mapbox_ten_dp">10dp</dimen>
-    <dimen name="mapbox_sixteen_dp">16dp</dimen>
     <dimen name="mapbox_ninety_two_dp">92dp</dimen>
     <dimen name="mapbox_my_locationview_outer_circle">18dp</dimen>
 </resources>

@@ -332,6 +332,22 @@ void SymbolLayer::setIconOffset(DataDrivenPropertyValue<std::array<float, 2>> va
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
+DataDrivenPropertyValue<SymbolAnchorType> SymbolLayer::getDefaultIconAnchor() {
+    return IconAnchor::defaultValue();
+}
+
+DataDrivenPropertyValue<SymbolAnchorType> SymbolLayer::getIconAnchor() const {
+    return impl().layout.get<IconAnchor>();
+}
+
+void SymbolLayer::setIconAnchor(DataDrivenPropertyValue<SymbolAnchorType> value) {
+    if (value == getIconAnchor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->layout.get<IconAnchor>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
 PropertyValue<AlignmentType> SymbolLayer::getDefaultIconPitchAlignment() {
     return IconPitchAlignment::defaultValue();
 }
@@ -428,15 +444,15 @@ void SymbolLayer::setTextSize(DataDrivenPropertyValue<float> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<float> SymbolLayer::getDefaultTextMaxWidth() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextMaxWidth() {
     return TextMaxWidth::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getTextMaxWidth() const {
+DataDrivenPropertyValue<float> SymbolLayer::getTextMaxWidth() const {
     return impl().layout.get<TextMaxWidth>();
 }
 
-void SymbolLayer::setTextMaxWidth(PropertyValue<float> value) {
+void SymbolLayer::setTextMaxWidth(DataDrivenPropertyValue<float> value) {
     if (value == getTextMaxWidth())
         return;
     auto impl_ = mutableImpl();
@@ -460,15 +476,15 @@ void SymbolLayer::setTextLineHeight(PropertyValue<float> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<float> SymbolLayer::getDefaultTextLetterSpacing() {
+DataDrivenPropertyValue<float> SymbolLayer::getDefaultTextLetterSpacing() {
     return TextLetterSpacing::defaultValue();
 }
 
-PropertyValue<float> SymbolLayer::getTextLetterSpacing() const {
+DataDrivenPropertyValue<float> SymbolLayer::getTextLetterSpacing() const {
     return impl().layout.get<TextLetterSpacing>();
 }
 
-void SymbolLayer::setTextLetterSpacing(PropertyValue<float> value) {
+void SymbolLayer::setTextLetterSpacing(DataDrivenPropertyValue<float> value) {
     if (value == getTextLetterSpacing())
         return;
     auto impl_ = mutableImpl();
@@ -492,15 +508,15 @@ void SymbolLayer::setTextJustify(DataDrivenPropertyValue<TextJustifyType> value)
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-DataDrivenPropertyValue<TextAnchorType> SymbolLayer::getDefaultTextAnchor() {
+DataDrivenPropertyValue<SymbolAnchorType> SymbolLayer::getDefaultTextAnchor() {
     return TextAnchor::defaultValue();
 }
 
-DataDrivenPropertyValue<TextAnchorType> SymbolLayer::getTextAnchor() const {
+DataDrivenPropertyValue<SymbolAnchorType> SymbolLayer::getTextAnchor() const {
     return impl().layout.get<TextAnchor>();
 }
 
-void SymbolLayer::setTextAnchor(DataDrivenPropertyValue<TextAnchorType> value) {
+void SymbolLayer::setTextAnchor(DataDrivenPropertyValue<SymbolAnchorType> value) {
     if (value == getTextAnchor())
         return;
     auto impl_ = mutableImpl();

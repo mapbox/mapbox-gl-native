@@ -401,7 +401,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     Point<double> extrude = normal;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, false }, endLeft, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, false, endLeft, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -412,7 +412,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     extrude = normal * -1.0;
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, true }, -endRight, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, true, -endRight, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -437,7 +437,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    std::size_t startVertex,
                                    std::vector<TriangleElement>& triangleStore) {
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
-    vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, { false, lineTurnsLeft }, 0, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, false, lineTurnsLeft, 0, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);

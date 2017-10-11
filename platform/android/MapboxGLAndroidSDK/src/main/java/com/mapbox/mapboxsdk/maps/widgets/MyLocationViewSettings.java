@@ -13,7 +13,10 @@ import com.mapbox.mapboxsdk.maps.Projection;
 
 /**
  * Settings to configure the visual appearance of the MyLocationView.
+ * @deprecated use location layer plugin from
+ * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
  */
+@Deprecated
 public class MyLocationViewSettings {
 
   private Projection projection;

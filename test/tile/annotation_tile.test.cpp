@@ -4,7 +4,6 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/text/collision_tile.hpp>
@@ -31,7 +30,6 @@ public:
     AnnotationManager annotationManager { style };
     HeadlessBackend backend;
     BackendScope scope { backend };
-    RenderStyle renderStyle { threadPool, fileSource };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
 
@@ -62,8 +60,7 @@ TEST(AnnotationTile, Issue8289) {
         std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::move(data),
-        0
-    });
+    }, 0);
 
     auto collisionTile = std::make_unique<CollisionTile>(PlacementConfig());
 
@@ -77,23 +74,21 @@ TEST(AnnotationTile, Issue8289) {
         std::move(collisionTile),
         {},
         {},
-        0
-    });
+    }, 0);
 
     // Simulate a second layout with empty data.
     tile.onLayout(GeometryTile::LayoutResult {
         std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         std::make_unique<FeatureIndex>(),
         std::make_unique<AnnotationTileData>(),
-        0
-    });
+    }, 0);
 
     std::unordered_map<std::string, std::vector<Feature>> result;
     GeometryCoordinates queryGeometry {{ Point<int16_t>(0, 0) }};
     TransformState transformState;
     RenderedQueryOptions options;
 
-    tile.queryRenderedFeatures(result, queryGeometry, transformState, test.renderStyle, options);
+    tile.queryRenderedFeatures(result, queryGeometry, transformState, {}, options);
 
     EXPECT_TRUE(result.empty());
 }

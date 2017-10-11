@@ -16,6 +16,8 @@
 		1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A21ECFB00300021D39 /* MGLLight.mm */; };
 		1F7454AB1ED1DDBD00021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */; };
 		1F95931B1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */; };
+		1FCDF1421F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */; };
+		1FCDF1431F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */; };
 		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
@@ -78,7 +80,11 @@
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558DE7A61E56161C00C7916D /* MGLFoundation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 558DE7A41E56161C00C7916D /* MGLFoundation_Private.h */; };
 		558DE7A71E56161C00C7916D /* MGLFoundation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 558DE7A51E56161C00C7916D /* MGLFoundation.mm */; };
+		55D120A31F7906E6004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
+		55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
+		92092EF01F5EB10E00AF5130 /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		92092EF11F5EB10E00AF5130 /* MGLMapSnapshotter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */; };
 		920A3E591E6F859D00C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */; };
 		92F2C3EB1F0E3A1900268EC0 /* MGLRendererFrontend.h in Headers */ = {isa = PBXBuildFile; fileRef = 92F2C3EA1F0E3A1900268EC0 /* MGLRendererFrontend.h */; };
 		96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027331E57C9A7004B8E66 /* Localizable.strings */; };
@@ -237,7 +243,6 @@
 		DAEDC4371D606291000224FF /* MGLAttributionButtonTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DAEDC4361D606291000224FF /* MGLAttributionButtonTests.m */; };
 		DAF0D80E1DFE0E5D00B28378 /* MGLPointCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D80D1DFE0E5D00B28378 /* MGLPointCollection_Private.h */; };
 		DAF0D8161DFE6B1800B28378 /* MGLAttributionInfo_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8151DFE6B1800B28378 /* MGLAttributionInfo_Private.h */; };
-		DAF0D81C1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAF0D81B1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m */; };
 		DD0902B21DB1AC6400C5BDCE /* MGLNetworkConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */; };
 		DD0902B31DB1AC6400C5BDCE /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */; };
 		DD58A4C91D822C6700E1F038 /* MGLExpressionTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = DD58A4C71D822C6200E1F038 /* MGLExpressionTests.mm */; };
@@ -284,6 +289,8 @@
 		1F7454A21ECFB00300021D39 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
 		1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
+		1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLVectorSource+MGLAdditions.h"; sourceTree = "<group>"; };
+		1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLVectorSource+MGLAdditions.m"; sourceTree = "<group>"; };
 		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
@@ -348,9 +355,12 @@
 		556660D51E1D07E400E2C41B /* MGLVersionNumber.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = MGLVersionNumber.m; path = ../../darwin/test/MGLVersionNumber.m; sourceTree = "<group>"; };
 		558DE7A41E56161C00C7916D /* MGLFoundation_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFoundation_Private.h; sourceTree = "<group>"; };
 		558DE7A51E56161C00C7916D /* MGLFoundation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFoundation.mm; sourceTree = "<group>"; };
+		55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-filesource.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
+		92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
+		92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; };
 		920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLSourceQueryTests.m; sourceTree = "<group>"; };
 		92F2C3EA1F0E3A1900268EC0 /* MGLRendererFrontend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRendererFrontend.h; sourceTree = "<group>"; };
 		966091701E5BBFF700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -395,21 +405,25 @@
 		DA6023EF1E4CE8E500DBFF23 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA6023F01E4CE8FF00DBFF23 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = sv; path = sv.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA618B131E68850300CB7F44 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
-		DA618B141E68852C00CB7F44 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B141E68852C00CB7F44 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B151E6886DF00CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ca; path = ca.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA618B161E6886E000CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B171E68876C00CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Foundation.strings; sourceTree = "<group>"; };
-		DA618B181E6887C600CB7F44 /* ca */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA618B181E6887C600CB7F44 /* ca */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ca; path = ca.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B231E6891ED00CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = lt; path = lt.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA618B241E6891F300CB7F44 /* lt */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = lt; path = lt.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA618B271E68926E00CB7F44 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA618B2A1E6892B500CB7F44 /* fi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = fi; path = fi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA6408D51DA4E5DA00908C90 /* MGLVectorStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorStyleLayer.h; sourceTree = "<group>"; };
 		DA6408D61DA4E5DA00908C90 /* MGLVectorStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLVectorStyleLayer.m; sourceTree = "<group>"; };
+		DA704CBA1F6372E8004B3F28 /* ru */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA704CBE1F637531004B3F28 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA704CBF1F637548004B3F28 /* hu */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = hu; path = hu.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA704CC61F666385004B3F28 /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA7262051DEEDD460043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA7262061DEEDD460043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
 		DA737ADE1E5914AD00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
-		DA737ADF1E5914D300AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA737ADF1E5914D300AD2CDE /* es */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA737AE31E5915A500AD2CDE /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = pl; path = pl.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA737AE41E5915B000AD2CDE /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA737AEC1E59180E00AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -469,7 +483,7 @@
 		DAA32CB31E4C4CC3006F8D24 /* ja */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ja; path = ja.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAA32CBA1E4C4F10006F8D24 /* sv */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = sv; path = sv.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAA32CC01E4C4F89006F8D24 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Foundation.strings; sourceTree = "<group>"; };
-		DAA32CC11E4C4F93006F8D24 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAA32CC11E4C4F93006F8D24 /* vi */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAA48EFB1D6A4731006A7E36 /* StyleLayerIconTransformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StyleLayerIconTransformer.h; sourceTree = "<group>"; };
 		DAA48EFC1D6A4731006A7E36 /* StyleLayerIconTransformer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = StyleLayerIconTransformer.m; sourceTree = "<group>"; };
 		DAA998F91E9F545C002E6EA6 /* MGLFillExtrusionStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFillExtrusionStyleLayer.h; sourceTree = "<group>"; };
@@ -483,6 +497,8 @@
 		DACC22121CF3D3E200D220D9 /* MGLFeature.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature.h; sourceTree = "<group>"; };
 		DACC22131CF3D3E200D220D9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DACC22171CF3D4F700D220D9 /* MGLFeature_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLFeature_Private.h; sourceTree = "<group>"; };
+		DACCD9C71F1F443B00BB09A1 /* fr */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DACFE7971F66EA0C00630DA8 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = vi; path = vi.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DAD165721CF4CD7A001FF4B9 /* MGLShapeCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeCollection.h; sourceTree = "<group>"; };
 		DAD165731CF4CD7A001FF4B9 /* MGLShapeCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeCollection.mm; sourceTree = "<group>"; };
 		DAE6C2E11CC304F900DB3429 /* Credits.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = Credits.rtf; sourceTree = "<group>"; };
@@ -575,9 +591,7 @@
 		DAEDC4361D606291000224FF /* MGLAttributionButtonTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAttributionButtonTests.m; sourceTree = "<group>"; };
 		DAF0D80D1DFE0E5D00B28378 /* MGLPointCollection_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPointCollection_Private.h; sourceTree = "<group>"; };
 		DAF0D8151DFE6B1800B28378 /* MGLAttributionInfo_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo_Private.h; sourceTree = "<group>"; };
-		DAF0D81A1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLVectorSource+MBXAdditions.h"; sourceTree = "<group>"; };
-		DAF0D81B1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLVectorSource+MBXAdditions.m"; sourceTree = "<group>"; };
-		DAFBD0D51E3FA969000CD6BF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		DAFBD0D51E3FA969000CD6BF /* zh-Hant */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DAFBD0D61E3FA983000CD6BF /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hant"; path = "zh-Hant.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLNetworkConfiguration.m; sourceTree = "<group>"; };
 		DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLNetworkConfiguration.h; sourceTree = "<group>"; };
@@ -598,6 +612,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */,
+				55D120A31F7906E6004B6D81 /* libmbgl-filesource.a in Frameworks */,
 				52B5D17F1E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -607,6 +622,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				DAE0DD7A1D5F015A005A6BB1 /* libmbgl-core.a in Frameworks */,
+				55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */,
 				DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */,
 				52B5D1801E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */,
 			);
@@ -749,8 +765,6 @@
 				DA839E9E1CC2E3400062CAFB /* MapDocument.xib */,
 				DACB0C371E18DFFD005DDBEA /* MGLStyle+MBXAdditions.h */,
 				DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */,
-				DAF0D81A1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.h */,
-				DAF0D81B1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m */,
 				DAE6C2E91CC3050F00DB3429 /* OfflinePackNameValueTransformer.h */,
 				DAE6C2EA1CC3050F00DB3429 /* OfflinePackNameValueTransformer.m */,
 				DAA48EFB1D6A4731006A7E36 /* StyleLayerIconTransformer.h */,
@@ -930,6 +944,8 @@
 		DAD1657F1CF4CF50001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */,
+				1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */,
 				408AA8601DAEED3300022900 /* MGLPolygon+MGLAdditions.h */,
 				408AA85C1DAEED3300022900 /* MGLPolygon+MGLAdditions.m */,
 				408AA8611DAEED3300022900 /* MGLPolyline+MGLAdditions.h */,
@@ -968,6 +984,7 @@
 		DAE6C31E1CC308BC00DB3429 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */,
 				5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */,
 				55D9B4B01D005D3900C1CCE2 /* libz.tbd */,
 				52BECB091CC5A26F009CD791 /* SystemConfiguration.framework */,
@@ -1046,6 +1063,8 @@
 				558DE7A51E56161C00C7916D /* MGLFoundation.mm */,
 				DAE6C34D1CC31E0400DB3429 /* MGLMapCamera.h */,
 				DAE6C36E1CC31E2A00DB3429 /* MGLMapCamera.mm */,
+				92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */,
+				92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */,
 				DD0902B01DB1AC6400C5BDCE /* MGLNetworkConfiguration.h */,
 				DD0902AF1DB1AC6400C5BDCE /* MGLNetworkConfiguration.m */,
 				92F2C3EA1F0E3A1900268EC0 /* MGLRendererFrontend.h */,
@@ -1109,6 +1128,7 @@
 				DA8F259C1D51CB000010E6B5 /* MGLStyleValue_Private.h in Headers */,
 				DAE6C35B1CC31E0400DB3429 /* MGLAnnotation.h in Headers */,
 				DAE6C3B61CC31EF300DB3429 /* MGLMapView_Private.h in Headers */,
+				92092EF01F5EB10E00AF5130 /* MGLMapSnapshotter.h in Headers */,
 				3527428D1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h in Headers */,
 				DA00FC8A1D5EEAC3009AABC8 /* MGLAttributionInfo.h in Headers */,
 				DAE6C3B21CC31EF300DB3429 /* MGLAttributionButton.h in Headers */,
@@ -1166,6 +1186,7 @@
 				DAE6C3601CC31E0400DB3429 /* MGLOfflineRegion.h in Headers */,
 				DAE6C3681CC31E0400DB3429 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA35A2CF1CCAAED300E826B2 /* NSValue+MGLAdditions.h in Headers */,
+				1FCDF1421F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h in Headers */,
 				DAE6C3A61CC31E9400DB3429 /* MGLMapViewDelegate.h in Headers */,
 				DAE6C38B1CC31E2A00DB3429 /* MGLOfflinePack_Private.h in Headers */,
 				558DE7A61E56161C00C7916D /* MGLFoundation_Private.h in Headers */,
@@ -1323,6 +1344,7 @@
 				ca,
 				fi,
 				nl,
+				hu,
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1391,7 +1413,6 @@
 				DACB0C391E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m in Sources */,
 				DA839E9A1CC2E3400062CAFB /* main.m in Sources */,
 				DA839E971CC2E3400062CAFB /* AppDelegate.m in Sources */,
-				DAF0D81C1DFF567C00B28378 /* MGLVectorSource+MBXAdditions.m in Sources */,
 				DAE6C2F01CC3050F00DB3429 /* OfflinePackNameValueTransformer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1401,6 +1422,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07A019EF1ED665CD00ACD43E /* MGLImageSource.mm in Sources */,
+				92092EF11F5EB10E00AF5130 /* MGLMapSnapshotter.mm in Sources */,
 				40ABDB561DB0022100372083 /* NSImage+MGLAdditions.mm in Sources */,
 				DAE6C3901CC31E2A00DB3429 /* MGLPointAnnotation.mm in Sources */,
 				DAE6C3981CC31E2A00DB3429 /* NSBundle+MGLAdditions.m in Sources */,
@@ -1408,6 +1430,7 @@
 				40B77E461DB11BCD003DA2FE /* NSArray+MGLAdditions.mm in Sources */,
 				DAE6C38C1CC31E2A00DB3429 /* MGLOfflinePack.mm in Sources */,
 				35D65C5B1D65AD5500722C23 /* NSDate+MGLAdditions.mm in Sources */,
+				1FCDF1431F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m in Sources */,
 				DD0902B21DB1AC6400C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */,
 				DAE6C3B11CC31EF300DB3429 /* MGLAnnotationImage.m in Sources */,
@@ -1549,6 +1572,7 @@
 				DA618B161E6886E000CB7F44 /* ca */,
 				DA618B271E68926E00CB7F44 /* fi */,
 				DAE8CCAB1E6E8B72009B5CB0 /* nl */,
+				DA704CBE1F637531004B3F28 /* hu */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1597,6 +1621,7 @@
 				DA618B181E6887C600CB7F44 /* ca */,
 				DA618B2A1E6892B500CB7F44 /* fi */,
 				DAE8CCAC1E6E8B8D009B5CB0 /* nl */,
+				DA704CBF1F637548004B3F28 /* hu */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1614,6 +1639,9 @@
 				DA618B171E68876C00CB7F44 /* ca */,
 				DA618B231E6891ED00CB7F44 /* lt */,
 				DAE9E0F21EB7BF39001E8E8B /* es */,
+				DACCD9C71F1F443B00BB09A1 /* fr */,
+				DA704CBA1F6372E8004B3F28 /* ru */,
+				DA704CC61F666385004B3F28 /* uk */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -1632,6 +1660,7 @@
 				DAE8CCAA1E6E8605009B5CB0 /* ru */,
 				DA618B151E6886DF00CB7F44 /* ca */,
 				DA618B241E6891F300CB7F44 /* lt */,
+				DACFE7971F66EA0C00630DA8 /* vi */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
@@ -1795,7 +1824,10 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
@@ -1806,7 +1838,7 @@
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_LDFLAGS = (
 					"$(mbgl_core_LINK_LIBRARIES)",
-					"$(mbgl_loop_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;
@@ -1829,14 +1861,17 @@
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
 				FRAMEWORK_VERSION = A;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = "$(SRCROOT)/sdk/Info.plist";
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/Frameworks";
 				OTHER_CFLAGS = "-fvisibility=hidden";
 				OTHER_LDFLAGS = (
 					"$(mbgl_core_LINK_LIBRARIES)",
-					"$(mbgl_loop_LINK_LIBRARIES)",
+					"$(mbgl_filesource_LINK_LIBRARIES)",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.mapbox.MapboxGL;
 				PRODUCT_NAME = Mapbox;
@@ -1853,7 +1888,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				LIBRARY_SEARCH_PATHS = (
@@ -1882,7 +1920,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				COMBINE_HIDPI_IMAGES = YES;
-				HEADER_SEARCH_PATHS = "$(mbgl_core_INCLUDE_DIRECTORIES)";
+				HEADER_SEARCH_PATHS = (
+					"$(mbgl_core_INCLUDE_DIRECTORIES)",
+					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
+				);
 				INFOPLIST_FILE = test/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
 				OTHER_CFLAGS = "-fvisibility=hidden";

@@ -19,6 +19,7 @@ public:
     double pitch = 0;
 
     EnumType debug = 0;
+    bool online = true;
 };
 
 } // namespace mbgl

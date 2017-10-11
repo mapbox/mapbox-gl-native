@@ -82,7 +82,9 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         } else if (header == "etag") {
             response.etag = std::string(line.second.constData(), line.second.size());
         } else if (header == "cache-control") {
-            response.expires = http::CacheControl::parse(line.second.constData()).toTimePoint();
+            const auto cc = http::CacheControl::parse(line.second.constData());
+            response.expires = cc.toTimePoint();
+            response.mustRevalidate = cc.mustRevalidate;
         } else if (header == "expires") {
             response.expires = util::parseTimestamp(line.second.constData());
         } else if (header == "retry-after") {

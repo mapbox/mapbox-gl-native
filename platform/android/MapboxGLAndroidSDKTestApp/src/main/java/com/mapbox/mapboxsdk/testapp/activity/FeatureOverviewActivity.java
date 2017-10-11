@@ -92,7 +92,7 @@ public class FeatureOverviewActivity extends AppCompatActivity implements Permis
         getPackageManager().getPackageInfo(getPackageName(),
           PackageManager.GET_ACTIVITIES | PackageManager.GET_META_DATA));
     } catch (PackageManager.NameNotFoundException exception) {
-      Timber.e("Could not resolve package info", exception);
+      Timber.e(exception, "Could not resolve package info");
     }
   }
 

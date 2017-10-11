@@ -8,9 +8,18 @@ namespace style {
 CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerInitializeFunction init,
                          CustomLayerRenderFunction render,
+                         CustomLayerContextLostFunction contextLost,
                          CustomLayerDeinitializeFunction deinit,
                          void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, deinit, context)) {
+        : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)) {
+}
+
+CustomLayer::CustomLayer(const std::string& layerID,
+                         CustomLayerInitializeFunction init,
+                         CustomLayerRenderFunction render,
+                         CustomLayerDeinitializeFunction deinit,
+                         void* context)
+    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)) {
 }
 
 CustomLayer::~CustomLayer() = default;

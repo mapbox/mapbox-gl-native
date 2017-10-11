@@ -69,16 +69,11 @@ void RasterBucket::setMask(TileMask&& mask_) {
     for (const auto& id : mask) {
         // Create a quad for every masked tile.
         const int32_t vertexExtent = util::EXTENT >> id.z;
-        const int32_t textureExtent = 32768 >> id.z;
 
         const Point<int16_t> tlVertex = { static_cast<int16_t>(id.x * vertexExtent),
                                           static_cast<int16_t>(id.y * vertexExtent) };
         const Point<int16_t> brVertex = { static_cast<int16_t>(tlVertex.x + vertexExtent),
                                           static_cast<int16_t>(tlVertex.y + vertexExtent) };
-        const Point<uint16_t> tlTexture = { static_cast<uint16_t>(id.x * textureExtent),
-                                            static_cast<uint16_t>(id.y * textureExtent) };
-        const Point<uint16_t> brTexture = { static_cast<uint16_t>(tlTexture.x + textureExtent),
-                                            static_cast<uint16_t>(tlTexture.y + textureExtent) };
 
         if (segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
             // Move to a new segments because the old one can't hold the geometry.
@@ -86,13 +81,13 @@ void RasterBucket::setMask(TileMask&& mask_) {
         }
 
         vertices.emplace_back(
-            RasterProgram::layoutVertex({ tlVertex.x, tlVertex.y }, { tlTexture.x, tlTexture.y }));
+            RasterProgram::layoutVertex({ tlVertex.x, tlVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(tlVertex.y) }));
         vertices.emplace_back(
-            RasterProgram::layoutVertex({ brVertex.x, tlVertex.y }, { brTexture.x, tlTexture.y }));
+            RasterProgram::layoutVertex({ brVertex.x, tlVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(tlVertex.y) }));
         vertices.emplace_back(
-            RasterProgram::layoutVertex({ tlVertex.x, brVertex.y }, { tlTexture.x, brTexture.y }));
+            RasterProgram::layoutVertex({ tlVertex.x, brVertex.y }, { static_cast<uint16_t>(tlVertex.x), static_cast<uint16_t>(brVertex.y) }));
         vertices.emplace_back(
-            RasterProgram::layoutVertex({ brVertex.x, brVertex.y }, { brTexture.x, brTexture.y }));
+            RasterProgram::layoutVertex({ brVertex.x, brVertex.y }, { static_cast<uint16_t>(brVertex.x), static_cast<uint16_t>(brVertex.y) }));
 
         auto& segment = segments.back();
         assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());

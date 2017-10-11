@@ -19,7 +19,6 @@ NS_ASSUME_NONNULL_END
 {
     if (self = [super init])
     {
-        _location = [[CLLocation alloc] initWithLatitude:MAXFLOAT longitude:MAXFLOAT];
         _mapView = mapView;
     }
 
@@ -102,7 +101,7 @@ NS_ASSUME_NONNULL_END
 
 - (CLLocationCoordinate2D)coordinate
 {
-    return self.location.coordinate;
+    return _location ? _location.coordinate : kCLLocationCoordinate2DInvalid;
 }
 
 - (NSString *)title

@@ -118,6 +118,9 @@ class AnnotationManager {
 
       if (marker instanceof MarkerView) {
         markerViewManager.removeMarkerView((MarkerView) marker);
+      } else {
+        // do icon cleanup
+        iconManager.iconCleanup(marker.getIcon());
       }
     } else {
       // instanceOf Polygon/Polyline
@@ -137,6 +140,8 @@ class AnnotationManager {
 
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
+        } else {
+          iconManager.iconCleanup(marker.getIcon());
         }
       } else {
         // instanceOf Polygon/Polyline
@@ -159,6 +164,8 @@ class AnnotationManager {
         marker.hideInfoWindow();
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
+        } else {
+          iconManager.iconCleanup(marker.getIcon());
         }
       } else {
         // instanceOf Polygon/Polyline

@@ -17,7 +17,7 @@ TEST(getIconQuads, normal) {
         style::Image::Impl("test", PremultipliedImage({1,1}), 1.0)
     };
 
-    auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -6.5f, -4.5f }}, 0);
+    auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -6.5f, -4.5f }}, SymbolAnchorType::Center, 0);
 
     GeometryCoordinates line;
     Shaping shapedText;
@@ -42,7 +42,7 @@ TEST(getIconQuads, style) {
         style::Image::Impl("test", PremultipliedImage({1,1}), 1.0)
     };
 
-    auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, 0);
+    auto shapedIcon = PositionedIcon::shapeIcon(image, {{ -9.5f, -9.5f }}, SymbolAnchorType::Center, 0);
 
     GeometryCoordinates line;
     Shaping shapedText;
@@ -50,7 +50,7 @@ TEST(getIconQuads, style) {
     shapedText.bottom = 30.0f;
     shapedText.left = -60.0f;
     shapedText.right = 20.0f;
-    shapedText.positionedGlyphs.emplace_back(PositionedGlyph(32, 0.0f, 0.0f, 0));
+    shapedText.positionedGlyphs.emplace_back(PositionedGlyph(32, 0.0f, 0.0f, false));
 
     // none
     {

@@ -72,9 +72,6 @@
     <public name="mapbox_uiAttributionMarginRight" type="attr" />
     <public name="mapbox_uiAttributionMarginBottom" type="attr" />
 
-    <!-- Deprecated to use TextureView-->
-    <public name="mapbox_renderTextureMode" type="attr" />
-
     <public name="mapbox_enableTilePrefetch" type="attr" />
     <public name="mapbox_enableZMediaOverlay" type="attr" />
 
@@ -83,11 +80,13 @@
 
     <!-- Exposed styles -->
     <public name="mapbox_style_mapbox_streets" type="string" />
-    <public name="mapbox_style_emerald" type="string" />
+    <public name="mapbox_style_outdoors" type="string" />
     <public name="mapbox_style_light" type="string" />
     <public name="mapbox_style_dark" type="string" />
     <public name="mapbox_style_satellite" type="string" />
     <public name="mapbox_style_satellite_streets" type="string" />
+    <public name="mapbox_style_traffic_day" type="string" />
+    <public name="mapbox_style_traffic_night" type="string" />
 
     <!-- Exposed strings -->
     <public name="mapbox_compassContentDescription" type="string" />

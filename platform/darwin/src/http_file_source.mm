@@ -266,7 +266,9 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     NSDictionary *headers = [(NSHTTPURLResponse *)res allHeaderFields];
                     NSString *cache_control = [headers objectForKey:@"Cache-Control"];
                     if (cache_control) {
-                        response.expires = http::CacheControl::parse([cache_control UTF8String]).toTimePoint();
+                        const auto cc = http::CacheControl::parse([cache_control UTF8String]);
+                        response.expires = cc.toTimePoint();
+                        response.mustRevalidate = cc.mustRevalidate;
                     }
 
                     NSString *expires = [headers objectForKey:@"Expires"];

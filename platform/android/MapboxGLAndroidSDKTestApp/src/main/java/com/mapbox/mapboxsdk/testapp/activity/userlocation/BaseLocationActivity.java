@@ -14,6 +14,9 @@ import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
 
 import java.util.List;
 
+/**
+ * Base class for location aware activities.
+ */
 public abstract class BaseLocationActivity extends AppCompatActivity implements PermissionsListener {
 
   private PermissionsManager permissionsManager;

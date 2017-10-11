@@ -3,14 +3,18 @@
 #include "qmapboxgl.hpp"
 #include "qmapboxgl_renderer_frontend_p.hpp"
 
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/storage/resource_transform.hpp>
 
 #include <QObject>
 #include <QSize>
+
+#include <memory>
 
 class QMapboxGLPrivate : public QObject, public mbgl::RendererBackend, public mbgl::MapObserver
 {
@@ -20,10 +24,10 @@ public:
     explicit QMapboxGLPrivate(QMapboxGL *, const QMapboxGLSettings &, const QSize &size, qreal pixelRatio);
     virtual ~QMapboxGLPrivate();
 
-    mbgl::Size framebufferSize() const;
 
     // mbgl::RendererBackend implementation.
     void bind() final;
+    mbgl::Size getFramebufferSize() const final;
     void updateAssumedState() final;
     void activate() final {}
     void deactivate() final {}
@@ -68,4 +72,7 @@ signals:
     void needsRendering();
     void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
+
+private:
+    std::unique_ptr< mbgl::Actor<mbgl::ResourceTransform> > m_resourceTransform;
 };

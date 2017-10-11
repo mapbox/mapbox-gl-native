@@ -88,7 +88,7 @@ void Style::Impl::parse(const std::string& json_) {
     }
 
     mutated = false;
-    loaded = true;
+    loaded = false;
     json = json_;
 
     sources.clear();
@@ -107,16 +107,18 @@ void Style::Impl::parse(const std::string& json_) {
     }
 
     name = parser.name;
-    defaultLatLng = parser.latLng;
-    defaultZoom = parser.zoom;
-    defaultBearing = parser.bearing;
-    defaultPitch = parser.pitch;
+    defaultCamera.center = parser.latLng;
+    defaultCamera.zoom = parser.zoom;
+    defaultCamera.angle = parser.bearing;
+    defaultCamera.pitch = parser.pitch;
+
     setLight(std::make_unique<Light>(parser.light));
 
     spriteLoaded = false;
     spriteLoader->load(parser.spriteURL, scheduler, fileSource);
     glyphURL = parser.glyphURL;
 
+    loaded = true;
     observer->onStyleLoaded();
 }
 
@@ -202,7 +204,7 @@ Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string>
     }
 
     layer->setObserver(this);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 
     return layers.add(std::move(layer), before);
 }
@@ -212,7 +214,7 @@ std::unique_ptr<Layer> Style::Impl::removeLayer(const std::string& id) {
 
     if (layer) {
         layer->setObserver(nullptr);
-        observer->onUpdate(Update::Repaint);
+        observer->onUpdate();
     }
 
     return layer;
@@ -232,20 +234,8 @@ std::string Style::Impl::getName() const {
     return name;
 }
 
-LatLng Style::Impl::getDefaultLatLng() const {
-    return defaultLatLng;
-}
-
-double Style::Impl::getDefaultZoom() const {
-    return defaultZoom;
-}
-
-double Style::Impl::getDefaultBearing() const {
-    return defaultBearing;
-}
-
-double Style::Impl::getDefaultPitch() const {
-    return defaultPitch;
+CameraOptions Style::Impl::getDefaultCamera() const {
+    return defaultCamera;
 }
 
 std::vector<Source*> Style::Impl::getSources() {
@@ -299,13 +289,13 @@ void Style::Impl::setObserver(style::Observer* observer_) {
 void Style::Impl::onSourceLoaded(Source& source) {
     sources.update(source);
     observer->onSourceLoaded(source);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onSourceChanged(Source& source) {
     sources.update(source);
     observer->onSourceChanged(source);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onSourceError(Source& source, std::exception_ptr error) {
@@ -329,7 +319,7 @@ void Style::Impl::onSpriteLoaded(std::vector<std::unique_ptr<Image>>&& images_) 
         addImage(std::move(image));
     }
     spriteLoaded = true;
-    observer->onUpdate(Update::Repaint); // For *-pattern properties.
+    observer->onUpdate(); // For *-pattern properties.
 }
 
 void Style::Impl::onSpriteError(std::exception_ptr error) {
@@ -340,11 +330,11 @@ void Style::Impl::onSpriteError(std::exception_ptr error) {
 
 void Style::Impl::onLayerChanged(Layer& layer) {
     layers.update(layer);
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::onLightChanged(const Light&) {
-    observer->onUpdate(Update::Repaint);
+    observer->onUpdate();
 }
 
 void Style::Impl::dumpDebugLogs() const {

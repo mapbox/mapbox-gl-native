@@ -48,7 +48,7 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
             int top = selectionBox.getTop() - mapView.getTop();
             int left = selectionBox.getLeft() - mapView.getLeft();
             RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i(String.format("Querying box %s", box));
+            Timber.i("Querying box %s", box);
             List<Feature> features = mapboxMap.queryRenderedFeatures(box);
 
             // Show count
@@ -66,22 +66,21 @@ public class QueryRenderedFeaturesBoxCountActivity extends AppCompatActivity {
   }
 
   private void debugOutput(List<Feature> features) {
-    Timber.i(String.format("Got %s features", features.size()));
+    Timber.i("Got %s features", features.size());
     for (Feature feature : features) {
       if (feature != null) {
-        Timber.i(String.format("Got feature %s with %s properties and Geometry %s",
+        Timber.i("Got feature %s with %s properties and Geometry %s",
           feature.getId(),
           feature.getProperties() != null ? feature.getProperties().entrySet().size() : "<null>",
-          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>")
+          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>"
         );
         if (feature.getProperties() != null) {
           for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
-            Timber.i(String.format("Prop %s - %s", entry.getKey(), entry.getValue()));
+            Timber.i("Prop %s - %s", entry.getKey(), entry.getValue());
           }
         }
       } else {
-        // TODO Question: Why not formatting here??
-        Timber.i("Got NULL feature %s");
+        Timber.i("Got 0 features");
       }
     }
   }

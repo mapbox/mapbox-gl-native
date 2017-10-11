@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@id/mapView"
@@ -20,8 +18,8 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:layout_marginBottom="82dp"
-        android:layout_marginRight="@dimen/fab_margin"
         android:layout_marginEnd="@dimen/fab_margin"
+        android:layout_marginRight="@dimen/fab_margin"
         android:src="@drawable/ic_my_location"
         app:backgroundTint="@color/accent"
         app:layout_anchorGravity="top"/>
@@ -35,4 +33,4 @@
         android:src="@drawable/ic_paint"
         app:backgroundTint="@color/primary"/>
 
-</FrameLayout>
+</merge>

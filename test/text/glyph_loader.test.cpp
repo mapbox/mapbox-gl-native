@@ -214,3 +214,52 @@ TEST(GlyphManager, LoadingInvalid) {
             {{{"Test Stack"}}, {u'A', u'E'}}
         });
 }
+
+TEST(GlyphManager, ImmediateFileSource) {
+    class GlyphManagerTestSynchronous {
+    public:
+        util::RunLoop loop;
+        StubFileSource fileSource = { StubFileSource::ResponseType::Synchronous };
+        StubGlyphManagerObserver observer;
+        StubGlyphRequestor requestor;
+        GlyphManager glyphManager { fileSource };
+
+        void run(const std::string& url, GlyphDependencies dependencies) {
+            // Squelch logging.
+            Log::setObserver(std::make_unique<Log::NullObserver>());
+
+            glyphManager.setURL(url);
+            glyphManager.setObserver(&observer);
+            glyphManager.getGlyphs(requestor, std::move(dependencies));
+
+            loop.run();
+        }
+
+        void end() {
+            loop.stop();
+        }
+    };
+
+    GlyphManagerTestSynchronous test;
+
+    test.fileSource.glyphsResponse = [&] (const Resource&) {
+        Response response;
+        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        return response;
+    };
+
+    test.observer.glyphsError = [&] (const FontStack&, const GlyphRange&, std::exception_ptr) {
+        FAIL();
+        test.end();
+    };
+
+    test.requestor.glyphsAvailable = [&] (GlyphMap) {
+        test.end();
+    };
+
+    test.run(
+        "test/fixtures/resources/glyphs.pbf",
+        GlyphDependencies {
+            {{{"Test Stack"}}, {u'a', u'å', u' '}}
+        });
+}

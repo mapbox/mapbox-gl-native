@@ -1,6 +1,6 @@
 #include <mbgl/util/thread_local.hpp>
 
-#include <mbgl/util/run_loop.hpp>
+#include <mbgl/actor/scheduler.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 
 #include <array>
@@ -41,7 +41,7 @@ void ThreadLocal<T>::set(T* ptr) {
    impl->local.localData()[0] = ptr;
 }
 
-template class ThreadLocal<RunLoop>;
+template class ThreadLocal<Scheduler>;
 template class ThreadLocal<BackendScope>;
 template class ThreadLocal<int>; // For unit tests
 

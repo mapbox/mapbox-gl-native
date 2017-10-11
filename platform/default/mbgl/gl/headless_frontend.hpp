@@ -3,6 +3,7 @@
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/util/async_task.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <memory>
 
@@ -16,8 +17,8 @@ class Map;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
-    HeadlessFrontend(float pixelRatio_, FileSource&, Scheduler&);
-    HeadlessFrontend(Size, float pixelRatio_, FileSource&, Scheduler&);
+    HeadlessFrontend(float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {});
+    HeadlessFrontend(Size, float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {});
     ~HeadlessFrontend() override;
 
     void reset() override;

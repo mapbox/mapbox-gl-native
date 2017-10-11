@@ -15,6 +15,8 @@ public:
 
     static jni::Object<CameraPosition> New(jni::JNIEnv&, mbgl::CameraOptions);
 
+    static mbgl::CameraOptions getCameraOptions(jni::JNIEnv&, jni::Object<CameraPosition>);
+
     static jni::Class<CameraPosition> javaClass;
 
     static void registerNative(jni::JNIEnv&);

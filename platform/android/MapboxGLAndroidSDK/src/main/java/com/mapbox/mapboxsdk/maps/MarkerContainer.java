@@ -53,7 +53,7 @@ class MarkerContainer implements Markers {
     mapboxMap) {
     int count = markerOptionsList.size();
     List<Marker> markers = new ArrayList<>(count);
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       BaseMarkerOptions markerOptions;
       Marker marker;
       for (int i = 0; i < count; i++) {
@@ -63,26 +63,13 @@ class MarkerContainer implements Markers {
       }
 
       if (markers.size() > 0) {
-        long[] ids = null;
-        if (nativeMapView != null) {
-          ids = nativeMapView.addMarkers(markers);
+        long[] ids = nativeMapView.addMarkers(markers);
+        for (int i = 0; i < ids.length; i++) {
+          Marker createdMarker = markers.get(i);
+          createdMarker.setMapboxMap(mapboxMap);
+          createdMarker.setId(ids[i]);
+          annotations.put(ids[i], createdMarker);
         }
-
-        long id = 0;
-        Marker m;
-        for (int i = 0; i < markers.size(); i++) {
-          m = markers.get(i);
-          m.setMapboxMap(mapboxMap);
-          if (ids != null) {
-            id = ids[i];
-          } else {
-            // unit test
-            id++;
-          }
-          m.setId(id);
-          annotations.put(id, m);
-        }
-
       }
     }
     return markers;

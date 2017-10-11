@@ -20,7 +20,11 @@ import timber.log.Timber;
 
 /**
  * Settings for the user location and bearing tracking of a MapboxMap.
+ *
+ * @deprecated use location layer plugin from
+ * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
  */
+@Deprecated
 public final class TrackingSettings {
 
   private final MyLocationView myLocationView;

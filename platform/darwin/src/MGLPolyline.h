@@ -33,8 +33,18 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLPolygon` object. To group multiple polylines together in one shape, use an
  `MGLMultiPolyline` or `MGLShapeCollection` object.
 
- To make the polyline straddle the antimeridian, specify some longitudes less
- than −180 degrees or greater than 180 degrees.
+ To make the polyline go across the antimeridian or international date line, 
+ specify some longitudes less than −180 degrees or greater than 180 degrees.
+ For example, a polyline that stretches from Tokyo to San Francisco would have
+ coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ 
+ ```swift
+ let coordinates = [
+     CLLocationCoordinate2D(latitude: 35.68476, longitude: -220.24257),
+     CLLocationCoordinate2D(latitude: 37.78428, longitude: -122.41310)
+ ]
+ let polyline = MGLPolyline(coordinates: coordinates, count: UInt(coordinates.count))
+ ```
 
  A polyline is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.4">LineString</a>

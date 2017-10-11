@@ -109,6 +109,32 @@ TEST(Map, LatLngBoundsToCamera) {
 
     CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {});
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.55467, 1e-5);
+}
+
+TEST(Map, LatLngBoundsToCameraWithAngle) {
+    MapTest<> test;
+
+    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+
+    LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35);
+    ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.21385, 1e-5);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD);
+}
+
+TEST(Map, LatLngsToCamera) {
+    MapTest<> test;
+
+    std::vector<LatLng> latLngs{{ 40.712730, 74.005953 }, {15.68169,73.499857}, {30.82678, 83.4082}};
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -23 * util::DEG2RAD);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 2.75434, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
 }
 
 TEST(Map, CameraToLatLngBounds) {
@@ -158,6 +184,21 @@ TEST(Map, Offline) {
                      0.1);
 
     NetworkStatus::Set(NetworkStatus::Status::Online);
+}
+
+TEST(Map, SetStyleDefaultCamera) {
+    MapTest<> test;
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getPitch(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getBearing(), 0.0);
+    EXPECT_EQ(test.map.getLatLng(), LatLng {});
+
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+
+    test.map.jumpTo(test.map.getStyle().getDefaultCamera());
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.5);
 }
 
 TEST(Map, SetStyleInvalidJSON) {
@@ -568,4 +609,46 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
     runLoop.run();
+}
+
+TEST(Map, NoContentTiles) {
+    MapTest<DefaultFileSource> test {":memory:", "."};
+
+    using namespace std::chrono_literals;
+
+    // Insert a 204 No Content response for the 0/0/0 tile
+    Response response;
+    response.noContent = true;
+    response.expires = util::now() + 1h;
+    test.fileSource.put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
+                                       Tileset::Scheme::XYZ),
+                        response);
+
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "name": "Water",
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "background",
+        "type": "background",
+        "paint": {
+          "background-color": "red"
+        }
+      }, {
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
+    test::checkImage("test/fixtures/map/nocontent",
+                     test.frontend.render(test.map),
+                     0.0015,
+                     0.1);
 }

@@ -59,7 +59,8 @@ TEST(VectorTile, setError) {
 TEST(VectorTile, onError) {
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
-    tile.onError(std::make_exception_ptr(std::runtime_error("test")));
+    tile.onError(std::make_exception_ptr(std::runtime_error("test")), 0);
+
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());
@@ -86,16 +87,14 @@ TEST(VectorTile, Issue7615) {
         nullptr,
         {},
         {},
-        0
-    });
+    }, 0);
 
     // Subsequent onLayout should not cause the existing symbol bucket to be discarded.
     tile.onLayout(GeometryTile::LayoutResult {
         std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
         nullptr,
         nullptr,
-        0
-    });
+    }, 0);
 
     EXPECT_EQ(symbolBucket.get(), tile.getBucket(*symbolLayer.baseImpl));
 }

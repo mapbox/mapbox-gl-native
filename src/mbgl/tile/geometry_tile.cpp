@@ -17,10 +17,9 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <iostream>
 
@@ -28,12 +27,28 @@ namespace mbgl {
 
 using namespace style;
 
+/*
+   Correlation between GeometryTile and GeometryTileWorker is safeguarded by two
+   correlation schemes:
+
+   GeometryTile's 'correlationID' is used for ensuring the tile will be flagged
+   as non-pending only when the placement coming from the last operation (as in
+   'setData', 'setLayers',  'setPlacementConfig') occurs. This is important for
+   still mode rendering as we want to render only when all layout and placement
+   operations are completed.
+
+   GeometryTileWorker's 'imageCorrelationID' is used for checking whether an
+   image request reply coming from `GeometryTile` is valid. Previous image
+   request replies are ignored as they result in incomplete placement attempts
+   that could flag the tile as non-pending too early.
+ */
+
 GeometryTile::GeometryTile(const OverscaledTileID& id_,
                            std::string sourceID_,
                            const TileParameters& parameters)
     : Tile(id_),
       sourceID(std::move(sourceID_)),
-      mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+      mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
@@ -42,8 +57,8 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              parameters.pixelRatio),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
-      placementThrottler(Milliseconds(300), [this] { invokePlacement(); }),
-      lastYStretch(1.0f) {
+      lastYStretch(1.0f),
+      mode(parameters.mode) {
 }
 
 GeometryTile::~GeometryTile() {
@@ -62,7 +77,6 @@ void GeometryTile::markObsolete() {
 
 void GeometryTile::setError(std::exception_ptr err) {
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
@@ -86,7 +100,7 @@ void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
 
     ++correlationID;
     requestedConfig = desiredConfig;
-    placementThrottler.invoke();
+    invokePlacement();
 }
 
 void GeometryTile::invokePlacement() {
@@ -120,9 +134,10 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
     worker.invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
 }
 
-void GeometryTile::onLayout(LayoutResult result) {
+void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
+    (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
@@ -130,10 +145,10 @@ void GeometryTile::onLayout(LayoutResult result) {
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onPlacement(PlacementResult result) {
+void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
-    if (result.correlationID == correlationID) {
+    if (resultCorrelationID == correlationID) {
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
@@ -150,10 +165,11 @@ void GeometryTile::onPlacement(PlacementResult result) {
     observer->onTileChanged(*this);
 }
 
-void GeometryTile::onError(std::exception_ptr err) {
+void GeometryTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
     loaded = true;
-    pending = false;
-    renderable = false;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     observer->onTileError(*this, err);
 }
     
@@ -165,12 +181,12 @@ void GeometryTile::getGlyphs(GlyphDependencies glyphDependencies) {
     glyphManager.getGlyphs(*this, std::move(glyphDependencies));
 }
 
-void GeometryTile::onImagesAvailable(ImageMap images) {
-    worker.invoke(&GeometryTileWorker::onImagesAvailable, std::move(images));
+void GeometryTile::onImagesAvailable(ImageMap images, uint64_t imageCorrelationID) {
+    worker.invoke(&GeometryTileWorker::onImagesAvailable, std::move(images), imageCorrelationID);
 }
 
-void GeometryTile::getImages(ImageDependencies imageDependencies) {
-    imageManager.getImages(*this, std::move(imageDependencies));
+void GeometryTile::getImages(ImageRequestPair pair) {
+    imageManager.getImages(*this, std::move(pair));
 }
 
 void GeometryTile::upload(gl::Context& context) {
@@ -214,10 +230,19 @@ void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
-    const RenderStyle& style,
+    const std::vector<const RenderLayer*>& layers,
     const RenderedQueryOptions& options) {
 
     if (!featureIndex || !data) return;
+
+    // Determine the additional radius needed factoring in property functions
+    float additionalRadius = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket) {
+            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
+        }
+    }
 
     featureIndex->query(result,
                         queryGeometry,
@@ -227,9 +252,9 @@ void GeometryTile::queryRenderedFeatures(
                         options,
                         *data,
                         id.canonical,
-                        style,
+                        layers,
                         collisionTile.get(),
-                        *this);
+                        additionalRadius);
 }
 
 void GeometryTile::querySourceFeatures(

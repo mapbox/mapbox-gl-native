@@ -1882,6 +1882,29 @@ public class PropertyFactory {
   }
 
   /**
+   * Part of the icon placed closest to the anchor.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> iconAnchor(@Property.ICON_ANCHOR String value) {
+    return new LayoutPropertyValue<>("icon-anchor", value);
+  }
+
+
+
+  /**
+   * Part of the icon placed closest to the anchor.
+   *
+   * @param <T> the function input type
+   * @param function a wrapper function for String
+   * @return property wrapper around a String function
+   */
+  public static <T> PropertyValue<Function<T, String>> iconAnchor(Function<T, String> function) {
+    return new LayoutPropertyValue<>("icon-anchor", function);
+  }
+
+  /**
    * Orientation of icon when map is pitched.
    *
    * @param value a String value
@@ -2034,11 +2057,11 @@ public class PropertyFactory {
   /**
    * The maximum line width for text wrapping.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textMaxWidth(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textMaxWidth(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-max-width", function);
   }
 
@@ -2080,11 +2103,11 @@ public class PropertyFactory {
   /**
    * Text tracking amount.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for Float
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
    * @return property wrapper around a Float function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> textLetterSpacing(CameraFunction<Z, Float> function) {
+  public static <T> PropertyValue<Function<T, Float>> textLetterSpacing(Function<T, Float> function) {
     return new LayoutPropertyValue<>("text-letter-spacing", function);
   }
 

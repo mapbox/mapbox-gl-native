@@ -34,3 +34,5 @@ mbgl_platform_core()
 create_source_groups(mbgl-core)
 
 xcode_create_scheme(TARGET mbgl-core)
+
+initialize_xcode_cxx_build_settings(mbgl-core)

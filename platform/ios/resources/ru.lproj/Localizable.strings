@@ -2,13 +2,16 @@
 "ANNOTATION_A11Y_HINT" = "Показать больше информации";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_DESC" = "The session data task failed. Original request was: %@";
+"API_CLIENT_400_DESC" = "The session data task failed. Original request was:%@";
 
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "The status code was %ld";
 
 /* No comment provided by engineer. */
 "CANCEL" = "Отмена";
+
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Вернуться на карту";
 
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Повернуть карту на север";
@@ -31,6 +34,12 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Об этой карте";
 
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Не удалось загрузить карту из-за неизвестной ошибки.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Не удалось загрузить карту так как невозможно загрузить стиль.";
+
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
 
@@ -40,8 +49,17 @@
 /* Map accessibility value */
 "MAP_A11Y_VALUE" = "Масштаб %1$dx\n%2$ld аннотации(й) видны";
 
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Не удалось загрузить карту из-за ошибки в стиле.";
+
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
+
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK версии %@теперь доступен.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Не удалось загрузить карту так как стиль не найден или несовместим.";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "Вы можете помочь сделать карты OpenStreetMap и Mapbox лучше путем предоставления анонимных данных об использовании.";

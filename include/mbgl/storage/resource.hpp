@@ -68,6 +68,7 @@ public:
     optional<Timestamp> priorModified = {};
     optional<Timestamp> priorExpires = {};
     optional<std::string> priorEtag = {};
+    std::shared_ptr<const std::string> priorData;
 };
 
 } // namespace mbgl

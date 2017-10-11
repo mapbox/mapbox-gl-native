@@ -54,6 +54,8 @@ mbgl_platform_node()
 
 create_source_groups(mbgl-node)
 
+initialize_xcode_cxx_build_settings(mbgl-node)
+
 xcode_create_scheme(
     TARGET mbgl-node
 )
@@ -63,7 +65,7 @@ xcode_create_scheme(
     TYPE node
     NAME "node tests"
     ARGS
-        "`npm bin tape`/tape platform/node/test/js/**/*.test.js"
+        "node_modules/.bin/tape platform/node/test/js/**/*.test.js"
 )
 
 xcode_create_scheme(

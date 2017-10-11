@@ -110,6 +110,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `N` to reset north\n");
     printf("- Press `R` to enable the route demo\n");
     printf("- Press `E` to insert an example building extrusion layer\n");
+    printf("- Press `O` to toggle online connectivity\n");
     printf("- Press `Z` to cycle through north orientations\n");
     printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
@@ -175,6 +176,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
         case GLFW_KEY_X:
             if (!mods)
                 view->map->resetPosition();
+            break;
+        case GLFW_KEY_O:
+            view->onlineStatusCallback();
             break;
         case GLFW_KEY_S:
             if (view->changeStyleCallback)

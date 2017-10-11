@@ -77,9 +77,9 @@ T mag(const S& a) {
     return std::sqrt(a.x * a.x + a.y * a.y);
 }
 
-template <typename S>
+template <typename T = double, typename S>
 S unit(const S& a) {
-    auto magnitude = mag(a);
+    auto magnitude = mag<T>(a);
     if (magnitude == 0) {
         return a;
     }
@@ -112,7 +112,7 @@ inline T division(const T dividend, const T divisor, const T nan) {
         if (dividend == 0) {
             return nan;
         } else {
-            return std::copysign(std::numeric_limits<T>::infinity(), dividend);
+            return ::copysign(std::numeric_limits<T>::infinity(), dividend);
         }
     } else {
         return dividend / divisor;

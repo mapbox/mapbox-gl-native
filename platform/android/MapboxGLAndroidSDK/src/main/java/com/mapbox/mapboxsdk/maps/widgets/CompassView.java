@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPropertyAnimatorCompat;
 import android.support.v4.view.ViewPropertyAnimatorListenerAdapter;
@@ -13,10 +11,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-
-import java.lang.ref.WeakReference;
 
 /**
  * UI element overlaid on a map to show the map's bearing when it isn't true north (0.0). Tapping
@@ -27,16 +22,17 @@ import java.lang.ref.WeakReference;
  * use {@link com.mapbox.mapboxsdk.maps.UiSettings}.
  * </p>
  */
-public final class CompassView extends AppCompatImageView implements Runnable, FocalPointChangeListener {
+public final class CompassView extends AppCompatImageView implements Runnable {
 
-  private static final long TIME_WAIT_IDLE = 500;
+  public static final long TIME_WAIT_IDLE = 500;
+  public static final long TIME_MAP_NORTH_ANIMATION = 150;
   private static final long TIME_FADE_ANIMATION = TIME_WAIT_IDLE;
-  private static final long TIME_MAP_NORTH_ANIMATION = 150;
 
   private float rotation = 0.0f;
   private boolean fadeCompassViewFacingNorth = true;
   private ViewPropertyAnimatorCompat fadeAnimator;
-  private PointF focalPoint;
+  private MapboxMap.OnCompassAnimationListener compassAnimationListener;
+  private boolean isAnimating = false;
 
   public CompassView(Context context) {
     super(context);
@@ -62,9 +58,12 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
     setLayoutParams(lp);
   }
 
-  // TODO refactor MapboxMap and replace with interface
-  public void setMapboxMap(@NonNull MapboxMap mapboxMap) {
-    setOnClickListener(new CompassClickListener(mapboxMap, this));
+  public void injectCompassAnimationListener(@NonNull MapboxMap.OnCompassAnimationListener compassAnimationListener) {
+    this.compassAnimationListener = compassAnimationListener;
+  }
+
+  public void isAnimating(boolean isAnimating) {
+    this.isAnimating = isAnimating;
   }
 
   private void resetAnimation() {
@@ -97,11 +96,6 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
     }
   }
 
-  @Nullable
-  PointF getFocalPoint() {
-    return focalPoint;
-  }
-
   /**
    * Updates the direction of the compass.
    *
@@ -126,6 +120,7 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
       setVisibility(View.VISIBLE);
     }
 
+    notifyCompassAnimationListenerWhenAnimating();
     setRotation(rotation);
   }
 
@@ -157,7 +152,8 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
 
   @Override
   public void run() {
-    if (isFacingNorth() && fadeCompassViewFacingNorth) {
+    if (isHidden()) {
+      compassAnimationListener.onCompassAnimationFinished();
       resetAnimation();
       setLayerType(View.LAYER_TYPE_HARDWARE, null);
       fadeAnimator = ViewCompat.animate(CompassView.this).alpha(0.0f).setDuration(TIME_FADE_ANIMATION);
@@ -172,34 +168,9 @@ public final class CompassView extends AppCompatImageView implements Runnable, F
     }
   }
 
-  @Override
-  public void onFocalPointChanged(PointF pointF) {
-    focalPoint = pointF;
-  }
-
-  static class CompassClickListener implements View.OnClickListener {
-
-    private WeakReference<MapboxMap> mapboxMap;
-    private WeakReference<CompassView> compassView;
-
-    CompassClickListener(final MapboxMap mapboxMap, CompassView compassView) {
-      this.mapboxMap = new WeakReference<>(mapboxMap);
-      this.compassView = new WeakReference<>(compassView);
-    }
-
-    @Override
-    public void onClick(View view) {
-      final MapboxMap mapboxMap = this.mapboxMap.get();
-      final CompassView compassView = this.compassView.get();
-      if (mapboxMap != null && compassView != null) {
-        PointF focalPoint = compassView.getFocalPoint();
-        if (focalPoint != null) {
-          mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
-        } else {
-          mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
-        }
-        compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
-      }
+  private void notifyCompassAnimationListenerWhenAnimating() {
+    if (isAnimating) {
+      compassAnimationListener.onCompassAnimation();
     }
   }
 }

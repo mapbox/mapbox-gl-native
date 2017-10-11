@@ -1,6 +1,5 @@
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/update_parameters.hpp>
-#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/map/transform_state.hpp>
 
@@ -11,17 +10,19 @@ PaintParameters::PaintParameters(gl::Context& context_,
                     GLContextMode contextMode_,
                     RendererBackend& backend_,
                     const UpdateParameters& updateParameters,
-                    RenderStyle& style,
+                    const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
-                    FrameHistory& frameHistory_)
+                    FrameHistory& frameHistory_,
+                    ImageManager& imageManager_,
+                    LineAtlas& lineAtlas_)
     : context(context_),
     backend(backend_),
     state(updateParameters.transformState),
-    evaluatedLight(style.getRenderLight().getEvaluated()),
+    evaluatedLight(evaluatedLight_),
     staticData(staticData_),
     frameHistory(frameHistory_),
-    imageManager(*style.imageManager),
-    lineAtlas(*style.lineAtlas),
+    imageManager(imageManager_),
+    lineAtlas(lineAtlas_),
     mapMode(updateParameters.mode),
     debugOptions(updateParameters.debugOptions),
     contextMode(contextMode_),
@@ -59,6 +60,10 @@ gl::DepthMode PaintParameters::depthModeForSublayer(uint8_t n, gl::DepthMode::Ma
     float nearDepth = ((1 + currentLayer) * numSublayers + n) * depthEpsilon;
     float farDepth = nearDepth + depthRangeSize;
     return gl::DepthMode { gl::DepthMode::LessEqual, mask, { nearDepth, farDepth } };
+}
+
+gl::DepthMode PaintParameters::depthModeFor3D(gl::DepthMode::Mask mask) const {
+    return gl::DepthMode { gl::DepthMode::LessEqual, mask, { 0.0, 1.0 } };
 }
 
 gl::StencilMode PaintParameters::stencilModeForClipping(const ClipID& id) const {

@@ -130,22 +130,7 @@
                                 }
                             ]
                         }
-                    }
-                ]
-            }
-        },
-        "BuildUserKey": {
-            "Type": "AWS::IAM::AccessKey",
-            "Properties": {
-                "UserName": {
-                    "Ref": "BuildUser"
-                }
-            }
-        },
-        "BitriseUser": {
-            "Type": "AWS::IAM::User",
-            "Properties": {
-                "Policies": [
+                    },
                     {
                         "PolicyName": "get-signing-key",
                         "PolicyDocument": {
@@ -223,11 +208,11 @@
                 ]
             }
         },
-        "BitriseUserKey": {
+        "BuildUserKey": {
             "Type": "AWS::IAM::AccessKey",
             "Properties": {
                 "UserName": {
-                    "Ref": "BitriseUser"
+                    "Ref": "BuildUser"
                 }
             }
         },
@@ -308,19 +293,6 @@
             "Value": {
                 "Fn::GetAtt": [
                     "BuildUserKey",
-                    "SecretAccessKey"
-                ]
-            }
-        },
-        "BitriseAccessKeyId": {
-            "Value": {
-                "Ref": "BitriseUserKey"
-            }
-        },
-        "BitriseSecretAccessKey": {
-            "Value": {
-                "Fn::GetAtt": [
-                    "BitriseUserKey",
                     "SecretAccessKey"
                 ]
             }

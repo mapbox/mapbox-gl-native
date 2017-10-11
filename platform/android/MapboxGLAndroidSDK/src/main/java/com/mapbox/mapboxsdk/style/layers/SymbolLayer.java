@@ -252,6 +252,16 @@ public class SymbolLayer extends Layer {
   }
 
   /**
+   * Get the IconAnchor property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getIconAnchor() {
+    return (PropertyValue<String>) new PropertyValue("icon-anchor", nativeGetIconAnchor());
+  }
+
+  /**
    * Get the IconPitchAlignment property
    *
    * @return property wrapper value around String
@@ -900,6 +910,8 @@ public class SymbolLayer extends Layer {
   private native Object nativeGetIconKeepUpright();
 
   private native Object nativeGetIconOffset();
+
+  private native Object nativeGetIconAnchor();
 
   private native Object nativeGetIconPitchAlignment();
 

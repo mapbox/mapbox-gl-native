@@ -346,7 +346,7 @@ final class Transform implements MapView.OnMapChangedListener {
 
   void setMinZoom(double minZoom) {
     if ((minZoom < MapboxConstants.MINIMUM_ZOOM) || (minZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-      Timber.e("Not setting minZoomPreference, value is in unsupported range: " + minZoom);
+      Timber.e("Not setting minZoomPreference, value is in unsupported range: %s", minZoom);
       return;
     }
     mapView.setMinZoom(minZoom);
@@ -358,7 +358,7 @@ final class Transform implements MapView.OnMapChangedListener {
 
   void setMaxZoom(double maxZoom) {
     if ((maxZoom < MapboxConstants.MINIMUM_ZOOM) || (maxZoom > MapboxConstants.MAXIMUM_ZOOM)) {
-      Timber.e("Not setting maxZoomPreference, value is in unsupported range: " + maxZoom);
+      Timber.e("Not setting maxZoomPreference, value is in unsupported range: %s", maxZoom);
       return;
     }
     mapView.setMaxZoom(maxZoom);

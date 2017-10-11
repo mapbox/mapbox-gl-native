@@ -98,8 +98,8 @@ const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLSh
     }
     
     std::vector<mbgl::Feature> features;
-    if (self.style) {
-        features = self.style.mapView.renderer->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
+    if (self.mapView) {
+        features = self.mapView.renderer->querySourceFeatures(self.rawSource->getID(), { {}, optionalFilter });
     }
     return MGLFeaturesFromMBGLFeatures(features);
 }

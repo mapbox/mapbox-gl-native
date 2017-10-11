@@ -12,7 +12,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  * <p>
  * Do not extend this class directly but extend {@link BaseMarkerViewOptions} instead.
  * </p>
+ * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
+ * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
  */
+@Deprecated
 public class MarkerViewOptions extends BaseMarkerViewOptions<MarkerView, MarkerViewOptions> {
 
   private MarkerView marker;

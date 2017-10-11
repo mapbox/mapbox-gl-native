@@ -38,7 +38,7 @@ public:
     void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
     void onGlyphsAvailable(GlyphMap glyphs);
-    void onImagesAvailable(ImageMap images);
+    void onImagesAvailable(ImageMap images, uint64_t imageCorrelationID);
 
 private:
     void coalesced();
@@ -70,6 +70,7 @@ private:
 
     State state = Idle;
     uint64_t correlationID = 0;
+    uint64_t imageCorrelationID = 0;
 
     // Outer optional indicates whether we've received it or not.
     optional<std::vector<Immutable<style::Layer::Impl>>> layers;

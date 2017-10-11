@@ -72,9 +72,9 @@ public class FileSource {
         MapboxConstants.KEY_META_DATA_SET_STORAGE_EXTERNAL,
         MapboxConstants.DEFAULT_SET_STORAGE_EXTERNAL);
     } catch (PackageManager.NameNotFoundException exception) {
-      Timber.e("Failed to read the package metadata: ", exception);
+      Timber.e(exception,"Failed to read the package metadata: ");
     } catch (Exception exception) {
-      Timber.e("Failed to read the storage key: ", exception);
+      Timber.e(exception, "Failed to read the storage key: ");
     }
 
     String cachePath = null;
@@ -83,7 +83,7 @@ public class FileSource {
         // Try getting the external storage path
         cachePath = context.getExternalFilesDir(null).getAbsolutePath();
       } catch (NullPointerException exception) {
-        Timber.e("Failed to obtain the external storage path: ", exception);
+        Timber.e(exception, "Failed to obtain the external storage path: ");
       }
     }
 

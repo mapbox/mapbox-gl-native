@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Неможливо завантажити мапу через невідому помилку.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Неможливо завантажити мапу, бо неможливо завантажити стиль.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Неможливо завантажити мапу, через помилки в стилі.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Неможливо завантажити мапу, бо неможливо знайти стиль або він несумісний.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";

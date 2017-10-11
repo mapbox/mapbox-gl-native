@@ -21,6 +21,8 @@ mbgl_platform_render()
 
 create_source_groups(mbgl-render)
 
+initialize_xcode_cxx_build_settings(mbgl-render)
+
 xcode_create_scheme(
     TARGET mbgl-render
     OPTIONAL_ARGS

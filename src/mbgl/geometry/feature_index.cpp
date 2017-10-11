@@ -1,5 +1,4 @@
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/renderer/render_style.hpp>
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
@@ -9,7 +8,7 @@
 #include <mbgl/math/minmax.hpp>
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/tile/geometry_tile.hpp>
+#include <mbgl/tile/tile_id.hpp>
 
 #include <mapbox/geometry/envelope.hpp>
 
@@ -32,55 +31,12 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
     }
 }
 
-static bool vectorContains(const std::vector<std::string>& vector, const std::string& s) {
-    return std::find(vector.begin(), vector.end(), s) != vector.end();
-}
-
-static bool vectorsIntersect(const std::vector<std::string>& vectorA, const std::vector<std::string>& vectorB) {
-    for (const auto& a : vectorA) {
-        if (vectorContains(vectorB, a)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 static bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
     return a.sortIndex > b.sortIndex;
 }
 
 static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
     return a.sortIndex < b.sortIndex;
-}
-
-static int16_t getAdditionalQueryRadius(const RenderedQueryOptions& queryOptions,
-                                        const RenderStyle& style,
-                                        const GeometryTile& tile,
-                                        const float pixelsToTileUnits) {
-
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-    auto getQueryRadius = [&](const RenderLayer& layer) {
-        auto bucket = tile.getBucket(*layer.baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(layer) * pixelsToTileUnits);
-        }
-    };
-
-    if (queryOptions.layerIDs) {
-        for (const auto& layerID : *queryOptions.layerIDs) {
-            const RenderLayer* layer = style.getRenderLayer(layerID);
-            if (layer) {
-                getQueryRadius(*layer);
-            }
-        }
-    } else {
-        for (const RenderLayer* layer : style.getRenderLayers()) {
-            getQueryRadius(*layer);
-        }
-    }
-
-    return std::min<int16_t>(util::EXTENT, additionalRadius);
 }
 
 void FeatureIndex::query(
@@ -92,13 +48,13 @@ void FeatureIndex::query(
         const RenderedQueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
-        const RenderStyle& style,
+        const std::vector<const RenderLayer*>& layers,
         const CollisionTile* collisionTile,
-        const GeometryTile& tile) const {
+        const float additionalQueryRadius) const {
 
     // Determine query radius
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
-    const int16_t additionalRadius = getAdditionalQueryRadius(queryOptions, style, tile, pixelsToTileUnits);
+    const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, additionalQueryRadius * pixelsToTileUnits);
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
@@ -113,7 +69,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
     }
 
     // Query symbol features, if they've been placed.
@@ -124,7 +80,7 @@ void FeatureIndex::query(
     std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, style, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
     }
 }
 
@@ -135,30 +91,39 @@ void FeatureIndex::addFeature(
     const RenderedQueryOptions& options,
     const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
-    const RenderStyle& style,
+    const std::vector<const RenderLayer*>& layers,
     const float bearing,
     const float pixelsToTileUnits) const {
 
-    auto& layerIDs = bucketLayerIDs.at(indexedFeature.bucketName);
-    if (options.layerIDs && !vectorsIntersect(layerIDs, *options.layerIDs)) {
-        return;
-    }
+    auto getRenderLayer = [&] (const std::string& layerID) -> const RenderLayer* {
+        for (const auto& layer : layers) {
+            if (layer->getID() == layerID) {
+                return layer;
+            }
+        }
+        return nullptr;
+    };
 
-    auto sourceLayer = geometryTileData.getLayer(indexedFeature.sourceLayerName);
-    assert(sourceLayer);
+    // Lazily calculated.
+    std::unique_ptr<GeometryTileLayer> sourceLayer;
+    std::unique_ptr<GeometryTileFeature> geometryTileFeature;
 
-    auto geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
-    assert(geometryTileFeature);
-
-    for (const auto& layerID : layerIDs) {
-        if (options.layerIDs && !vectorContains(*options.layerIDs, layerID)) {
+    for (const std::string& layerID : bucketLayerIDs.at(indexedFeature.bucketName)) {
+        const RenderLayer* renderLayer = getRenderLayer(layerID);
+        if (!renderLayer) {
             continue;
         }
 
-        auto renderLayer = style.getRenderLayer(layerID);
-        if (!renderLayer ||
-            (!renderLayer->is<RenderSymbolLayer>() &&
-             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits))) {
+        if (!geometryTileFeature) {
+            sourceLayer = geometryTileData.getLayer(indexedFeature.sourceLayerName);
+            assert(sourceLayer);
+
+            geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
+            assert(geometryTileFeature);
+        }
+
+        if (!renderLayer->is<RenderSymbolLayer>() &&
+             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits)) {
             continue;
         }
 

@@ -33,6 +33,7 @@ TEST(GeoJSONOptions, RetainsDefaults) {
     GeoJSONOptions defaults;
 
     // GeoJSON-VT
+    ASSERT_EQ(converted.minzoom, defaults.minzoom);
     ASSERT_EQ(converted.maxzoom, defaults.maxzoom);
     ASSERT_EQ(converted.buffer, defaults.buffer);
     ASSERT_EQ(converted.tolerance, defaults.tolerance);
@@ -61,6 +62,7 @@ TEST(GeoJSONOptions, FullConversion) {
     GeoJSONOptions converted = *convert<GeoJSONOptions>(raw, error);
 
     // GeoJSON-VT
+    ASSERT_EQ(converted.minzoom, 0);
     ASSERT_EQ(converted.maxzoom, 1);
     ASSERT_EQ(converted.buffer, 2);
     ASSERT_EQ(converted.tolerance, 3);

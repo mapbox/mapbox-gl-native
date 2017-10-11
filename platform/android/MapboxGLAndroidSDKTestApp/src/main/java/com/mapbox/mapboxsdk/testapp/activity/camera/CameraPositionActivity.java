@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -24,6 +25,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing how to listen to camera change events.
+ */
 public class CameraPositionActivity extends AppCompatActivity implements OnMapReadyCallback {
 
   private MapView mapView;
@@ -67,7 +71,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
       }
     });
 
-    mapboxMap.setOnCameraMoveStartedistener(new MapboxMap.OnCameraMoveStartedListener() {
+    mapboxMap.setOnCameraMoveStartedListener(new MapboxMap.OnCameraMoveStartedListener() {
 
       private final String[] REASONS = {"REASON_API_GESTURE", "REASON_DEVELOPER_ANIMATION", "REASON_API_ANIMATION"};
 
@@ -83,6 +87,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setColorFilter(ContextCompat.getColor(CameraPositionActivity.this, R.color.primary));
     fab.setOnClickListener(new View.OnClickListener() {
+      @SuppressLint("InflateParams")
       @Override
       public void onClick(View view) {
         Context context = view.getContext();

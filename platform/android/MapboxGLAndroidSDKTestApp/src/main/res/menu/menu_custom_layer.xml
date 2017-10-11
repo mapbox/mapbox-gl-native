@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:mapbox="http://schemas.android.com/apk/res-auto">
-
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/action_update_layer"
-        android:title="Update layer (invalidate)" />
+        android:title="@string/update_layer_invalidate"/>
     <item
         android:id="@+id/action_set_color_red"
-        android:title="Red" />
+        android:title="@string/red"/>
     <item
         android:id="@+id/action_set_color_green"
-        android:title="Green" />
+        android:title="@string/green"/>
     <item
         android:id="@+id/action_set_color_blue"
-        android:title="Blue" />
+        android:title="@string/blue"/>
 </menu>

@@ -32,6 +32,8 @@
 #include "gson/json_object.hpp"
 #include "gson/json_primitive.hpp"
 #include "java_types.hpp"
+#include "map_renderer.hpp"
+#include "map_renderer_runnable.hpp"
 #include "native_map_view.hpp"
 #include "offline/offline_manager.hpp"
 #include "offline/offline_region.hpp"
@@ -47,6 +49,7 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/sources.hpp"
 #include "style/light.hpp"
+#include "snapshotter/map_snapshotter.hpp"
 
 namespace mbgl {
 namespace android {
@@ -143,6 +146,8 @@ void registerNatives(JavaVM *vm) {
     Polyline::registerNative(env);
 
     // Map
+    MapRenderer::registerNative(env);
+    MapRendererRunnable::registerNative(env);
     NativeMapView::registerNative(env);
 
     // Http
@@ -177,6 +182,9 @@ void registerNatives(JavaVM *vm) {
     OfflineTilePyramidRegionDefinition::registerNative(env);
     OfflineRegionError::registerNative(env);
     OfflineRegionStatus::registerNative(env);
+
+    // Snapshotter
+    MapSnapshotter::registerNative(env);
 }
 
 } // namespace android

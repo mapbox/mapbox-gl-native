@@ -4,6 +4,7 @@
 #include <mbgl/util/thread_local.hpp>
 #include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <android/looper.h>
 
@@ -23,7 +24,6 @@
 namespace {
 
 using namespace mbgl::util;
-static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
 int looperCallbackNew(int fd, int, void* data) {
     int buffer[1];
@@ -200,19 +200,20 @@ Milliseconds RunLoop::Impl::processRunnables() {
 }
 
 RunLoop* RunLoop::Get() {
-    return current.get();
+    assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
+    return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>(this, type)) {
-    current.set(this);
+    Scheduler::SetCurrent(this);
 }
 
 RunLoop::~RunLoop() {
-    current.set(nullptr);
+    Scheduler::SetCurrent(nullptr);
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {
-    return current.get()->impl.get();
+    return Get()->impl.get();
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {

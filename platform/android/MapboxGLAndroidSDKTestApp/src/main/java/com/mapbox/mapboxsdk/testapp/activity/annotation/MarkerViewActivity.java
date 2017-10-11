@@ -36,6 +36,7 @@ import com.mapbox.mapboxsdk.testapp.model.annotations.CountryMarkerViewOptions;
 import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerView;
 import com.mapbox.mapboxsdk.testapp.model.annotations.TextMarkerViewOptions;
 
+import java.util.Locale;
 import java.util.Random;
 
 /**
@@ -150,7 +151,11 @@ public class MarkerViewActivity extends AppCompatActivity {
           public void onMapChanged(@MapView.MapChange int change) {
             if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
               if (!markerViewManager.getMarkerViewAdapters().isEmpty() && viewCountView != null) {
-                viewCountView.setText("ViewCache size " + markerViewContainer.getChildCount());
+                viewCountView.setText(String.format(
+                  Locale.getDefault(),
+                  getString(R.string.viewcache_size),
+                  markerViewContainer.getChildCount())
+                );
               }
             }
           }

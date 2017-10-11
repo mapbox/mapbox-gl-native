@@ -50,7 +50,7 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
 
     mapView = new MapView(this, mapboxMapOptions);
     mapView.setId(R.id.mapView);
-    ViewGroup parent = (ViewGroup) findViewById(R.id.container);
+    ViewGroup parent = (ViewGroup) findViewById(android.R.id.content);
     parent.addView(mapView);
 
     mapView.onCreate(savedInstanceState);

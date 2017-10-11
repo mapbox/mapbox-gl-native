@@ -23,7 +23,7 @@ const char* line_pattern::vertexSource = R"MBGL_SHADER(
 // Retina devices need a smaller distance to avoid aliasing.
 #define ANTIALIASING 1.0 / DEVICE_PIXEL_RATIO / 2.0
 
-attribute vec2 a_pos;
+attribute vec4 a_pos_normal;
 attribute vec4 a_data;
 
 uniform mat4 u_matrix;
@@ -44,6 +44,7 @@ varying lowp float blur;
 uniform lowp float u_blur;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
@@ -52,12 +53,14 @@ varying lowp float opacity;
 uniform lowp float u_opacity;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_offset
 uniform lowp float a_offset_t;
 attribute lowp vec2 a_offset;
 #else
 uniform lowp float u_offset;
 #endif
+
 
 #ifndef HAS_UNIFORM_u_gapwidth
 uniform lowp float a_gapwidth_t;
@@ -66,6 +69,7 @@ attribute mediump vec2 a_gapwidth;
 uniform mediump float u_gapwidth;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_width
 uniform lowp float a_width_t;
 attribute mediump vec2 a_width;
@@ -73,55 +77,60 @@ attribute mediump vec2 a_width;
 uniform mediump float u_width;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifndef HAS_UNIFORM_u_blur
     blur = unpack_mix_vec2(a_blur, a_blur_t);
 #else
     lowp float blur = u_blur;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
 #else
     lowp float opacity = u_opacity;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_offset
     lowp float offset = unpack_mix_vec2(a_offset, a_offset_t);
 #else
     lowp float offset = u_offset;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_gapwidth
     mediump float gapwidth = unpack_mix_vec2(a_gapwidth, a_gapwidth_t);
 #else
     mediump float gapwidth = u_gapwidth;
 #endif
 
+    
 #ifndef HAS_UNIFORM_u_width
     mediump float width = unpack_mix_vec2(a_width, a_width_t);
 #else
     mediump float width = u_width;
 #endif
 
+
     vec2 a_extrude = a_data.xy - 128.0;
     float a_direction = mod(a_data.z, 4.0) - 1.0;
     float a_linesofar = (floor(a_data.z / 4.0) + a_data.w * 64.0) * LINE_DISTANCE_SCALE;
 
-    // We store the texture normals in the most insignificant bit
-    // transform y so that 0 => -1 and 1 => 1
-    // In the texture normal, x is 0 if the normal points straight up/down and 1 if it's a round cap
+    vec2 pos = a_pos_normal.xy;
+
+    // x is 1 if it's a round cap, 0 otherwise
     // y is 1 if the normal points up, and -1 if it points down
-    mediump vec2 normal = mod(a_pos, 2.0);
-    normal.y = sign(normal.y - 0.5);
+    mediump vec2 normal = a_pos_normal.zw;
     v_normal = normal;
 
-    // these transformations used to be applied in the JS and native code bases. 
-    // moved them into the shader for clarity and simplicity. 
+    // these transformations used to be applied in the JS and native code bases.
+    // moved them into the shader for clarity and simplicity.
     gapwidth = gapwidth / 2.0;
     float halfwidth = width / 2.0;
-    offset = -1.0 * offset; 
+    offset = -1.0 * offset;
 
     float inset = gapwidth + (gapwidth > 0.0 ? ANTIALIASING : 0.0);
     float outset = gapwidth + halfwidth * (gapwidth > 0.0 ? 2.0 : 1.0) + ANTIALIASING;
@@ -137,9 +146,6 @@ void main() {
     mediump float u = 0.5 * a_direction;
     mediump float t = 1.0 - abs(u);
     mediump vec2 offset2 = offset * a_extrude * scale * normal.y * mat2(t, -u, u, t);
-
-    // Remove the texture normal bit to get the position
-    vec2 pos = floor(a_pos * 0.5);
 
     vec4 projected_extrude = u_matrix * vec4(dist / u_ratio, 0.0, 0.0);
     gl_Position = u_matrix * vec4(pos + offset2 / u_ratio, 0.0, 1.0) + projected_extrude;
@@ -178,21 +184,25 @@ varying lowp float blur;
 uniform lowp float u_blur;
 #endif
 
+
 #ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
 #else
 uniform lowp float u_opacity;
 #endif
 
-void main() {
 
+void main() {
+    
 #ifdef HAS_UNIFORM_u_blur
     lowp float blur = u_blur;
 #endif
 
+    
 #ifdef HAS_UNIFORM_u_opacity
     lowp float opacity = u_opacity;
 #endif
+
 
     // Calculate the distance of the pixel from the line in pixels.
     float dist = length(v_normal) * v_width2.s;
