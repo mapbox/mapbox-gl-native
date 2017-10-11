@@ -14,12 +14,17 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
-#### Open project in Android Studio
+#### Opening the project in Android Studio
 
+We recommend that you open this repository's `android` folder in Android Studio. 
+
+mapbox-gl-native > platform > android
+
+Once you open it in Android Studio and switch to the Android view in the left-hand sidebar,  you should see the `MapboxGLAndroidSDK` and `MapboxGLAndroidSDKTestApp` folders.
+
+
+Alternatively, you can use the Terminal application to open the project in Android Studio. Open your Terminal application, navigate to this repository's root folder, and run the `make aproj` command.
 #### Using the SDK snapshot
-
-
-
 
 Instead of using the latest stable release of the Mapbox Android SDK, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
 
@@ -88,18 +93,6 @@ $ sudo apt-get install -y build-essential curl lib32stdc++6 lib32z1 pkg-config p
 
 - Apple Command Line Tools (available at  [Apple Developer](https://developer.apple.com/download/more/))
 - [xcpretty](https://github.com/supermarin/xcpretty) (`gem install xcpretty`)
-
-
-#### Open project in Android Studio
-
-We recommend that you open this repository's `android` folder in Android Studio. 
-
-mapbox-gl-native > platform > android
-
-Once you open it in Android Studio and switch to the Android view in the left-hand sidebar,  you should see the `MapboxGLAndroidSDK` and `MapboxGLAndroidSDKTestApp` folders.
-
-
-Alternatively, you can use the Terminal application to open the project in Android Studio. Open your Terminal application, navigate to this repository's root folder, and run the `make aproj` command.
 
 
 ##### macOS
