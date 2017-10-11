@@ -24,6 +24,17 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".activity.NavigationViewActivity"
+            android:description="@string/navigation_view"
+            android:label="@string/navigation_view">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_basic"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.infowindow.InfoWindowActivity"
             android:description="@string/description_info_window"
             android:label="@string/activity_info_window">

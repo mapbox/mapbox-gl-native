@@ -87,6 +87,11 @@ public class MockLocationEngine extends LocationEngine {
     }
   }
 
+  @Override
+  public Type obtainType() {
+    return Type.MOCK;
+  }
+
   private static class LocationAnimator extends AnimatorListenerAdapter {
 
     private static final long DURATION_ANIMATION = 10000;
