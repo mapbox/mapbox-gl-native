@@ -232,7 +232,7 @@ public:
 @interface MGLMapView () <UIGestureRecognizerDelegate,
                           GLKViewDelegate,
                           CLLocationManagerDelegate,
-                          SMCalloutViewDelegate,
+                          MGLSMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
                           MGLAnnotationImageDelegate>
@@ -1929,7 +1929,7 @@ public:
     return [self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)];
 }
 
-- (void)calloutViewClicked:(__unused SMCalloutView *)calloutView
+- (void)calloutViewClicked:(__unused MGLSMCalloutView *)calloutView
 {
     if ([self.delegate respondsToSelector:@selector(mapView:tapOnCalloutForAnnotation:)])
     {
