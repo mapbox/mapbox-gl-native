@@ -14,11 +14,9 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-Value makeValue(const v8::Local<v8::Value>);
-
 template <class T, class...Args>
 optional<T> convert(const v8::Local<v8::Value>& value, Error& error, Args&&...args) {
-    return convert<T>(makeValue(value), error, std::forward<Args>(args)...);
+    return convert<T>(Value(value), error, std::forward<Args>(args)...);
 }
 
 

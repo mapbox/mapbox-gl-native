@@ -44,6 +44,45 @@ struct Storage : std::aligned_storage_t<16, 8> {
 
 struct Error { std::string message; };
 
+template <typename T>
+const T& cast(const Storage& storage) {
+    return reinterpret_cast<const T&>(storage);
+}
+
+template <typename T>
+T& cast(Storage& storage) {
+    return reinterpret_cast<T&>(storage);
+}
+
+template <typename T>
+void destroy (Storage& storage) {
+    const T value(std::move(cast<T>(storage)));
+    (void)value; // appease linter
+}
+
+template <typename T>
+void move(Storage&& src, Storage& dest) {
+    new (static_cast<void*>(&dest)) const T (std::move(cast<T>(src)));
+    destroy<T>(src);
+}
+
+template <typename T>
+struct ValueTraits {
+    static bool isUndefined(const T& value);
+    static bool isArray(const T& value);
+    static std::size_t arrayLength(const T& value);
+    static T arrayMember(const T& value, std::size_t i);
+    static bool isObject(const T& value);
+    static optional<T> objectMember(const T& value, const char * name);
+    static optional<Error> eachMember(const T& value, const std::function<optional<Error> (const std::string&, const T&)>& fn);
+    static optional<bool> toBool(const T& value);
+    static optional<float> toNumber(const T& value);
+    static optional<double> toDouble(const T& value);
+    static optional<std::string> toString(const T& value);
+    static optional<mbgl::Value> toValue(const T& value);
+    static optional<GeoJSON> toGeoJSON(const T& value, Error& error);
+};
+
 class Value {
 public:
     struct VTable {
@@ -81,6 +120,13 @@ public:
     {
         vtable->move(std::move(v.storage), this->storage);
     }
+
+    template <typename T>
+    Value(const T value) : vtable(vtableForType<T>()) {
+        static_assert(sizeof(Storage) >= sizeof(T), "Storage must be large enough to hold value type");
+
+        new (static_cast<void*>(&storage)) const T (value);
+   }
 
     ~Value() {
         vtable->destroy(storage);
@@ -150,6 +196,60 @@ public:
     }
 
 private:
+    template <typename T>
+    static VTable* vtableForType() {
+        using Traits = ValueTraits<T>;
+    
+        static Value::VTable vtable = {
+            move<T>,
+            destroy<T>,
+            [] (const Storage& s) {
+                return Traits::isUndefined(cast<T>(s));
+            },
+            [] (const Storage& s) {
+                return Traits::isArray(cast<T>(s));
+            },
+            [] (const Storage& s) {
+                return Traits::arrayLength(cast<T>(s));
+            },
+            [] (const Storage& s, std::size_t i) {
+                return Value(Traits::arrayMember(cast<T>(s), i));
+            },
+            [] (const Storage& s) {
+                return Traits::isObject(cast<T>(s));
+            },
+            [] (const Storage& s, const char * key) {
+                optional<T> member = Traits::objectMember(cast<T>(s), key);
+                if (member) return optional<Value>(*member);
+                return optional<Value>();
+            },
+            [] (const Storage& s, const std::function<optional<Error> (const std::string&, const Value&)>& fn) {
+                return Traits::eachMember(cast<T>(s), [&](const std::string& k, const T& v) {
+                    return fn(k, Value(v));
+                });
+            },
+            [] (const Storage& s) {
+                return Traits::toBool(cast<T>(s));
+            },
+            [] (const Storage& s) {
+                return Traits::toNumber(cast<T>(s));
+            },
+            [] (const Storage& s) {
+                return Traits::toDouble(cast<T>(s));
+            },
+            [] (const Storage& s) {
+                return Traits::toString(cast<T>(s));
+            },
+            []  (const Storage& s) {
+                return Traits::toValue(cast<T>(s));
+            },
+            [] (const Storage& s, Error& err) {
+                return Traits::toGeoJSON(cast<T>(s), err);
+            }
+        };
+        return &vtable;
+    }
+
     VTable* vtable;
     Storage storage;
 };

@@ -1,59 +1,47 @@
 #include <mbgl/style/rapidjson_conversion.hpp>
-
 #include <mapbox/geojson.hpp>
 #include <mapbox/geojson/rapidjson.hpp>
+
 
 namespace mbgl {
 namespace style {
 namespace conversion {
 
-static const JSValue& cast(const Storage& storage) {
-    return **static_cast<const JSValue* const*>(static_cast<const void*>(&storage));
+using JSValuePointer = const JSValue*;
+
+template<> bool ValueTraits<JSValuePointer>::isUndefined(const JSValuePointer& value) {
+    return value->IsNull();
 }
 
-static void destroy(Storage&) {
-    return;
+template<> bool ValueTraits<JSValuePointer>::isArray(const JSValuePointer& value) {
+    return value->IsArray();
 }
 
-static void move(Storage&& src, Storage& dest) {
-    new (static_cast<void*>(&dest)) JSValue* (std::move(*static_cast<JSValue**>(static_cast<void*>(&src))));
-    destroy(src);
+template<> std::size_t ValueTraits<JSValuePointer>::arrayLength(const JSValuePointer& value) {
+    return value->Size();
 }
 
-static bool isUndefined(const Storage& storage) {
-    return cast(storage).IsNull();
+template<> JSValuePointer ValueTraits<JSValuePointer>::arrayMember(const JSValuePointer& value, std::size_t i) {
+    return &(*value)[rapidjson::SizeType(i)];
 }
 
-static bool isArray(const Storage& storage) {
-    return cast(storage).IsArray();
+template<> bool ValueTraits<JSValuePointer>::isObject(const JSValuePointer& value) {
+    return value->IsObject();
 }
 
-static std::size_t arrayLength(const Storage& storage) {
-    return cast(storage).Size();
-}
-
-static Value arrayMember(const Storage& storage, std::size_t i) {
-    return makeValue(&cast(storage)[rapidjson::SizeType(i)]);
-}
-
-static bool isObject(const Storage& storage) {
-    return cast(storage).IsObject();
-}
-
-static optional<Value> objectMember(const Storage& storage, const char * name) {
-    const JSValue& value = cast(storage);
-    if (!value.HasMember(name)) {
-        return optional<Value>();
+template<> optional<JSValuePointer> ValueTraits<JSValuePointer>::objectMember(const JSValuePointer& value, const char * name) {
+    if (!value->HasMember(name)) {
+        return optional<JSValuePointer>();
     }
-    return makeValue(&value[name]);
+    const JSValuePointer& member = &(*value)[name];
+    return {member};
 }
 
-static optional<Error> eachMember(const Storage& storage, const std::function<optional<Error> (const std::string&, const Value&)>& fn) {
-    const JSValue& value = cast(storage);
-    assert(value.IsObject());
-    for (const auto& property : value.GetObject()) {
+template<> optional<Error> ValueTraits<JSValuePointer>::eachMember(const JSValuePointer& value, const std::function<optional<Error> (const std::string&, const JSValuePointer&)>& fn) {
+    assert(value->IsObject());
+    for (const auto& property : value->GetObject()) {
         optional<Error> result =
-            fn({ property.name.GetString(), property.name.GetStringLength() }, makeValue(&property.value));
+            fn({ property.name.GetString(), property.name.GetStringLength() }, &property.value);
         if (result) {
             return result;
         }
@@ -61,41 +49,36 @@ static optional<Error> eachMember(const Storage& storage, const std::function<op
     return {};
 }
 
-static optional<bool> toBool(const Storage& storage) {
-    const JSValue& value = cast(storage);
-    if (!value.IsBool()) {
+template<> optional<bool> ValueTraits<JSValuePointer>::toBool(const JSValuePointer& value) {
+    if (!value->IsBool()) {
         return {};
     }
-    return value.GetBool();
+    return value->GetBool();
 }
 
-static optional<float> toNumber(const Storage& storage) {
-    const JSValue& value = cast(storage);
-    if (!value.IsNumber()) {
+template<> optional<float> ValueTraits<JSValuePointer>::toNumber(const JSValuePointer& value) {
+    if (!value->IsNumber()) {
         return {};
     }
-    return value.GetDouble();
+    return value->GetDouble();
 }
 
-static optional<double> toDouble(const Storage& storage) {
-    const JSValue& value = cast(storage);
-    if (!value.IsNumber()) {
+template<> optional<double> ValueTraits<JSValuePointer>::toDouble(const JSValuePointer& value) {
+    if (!value->IsNumber()) {
         return {};
     }
-    return value.GetDouble();
+    return value->GetDouble();
 }
 
-static optional<std::string> toString(const Storage& storage) {
-    const JSValue& value = cast(storage);
-    if (!value.IsString()) {
+template<> optional<std::string> ValueTraits<JSValuePointer>::toString(const JSValuePointer& value) {
+    if (!value->IsString()) {
         return {};
     }
-    return {{ value.GetString(), value.GetStringLength() }};
+    return {{ value->GetString(), value->GetStringLength() }};
 }
 
-static optional<mbgl::Value> toValue(const Storage& storage) {
-    const JSValue& value = cast(storage);
-    switch (value.GetType()) {
+template<> optional<mbgl::Value> ValueTraits<JSValuePointer>::toValue(const JSValuePointer& value) {
+    switch (value->GetType()) {
         case rapidjson::kNullType:
         case rapidjson::kFalseType:
             return { false };
@@ -104,50 +87,27 @@ static optional<mbgl::Value> toValue(const Storage& storage) {
             return { true };
 
         case rapidjson::kStringType:
-            return { std::string { value.GetString(), value.GetStringLength() } };
+            return { std::string { value->GetString(), value->GetStringLength() } };
 
         case rapidjson::kNumberType:
-            if (value.IsUint64()) return { value.GetUint64() };
-            if (value.IsInt64()) return { value.GetInt64() };
-            return { value.GetDouble() };
+            if (value->IsUint64()) return { value->GetUint64() };
+            if (value->IsInt64()) return { value->GetInt64() };
+            return { value->GetDouble() };
 
         default:
             return {};
     }
 }
 
-static optional<GeoJSON> toGeoJSON(const Storage& storage, Error& error) {
+template<> optional<GeoJSON> ValueTraits<JSValuePointer>::toGeoJSON(const JSValuePointer& value, Error& error) {
     try {
-        return mapbox::geojson::convert(cast(storage));
+        return mapbox::geojson::convert(*value);
     } catch (const std::exception& ex) {
         error = { ex.what() };
         return {};
     }
 }
 
-Value makeValue(const JSValue* value) {
-    static Value::VTable vtable = {
-        move,
-        destroy,
-        isUndefined,
-        isArray,
-        arrayLength,
-        arrayMember,
-        isObject,
-        objectMember,
-        eachMember,
-        toBool,
-        toNumber,
-        toDouble,
-        toString,
-        toValue,
-        toGeoJSON
-    };
-
-    Storage storage;
-    new (static_cast<void*>(&storage)) const JSValue* (value);
-    return Value(&vtable, std::move(storage));
-}
 
 } // namespace conversion
 } // namespace style
