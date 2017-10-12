@@ -11,15 +11,18 @@ opt_out_usage
 
 default_platform :ios
 
+project = "ios.xcodeproj"
+plist = "app/Info.plist"
+identifier = "com.mapbox.MapboxGL-nightly"
+teamid = ENV['FASTLANE_TEAM_ID']
+
 platform :ios do
   before_all do
-    #update_fastlane
-    update_info_plist(
-      app_identifier: "com.mapbox.MapboxGL-nightly",
-      display_name: "Nightly",
-      plist_path: "app/Info.plist",
-      xcodeproj: "ios.xcodeproj"
-    )
+    update_fastlane
+    update_info_plist(display_name: "Nightly", app_identifier: identifier, plist_path: plist, xcodeproj: project)
+    update_app_identifier(app_identifier: identifier, plist_path: plist, xcodeproj: project)
+    update_project_team(path: project, teamid: teamid)
+    set_info_plist_value(path: plist, key: "MAPBOX_ACCESS_TOKEN", value: ENV['MAPBOX_ACCESS_TOKEN'])
   end
 
   desc "Submit a new build to Apple TestFlight."
