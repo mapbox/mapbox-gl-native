@@ -15,7 +15,6 @@ import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
@@ -34,7 +33,7 @@ import java.util.Map;
  * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
  */
 @Deprecated
-public class MarkerViewManager implements MapView.OnMapChangedListener {
+public class MarkerViewManager {
 
   private final ViewGroup markerViewContainer;
   private final ViewTreeObserver.OnPreDrawListener markerViewPreDrawObserver =
@@ -75,9 +74,8 @@ public class MarkerViewManager implements MapView.OnMapChangedListener {
     this.mapboxMap = mapboxMap;
   }
 
-  @Override
-  public void onMapChanged(@MapView.MapChange int change) {
-    if (isWaitingForRenderInvoke && change == MapView.DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
+  public void onDidFinishRenderingFrameFully() {
+    if (isWaitingForRenderInvoke) {
       isWaitingForRenderInvoke = false;
       invalidateViewMarkersInVisibleRegion();
     }

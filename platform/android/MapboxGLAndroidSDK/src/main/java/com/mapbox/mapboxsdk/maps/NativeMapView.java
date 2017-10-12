@@ -62,6 +62,8 @@ final class NativeMapView {
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
 
+  private MapChangeEventManager mapChangeEventManager;
+
   static {
     LibraryLoader.load();
   }
@@ -70,9 +72,10 @@ final class NativeMapView {
   // Constructors
   //
 
-  public NativeMapView(final MapView mapView, MapRenderer mapRenderer) {
+  public NativeMapView(final MapView mapView, MapRenderer mapRenderer, MapChangeEventManager mapChangeEventManager) {
     this.mapRenderer = mapRenderer;
     this.mapView = mapView;
+    this.mapChangeEventManager = mapChangeEventManager;
 
     Context context = mapView.getContext();
     fileSource = FileSource.getInstance(context);
@@ -829,10 +832,52 @@ final class NativeMapView {
   // Callbacks
   //
 
-  protected void onMapChanged(int rawChange) {
-    if (mapView != null) {
-      mapView.onMapChange(rawChange);
-    }
+  protected void onCameraWillChange(boolean animated) {
+    mapChangeEventManager.onCameraWillChange(animated);
+  }
+
+  protected void onCameraIsChanging() {
+    mapChangeEventManager.onCameraIsChanging();
+  }
+
+  protected void onCameraDidChange(boolean animated) {
+    mapChangeEventManager.onCameraDidChange(animated);
+  }
+
+  protected void onWillStartLoadingMap() {
+    mapChangeEventManager.onWillStartLoadingMap();
+  }
+
+  protected void onDidFinishLoadingMap() {
+    mapChangeEventManager.onDidFinishLoadingMap();
+  }
+
+  protected void onDidFailLoadingMap(String erorMessage) {
+    mapChangeEventManager.onDidFailLoadingMap(erorMessage);
+  }
+
+  protected void onWillStartRenderingFrame() {
+    mapChangeEventManager.onWillStartRenderingFrame();
+  }
+
+  protected void onDidFinishRenderingFrame(boolean partial) {
+    mapChangeEventManager.onDidFinishRenderingFrame(partial);
+  }
+
+  protected void onWillStartRenderingMap() {
+    mapChangeEventManager.onWillStartRenderingMap();
+  }
+
+  protected void onDidFinishRenderingMap(boolean partial) {
+    mapChangeEventManager.onDidFinishRenderingMap(partial);
+  }
+
+  protected void onDidFinishLoadingStyle() {
+    mapChangeEventManager.onDidFinishLoadingStyle();
+  }
+
+  protected void onSourceChanged(String id) {
+    mapChangeEventManager.onSourceChanged(id);
   }
 
   protected void onSnapshotReady(Bitmap mapContent) {
@@ -1050,11 +1095,11 @@ final class NativeMapView {
   //
 
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    mapView.addOnMapChangedListener(listener);
+    mapChangeEventManager.addOnMapChangedListener(listener);
   }
 
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    mapView.removeOnMapChangedListener(listener);
+    mapChangeEventManager.removeOnMapChangedListener(listener);
   }
 
   //

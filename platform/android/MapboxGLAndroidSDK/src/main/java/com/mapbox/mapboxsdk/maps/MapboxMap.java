@@ -188,19 +188,30 @@ public final class MapboxMap {
   /**
    * Called when the region is changing or has changed.
    */
-  void onUpdateRegionChange() {
+  void onCameraChange() {
     trackingSettings.update();
     annotationManager.update();
   }
 
   /**
+   * Called when the region did change animated.
+   */
+  void onCameraDidChangeAnimated() {
+    transform.onCameraDidChangeAnimated();
+  }
+
+  /**
    * Called when the map frame is fully rendered.
    */
-  void onUpdateFullyRendered() {
+  void onDidFinishRenderingFrame() {
     CameraPosition cameraPosition = transform.invalidateCameraPosition();
     if (cameraPosition != null) {
       uiSettings.update(cameraPosition);
     }
+  }
+
+  void onDidFinishRenderingFrameFully() {
+    annotationManager.getMarkerViewManager().onDidFinishRenderingFrameFully();
   }
 
   // Style
@@ -1082,6 +1093,7 @@ public final class MapboxMap {
    */
   public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
     if (callback != null) {
+      // TODO refactor out
       nativeMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override
         public void onMapChanged(@MapView.MapChange int change) {
@@ -1670,9 +1682,9 @@ public final class MapboxMap {
   /**
    * Get a camera position that fits a provided shape with a given bearing and padding.
    *
-   * @param geometry     the geometry to constrain the map with
-   * @param bearing      the bearing at which to compute the geometry's bounds
-   * @param padding      the padding to apply to the bounds
+   * @param geometry the geometry to constrain the map with
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
