@@ -7,16 +7,17 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
-static Storage&& move(Storage&& storage) {
-    return std::move(storage);
+static const JSValue& cast(const Storage& storage) {
+    return **static_cast<const JSValue* const*>(static_cast<const void*>(&storage));
 }
 
-static void destroy(Storage&&) {
+static void destroy(Storage&) {
     return;
 }
 
-static const JSValue& cast(const Storage& storage) {
-    return **static_cast<const JSValue* const*>(static_cast<const void*>(&storage));
+static void move(Storage&& src, Storage& dest) {
+    new (static_cast<void*>(&dest)) JSValue* (std::move(*static_cast<JSValue**>(static_cast<void*>(&src))));
+    destroy(src);
 }
 
 static bool isUndefined(const Storage& storage) {

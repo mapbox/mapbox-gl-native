@@ -35,15 +35,20 @@ namespace conversion {
 // iOS/macOS:   JSValue* or id
 // Qt:          JSValue* or QVariant
 
-using Storage = std::aligned_storage_t<16, 8>;
+struct Storage : std::aligned_storage_t<16, 8> {
+    using std::aligned_storage_t<16, 8>::aligned_storage_t;
+    Storage(Storage&) = delete;
+    Storage(const Storage&) = delete;
+    Storage(Storage&&) = delete;
+};
 
 struct Error { std::string message; };
 
 class Value {
 public:
     struct VTable {
-        Storage&& (*move) (Storage&&);
-        void (*destroy) (Storage&&);
+        void (*move) (Storage&& src, Storage& dest);
+        void (*destroy) (Storage&);
 
         bool (*isUndefined) (const Storage&);
 
@@ -67,20 +72,24 @@ public:
 
     Value(VTable* vt, Storage&& s)
         : vtable(vt)
-        , storage(std::move(s)) {}
+    {
+        vtable->move(std::move(s), this->storage);
+    }
 
     Value(Value&& v)
         : vtable(v.vtable)
-        , storage(vtable->move(std::move(v.storage))) {}
+    {
+        vtable->move(std::move(v.storage), this->storage);
+    }
 
     ~Value() {
-        vtable->destroy(std::move(storage));
+        vtable->destroy(storage);
     }
 
     Value& operator=(Value&& v) {
-        vtable->destroy(std::move(storage));
+        vtable->destroy(storage);
         vtable = v.vtable;
-        storage = vtable->move(std::move(v.storage));
+        vtable->move(std::move(v.storage), this->storage);
         return *this;
     }
 

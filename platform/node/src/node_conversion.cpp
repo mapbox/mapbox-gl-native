@@ -13,15 +13,14 @@ static v8::Local<v8::Value>& cast(Storage& storage) {
     return *static_cast<v8::Local<v8::Value>*>(static_cast<void*>(&storage));
 }
 
-static Storage&& move(Storage&& src) {
-    Storage dest;
-    new (static_cast<void*>(&dest)) const v8::Local<v8::Value> (std::move(cast(src)));
-    return std::move(dest);
-}
-
-static void destroy(Storage&& storage) {
+static void destroy(Storage& storage) {
     const v8::Local<v8::Value> value(std::move(cast(storage)));
     (void)value; // appease linter
+}
+
+static void move(Storage&& src, Storage& dest) {
+    new (static_cast<void*>(&dest)) const v8::Local<v8::Value> (std::move(cast(src)));
+    destroy(src);
 }
 
 inline bool isUndefined(const Storage& storage) {

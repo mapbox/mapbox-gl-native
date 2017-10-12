@@ -22,17 +22,14 @@ static const Holder& cast(const Storage& storage) {
     return *static_cast<const Holder*>(static_cast<const void*>(&storage));
 }
 
-static Storage&& move(Storage&& storage) {
+static void destroy(Storage& storage) {
     Holder& value = cast(storage);
-    Storage result;
-    new (static_cast<void*>(&result)) Holder(value);
     value.~Holder();
-    return std::move(result);
 }
 
-static void destroy(Storage&& storage) {
-    Holder& value = cast(storage);
-    value.~Holder();
+static void move(Storage&& src, Storage& dest) {
+    new (static_cast<void*>(&dest)) Holder(std::move(cast(src)));
+    destroy(src);
 }
 
 static bool isUndefined(const Storage& storage) {
