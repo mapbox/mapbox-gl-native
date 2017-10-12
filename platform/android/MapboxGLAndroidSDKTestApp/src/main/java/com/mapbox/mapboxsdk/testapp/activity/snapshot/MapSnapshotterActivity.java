@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
+import com.mapbox.mapboxsdk.snapshotter.Snapshot;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
@@ -96,12 +97,13 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
     MapSnapshotter snapshotter = new MapSnapshotter(MapSnapshotterActivity.this, options);
 
-    snapshotter.start(new MapboxMap.SnapshotReadyCallback() {
+    snapshotter.start(new MapboxMap.MapSnapshotReadyCallback() {
       @Override
-      public void onSnapshotReady(Bitmap snapshot) {
+      public void onSnapshotReady(Snapshot snapshot) {
         Timber.i("Got the snapshot");
         ImageView imageView = new ImageView(MapSnapshotterActivity.this);
-        imageView.setImageBitmap(snapshot);
+        Bitmap bitmap = snapshot.getBitmap();
+        imageView.setImageBitmap(bitmap);
         grid.addView(
           imageView,
           new GridLayout.LayoutParams(GridLayout.spec(row), GridLayout.spec(column))

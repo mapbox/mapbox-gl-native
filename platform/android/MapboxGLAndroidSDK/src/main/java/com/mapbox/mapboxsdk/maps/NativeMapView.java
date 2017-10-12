@@ -842,7 +842,8 @@ final class NativeMapView {
 
     Bitmap viewContent = BitmapUtils.createBitmapFromView(mapView);
     if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
-      snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
+      Bitmap mergedBitmap = BitmapUtils.mergeBitmap(mapContent, viewContent);
+      snapshotReadyCallback.onSnapshotReady(mergedBitmap);
     }
   }
 
