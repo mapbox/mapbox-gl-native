@@ -6,6 +6,7 @@ set -u
 
 NAME=Mapbox
 OUTPUT=build/macos/pkg
+APP_OUTPUT=build/macos/app
 DERIVED_DATA=build/macos
 PRODUCTS=${DERIVED_DATA}
 
@@ -16,7 +17,7 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-rm -rf ${OUTPUT}
+rm -rf ${OUTPUT} ${APP_OUTPUT}
 
 HASH=`git log | head -1 | awk '{ print $2 }' | cut -c 1-10` && true
 PROJ_VERSION=$(git rev-list --count HEAD)
@@ -91,3 +92,27 @@ make xdocument OUTPUT="${OUTPUT}/documentation"
 
 step "Checking that all public symbols are exported…"
 node platform/darwin/scripts/check-public-symbols.js macOS
+
+if [[ ${BUILDTYPE} == Release ]]; then
+    step "Building Mapbox GL.app (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
+    mkdir -p ${APP_OUTPUT}
+    xcodebuild \
+        CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+        CURRENT_SHORT_VERSION=${SHORT_VERSION} \
+        CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
+        CURRENT_COMMIT_HASH=${HASH} \
+        -derivedDataPath ${DERIVED_DATA} \
+        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
+        -workspace ./platform/macos/macos.xcworkspace \
+        -scheme macosapp \
+        -configuration Release \
+        -jobs ${JOBS} \
+        archive | xcpretty
+    
+    step "Exporting Mapbox GL.app"
+    xcodebuild \
+        -exportArchive \
+        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
+        -exportPath "${APP_OUTPUT}" \
+        -exportOptionsPlist platform/macos/ExportOptions.plist
+fi
