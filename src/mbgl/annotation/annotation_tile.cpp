@@ -19,9 +19,6 @@ AnnotationTile::~AnnotationTile() {
     annotationManager.removeTile(*this);
 }
 
-void AnnotationTile::setNecessity(Necessity) {
-}
-
 class AnnotationTileFeatureData {
 public:
     AnnotationTileFeatureData(const AnnotationID id_,

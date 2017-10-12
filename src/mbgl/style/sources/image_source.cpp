@@ -59,7 +59,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
     if (req ||  loaded) {
         return;
     }
-    const Resource imageResource { Resource::Image, *url, {}, Resource::Necessity::Required };
+    const Resource imageResource { Resource::Image, *url, {} };
 
     req = fileSource.request(imageResource, [this](Response res) {
         if (res.error) {
