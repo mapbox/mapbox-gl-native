@@ -1,0 +1,37 @@
+# Customise this file, documentation can be found here:
+# https://github.com/fastlane/fastlane/tree/master/fastlane/docs
+# All available actions: https://docs.fastlane.tools/actions
+# can also be listed using the `fastlane actions` command
+
+# Change the syntax highlighting to Ruby
+# All lines starting with a # are ignored when running `fastlane`
+
+fastlane_version "2.60.0"
+opt_out_usage
+
+default_platform :ios
+
+platform :ios do
+  before_all do
+    #update_fastlane
+    update_info_plist(
+      app_identifier: "com.mapbox.MapboxGL-nightly",
+      display_name: "Nightly",
+      plist_path: "app/Info.plist",
+      xcodeproj: "ios.xcodeproj"
+    )
+  end
+
+  desc "Submit a new build to Apple TestFlight."
+  lane :beta do
+    increment_build_number(build_number: 1)#Time.now.strftime("%Y%m%d"))
+    gym(scheme: "iosapp", include_bitcode: true)
+    pilot(skip_waiting_for_build_processing: true)
+  end
+
+  after_all do |lane|
+  end
+
+  error do |lane, exception|
+  end
+end
