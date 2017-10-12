@@ -5,10 +5,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-MGL_EXPORT
 /**
- The options to use when creating images with the `MGLMapsnapshotter`.
+ The options to use when creating images with the `MGLMapSnapshotter`.
  */
+MGL_EXPORT
 @interface MGLMapSnapshotOptions : NSObject
 
 /**
@@ -63,7 +63,8 @@ MGL_EXPORT
 
 /**
  The scale of the output image. Defaults to the main screen scale.
- Minimum is 1.
+ 
+ The minimum scale is 1.
  */
 @property (nonatomic) CGFloat scale;
 
