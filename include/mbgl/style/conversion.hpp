@@ -37,7 +37,8 @@ namespace detail {
 // iOS/macOS:   JSValue* or id
 // Qt:          JSValue* or QVariant
 
-using Storage = std::aligned_storage_t<16, 8>;
+// TODO: use platform-specific size
+using Storage = std::aligned_storage_t<32, 8>;
 
 } // namespace detail
 
