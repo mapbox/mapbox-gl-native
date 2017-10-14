@@ -541,7 +541,7 @@ bool Style::isLoaded() const {
     return true;
 }
 
-RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const {
+RenderData Style::getRenderData(MapDebugOptions debugOptions, MapMode mapMode, float angle) const {
     RenderData result;
 
     for (const auto& renderSource: renderSources) {
@@ -636,6 +636,13 @@ RenderData Style::getRenderData(MapDebugOptions debugOptions, float angle) const
             if (bucket) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
+
+                // We only need clipping when we're _not_ drawing a symbol layer. The only exception
+                // for symbol layers is when we're rendering still images. See render_symbol_layer.cpp
+                // for the exception we make there.
+                if (!symbolLayer || mapMode == MapMode::Still) {
+                    tile.needsClipping = true;
+                }
             }
         }
 
