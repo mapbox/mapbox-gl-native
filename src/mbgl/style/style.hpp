@@ -107,7 +107,7 @@ public:
     Light* getLight() const;
     RenderLight* getRenderLight() const;
 
-    RenderData getRenderData(MapDebugOptions, float angle) const;
+    RenderData getRenderData(MapDebugOptions, MapMode, float angle) const;
 
     std::vector<Feature> queryRenderedFeatures(const ScreenLineString& geometry,
                                                const TransformState& transformState,

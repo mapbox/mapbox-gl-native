@@ -146,7 +146,7 @@ void Painter::render(const Style& style, const FrameData& frame_, View& view, Sp
 
     evaluatedLight = style.getRenderLight()->getEvaluated();
 
-    RenderData renderData = style.getRenderData(frame.debugOptions, state.getAngle());
+    RenderData renderData = style.getRenderData(frame.debugOptions, frame.mapMode, state.getAngle());
     const std::vector<RenderItem>& order = renderData.order;
     const std::unordered_set<RenderSource*>& sources = renderData.sources;
 

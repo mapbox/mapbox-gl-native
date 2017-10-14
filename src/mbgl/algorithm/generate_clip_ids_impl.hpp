@@ -15,7 +15,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
     for (auto it = renderables.begin(); it != end; it++) {
         auto& tileID = it->first;
         auto& renderable = it->second;
-        if (!renderable.used) {
+        if (!renderable.used || !renderable.needsClipping) {
             continue;
         }
 
