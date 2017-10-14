@@ -8,13 +8,16 @@ struct Renderable {
     UnwrappedTileID id;
     ClipID clip;
     bool used;
+    bool needsClipping;
 
     Renderable(UnwrappedTileID id_,
                ClipID clip_,
-               bool used_ = true)
+               bool used_ = true,
+               bool needsClipping_ = true)
         : id(std::move(id_)),
           clip(std::move(clip_)),
-          used(used_) {}
+          used(used_),
+          needsClipping(needsClipping_) {}
 
     bool operator==(const Renderable& rhs) const {
         return id == rhs.id && clip == rhs.clip;
