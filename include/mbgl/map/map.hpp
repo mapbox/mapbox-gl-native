@@ -127,6 +127,14 @@ public:
     void setViewportMode(ViewportMode);
     ViewportMode getViewportMode() const;
 
+    // Projection mode
+    void setAxonometric(bool);
+    bool getAxonometric() const;
+    void setXSkew(double ySkew);
+    double getXSkew() const;
+    void setYSkew(double ySkew);
+    double getYSkew() const;
+
     // Size
     void setSize(Size);
     Size getSize() const;

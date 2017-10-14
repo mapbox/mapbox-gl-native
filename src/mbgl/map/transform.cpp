@@ -527,6 +527,32 @@ ViewportMode Transform::getViewportMode() const {
     return state.getViewportMode();
 }
 
+#pragma mark - Projection mode
+
+void Transform::setAxonometric(bool axonometric) {
+    state.axonometric = axonometric;
+}
+
+bool Transform::getAxonometric() const {
+    return state.axonometric;
+}
+
+void Transform::setXSkew(double xSkew) {
+    state.xSkew = xSkew;
+}
+
+double Transform::getXSkew() const {
+    return state.xSkew;
+}
+
+void Transform::setYSkew(double ySkew) {
+    state.ySkew = ySkew;
+}
+
+double Transform::getYSkew() const {
+    return state.ySkew;
+}
+
 #pragma mark - Transition
 
 void Transform::startTransition(const CameraOptions& camera,

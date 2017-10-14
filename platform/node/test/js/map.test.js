@@ -121,6 +121,9 @@ test('Map', function(t) {
             'setZoom',
             'setBearing',
             'setPitch',
+            'setAxonometric',
+            'setXSkew',
+            'setYSkew',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);

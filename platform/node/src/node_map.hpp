@@ -57,6 +57,9 @@ public:
     static void SetZoom(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetBearing(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPitch(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetAxonometric(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetXSkew(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetYSkew(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
