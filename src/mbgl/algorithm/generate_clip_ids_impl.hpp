@@ -17,7 +17,7 @@ void ClipIDGenerator::update(std::vector<std::reference_wrapper<Renderable>> ren
     const auto end = renderables.end();
     for (auto it = renderables.begin(); it != end; it++) {
         auto& renderable = it->get();
-        if (!renderable.used) {
+        if (!renderable.used || !renderable.needsClipping) {
             continue;
         }
 
