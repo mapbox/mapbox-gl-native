@@ -370,6 +370,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             if (bucket) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
+
+                // We only need clipping when we're _not_ drawing a symbol layer. The only exception
+                // for symbol layers is when we're rendering still images. See render_symbol_layer.cpp
+                // for the exception we make there.
+                if (!symbolLayer || parameters.mapMode == MapMode::Still) {
+                    tile.needsClipping = true;
+                }
             }
         }
         layer->setRenderTiles(std::move(sortedTilesForInsertion));
