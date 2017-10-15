@@ -39,6 +39,21 @@ static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
             util::toString(max.x) + "," + util::toString(max.y));
 }
 
+static std::string getResourceResolutionString(float pixelRatio) {
+    // returns a supported resolutionString for a given pixelRatio
+    if (pixelRatio == 1.0f) {
+        return "";
+    }
+    if (pixelRatio >= 4.0f) {
+        return "@4x";
+    }
+    if (pixelRatio <= 0.2f) {
+        return "@0.2x";
+    }
+    // e.g. @1.5x
+    return "@" + util::toString(pixelRatio) + "x";
+}
+
 Resource Resource::style(const std::string& url) {
     return Resource {
         Resource::Kind::Style,
@@ -63,14 +78,14 @@ Resource Resource::image(const std::string& url) {
 Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
     return Resource {
         Resource::Kind::SpriteImage,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".png"
+        base + getResourceResolutionString(pixelRatio) + ".png"
     };
 }
 
 Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
     return Resource {
         Resource::Kind::SpriteJSON,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".json"
+        base + getResourceResolutionString(pixelRatio) + ".json"
     };
 }
 
