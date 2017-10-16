@@ -277,6 +277,7 @@ public:
     NS_ARRAY_OF(id <MGLFeature>) *_visiblePlaceFeatures;
     NS_ARRAY_OF(id <MGLFeature>) *_visibleRoadFeatures;
     NS_MUTABLE_SET_OF(MGLFeatureAccessibilityElement *) *_featureAccessibilityElements;
+    BOOL _accessibilityValueAnnouncementIsPending;
 
     MGLReachability *_reachability;
 }
@@ -2821,10 +2822,11 @@ public:
     {
         centerPoint = self.userLocationAnnotationViewCenter;
     }
-    _mbglMap->setZoom(_mbglMap->getZoom() + log2(scaleFactor), mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
+    double newZoom = round(self.zoomLevel) + log2(scaleFactor);
+    _mbglMap->setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
     [self unrotateIfNeededForGesture];
 
-    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
+    _accessibilityValueAnnouncementIsPending = YES;
 }
 
 #pragma mark - Geography -
@@ -5387,10 +5389,21 @@ public:
             _featureAccessibilityElements = nil;
             _visiblePlaceFeatures = nil;
             _visibleRoadFeatures = nil;
-            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+            if (_accessibilityValueAnnouncementIsPending) {
+                _accessibilityValueAnnouncementIsPending = NO;
+                [self performSelector:@selector(announceAccessibilityValue) withObject:nil afterDelay:0.1];
+            } else {
+                UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
+            }
         }
         [self.delegate mapView:self regionDidChangeAnimated:animated];
     }
+}
+
+- (void)announceAccessibilityValue
+{
+    UIAccessibilityPostNotification(UIAccessibilityAnnouncementNotification, self.accessibilityValue);
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)mapViewWillStartLoadingMap {
