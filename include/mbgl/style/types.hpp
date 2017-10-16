@@ -4,7 +4,9 @@
 
 namespace mbgl {
 
-// TODO: should be in public source.hpp header and style namespace
+namespace style {
+
+// TODO: should be in public source.hpp header
 enum class SourceType : uint8_t {
     Vector,
     Raster,
@@ -13,8 +15,6 @@ enum class SourceType : uint8_t {
     Annotations,
     Image
 };
-
-namespace style {
 
 enum class VisibilityType : bool {
     Visible,

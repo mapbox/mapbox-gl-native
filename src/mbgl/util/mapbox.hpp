@@ -19,10 +19,10 @@ std::string normalizeGlyphsURL(const std::string& baseURL, const std::string& ur
 std::string normalizeTileURL(const std::string& baseURL, const std::string& url, const std::string& accessToken);
 
 // Return a "mapbox://tiles/..." URL (suitable for normalizeTileURL) for the given Mapbox tile URL.
-std::string canonicalizeTileURL(const std::string& url, SourceType, uint16_t tileSize);
+std::string canonicalizeTileURL(const std::string& url, style::SourceType, uint16_t tileSize);
 
 // Replace URL templates with "mapbox://tiles/..." URLs (suitable for normalizeTileURL).
-void canonicalizeTileset(Tileset&, const std::string& url, SourceType, uint16_t tileSize);
+void canonicalizeTileset(Tileset&, const std::string& url, style::SourceType, uint16_t tileSize);
 
 extern const uint64_t DEFAULT_OFFLINE_TILE_COUNT_LIMIT;
 

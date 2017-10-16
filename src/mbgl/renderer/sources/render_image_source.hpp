@@ -52,7 +52,7 @@ private:
 
 template <>
 inline bool RenderSource::is<RenderImageSource>() const {
-    return baseImpl->type == SourceType::Image;
+    return baseImpl->type == style::SourceType::Image;
 }
 
 } // namespace mbgl

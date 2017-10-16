@@ -48,7 +48,7 @@ private:
 
 template <>
 inline bool RenderSource::is<RenderGeoJSONSource>() const {
-    return baseImpl->type == SourceType::GeoJSON;
+    return baseImpl->type == style::SourceType::GeoJSON;
 }
 
 } // namespace mbgl
