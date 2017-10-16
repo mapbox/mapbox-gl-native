@@ -44,7 +44,7 @@ private:
 
 template <>
 inline bool RenderSource::is<RenderVectorSource>() const {
-    return baseImpl->type == SourceType::Vector;
+    return baseImpl->type == style::SourceType::Vector;
 }
 
 } // namespace mbgl

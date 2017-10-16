@@ -38,6 +38,7 @@
 #include <cstdint>
 
 using namespace mbgl;
+using SourceType = mbgl::style::SourceType;
 
 class SourceTest {
 public:

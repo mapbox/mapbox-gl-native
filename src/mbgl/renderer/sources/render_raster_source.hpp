@@ -44,7 +44,7 @@ private:
 
 template <>
 inline bool RenderSource::is<RenderRasterSource>() const {
-    return baseImpl->type == SourceType::Raster;
+    return baseImpl->type == style::SourceType::Raster;
 }
 
 } // namespace mbgl
