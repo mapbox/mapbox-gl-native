@@ -24,7 +24,7 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
     }
 }
 
-std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
     const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
 
     std::vector<CanonicalTileID> result;
@@ -38,7 +38,7 @@ std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(Sourc
     return result;
 }
 
-uint64_t OfflineTilePyramidRegionDefinition::tileCount(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+uint64_t OfflineTilePyramidRegionDefinition::tileCount(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
     
     const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
     unsigned long result = 0;;
@@ -49,7 +49,7 @@ uint64_t OfflineTilePyramidRegionDefinition::tileCount(SourceType type, uint16_t
     return result;
 }
 
-Range<uint8_t> OfflineTilePyramidRegionDefinition::coveringZoomRange(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+Range<uint8_t> OfflineTilePyramidRegionDefinition::coveringZoomRange(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
     double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), zoomRange.min);
     double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), zoomRange.max);
 

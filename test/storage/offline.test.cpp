@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 using namespace mbgl;
+using SourceType = mbgl::style::SourceType;
 
 static const LatLngBounds sanFrancisco =
     LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });

@@ -37,7 +37,7 @@ public:
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&,
-                SourceType type,
+                style::SourceType type,
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);

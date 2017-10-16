@@ -60,7 +60,7 @@ private:
     std::deque<Resource> resourcesRemaining;
 
     void queueResource(Resource);
-    void queueTiles(SourceType, uint16_t tileSize, const Tileset&);
+    void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
 };
 
 } // namespace mbgl
