@@ -5,19 +5,14 @@
 #include <mbgl/style/function/composite_exponential_stops.hpp>
 #include <mbgl/style/function/composite_function.hpp>
 
-#include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/function.hpp>
-
-#include <rapidjson/document.h>
-
 
 using namespace mbgl;
 using namespace mbgl::style;
 
-static rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> createFunctionJSON(size_t stopCount) {
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
-
+static std::string createFunctionJSON(size_t stopCount) {
     std::string stops = "[";
     for (size_t outerStop = 0; outerStop < stopCount; outerStop++) {
         for (size_t innerStop = 0; innerStop < stopCount; innerStop++) {
@@ -29,9 +24,7 @@ static rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> cr
         }
     }
     stops += "]";
-    
-    doc.Parse<0>(R"({"type": "exponential", "base": 2,  "stops": )" + stops + R"(, "property": "x"})");
-    return doc;
+    return R"({"type": "exponential", "base": 2,  "stops": )" + stops + R"(, "property": "x"})";
 }
 
 static void Parse_CompositeFunction(benchmark::State& state) {
@@ -42,7 +35,7 @@ static void Parse_CompositeFunction(benchmark::State& state) {
         state.PauseTiming();
         auto doc = createFunctionJSON(stopCount);
         state.ResumeTiming();
-        optional<CompositeFunction<float>> result = conversion::convert<style::CompositeFunction<float>, JSValue>(doc, error);
+        optional<CompositeFunction<float>> result = conversion::convertJSON<style::CompositeFunction<float>>(doc, error);
         if (!result) {
             state.SkipWithError(error.message.c_str());
         }
@@ -54,7 +47,7 @@ static void Evaluate_CompositeFunction(benchmark::State& state) {
     size_t stopCount = state.range(0);
     auto doc = createFunctionJSON(stopCount);
     conversion::Error error;
-    optional<CompositeFunction<float>> function = conversion::convert<CompositeFunction<float>, JSValue>(doc, error);
+    optional<CompositeFunction<float>> function = conversion::convertJSON<CompositeFunction<float>>(doc, error);
     if (!function) {
         state.SkipWithError(error.message.c_str());
     }
