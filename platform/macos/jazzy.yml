@@ -28,6 +28,8 @@ custom_categories:
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
+      - MGLMapSnapshotOptions
+      - MGLMapSnapshotter
   - name: Shapes and Annotations
     children:
       - MGLAnnotation
