@@ -23,19 +23,19 @@ void GeoJSONTile::querySourceFeatures(
     const SourceQueryOptions& options) {
     
     // Ignore the sourceLayer, there is only one
-    auto layer = getData()->getLayer({});
-    
-    if (layer) {
-        auto featureCount = layer->featureCount();
-        for (std::size_t i = 0; i < featureCount; i++) {
-            auto feature = layer->getFeature(i);
-            
-            // Apply filter, if any
-            if (options.filter && !(*options.filter)(*feature)) {
-                continue;
+    if (auto tileData = getData()) {
+        if (auto layer = tileData->getLayer({})) {
+            auto featureCount = layer->featureCount();
+            for (std::size_t i = 0; i < featureCount; i++) {
+                auto feature = layer->getFeature(i);
+
+                // Apply filter, if any
+                if (options.filter && !(*options.filter)(*feature)) {
+                    continue;
+                }
+
+                result.push_back(convertFeature(*feature, id.canonical));
             }
-            
-            result.push_back(convertFeature(*feature, id.canonical));
         }
     }
 }
