@@ -4,20 +4,15 @@
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
-#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/filter.hpp>
-
-#include <rapidjson/document.h>
 
 using namespace mbgl;
 using namespace mbgl::style;
 
 Filter parse(const char * expression) {
-    rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> doc;
-    doc.Parse<0>(expression);
     conversion::Error error;
-    optional<Filter> filter = conversion::convert<Filter, JSValue>(doc, error);
+    optional<Filter> filter = conversion::convertJSON<Filter>(expression, error);
     EXPECT_TRUE(bool(filter));
     return *filter;
 }
