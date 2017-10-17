@@ -27,7 +27,6 @@ ext {
             mockito                : 'org.mockito:mockito-core:2.10.0',
 
             // instrumentation test
-            testSpoonRunner        : 'com.squareup.spoon:spoon-client:1.7.1',
             testRunner             : "com.android.support.test:runner:${testRunnerVersion}",
             testRules              : "com.android.support.test:rules:${testRunnerVersion}",
             testEspressoCore       : "com.android.support.test.espresso:espresso-core:${espressoVersion}",

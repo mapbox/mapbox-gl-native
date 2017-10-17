@@ -70,7 +70,6 @@ dependencies {
     }
 
     // Testing dependencies
-    androidTestCompile rootProject.ext.dep.testSpoonRunner
     androidTestCompile rootProject.ext.dep.supportAnnotations
     androidTestCompile rootProject.ext.dep.testRunner
     androidTestCompile rootProject.ext.dep.testRules
@@ -80,8 +79,6 @@ dependencies {
 
 apply from: 'gradle-make.gradle'
 apply from: 'gradle-config.gradle'
-apply from: 'gradle-device-farm.gradle'
-apply from: 'gradle-spoon.gradle'
 apply from: 'gradle-checkstyle.gradle'
 apply from: '../gradle-lint.gradle'
 
