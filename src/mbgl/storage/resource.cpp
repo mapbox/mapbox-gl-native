@@ -54,17 +54,19 @@ Resource Resource::source(const std::string& url) {
 }
 
 Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
-    return Resource {
-        Resource::Kind::SpriteImage,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".png"
-    };
+    util::URL url(base);
+    return Resource{ Resource::Kind::SpriteImage,
+                     base.substr(0, url.path.first + url.path.second) +
+                         (pixelRatio > 1 ? "@2x" : "") + ".png" +
+                         base.substr(url.query.first, url.query.second) };
 }
 
 Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
-    return Resource {
-        Resource::Kind::SpriteJSON,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".json"
-    };
+    util::URL url(base);
+    return Resource{ Resource::Kind::SpriteJSON,
+                     base.substr(0, url.path.first + url.path.second) +
+                         (pixelRatio > 1 ? "@2x" : "") + ".json" +
+                         base.substr(url.query.first, url.query.second) };
 }
 
 Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
