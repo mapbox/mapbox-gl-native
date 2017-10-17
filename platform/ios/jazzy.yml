@@ -32,6 +32,9 @@ custom_categories:
       - MGLMapCamera
       - MGLMapView
       - MGLMapViewDelegate
+      - MGLMapSnapshot
+      - MGLMapSnapshotOptions
+      - MGLMapSnapshotter
       - MGLUserTrackingMode
   - name: Primitive Shapes
     children:
