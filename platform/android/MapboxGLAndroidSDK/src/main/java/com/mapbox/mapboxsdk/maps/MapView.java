@@ -190,8 +190,10 @@ public class MapView extends FrameLayout {
       annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
+    // overlain zoom buttons
     mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
-    MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform);
+    MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform,
+      cameraChangeDispatcher, getWidth(), getHeight());
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
@@ -877,16 +879,23 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
+  private static class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
 
     private final MapGestureDetector mapGestureDetector;
     private final UiSettings uiSettings;
     private final Transform transform;
+    private final CameraChangeDispatcher cameraChangeDispatcher;
+    private final float mapWidth;
+    private final float mapHeight;
 
-    MapZoomControllerListener(MapGestureDetector detector, UiSettings uiSettings, Transform transform) {
+    MapZoomControllerListener(MapGestureDetector detector, UiSettings uiSettings, Transform transform,
+                              CameraChangeDispatcher dispatcher, float mapWidth, float mapHeight) {
       this.mapGestureDetector = detector;
       this.uiSettings = uiSettings;
       this.transform = transform;
+      this.cameraChangeDispatcher = dispatcher;
+      this.mapWidth = mapWidth;
+      this.mapHeight = mapHeight;
     }
 
     // Not used
@@ -899,6 +908,7 @@ public class MapView extends FrameLayout {
     @Override
     public void onZoom(boolean zoomIn) {
       if (uiSettings.isZoomGesturesEnabled()) {
+        cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
         onZoom(zoomIn, mapGestureDetector.getFocalPoint());
       }
     }
@@ -907,7 +917,7 @@ public class MapView extends FrameLayout {
       if (focalPoint != null) {
         transform.zoom(zoomIn, focalPoint);
       } else {
-        PointF centerPoint = new PointF(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
+        PointF centerPoint = new PointF(mapWidth / 2, mapHeight / 2);
         transform.zoom(zoomIn, centerPoint);
       }
     }
