@@ -27,6 +27,9 @@ struct EvaluationParameters {
     EvaluationParameters(float zoom_, GeometryTileFeature const * feature_) :
         zoom(zoom_), feature(feature_)
     {}
+    EvaluationParameters(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> heatmapDensity_) :
+        zoom(std::move(zoom_)), feature(feature_), heatmapDensity(std::move(heatmapDensity_))
+    {}
     
     optional<float> zoom;
     GeometryTileFeature const * feature;
@@ -114,9 +117,9 @@ public:
 
     bool isFeatureConstant() const;
     bool isZoomConstant() const;
-    EvaluationResult evaluate(float z, const Feature& feature) const;
     type::Type getType() const { return type; };
     
+    EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;
 private:
     type::Type type;
 };

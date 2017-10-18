@@ -59,9 +59,9 @@ bool Expression::isZoomConstant() const {
     return zoomConstant;
 }
 
-EvaluationResult Expression::evaluate(float z, const Feature& feature) const {
+EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const {
     GeoJSONFeature f(feature);
-    return this->evaluate(EvaluationParameters(z, &f));
+    return this->evaluate(EvaluationParameters(zoom, &f, heatmapDensity));
 }
 
 } // namespace expression

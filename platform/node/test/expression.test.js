@@ -47,16 +47,13 @@ suite.run('native', {tests: tests}, (fixture) => {
         const evaluate = fixture.inputs || [];
         const evaluateResults = [];
         for (const input of evaluate) {
-            const zoom = typeof input[0].zoom === 'number' ?
-                input[0].zoom : -1;
-
             const feature = Object.assign({
                 type: 'Feature',
                 properties: {},
                 geometry: { type: 'Point', coordinates: [0, 0] }
             }, input[1])
 
-            const output = expression.evaluate(zoom, feature);
+            const output = expression.evaluate(input[0], feature);
             evaluateResults.push(output);
         }
 

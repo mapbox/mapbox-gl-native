@@ -168,11 +168,17 @@ void NodeExpression::Evaluate(const Nan::FunctionCallbackInfo<v8::Value>& info) 
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
 
-    if (info.Length() < 2) {
-        return Nan::ThrowTypeError("Requires arguments zoom and feature arguments.");
+    if (info.Length() < 2 || !info[0]->IsObject()) {
+        return Nan::ThrowTypeError("Requires globals and feature arguments.");
     }
 
-    float zoom = info[0]->NumberValue();
+    mbgl::optional<float> zoom;
+    v8::Local<v8::Value> v8zoom = Nan::Get(info[0]->ToObject(), Nan::New("zoom").ToLocalChecked()).ToLocalChecked();
+    if (v8zoom->IsNumber()) zoom = v8zoom->NumberValue();
+
+    mbgl::optional<double> heatmapDensity;
+    v8::Local<v8::Value> v8heatmapDensity = Nan::Get(info[0]->ToObject(), Nan::New("heatmapDensity").ToLocalChecked()).ToLocalChecked();
+    if (v8heatmapDensity->IsNumber()) heatmapDensity = v8heatmapDensity->NumberValue();
 
     Nan::JSON NanJSON;
     conversion::Error conversionError;
@@ -184,7 +190,7 @@ void NodeExpression::Evaluate(const Nan::FunctionCallbackInfo<v8::Value>& info) 
 
     try {
         mapbox::geojson::feature feature = geoJSON->get<mapbox::geojson::feature>();
-        auto result = expression->evaluate(zoom, feature);
+        auto result = expression->evaluate(zoom, feature, heatmapDensity);
         if (result) {
             info.GetReturnValue().Set(toJS(*result));
         } else {
