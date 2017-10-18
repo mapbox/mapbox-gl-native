@@ -62,14 +62,9 @@ workflows:
             #!/bin/bash
             set -eu -o pipefail
             brew install cmake
+            sudo easy_install pip
+            sudo pip install awscli
         - is_debug: 'yes'
-    - script:
-        title: Configure AWS-CLI
-        inputs:
-        - content: |-
-            #!/bin/bash
-            apt-get install -y python-pip python-dev build-essential
-            pip install awscli
     - script:
         title: Build package
         inputs:
