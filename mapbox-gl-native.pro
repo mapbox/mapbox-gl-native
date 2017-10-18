@@ -60,6 +60,8 @@ qtConfig(system-zlib) {
 TR_EXCLUDE += $$PWD/*
 
 qtConfig(icu) {
+    QMAKE_USE_PRIVATE += icu
+
     SOURCES += \
         platform/default/bidi.cpp
 } else {
@@ -153,7 +155,6 @@ SOURCES += \
     src/mbgl/renderer/render_light.cpp \
     src/mbgl/renderer/render_source.cpp \
     src/mbgl/renderer/render_static_data.cpp \
-    src/mbgl/renderer/render_style.cpp \
     src/mbgl/renderer/render_tile.cpp \
     src/mbgl/renderer/renderer.cpp \
     src/mbgl/renderer/renderer_backend.cpp \
@@ -185,7 +186,6 @@ SOURCES += \
     src/mbgl/sprite/sprite_loader.cpp \
     src/mbgl/sprite/sprite_loader_worker.cpp \
     src/mbgl/sprite/sprite_parser.cpp \
-    src/mbgl/storage/file_source_request.cpp \
     src/mbgl/storage/network_status.cpp \
     src/mbgl/storage/resource.cpp \
     src/mbgl/storage/resource_transform.cpp \
@@ -254,6 +254,7 @@ SOURCES += \
     src/mbgl/tile/raster_tile_worker.cpp \
     src/mbgl/tile/tile.cpp \
     src/mbgl/tile/tile_cache.cpp \
+    src/mbgl/tile/tile_id_hash.cpp \
     src/mbgl/tile/tile_id_io.cpp \
     src/mbgl/tile/vector_tile.cpp \
     src/mbgl/tile/vector_tile_data.cpp \
@@ -292,14 +293,15 @@ SOURCES += \
     src/parsedate/parsedate.c \
 	platform/default/asset_file_source.cpp \
 	platform/default/default_file_source.cpp \
+	platform/default/file_source_request.cpp \
 	platform/default/local_file_source.cpp \
-	platform/default/online_file_source.cpp \
+	platform/default/logging_stderr.cpp \
 	platform/default/mbgl/storage/offline.cpp \
 	platform/default/mbgl/storage/offline_database.cpp \
 	platform/default/mbgl/storage/offline_download.cpp \
-	platform/default/logging_stderr.cpp \
+	platform/default/mbgl/util/default_thread_pool.cpp \
 	platform/default/mbgl/util/shared_thread_pool.cpp \
-	platform/default/mbgl/util/default_thread_pool.cpp
+	platform/default/online_file_source.cpp
 
 HEADERS += \
     platform/qt/include/qmapbox.hpp \
@@ -323,10 +325,10 @@ INCLUDEPATH += \
     deps/cheap-ruler/2.5.3/include \
     deps/earcut/0.12.3 \
     deps/earcut/0.12.3/include \
-    deps/geojson/0.4.0 \
-    deps/geojson/0.4.0/include \
-    deps/geojsonvt/6.2.1 \
-    deps/geojsonvt/6.2.1/include \
+    deps/geojson/0.4.2 \
+    deps/geojson/0.4.2/include \
+    deps/geojsonvt/6.3.0 \
+    deps/geojsonvt/6.3.0/include \
     deps/geometry/0.9.2 \
     deps/geometry/0.9.2/include \
     deps/kdbush/0.1.1-1 \

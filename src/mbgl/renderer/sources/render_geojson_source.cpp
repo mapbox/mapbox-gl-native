@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/tile/geojson_tile.hpp>
+#include <mbgl/renderer/tile_parameters.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -34,17 +35,24 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     GeoJSONData* data_ = impl().getData();
 
-    if (!data_) {
-        return;
-    }
-
     if (data_ != data) {
         data = data_;
         tilePyramid.cache.clear();
 
-        for (auto const& item : tilePyramid.tiles) {
-            static_cast<GeoJSONTile*>(item.second.get())->updateData(data->getTile(item.first.canonical));
+        if (data) {
+            const uint8_t maxZ = impl().getZoomRange().max;
+            for (const auto& pair : tilePyramid.tiles) {
+                if (pair.first.canonical.z <= maxZ) {
+                    static_cast<GeoJSONTile*>(pair.second.get())->updateData(data->getTile(pair.first.canonical));
+                }
+            }
         }
+    }
+
+    if (!data) {
+        tilePyramid.tiles.clear();
+        tilePyramid.renderTiles.clear();
+        return;
     }
 
     tilePyramid.update(layers,
@@ -75,9 +83,9 @@ std::vector<std::reference_wrapper<RenderTile>> RenderGeoJSONSource::getRenderTi
 std::unordered_map<std::string, std::vector<Feature>>
 RenderGeoJSONSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
-                                           const RenderStyle& style,
+                                           const std::vector<const RenderLayer*>& layers,
                                            const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options);
 }
 
 std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryOptions& options) const {

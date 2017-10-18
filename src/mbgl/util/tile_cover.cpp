@@ -126,9 +126,9 @@ std::vector<UnwrappedTileID> tileCover(const Point<double>& tl,
 
 } // namespace
 
-int32_t coveringZoomLevel(double zoom, SourceType type, uint16_t size) {
+int32_t coveringZoomLevel(double zoom, style::SourceType type, uint16_t size) {
     zoom += std::log(util::tileSize / size) / std::log(2);
-    if (type == SourceType::Raster || type == SourceType::Video) {
+    if (type == style::SourceType::Raster || type == style::SourceType::Video) {
         return ::round(zoom);
     } else {
         return std::floor(zoom);
@@ -167,6 +167,27 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
         TileCoordinate::fromScreenCoordinate(state, z, { 0,   h   }).p,
         TileCoordinate::fromScreenCoordinate(state, z, { w/2, h/2 }).p,
         z);
+}
+
+// Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
+// Computes the projected tiles for the lower left and upper right points of the bounds
+// and uses that to compute the tile cover count
+uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_){
+
+    auto sw = Projection::project(bounds.southwest().wrapped(), zoom, tileSize_);
+    auto ne = Projection::project(bounds.northeast().wrapped(), zoom, tileSize_);
+
+    auto x1 = floor(sw.x/ tileSize_);
+    auto x2 = floor((ne.x - 1) / tileSize_);
+    auto y1 = floor(sw.y/ tileSize_);
+    auto y2 = floor((ne.y - 1) / tileSize_);
+
+    auto minX = std::fmax(std::min(x1, x2), 0);
+    auto maxX = std::max(x1, x2);
+    auto minY = (std::pow(2, zoom) - 1) - std::max(y1, y2);
+    auto maxY = (std::pow(2, zoom) - 1) - std::fmax(std::min(y1, y2), 0);
+    
+    return (maxX - minX + 1) * (maxY - minY + 1);
 }
 
 } // namespace util

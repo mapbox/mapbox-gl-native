@@ -64,6 +64,10 @@ void HeadlessBackend::bind() {
     context_.viewport = { 0, 0, size };
 }
 
+Size HeadlessBackend::getFramebufferSize() const {
+    return size;
+}
+
 void HeadlessBackend::updateAssumedState() {
     // no-op
 }

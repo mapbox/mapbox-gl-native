@@ -60,9 +60,9 @@ std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRende
 std::unordered_map<std::string, std::vector<Feature>>
 RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                               const TransformState& transformState,
-                                              const RenderStyle& style,
+                                              const std::vector<const RenderLayer*>& layers,
                                               const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options);
 }
 
 std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQueryOptions&) const {

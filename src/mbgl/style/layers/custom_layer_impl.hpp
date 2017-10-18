@@ -14,6 +14,7 @@ public:
     Impl(const std::string& id,
          CustomLayerInitializeFunction,
          CustomLayerRenderFunction,
+         CustomLayerContextLostFunction,
          CustomLayerDeinitializeFunction,
          void* context);
 
@@ -22,6 +23,7 @@ public:
 
     CustomLayerInitializeFunction initializeFn = nullptr;
     CustomLayerRenderFunction renderFn = nullptr;
+    CustomLayerContextLostFunction contextLostFn = nullptr;
     CustomLayerDeinitializeFunction deinitializeFn = nullptr;
     void* context = nullptr;
 };

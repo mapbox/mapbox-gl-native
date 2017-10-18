@@ -117,13 +117,24 @@ public:
     }
 
     void activateRequest(OnlineFileRequest* request) {
-        activeRequests.insert(request);
-        request->request = httpFileSource.request(request->resource, [=] (Response response) {
+        auto callback = [=](Response response) {
             activeRequests.erase(request);
-            activatePendingRequest();
             request->request.reset();
             request->completed(response);
-        });
+            activatePendingRequest();
+        };
+
+        activeRequests.insert(request);
+
+        if (online) {
+            request->request = httpFileSource.request(request->resource, callback);
+        } else {
+            Response response;
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection,
+                                                               "Online connectivity is disabled.");
+            callback(response);
+        }
+
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
@@ -153,6 +164,11 @@ public:
         resourceTransform = std::move(transform);
     }
 
+    void setOnlineStatus(const bool status) {
+        online = status;
+        networkIsReachableAgain();
+    }
+
 private:
     void networkIsReachableAgain() {
         for (auto& request : allRequests) {
@@ -178,6 +194,7 @@ private:
     std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
+    bool online = true;
     HTTPFileSource httpFileSource;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
@@ -387,6 +404,12 @@ ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
     }
 
     return ActorRef<OnlineFileRequest>(*this, mailbox);
+}
+
+// For testing only:
+
+void OnlineFileSource::setOnlineStatus(const bool status) {
+    impl->setOnlineStatus(status);
 }
 
 } // namespace mbgl

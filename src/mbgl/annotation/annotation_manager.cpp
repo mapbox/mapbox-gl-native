@@ -39,19 +39,22 @@ AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, cons
     Annotation::visit(annotation, [&] (const auto& annotation_) {
         this->add(id, annotation_, maxZoom);
     });
+    dirty = true;
     return id;
 }
 
-Update AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
     std::lock_guard<std::mutex> lock(mutex);
-    return Annotation::visit(annotation, [&] (const auto& annotation_) {
-        return this->update(id, annotation_, maxZoom);
+    Annotation::visit(annotation, [&] (const auto& annotation_) {
+        this->update(id, annotation_, maxZoom);
     });
+    return dirty;
 }
 
 void AnnotationManager::removeAnnotation(const AnnotationID& id) {
     std::lock_guard<std::mutex> lock(mutex);
     remove(id);
+    dirty = true;
 }
 
 void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t) {
@@ -72,49 +75,45 @@ void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annota
     impl.updateStyle(*style.get().impl);
 }
 
-Update AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
-    Update result = Update::Nothing;
-
+void AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
     auto it = symbolAnnotations.find(id);
     if (it == symbolAnnotations.end()) {
         assert(false); // Attempt to update a non-existent symbol annotation
-        return result;
+        return;
     }
 
     const SymbolAnnotation& existing = it->second->annotation;
 
     if (existing.geometry != annotation.geometry || existing.icon != annotation.icon) {
-        result |= Update::AnnotationData;
+        dirty = true;
 
         remove(id);
         add(id, annotation, maxZoom);
     }
-
-    return result;
 }
 
-Update AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
         assert(false); // Attempt to update a non-existent shape annotation
-        return Update::Nothing;
+        return;
     }
 
     shapeAnnotations.erase(it);
     add(id, annotation, maxZoom);
-    return Update::AnnotationData;
+    dirty = true;
 }
 
-Update AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
         assert(false); // Attempt to update a non-existent shape annotation
-        return Update::Nothing;
+        return;
     }
 
     shapeAnnotations.erase(it);
     add(id, annotation, maxZoom);
-    return Update::AnnotationData;
+    dirty = true;
 }
 
 void AnnotationManager::remove(const AnnotationID& id) {
@@ -187,8 +186,11 @@ void AnnotationManager::updateStyle() {
 
 void AnnotationManager::updateData() {
     std::lock_guard<std::mutex> lock(mutex);
-    for (auto& tile : tiles) {
-        tile->setData(getTileData(tile->id.canonical));
+    if (dirty) {
+        for (auto& tile : tiles) {
+            tile->setData(getTileData(tile->id.canonical));
+        }
+        dirty = false;
     }
 }
 

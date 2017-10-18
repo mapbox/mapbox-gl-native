@@ -2,7 +2,6 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
 
 #include <string>
 #include <memory>

@@ -34,7 +34,7 @@ template class CategoricalStops<std::array<float, 2>>;
 template class CategoricalStops<std::string>;
 template class CategoricalStops<TextTransformType>;
 template class CategoricalStops<TextJustifyType>;
-template class CategoricalStops<TextAnchorType>;
+template class CategoricalStops<SymbolAnchorType>;
 template class CategoricalStops<LineJoinType>;
 
 } // namespace style

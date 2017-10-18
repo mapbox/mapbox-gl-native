@@ -114,7 +114,7 @@ std::string normalizeTileURL(const std::string& baseURL,
 }
 
 std::string
-canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_t tileSize) {
+canonicalizeTileURL(const std::string& str, const style::SourceType type, const uint16_t tileSize) {
     const char* version = "/v4/";
     const size_t versionLen = strlen(version);
 
@@ -133,7 +133,7 @@ canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_
     std::string result = "mapbox://tiles/";
     result.append(str, path.directory.first + versionLen, path.directory.second - versionLen);
     result.append(str, path.filename.first, path.filename.second);
-    if (type == SourceType::Raster) {
+    if (type == style::SourceType::Raster) {
         result += tileSize == util::tileSize ? "@2x" : "{ratio}";
     }
 
@@ -171,7 +171,7 @@ canonicalizeTileURL(const std::string& str, const SourceType type, const uint16_
     return result;
 }
 
-void canonicalizeTileset(Tileset& tileset, const std::string& sourceURL, SourceType type, uint16_t tileSize) {
+void canonicalizeTileset(Tileset& tileset, const std::string& sourceURL, style::SourceType type, uint16_t tileSize) {
     // TODO: Remove this hack by delivering proper URLs in the TileJSON to begin with.
     if (isMapboxURL(sourceURL)) {
         for (auto& url : tileset.tiles) {

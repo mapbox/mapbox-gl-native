@@ -13,7 +13,7 @@ class RasterTileWorker {
 public:
     RasterTileWorker(ActorRef<RasterTileWorker>, ActorRef<RasterTile>);
 
-    void parse(std::shared_ptr<const std::string> data);
+    void parse(std::shared_ptr<const std::string> data, uint64_t correlationID);
 
 private:
     ActorRef<RasterTile> parent;

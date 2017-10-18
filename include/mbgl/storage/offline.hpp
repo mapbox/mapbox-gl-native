@@ -30,13 +30,15 @@ public:
     OfflineTilePyramidRegionDefinition(std::string, LatLngBounds, double, double, float);
 
     /* Private */
-    std::vector<CanonicalTileID> tileCover(SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
-
+    std::vector<CanonicalTileID> tileCover(style::SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
+    uint64_t tileCount(style::SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
     const std::string styleURL;
     const LatLngBounds bounds;
     const double minZoom;
     const double maxZoom;
     const float pixelRatio;
+private:
+    Range<uint8_t> coveringZoomRange(style::SourceType, uint16_t tileSize, const Range<uint8_t>& zoomRange) const;
 };
 
 /*

@@ -554,7 +554,7 @@ std::u16string verticalizePunctuation(const std::u16string& input) {
     std::u16string output;
 
     for (size_t i = 0; i < input.size(); i++) {
-        char16_t nextCharCode = i < input.size() ? input[i + 1] : 0;
+        char16_t nextCharCode = i < input.size() - 1 ? input[i + 1] : 0;
         char16_t prevCharCode = i ? input[i - 1] : 0;
 
         bool canReplacePunctuation =

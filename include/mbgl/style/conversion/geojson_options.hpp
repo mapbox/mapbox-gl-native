@@ -14,6 +14,16 @@ struct Converter<GeoJSONOptions> {
     optional<GeoJSONOptions> operator()(const V& value, Error& error) const {
         GeoJSONOptions options;
 
+        const auto minzoomValue = objectMember(value, "minzoom");
+        if (minzoomValue) {
+            if (toNumber(*minzoomValue)) {
+                options.minzoom = static_cast<uint8_t>(*toNumber(*minzoomValue));
+            } else {
+                error = { "GeoJSON source minzoom value must be a number" };
+                return {};
+            }
+        }
+
         const auto maxzoomValue = objectMember(value, "maxzoom");
         if (maxzoomValue) {
             if (toNumber(*maxzoomValue)) {

@@ -29,6 +29,7 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/traits.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
@@ -359,6 +360,27 @@ QString QMapboxGLSettings::apiBaseUrl() const
 void QMapboxGLSettings::setApiBaseUrl(const QString& url)
 {
     m_apiBaseUrl = url;
+}
+
+/*!
+    Returns resource transformation callback used to transform requested URLs.
+*/
+std::function<std::string(const std::string &&)> QMapboxGLSettings::resourceTransform() const
+{
+    return m_resourceTransform;
+}
+
+/*!
+    Sets the resource transformation callback.
+
+    When given, resource transformation callback will be used to transform the
+    requested resource URLs before they are requested from internet. This can be
+    used add or remove custom parameters, or reroute certain requests to other
+    servers or endpoints.
+*/
+void QMapboxGLSettings::setResourceTransform(const std::function<std::string(const std::string &&)> &transform)
+{
+    m_resourceTransform = transform;
 }
 
 /*!
@@ -1499,13 +1521,25 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , threadPool(mbgl::sharedThreadPool())
 {
+    // Setup resource transform if needed
+    if (settings.resourceTransform()) {
+      m_resourceTransform =
+        std::make_unique< mbgl::Actor<mbgl::ResourceTransform> >( *mbgl::Scheduler::GetCurrent(),
+                                                                  [callback = settings.resourceTransform()]
+                                                                  (mbgl::Resource::Kind , const std::string&& url_)  -> std::string {
+                                                                    return callback(std::move(url_));
+                                                                  }
+                                                                  );
+      fileSourceObj->setResourceTransform(m_resourceTransform->self());
+    }
+
     // Setup and connect the renderer frontend
     frontend = std::make_unique<QMapboxGLRendererFrontend>(
             std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
                                              static_cast<mbgl::GLContextMode>(settings.contextMode())),
             *this);
     connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
-    
+
     mapObj = std::make_unique<mbgl::Map>(
             *frontend,
             *this, sanitizedSize(size),
@@ -1528,18 +1562,18 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-mbgl::Size QMapboxGLPrivate::framebufferSize() const {
+mbgl::Size QMapboxGLPrivate::getFramebufferSize() const {
     return sanitizedSize(fbSize);
 }
 
 void QMapboxGLPrivate::updateAssumedState() {
     assumeFramebufferBinding(fbObject);
-    assumeViewport(0, 0, framebufferSize());
+    assumeViewport(0, 0, getFramebufferSize());
 }
 
 void QMapboxGLPrivate::bind() {
     setFramebufferBinding(fbObject);
-    setViewport(0, 0, framebufferSize());
+    setViewport(0, 0, getFramebufferSize());
 }
 
 void QMapboxGLPrivate::invalidate()

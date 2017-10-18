@@ -39,6 +39,13 @@ void ImageManager::removeImage(const std::string& id) {
 
     auto it = patterns.find(id);
     if (it != patterns.end()) {
+        // Clear pattern from the atlas image.
+        const uint32_t x = it->second.bin->x;
+        const uint32_t y = it->second.bin->y;
+        const uint32_t w = it->second.bin->w;
+        const uint32_t h = it->second.bin->h;
+        PremultipliedImage::clear(atlasImage, { x, y }, { w, h });
+
         shelfPack.unref(*it->second.bin);
         patterns.erase(it);
     }
@@ -52,23 +59,23 @@ const style::Image::Impl* ImageManager::getImage(const std::string& id) const {
     return nullptr;
 }
 
-void ImageManager::getImages(ImageRequestor& requestor, ImageDependencies dependencies) {
+void ImageManager::getImages(ImageRequestor& requestor, ImageRequestPair&& pair) {
     // If the sprite has been loaded, or if all the icon dependencies are already present
     // (i.e. if they've been addeded via runtime styling), then notify the requestor immediately.
     // Otherwise, delay notification until the sprite is loaded. At that point, if any of the
     // dependencies are still unavailable, we'll just assume they are permanently missing.
     bool hasAllDependencies = true;
     if (!isLoaded()) {
-        for (const auto& dependency : dependencies) {
+        for (const auto& dependency : pair.first) {
             if (images.find(dependency) == images.end()) {
                 hasAllDependencies = false;
             }
         }
     }
     if (isLoaded() || hasAllDependencies) {
-        notify(requestor, dependencies);
+        notify(requestor, std::move(pair));
     } else {
-        requestors.emplace(&requestor, std::move(dependencies));
+        requestors.emplace(&requestor, std::move(pair));
     }
 }
 
@@ -76,17 +83,17 @@ void ImageManager::removeRequestor(ImageRequestor& requestor) {
     requestors.erase(&requestor);
 }
 
-void ImageManager::notify(ImageRequestor& requestor, const ImageDependencies& dependencies) const {
+void ImageManager::notify(ImageRequestor& requestor, const ImageRequestPair& pair) const {
     ImageMap response;
 
-    for (const auto& dependency : dependencies) {
+    for (const auto& dependency : pair.first) {
         auto it = images.find(dependency);
         if (it != images.end()) {
             response.emplace(*it);
         }
     }
 
-    requestor.onImagesAvailable(response);
+    requestor.onImagesAvailable(response, pair.second);
 }
 
 void ImageManager::dumpDebugLogs() const {

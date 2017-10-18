@@ -36,8 +36,9 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         for (const auto& range : ranges) {
             auto it = entry.ranges.find(range);
             if (it == entry.ranges.end() || !it->second.parsed) {
-                GlyphRequest& request = requestRange(entry, fontStack, range);
+                GlyphRequest& request = entry.ranges[range];
                 request.requestors[&requestor] = dependencies;
+                requestRange(request, fontStack, range);
             }
         }
     }
@@ -49,18 +50,14 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
     }
 }
 
-GlyphManager::GlyphRequest& GlyphManager::requestRange(Entry& entry, const FontStack& fontStack, const GlyphRange& range) {
-    GlyphRequest& request = entry.ranges[range];
-
+void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range) {
     if (request.req) {
-        return request;
+        return;
     }
 
     request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
         processResponse(res, fontStack, range);
     });
-
-    return request;
 }
 
 void GlyphManager::processResponse(const Response& res, const FontStack& fontStack, const GlyphRange& range) {

@@ -13,9 +13,9 @@ public:
     bool operator==(const PlacementConfig& rhs) const {
         return angle == rhs.angle &&
             pitch == rhs.pitch &&
-            cameraToCenterDistance == rhs.cameraToCenterDistance &&
-            (pitch * util::RAD2DEG < 25 || cameraToTileDistance == rhs.cameraToTileDistance) &&
-            debug == rhs.debug;
+            debug == rhs.debug &&
+            ((pitch * util::RAD2DEG < 25) ||
+             (cameraToCenterDistance == rhs.cameraToCenterDistance && cameraToTileDistance == rhs.cameraToTileDistance));
     }
 
     bool operator!=(const PlacementConfig& rhs) const {

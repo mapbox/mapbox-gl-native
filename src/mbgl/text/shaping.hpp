@@ -32,7 +32,10 @@ private:
     float _angle;
 
 public:
-    static PositionedIcon shapeIcon(const ImagePosition&, const std::array<float, 2>& iconOffset, const float iconRotation);
+    static PositionedIcon shapeIcon(const ImagePosition&,
+                                    const std::array<float, 2>& iconOffset,
+                                    style::SymbolAnchorType iconAnchor,
+                                    const float iconRotation);
 
     const ImagePosition& image() const { return _image; }
     float top() const { return _top; }
@@ -45,7 +48,7 @@ public:
 const Shaping getShaping(const std::u16string& string,
                          float maxWidth,
                          float lineHeight,
-                         style::TextAnchorType textAnchor,
+                         style::SymbolAnchorType textAnchor,
                          style::TextJustifyType textJustify,
                          float spacing,
                          const Point<float>& translate,

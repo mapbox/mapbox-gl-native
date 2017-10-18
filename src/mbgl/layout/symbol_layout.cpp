@@ -205,11 +205,11 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                 const Shaping result = getShaping(
                     /* string */ text,
                     /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
-                        layout.get<TextMaxWidth>() * oneEm : 0,
+                        layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
                     /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
                     /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
                     /* justify */ layout.evaluate<TextJustify>(zoom, feature),
-                    /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.get<TextLetterSpacing>() * oneEm : 0.0f,
+                    /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * oneEm : 0.0f,
                     /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
                     /* verticalHeight */ oneEm,
                     /* writingMode */ writingMode,
@@ -233,6 +233,7 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                 shapedIcon = PositionedIcon::shapeIcon(
                     imagePositions.at(*feature.icon),
                     layout.evaluate<IconOffset>(zoom, feature),
+                    layout.evaluate<IconAnchor>(zoom, feature),
                     layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
                 if (image->second->sdf) {
                     sdfIcons = true;

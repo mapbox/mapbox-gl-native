@@ -35,6 +35,8 @@ public:
     // set to the current state.
     virtual void bind() = 0;
 
+    virtual Size getFramebufferSize() const = 0;
+
 protected:
     // Called with the name of an OpenGL extension that should be loaded. RendererBackend implementations
     // must call the API-specific version that obtains the function pointer for this function,

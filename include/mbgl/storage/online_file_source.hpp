@@ -24,6 +24,9 @@ public:
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
+    // For testing only.
+    void setOnlineStatus(bool);
+
 private:
     friend class OnlineFileRequest;
 

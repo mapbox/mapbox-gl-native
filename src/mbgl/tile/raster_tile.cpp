@@ -29,29 +29,35 @@ void RasterTile::cancel() {
 
 void RasterTile::setError(std::exception_ptr err) {
     loaded = true;
-    renderable = false;
     observer->onTileError(*this, err);
 }
 
-void RasterTile::setData(std::shared_ptr<const std::string> data,
-                             optional<Timestamp> modified_,
-                             optional<Timestamp> expires_) {
+void RasterTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> expires_) {
     modified = modified_;
     expires = expires_;
-    worker.invoke(&RasterTileWorker::parse, data);
 }
 
-void RasterTile::onParsed(std::unique_ptr<RasterBucket> result) {
+void RasterTile::setData(std::shared_ptr<const std::string> data) {
+    pending = true;
+    ++correlationID;
+    worker.invoke(&RasterTileWorker::parse, data, correlationID);
+}
+
+void RasterTile::onParsed(std::unique_ptr<RasterBucket> result, const uint64_t resultCorrelationID) {
     bucket = std::move(result);
     loaded = true;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     renderable = bucket ? true : false;
     observer->onTileChanged(*this);
 }
 
-void RasterTile::onError(std::exception_ptr err) {
-    bucket.reset();
+void RasterTile::onError(std::exception_ptr err, const uint64_t resultCorrelationID) {
     loaded = true;
-    renderable = false;
+    if (resultCorrelationID == correlationID) {
+        pending = false;
+    }
     observer->onTileError(*this, err);
 }
 
@@ -71,7 +77,7 @@ void RasterTile::setMask(TileMask&& mask) {
     }
 }
 
-void RasterTile::setNecessity(Necessity necessity) {
+void RasterTile::setNecessity(TileNecessity necessity) {
     loader.setNecessity(necessity);
 }
 

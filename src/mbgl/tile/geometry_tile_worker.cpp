@@ -88,7 +88,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -112,7 +112,7 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -136,7 +136,7 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -161,7 +161,7 @@ void GeometryTileWorker::symbolDependenciesChanged() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -187,7 +187,7 @@ void GeometryTileWorker::coalesced() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -216,14 +216,12 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
-    imageMap = std::move(newImageMap);
-    for (const auto& pair : imageMap) {
-        auto it = pendingImageDependencies.find(pair.first);
-        if (it != pendingImageDependencies.end()) {
-            pendingImageDependencies.erase(it);
-        }
+void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap, uint64_t imageCorrelationID_) {
+    if (imageCorrelationID != imageCorrelationID_) {
+        return; // Ignore outdated image request replies.
     }
+    imageMap = std::move(newImageMap);
+    pendingImageDependencies.clear();
     symbolDependenciesChanged();
 }
 
@@ -244,7 +242,7 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
 void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
     pendingImageDependencies = imageDependencies;
     if (!pendingImageDependencies.empty()) {
-        parent.invoke(&GeometryTile::getImages, pendingImageDependencies);
+        parent.invoke(&GeometryTile::getImages, std::make_pair(pendingImageDependencies, ++imageCorrelationID));
     }
 }
 
@@ -359,8 +357,7 @@ void GeometryTileWorker::redoLayout() {
         std::move(buckets),
         std::move(featureIndex),
         *data ? (*data)->clone() : nullptr,
-        correlationID
-    });
+    }, correlationID);
 
     attemptPlacement();
 }
@@ -424,8 +421,7 @@ void GeometryTileWorker::attemptPlacement() {
         std::move(collisionTile),
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage),
-        correlationID
-    });
+    }, correlationID);
 }
 
 } // namespace mbgl

@@ -87,7 +87,9 @@ static_assert(std::is_same<BinaryProgramFormat, GLenum>::value, "OpenGL type mis
 Context::Context() = default;
 
 Context::~Context() {
-    reset();
+    if (cleanupOnDestruction) {
+        reset();
+    }
 }
 
 void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
@@ -457,6 +459,9 @@ Framebuffer Context::createFramebuffer(const Texture& color) {
 Framebuffer
 Context::createFramebuffer(const Texture& color,
                            const Renderbuffer<RenderbufferType::DepthComponent>& depthTarget) {
+    if (color.size != depthTarget.size) {
+        throw std::runtime_error("Renderbuffer size mismatch");
+    }
     auto fbo = createFramebuffer();
     bindFramebuffer = fbo;
     MBGL_CHECK_ERROR(glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, color.texture, 0));
@@ -481,7 +486,7 @@ Context::createTexture(const Size size, const void* data, TextureFormat format, 
 
 void Context::updateTexture(
     TextureID id, const Size size, const void* data, TextureFormat format, TextureUnit unit) {
-    activeTexture = unit;
+    activeTextureUnit = unit;
     texture[unit] = id;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
                                   size.height, 0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
@@ -495,7 +500,7 @@ void Context::bindTexture(Texture& obj,
                           TextureWrap wrapX,
                           TextureWrap wrapY) {
     if (filter != obj.filter || mipmap != obj.mipmap || wrapX != obj.wrapX || wrapY != obj.wrapY) {
-        activeTexture = unit;
+        activeTextureUnit = unit;
         texture[unit] = obj.texture;
 
         if (filter != obj.filter || mipmap != obj.mipmap) {
@@ -526,7 +531,7 @@ void Context::bindTexture(Texture& obj,
     } else if (texture[unit] != obj.texture) {
         // We are checking first to avoid setting the active texture without a subsequent
         // texture bind.
-        activeTexture = unit;
+        activeTextureUnit = unit;
         texture[unit] = obj.texture;
     }
 }
@@ -558,7 +563,7 @@ void Context::setDirtyState() {
     clearStencil.setDirty();
     program.setDirty();
     lineWidth.setDirty();
-    activeTexture.setDirty();
+    activeTextureUnit.setDirty();
     pixelStorePack.setDirty();
     pixelStoreUnpack.setDirty();
 #if not MBGL_USE_GLES2
@@ -709,8 +714,10 @@ void Context::performCleanup() {
 
     if (!abandonedTextures.empty()) {
         for (const auto id : abandonedTextures) {
-            if (activeTexture == id) {
-                activeTexture.setDirty();
+            for (auto& binding : texture) {
+                if (binding == id) {
+                    binding.setDirty();
+                }
             }
         }
         MBGL_CHECK_ERROR(glDeleteTextures(int(abandonedTextures.size()), abandonedTextures.data()));

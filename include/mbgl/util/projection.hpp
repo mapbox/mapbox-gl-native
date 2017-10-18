@@ -75,10 +75,7 @@ public:
     }
 
     static Point<double> project(const LatLng& latLng, double scale) {
-        return Point<double> {
-            util::LONGITUDE_MAX + latLng.longitude(),
-            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
-        } * worldSize(scale) / util::DEGREES_MAX;
+        return project_(latLng, worldSize(scale));
     }
 
     static LatLng unproject(const Point<double>& p, double scale, LatLng::WrapMode wrapMode = LatLng::Unwrapped) {
@@ -88,6 +85,23 @@ public:
             p2.x - util::LONGITUDE_MAX,
             wrapMode
         };
+    }
+    
+    // Project lat, lon to point in a zoom-dependent world size
+    static Point<double> project(const LatLng& point, uint8_t zoom, uint16_t tileSize) {
+        const double t2z = tileSize * std::pow(2, zoom);
+        Point<double> pt = project_(point, t2z);
+        // Flip y coordinate
+        auto x = std::round(std::min(pt.x, t2z));
+        auto y = std::round(std::min(t2z - pt.y, t2z));
+        return { x, y };
+    }
+private:
+    static Point<double> project_(const LatLng& latLng, double worldSize) {
+        return Point<double> {
+            util::LONGITUDE_MAX + latLng.longitude(),
+            util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
+        } * worldSize / util::DEGREES_MAX;
     }
 };
 

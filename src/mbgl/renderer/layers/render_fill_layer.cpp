@@ -99,7 +99,9 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
               && evaluated.get<FillOpacity>().constantOr(0) >= 1.0f) == (parameters.pass == RenderPass::Opaque)) {
                 draw(parameters.programs.fill,
                      gl::Triangles(),
-                     parameters.depthModeForSublayer(1, gl::DepthMode::ReadWrite),
+                     parameters.depthModeForSublayer(1, parameters.pass == RenderPass::Opaque
+                        ? gl::DepthMode::ReadWrite
+                        : gl::DepthMode::ReadOnly),
                      *bucket.triangleIndexBuffer,
                      bucket.triangleSegments);
             }

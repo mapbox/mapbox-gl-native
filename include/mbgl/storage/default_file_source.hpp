@@ -34,7 +34,7 @@ public:
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
-    bool supportsOptionalRequests() const override {
+    bool supportsCacheOnlyRequests() const override {
         return true;
     }
 
@@ -140,6 +140,7 @@ public:
     void resume();
 
     // For testing only.
+    void setOnlineStatus(bool);
     void put(const Resource&, const Response&);
 
     class Impl;

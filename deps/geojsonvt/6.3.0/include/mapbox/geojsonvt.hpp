@@ -13,11 +13,11 @@
 namespace mapbox {
 namespace geojsonvt {
 
-using geometry            = mapbox::geometry::geometry<double>;
-using feature             = mapbox::geometry::feature<double>;
-using feature_collection  = mapbox::geometry::feature_collection<double>;
+using geometry = mapbox::geometry::geometry<double>;
+using feature = mapbox::geometry::feature<double>;
+using feature_collection = mapbox::geometry::feature_collection<double>;
 using geometry_collection = mapbox::geometry::geometry_collection<double>;
-using geojson             = mapbox::util::variant<geometry, feature, feature_collection>;
+using geojson = mapbox::util::variant<geometry, feature, feature_collection>;
 
 struct ToFeatureCollection {
     feature_collection operator()(const feature_collection& value) const {
@@ -31,7 +31,18 @@ struct ToFeatureCollection {
     }
 };
 
-struct Options {
+struct TileOptions {
+    // simplification tolerance (higher means simpler)
+    double tolerance = 3;
+
+    // tile extent
+    uint16_t extent = 4096;
+
+    // tile buffer on each side
+    uint16_t buffer = 64;
+};
+
+struct Options : TileOptions {
     // max zoom to preserve detail on
     uint8_t maxZoom = 18;
 
@@ -43,21 +54,37 @@ struct Options {
 
     // whether to tile solid square tiles further
     bool solidChildren = false;
-
-    // simplification tolerance (higher means simpler)
-    double tolerance = 3;
-
-    // tile extent
-    uint16_t extent = 4096;
-
-    // tile buffer on each side
-    uint16_t buffer = 64;
 };
 
 const Tile empty_tile{};
 
 inline uint64_t toID(uint8_t z, uint32_t x, uint32_t y) {
     return (((1ull << z) * y + x) * 32) + z;
+}
+
+inline const Tile geoJSONToTile(const geojson& geojson_,
+                         uint8_t z,
+                         uint32_t x,
+                         uint32_t y,
+                         const TileOptions& options = TileOptions(),
+                         bool wrap = false,
+                         bool clip = false) {
+
+    const auto features_ = geojson::visit(geojson_, ToFeatureCollection{});
+    auto z2 = 1u << z;
+    auto tolerance = (options.tolerance / options.extent) / z2;
+    auto features = detail::convert(features_, tolerance);
+    if (wrap) {
+        features = detail::wrap(features, double(options.buffer) / options.extent);
+    }
+    if (clip) {
+        const double p = options.buffer / options.extent;
+
+        const auto left = detail::clip<0>(features, (x - p) / z2, (x + 1 + p) / z2, -1, 2);
+        features = detail::clip<1>(left, (y - p) / z2, (y + 1 + p) / z2, -1, 2);
+    }
+    return detail::InternalTile({ features, z, x, y, options.extent, options.buffer, tolerance })
+        .tile;
 }
 
 class GeoJSONVT {
@@ -68,7 +95,7 @@ public:
               const Options& options_ = Options())
         : options(options_) {
 
-        const uint32_t z2 = std::pow(2, options.maxZoom);
+        const uint32_t z2 = 1u << options.maxZoom;
 
         auto converted = detail::convert(features_, (options.tolerance / options.extent) / z2);
         auto features = detail::wrap(converted, double(options.buffer) / options.extent);
@@ -88,7 +115,7 @@ public:
         if (z > options.maxZoom)
             throw std::runtime_error("Requested zoom higher than maxZoom: " + std::to_string(z));
 
-        const uint32_t z2 = std::pow(2, z);
+        const uint32_t z2 = 1u << z;
         const uint32_t x = ((x_ % z2) + z2) % z2; // wrap tile x coordinate
         const uint64_t id = toID(z, x, y);
 
