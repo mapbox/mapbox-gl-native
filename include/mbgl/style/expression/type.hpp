@@ -85,7 +85,7 @@ using Type = variant<
     ErrorType>;
 
 struct Array {
-    Array(Type itemType_) : itemType(std::move(itemType_)) {}
+    explicit Array(Type itemType_) : itemType(std::move(itemType_)) {}
     Array(Type itemType_, std::size_t N_) : itemType(std::move(itemType_)), N(N_) {}
     Array(Type itemType_, optional<std::size_t> N_) : itemType(std::move(itemType_)), N(std::move(N_)) {}
     std::string getName() const {

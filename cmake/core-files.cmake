@@ -395,10 +395,13 @@ set(MBGL_CORE_FILES
 
     # style/expression
     include/mbgl/style/expression/array_assertion.hpp
+    include/mbgl/style/expression/assertion.hpp
     include/mbgl/style/expression/at.hpp
+    include/mbgl/style/expression/boolean_operator.hpp
     include/mbgl/style/expression/case.hpp
     include/mbgl/style/expression/check_subtype.hpp
     include/mbgl/style/expression/coalesce.hpp
+    include/mbgl/style/expression/coercion.hpp
     include/mbgl/style/expression/compound_expression.hpp
     include/mbgl/style/expression/curve.hpp
     include/mbgl/style/expression/expression.hpp
@@ -409,16 +412,21 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/type.hpp
     include/mbgl/style/expression/value.hpp
     src/mbgl/style/expression/array_assertion.cpp
+    src/mbgl/style/expression/assertion.cpp
     src/mbgl/style/expression/at.cpp
+    src/mbgl/style/expression/boolean_operator.cpp
     src/mbgl/style/expression/case.cpp
     src/mbgl/style/expression/check_subtype.cpp
     src/mbgl/style/expression/coalesce.cpp
+    src/mbgl/style/expression/coercion.cpp
     src/mbgl/style/expression/compound_expression.cpp
     src/mbgl/style/expression/curve.cpp
     src/mbgl/style/expression/let.cpp
     src/mbgl/style/expression/literal.cpp
     src/mbgl/style/expression/match.cpp
     src/mbgl/style/expression/parsing_context.cpp
+    src/mbgl/style/expression/util.cpp
+    src/mbgl/style/expression/util.hpp
     src/mbgl/style/expression/value.cpp
 
     # style/function

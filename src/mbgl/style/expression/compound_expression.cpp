@@ -1,11 +1,11 @@
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/util.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/ignore.hpp>
 
 namespace mbgl {
 namespace style {
 namespace expression {
-
 
 namespace detail {
 
@@ -181,32 +181,6 @@ Result<T> assertion(const Value& v) {
     return v.get<T>();
 }
 
-std::string stringifyColor(double r, double g, double b, double a) {
-    return stringify(r) + ", " +
-        stringify(g) + ", " +
-        stringify(b) + ", " +
-        stringify(a);
-}
-Result<mbgl::Color> rgba(double r, double g, double b, double a) {
-    if (
-        r < 0 || r > 255 ||
-        g < 0 || g > 255 ||
-        b < 0 || b > 255
-    ) {
-        return EvaluationError {
-            "Invalid rgba value [" + stringifyColor(r, g, b, a)  +
-            "]: 'r', 'g', and 'b' must be between 0 and 255."
-        };
-    }
-    if (a < 0 || a > 1) {
-        return EvaluationError {
-            "Invalid rgba value [" + stringifyColor(r, g, b, a)  +
-            "]: 'a' must be between 0 and 1."
-        };
-    }
-    return mbgl::Color(r / 255, g / 255, b / 255, a);
-}
-
 template <typename T>
 Result<bool> equal(const T& lhs, const T& rhs) { return lhs == rhs; }
 
@@ -236,38 +210,11 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(
-            [](const std::unordered_map<std::string, Value>&) -> Result<std::string> {
-                return EvaluationError {
-                    R"(Expected a primitive value in ["string", ...], but found Object instead.)"
-                };
-            },
-            [](const std::vector<Value>& v) -> Result<std::string> {
-                return EvaluationError {
-                    R"(Expected a primitive value in ["string", ...], but found )" + toString(typeOf(v)) + " instead."
-                };
-            },
+            [](const mbgl::Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
             [](const auto& v) -> Result<std::string> { return stringify(v); }
         );
     });
-    define("to-number", [](const Value& v) -> Result<double> {
-        optional<double> result = v.match(
-            [](const double f) -> optional<double> { return f; },
-            [](const std::string& s) -> optional<double> {
-                try {
-                    return std::stof(s);
-                } catch(std::exception) {
-                    return optional<double>();
-                }
-            },
-            [](const auto&) { return optional<double>(); }
-        );
-        if (!result) {
-            return EvaluationError {
-                "Could not convert " + stringify(v) + " to number."
-            };
-        }
-        return *result;
-    });
+    
     define("to-boolean", [](const Value& v) -> Result<bool> {
         return v.match(
             [&] (double f) { return (bool)f; },
@@ -281,45 +228,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return std::array<double, 4> {{ color.r, color.g, color.b, color.a }};
     });
     
-    define("to-color", [](const Value& colorValue) -> Result<mbgl::Color> {
-        return colorValue.match(
-            [&](const std::string& colorString) -> Result<mbgl::Color> {
-                const optional<mbgl::Color> result = mbgl::Color::parse(colorString);
-                if (result) {
-                    return *result;
-                } else {
-                    return EvaluationError{
-                        "Could not parse color from value '" + colorString + "'"
-                    };
-                }
-            },
-            [&](const std::vector<Value>& components) -> Result<mbgl::Color> {
-                std::size_t len = components.size();
-                bool isNumeric = std::all_of(components.begin(), components.end(), [](const Value& item) {
-                    return item.template is<double>();
-                });
-                if ((len == 3 || len == 4) && isNumeric) {
-                    return {rgba(
-                        components[0].template get<double>(),
-                        components[1].template get<double>(),
-                        components[2].template get<double>(),
-                        len == 4 ? components[3].template get<double>() : 1.0
-                    )};
-                } else {
-                    return EvaluationError{
-                        "Could not parse color from value '" + stringify(colorValue) + "'"
-                    };
-                }
-            },
-            [&](const auto&) -> Result<mbgl::Color> {
-                return EvaluationError{
-                    "Could not parse color from value '" + stringify(colorValue) + "'"
-                };
-            }
-        );
-    
-    });
-    
     define("rgba", rgba);
     define("rgb", [](double r, double g, double b) { return rgba(r, g, b, 1.0f); });
     
@@ -330,6 +238,15 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             };
         }
         return *(params.zoom);
+    });
+    
+    define("heatmap-density", [](const EvaluationParameters& params) -> Result<double> {
+        if (!params.heatmapDensity) {
+            return EvaluationError {
+                "The 'heatmap-density' expression is unavailable in the current evaluation context."
+            };
+        }
+        return *(params.heatmapDensity);
     });
     
     define("has", [](const EvaluationParameters& params, const std::string& key) -> Result<bool> {
@@ -472,10 +389,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("==", equal<bool>);
     define("==", equal<NullValue>);
 
-    define("==", notEqual<double>);
-    define("==", notEqual<const std::string&>);
-    define("==", notEqual<bool>);
-    define("==", notEqual<NullValue>);
+    define("!=", notEqual<double>);
+    define("!=", notEqual<const std::string&>);
+    define("!=", notEqual<bool>);
+    define("!=", notEqual<NullValue>);
 
     define(">", [](double lhs, double rhs) -> Result<bool> { return lhs > rhs; });
     define(">", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs > rhs; });

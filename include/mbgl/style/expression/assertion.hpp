@@ -1,24 +1,15 @@
 #pragma once
-
-#include <vector>
-#include <memory>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/style/conversion.hpp>
 
 namespace mbgl {
 namespace style {
 namespace expression {
 
-class ArrayAssertion : public Expression  {
+class Assertion : public Expression  {
 public:
-    ArrayAssertion(type::Array type_, std::unique_ptr<Expression> input_) :
+    Assertion(type::Type type_, std::vector<std::unique_ptr<Expression>> inputs_) :
         Expression(type_),
-        input(std::move(input_))
+        inputs(std::move(inputs_))
     {}
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
@@ -27,9 +18,10 @@ public:
     void accept(std::function<void(const Expression*)> visit) const override;
 
 private:
-    std::unique_ptr<Expression> input;
+    std::vector<std::unique_ptr<Expression>> inputs;
 };
 
 } // namespace expression
 } // namespace style
 } // namespace mbgl
+

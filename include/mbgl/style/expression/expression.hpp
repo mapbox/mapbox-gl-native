@@ -30,6 +30,7 @@ struct EvaluationParameters {
     
     optional<float> zoom;
     GeometryTileFeature const * feature;
+    optional<double> heatmapDensity;
 };
 
 template<typename T>

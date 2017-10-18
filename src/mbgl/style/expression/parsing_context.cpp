@@ -2,8 +2,10 @@
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/at.hpp>
 #include <mbgl/style/expression/array_assertion.hpp>
+#include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/case.hpp>
 #include <mbgl/style/expression/coalesce.hpp>
+#include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/let.hpp>
@@ -65,6 +67,10 @@ ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& va
             parsed = Var::parse(value, *this);
         } else if (*op == "at") {
             parsed = At::parse(value, *this);
+        } else if (*op == "string" || *op == "number" || *op == "boolean" || *op == "object") {
+            parsed = Assertion::parse(value, *this);
+        } else if (*op == "to-color" || *op == "to-number") {
+            parsed = Coercion::parse(value, *this);
         } else {
             parsed = parseCompoundExpression(*op, value, *this);
         }
@@ -80,23 +86,21 @@ ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& va
     if (!parsed) {
         assert(errors.size() > 0);
     } else if (expected) {
-        auto wrapForType = [&](const std::string& wrapper, std::unique_ptr<Expression> expression) {
+        auto wrapForType = [&](const type::Type& target, std::unique_ptr<Expression> expression) -> std::unique_ptr<Expression> {
             std::vector<std::unique_ptr<Expression>> args;
             args.push_back(std::move(expression));
-            return createCompoundExpression(wrapper, std::move(args), *this);
+            if (target == type::Color) {
+                return std::make_unique<Coercion>(target, std::move(args));
+            } else {
+                return std::make_unique<Assertion>(target, std::move(args));
+            }
         };
         
         const type::Type actual = (*parsed)->getType();
         if (*expected == type::Color && (actual == type::String || actual == type::Value)) {
-            parsed = wrapForType("to-color", std::move(*parsed));
-        } else if (*expected != type::Value && actual == type::Value) {
-            if (*expected == type::String) {
-                parsed = wrapForType("string", std::move(*parsed));
-            } else if (*expected == type::Number) {
-                parsed = wrapForType("number", std::move(*parsed));
-            } else if (*expected == type::Boolean) {
-                parsed = wrapForType("boolean", std::move(*parsed));
-            }
+            parsed = wrapForType(type::Color, std::move(*parsed));
+        } else if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
+            parsed = wrapForType(*expected, std::move(*parsed));
         }
     
         checkType((*parsed)->getType());
