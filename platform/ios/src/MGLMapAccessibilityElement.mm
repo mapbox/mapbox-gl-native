@@ -5,38 +5,7 @@
 #import "MGLVectorSource+MGLAdditions.h"
 
 #import "NSBundle+MGLAdditions.h"
-
-typedef CLLocationDegrees MGLLocationRadians;
-typedef CLLocationDirection MGLRadianDirection;
-typedef struct {
-    MGLLocationRadians latitude;
-    MGLLocationRadians longitude;
-} MGLRadianCoordinate2D;
-
-MGLRadianCoordinate2D MGLRadianCoordinate2DMake(MGLLocationRadians latitude, MGLLocationRadians longitude) {
-    MGLRadianCoordinate2D radianCoordinate = {
-        .latitude = latitude,
-        .longitude = longitude,
-    };
-    return radianCoordinate;
-}
-
-MGLRadianCoordinate2D MGLRadianCoordinate2DFromLocationCoordinate2D(CLLocationCoordinate2D degreeCoordinate) {
-    return MGLRadianCoordinate2DMake(degreeCoordinate.latitude * M_PI / 180, degreeCoordinate.longitude * M_PI / 180);
-}
-
-/** Returns the direction from one coordinate to another. */
-CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate) {
-    // Ported from https://github.com/mapbox/turf-swift/blob/857e2e8060678ef4a7a9169d4971b0788fdffc37/Turf/Turf.swift#L23-L31
-    MGLRadianCoordinate2D firstRadianCoordinate = MGLRadianCoordinate2DFromLocationCoordinate2D(firstCoordinate);
-    MGLRadianCoordinate2D secondRadianCoordinate = MGLRadianCoordinate2DFromLocationCoordinate2D(secondCoordinate);
-    
-    CGFloat a = sin(secondRadianCoordinate.longitude - firstRadianCoordinate.longitude) * cos(secondRadianCoordinate.latitude);
-    CGFloat b = (cos(firstRadianCoordinate.latitude) * sin(secondRadianCoordinate.latitude)
-                 - sin(firstRadianCoordinate.latitude) * cos(secondRadianCoordinate.latitude) * cos(secondRadianCoordinate.longitude - firstRadianCoordinate.longitude));
-    MGLRadianDirection radianDirection = atan2(a, b);
-    return radianDirection * 180 / M_PI;
-}
+#import "MGLGeometry_Private.h"
 
 @implementation MGLMapAccessibilityElement
 

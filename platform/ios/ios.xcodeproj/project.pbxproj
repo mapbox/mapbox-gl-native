@@ -298,8 +298,8 @@
 		DA6408DE1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DA6408DA1DA4E7D300908C90 /* MGLVectorStyleLayer.m */; };
 		DA704CC21F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
 		DA704CC31F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */ = {isa = PBXBuildFile; fileRef = DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */; };
-		DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */; };
-		DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */; };
+		DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */; };
+		DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */; };
 		DA72620B1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */; };
@@ -824,9 +824,9 @@
 		DA704CBB1F637311004B3F28 /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA704CBC1F637405004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = uk; path = uk.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DA704CBD1F63746E004B3F28 /* zh-Hant */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "zh-Hant"; path = "zh-Hant.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
-		DA704CC71F6663A3004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapAccessibilityElement.h; sourceTree = "<group>"; };
-		DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapAccessibilityElement.m; sourceTree = "<group>"; };
+		DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapAccessibilityElement.mm; sourceTree = "<group>"; };
+		DA704CC71F6663A3004B3F28 /* uk */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Foundation.strings; sourceTree = "<group>"; };
 		DA7262091DEEE3480043BB89 /* MGLOpenGLStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLOpenGLStyleLayer.h; sourceTree = "<group>"; };
 		DA72620A1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLOpenGLStyleLayer.mm; sourceTree = "<group>"; };
 		DA737ADA1E59139D00AD2CDE /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = es; path = es.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
@@ -1432,7 +1432,7 @@
 				DAD165841CF4D06B001FF4B9 /* Annotations */,
 				DAD165851CF4D08B001FF4B9 /* Telemetry */,
 				DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */,
-				DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.m */,
+				DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */,
 				DA8848361CBAFB8500AB86E3 /* MGLMapView.h */,
 				DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */,
 				DA8848371CBAFB8500AB86E3 /* MGLMapView+IBAdditions.h */,
@@ -2374,7 +2374,7 @@
 				DA88482A1CBAFA6200AB86E3 /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				4049C29F1DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
 				35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
-				DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */,
+				DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
 				DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				3510FFFB1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
@@ -2462,7 +2462,7 @@
 				DAA4E4211CBB730400178DFB /* MGLOfflineStorage.mm in Sources */,
 				4049C2A01DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
 				35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
-				DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.m in Sources */,
+				DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
 				DA72620E1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				3510FFFC1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
@@ -2771,7 +2771,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+                DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -2785,7 +2785,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+                DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
