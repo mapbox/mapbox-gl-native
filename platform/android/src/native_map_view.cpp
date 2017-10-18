@@ -103,7 +103,11 @@ void NativeMapView::notifyMapChange(mbgl::MapChange change) {
 
     android::UniqueEnv _env = android::AttachEnv();
     static auto onMapChanged = javaClass.GetMethod<void (int)>(*_env, "onMapChanged");
-    javaPeer->Call(*_env, onMapChanged, (int) change);
+    try {
+        javaPeer->Call(*_env, onMapChanged, (int) change);
+    } catch (jni::PendingJavaException& exception) {
+        jni::ThrowJavaError(*_env, std::current_exception());
+    }
 }
 
 void NativeMapView::onCameraWillChange(MapObserver::CameraChangeMode mode) {
