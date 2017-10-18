@@ -334,7 +334,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutBars {
-    CGFloat barWidth = (CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count;
+    CGFloat barWidth = round((CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count);
     
     NSUInteger i = 0;
     for (UIView *bar in self.bars) {
@@ -357,11 +357,11 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutLabels {
-    CGFloat barWidth = self.bounds.size.width / self.bars.count;
+    CGFloat barWidth = round(self.bounds.size.width / self.bars.count);
     BOOL RTL = [self usesRightToLeftLayout];
     NSUInteger i = RTL ? self.bars.count : 0;
     for (MGLScaleBarLabel *label in self.labels) {
-        CGFloat xPosition = barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth;
+        CGFloat xPosition = round(barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth);
         label.frame = CGRectMake(xPosition, 0,
                                  CGRectGetWidth(label.bounds),
                                  CGRectGetHeight(label.bounds));
