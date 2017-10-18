@@ -57,6 +57,21 @@ AnnotationIDs Renderer::queryPointAnnotations(const ScreenBox& box) const {
     RenderedQueryOptions options;
     options.layerIDs = {{ AnnotationManager::PointLayerID }};
     auto features = queryRenderedFeatures(box, options);
+    return getAnnotationIDs(features);
+}
+
+AnnotationIDs Renderer::queryShapeAnnotations(const ScreenBox& box) const {
+    auto features = impl->queryShapeAnnotations({
+        box.min,
+        {box.max.x, box.min.y},
+        box.max,
+        {box.min.x, box.max.y},
+        box.min
+    });
+    return getAnnotationIDs(features);
+}
+    
+AnnotationIDs Renderer::getAnnotationIDs(const std::vector<Feature>& features) const {
     std::set<AnnotationID> set;
     for (auto &feature : features) {
         assert(feature.id);
