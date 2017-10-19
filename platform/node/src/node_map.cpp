@@ -538,7 +538,10 @@ void NodeMap::cancel() {
     // Reset map explicitly as it resets the renderer frontend
     map.reset();
 
-    frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this, threadpool);
+    if (!frontend) {
+        frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this, threadpool);
+    }
+
     map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
                                       *this, threadpool, mbgl::MapMode::Still);
 
