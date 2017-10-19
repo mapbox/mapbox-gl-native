@@ -133,6 +133,10 @@ macro(mbgl_platform_test)
         PRIVATE platform/default/mbgl/test/main.cpp
     )
 
+    target_include_directories(mbgl-test
+        PRIVATE platform/macos
+    )
+
     set_source_files_properties(
         platform/default/mbgl/test/main.cpp
             PROPERTIES
