@@ -1,3 +1,8 @@
+# 3.5.8 - October 19, 2017
+- Fixes an issue that causes memory leaks when not deleting the frontend object
+  in NodeMap::release()
+- Fixes a crash in Earcut: [#10245](https://github.com/mapbox/mapbox-gl-native/pull/10245)
+
 # 3.5.7 - October 9, 2017
 - Fixed an issue causing synchronous resource requests to stall [#10153](https://github.com/mapbox/mapbox-gl-native/pull/10153)
 
