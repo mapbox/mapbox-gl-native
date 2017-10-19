@@ -1,6 +1,6 @@
 {
   "name": "@mapbox/mapbox-gl-native",
-  "version": "3.5.7",
+  "version": "3.5.8-pre.1",
   "description": "Renders map tiles with Mapbox GL",
   "keywords": [
     "mapbox",
@@ -14,7 +14,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "nan": "^2.4.0",
-    "node-pre-gyp": "^0.6.37",
+    "node-pre-gyp": "^0.6.38",
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
