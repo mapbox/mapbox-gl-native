@@ -27,6 +27,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 import com.mapbox.services.api.utils.turf.TurfMeasurement;
 import com.mapbox.services.commons.models.Position;
 
@@ -175,7 +176,7 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     marker.setRotation((float) getBearing(marker.getPosition(), to));
 
     final ValueAnimator markerAnimator = ObjectAnimator.ofObject(
-      marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
+      marker, "position", new AnimatorUtils.LatLngEvaluator(), marker.getPosition(), to);
     markerAnimator.setDuration((long) (10 * marker.getPosition().distanceTo(to)));
     markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
 
@@ -266,23 +267,6 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  /**
-   * Evaluator for LatLng pairs
-   */
-  private static class LatLngEvaluator implements TypeEvaluator<LatLng> {
-
-    private LatLng latLng = new LatLng();
-
-    @Override
-    public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
-      latLng.setLatitude(startValue.getLatitude()
-        + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
-      latLng.setLongitude(startValue.getLongitude()
-        + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
-      return latLng;
-    }
   }
 
   private double getBearing(LatLng from, LatLng to) {

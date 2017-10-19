@@ -4,11 +4,16 @@ import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
+import android.animation.PointFEvaluator;
+import android.animation.TypeEvaluator;
+import android.graphics.PointF;
 import android.support.annotation.AnimatorRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
+
+import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
  * Animator utility class.
@@ -165,4 +170,31 @@ public class AnimatorUtils {
   public interface OnAnimationEndListener {
     void onAnimationEnd();
   }
+
+  public static class PointFEvaluator implements TypeEvaluator<PointF> {
+
+    private final PointF pointF = new PointF();
+
+    @Override
+    public PointF evaluate(float fraction, PointF startValue, PointF endValue) {
+      pointF.x = startValue.x + ((endValue.x - startValue.x) * fraction);
+      pointF.y = startValue.y + ((endValue.y - startValue.y) * fraction);
+      return pointF;
+    }
+  }
+
+  public static class LatLngEvaluator implements TypeEvaluator<LatLng> {
+
+    private final LatLng latLng = new LatLng();
+
+    @Override
+    public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
+      latLng.setLatitude(startValue.getLatitude()
+        + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
+      latLng.setLongitude(startValue.getLongitude()
+        + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
+      return latLng;
+    }
+  }
 }
+

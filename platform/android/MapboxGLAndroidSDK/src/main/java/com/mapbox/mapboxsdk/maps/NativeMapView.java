@@ -194,28 +194,14 @@ final class NativeMapView {
     if (isDestroyedOn("moveBy")) {
       return;
     }
-    moveBy(dx, dy, 0);
-  }
-
-  public void moveBy(double dx, double dy, long duration) {
-    if (isDestroyedOn("moveBy")) {
-      return;
-    }
-    nativeMoveBy(dx / pixelRatio, dy / pixelRatio, duration);
+    nativeMoveBy(dx/pixelRatio, dy/pixelRatio);
   }
 
   public void setLatLng(LatLng latLng) {
     if (isDestroyedOn("setLatLng")) {
       return;
     }
-    setLatLng(latLng, 0);
-  }
-
-  public void setLatLng(LatLng latLng, long duration) {
-    if (isDestroyedOn("setLatLng")) {
-      return;
-    }
-    nativeSetLatLng(latLng.getLatitude(), latLng.getLongitude(), duration);
+    nativeSetLatLng(latLng.getLatitude(), latLng.getLongitude());
   }
 
   public LatLng getLatLng() {
@@ -254,18 +240,18 @@ final class NativeMapView {
     return nativeGetPitch();
   }
 
-  public void setPitch(double pitch, long duration) {
+  public void setPitch(double pitch) {
     if (isDestroyedOn("setPitch")) {
       return;
     }
-    nativeSetPitch(pitch, duration);
+    nativeSetPitch(pitch);
   }
 
-  public void setZoom(double zoom, PointF focalPoint, long duration) {
+  public void setZoom(double zoom, PointF focalPoint) {
     if (isDestroyedOn("setZoom")) {
       return;
     }
-    nativeSetZoom(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio, duration);
+    nativeSetZoom(zoom, focalPoint.x / pixelRatio, focalPoint.y / pixelRatio);
   }
 
   public double getZoom() {
@@ -314,15 +300,7 @@ final class NativeMapView {
     if (isDestroyedOn("rotateBy")) {
       return;
     }
-    rotateBy(sx, sy, ex, ey, 0);
-  }
-
-  public void rotateBy(double sx, double sy, double ex, double ey,
-                       long duration) {
-    if (isDestroyedOn("rotateBy")) {
-      return;
-    }
-    nativeRotateBy(sx / pixelRatio, sy / pixelRatio, ex, ey, duration);
+    nativeRotateBy(sx / pixelRatio, sy / pixelRatio, ex, ey);
   }
 
   public void setContentPadding(int[] padding) {
@@ -340,28 +318,14 @@ final class NativeMapView {
     if (isDestroyedOn("setBearing")) {
       return;
     }
-    setBearing(degrees, 0);
-  }
-
-  public void setBearing(double degrees, long duration) {
-    if (isDestroyedOn("setBearing")) {
-      return;
-    }
-    nativeSetBearing(degrees, duration);
+    nativeSetBearing(degrees);
   }
 
   public void setBearing(double degrees, double cx, double cy) {
     if (isDestroyedOn("setBearing")) {
       return;
     }
-    setBearing(degrees, cx, cy, 0);
-  }
-
-  public void setBearing(double degrees, double fx, double fy, long duration) {
-    if (isDestroyedOn("setBearing")) {
-      return;
-    }
-    nativeSetBearingXY(degrees, fx / pixelRatio, fy / pixelRatio, duration);
+    nativeSetBearingXY(degrees, cx / pixelRatio, cy / pixelRatio);
   }
 
   public double getBearing() {
@@ -482,11 +446,11 @@ final class NativeMapView {
     nativeRemoveAnnotationIcon(symbol);
   }
 
-  public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction, long duration) {
+  public void setVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction) {
     if (isDestroyedOn("setVisibleCoordinateBounds")) {
       return;
     }
-    nativeSetVisibleCoordinateBounds(coordinates, padding, direction, duration);
+    nativeSetVisibleCoordinateBounds(coordinates, padding, direction);
   }
 
   public void onLowMemory() {
@@ -873,9 +837,9 @@ final class NativeMapView {
 
   private native void nativeSetGestureInProgress(boolean inProgress);
 
-  private native void nativeMoveBy(double dx, double dy, long duration);
+  private native void nativeMoveBy(double dx, double dy);
 
-  private native void nativeSetLatLng(double latitude, double longitude, long duration);
+  private native void nativeSetLatLng(double latitude, double longitude);
 
   private native LatLng nativeGetLatLng();
 
@@ -887,9 +851,9 @@ final class NativeMapView {
 
   private native double nativeGetPitch();
 
-  private native void nativeSetPitch(double pitch, long duration);
+  private native void nativeSetPitch(double pitch);
 
-  private native void nativeSetZoom(double zoom, double cx, double cy, long duration);
+  private native void nativeSetZoom(double zoom, double cx, double cy);
 
   private native double nativeGetZoom();
 
@@ -903,13 +867,13 @@ final class NativeMapView {
 
   private native double nativeGetMaxZoom();
 
-  private native void nativeRotateBy(double sx, double sy, double ex, double ey, long duration);
+  private native void nativeRotateBy(double sx, double sy, double ex, double ey);
 
   private native void nativeSetContentPadding(double top, double left, double bottom, double right);
 
-  private native void nativeSetBearing(double degrees, long duration);
+  private native void nativeSetBearing(double degrees);
 
-  private native void nativeSetBearingXY(double degrees, double fx, double fy, long duration);
+  private native void nativeSetBearingXY(double degrees, double fx, double fy);
 
   private native double nativeGetBearing();
 
@@ -931,8 +895,7 @@ final class NativeMapView {
 
   private native void nativeRemoveAnnotationIcon(String symbol);
 
-  private native void nativeSetVisibleCoordinateBounds(LatLng[] coordinates, RectF padding,
-                                                       double direction, long duration);
+  private native void nativeSetVisibleCoordinateBounds(LatLng[] coordinates, RectF padding, double direction);
 
   private native void nativeOnLowMemory();
 

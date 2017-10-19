@@ -24,6 +24,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 /**
  * Test activity showcasing using Android SDK animators to animate camera position changes.
@@ -129,7 +130,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   }
 
   private Animator createLatLngAnimator(LatLng currentPosition, LatLng targetPosition) {
-    ValueAnimator latLngAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), currentPosition, targetPosition);
+    ValueAnimator latLngAnimator = ValueAnimator.ofObject(new AnimatorUtils.LatLngEvaluator(), currentPosition, targetPosition);
     latLngAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     latLngAnimator.setInterpolator(new FastOutSlowInInterpolator());
     latLngAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -282,23 +283,6 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   public void onLowMemory() {
     super.onLowMemory();
     mapView.onLowMemory();
-  }
-
-  /**
-   * Helper class to evaluate LatLng objects with a ValueAnimator
-   */
-  private static class LatLngEvaluator implements TypeEvaluator<LatLng> {
-
-    private final LatLng latLng = new LatLng();
-
-    @Override
-    public LatLng evaluate(float fraction, LatLng startValue, LatLng endValue) {
-      latLng.setLatitude(startValue.getLatitude()
-        + ((endValue.getLatitude() - startValue.getLatitude()) * fraction));
-      latLng.setLongitude(startValue.getLongitude()
-        + ((endValue.getLongitude() - startValue.getLongitude()) * fraction));
-      return latLng;
-    }
   }
 
   interface AnimatorBuilder {

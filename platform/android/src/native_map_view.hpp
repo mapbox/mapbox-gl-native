@@ -91,7 +91,7 @@ public:
 
     void setGestureInProgress(jni::JNIEnv&, jni::jboolean);
 
-    void moveBy(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
+    void moveBy(jni::JNIEnv&, jni::jdouble, jni::jdouble);
 
     void jumpTo(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble);
 
@@ -101,7 +101,7 @@ public:
 
     jni::Object<LatLng> getLatLng(JNIEnv&);
 
-    void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
+    void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble);
 
     jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
 
@@ -113,9 +113,9 @@ public:
 
     jni::jdouble getPitch(jni::JNIEnv&);
 
-    void setPitch(jni::JNIEnv&, jni::jdouble, jni::jlong);
+    void setPitch(jni::JNIEnv&, jni::jdouble);
 
-    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
+    void setZoom(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble);
 
     jni::jdouble getZoom(jni::JNIEnv&);
 
@@ -129,17 +129,17 @@ public:
 
     jni::jdouble getMaxZoom(jni::JNIEnv&);
 
-    void rotateBy(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
+    void rotateBy(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jdouble);
 
-    void setBearing(jni::JNIEnv&, jni::jdouble, jni::jlong);
+    void setBearing(jni::JNIEnv&, jni::jdouble);
 
-    void setBearingXY(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble, jni::jlong);
+    void setBearingXY(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble);
 
     jni::jdouble getBearing(jni::JNIEnv&);
 
     void resetNorth(jni::JNIEnv&);
 
-    void setVisibleCoordinateBounds(JNIEnv&, jni::Array<jni::Object<LatLng>>, jni::Object<RectF>, jni::jdouble, jni::jlong);
+    void setVisibleCoordinateBounds(JNIEnv&, jni::Array<jni::Object<LatLng>>, jni::Object<RectF>, jni::jdouble);
 
     void setContentPadding(JNIEnv&, double, double, double, double);
 

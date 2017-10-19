@@ -1,5 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.TypeEvaluator;
+import android.animation.ValueAnimator;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -12,6 +16,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.mapboxsdk.utils.AnimatorUtils;
 
 import timber.log.Timber;
 
@@ -210,6 +215,10 @@ final class Transform implements MapView.OnMapChangedListener {
     return cameraPosition.zoom;
   }
 
+  double getRawZoom() {
+    return mapView.getZoom();
+  }
+
   void zoom(boolean zoomIn, @NonNull PointF focalPoint) {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
@@ -222,20 +231,29 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setZoom(double zoom, @NonNull PointF focalPoint) {
-    setZoom(zoom, focalPoint, 0);
+    mapView.setZoom(zoom, focalPoint);
   }
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
-    mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+  void setZoom(double zoom, @NonNull final PointF focalPoint, long duration) {
+    ValueAnimator animator = ValueAnimator.ofFloat(
+      (float) getRawZoom(),
+      (float) zoom
+    );
+    animator.setDuration(duration);
+    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
       @Override
-      public void onMapChanged(int change) {
-        if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
-          cameraChangeDispatcher.onCameraIdle();
-          mapView.removeOnMapChangedListener(this);
-        }
+      public void onAnimationUpdate(ValueAnimator animation) {
+        mapView.setZoom((Float) animation.getAnimatedValue(), focalPoint);
       }
     });
-    mapView.setZoom(zoom, focalPoint, duration);
+    animator.addListener(new AnimatorListenerAdapter() {
+      @Override
+      public void onAnimationEnd(Animator animation) {
+        super.onAnimationEnd(animation);
+        cameraChangeDispatcher.onCameraIdle();
+      }
+    });
+    animator.start();
   }
 
   // Direction
@@ -270,13 +288,20 @@ final class Transform implements MapView.OnMapChangedListener {
     mapView.setBearing(bearing, focalX, focalY);
   }
 
-  void setBearing(double bearing, float focalX, float focalY, long duration) {
-    if (myLocationView != null) {
-      myLocationView.setBearing(bearing);
-    }
-    mapView.setBearing(bearing, focalX, focalY, duration);
+  void setBearing(double bearing, final float focalX, final float focalY, long duration) {
+    ValueAnimator animator = ValueAnimator.ofFloat(
+      (float) getRawBearing(),
+      (float) bearing
+    );
+    animator.setDuration(duration);
+    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        setBearing((Float) animation.getAnimatedValue(), focalX, focalY);
+      }
+    });
+    animator.start();
   }
-
 
   //
   // LatLng / CenterCoordinate
@@ -299,7 +324,7 @@ final class Transform implements MapView.OnMapChangedListener {
       myLocationView.setTilt(pitch);
     }
     markerViewManager.setTilt(pitch.floatValue());
-    mapView.setPitch(pitch, 0);
+    mapView.setPitch(pitch);
   }
 
   //
@@ -322,22 +347,31 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void zoomBy(double z, float x, float y) {
-    mapView.setZoom(mapView.getZoom() + z, new PointF(x, y), 0);
+    mapView.setZoom(getRawZoom() + z, new PointF(x, y));
   }
 
   void moveBy(double offsetX, double offsetY, long duration) {
-    if (duration > 0) {
-      mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-        @Override
-        public void onMapChanged(int change) {
-          if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
-            mapView.removeOnMapChangedListener(this);
-            cameraChangeDispatcher.onCameraIdle();
-          }
-        }
-      });
-    }
-    mapView.moveBy(offsetX, offsetY, duration);
+    PointF offset = new PointF((float) offsetX, (float) offsetY);
+    ValueAnimator animator = ValueAnimator.ofObject(new AnimatorUtils.PointFEvaluator(),
+      new PointF(),
+      offset
+    );
+    animator.setDuration(duration);
+    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        PointF pointF = (PointF) animation.getAnimatedValue();
+        mapView.moveBy(pointF.x, pointF.y);
+      }
+    });
+    animator.addListener(new AnimatorListenerAdapter() {
+      @Override
+      public void onAnimationEnd(Animator animation) {
+        super.onAnimationEnd(animation);
+        cameraChangeDispatcher.onCameraIdle();
+      }
+    });
+    animator.start();
   }
 
   //
