@@ -32,10 +32,9 @@ EvaluationResult At::evaluate(const EvaluationParameters& params) const {
     return inputArray[static_cast<std::size_t>(i)];
 }
 
-void At::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
-    index->accept(visit);
-    input->accept(visit);
+void At::eachChild(std::function<void(const Expression*)> visit) const {
+    visit(index.get());
+    visit(input.get());
 }
 
 ParseResult At::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {

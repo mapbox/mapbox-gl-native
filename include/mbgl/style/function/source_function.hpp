@@ -1,7 +1,7 @@
 #pragma once
 
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/function/convert.hpp>
-
 #include <mbgl/style/function/exponential_stops.hpp>
 #include <mbgl/style/function/interval_stops.hpp>
 #include <mbgl/style/function/categorical_stops.hpp>
@@ -32,8 +32,8 @@ public:
     SourceFunction(std::unique_ptr<expression::Expression> expression_)
         : expression(std::move(expression_))
     {
-        assert(expression->isZoomConstant());
-        assert(!expression->isFeatureConstant());
+        assert(isZoomConstant(expression.get()));
+        assert(!isFeatureConstant(expression.get()));
     }
     
     SourceFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})

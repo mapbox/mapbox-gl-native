@@ -96,10 +96,9 @@ public:
         return signature.apply(evaluationParams, args);
     }
     
-    void accept(std::function<void(const Expression*)> visitor) const override {
-        visitor(this);
+    void eachChild(std::function<void(const Expression*)> visit) const override {
         for (const std::unique_ptr<Expression>& e : args) {
-            e->accept(visitor);
+            visit(e.get());
         }
     }
     

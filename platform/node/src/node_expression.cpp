@@ -2,6 +2,7 @@
 #include "node_expression.hpp"
 
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/conversion/geojson.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <nan.h>
@@ -217,13 +218,13 @@ void NodeExpression::GetType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 void NodeExpression::IsFeatureConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
-    info.GetReturnValue().Set(Nan::New(expression->isFeatureConstant()));
+    info.GetReturnValue().Set(Nan::New(isFeatureConstant(expression.get())));
 }
 
 void NodeExpression::IsZoomConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
-    info.GetReturnValue().Set(Nan::New(expression->isZoomConstant()));
+    info.GetReturnValue().Set(Nan::New(isZoomConstant(expression.get())));
 }
 
 } // namespace node_mbgl

@@ -111,12 +111,10 @@ public:
         
     }
     
-    void accept(std::function<void(const Expression*)> visit) const override {
-        visit(this);
-        input->accept(visit);
-        
+    void eachChild(std::function<void(const Expression*)> visit) const override {
+        visit(input.get());
         for (auto it = stops.begin(); it != stops.end(); it++) {
-            it->second->accept(visit);
+            visit(it->second.get());
         }
     }
     

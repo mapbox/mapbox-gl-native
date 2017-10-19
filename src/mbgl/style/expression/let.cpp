@@ -9,12 +9,11 @@ EvaluationResult Let::evaluate(const EvaluationParameters& params) const {
     return result->evaluate(params);
 }
 
-void Let::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
+void Let::eachChild(std::function<void(const Expression*)> visit) const {
     for (auto it = bindings.begin(); it != bindings.end(); it++) {
-        it->second->accept(visit);
+        visit(it->second.get());
     }
-    result->accept(visit);
+    visit(result.get());
 }
 
 ParseResult Let::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
@@ -65,9 +64,7 @@ EvaluationResult Var::evaluate(const EvaluationParameters& params) const {
     return value->evaluate(params);
 }
 
-void Var::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
-}
+void Var::eachChild(std::function<void(const Expression*)>) const {}
 
 ParseResult Var::parse(const mbgl::style::conversion::Convertible& value_, ParsingContext ctx) {
     using namespace mbgl::style::conversion;

@@ -3,11 +3,13 @@
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/function/convert.hpp>
 #include <mbgl/style/function/exponential_stops.hpp>
 #include <mbgl/style/function/interval_stops.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/variant.hpp>
+
 
 namespace mbgl {
 namespace style {
@@ -29,8 +31,8 @@ public:
         : expression(std::move(expression_)),
           zoomCurve(*Curve::findZoomCurve(expression.get()))
     {
-        assert(!expression->isZoomConstant());
-        assert(expression->isFeatureConstant());
+        assert(!isZoomConstant(expression.get()));
+        assert(isFeatureConstant(expression.get()));
     }
 
     CameraFunction(Stops stops_)

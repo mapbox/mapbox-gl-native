@@ -6,6 +6,7 @@
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/expression.hpp>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 
 namespace mbgl {
 namespace style {
@@ -21,7 +22,7 @@ struct Converter<PropertyValue<T>> {
             if (!expression) {
                 return {};
             }
-            if ((*expression)->isFeatureConstant()) {
+            if (isFeatureConstant(expression->get())) {
                 return { CameraFunction<T>(std::move(*expression)) };
             } else {
                 error = { "data-driven style property not supported " };

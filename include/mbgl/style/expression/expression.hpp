@@ -112,11 +112,8 @@ public:
     virtual ~Expression() = default;
     
     virtual EvaluationResult evaluate(const EvaluationParameters& params) const = 0;
-    
-    virtual void accept(std::function<void(const Expression*)>) const = 0;
+    virtual void eachChild(std::function<void(const Expression*)>) const = 0;
 
-    bool isFeatureConstant() const;
-    bool isZoomConstant() const;
     type::Type getType() const { return type; };
     
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;

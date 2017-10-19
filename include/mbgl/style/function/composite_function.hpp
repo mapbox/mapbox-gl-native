@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/function/convert.hpp>
 #include <mbgl/style/function/composite_exponential_stops.hpp>
 #include <mbgl/style/function/composite_interval_stops.hpp>
@@ -53,8 +54,8 @@ public:
     :   expression(std::move(expression_)),
         zoomCurve(*Curve::findZoomCurve(expression.get()))
     {
-        assert(!expression->isZoomConstant());
-        assert(!expression->isFeatureConstant());
+        assert(!isZoomConstant(expression.get()));
+        assert(!isFeatureConstant(expression.get()));
     }
 
     CompositeFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})

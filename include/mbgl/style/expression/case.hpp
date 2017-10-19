@@ -20,7 +20,7 @@ public:
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
 
     EvaluationResult evaluate(const EvaluationParameters& params) const override;
-    void accept(std::function<void(const Expression*)> visit) const override;
+    void eachChild(std::function<void(const Expression*)> visit) const override;
 
 private:
     std::vector<Branch> branches;

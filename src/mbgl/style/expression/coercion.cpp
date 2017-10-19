@@ -121,10 +121,9 @@ EvaluationResult Coercion::evaluate(const EvaluationParameters& params) const {
     return EvaluationResult();
 };
 
-void Coercion::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
+void Coercion::eachChild(std::function<void(const Expression*)> visit) const {
     for(const std::unique_ptr<Expression>& input : inputs) {
-        input->accept(visit);
+        visit(input.get());
     }
 };
 

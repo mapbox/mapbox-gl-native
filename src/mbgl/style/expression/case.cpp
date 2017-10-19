@@ -18,13 +18,12 @@ EvaluationResult Case::evaluate(const EvaluationParameters& params) const {
     return otherwise->evaluate(params);
 }
 
-void Case::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
+void Case::eachChild(std::function<void(const Expression*)> visit) const {
     for (const Branch& branch : branches) {
-        branch.first->accept(visit);
-        branch.second->accept(visit);
+        visit(branch.first.get());
+        visit(branch.second.get());
     }
-    otherwise->accept(visit);
+    visit(otherwise.get());
 }
 
 ParseResult Case::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {

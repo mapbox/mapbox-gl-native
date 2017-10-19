@@ -13,10 +13,9 @@ EvaluationResult Coalesce::evaluate(const EvaluationParameters& params) const {
     return Null;
 }
 
-void Coalesce::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
+void Coalesce::eachChild(std::function<void(const Expression*)> visit) const {
     for (const std::unique_ptr<Expression>& arg : args) {
-        arg->accept(visit);
+        visit(arg.get());
     }
 }
 

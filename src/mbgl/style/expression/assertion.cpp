@@ -52,10 +52,9 @@ EvaluationResult Assertion::evaluate(const EvaluationParameters& params) const {
     return EvaluationResult();
 };
 
-void Assertion::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
+void Assertion::eachChild(std::function<void(const Expression*)> visit) const {
     for(const std::unique_ptr<Expression>& input : inputs) {
-        input->accept(visit);
+        visit(input.get());
     }
 };
 

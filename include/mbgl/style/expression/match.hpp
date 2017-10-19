@@ -26,7 +26,7 @@ public:
         otherwise(std::move(otherwise_))
     {}
 
-    void accept(std::function<void(const Expression*)> visit) const override;
+    void eachChild(std::function<void(const Expression*)> visit) const override;
 
     EvaluationResult evaluate(const EvaluationParameters& params) const override;
     

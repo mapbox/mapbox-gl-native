@@ -6,6 +6,7 @@
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
 
 namespace mbgl {
 namespace style {
@@ -31,9 +32,9 @@ struct Converter<DataDrivenPropertyValue<T>> {
             if (!expression) {
                 return {};
             }
-            if ((*expression)->isFeatureConstant()) {
+            if (isFeatureConstant(expression->get())) {
                 return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
-            } else if ((*expression)->isZoomConstant()) {
+            } else if (isZoomConstant(expression->get())) {
                 return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
             } else {
                 if (!CompositeFunction<T>::Curve::findZoomCurve(expression->get())) {

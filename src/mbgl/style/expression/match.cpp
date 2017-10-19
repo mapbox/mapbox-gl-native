@@ -6,13 +6,12 @@ namespace style {
 namespace expression {
 
 template <typename T>
-void Match<T>::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
-    input->accept(visit);
+void Match<T>::eachChild(std::function<void(const Expression*)> visit) const {
+    visit(input.get());
     for (const std::pair<T, std::shared_ptr<Expression>>& branch : branches) {
-        branch.second->accept(visit);
+        visit(branch.second.get());
     }
-    otherwise->accept(visit);
+    visit(otherwise.get());
 }
 
 template<> EvaluationResult Match<std::string>::evaluate(const EvaluationParameters& params) const {

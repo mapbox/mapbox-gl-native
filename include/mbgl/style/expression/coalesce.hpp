@@ -23,7 +23,7 @@ public:
 
     EvaluationResult evaluate(const EvaluationParameters& params) const override;
     
-    void accept(std::function<void(const Expression*)> visit) const override;
+    void eachChild(std::function<void(const Expression*)> visit) const override;
 
     std::size_t getLength() const {
         return args.size();

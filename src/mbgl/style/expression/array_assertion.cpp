@@ -20,9 +20,8 @@ EvaluationResult ArrayAssertion::evaluate(const EvaluationParameters& params) co
     return *result;
 }
 
-void ArrayAssertion::accept(std::function<void(const Expression*)> visit) const {
-    visit(this);
-    input->accept(visit);
+void ArrayAssertion::eachChild(std::function<void(const Expression*)> visit) const {
+    visit(input.get());
 }
 
 ParseResult ArrayAssertion::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
