@@ -20,6 +20,7 @@ macro(mbgl_platform_core)
 
     target_include_directories(mbgl-core
         PUBLIC platform/default
+        PRIVATE platform/qt
         PRIVATE platform/qt/include
     )
 
@@ -67,6 +68,10 @@ macro(mbgl_platform_test)
         PRIVATE platform/qt/test/main.cpp
         PRIVATE platform/qt/test/qmapboxgl.test.cpp
         PRIVATE platform/qt/test/qmapboxgl.test.cpp
+    )
+
+    target_include_directories(mbgl-test
+        PRIVATE platform/qt
     )
 
     set_source_files_properties(

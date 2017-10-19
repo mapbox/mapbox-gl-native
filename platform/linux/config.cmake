@@ -76,6 +76,7 @@ macro(mbgl_platform_core)
 
     target_include_directories(mbgl-core
         PRIVATE platform/default
+        PRIVATE platform/linux
     )
 
     target_add_mason_package(mbgl-core PUBLIC nunicode)
@@ -147,6 +148,10 @@ endmacro()
 macro(mbgl_platform_test)
     target_sources(mbgl-test
         PRIVATE platform/default/mbgl/test/main.cpp
+    )
+
+    target_include_directories(mbgl-test
+        PRIVATE platform/linux
     )
 
     set_source_files_properties(
