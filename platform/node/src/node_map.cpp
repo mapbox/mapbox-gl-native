@@ -508,6 +508,7 @@ void NodeMap::release() {
     });
     
     map.reset();
+    frontend.reset();
 }
 
 /**
