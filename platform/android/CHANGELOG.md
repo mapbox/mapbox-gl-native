@@ -6,6 +6,19 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
+## 5.2.0-beta.2 - October 19, 2017
+
+- Wire up MapZoomButtonController with camera change events [#10221](https://github.com/mapbox/mapbox-gl-native/pull/10221)
+- Execute callbacks only when not idle [#10220](https://github.com/mapbox/mapbox-gl-native/pull/10220)
+- Cleanup unused gradle plugins [#10211](https://github.com/mapbox/mapbox-gl-native/pull/10211)
+- add FileSource pause/resume [#9977](https://github.com/mapbox/mapbox-gl-native/pull/9977)
+- add make target for ndk-stack [#10185](https://github.com/mapbox/mapbox-gl-native/pull/10185)
+- Add interpolator examples [#10067](https://github.com/mapbox/mapbox-gl-native/pull/10067)
+- Add an UnsatisfiedLinkError safeguard [#10180](https://github.com/mapbox/mapbox-gl-native/pull/10180)
+- Hold off handling hover events untill map has been created [#10142](https://github.com/mapbox/mapbox-gl-native/pull/10142)
+- Added `MapboxMap.getCameraForGeometry()` to get a camera with zoom level and center coordinate computed to fit a shape [#10107](https://github.com/mapbox/mapbox-gl-native/pull/10107)
+- Fine tune gesture zoom & rotation [#10134](https://github.com/mapbox/mapbox-gl-native/pull/10134) 
+
 ## 5.2.0-beta.1 - October 6, 2017
 
 * Allow multiple listeners for camera events, deprecate old API [#10141](https://github.com/mapbox/mapbox-gl-native/pull/10141)
@@ -59,7 +72,6 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 - build release package once during ci build [#9351](https://github.com/mapbox/mapbox-gl-native/pull/9351)
 * Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
 * Increased the default maximum zoom level from 20 to 22. [#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835)
-* Added `MapboxMap.getCameraForGeometry()` to get a camera with zoom level and center coordinate computed to fit a shape. ([#10107](https://github.com/mapbox/mapbox-gl-native/pull/10107))
 
 ### 5.1.4 - September 25, 2017
 
