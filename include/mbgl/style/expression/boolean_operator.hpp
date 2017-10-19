@@ -7,8 +7,8 @@ namespace expression {
 
 class Any : public Expression  {
 public:
-    Any(type::Array type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type_),
+    Any(std::vector<std::unique_ptr<Expression>> inputs_) :
+        Expression(type::Boolean),
         inputs(std::move(inputs_))
     {}
 
@@ -18,13 +18,13 @@ public:
     void accept(std::function<void(const Expression*)> visit) const override;
 
 private:
-    std::unique_ptr<Expression> inputs;
+    std::vector<std::unique_ptr<Expression>> inputs;
 };
 
 class All : public Expression  {
 public:
-    All(type::Array type_, std::vector<std::unique_ptr<Expression>> inputs_) :
-        Expression(type_),
+    All(std::vector<std::unique_ptr<Expression>> inputs_) :
+        Expression(type::Boolean),
         inputs(std::move(inputs_))
     {}
 
@@ -34,7 +34,7 @@ public:
     void accept(std::function<void(const Expression*)> visit) const override;
 
 private:
-    std::unique_ptr<Expression> inputs;
+    std::vector<std::unique_ptr<Expression>> inputs;
 };
 
 } // namespace expression

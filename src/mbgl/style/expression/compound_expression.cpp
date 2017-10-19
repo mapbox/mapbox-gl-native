@@ -403,16 +403,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("<=", [](double lhs, double rhs) -> Result<bool> { return lhs <= rhs; });
     define("<=", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs <= rhs; });
     
-    define("any", [](const Varargs<bool>& args) -> Result<bool> {
-        bool result = false;
-        for (auto arg : args) result = result || arg;
-        return result;
-    });
-    define("all", [](const Varargs<bool>& args) -> Result<bool> {
-        bool result = true;
-        for (bool arg : args) result = result && arg;
-        return result;
-    });
     define("!", [](bool e) -> Result<bool> { return !e; });
     
     define("upcase", [](const std::string& input) -> Result<std::string> {

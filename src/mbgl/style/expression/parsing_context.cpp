@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/at.hpp>
 #include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/style/expression/assertion.hpp>
+#include <mbgl/style/expression/boolean_operator.hpp>
 #include <mbgl/style/expression/case.hpp>
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
@@ -71,6 +72,10 @@ ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& va
             parsed = Assertion::parse(value, *this);
         } else if (*op == "to-color" || *op == "to-number") {
             parsed = Coercion::parse(value, *this);
+        } else if (*op == "any") {
+            parsed = Any::parse(value, *this);
+        } else if (*op == "all") {
+            parsed = All::parse(value, *this);
         } else {
             parsed = parseCompoundExpression(*op, value, *this);
         }
