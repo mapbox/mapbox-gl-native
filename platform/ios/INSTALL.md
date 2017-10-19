@@ -1,6 +1,6 @@
 # Integrating custom builds of the Mapbox iOS SDK into your application
 
-This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application.
+This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK installation page](https://www.mapbox.com/install/ios/).
 
 ### Requirements
 
