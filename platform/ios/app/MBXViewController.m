@@ -165,7 +165,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     self.mapView.scaleBar.hidden = NO;
     self.mapView.showsUserHeadingIndicator = YES;
     self.hudLabel.hidden = YES;
-    self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
+    if ([UIFont respondsToSelector:@selector(monospacedDigitSystemFontOfSize:weight:)]) {
+        self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
+    }
 
     if ([MGLAccountManager accessToken].length)
     {
