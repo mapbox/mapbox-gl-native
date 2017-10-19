@@ -222,6 +222,14 @@ iproj: $(IOS_PROJ_PATH)
 ios-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: ios-sanitize-address
+ios-sanitize-address: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
+
+.PHONY: ios-sanitize-thread
+ios-sanitize-thread: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES test $(XCPRETTY)
+
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \

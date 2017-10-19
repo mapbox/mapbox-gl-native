@@ -30,6 +30,9 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
+      - ios-debug
+      #- ios-sanitize-address
+      - ios-sanitize-thread
 
 step-library:
   - &generate-cache-key
@@ -47,7 +50,7 @@ step-library:
   - &save-cache
       save_cache:
         key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-        paths: [ "node_modules", "/root/.ccache", "mason_packages/.binaries" ]
+        paths: [ "node_modules", "/root/.ccache", "~/.ccache", "mason_packages/.binaries" ]
 
 
   - &reset-ccache-stats
@@ -97,6 +100,24 @@ step-library:
       run:
         name: Build qt-test
         command: make qt-test
+  - &build-ios-test
+      run:
+        name: Build ios-test
+        command: make ios-test
+
+
+  - &check-public-symbols
+      run:
+        name: Check public symbols
+        command: make check-public-symbols
+
+
+  - &install-ios-dependencies
+      run:
+        name: Install dependencies
+        command: |
+          brew install cmake
+          brew install ccache
 
 
   - &run-node-tests
@@ -589,3 +610,59 @@ jobs:
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+
+# ------------------------------------------------------------------------------
+  ios-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-ios-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-ios-test
+      - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-address:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-ios-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with address sanitizer
+          command: make ios-sanitize-address
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-thread:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-ios-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread sanitizer
+          command: make ios-sanitize-thread
+      - *show-ccache-stats
+      - *save-cache
