@@ -102,7 +102,7 @@ template <>
 struct ValueConverter<float> {
     using ExpressionType = double;
     static type::Type expressionType() { return type::Number; }
-    static Value toExpressionValue(const float& value);
+    static Value toExpressionValue(const float value);
     static optional<float> fromExpressionValue(const Value& value);
 };
 

@@ -16,7 +16,7 @@ namespace expression {
 
 class StepInterpolator {
 public:
-    double interpolationFactor(const Range<double>&, const double&) const {
+    double interpolationFactor(const Range<double>&, const double) const {
         return 0;
     }
     
@@ -28,7 +28,7 @@ public:
 
     double base;
     
-    double interpolationFactor(const Range<double>& inputLevels, const double& input) const {
+    double interpolationFactor(const Range<double>& inputLevels, const double input) const {
         return util::interpolationFactor(base,
                                          Range<float> {
                                             static_cast<float>(inputLevels.min),
@@ -42,7 +42,7 @@ class CubicBezierInterpolator {
 public:
     CubicBezierInterpolator(double x1_, double y1_, double x2_, double y2_) : ub(x1_, y1_, x2_, y2_) {}
     
-    double interpolationFactor(const Range<double>& inputLevels, const double& input) const {
+    double interpolationFactor(const Range<double>& inputLevels, const double input) const {
         return ub.solve(input / (inputLevels.max - inputLevels.min), 1e-6);
     }
     
@@ -160,7 +160,7 @@ public:
         };
     }
     
-    double interpolationFactor(const Range<double>& inputLevels, const double& inputValue) const {
+    double interpolationFactor(const Range<double>& inputLevels, const double inputValue) const {
         return interpolator.match(
             [&](const auto& interp) { return interp.interpolationFactor(inputLevels, inputValue); }
         );
@@ -168,7 +168,7 @@ public:
     
 private:
     template <typename OutputType = T>
-    static EvaluationResult interpolate(const Range<Value>&, const double&,
+    static EvaluationResult interpolate(const Range<Value>&, const double,
                                         typename std::enable_if<!util::Interpolatable<OutputType>::value>::type* = nullptr) {
         // Assume that Curve::evaluate() will always short circuit due to
         // interpolationFactor always returning 0.
@@ -177,7 +177,7 @@ private:
     }
     
     template <typename OutputType = T>
-    static EvaluationResult interpolate(const Range<Value>& outputs, const double& t,
+    static EvaluationResult interpolate(const Range<Value>& outputs, const double t,
                                         typename std::enable_if<util::Interpolatable<OutputType>::value>::type* = nullptr) {
         optional<T> lower = fromExpressionValue<T>(outputs.min);
         if (!lower) {

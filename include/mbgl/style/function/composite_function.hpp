@@ -87,7 +87,7 @@ public:
         return finalDefaultValue;
     }
     
-    float interpolationFactor(const Range<float>& inputLevels, const float& inputValue) const {
+    float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
         return zoomCurve->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
     }
     
