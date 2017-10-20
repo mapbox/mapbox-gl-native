@@ -52,7 +52,7 @@ public final class CameraPosition implements Parcelable {
    * Zoom level near the center of the screen. See zoom(float) for the definition of the camera's
    * zoom level.
    */
-  public final double zoom;
+  public double zoom;
 
   /**
    * Constructs a CameraPosition.

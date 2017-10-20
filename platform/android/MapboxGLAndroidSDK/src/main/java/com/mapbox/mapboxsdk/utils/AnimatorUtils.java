@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.utils;
 import android.animation.Animator;
 import android.animation.AnimatorInflater;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.FloatEvaluator;
 import android.animation.ObjectAnimator;
 import android.animation.PointFEvaluator;
 import android.animation.TypeEvaluator;
@@ -13,6 +14,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
+import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 /**
@@ -196,5 +198,21 @@ public class AnimatorUtils {
       return latLng;
     }
   }
+
+  public static class CameraPositionEvaluator implements TypeEvaluator<CameraPosition> {
+
+    private final LatLngEvaluator latLngEvaluator = new LatLngEvaluator();
+    private final FloatEvaluator floatEvaluator = new FloatEvaluator();
+
+    @Override
+    public CameraPosition evaluate(float fraction, CameraPosition startValue, CameraPosition endValue) {
+      LatLng latLng = latLngEvaluator.evaluate(fraction, startValue.target, endValue.target);
+      double zoom = floatEvaluator.evaluate(fraction, startValue.zoom, endValue.zoom);
+      double bearing = floatEvaluator.evaluate(fraction, startValue.bearing, endValue.bearing);
+      double tilt = floatEvaluator.evaluate(fraction, startValue.tilt, endValue.tilt);
+      return new CameraPosition.Builder().target(latLng).zoom(zoom).bearing(bearing).tilt(tilt).build();
+    }
+  }
+
 }
 

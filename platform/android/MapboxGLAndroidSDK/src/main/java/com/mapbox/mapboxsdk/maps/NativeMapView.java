@@ -533,6 +533,17 @@ final class NativeMapView {
     return nativeLatLngForPixel(pixel.x / pixelRatio, pixel.y / pixelRatio).wrap();
   }
 
+  public LatLng latLngForPixel(PointF pixel, double startScale) {
+    if (isDestroyedOn("latLngForPixel")) {
+      return new LatLng();
+    }
+    return nativeLatLngForPixel2(pixel.x , pixel.y, startScale);
+  }
+
+  public PointF pixelForLatLng2(LatLng latLng){
+    return nativePixelForLatLng2(latLng.getLatitude(), latLng.getLongitude());
+  }
+
   public double getTopOffsetPixelsForAnnotationSymbol(String symbolName) {
     if (isDestroyedOn("getTopOffsetPixelsForAnnotationSymbol")) {
       return 0;
@@ -877,6 +888,8 @@ final class NativeMapView {
 
   private native double nativeGetBearing();
 
+  private native double nativeGetScale();
+
   private native void nativeResetNorth();
 
   private native void nativeUpdateMarker(long markerId, double lat, double lon, String iconId);
@@ -916,8 +929,11 @@ final class NativeMapView {
   private native LatLng nativeLatLngForProjectedMeters(double northing, double easting);
 
   private native PointF nativePixelForLatLng(double lat, double lon);
+  private native PointF nativePixelForLatLng2(double lat, double lon);
 
   private native LatLng nativeLatLngForPixel(float x, float y);
+
+  private native LatLng nativeLatLngForPixel2(float x, float y, double startScale);
 
   private native double nativeGetTopOffsetPixelsForAnnotationSymbol(String symbolName);
 
@@ -1055,5 +1071,9 @@ final class NativeMapView {
       }
 
     });
+  }
+
+  public double getScale() {
+    return nativeGetScale();
   }
 }

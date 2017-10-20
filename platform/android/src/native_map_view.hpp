@@ -136,6 +136,7 @@ public:
     void setBearingXY(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jdouble);
 
     jni::jdouble getBearing(jni::JNIEnv&);
+    jni::jdouble getScale(jni::JNIEnv&);
 
     void resetNorth(jni::JNIEnv&);
 
@@ -166,10 +167,13 @@ public:
     jni::Object<ProjectedMeters> projectedMetersForLatLng(JNIEnv&, jni::jdouble, jni::jdouble);
 
     jni::Object<PointF> pixelForLatLng(JNIEnv&, jdouble, jdouble);
+    jni::Object<PointF> pixelForLatLng2(JNIEnv&, jdouble, jdouble);
 
     jni::Object<LatLng> latLngForProjectedMeters(JNIEnv&, jdouble, jdouble);
 
     jni::Object<LatLng> latLngForPixel(JNIEnv&, jfloat, jfloat);
+
+    jni::Object<LatLng> latLngForPixel2(JNIEnv&, jfloat, jfloat, jdouble);
 
     jni::Array<jlong> addPolylines(JNIEnv&, jni::Array<jni::Object<Polyline>>);
 

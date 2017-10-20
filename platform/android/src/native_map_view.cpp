@@ -356,6 +356,10 @@ jni::jdouble NativeMapView::getBearing(jni::JNIEnv&) {
     return map->getBearing();
 }
 
+jni::jdouble NativeMapView::getScale(jni::JNIEnv&) {
+    return map->getBearing();
+}
+
 void NativeMapView::resetNorth(jni::JNIEnv&) {
     map->resetNorth();
 }
@@ -478,8 +482,17 @@ jni::Object<PointF> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude,
     return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
 }
 
+jni::Object<PointF> NativeMapView::pixelForLatLng2(JNIEnv& env, jdouble latitude, jdouble longitude) {
+    mbgl::ScreenCoordinate pixel = map->pixelForLatLng2(mbgl::LatLng(latitude, longitude));
+    return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
+}
+
 jni::Object<LatLng> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {
     return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
+}
+
+jni::Object<LatLng> NativeMapView::latLngForPixel2(JNIEnv& env, jfloat x, jfloat y, jdouble startScale) {
+    return LatLng::New(env, Projection::unproject(mbgl::ScreenCoordinate(x, y), startScale));
 }
 
 jni::Array<jlong> NativeMapView::addPolylines(JNIEnv& env, jni::Array<jni::Object<Polyline>> polylines) {
@@ -958,6 +971,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::setBearing, "nativeSetBearing"),
             METHOD(&NativeMapView::setBearingXY, "nativeSetBearingXY"),
             METHOD(&NativeMapView::getBearing, "nativeGetBearing"),
+            METHOD(&NativeMapView::getScale, "nativeGetScale"),
             METHOD(&NativeMapView::resetNorth, "nativeResetNorth"),
             METHOD(&NativeMapView::setVisibleCoordinateBounds, "nativeSetVisibleCoordinateBounds"),
             METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
@@ -973,8 +987,10 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getMetersPerPixelAtLatitude, "nativeGetMetersPerPixelAtLatitude"),
             METHOD(&NativeMapView::projectedMetersForLatLng, "nativeProjectedMetersForLatLng"),
             METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
+            METHOD(&NativeMapView::pixelForLatLng2, "nativePixelForLatLng2"),
             METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
             METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
+            METHOD(&NativeMapView::latLngForPixel2, "nativeLatLngForPixel2"),
             METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
             METHOD(&NativeMapView::addPolygons, "nativeAddPolygons"),
             METHOD(&NativeMapView::updatePolyline, "nativeUpdatePolyline"),

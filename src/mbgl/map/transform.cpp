@@ -495,6 +495,10 @@ double Transform::getPitch() const {
     return state.pitch;
 }
 
+double Transform::getScale() const {
+    return state.scale;
+}
+
 #pragma mark - North Orientation
 
 void Transform::setNorthOrientation(NorthOrientation orientation) {
@@ -620,6 +624,12 @@ void Transform::setGestureInProgress(bool inProgress) {
 
 ScreenCoordinate Transform::latLngToScreenCoordinate(const LatLng& latLng) const {
     ScreenCoordinate point = state.latLngToScreenCoordinate(latLng);
+    point.y = state.size.height - point.y;
+    return point;
+}
+
+ScreenCoordinate Transform::latLngToScreenCoordinate2(const LatLng& latLng) const {\
+    ScreenCoordinate point = Projection::project(latLng,state.scale);
     point.y = state.size.height - point.y;
     return point;
 }

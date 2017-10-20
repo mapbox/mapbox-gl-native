@@ -2,12 +2,16 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.TimeAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.annotation.SuppressLint;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.view.animation.LinearInterpolator;
 
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -17,6 +21,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.utils.AnimatorUtils;
+import com.mapbox.services.android.telemetry.utils.MathUtils;
 
 import timber.log.Timber;
 
@@ -129,21 +134,142 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, int durationMs,
+  @SuppressLint("NewApi")
+  final void animateCamera(MapboxMap mapboxMap, CameraUpdate update, final int durationMs,
                            final MapboxMap.CancelableCallback callback) {
-    CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
-    if (isValidCameraPosition(cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
-      cancelTransitions();
-      cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
-      if (callback != null) {
-        cameraCancelableCallback = callback;
-      }
-      mapView.addOnMapChangedListener(this);
-      mapView.flyTo(cameraPosition.bearing, cameraPosition.target, durationMs, cameraPosition.tilt,
-        cameraPosition.zoom);
+    // TODO
+    // correct rotation value
+    // correct fixed 512 value for pixel points
+    // integrate callback & MapboxMap#cancelTransitions
+    // integrate padding (aka edge insets)
+    // integrate unwrap for shortest path
+    // handle edge cases for NaN and infinite values
+    // reimplement ValueAnimator with an actual value
+    // handle not provided values of CameraPosition, -1 = not provided
+
+    CameraPosition camera = update.getCameraPosition(mapboxMap);
+    final LatLng latLng = camera.target;
+    final double zoom = camera.zoom;
+    final double angle = Math.toRadians(camera.bearing - 180);
+    final double pitch = Math.toRadians(camera.tilt);
+
+    if (Double.isNaN(zoom)) {
+      return;
     }
+
+    // Determine endpoints.
+    //EdgeInsets padding = camera.padding;
+    LatLng startLatLng = getLatLng();//getLatLng(padding).wrapped();
+    //startLatLng.unwrapForShortestPath(latLng);
+
+    final PointF startPoint = mapView.pixelForLatLng2(startLatLng);
+    startPoint.y = 512 - startPoint.y;
+    final PointF endPoint = mapView.pixelForLatLng2(latLng);
+    endPoint.y = 512 - endPoint.y;
+
+    final double startZoom = mapView.getZoom();
+    final double startTilt = Math.toRadians(mapView.getPitch());
+    final double startBearing = Math.toRadians(getBearing());
+
+    // Minimize rotation by taking the shorter path around the circle.
+    final double angleNormal = normalizeAngle(angle, startBearing);
+
+    final double w0 = 512;
+    final double w1 = 256;
+    final double u1 = Math.hypot(endPoint.x - startPoint.x, endPoint.y - startPoint.y);
+    final double rho = 1.42;
+    final double rho2 = rho * rho;
+
+    final double r0 = calculateZoomFactor(0, w1, w0, rho2, u1);
+    final double r1 = calculateZoomFactor(1, w1, w0, rho2, u1);
+
+    final boolean isClose = false;
+
+    final double S = (isClose ? (Math.abs(Math.log(w1 / w0)) / rho) : ((r1 - r0) / rho));
+
+    final double startScale = Math.abs(mapView.getScale());
+
+    ValueAnimator valueAnimator = ValueAnimator.ofObject(new TypeEvaluator() {
+      @Override
+      public Object evaluate(float k, Object startValue, Object endValue) {
+        double s = k * S;
+        float us = k == 1.0 ? 1.0f : (float) u(s, isClose, w0, r0, rho, rho2, u1);
+
+        float framePointX = interpolate(startPoint.x, endPoint.x, us);
+        float framePointY = interpolate(startPoint.y, endPoint.y, us);
+        PointF framePoint = new PointF(framePointX, framePointY);
+        double frameZoom = startZoom + scaleZoom(1 / w(s, isClose, w1, w0, rho, r0));
+        double frameTilt = interpolate(startTilt, pitch, us);
+        double frameBearing = interpolate(startBearing, angleNormal, us);
+
+        // Zoom can be NaN if size is empty.
+        if (Double.isNaN(frameZoom)) {
+          frameZoom = zoom;
+        }
+
+        LatLng frameLatLng = mapView.latLngForPixel(framePoint, startScale);
+        mapView.setLatLng(frameLatLng);
+        mapView.setZoom(frameZoom, new PointF(mapView.getWidth() / 2, mapView.getHeight() / 2));
+        mapView.setBearing(Math.toDegrees(frameBearing));
+        mapView.setPitch(Math.toDegrees(frameTilt));
+        return new Object();
+      }
+    }, new Object(), new Object());
+    valueAnimator.setDuration(durationMs);
+    valueAnimator.start();
+  }
+
+  public static double normalizeAngle(double angle, double anchorAngle) {
+    if (Double.isNaN(angle) || Double.isNaN(anchorAngle)) {
+      return 0;
+    }
+
+    angle = MathUtils.wrap(angle, -Math.PI, Math.PI);
+    if (angle == -Math.PI) {
+      angle = Math.PI;
+    }
+    double diff = Math.abs(angle - anchorAngle);
+    if (Math.abs(angle - Math.PI * 2 - anchorAngle) < diff) {
+      angle -= Math.PI * 2;
+    }
+    if (Math.abs(angle + Math.PI * 2 - anchorAngle) < diff) {
+      angle += Math.PI * 2;
+    }
+
+    return angle;
+  }
+
+  private double scaleZoom(double scale) {
+    return log(scale, 2);
+  }
+
+  static double log(double x, int base) {
+    return (Math.log(x) / Math.log(base));
+  }
+
+  private float interpolate(float a, float b, float t) {
+    return a * (1.0f - t) + b * t;
+  }
+
+  private double interpolate(double a, double b, double t) {
+    return a * (1.0 - t) + b * t;
+  }
+
+
+  private double calculateZoomFactor(double i, double w1, double w0, double rho2, double u1) {
+    double b = (w1 * w1 - w0 * w0 + (i == 1 ? -1 : 1) * rho2 * rho2 * u1 * u1) / (2 * (i == 1 ? w1 : w0) * rho2 * u1);
+    return Math.log(Math.sqrt(b * b + 1) - b);
+  }
+
+  private double w(double s, boolean isClose, double w1, double w0, double rho, double r0) {
+    return (isClose ? Math.exp((w1 < w0 ? -1 : 1) * rho * s)
+      : (Math.cosh(r0) / Math.cosh(r0 + rho * s)));
+  }
+
+  private double u(double s, boolean isClose, double w0, double r0, double rho, double rho2, double u1) {
+    return (isClose ? 0.
+      : (w0 * (Math.cosh(r0) * Math.tanh(r0 + rho * s) - Math.sinh(r0)) / rho2 / u1));
   }
 
   private boolean isValidCameraPosition(@Nullable CameraPosition cameraPosition) {
