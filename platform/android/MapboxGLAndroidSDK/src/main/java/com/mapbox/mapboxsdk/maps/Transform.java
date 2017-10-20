@@ -151,7 +151,7 @@ final class Transform implements MapView.OnMapChangedListener {
     CameraPosition camera = update.getCameraPosition(mapboxMap);
     final LatLng latLng = camera.target;
     final double zoom = camera.zoom;
-    final double angle = Math.toRadians(camera.bearing - 180);
+    final double angle = Math.toRadians(-camera.bearing);
     final double pitch = Math.toRadians(camera.tilt);
 
     if (Double.isNaN(zoom)) {
