@@ -7,7 +7,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-Result<mbgl::Color> rgba(double r, double g, double b, double a);
+Result<Color> rgba(double r, double g, double b, double a);
 
 } // namespace expression
 } // namespace style

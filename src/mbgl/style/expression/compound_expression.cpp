@@ -210,7 +210,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(
-            [](const mbgl::Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
+            [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
             [](const auto& v) -> Result<std::string> { return stringify(v); }
         );
     });
@@ -224,7 +224,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             [&] (const auto&) { return true; }
         );
     });
-    define("to-rgba", [](const mbgl::Color& color) -> Result<std::array<double, 4>> {
+    define("to-rgba", [](const Color& color) -> Result<std::array<double, 4>> {
         return std::array<double, 4> {{ color.r, color.g, color.b, color.a }};
     });
     

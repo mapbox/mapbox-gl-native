@@ -11,7 +11,7 @@ type::Type typeOf(const Value& value) {
         [&](bool) -> type::Type { return type::Boolean; },
         [&](double) -> type::Type { return type::Number; },
         [&](const std::string&) -> type::Type { return type::String; },
-        [&](const mbgl::Color&) -> type::Type { return type::Color; },
+        [&](const Color&) -> type::Type { return type::Color; },
         [&](const NullValue&) -> type::Type { return type::Null; },
         [&](const std::unordered_map<std::string, Value>&) -> type::Type { return type::Object; },
         [&](const std::vector<Value>& arr) -> type::Type {
@@ -45,7 +45,7 @@ void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& 
             f == std::floor(f) ? writer.Int(f) : writer.Double(f);
         },
         [&] (const std::string& s) { writer.String(s); },
-        [&] (const mbgl::Color& c) { writer.String(c.stringify()); },
+        [&] (const Color& c) { writer.String(c.stringify()); },
         [&] (const std::vector<Value>& arr) {
             writer.StartArray();
             for(const auto& item : arr) {
@@ -90,7 +90,7 @@ struct FromMBGLValue {
     
     Value operator()(const std::string& s) { return s; }
     Value operator()(const bool& b) { return b; }
-    Value operator()(const mbgl::NullValue) { return Null; }
+    Value operator()(const NullValue) { return Null; }
     Value operator()(const double& v) { return v; }
     Value operator()(const uint64_t& v) {
         return static_cast<double>(v);
@@ -232,7 +232,7 @@ template <> type::Type valueTypeToExpressionType<NullValue>() { return type::Nul
 template <> type::Type valueTypeToExpressionType<bool>() { return type::Boolean; }
 template <> type::Type valueTypeToExpressionType<double>() { return type::Number; }
 template <> type::Type valueTypeToExpressionType<std::string>() { return type::String; }
-template <> type::Type valueTypeToExpressionType<mbgl::Color>() { return type::Color; }
+template <> type::Type valueTypeToExpressionType<Color>() { return type::Color; }
 template <> type::Type valueTypeToExpressionType<std::unordered_map<std::string, Value>>() { return type::Object; }
 template <> type::Type valueTypeToExpressionType<std::vector<Value>>() { return type::Array(type::Value); }
 

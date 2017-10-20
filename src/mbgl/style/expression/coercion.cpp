@@ -29,7 +29,7 @@ EvaluationResult toNumber(const Value& v) {
 EvaluationResult toColor(const Value& colorValue) {
     return colorValue.match(
         [&](const std::string& colorString) -> EvaluationResult {
-            const optional<mbgl::Color> result = mbgl::Color::parse(colorString);
+            const optional<Color> result = Color::parse(colorString);
             if (result) {
                 return *result;
             } else {
@@ -44,7 +44,7 @@ EvaluationResult toColor(const Value& colorValue) {
                 return item.template is<double>();
             });
             if ((len == 3 || len == 4) && isNumeric) {
-                Result<mbgl::Color> c = {rgba(
+                Result<Color> c = {rgba(
                     components[0].template get<double>(),
                     components[1].template get<double>(),
                     components[2].template get<double>(),

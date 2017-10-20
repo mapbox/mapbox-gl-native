@@ -13,7 +13,7 @@ std::string stringifyColor(double r, double g, double b, double a) {
         stringify(a);
 }
 
-Result<mbgl::Color> rgba(double r, double g, double b, double a) {
+Result<Color> rgba(double r, double g, double b, double a) {
     if (
         r < 0 || r > 255 ||
         g < 0 || g > 255 ||
@@ -30,7 +30,7 @@ Result<mbgl::Color> rgba(double r, double g, double b, double a) {
             "]: 'a' must be between 0 and 1."
         };
     }
-    return mbgl::Color(r / 255, g / 255, b / 255, a);
+    return Color(r / 255, g / 255, b / 255, a);
 }
 
 } // namespace expression

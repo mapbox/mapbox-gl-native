@@ -229,6 +229,8 @@ ParseResult parseMatch(const mbgl::style::conversion::Convertible& value, Parsin
             return create<std::string>(*outputType, std::move(*input), std::move(branches), std::move(*otherwise), ctx);
         },
         [&](const auto&) {
+            // unreachable: inputType is set by parseInputValue(), which only
+            // accepts string and (integer) numeric values.
             assert(false);
             return ParseResult();
         }

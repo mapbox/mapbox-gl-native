@@ -201,7 +201,7 @@ ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, Parsin
         },
         [&](const type::ColorType&) -> ParseResult {
             return interpolator.match([&](const auto& interpolator_) {
-                return ParseResult(std::make_unique<Curve<mbgl::Color>>(
+                return ParseResult(std::make_unique<Curve<Color>>(
                     *outputType, interpolator_, std::move(*input), std::move(stops)
                 ));
             });
