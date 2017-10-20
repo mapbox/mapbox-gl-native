@@ -91,6 +91,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
     
     EvaluationResult apply(const EvaluationParameters& evaluationParameters, const Args& args) const {
         Varargs<T> evaluated;
+        evaluated.reserve(args.size());
         for (const auto& arg : args) {
             const EvaluationResult evaluatedArg = arg->evaluate(evaluationParameters);
             if(!evaluatedArg) return evaluatedArg.error();
@@ -448,7 +449,6 @@ ParseResult parseCompoundExpression(const std::string name, const mbgl::style::c
     }
     const CompoundExpressionRegistry::Definition& definition = it->second;
     
-    std::vector<std::unique_ptr<Expression>> args;
     auto length = arrayLength(value);
 
     // Check if we have a single signature with the correct number of
@@ -470,6 +470,8 @@ ParseResult parseCompoundExpression(const std::string name, const mbgl::style::c
     }
 
     // parse subexpressions first
+    std::vector<std::unique_ptr<Expression>> args;
+    args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
         optional<type::Type> expected;
         

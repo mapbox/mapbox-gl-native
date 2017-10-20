@@ -41,7 +41,8 @@ ParseResult parseBooleanOp(const mbgl::style::conversion::Convertible& value, Pa
     auto length = arrayLength(value);
  
     std::vector<std::unique_ptr<Expression>> parsedInputs;
-
+    
+    parsedInputs.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
         auto parsed = ctx.concat(i, {type::Boolean}).parse(arrayMember(value, i));
         if (!parsed) {

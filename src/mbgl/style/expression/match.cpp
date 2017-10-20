@@ -120,6 +120,8 @@ static ParseResult create(type::Type outputType,
     typename Match<T>::Branches typedBranches;
     
     std::size_t index = 2;
+
+    typedBranches.reserve(branches.size());
     for (std::pair<std::vector<InputType>,
                    std::unique_ptr<Expression>>& pair : branches) {
         std::shared_ptr<Expression> result = std::move(pair.second);
@@ -169,6 +171,7 @@ ParseResult parseMatch(const mbgl::style::conversion::Convertible& value, Parsin
     std::vector<std::pair<std::vector<InputType>,
                           std::unique_ptr<Expression>>> branches;
 
+    branches.reserve((length - 3) / 2);
     for (size_t i = 2; i + 1 < length; i += 2) {
         const auto& label = arrayMember(value, i);
 
@@ -182,6 +185,7 @@ ParseResult parseMatch(const mbgl::style::conversion::Convertible& value, Parsin
                 return ParseResult();
             }
             
+            labels.reserve(groupLength);
             for (size_t j = 0; j < groupLength; j++) {
                 const optional<InputType> inputValue = parseInputValue(arrayMember(label, j), ctx.concat(i, inputType), inputType);
                 if (!inputValue) {

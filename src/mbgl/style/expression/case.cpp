@@ -48,6 +48,7 @@ ParseResult Case::parse(const mbgl::style::conversion::Convertible& value, Parsi
     }
 
     std::vector<Case::Branch> branches;
+    branches.reserve((length - 2) / 2);
     for (size_t i = 1; i + 1 < length; i += 2) {
         auto test = ctx.concat(i, {type::Boolean}).parse(arrayMember(value, i));
         if (!test) {

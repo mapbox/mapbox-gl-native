@@ -98,6 +98,7 @@ ParseResult Coercion::parse(const mbgl::style::conversion::Convertible& value, P
     assert(it != types.end());
     
     std::vector<std::unique_ptr<Expression>> parsed;
+    parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
         ParseResult input = ctx.concat(i, {type::Value}).parse(arrayMember(value, i));
         if (!input) return ParseResult();

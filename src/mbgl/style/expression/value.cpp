@@ -74,6 +74,7 @@ std::string stringify(const Value& value) {
 struct FromMBGLValue {
     Value operator()(const std::vector<mbgl::Value>& v) {
         std::vector<Value> result;
+        result.reserve(v.size());
         for(const auto& item : v) {
             result.emplace_back(toExpressionValue(item));
         }
@@ -82,6 +83,7 @@ struct FromMBGLValue {
     
     Value operator()(const std::unordered_map<std::string, mbgl::Value>& v) {
         std::unordered_map<std::string, Value> result;
+        result.reserve(v.size());
         for(const auto& entry : v) {
             result.emplace(entry.first, toExpressionValue(entry.second));
         }
@@ -123,6 +125,7 @@ optional<float> ValueConverter<float>::fromExpressionValue(const Value& value) {
 template <typename T, typename Container>
 std::vector<Value> toArrayValue(const Container& value) {
     std::vector<Value> result;
+    result.reserve(value.size());
     for (const T& item : value) {
         result.push_back(ValueConverter<T>::toExpressionValue(item));
     }
@@ -166,6 +169,7 @@ optional<std::vector<T>> ValueConverter<std::vector<T>>::fromExpressionValue(con
     return value.match(
         [&] (const std::vector<Value>& v) -> optional<std::vector<T>> {
             std::vector<T> result;
+            result.reserve(v.size());
             for(const Value& item : v) {
                 optional<T> convertedItem = ValueConverter<T>::fromExpressionValue(item);
                 if (!convertedItem) {

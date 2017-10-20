@@ -28,12 +28,13 @@ ParseResult Coalesce::parse(const mbgl::style::conversion::Convertible& value, P
         return ParseResult();
     }
  
-    Coalesce::Args args;
     optional<type::Type> outputType;
     if (ctx.expected && *ctx.expected != type::Value) {
         outputType = ctx.expected;
     }
 
+    Coalesce::Args args;
+    args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
         auto parsed = ctx.concat(i, outputType).parse(arrayMember(value, i));
         if (!parsed) {
