@@ -6,8 +6,8 @@ A library based on [Mapbox GL Native](../../README.md) for embedding interactive
 
 This repository is for day-to-day development of the SDK. Building the SDK yourself requires [a number of dependencies and steps](../../INSTALL.md) that are unnecessary for developing production applications. For production applications, please consider installing an official, production-ready version instead.
 
-* [Integrate a production-ready version of the Mapbox iOS SDK into your application](https://www.mapbox.com/install/ios/).
-* [Integrate custom builds of the Mapbox iOS SDK into your application](INSTALL.md)
-* [Contributing to the Mapbox iOS SDK](DEVELOPING.md)
+* [Integrate the Mapbox iOS SDK into your application](https://www.mapbox.com/install/ios/).
+* [Learn about custom builds](INSTALL.md)
+* [Contribute to the Mapbox iOS SDK](DEVELOPING.md)
 
 ![](docs/img/screenshot.png)
