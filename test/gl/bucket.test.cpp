@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_geometry_tile_feature.hpp>
 
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/buckets/fill_bucket.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
@@ -9,6 +10,7 @@
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/headless_backend.hpp>
 
 #include <mbgl/map/mode.hpp>
 
@@ -41,6 +43,9 @@ PropertyMap properties;
 } // namespace
 
 TEST(Buckets, CircleBucket) {
+    HeadlessBackend backend({ 512, 256 });
+    BackendScope scope { backend };
+
     gl::Context context;
     CircleBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
@@ -57,6 +62,9 @@ TEST(Buckets, CircleBucket) {
 }
 
 TEST(Buckets, FillBucket) {
+    HeadlessBackend backend({ 512, 256 });
+    BackendScope scope { backend };
+
     gl::Context context;
     FillBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
@@ -72,6 +80,9 @@ TEST(Buckets, FillBucket) {
 }
 
 TEST(Buckets, LineBucket) {
+    HeadlessBackend backend({ 512, 256 });
+    BackendScope scope { backend };
+
     gl::Context context;
     LineBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
@@ -92,6 +103,9 @@ TEST(Buckets, LineBucket) {
 }
 
 TEST(Buckets, SymbolBucket) {
+    HeadlessBackend backend({ 512, 256 });
+    BackendScope scope { backend };
+
     style::SymbolLayoutProperties::PossiblyEvaluated layout;
     bool sdfIcons = false;
     bool iconsNeedLinear = false;
@@ -120,6 +134,9 @@ TEST(Buckets, SymbolBucket) {
 }
 
 TEST(Buckets, RasterBucket) {
+    HeadlessBackend backend({ 512, 256 });
+    BackendScope scope { backend };
+
     gl::Context context;
     PremultipliedImage rgba({ 1, 1 });
 
