@@ -70,15 +70,15 @@ TEST(StyleConversion, CompositeFunctionExpression) {
     })");
     ASSERT_TRUE(fn2);
 
-//    auto fn3 = parseFunction(R"({
-//        "expression": ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10] ]
-//    })");
-//    ASSERT_TRUE(fn3);
+    auto fn3 = parseFunction(R"({
+        "expression": ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10] ]
+    })");
+    ASSERT_TRUE(fn3);
 
-//    auto fn4 = parseFunction(R"({
-//        "expression": ["coalesce", ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0 ]
-//    })");
-//    ASSERT_TRUE(fn4);
+    auto fn4 = parseFunction(R"({
+        "expression": ["coalesce", ["let", "a", 0, ["curve", ["linear"], ["zoom"], 0, ["number", ["get", "x"]], 10, 10], 0 ]
+    })");
+    ASSERT_TRUE(fn4);
 
     auto fn5 = parseFunction(R"({
         "expression": ["coalesce", ["curve", ["linear"], ["number", ["get", "x"]], 0, ["zoom"], 10, 10], 0]
