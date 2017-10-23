@@ -369,7 +369,10 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onStop() {
-    mapboxMap.onStop();
+    if (mapboxMap != null) {
+      // map was destroyed before it was started
+      mapboxMap.onStop();
+    }
     ConnectivityReceiver.instance(getContext()).deactivate();
     FileSource.getInstance(getContext()).deactivate();
   }
