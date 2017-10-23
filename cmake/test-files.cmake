@@ -123,6 +123,7 @@ set(MBGL_TEST_FILES
     test/util/async_task.test.cpp
     test/util/dtoa.test.cpp
     test/util/geo.test.cpp
+    test/util/grid_index.test.cpp
     test/util/http_timeout.test.cpp
     test/util/image.test.cpp
     test/util/mapbox.test.cpp
