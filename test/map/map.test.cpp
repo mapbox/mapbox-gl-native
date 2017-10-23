@@ -16,7 +16,9 @@
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/image.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/util/color.hpp>
 
 using namespace mbgl;
@@ -54,12 +56,19 @@ public:
             didFinishRenderingFrame(mode);
         }
     }
+    
+    void onCameraDidChange(CameraChangeMode mode) final {
+        if (onCameraDidChangeCallback) {
+            onCameraDidChangeCallback(mode);
+        }
+    }
 
     std::function<void()> onWillStartLoadingMapCallback;
     std::function<void()> onDidFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
     std::function<void(RenderMode)> didFinishRenderingFrame;
+    std::function<void(CameraChangeMode)> onCameraDidChangeCallback;
 };
 
 template <class FileSource = StubFileSource>
@@ -98,6 +107,56 @@ TEST(Map, LatLngBehavior) {
 
     ASSERT_DOUBLE_EQ(latLng1.latitude(), latLng2.latitude());
     ASSERT_DOUBLE_EQ(latLng1.longitude(), latLng2.longitude());
+}
+
+TEST(Map, MapLoadedTilt) {
+    MapTest<DefaultFileSource> test { ":memory:", ".", 1, MapMode::Continuous };
+    test.fileSource.setAccessToken("pk.eyJ1IjoiaXZvdmFuZG9uZ2VuIiwiYSI6ImNpbzVpdG10eDAwM3R1bWtubGw0Y2dsb3kifQ.S0KL6oRTIrz12tQw1etMcg");
+    
+    bool styleSetup = false;
+    test.observer.didFinishLoadingStyleCallback = [&]() {
+        if (!styleSetup) {
+            styleSetup = true;
+            
+            // Add the streets source
+            auto source = std::make_unique<VectorSource>("composite", "mapbox://mapbox.mapbox-streets-v7");
+            test.map.getStyle().addSource(std::move(source));
+            
+            // Add the symbols source
+            auto layer = std::make_unique<SymbolLayer>("symbols-crash", "composite");
+            layer->setSourceLayer("road_label");
+            layer->setTextField(DataDrivenPropertyValue<std::string>("{name_en}"));
+            layer->setSymbolPlacement(PropertyValue<SymbolPlacementType>(SymbolPlacementType::Line));
+            layer->setTextColor(DataDrivenPropertyValue<Color>(*Color::parse("hsl(0, 0%, 78%)")));
+            test.map.getStyle().addLayer(std::move(layer));
+            
+            CameraOptions options;
+            options.center = mbgl::LatLng(40.7135, -74.0066);
+            options.zoom = 15;
+            test.map.jumpTo(options);
+        }
+    };
+    
+    test.observer.onDidFinishLoadingMapCallback = [&]() {
+        
+        mbgl::CameraOptions cameraOptions;
+        cameraOptions.pitch = 60 * util::DEG2RAD;
+
+        mbgl::AnimationOptions animationOptions;
+        animationOptions.duration.emplace(mbgl::Milliseconds(2000));
+
+        test.map.flyTo(cameraOptions, animationOptions);
+    };
+    
+    test.observer.onCameraDidChangeCallback = [&](MapObserver::CameraChangeMode mode) {
+        if (mode == MapObserver::CameraChangeMode::Animated) {
+             test.runLoop.stop();
+        }
+    };
+    
+    test.map.setSize({2048, 2048});
+    test.map.getStyle().loadURL("mapbox://styles/ivovandongen/citfk0tw5000o2inv9aueajs0");
+    test.runLoop.run();
 }
 
 TEST(Map, LatLngBoundsToCamera) {
