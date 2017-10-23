@@ -186,8 +186,8 @@ for (const layer of layers) {
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
 }
 
-const propertySettersHpp = ejs.compile(fs.readFileSync('include/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified('include/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
+const propertySettersHpp = ejs.compile(fs.readFileSync('src/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
+writeIfModified('src/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
 
 // Light
 const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {

@@ -370,16 +370,26 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/geojson_options.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
-    include/mbgl/style/conversion/make_property_setters.hpp
     include/mbgl/style/conversion/position.hpp
-    include/mbgl/style/conversion/property_setter.hpp
     include/mbgl/style/conversion/property_value.hpp
     include/mbgl/style/conversion/source.hpp
     include/mbgl/style/conversion/tileset.hpp
     include/mbgl/style/conversion/transition_options.hpp
+    src/mbgl/style/conversion/constant.cpp
+    src/mbgl/style/conversion/coordinate.cpp
+    src/mbgl/style/conversion/filter.cpp
     src/mbgl/style/conversion/geojson.cpp
+    src/mbgl/style/conversion/geojson_options.cpp
     src/mbgl/style/conversion/json.hpp
+    src/mbgl/style/conversion/layer.cpp
+    src/mbgl/style/conversion/light.cpp
+    src/mbgl/style/conversion/make_property_setters.hpp
+    src/mbgl/style/conversion/position.cpp
+    src/mbgl/style/conversion/property_setter.hpp
+    src/mbgl/style/conversion/source.cpp
     src/mbgl/style/conversion/stringify.hpp
+    src/mbgl/style/conversion/tileset.cpp
+    src/mbgl/style/conversion/transition_options.cpp
 
     # style/function
     include/mbgl/style/function/camera_function.hpp

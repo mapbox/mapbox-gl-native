@@ -51,7 +51,6 @@ set(MBGL_TEST_FILES
     test/sprite/sprite_parser.test.cpp
 
     # src/mbgl/test
-    test/src/mbgl/test/conversion_stubs.hpp
     test/src/mbgl/test/fake_file_source.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
