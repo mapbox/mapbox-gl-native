@@ -33,6 +33,7 @@ workflows:
       - ios-debug
       #- ios-sanitize-address
       - ios-sanitize-thread
+      - macos-debug
 
 step-library:
   - &generate-cache-key
@@ -104,6 +105,10 @@ step-library:
       run:
         name: Build ios-test
         command: make ios-test
+  - &build-macos-test
+      run:
+        name: Build and run macOS tests
+        command: make run-test
 
 
   - &check-public-symbols
@@ -112,7 +117,7 @@ step-library:
         command: make check-public-symbols
 
 
-  - &install-ios-dependencies
+  - &install-macos-dependencies
       run:
         name: Install dependencies
         command: |
@@ -620,7 +625,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
-      - *install-ios-dependencies
+      - *install-macos-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
@@ -638,7 +643,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
-      - *install-ios-dependencies
+      - *install-macos-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
@@ -657,7 +662,7 @@ jobs:
       HOMEBREW_NO_AUTO_UPDATE: 1
     steps:
       - checkout
-      - *install-ios-dependencies
+      - *install-macos-dependencies
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
@@ -666,3 +671,24 @@ jobs:
           command: make ios-sanitize-thread
       - *show-ccache-stats
       - *save-cache
+
+# ------------------------------------------------------------------------------
+  macos-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-macos-test
+      - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+      - store_artifacts:
+          path: test/fixtures
+          destination: test/fixtures
