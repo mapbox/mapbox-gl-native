@@ -1,6 +1,6 @@
 # Integrating custom builds of the Mapbox iOS SDK into your application
 
-This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://mapbox.com/ios-sdk).
+This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK installation page](https://www.mapbox.com/install/ios/).
 
 ### Requirements
 
@@ -113,7 +113,7 @@ If using the static framework, add `$(inherited)` to your target’s Other Linke
 
 #### Carthage
 
-For instructions on installing stable release versions of the Mapbox iOS SDK with Carthage, see [our website](https://www.mapbox.com/ios-sdk/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
+For instructions on installing stable release versions of the Mapbox iOS SDK with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
 
 ##### Testing pre-releases with Carthage
 
