@@ -46,7 +46,6 @@
   "render-tests/runtime-styling/set-style-paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
   "render-tests/symbol-placement/line": "needs issue",
   "render-tests/text-font/camera-function": "https://github.com/mapbox/mapbox-gl-native/pull/9439",
-  "render-tests/text-keep-upright/line-placement-true-offset": "https://github.com/mapbox/mapbox-gl-native/issues/9271",
   "render-tests/text-pitch-alignment/auto-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-alignment/auto-text-rotation-alignment-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
   "render-tests/text-pitch-alignment/map-text-rotation-alignment-map": "https://github.com/mapbox/mapbox-gl-native/issues/9732",
