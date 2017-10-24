@@ -98,15 +98,8 @@ class MarkerContainer implements Markers {
   @NonNull
   @Override
   public List<Marker> obtainAllIn(@NonNull RectF rectangle) {
-    // convert Rectangle to be density depedent
-    float pixelRatio = nativeMapView.getPixelRatio();
-    RectF rect = new RectF(rectangle.left / pixelRatio,
-      rectangle.top / pixelRatio,
-      rectangle.right / pixelRatio,
-      rectangle.bottom / pixelRatio);
-
+    RectF rect = nativeMapView.getDensityDependantRectangle(rectangle);
     long[] ids = nativeMapView.queryPointAnnotations(rect);
-
     List<Long> idsList = new ArrayList<>(ids.length);
     for (long id : ids) {
       idsList.add(id);

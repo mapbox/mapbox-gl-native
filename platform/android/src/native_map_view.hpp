@@ -197,6 +197,8 @@ public:
 
     jni::Array<jlong> queryPointAnnotations(JNIEnv&, jni::Object<RectF>);
 
+    jni::Array<jlong> queryShapeAnnotations(JNIEnv&, jni::Object<RectF>);
+
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
                                                                    jni::Array<jni::String>,
                                                                    jni::Array<jni::Object<>> jfilter);
