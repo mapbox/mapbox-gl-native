@@ -591,13 +591,6 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 Point<float> tr{box.x2, box.y1 * yStretch};
                 Point<float> bl{box.x1, box.y2 * yStretch};
                 Point<float> br{box.x2, box.y2 * yStretch};
-                tl = util::matrixMultiply(collisionTile.reverseRotationMatrix, tl);
-                tr = util::matrixMultiply(collisionTile.reverseRotationMatrix, tr);
-                bl = util::matrixMultiply(collisionTile.reverseRotationMatrix, bl);
-                br = util::matrixMultiply(collisionTile.reverseRotationMatrix, br);
-
-                const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
-                const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
 
                 static constexpr std::size_t vertexLength = 4;
                 static constexpr std::size_t indexLength = 8;
@@ -609,10 +602,16 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 auto& segment = collisionBox.segments.back();
                 uint16_t index = segment.vertexLength;
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl, maxZoom, placementZoom));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tl));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tr));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
+                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
+
+                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(true, true); // TODO
+                collisionBox.opacityVertices.emplace_back(opacityVertex);
+                collisionBox.opacityVertices.emplace_back(opacityVertex);
+                collisionBox.opacityVertices.emplace_back(opacityVertex);
+                collisionBox.opacityVertices.emplace_back(opacityVertex);
 
                 collisionBox.lines.emplace_back(index + 0, index + 1);
                 collisionBox.lines.emplace_back(index + 1, index + 2);

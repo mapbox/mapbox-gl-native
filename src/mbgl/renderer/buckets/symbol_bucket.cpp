@@ -53,6 +53,7 @@ void SymbolBucket::upload(gl::Context& context) {
 
     if (!collisionBox.vertices.empty()) {
         collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
+        collisionBox.opacityVertexBuffer = context.createVertexBuffer(std::move(collisionBox.opacityVertices), gl::BufferUsage::StreamDraw);
         collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
     }
 

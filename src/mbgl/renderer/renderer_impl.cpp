@@ -366,7 +366,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     Placement placement(parameters.state);
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            bool showCollisionBoxes = false; // TODO
+            bool showCollisionBoxes = true; // TODO
             placement.placeLayer(*it->layer.as<RenderSymbolLayer>(), showCollisionBoxes);
         }
     }
