@@ -204,9 +204,10 @@ Layer* Style::Impl::addLayer(std::unique_ptr<Layer> layer, optional<std::string>
     }
 
     layer->setObserver(this);
+    Layer* result = layers.add(std::move(layer), before);
     observer->onUpdate();
 
-    return layers.add(std::move(layer), before);
+    return result;
 }
 
 std::unique_ptr<Layer> Style::Impl::removeLayer(const std::string& id) {
