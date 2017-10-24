@@ -225,6 +225,15 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             static const style::Properties<>::PossiblyEvaluated properties {};
             static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+            auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
+            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            std::array<float,2> extrudeScale =
+                {{
+                    parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
+                    parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
+                    
+                }};
+            
             parameters.programs.collisionBox.draw(
                 parameters.context,
                 gl::Lines { 1.0f },
@@ -233,13 +242,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
-                    uniforms::u_scale::Value{ std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ)) },
-                    uniforms::u_zoom::Value{ float(parameters.state.getZoom() * 10) },
-                    uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
-                    uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
-                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
-                    uniforms::u_pitch::Value{ parameters.state.getPitch() },
-                    uniforms::u_fadetexture::Value{ 1 }
+                    uniforms::u_extrude_scale::Value{ extrudeScale },
+                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionBox.vertexBuffer,
                 *bucket.collisionBox.indexBuffer,
