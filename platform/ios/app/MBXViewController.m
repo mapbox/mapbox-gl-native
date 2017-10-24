@@ -1909,5 +1909,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     [self.hudLabel setTitle:hudString forState:UIControlStateNormal];
 }
+- (IBAction)addStyle:(id)sender {
+    MGLRasterSource *source = [[MGLRasterSource alloc] initWithIdentifier:@"stamen-watercolor" tileURLTemplates:@[@"https://stamen-tiles.a.ssl.fastly.net/watercolor/{z}/{x}/{y}.jpg"] options:@{MGLTileSourceOptionTileSize:@256}];
+    
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"custom-stamen-watercolor" source:source];
+    
+    rasterLayer.rasterOpacity = [MGLStyleValue valueWithRawValue:@0.4];
+    rasterLayer.visible = YES;
+    
+    [self.mapView.style addSource:source];
+    
+    MGLStyleLayer *water = [self.mapView.style layerWithIdentifier:@"water"];
+    if (water) {
+        [self.mapView.style insertLayer:rasterLayer belowLayer:water];
+    }
+}
 
 @end
