@@ -633,6 +633,26 @@ jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<
     return result;
 }
 
+jni::Array<jlong> NativeMapView::queryShapeAnnotations(JNIEnv &env, jni::Object<RectF> rect) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    // Convert input
+    mbgl::ScreenBox box = {
+         {RectF::getLeft(env, rect),  RectF::getTop(env, rect)},
+         {RectF::getRight(env, rect), RectF::getBottom(env, rect)},
+    };
+
+    mbgl::AnnotationIDs ids = rendererFrontend->queryShapeAnnotations(box);
+
+    // Convert result
+    std::vector<jlong> longIds(ids.begin(), ids.end());
+    auto result = jni::Array<jni::jlong>::New(env, ids.size());
+    result.SetRegion<std::vector<jni::jlong>>(env, 0, longIds);
+
+    return result;
+}
+
 jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
                                                                               jni::Array<jni::String> layerIds,
                                                                               jni::Array<jni::Object<>> jfilter) {
@@ -1000,6 +1020,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getTransitionDelay, "nativeGetTransitionDelay"),
             METHOD(&NativeMapView::setTransitionDelay, "nativeSetTransitionDelay"),
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
+            METHOD(&NativeMapView::queryShapeAnnotations, "nativeQueryShapeAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
             METHOD(&NativeMapView::getLight, "nativeGetLight"),

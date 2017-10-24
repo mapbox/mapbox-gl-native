@@ -468,6 +468,13 @@ final class NativeMapView {
     return nativeQueryPointAnnotations(rect);
   }
 
+  public long[] queryShapeAnnotations(RectF rectF) {
+    if (isDestroyedOn("queryShapeAnnotations")) {
+      return new long[] {};
+    }
+    return nativeQueryShapeAnnotations(rectF);
+  }
+
   public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
     if (isDestroyedOn("addAnnotationIcon")) {
       return;
@@ -825,6 +832,15 @@ final class NativeMapView {
     return pixelRatio;
   }
 
+  RectF getDensityDependantRectangle(final RectF rectangle) {
+    return new RectF(
+      rectangle.left / pixelRatio,
+      rectangle.top / pixelRatio,
+      rectangle.right / pixelRatio,
+      rectangle.bottom / pixelRatio
+    );
+  }
+
   //
   // Callbacks
   //
@@ -926,6 +942,8 @@ final class NativeMapView {
   private native void nativeRemoveAnnotations(long[] id);
 
   private native long[] nativeQueryPointAnnotations(RectF rect);
+
+  private native long[] nativeQueryShapeAnnotations(RectF rect);
 
   private native void nativeAddAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels);
 

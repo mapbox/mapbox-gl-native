@@ -175,8 +175,9 @@ public class MapView extends FrameLayout {
     Markers markers = new MarkerContainer(nativeMapView, this, annotationsArray, iconManager, markerViewManager);
     Polygons polygons = new PolygonContainer(nativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(nativeMapView, annotationsArray);
+    ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
     AnnotationManager annotationManager = new AnnotationManager(nativeMapView, this, annotationsArray,
-      markerViewManager, iconManager, annotations, markers, polygons, polylines);
+      markerViewManager, iconManager, annotations, markers, polygons, polylines, shapeAnnotations);
     Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings,
       cameraChangeDispatcher);
 
