@@ -5071,7 +5071,9 @@ public:
     [self updateCompass];
     
     if (!self.scaleBar.hidden) {
-        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
+        });
     }
     
     if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
