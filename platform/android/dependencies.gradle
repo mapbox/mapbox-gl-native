@@ -35,7 +35,7 @@ ext {
             // support
             supportAnnotations     : "com.android.support:support-annotations:${supportLibVersion}",
             supportAppcompatV7     : "com.android.support:appcompat-v7:${supportLibVersion}",
-            supportV4              : "com.android.support:support-v4:${supportLibVersion}",
+            supportFragmentV4      : "com.android.support:support-fragment:${supportLibVersion}",
             supportDesign          : "com.android.support:design:${supportLibVersion}",
             supportRecyclerView    : "com.android.support:recyclerview-v7:${supportLibVersion}",
 
