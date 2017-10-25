@@ -51,10 +51,16 @@ void SymbolBucket::upload(gl::Context& context) {
         icon.indexBuffer = context.createIndexBuffer(std::move(icon.triangles));
     }
 
-    if (!collisionBox.vertices.empty()) {
+    if (hasCollisionBoxData()) {
         collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
         collisionBox.opacityVertexBuffer = context.createVertexBuffer(std::move(collisionBox.opacityVertices), gl::BufferUsage::StreamDraw);
         collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
+    }
+    
+    if (hasCollisionCircleData()) {
+        collisionCircle.vertexBuffer = context.createVertexBuffer(std::move(collisionCircle.vertices));
+        collisionCircle.opacityVertexBuffer = context.createVertexBuffer(std::move(collisionCircle.opacityVertices), gl::BufferUsage::StreamDraw);
+        collisionCircle.indexBuffer = context.createIndexBuffer(std::move(collisionCircle.triangles));
     }
 
     for (auto& pair : paintPropertyBinders) {
@@ -79,6 +85,10 @@ bool SymbolBucket::hasIconData() const {
 
 bool SymbolBucket::hasCollisionBoxData() const {
     return !collisionBox.segments.empty();
+}
+
+bool SymbolBucket::hasCollisionCircleData() const {
+    return !collisionCircle.segments.empty();
 }
 
 } // namespace mbgl

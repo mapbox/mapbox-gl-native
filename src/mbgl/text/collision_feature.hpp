@@ -11,8 +11,8 @@ namespace mbgl {
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _tileUnitDistanceToAnchor = 0) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), tileUnitDistanceToAnchor(_tileUnitDistanceToAnchor) {}
+    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _tileUnitDistanceToAnchor = 0, float _radius = 0) :
+        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), tileUnitDistanceToAnchor(_tileUnitDistanceToAnchor), radius(_radius) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
@@ -34,11 +34,10 @@ public:
     // Placeholder for center of circles (can be derived from bounding box)
     float px;
     float py;
-    float radius;
     bool used;
 
     float tileUnitDistanceToAnchor;
-
+    float radius;
     
     // TODO Placeholders for old collision tiles
     float maxScale;

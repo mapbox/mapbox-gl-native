@@ -233,7 +233,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
                     
                 }};
-            
             parameters.programs.collisionBox.draw(
                 parameters.context,
                 gl::Lines { 1.0f },
@@ -254,6 +253,41 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.state.getZoom(),
                 getID()
             );
+        }
+        if (bucket.hasCollisionCircleData()) {
+            static const style::Properties<>::PossiblyEvaluated properties {};
+            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+
+            auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
+            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            std::array<float,2> extrudeScale =
+                {{
+                    parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
+                    parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
+                    
+                }};
+
+            parameters.programs.collisionCircle.draw(
+                parameters.context,
+                gl::Triangles(),
+                gl::DepthMode::disabled(),
+                parameters.stencilModeForClipping(tile.clip),
+                parameters.colorModeForRenderPass(),
+                CollisionBoxProgram::UniformValues {
+                    uniforms::u_matrix::Value{ tile.matrix },
+                    uniforms::u_extrude_scale::Value{ extrudeScale },
+                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
+                },
+                *bucket.collisionCircle.vertexBuffer,
+                *bucket.collisionCircle.opacityVertexBuffer,
+                *bucket.collisionCircle.indexBuffer,
+                bucket.collisionCircle.segments,
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom(),
+                getID()
+            );
+
         }
     }
 }

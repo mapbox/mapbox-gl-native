@@ -255,6 +255,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/circle.hpp
     src/mbgl/shaders/collision_box.cpp
     src/mbgl/shaders/collision_box.hpp
+    src/mbgl/shaders/collision_circle.cpp
+    src/mbgl/shaders/collision_circle.hpp
     src/mbgl/shaders/debug.cpp
     src/mbgl/shaders/debug.hpp
     src/mbgl/shaders/extrusion_texture.cpp
