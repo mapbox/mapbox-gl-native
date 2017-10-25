@@ -1,5 +1,10 @@
 
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/check_subtype.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/expression/type.hpp>
+
+#include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/at.hpp>
 #include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/style/expression/assertion.hpp>
@@ -12,13 +17,37 @@
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/match.hpp>
-#include <mbgl/style/expression/type.hpp>
+
 #include <mbgl/style/conversion/get_json_type.hpp>
-#include <mbgl/style/expression/check_subtype.hpp>
 
 namespace mbgl {
 namespace style {
 namespace expression {
+
+bool isConstant(const Expression* expression) {
+    if (dynamic_cast<const Var*>(expression)) {
+        return false;
+    }
+    
+    if (auto compound = dynamic_cast<const CompoundExpressionBase*>(expression)) {
+        if (compound->getName() == "error") {
+            return false;
+        }
+    }
+    
+    bool literalArgs = true;
+    expression->eachChild([&](const Expression* child) {
+        if (!dynamic_cast<const Literal*>(child)) {
+            literalArgs = false;
+        }
+    });
+    if (!literalArgs) {
+        return false;
+    }
+    
+    return isFeatureConstant(expression) &&
+        isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "heatmap-density"}});
+}
 
 ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& value)
 {
@@ -111,6 +140,30 @@ ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& va
         checkType((*parsed)->getType());
         if (errors.size() > 0) {
             return ParseResult();
+        }
+    }
+    
+    // If an expression's arguments are all literals, we can evaluate
+    // it immediately and replace it with a literal value in the
+    // parsed result.
+    if (parsed && !dynamic_cast<Literal *>(parsed->get()) && isConstant(parsed->get())) {
+        EvaluationParameters params(nullptr);
+        EvaluationResult evaluated((*parsed)->evaluate(params));
+        if (!evaluated) {
+            error(evaluated.error().message);
+            return ParseResult();
+        }
+        
+        const type::Type type = (*parsed)->getType();
+        if (type.is<type::Array>()) {
+            // keep the original expression's array type, even if the evaluated
+            // type is more specific.
+            return ParseResult(std::make_unique<Literal>(
+                  type.get<type::Array>(),
+                  evaluated->get<std::vector<Value>>())
+            );
+        } else {
+            return ParseResult(std::make_unique<Literal>(*evaluated));
         }
     }
     
