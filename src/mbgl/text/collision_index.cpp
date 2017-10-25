@@ -25,7 +25,10 @@ namespace mbgl {
 // stability, but it's expensive.
 static const float viewportPadding = 100;
 
-CollisionIndex::CollisionIndex(const TransformState& transformState_) : transformState(transformState_) {
+CollisionIndex::CollisionIndex(const TransformState& transformState_)
+    : transformState(transformState_)
+    , collisionGrid(transformState.getSize().width, transformState.getSize().height, 30)
+    , ignoredGrid(transformState.getSize().width, transformState.getSize().height, 30) {
     pitchFactor = std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance();
 }
 
@@ -49,12 +52,6 @@ float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, 
         (incidenceStretch - 1) * lastSegmentTile * std::abs(std::sin(lastSegmentAngle));
 }
 
-Box CollisionIndex::getTreeBox(const CollisionBox& box) const {
-    return Box{
-        CollisionPoint{ box.px1, box.py1 },
-        CollisionPoint{ box.px2, box.py2 }
-    };
-}
 
 bool CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
@@ -70,13 +67,13 @@ bool CollisionIndex::placeFeature(CollisionFeature& feature,
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
         const float tileToViewport = textPixelRatio * projectedPoint.second;
-        box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
-        box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
-        box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
-        box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
-    
+        GridUnit px1 = box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
+        GridUnit py1 = box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
+        GridUnit px2 = box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
+        GridUnit py2 = box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
+        
         if (!allowOverlap) {
-            if (tree.qbegin(bgi::intersects(getTreeBox(box))) != tree.qend()) {
+            if (collisionGrid.hitTest({{ px1, py1 }, { px2, py2 }})) {
                 return false;
             }
         }
@@ -183,9 +180,13 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         circle.py2 = projectedPoint.y + radius;
         
         circle.used = true;
+        
+        GridUnit px = circle.px = projectedPoint.x;
+        GridUnit py = circle.py = projectedPoint.y;
+        GridUnit r = circle.radius = radius;
 
         if (!allowOverlap) {
-            if (tree.qbegin(bgi::intersects(getTreeBox(circle))) != tree.qend()) {
+            if (collisionGrid.hitTest({{px, py}, r})) {
                 if (!collisionDebug) {
                     return false;
                 } else {
@@ -202,32 +203,119 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
 
 
 void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement) {
-    std::vector<CollisionTreeBox> treeBoxes;
-    for (auto& box : feature.boxes) {
-        treeBoxes.emplace_back(getTreeBox(box), box, feature.indexedFeature);
-    }
-    
-    if (ignorePlacement) {
-        ignoredTree.insert(treeBoxes.begin(), treeBoxes.end());
+    if (feature.alongLine) {
+        for (auto& box : feature.boxes) {
+            GridUnit px = box.px;
+            GridUnit py = box.py;
+            GridUnit radius = box.radius;
+            if (ignorePlacement) {
+                // TODO: revisit whether GridIndex should move vs. copy on insert
+                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px, py }, radius});
+            } else {
+                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px, py }, radius});
+            }
+        }
     } else {
-        tree.insert(treeBoxes.begin(), treeBoxes.end());
+        for (auto& box : feature.boxes) {
+            // TODO: Iteration is vestigial, there should be only one box
+            GridUnit px1 = box.px1;
+            GridUnit py1 = box.py1;
+            GridUnit px2 = box.px2;
+            GridUnit py2 = box.py2;
+            if (ignorePlacement) {
+                // TODO: revisit whether GridIndex should move vs. copy on insert
+                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px1, py1 }, { px2, py2 }});
+            } else {
+                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px1, py1 }, { px2, py2 }});
+            }
+        }
     }
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const float textPixelRatio) const {
+std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID&, const float) const {
     std::vector<IndexedSubfeature> result;
-    if (queryGeometry.empty() || (tree.empty() && ignoredTree.empty())) {
+    if (true || queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
     }
-
+    
+    // TODO: reimplement queryRenderedSymbols
+/*
     mat4 posMatrix;
     transformState.matrixFor(posMatrix, tileID);
 
     GeometryCoordinates polygon;
+    auto minX = std::numeric_limits<GridUnit>::max();
+    auto minY = std::numeric_limits<GridUnit>::max();
+    auto maxX = std::numeric_limits<GridUnit>::min();
+    auto maxY = std::numeric_limits<GridUnit>::min();
+    
     for (const auto& point : queryGeometry) {
         auto projected = projectPoint(posMatrix, convertPoint<float>(point));
+        GridUnit px = projected.x;
+        GridUnit py = projected.y;
+        minX = std::min(minX, px);
+        minY = std::min(minY, py);
+        maxX = std::max(maxX, px);
+        maxY = std::max(maxY, py);
         polygon.push_back(convertPoint<int16_t>(projected));
     }
+    
+    std::vector<IndexedSubfeature> thisTileFeatures;
+    std::vector<IndexedSubfeature> features = collisionGrid.query({{minX, minY}, {maxX, maxY}});
+    // TODO: reimplement "thisTileFeatures" filter
+    // onst tileID = tileCoord.id;
+    for (auto& feature : features) {
+        //if (features[i].tileID === tileID) {
+            thisTileFeatures.push_back(feature);
+        //}
+    }
+    
+    std::vector<IndexedSubfeature> ignoredFeatures = ignoredGrid.query({{minX, minY}, {maxX, maxY}});
+    // TODO: reimplement "thisTileFeatures" filter
+    // onst tileID = tileCoord.id;
+    for (auto& feature : ignoredFeatures) {
+        //if (features[i].tileID === tileID) {
+            thisTileFeatures.push_back(feature);
+        //}
+    }
+
+    for (auto& feature : thisTileFeatures) {
+        for (let i = 0; i < thisTileFeatures.length; i++) {
+            const blocking = collisionBoxArray.get(thisTileFeatures[i]);
+            const sourceLayer = blocking.sourceLayerIndex;
+            const featureIndex = blocking.featureIndex;
+
+            // Skip already seen features.
+            if (sourceLayerFeatures[sourceLayer] === undefined) {
+                sourceLayerFeatures[sourceLayer] = {};
+            }
+            if (sourceLayerFeatures[sourceLayer][featureIndex]) continue;
+
+
+            // Check if query intersects with the feature box
+            // "Collision Circles" for line labels are treated as boxes here
+            // Since there's no actual collision taking place, the circle vs. square
+            // distinction doesn't matter as much, and box geometry is easier
+            // to work with.
+            const projectedPoint = this.projectAndGetPerspectiveRatio(posMatrix, blocking.anchorPointX, blocking.anchorPointY);
+            const tileToViewport = textPixelRatio * projectedPoint.perspectiveRatio;
+            const x1 = blocking.x1 / tileToViewport + projectedPoint.point.x;
+            const y1 = blocking.y1 / tileToViewport + projectedPoint.point.y;
+            const x2 = blocking.x2 / tileToViewport + projectedPoint.point.x;
+            const y2 = blocking.y2 / tileToViewport + projectedPoint.point.y;
+            const bbox = [
+                new Point(x1, y1),
+                new Point(x2, y1),
+                new Point(x2, y2),
+                new Point(x1, y2)
+            ];
+            if (!intersectionTests.polygonIntersectsPolygon(query, bbox)) continue;
+
+            sourceLayerFeatures[sourceLayer][featureIndex] = true;
+            result.push(thisTileFeatures[i]);
+        }
+
+        return result;
 
     // Predicate for ruling out already seen features.
     std::unordered_map<std::string, std::unordered_set<std::size_t>> sourceLayerFeatures;
@@ -256,19 +344,8 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
 
     auto predicates = bgi::satisfies(seenFeature) && bgi::satisfies(intersectsAtScale);
 
-    auto queryTree = [&](const auto& tree_) {
-        for (auto it = tree_.qbegin(predicates); it != tree_.qend(); ++it) {
-            const IndexedSubfeature& feature = std::get<2>(*it);
-            auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName];
-            seenFeatures.insert(feature.index);
-            result.push_back(feature);
-        }
-    };
-
-    queryTree(tree);
-    queryTree(ignoredTree);
-
     return result;
+    */
 }
 
 std::pair<float,float> CollisionIndex::projectAnchor(const mat4& posMatrix, const Point<float>& point) const {

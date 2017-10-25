@@ -34,6 +34,7 @@ public:
     // Placeholder for center of circles (can be derived from bounding box)
     float px;
     float py;
+    float radius;
     bool used;
 
     float tileUnitDistanceToAnchor;
