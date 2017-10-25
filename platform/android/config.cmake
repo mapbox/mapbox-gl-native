@@ -143,6 +143,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/conversion/types_string_values.hpp
     platform/android/src/map/camera_position.cpp
     platform/android/src/map/camera_position.hpp
+    platform/android/src/map/image.cpp
+    platform/android/src/map/image.hpp
 
     # Style conversion Java -> C++
     platform/android/src/style/android_conversion.hpp
