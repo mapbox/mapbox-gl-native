@@ -246,6 +246,12 @@ bool GridIndex<T>::circleAndBoxCollide(const BCircle& circle, const BBox& box) c
     return (dx * dx + dy * dy) <= (circle.radius * circle.radius);
 }
 
+template <class T>
+bool GridIndex<T>::empty() const {
+    return boxElements.empty() && circleElements.empty();
+}
+
+
 template class GridIndex<IndexedSubfeature>;
 
 } // namespace mbgl

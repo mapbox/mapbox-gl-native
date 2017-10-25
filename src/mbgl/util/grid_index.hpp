@@ -70,6 +70,8 @@ public:
     
     bool hitTest(const BBox&) const;
     bool hitTest(const BCircle&) const;
+    
+    bool empty() const;
 
 private:
 
