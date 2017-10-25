@@ -11,7 +11,7 @@
 
 namespace mbgl {
 
-using CollisionBoxAttributes = gl::Attributes<
+using CollisionBoxLayoutAttributes = gl::Attributes<
     attributes::a_pos,
     attributes::a_anchor_pos,
     attributes::a_extrude>;
@@ -27,7 +27,7 @@ struct CollisionBoxOpacityAttributes : gl::Attributes<attributes::a_placed> {
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
     gl::Line,
-    CollisionBoxAttributes,
+    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxOpacityAttributes>,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
@@ -37,8 +37,8 @@ class CollisionBoxProgram : public Program<
 public:
     using Program::Program;
 
-    static LayoutVertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
-        return LayoutVertex {
+    static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
+        return CollisionBoxLayoutAttributes::Vertex {
             {{
                 static_cast<int16_t>(a.x),
                 static_cast<int16_t>(a.y)
@@ -53,6 +53,51 @@ public:
             }}
         };
     }
+
+	template <class DrawMode>
+		void draw(gl::Context& context,
+				DrawMode drawMode,
+				gl::DepthMode depthMode,
+				gl::StencilMode stencilMode,
+				gl::ColorMode colorMode,
+				const UniformValues& uniformValues,
+				const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
+                const gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>& opacityVertexBuffer,
+				const gl::IndexBuffer<DrawMode>& indexBuffer,
+				const SegmentVector<Attributes>& segments,
+				const PaintPropertyBinders& paintPropertyBinders,
+				const typename PaintProperties::PossiblyEvaluated& currentProperties,
+				float currentZoom,
+				const std::string& layerID) {
+			typename AllUniforms::Values allUniformValues = uniformValues
+				.concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+
+			typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
+                .concat(CollisionBoxOpacityAttributes::bindings(opacityVertexBuffer))
+				.concat(paintPropertyBinders.attributeBindings(currentProperties));
+
+			for (auto& segment : segments) {
+				auto vertexArrayIt = segment.vertexArrays.find(layerID);
+
+				if (vertexArrayIt == segment.vertexArrays.end()) {
+					vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+				}
+
+				program.draw(
+						context,
+						std::move(drawMode),
+						std::move(depthMode),
+						std::move(stencilMode),
+						std::move(colorMode),
+						allUniformValues,
+						vertexArrayIt->second,
+						Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+						indexBuffer,
+						segment.indexOffset,
+						segment.indexLength);
+			}
+		}
+
 };
 
 using CollisionBoxVertex = CollisionBoxProgram::LayoutVertex;
