@@ -225,9 +225,6 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
                             CGRectGetMinY(self.frame),
                             size.width,
                             size.height);
-    
-    [self invalidateIntrinsicContentSize];
-    [self setNeedsLayout];
 }
 
 - (void)updateVisibility {
