@@ -90,6 +90,12 @@ module.exports = function (style, options, callback) {
                 applyOperations(operations.slice(1), callback);
             });
 
+        } else if (operation[0] === 'sleep') {
+            // Prefer "wait", which renders until the map is loaded
+            // Use "sleep" when you need to test something that sidesteps the "loaded" logic
+            setTimeout(() => {
+                applyOperations(operations.slice(1), callback);
+            }, operation[1]);
         } else if (operation[0] === 'addImage' || operation[0] === 'updateImage') {
             var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../mapbox-gl-js/test/integration', operation[2])));
             const testOpts = (operation.length > 3) ? operation[3] : {};
