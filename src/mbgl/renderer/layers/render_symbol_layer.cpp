@@ -149,7 +149,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -159,7 +159,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 if (values.hasFill) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -168,7 +168,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
             } else {
                 draw(parameters.programs.symbolIcon,
-                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state),
+                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -202,7 +202,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasHalo) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -212,7 +212,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
