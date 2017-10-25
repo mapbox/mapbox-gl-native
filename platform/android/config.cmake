@@ -74,6 +74,7 @@ macro(mbgl_platform_core)
 
     target_include_directories(mbgl-core
         PUBLIC platform/default
+        PRIVATE platform/android
     )
 
     target_add_mason_package(mbgl-core PUBLIC nunicode)
@@ -344,6 +345,10 @@ macro(mbgl_platform_test)
 
         platform/linux/src/headless_backend_egl.cpp
         platform/linux/src/headless_display_egl.cpp
+    )
+
+    target_include_directories(mbgl-test
+        PRIVATE platform/android
     )
 
     target_compile_options(mbgl-test
