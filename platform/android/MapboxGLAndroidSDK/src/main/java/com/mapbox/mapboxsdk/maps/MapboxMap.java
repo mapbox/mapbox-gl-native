@@ -47,6 +47,7 @@ import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Geometry;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -464,6 +465,13 @@ public final class MapboxMap {
    */
   public void addImage(@NonNull String name, @NonNull Bitmap image) {
     nativeMapView.addImage(name, image);
+  }
+
+  /**
+   * Adds an images to be used in the map's style
+   */
+  public void addImages(@NonNull HashMap<String, Bitmap> images) {
+    nativeMapView.addImages(images);
   }
 
   /**
@@ -1670,9 +1678,9 @@ public final class MapboxMap {
   /**
    * Get a camera position that fits a provided shape with a given bearing and padding.
    *
-   * @param geometry     the geometry to constrain the map with
-   * @param bearing      the bearing at which to compute the geometry's bounds
-   * @param padding      the padding to apply to the bounds
+   * @param geometry the geometry to constrain the map with
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
