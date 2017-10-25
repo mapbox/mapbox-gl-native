@@ -597,7 +597,8 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 const std::size_t indexLength = feature.alongLine ? 4 : 8;
 
                 if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(), bucket.collisionBox.lines.indexSize());
+                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(),
+                      feature.alongLine? bucket.collisionCircle.triangles.indexSize() : bucket.collisionBox.lines.indexSize());
                 }
 
                 auto& segment = collisionBuffer.segments.back();
