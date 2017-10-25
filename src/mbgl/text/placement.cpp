@@ -239,8 +239,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
                 }
             }
         };
-        updateCollisionBox(symbolInstance.textCollisionFeature, symbolInstance.placedText);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, symbolInstance.placedIcon);
+        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.targetOpacity == 1.0);
+        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.targetOpacity == 1.0);
     }
 
     if (bucket.hasTextData()) context.updateVertexBuffer(*bucket.text.opacityVertexBuffer, std::move(bucket.text.opacityVertices));
