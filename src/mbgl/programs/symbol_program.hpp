@@ -333,6 +333,9 @@ public:
             .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
+        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
+                layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
