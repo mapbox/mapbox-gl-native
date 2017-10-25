@@ -32,7 +32,8 @@ public:
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
-                    LineAtlas&);
+                    LineAtlas&,
+                    TimePoint placementCommitTime);
 
     gl::Context& context;
     RendererBackend& backend;
@@ -49,6 +50,8 @@ public:
     MapDebugOptions debugOptions;
     GLContextMode contextMode;
     TimePoint timePoint;
+
+    float symbolFadeChange;
 
     float pixelRatio;
     std::array<float, 2> pixelsToGLUnits;

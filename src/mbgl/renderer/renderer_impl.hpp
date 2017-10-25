@@ -10,6 +10,7 @@
 #include <mbgl/map/zoom_history.hpp>
 #include <mbgl/map/mode.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
+#include <mbgl/text/placement.hpp>
 
 #include <memory>
 #include <string>
@@ -102,6 +103,8 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
+
+    std::unique_ptr<Placement> placement;
 
     bool contextLost = false;
 };

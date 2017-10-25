@@ -27,7 +27,6 @@
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
-#include <mbgl/text/placement.hpp>
 
 namespace mbgl {
 
@@ -254,7 +253,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLight.getEvaluated(),
         *staticData,
         *imageManager,
-        *lineAtlas
+        *lineAtlas,
+        updateParameters.timePoint // TODO set this only when committing placement
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
@@ -363,16 +363,16 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
-    Placement placement(parameters.state);
+    auto newPlacement = std::make_unique<Placement>(parameters.state);
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             bool showCollisionBoxes = true; // TODO
-            placement.placeLayer(*it->layer.as<RenderSymbolLayer>(), showCollisionBoxes);
+            newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), showCollisionBoxes);
         }
     }
 
-    std::unique_ptr<Placement> prevPlacement;
-    placement.commit(std::move(prevPlacement), Clock::now());
+    newPlacement->commit(std::move(placement), parameters.timePoint);
+    placement = std::move(newPlacement);
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -392,7 +392,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            placement.updateLayerOpacities(*it->layer.as<RenderSymbolLayer>(), parameters.context);
+            placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>(), parameters.context);
         }
     }
    
