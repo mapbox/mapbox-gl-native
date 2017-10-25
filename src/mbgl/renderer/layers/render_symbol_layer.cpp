@@ -246,6 +246,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionBox.vertexBuffer,
+                *bucket.collisionBox.opacityVertexBuffer,
                 *bucket.collisionBox.indexBuffer,
                 bucket.collisionBox.segments,
                 paintAttributeData,
