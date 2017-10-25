@@ -77,6 +77,8 @@ public:
                 .concat(CollisionBoxOpacityAttributes::bindings(opacityVertexBuffer))
 				.concat(paintPropertyBinders.attributeBindings(currentProperties));
 
+            assert(layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+
 			for (auto& segment : segments) {
 				auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
