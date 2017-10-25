@@ -19,7 +19,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::array<float, 2> textOffset_,
                                const float iconBoxScale,
                                const float iconPadding,
-                               const SymbolPlacementType iconPlacement,
+                               const SymbolPlacementType, // TODO: vestigial?
                                const std::array<float, 2> iconOffset_,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
@@ -33,7 +33,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line_, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
-    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, iconPlacement, indexedFeature),
+    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, SymbolPlacementType::Point, indexedFeature),
     featureIndex(featureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),

@@ -124,7 +124,7 @@ void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoo
             0 :
             (boxDistanceToAnchor - firstBoxOffset) * 0.8;
 
-        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance);
+        boxes.emplace_back(boxAnchor, boxAnchor - convertPoint<float>(anchorPoint), -boxSize / 2, -boxSize / 2, boxSize / 2, boxSize / 2, paddedAnchorDistance, boxSize / 2);
     }
 }
 
