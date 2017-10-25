@@ -1,10 +1,12 @@
 #pragma once
 
+#include <unordered_set>
 #include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/expression.hpp>
+#include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 
@@ -14,18 +16,13 @@ namespace conversion {
 
 template <class T>
 struct Converter<DataDrivenPropertyValue<T>> {
+
     optional<DataDrivenPropertyValue<T>> operator()(const Convertible& value, Error& error) const {
         if (isUndefined(value)) {
             return DataDrivenPropertyValue<T>();
-        } else if (!isObject(value)) {
-            optional<T> constant = convert<T>(value, error);
-            if (!constant) {
-                return {};
-            }
-            return DataDrivenPropertyValue<T>(*constant);
-        } else if (objectMember(value, "expression")) {
+        } else if (expression::isExpression(value)) {
             optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(
-                *objectMember(value, "expression"),
+                value,
                 error,
                 valueTypeToExpressionType<T>());
             
@@ -44,6 +41,12 @@ struct Converter<DataDrivenPropertyValue<T>> {
             
                 return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
             }
+        } else if (!isObject(value)) {
+            optional<T> constant = convert<T>(value, error);
+            if (!constant) {
+                return {};
+            }
+            return DataDrivenPropertyValue<T>(*constant);
         } else if (!objectMember(value, "property")) {
             optional<CameraFunction<T>> function = convert<CameraFunction<T>>(value, error);
             if (!function) {
