@@ -125,10 +125,12 @@ void Placement::placeLayerBucket(
                 placeIcon = placeText && placeIcon;
             }
 
+            symbolInstance.placedText = placeText;
             if (placeText) {
                 collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<TextIgnorePlacement>());
             }
 
+            symbolInstance.placedIcon = placeIcon;
             if (placeIcon) {
                 collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
             }
@@ -196,6 +198,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
     // TODO check if this clear is necessary, whether the vector has been moved out
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
+    if (bucket.hasCollisionBoxData()) bucket.collisionBox.opacityVertices.clear();
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         auto opacityState = getOpacity(symbolInstance.crossTileID);
@@ -218,10 +221,24 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
             }
         }
+        
+        auto updateCollisionBox = [&](const auto& feature, const bool placed) {
+            for (size_t i = 0; i < feature.boxes.size(); i++) {
+                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false); // TODO
+                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+
+            }
+        };
+        updateCollisionBox(symbolInstance.textCollisionFeature, symbolInstance.placedText);
+        updateCollisionBox(symbolInstance.iconCollisionFeature, symbolInstance.placedIcon);
     }
 
     if (bucket.hasTextData()) context.updateVertexBuffer(*bucket.text.opacityVertexBuffer, std::move(bucket.text.opacityVertices));
     if (bucket.hasIconData()) context.updateVertexBuffer(*bucket.icon.opacityVertexBuffer, std::move(bucket.icon.opacityVertices));
+    if (bucket.hasCollisionBoxData()) context.updateVertexBuffer(*bucket.collisionBox.opacityVertexBuffer, std::move(bucket.collisionBox.opacityVertices));
 }
 
 JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
