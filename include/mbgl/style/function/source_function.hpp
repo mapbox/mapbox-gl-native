@@ -41,7 +41,7 @@ public:
           stops(std::move(stops_)),
           defaultValue(std::move(defaultValue_)),
           expression(stops.match([&] (const auto& s) {
-            return expression::Convert::toExpression(property, s, defaultValue);
+            return expression::Convert::toExpression(property, s);
           }))
     {}
 
@@ -50,9 +50,9 @@ public:
         const expression::EvaluationResult result = expression->evaluate(expression::EvaluationParameters(&feature));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
-            return typed ? *typed : finalDefaultValue;
+            return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
         }
-        return finalDefaultValue;
+        return defaultValue ? *defaultValue : finalDefaultValue;
     }
 
     friend bool operator==(const SourceFunction& lhs,
