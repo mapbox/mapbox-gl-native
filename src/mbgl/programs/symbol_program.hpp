@@ -386,7 +386,8 @@ public:
                                        const std::array<float, 2>& pixelsToGLUnits,
                                        const bool alongLine,
                                        const RenderTile&,
-                                       const TransformState&);
+                                       const TransformState&,
+                                       const float symbolFadeChange);
 };
 
 enum class SymbolSDFPart {
@@ -454,6 +455,7 @@ public:
                                        const bool alongLine,
                                        const RenderTile&,
                                        const TransformState&,
+                                       const float SymbolFadeChange,
                                        const SymbolSDFPart);
 };
 

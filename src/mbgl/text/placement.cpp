@@ -11,7 +11,7 @@ namespace mbgl {
 OpacityState::OpacityState(float targetOpacity_) : opacity(0), targetOpacity(targetOpacity_) {}
 
 OpacityState::OpacityState(OpacityState& prevState, float increment, float targetOpacity) :
-    opacity(std::fmax(0, std::fmin(1, prevState.opacity + prevState.targetOpacity == 1.0 ? increment : -increment))),
+    opacity(std::fmax(0, std::fmin(1, prevState.opacity + (prevState.targetOpacity == 1.0 ? increment : -increment)))),
     targetOpacity(targetOpacity) {}
 
 bool OpacityState::isHidden() const {
@@ -155,8 +155,7 @@ void Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) 
         }
 
     } else {
-        const Duration symbolFadeDuration(300);
-        float increment = (commitTime - prevPlacement->commitTime) / symbolFadeDuration;
+        float increment = std::chrono::duration<float>(commitTime - prevPlacement->commitTime) / Duration(std::chrono::milliseconds(300));
 
         // add the opacities from the current placement, and copy their current values from the previous placement
         for (auto& placementPair : placements) {
