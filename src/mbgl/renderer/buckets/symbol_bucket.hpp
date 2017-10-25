@@ -103,13 +103,12 @@ public:
     } icon;
 
     struct CollisionBoxBuffer {
-        gl::VertexVector<CollisionBoxVertex> vertices;
+        gl::VertexVector<CollisionBoxLayoutAttributes::Vertex> vertices;
         gl::VertexVector<CollisionBoxOpacityAttributes::Vertex> opacityVertices;
         gl::IndexVector<gl::Lines> lines;
-        SegmentVector<CollisionBoxAttributes> segments;
+        SegmentVector<CollisionBoxProgram::Attributes> segments;
 
-        optional<gl::VertexBuffer<CollisionBoxVertex>> vertexBuffer;
-        optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
+        optional<gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>> vertexBuffer;
         optional<gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>> opacityVertexBuffer;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
