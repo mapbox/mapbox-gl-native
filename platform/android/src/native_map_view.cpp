@@ -49,6 +49,7 @@
 #include "java/util.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include  "map/image.hpp"
 #include "style/light.hpp"
 #include "bitmap_factory.hpp"
 
@@ -924,6 +925,18 @@ void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::ji
         float(scale)));
 }
 
+void NativeMapView::addImages(JNIEnv& env, jni::Array<jni::Object<mbgl::android::Image>> jimages) {
+    jni::NullCheck(env, &jimages);
+    std::size_t len = jimages.Length(env);
+
+    for (std::size_t i = 0; i < len; i++) {
+        jni::Object<mbgl::android::Image> jimage = jimages.Get(env, i);
+        auto image = mbgl::android::Image::getImage(env, jimage);
+        map->getStyle().addImage(std::make_unique<mbgl::style::Image>(image));
+        jni::DeleteLocalRef(env, jimage);
+    }
+}
+
 void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
     map->getStyle().removeImage(jni::Make<std::string>(env, name));
 }
@@ -1038,6 +1051,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeSourceById, "nativeRemoveSourceById"),
             METHOD(&NativeMapView::removeSource, "nativeRemoveSource"),
             METHOD(&NativeMapView::addImage, "nativeAddImage"),
+            METHOD(&NativeMapView::addImages, "nativeAddImages"),
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
             METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),
