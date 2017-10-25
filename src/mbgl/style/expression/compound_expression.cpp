@@ -212,6 +212,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(
             [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
+            [](const std::string& s) -> Result<std::string> { return s; }, // avoid quoting
             [](const auto& v) -> Result<std::string> { return stringify(v); }
         );
     });
@@ -360,6 +361,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("/", [](double a, double b) -> Result<double> { return a / b; });
     define("%", [](double a, double b) -> Result<double> { return fmod(a, b); });
     define("^", [](double a, double b) -> Result<double> { return pow(a, b); });
+    define("sqrt", [](double x) -> Result<double> { return sqrt(x); });
     define("log10", [](double x) -> Result<double> { return log10(x); });
     define("ln", [](double x) -> Result<double> { return log(x); });
     define("log2", [](double x) -> Result<double> { return log2(x); });
