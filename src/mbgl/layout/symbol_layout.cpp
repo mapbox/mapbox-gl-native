@@ -607,7 +607,7 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
                 collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
 
-                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(true, true); // TODO
+                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(true, false); // TODO
                 collisionBox.opacityVertices.emplace_back(opacityVertex);
                 collisionBox.opacityVertices.emplace_back(opacityVertex);
                 collisionBox.opacityVertices.emplace_back(opacityVertex);
