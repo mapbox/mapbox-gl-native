@@ -23,7 +23,10 @@ template<> struct Converter<std::unique_ptr<Expression>> {
             if (combinedError.size() > 0) {
                 combinedError += "\n";
             }
-            combinedError += parsingError.key + ": " + parsingError.message;
+            if (parsingError.key.size() > 0) {
+                combinedError += parsingError.key + ": ";
+            }
+            combinedError += parsingError.message;
         }
         error = { combinedError };
         return {};

@@ -29,16 +29,21 @@ struct Converter<DataDrivenPropertyValue<T>> {
             if (!expression) {
                 return {};
             }
-            if (isFeatureConstant(expression->get())) {
-                return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
-            } else if (isZoomConstant(expression->get())) {
-                return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
-            } else {
-                if (!CompositeFunction<T>::Curve::findZoomCurve(expression->get())) {
+            
+            bool zoomConstant = isZoomConstant(expression->get());
+            
+            if (!zoomConstant) {
+                if (!CameraFunction<T>::Curve::findZoomCurve(expression->get())) {
                     error = { R"("zoom" expression may only be used as input to a top-level "curve" expression.)" };
                     return {};
                 }
+            }
             
+            if (isFeatureConstant(expression->get())) {
+                return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
+            } else if (zoomConstant) {
+                return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
+            } else {
                 return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
             }
         } else if (!isObject(value)) {

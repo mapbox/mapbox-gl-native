@@ -181,7 +181,8 @@ ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, Parsin
         *outputType != type::Color &&
         !(
             outputType->is<type::Array>() &&
-            outputType->get<type::Array>().itemType == type::Number
+            outputType->get<type::Array>().itemType == type::Number &&
+            outputType->get<type::Array>().N
         )
     )
     {

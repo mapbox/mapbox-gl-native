@@ -7,6 +7,7 @@
 #include <mbgl/style/conversion/expression.hpp>
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/expression/is_expression.hpp>
 
 namespace mbgl {
 namespace style {
@@ -17,15 +18,15 @@ struct Converter<PropertyValue<T>> {
     optional<PropertyValue<T>> operator()(const Convertible& value, Error& error) const {
         if (isUndefined(value)) {
             return PropertyValue<T>();
-        } else if (isObject(value) && objectMember(value, "expression")) {
-            optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(*objectMember(value, "expression"), error, valueTypeToExpressionType<T>());
+        } else if (isExpression(value)) {
+            optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(value, error, valueTypeToExpressionType<T>());
             if (!expression) {
                 return {};
             }
             if (isFeatureConstant(expression->get())) {
                 return { CameraFunction<T>(std::move(*expression)) };
             } else {
-                error = { "data-driven style property not supported " };
+                error = { "property expressions not supported" };
                 return {};
             }
         } else if (isObject(value)) {
