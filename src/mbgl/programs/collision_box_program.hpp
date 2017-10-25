@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/collision_box.hpp>
+#include <mbgl/shaders/collision_circle.hpp>
 #include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
@@ -97,6 +98,83 @@ public:
 						segment.indexLength);
 			}
 		}
+
+};
+
+
+class CollisionCircleProgram : public Program<
+    shaders::collision_circle,
+    gl::Triangle,
+    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxOpacityAttributes>,
+    gl::Uniforms<
+        uniforms::u_matrix,
+        uniforms::u_extrude_scale,
+        uniforms::u_camera_to_center_distance>,
+    style::Properties<>>
+{
+public:
+    using Program::Program;
+
+    static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
+        return CollisionBoxLayoutAttributes::Vertex {
+            {{
+                static_cast<int16_t>(a.x),
+                static_cast<int16_t>(a.y)
+            }},
+            {{
+                static_cast<int16_t>(anchor.x),
+                static_cast<int16_t>(anchor.y)
+            }},
+            {{
+                static_cast<int16_t>(::round(o.x)),
+                static_cast<int16_t>(::round(o.y))
+            }}
+        };
+    }
+
+    template <class DrawMode>
+        void draw(gl::Context& context,
+                DrawMode drawMode,
+                gl::DepthMode depthMode,
+                gl::StencilMode stencilMode,
+                gl::ColorMode colorMode,
+                const UniformValues& uniformValues,
+                const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
+                const gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>& opacityVertexBuffer,
+                const gl::IndexBuffer<DrawMode>& indexBuffer,
+                const SegmentVector<Attributes>& segments,
+                const PaintPropertyBinders& paintPropertyBinders,
+                const typename PaintProperties::PossiblyEvaluated& currentProperties,
+                float currentZoom,
+                const std::string& layerID) {
+            typename AllUniforms::Values allUniformValues = uniformValues
+                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+
+            typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
+                .concat(CollisionBoxOpacityAttributes::bindings(opacityVertexBuffer))
+                .concat(paintPropertyBinders.attributeBindings(currentProperties));
+
+            for (auto& segment : segments) {
+                auto vertexArrayIt = segment.vertexArrays.find(layerID);
+
+                if (vertexArrayIt == segment.vertexArrays.end()) {
+                    vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+                }
+
+                program.draw(
+                        context,
+                        std::move(drawMode),
+                        std::move(depthMode),
+                        std::move(stencilMode),
+                        std::move(colorMode),
+                        allUniformValues,
+                        vertexArrayIt->second,
+                        Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                        indexBuffer,
+                        segment.indexOffset,
+                        segment.indexLength);
+            }
+        }
 
 };
 

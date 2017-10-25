@@ -199,6 +199,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.opacityVertices.clear();
+    if (bucket.hasCollisionCircleData()) bucket.collisionCircle.opacityVertices.clear();
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         auto opacityState = getOpacity(symbolInstance.crossTileID);
@@ -223,13 +224,20 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
         }
         
         auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-            for (size_t i = 0; i < feature.boxes.size(); i++) {
-                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false); // TODO
-                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-
+            for (const CollisionBox& box : feature.boxes) {
+                if (feature.alongLine) {
+                   auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                } else {
+                    auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                }
             }
         };
         updateCollisionBox(symbolInstance.textCollisionFeature, symbolInstance.placedText);
@@ -239,6 +247,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
     if (bucket.hasTextData()) context.updateVertexBuffer(*bucket.text.opacityVertexBuffer, std::move(bucket.text.opacityVertices));
     if (bucket.hasIconData()) context.updateVertexBuffer(*bucket.icon.opacityVertexBuffer, std::move(bucket.icon.opacityVertices));
     if (bucket.hasCollisionBoxData()) context.updateVertexBuffer(*bucket.collisionBox.opacityVertexBuffer, std::move(bucket.collisionBox.opacityVertices));
+    if (bucket.hasCollisionCircleData()) context.updateVertexBuffer(*bucket.collisionCircle.opacityVertexBuffer, std::move(bucket.collisionCircle.opacityVertices));
 }
 
 JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {

@@ -58,6 +58,7 @@ public:
     bool hasTextData() const;
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
+    bool hasCollisionCircleData() const;
 
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
@@ -102,16 +103,24 @@ public:
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } icon;
 
-    struct CollisionBoxBuffer {
+    struct CollisionBuffer {
         gl::VertexVector<CollisionBoxLayoutAttributes::Vertex> vertices;
         gl::VertexVector<CollisionBoxOpacityAttributes::Vertex> opacityVertices;
-        gl::IndexVector<gl::Lines> lines;
         SegmentVector<CollisionBoxProgram::Attributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>> vertexBuffer;
         optional<gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>> opacityVertexBuffer;
+    };
+
+    struct CollisionBoxBuffer : public CollisionBuffer {
+        gl::IndexVector<gl::Lines> lines;
         optional<gl::IndexBuffer<gl::Lines>> indexBuffer;
     } collisionBox;
+    
+    struct CollisionCircleBuffer : public CollisionBuffer {
+        gl::IndexVector<gl::Triangles> triangles;
+        optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
+    } collisionCircle;
 };
 
 } // namespace mbgl

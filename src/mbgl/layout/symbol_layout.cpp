@@ -580,10 +580,11 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
 
     const float yStretch = collisionTile.yStretch;
 
-    auto& collisionBox = bucket.collisionBox;
-
     for (const SymbolInstance &symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature) {
+            SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionBox);
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
@@ -593,30 +594,35 @@ void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket&
                 Point<float> br{box.x2, box.y2 * yStretch};
 
                 static constexpr std::size_t vertexLength = 4;
-                static constexpr std::size_t indexLength = 8;
+                const std::size_t indexLength = feature.alongLine ? 4 : 8;
 
-                if (collisionBox.segments.empty() || collisionBox.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBox.segments.emplace_back(collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize());
+                if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(), bucket.collisionBox.lines.indexSize());
                 }
 
-                auto& segment = collisionBox.segments.back();
+                auto& segment = collisionBuffer.segments.back();
                 uint16_t index = segment.vertexLength;
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tl));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tr));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tl));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tr));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
 
                 auto opacityVertex = CollisionBoxOpacityAttributes::vertex(true, false); // TODO
-                collisionBox.opacityVertices.emplace_back(opacityVertex);
-                collisionBox.opacityVertices.emplace_back(opacityVertex);
-                collisionBox.opacityVertices.emplace_back(opacityVertex);
-                collisionBox.opacityVertices.emplace_back(opacityVertex);
+                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
+                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
+                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
+                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
 
-                collisionBox.lines.emplace_back(index + 0, index + 1);
-                collisionBox.lines.emplace_back(index + 1, index + 2);
-                collisionBox.lines.emplace_back(index + 2, index + 3);
-                collisionBox.lines.emplace_back(index + 3, index + 0);
+                if (feature.alongLine) {
+                    bucket.collisionCircle.triangles.emplace_back(index, index + 1, index + 2);
+                    bucket.collisionCircle.triangles.emplace_back(index, index + 2, index + 3);
+                } else {
+                    bucket.collisionBox.lines.emplace_back(index + 0, index + 1);
+                    bucket.collisionBox.lines.emplace_back(index + 1, index + 2);
+                    bucket.collisionBox.lines.emplace_back(index + 2, index + 3);
+                    bucket.collisionBox.lines.emplace_back(index + 3, index + 0);
+                }
 
                 segment.vertexLength += vertexLength;
                 segment.indexLength += indexLength;
