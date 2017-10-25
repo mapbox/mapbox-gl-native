@@ -2,12 +2,11 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.support.v7.app.AppCompatActivity;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +31,7 @@ import com.mapbox.services.commons.geojson.custom.PositionDeserializer;
 import com.mapbox.services.commons.models.Position;
 
 import java.io.IOException;
-
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -81,6 +80,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       mapboxMap.addSource(source);
 
       // for each feature add a symbolLayer
+      HashMap<String, Bitmap> imagesMap = new HashMap<>();
       for (Feature feature : featureCollection.getFeatures()) {
         String countryName = feature.getStringProperty(FEATURE_ID);
 
@@ -91,9 +91,11 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         textView.setTextColor(Color.WHITE);
         textView.setText(countryName);
 
-        // create bitmap from view
-        mapboxMap.addImage(countryName, SymbolGenerator.generate(textView));
+        Bitmap bitmap = SymbolGenerator.generate(textView);
+        imagesMap.put(countryName, bitmap);
       }
+
+      mapboxMap.addImages(imagesMap);
 
       // create layer use
       mapboxMap.addLayer(new SymbolLayer(LAYER_ID, SOURCE_ID)

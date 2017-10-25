@@ -34,7 +34,9 @@ import com.mapbox.services.commons.geojson.Geometry;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -746,6 +748,7 @@ final class NativeMapView {
     if (isDestroyedOn("addImage")) {
       return;
     }
+
     // Check/correct config
     if (image.getConfig() != Bitmap.Config.ARGB_8888) {
       image = image.copy(Bitmap.Config.ARGB_8888, false);
@@ -754,12 +757,42 @@ final class NativeMapView {
     // Get pixels
     ByteBuffer buffer = ByteBuffer.allocate(image.getByteCount());
     image.copyPixelsToBuffer(buffer);
+    byte[] byteArray = buffer.array();
 
     // Determine pixel ratio
     float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
     float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
 
-    nativeAddImage(name, image.getWidth(), image.getHeight(), pixelRatio, buffer.array());
+    nativeAddImage(name, image.getWidth(), image.getHeight(), pixelRatio, byteArray);
+  }
+
+  public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
+    if (isDestroyedOn("addImages")) {
+      return;
+    }
+
+    String name;
+    Bitmap bitmap;
+
+    List<Image> images = new ArrayList<>();
+    for (Map.Entry<String, Bitmap> stringBitmapEntry : bitmapHashMap.entrySet()) {
+      name = stringBitmapEntry.getKey();
+      bitmap = stringBitmapEntry.getValue();
+
+      if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+        bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+      }
+
+      ByteBuffer buffer = ByteBuffer.allocate(bitmap.getByteCount());
+      bitmap.copyPixelsToBuffer(buffer);
+
+      float density = bitmap.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : bitmap.getDensity();
+      float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
+
+      images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight()));
+    }
+
+    nativeAddImages(images.toArray(new Image[images.size()]));
   }
 
   public void removeImage(String name) {
@@ -1005,6 +1038,8 @@ final class NativeMapView {
 
   private native void nativeAddImage(String name, int width, int height, float pixelRatio,
                                      byte[] array);
+
+  private native void nativeAddImages(Image[] images);
 
   private native void nativeRemoveImage(String name);
 
