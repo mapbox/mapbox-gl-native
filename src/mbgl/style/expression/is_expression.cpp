@@ -9,24 +9,25 @@ bool isExpression(const conversion::Convertible& value) {
     using namespace mbgl::style::conversion;
     
     static std::unordered_set<std::string> specialForms = {
+        "all",
+        "any",
+        "array",
+        "at",
+        "boolean",
+        "case",
+        "coalesce",
+        "color",
+        "curve",
+        "let",
         "literal",
         "match",
-        "curve",
-        "coalesce",
-        "array",
-        "let",
-        "var",
-        "at",
-        "string",
         "number",
-        "color",
-        "boolean",
-        "to-string",
-        "to-number",
-        "to-color",
+        "string",
         "to-boolean",
-        "any",
-        "all"
+        "to-color",
+        "to-number",
+        "to-string",
+        "var",
     };
 
     if (!isArray(value) || arrayLength(value) == 0) return false;
