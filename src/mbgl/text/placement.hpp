@@ -61,8 +61,9 @@ namespace mbgl {
             TransformState state;
             TimePoint commitTime;
 
-            uint32_t maxCrossTileID = 0;
+            static uint32_t maxCrossTileID; // TODO remove
             std::unordered_map<uint32_t,PlacementPair> placements;
             std::unordered_map<uint32_t,JointOpacityState> opacities;
     };
+
 } // namespace mbgl

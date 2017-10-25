@@ -27,10 +27,13 @@ JointOpacityState::JointOpacityState(JointOpacityState& prevOpacityState, float 
     text(OpacityState(prevOpacityState.text, increment, textOpacity)) {}
 
 
+uint32_t Placement::maxCrossTileID = 0;
+
 Placement::Placement(const TransformState& state_) : collisionIndex(state_), state(state_) {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, bool showCollisionBoxes) {
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
+
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
@@ -83,11 +86,15 @@ void Placement::placeLayerBucket(
 
     for (auto& symbolInstance : bucket.symbolInstances) {
 
+        // TODO symbollayout handles a couple special cases related to this. copy those over if needed.
+        auto anchor = symbolInstance.anchor;
+        const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
+        if (!withinPlus0) continue;
 
         bool placeText = false;
         bool placeIcon = false;
 
-        if (!symbolInstance.isDuplicate) {
+        if (true || !symbolInstance.isDuplicate) {
 
             if (symbolInstance.placedTextIndices.size()) {
                 assert(symbolInstance.placedTextIndices.size() != 0);
@@ -157,6 +164,7 @@ void Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) 
     } else {
         float increment = std::chrono::duration<float>(commitTime - prevPlacement->commitTime) / Duration(std::chrono::milliseconds(300));
 
+        if (increment) {}
         // add the opacities from the current placement, and copy their current values from the previous placement
         for (auto& placementPair : placements) {
             auto prevOpacity = prevPlacement->opacities.find(placementPair.first);
