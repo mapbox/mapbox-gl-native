@@ -211,20 +211,26 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
 
         // TODO check if hasText is the right thing here, or if there are cases where hasText is true but it's not added to the buffers
         if (symbolInstance.hasText) {
-            // TODO mark PlacedSymbols as hidden so that they don't need to be projected at render time
             auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
             for (size_t i = 0; i < symbolInstance.glyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
+            // TODO On JS we avoid setting this if it hasn't chnaged, but it may be cheap enough here we don't care
+            for (auto index : symbolInstance.placedTextIndices) {
+                bucket.text.placedSymbols[index].hidden = opacityState.isHidden();
+            }
         }
         if (symbolInstance.hasIcon) {
-            // TODO mark PlacedSymbols as hidden so that they don't need to be projected at render time
             auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.icon.placed, opacityState.icon.opacity);
             if (symbolInstance.iconQuad) {
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
+            }
+            // TODO On JS we avoid setting this if it hasn't chnaged, but it may be cheap enough here we don't care
+            for (auto index : symbolInstance.placedIconIndices) {
+                bucket.icon.placedSymbols[index].hidden = opacityState.isHidden();
             }
         }
         
