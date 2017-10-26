@@ -6,6 +6,12 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
+## 5.2.0-beta.3 - October 26, 2017
+
+- Reorganize dependencies [#10268](https://github.com/mapbox/mapbox-gl-native/pull/10268)
+- Blacklist VAO usage on adreno 3xx [#10291](https://github.com/mapbox/mapbox-gl-native/pull/10291)
+- On stop null check [#10259](https://github.com/mapbox/mapbox-gl-native/pull/10259)
+
 ## 5.2.0-beta.2 - October 19, 2017
 
 - Wire up MapZoomButtonController with camera change events [#10221](https://github.com/mapbox/mapbox-gl-native/pull/10221)
