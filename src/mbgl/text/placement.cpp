@@ -186,7 +186,7 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
     return placementChanged;
 }
 
-void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer, gl::Context& context) {
+void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
         if (!renderTile.tile.isRenderable()) {
             continue;
@@ -195,11 +195,11 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer, gl::Context
         auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
-        updateBucketOpacities(symbolBucket, context);
+        updateBucketOpacities(symbolBucket);
     }
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context) {
+void Placement::updateBucketOpacities(SymbolBucket& bucket) {
     // TODO check if this clear is necessary, whether the vector has been moved out
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
@@ -249,10 +249,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
         updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
     }
 
-    if (bucket.hasTextData()) context.updateVertexBuffer(*bucket.text.opacityVertexBuffer, std::move(bucket.text.opacityVertices));
-    if (bucket.hasIconData()) context.updateVertexBuffer(*bucket.icon.opacityVertexBuffer, std::move(bucket.icon.opacityVertices));
-    if (bucket.hasCollisionBoxData()) context.updateVertexBuffer(*bucket.collisionBox.opacityVertexBuffer, std::move(bucket.collisionBox.opacityVertices));
-    if (bucket.hasCollisionCircleData()) context.updateVertexBuffer(*bucket.collisionCircle.opacityVertexBuffer, std::move(bucket.collisionCircle.opacityVertices));
+    bucket.updateOpacity();
 }
 
 JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
