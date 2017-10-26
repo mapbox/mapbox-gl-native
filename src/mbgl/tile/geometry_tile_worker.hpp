@@ -35,7 +35,6 @@ public:
 
     void setLayers(std::vector<Immutable<style::Layer::Impl>>, uint64_t correlationID);
     void setData(std::unique_ptr<const GeometryTileData>, uint64_t correlationID);
-    void setPlacementConfig(PlacementConfig, uint64_t correlationID);
     
     void onGlyphsAvailable(GlyphMap glyphs);
     void onImagesAvailable(ImageMap images, uint64_t imageCorrelationID);
@@ -75,7 +74,6 @@ private:
     // Outer optional indicates whether we've received it or not.
     optional<std::vector<Immutable<style::Layer::Impl>>> layers;
     optional<std::unique_ptr<const GeometryTileData>> data;
-    optional<PlacementConfig> placementConfig;
 
     bool symbolLayoutsNeedPreparation = false;
     std::vector<std::unique_ptr<SymbolLayout>> symbolLayouts;
