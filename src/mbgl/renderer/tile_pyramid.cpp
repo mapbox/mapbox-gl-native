@@ -5,7 +5,6 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/text/placement_config.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/enum.hpp>
@@ -193,13 +192,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     }
 
     for (auto& pair : tiles) {
-        const PlacementConfig config { parameters.transformState.getAngle(),
-                                       parameters.transformState.getPitch(),
-                                       parameters.transformState.getCameraToCenterDistance(),
-                                       parameters.transformState.getCameraToTileDistance(pair.first.toUnwrapped()),
-                                       parameters.debugOptions & MapDebugOptions::Collision };
-
-        pair.second->setPlacementConfig(config);
+        pair.second->setShowCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision);
     }
 }
 

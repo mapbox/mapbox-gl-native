@@ -413,7 +413,7 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
     return tileDistances;
 }
 
-std::unique_ptr<SymbolBucket> SymbolLayout::place() {
+std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, symbolInstances);
 
     // Calculate which labels can be shown and when they can be shown and
@@ -470,7 +470,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place() {
         }
     }
 
-    if (true) { // TODO: hook up showCollisionBoxes
+    if (showCollisionBoxes) {
         addToDebugBuffers(*bucket);
     }
 

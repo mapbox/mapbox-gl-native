@@ -2,8 +2,6 @@
 
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/text/collision_feature.hpp>
-#include <mbgl/text/placement_config.hpp>
-#include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/map/transform_state.hpp>
 

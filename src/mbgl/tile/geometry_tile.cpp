@@ -32,7 +32,7 @@ using namespace style;
 
    GeometryTile's 'correlationID' is used for ensuring the tile will be flagged
    as non-pending only when the placement coming from the last operation (as in
-   'setData', 'setLayers',  'setPlacementConfig') occurs. This is important for
+   'setData', 'setLayers',  'setShowCollisionBoxes') occurs. This is important for
    still mode rendering as we want to render only when all layout and placement
    operations are completed.
 
@@ -53,10 +53,12 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              id_,
              obsolete,
              parameters.mode,
-             parameters.pixelRatio),
+             parameters.pixelRatio,
+             parameters.debugOptions & MapDebugOptions::Collision),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
-      mode(parameters.mode) {
+      mode(parameters.mode),
+      showCollisionBoxes(parameters.debugOptions & MapDebugOptions::Collision) {
 }
 
 GeometryTile::~GeometryTile() {
@@ -111,6 +113,14 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
 
     ++correlationID;
     worker.invoke(&GeometryTileWorker::setLayers, std::move(impls), correlationID);
+}
+
+void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
+    if (showCollisionBoxes != showCollisionBoxes_) {
+       showCollisionBoxes = showCollisionBoxes_;
+       ++correlationID;
+        worker.invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
+    }
 }
 
 void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
