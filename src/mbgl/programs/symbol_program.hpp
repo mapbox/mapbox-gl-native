@@ -87,9 +87,9 @@ struct SymbolDynamicLayoutAttributes : gl::Attributes<attributes::a_projected_po
 };
 
 struct SymbolOpacityAttributes : gl::Attributes<attributes::a_fade_opacity> {
-    static Vertex vertex(float targetOpacity, float opacity) {
+    static Vertex vertex(bool placed, float opacity) {
         return Vertex {
-            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(targetOpacity == 1.0 ? 1 : 0)) }}
+            {{ static_cast<uint8_t>((static_cast<uint8_t>(opacity * 127) << 1) | static_cast<uint8_t>(placed)) }}
         };
     }
 };
