@@ -104,9 +104,41 @@ bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
 }
 
 template <class T>
+bool GridIndex<T>::noIntersection(const BBox& query) const {
+    return query.max.x < 0 || query.min.x > width || query.max.y < 0 || query.min.y > height;
+}
+
+template <class T>
+bool GridIndex<T>::completeIntersection(const BBox& query) const {
+    return query.min.x <= 0 && query.min.y <= 0 && width <= query.max.x && height <= query.max.y;
+}
+
+template <class T>
+typename GridIndex<T>::BBox GridIndex<T>::convertToBox(const BCircle& circle) const {
+    return BBox{{circle.center.x - circle.radius, circle.center.y - circle.radius},
+                {circle.center.x + circle.radius, circle.center.y + circle.radius}};
+}
+
+template <class T>
 void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
+    
+    if (noIntersection(queryBBox)) {
+        return;
+    } else if (completeIntersection(queryBBox)) {
+        // TODO: std::for_each?
+        for (auto& element : boxElements) {
+            if (resultFn(element.first)) {
+                return;
+            };
+        }
+        for (auto& element : circleElements) {
+            if (resultFn(element.first)) {
+                return;
+            };
+        }
+    }
 
     auto cx1 = convertToXCellCoord(queryBBox.min.x);
     auto cy1 = convertToYCellCoord(queryBBox.min.y);
@@ -154,6 +186,23 @@ template <class T>
 void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const T&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
+
+    BBox queryBBox = convertToBox(queryBCircle);
+    if (noIntersection(queryBBox)) {
+        return;
+    } else if (completeIntersection(queryBBox)) {
+        // TODO: std::for_each?
+        for (auto& element : boxElements) {
+            if (resultFn(element.first)) {
+                return;
+            };
+        }
+        for (auto& element : circleElements) {
+            if (resultFn(element.first)) {
+                return;
+            };
+        }
+    }
 
     auto cx1 = convertToXCellCoord(queryBCircle.center.x - queryBCircle.radius);
     auto cy1 = convertToYCellCoord(queryBCircle.center.y - queryBCircle.radius);
