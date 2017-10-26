@@ -1,12 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AlertDialog;
 import android.text.Html;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
@@ -56,7 +56,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
 
   private void showAttributionDialog() {
     attributionKeys = attributionMap.keySet().toArray(new String[attributionMap.size()]);
-    AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.mapbox_AlertDialogStyle);
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
     builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionKeys), this);
     builder.show();
@@ -77,7 +77,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   }
 
   private void showTelemetryDialog() {
-    AlertDialog.Builder builder = new AlertDialog.Builder(context, R.style.mapbox_AlertDialogStyle);
+    AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionTelemetryTitle);
     builder.setMessage(R.string.mapbox_attributionTelemetryMessage);
     builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {

@@ -2,12 +2,12 @@ apply plugin: 'com.android.library'
 
 dependencies {
     compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportV4
-    compile rootProject.ext.dep.supportDesign
+    compile rootProject.ext.dep.supportFragmentV4
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
     compile(rootProject.ext.dep.lost) {
         exclude group: 'com.google.guava'
+        exclude group: 'com.android.support'
     }
     testCompile rootProject.ext.dep.junit
     testCompile rootProject.ext.dep.mockito
@@ -20,6 +20,7 @@ dependencies {
     // Mapbox Android Services (Telemetry support)
     compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
         transitive = true
+        exclude group: 'com.android.support'
     }
 }
 
