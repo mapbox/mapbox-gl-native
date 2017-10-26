@@ -391,6 +391,28 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
     return false;
 }
 
+// TODO: this is a weird naive port of JS code; think harder about what makes sense in native
+std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
+    std::vector<float> tileDistances(line.size());
+    if (anchor.segment != -1) {
+        auto sumForwardLength = util::dist<float>(anchor.point, line[anchor.segment + 1]);
+        auto sumBackwardLength = util::dist<float>(anchor.point, line[anchor.segment]);
+        for (size_t i = anchor.segment + 1; i < line.size(); i++) {
+            tileDistances[i] = sumForwardLength;
+            if (i < line.size() - 1) {
+                sumForwardLength += util::dist<float>(line[i + 1], line[i]);
+            }
+        }
+        for (auto i = anchor.segment; i >= 0; i--) {
+            tileDistances[i] = sumBackwardLength;
+            if (i > 0) {
+                sumBackwardLength += util::dist<float>(line[i - 1], line[i]);
+            }
+        }
+    }
+    return tileDistances;
+}
+
 std::unique_ptr<SymbolBucket> SymbolLayout::place() {
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, symbolInstances);
 
@@ -420,7 +442,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place() {
             const bool useVerticalMode = false; // TODO: Add both versions of glyphs to buckets
             const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
             bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                    symbolInstance.textOffset, useVerticalMode, symbolInstance.line);
+                    symbolInstance.textOffset, useVerticalMode, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
             symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
 
             for (const auto& symbol : symbolInstance.glyphQuads) {
@@ -434,7 +456,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place() {
             if (symbolInstance.iconQuad) {
                 const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        symbolInstance.iconOffset, false, symbolInstance.line);
+                        symbolInstance.iconOffset, false, symbolInstance.line, std::vector<float>());
                 symbolInstance.placedIconIndices.push_back(bucket->icon.placedSymbols.size() - 1);
                 addSymbol(
                     bucket->icon, sizeData, *symbolInstance.iconQuad,
