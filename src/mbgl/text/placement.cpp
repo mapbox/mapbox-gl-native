@@ -132,12 +132,10 @@ void Placement::placeLayerBucket(
                 placeIcon = placeText && placeIcon;
             }
 
-            symbolInstance.placedText = placeText;
             if (placeText) {
                 collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<TextIgnorePlacement>());
             }
 
-            symbolInstance.placedIcon = placeIcon;
             if (placeIcon) {
                 collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
             }
