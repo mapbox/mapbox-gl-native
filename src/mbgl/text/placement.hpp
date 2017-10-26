@@ -14,7 +14,7 @@ namespace mbgl {
     class OpacityState {
         public:
             OpacityState(bool placed);
-            OpacityState(OpacityState& prevOpacityState, float increment, bool placed);
+            OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
             bool isHidden() const;
             float opacity;
             bool placed;
@@ -23,7 +23,7 @@ namespace mbgl {
     class JointOpacityState {
         public:
             JointOpacityState(bool placedIcon, bool placedText);
-            JointOpacityState(JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
+            JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
             bool isHidden() const;
             OpacityState icon;
             OpacityState text;
@@ -40,9 +40,11 @@ namespace mbgl {
         public:
             Placement(const TransformState&);
             void placeLayer(RenderSymbolLayer&, bool showCollisionBoxes);
-            bool commit(std::unique_ptr<Placement> prevPlacement, TimePoint);
+            bool commit(const Placement& prevPlacement, TimePoint);
             void updateLayerOpacities(RenderSymbolLayer&, gl::Context&);
             JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
+            float symbolFadeChange(TimePoint now) const;
+            bool hasTransitions(TimePoint now) const;
 
         private:
 
