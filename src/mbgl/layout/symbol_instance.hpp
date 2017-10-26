@@ -49,8 +49,6 @@ public:
     std::array<float, 2> iconOffset;
     std::u16string key;
     bool isDuplicate;
-    bool placedText;
-    bool placedIcon;
     std::vector<size_t> placedTextIndices; // TODO clean this up 
     std::vector<size_t> placedIconIndices;
     uint32_t crossTileID = 0;
