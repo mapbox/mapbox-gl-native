@@ -74,6 +74,9 @@ public:
     bool empty() const;
 
 private:
+    bool noIntersection(const BBox& query) const;
+    bool completeIntersection(const BBox& query) const;
+    BBox convertToBox(const BCircle& circle) const;
 
     void query(const BBox&, std::function<bool (const T&)>) const;
     void query(const BCircle&, std::function<bool (const T&)>) const;
