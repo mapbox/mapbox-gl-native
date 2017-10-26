@@ -57,10 +57,10 @@ namespace mbgl {
 template <class T>
 class GridIndex {
 public:
-    GridIndex(int32_t width_, int32_t height_, int32_t cellSize_);
+    GridIndex(const float width_, const float height_, const int16_t cellSize_);
 
-    using BBox = mapbox::geometry::box<int16_t>;
-    using BCircle = mapbox::geometry::circle<int16_t>;
+    using BBox = mapbox::geometry::box<float>;
+    using BCircle = mapbox::geometry::circle<float>;
 
     void insert(T&& t, const BBox&);
     void insert(T&& t, const BCircle&);
@@ -78,15 +78,15 @@ private:
     void query(const BBox&, std::function<bool (const T&)>) const;
     void query(const BCircle&, std::function<bool (const T&)>) const;
 
-    int32_t convertToXCellCoord(int32_t x) const;
-    int32_t convertToYCellCoord(int32_t y) const;
+    int16_t convertToXCellCoord(const float x) const;
+    int16_t convertToYCellCoord(const float y) const;
     
     bool boxesCollide(const BBox&, const BBox&) const;
     bool circlesCollide(const BCircle&, const BCircle&) const;
     bool circleAndBoxCollide(const BCircle&, const BBox&) const;
 
-    const int32_t width;
-    const int32_t height;
+    const float width;
+    const float height;
     
     const int16_t xCellCount;
     const int16_t yCellCount;
