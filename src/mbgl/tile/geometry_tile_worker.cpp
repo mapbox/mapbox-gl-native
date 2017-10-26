@@ -25,13 +25,15 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        OverscaledTileID id_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_,
-                                       const float pixelRatio_)
+                                       const float pixelRatio_,
+                                       const bool showCollisionBoxes_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
       obsolete(obsolete_),
       mode(mode_),
-      pixelRatio(pixelRatio_) {
+      pixelRatio(pixelRatio_),
+      showCollisionBoxes(showCollisionBoxes_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() = default;
@@ -107,6 +109,30 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
             state = NeedLayout;
             break;
 
+        case NeedLayout:
+            break;
+        }
+    } catch (...) {
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
+    }
+}
+
+void GeometryTileWorker::setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_) {
+    try {
+        showCollisionBoxes = showCollisionBoxes_;
+        correlationID = correlationID_;
+
+        switch (state) {
+        case Idle:
+            attemptPlacement();
+            coalesce();
+            break;
+
+        case Coalescing:
+            state = NeedPlacement;
+            break;
+
+        case NeedPlacement:
         case NeedLayout:
             break;
         }
@@ -384,7 +410,7 @@ void GeometryTileWorker::attemptPlacement() {
             continue;
         }
 
-        std::shared_ptr<Bucket> bucket = symbolLayout->place();
+        std::shared_ptr<Bucket> bucket = symbolLayout->place(showCollisionBoxes);
         for (const auto& pair : symbolLayout->layerPaintProperties) {
             buckets.emplace(pair.first, bucket);
         }

@@ -36,7 +36,7 @@ public:
     void prepare(const GlyphMap&, const GlyphPositions&,
                                           const ImageMap&, const ImagePositions&);
 
-    std::unique_ptr<SymbolBucket> place();
+    std::unique_ptr<SymbolBucket> place(const bool showCollisionBoxes);
 
     bool hasSymbolInstances() const;
 

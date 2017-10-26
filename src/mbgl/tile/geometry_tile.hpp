@@ -4,7 +4,6 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
-#include <mbgl/text/placement_config.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
@@ -37,6 +36,7 @@ public:
     void setData(std::unique_ptr<const GeometryTileData>);
 
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
+    void setShowCollisionBoxes(const bool showCollisionBoxes) override;
 
     void onGlyphsAvailable(GlyphMap) override;
     void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) override;
@@ -115,7 +115,6 @@ private:
     ImageManager& imageManager;
 
     uint64_t correlationID = 0;
-    optional<PlacementConfig> requestedConfig;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
@@ -128,6 +127,8 @@ private:
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayouts;
 
     const MapMode mode;
+    
+    bool showCollisionBoxes;
 
 public:
     optional<gl::Texture> glyphAtlasTexture;
