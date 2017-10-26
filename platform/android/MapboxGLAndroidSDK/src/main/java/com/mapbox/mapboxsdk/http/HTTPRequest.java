@@ -4,6 +4,7 @@ package com.mapbox.mapboxsdk.http;
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.BuildConfig;
@@ -26,6 +27,7 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 import okhttp3.internal.Util;
 import timber.log.Timber;
 
@@ -108,38 +110,40 @@ class HTTPRequest implements Callback {
   }
 
   @Override
-  public void onResponse(Call call, Response response) throws IOException {
-    if (response.isSuccessful()) {
-      Timber.v("[HTTP] Request was successful (code = %s).", response.code());
-    } else {
-      // We don't want to call this unsuccessful because a 304 isn't really an error
-      String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
-      Timber.d("[HTTP] Request with response code = %s: %s", response.code(), message);
-    }
-
-    byte[] body;
+  public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+    ResponseBody responseBody = null;
     try {
-      body = response.body().bytes();
+      if (response.isSuccessful()) {
+        Timber.v("[HTTP] Request was successful (code = %s).", response.code());
+      } else {
+        // We don't want to call this unsuccessful because a 304 isn't really an error
+        String message = !TextUtils.isEmpty(response.message()) ? response.message() : "No additional information";
+        Timber.d("[HTTP] Request with response code = %s: %s", response.code(), message);
+      }
+
+      responseBody = response.body();
+      if (responseBody != null) {
+        mLock.lock();
+        if (mNativePtr != 0) {
+          nativeOnResponse(response.code(),
+            response.header("ETag"),
+            response.header("Last-Modified"),
+            response.header("Cache-Control"),
+            response.header("Expires"),
+            response.header("Retry-After"),
+            response.header("x-rate-limit-reset"),
+            responseBody.bytes());
+        }
+        mLock.unlock();
+      }
     } catch (IOException ioException) {
       onFailure(ioException);
-      // throw ioException;
-      return;
     } finally {
-      response.body().close();
+      if (responseBody != null) {
+        responseBody.close();
+      }
+      response.close();
     }
-
-    mLock.lock();
-    if (mNativePtr != 0) {
-      nativeOnResponse(response.code(),
-        response.header("ETag"),
-        response.header("Last-Modified"),
-        response.header("Cache-Control"),
-        response.header("Expires"),
-        response.header("Retry-After"),
-        response.header("x-rate-limit-reset"),
-        body);
-    }
-    mLock.unlock();
   }
 
   @Override
