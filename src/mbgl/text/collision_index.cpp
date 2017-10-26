@@ -198,7 +198,7 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         }
     }
 
-    return !collisionDetected;
+    return !collisionDetected && firstAndLastGlyph;
 }
 
 
