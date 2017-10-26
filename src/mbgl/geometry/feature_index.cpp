@@ -2,7 +2,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/text/collision_tile.hpp>
+#include <mbgl/text/collision_index.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
@@ -51,7 +51,7 @@ void FeatureIndex::query(
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
         const std::vector<const RenderLayer*>& layers,
-        const CollisionTile* collisionTile,
+        const CollisionIndex* collisionIndex,
         const float additionalQueryRadius) const {
 
     // Determine query radius
@@ -76,11 +76,11 @@ void FeatureIndex::query(
     }
 
     // Query symbol features, if they've been placed.
-    if (!collisionTile) {
+    if (!collisionIndex) {
         return;
     }
 
-    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
+    std::vector<IndexedSubfeature> symbolFeatures;// = collisionIndex->queryRenderedSymbols(queryGeometry, UnwrappedTileID(), scale); // TODO: hook up
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);

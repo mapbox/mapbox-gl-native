@@ -16,7 +16,6 @@
 namespace mbgl {
 
 class BucketParameters;
-class CollisionTile;
 class SymbolBucket;
 class Anchor;
 class RenderLayer;
@@ -35,9 +34,9 @@ public:
                  GlyphDependencies&);
 
     void prepare(const GlyphMap&, const GlyphPositions&,
-                 const ImageMap&, const ImagePositions&);
+                                          const ImageMap&, const ImagePositions&);
 
-    std::unique_ptr<SymbolBucket> place(CollisionTile&);
+    std::unique_ptr<SymbolBucket> place();
 
     bool hasSymbolInstances() const;
 
@@ -57,7 +56,7 @@ private:
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
 
-    void addToDebugBuffers(CollisionTile&, SymbolBucket&);
+    void addToDebugBuffers(SymbolBucket&);
 
     // Adds placed items to the buffer.
     template <typename Buffer>

@@ -15,7 +15,6 @@
 #include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/logging.hpp>
@@ -57,7 +56,6 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
              parameters.pixelRatio),
       glyphManager(parameters.glyphManager),
       imageManager(parameters.imageManager),
-      lastYStretch(1.0f),
       mode(parameters.mode) {
 }
 
@@ -89,25 +87,6 @@ void GeometryTile::setData(std::unique_ptr<const GeometryTileData> data_) {
     worker.invoke(&GeometryTileWorker::setData, std::move(data_), correlationID);
 }
 
-void GeometryTile::setPlacementConfig(const PlacementConfig& desiredConfig) {
-    if (requestedConfig == desiredConfig) {
-        return;
-    }
-
-    // Mark the tile as pending again if it was complete before to prevent signaling a complete
-    // state despite pending parse operations.
-    pending = true;
-
-    ++correlationID;
-    requestedConfig = desiredConfig;
-    invokePlacement();
-}
-
-void GeometryTile::invokePlacement() {
-    if (requestedConfig) {
-        worker.invoke(&GeometryTileWorker::setPlacementConfig, *requestedConfig, correlationID);
-    }
-}
 
 void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) {
     // Mark the tile as pending again if it was complete before to prevent signaling a complete
@@ -141,7 +120,6 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
-    collisionTile.reset();
     observer->onTileChanged(*this);
 }
 
@@ -152,16 +130,13 @@ void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorr
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
-    collisionTile = std::move(result.collisionTile);
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
     }
     if (result.iconAtlasImage) {
         iconAtlasImage = std::move(*result.iconAtlasImage);
     }
-    if (collisionTile.get()) {
-        lastYStretch = collisionTile->yStretch;
-    }
+
     observer->onTileChanged(*this);
 }
 
@@ -253,7 +228,7 @@ void GeometryTile::queryRenderedFeatures(
                         *data,
                         id.canonical,
                         layers,
-                        collisionTile.get(),
+                        0, // TODO: hook up to global CollisionIndex
                         additionalRadius);
 }
 
@@ -291,13 +266,6 @@ void GeometryTile::querySourceFeatures(
             }
         }
     }
-}
-
-float GeometryTile::yStretch() const {
-    // collisionTile gets reset in onLayout but we don't clear the symbolBuckets
-    // until a new placement result comes along, so keep the yStretch value in
-    // case we need to render them.
-    return lastYStretch;
 }
 
 } // namespace mbgl

@@ -1,7 +1,6 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
@@ -108,30 +107,6 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
             state = NeedLayout;
             break;
 
-        case NeedLayout:
-            break;
-        }
-    } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
-    }
-}
-
-void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, uint64_t correlationID_) {
-    try {
-        placementConfig = std::move(placementConfig_);
-        correlationID = correlationID_;
-
-        switch (state) {
-        case Idle:
-            //attemptPlacement();
-            coalesce();
-            break;
-
-        case Coalescing:
-            //state = NeedPlacement;
-            break;
-
-        case NeedPlacement:
         case NeedLayout:
             break;
         }
@@ -372,7 +347,7 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
 }
 
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
+    if (!data || !layers || hasPendingSymbolDependencies()) {
         return;
     }
     
@@ -398,7 +373,6 @@ void GeometryTileWorker::attemptPlacement() {
         symbolLayoutsNeedPreparation = false;
     }
 
-    auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     for (auto& symbolLayout : symbolLayouts) {
@@ -410,7 +384,7 @@ void GeometryTileWorker::attemptPlacement() {
             continue;
         }
 
-        std::shared_ptr<Bucket> bucket = symbolLayout->place(*collisionTile);
+        std::shared_ptr<Bucket> bucket = symbolLayout->place();
         for (const auto& pair : symbolLayout->layerPaintProperties) {
             buckets.emplace(pair.first, bucket);
         }
@@ -418,7 +392,6 @@ void GeometryTileWorker::attemptPlacement() {
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
-        std::move(collisionTile),
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage),
     }, correlationID);

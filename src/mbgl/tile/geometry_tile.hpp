@@ -5,7 +5,6 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/text/placement_config.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
@@ -37,7 +36,6 @@ public:
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
 
-    void setPlacementConfig(const PlacementConfig&) override;
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
 
     void onGlyphsAvailable(GlyphMap) override;
@@ -83,24 +81,19 @@ public:
     class PlacementResult {
     public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
-        std::unique_ptr<CollisionTile> collisionTile;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
         PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
-                        std::unique_ptr<CollisionTile> collisionTile_,
                         optional<AlphaImage> glyphAtlasImage_,
                         optional<PremultipliedImage> iconAtlasImage_)
             : symbolBuckets(std::move(symbolBuckets_)),
-              collisionTile(std::move(collisionTile_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
     void onPlacement(PlacementResult, uint64_t correlationID);
 
     void onError(std::exception_ptr, uint64_t correlationID);
-    
-    float yStretch() const override;
     
 protected:
     const GeometryTileData* getData() {
@@ -109,7 +102,6 @@ protected:
 
 private:
     void markObsolete();
-    void invokePlacement();
 
     const std::string sourceID;
 
@@ -134,9 +126,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayouts;
-    std::unique_ptr<CollisionTile> collisionTile;
 
-    float lastYStretch;
     const MapMode mode;
 
 public:
