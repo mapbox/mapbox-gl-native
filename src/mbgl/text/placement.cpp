@@ -10,7 +10,7 @@ namespace mbgl {
 
 OpacityState::OpacityState(bool placed_) : opacity(0), placed(placed_) {}
 
-OpacityState::OpacityState(OpacityState& prevState, float increment, bool placed_) :
+OpacityState::OpacityState(const OpacityState& prevState, float increment, bool placed_) :
     opacity(std::fmax(0, std::fmin(1, prevState.opacity + (prevState.placed ? increment : -increment)))),
     placed(placed_) {}
 
@@ -22,7 +22,7 @@ JointOpacityState::JointOpacityState(bool placedIcon, bool placedText) :
     icon(OpacityState(placedIcon)),
     text(OpacityState(placedText)) {}
 
-JointOpacityState::JointOpacityState(JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText) :
+JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText) :
     icon(OpacityState(prevOpacityState.icon, increment, placedIcon)),
     text(OpacityState(prevOpacityState.text, increment, placedText)) {}
 
@@ -152,44 +152,35 @@ void Placement::placeLayerBucket(
     } 
 }
 
-bool Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) {
+bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
     commitTime = now;
 
     bool placementChanged = false;
 
-    if (!prevPlacement) {
-        // First time doing placement. Fade in all labels from 0.
-        for (auto& placementPair : placements) {
+    float increment = std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
+
+    if (increment) {}
+    // add the opacities from the current placement, and copy their current values from the previous placement
+    for (auto& placementPair : placements) {
+        auto prevOpacity = prevPlacement.opacities.find(placementPair.first);
+        if (prevOpacity != prevPlacement.opacities.end()) {
+            opacities.emplace(placementPair.first, JointOpacityState(prevOpacity->second, increment, placementPair.second.icon, placementPair.second.text));
+            placementChanged = placementChanged ||
+                placementPair.second.icon != prevOpacity->second.icon.placed ||
+                placementPair.second.text != prevOpacity->second.text.placed;
+        } else {
             opacities.emplace(placementPair.first, JointOpacityState(placementPair.second.icon, placementPair.second.text));
+            placementChanged = placementChanged || placementPair.second.icon || placementPair.second.text;
         }
-        placementChanged = true;
+    }
 
-    } else {
-        float increment = std::chrono::duration<float>(commitTime - prevPlacement->commitTime) / Duration(std::chrono::milliseconds(300));
-
-        if (increment) {}
-        // add the opacities from the current placement, and copy their current values from the previous placement
-        for (auto& placementPair : placements) {
-            auto prevOpacity = prevPlacement->opacities.find(placementPair.first);
-            if (prevOpacity != prevPlacement->opacities.end()) {
-                opacities.emplace(placementPair.first, JointOpacityState(prevOpacity->second, increment, placementPair.second.icon, placementPair.second.text));
-                placementChanged = placementChanged ||
-                    placementPair.second.icon != prevOpacity->second.icon.placed ||
-                    placementPair.second.text != prevOpacity->second.text.placed;
-            } else {
-                opacities.emplace(placementPair.first, JointOpacityState(placementPair.second.icon, placementPair.second.text));
-                placementChanged = true;
-            }
-        }
-
-        // copy and update values from the previous placement that aren't in the current placement but haven't finished fading
-        for (auto& prevOpacity : prevPlacement->opacities) {
-            if (opacities.find(prevOpacity.first) != opacities.end()) {
-                JointOpacityState jointOpacity(prevOpacity.second, increment, false, false);
-                if (!jointOpacity.isHidden()) {
-                    opacities.emplace(prevOpacity.first, jointOpacity);
-                    placementChanged = placementChanged || prevOpacity.second.icon.placed || prevOpacity.second.text.placed;
-                }
+    // copy and update values from the previous placement that aren't in the current placement but haven't finished fading
+    for (auto& prevOpacity : prevPlacement.opacities) {
+        if (opacities.find(prevOpacity.first) == opacities.end()) {
+            JointOpacityState jointOpacity(prevOpacity.second, increment, false, false);
+            if (!jointOpacity.isHidden()) {
+                opacities.emplace(prevOpacity.first, jointOpacity);
+                placementChanged = placementChanged || prevOpacity.second.icon.placed || prevOpacity.second.text.placed;
             }
         }
     }
@@ -274,6 +265,14 @@ JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
         return JointOpacityState(false, false);
     }
 
+}
+
+float Placement::symbolFadeChange(TimePoint now) const {
+    return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
+}
+
+bool Placement::hasTransitions(TimePoint now) const {
+    return symbolFadeChange(now) < 1.0;
 }
 
 } // namespace mbgl

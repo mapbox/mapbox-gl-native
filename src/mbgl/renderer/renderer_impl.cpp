@@ -56,7 +56,8 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
-    , renderLight(makeMutable<Light::Impl>()) {
+    , renderLight(makeMutable<Light::Impl>())
+    , placement(std::make_unique<Placement>(TransformState{})) {
     glyphManager->setObserver(this);
 }
 
@@ -371,8 +372,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    newPlacement->commit(std::move(placement), parameters.timePoint);
-    placement = std::move(newPlacement);
+    const bool placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+    if (placementChanged) placement = std::move(newPlacement);
+    parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -390,12 +392,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
+    // TODO only update when necessary
+    // TODO move this before the upload pass and use upload pass to update buffers
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>(), parameters.context);
         }
     }
-   
+
     // - 3D PASS -------------------------------------------------------------------------------------
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
     // depth rbo between them.
@@ -593,7 +597,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        updateParameters.mode == MapMode::Continuous && (hasTransitions())
+        updateParameters.mode == MapMode::Continuous && (hasTransitions(parameters.timePoint))
     );
 
     if (!loaded) {
@@ -694,7 +698,7 @@ RenderSource* Renderer::Impl::getRenderSource(const std::string& id) const {
     return it != renderSources.end() ? it->second.get() : nullptr;
 }
 
-bool Renderer::Impl::hasTransitions() const {
+bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     if (renderLight.hasTransition()) {
         return true;
     }
@@ -703,6 +707,10 @@ bool Renderer::Impl::hasTransitions() const {
         if (entry.second->hasTransition()) {
             return true;
         }
+    }
+
+    if (placement->hasTransitions(timePoint)) {
+        return true;
     }
 
     return false;
