@@ -27,8 +27,8 @@ static const float viewportPadding = 100;
 
 CollisionIndex::CollisionIndex(const TransformState& transformState_)
     : transformState(transformState_)
-    , collisionGrid(transformState.getSize().width, transformState.getSize().height, 30)
-    , ignoredGrid(transformState.getSize().width, transformState.getSize().height, 30) {
+    , collisionGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25)
+    , ignoredGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25) {
     pitchFactor = std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance();
 }
 
