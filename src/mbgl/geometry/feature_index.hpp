@@ -14,7 +14,7 @@ namespace mbgl {
 class RenderedQueryOptions;
 class RenderLayer;
 
-class CollisionTile;
+class CollisionIndex;
 class CanonicalTileID;
 
 class IndexedSubfeature {
@@ -42,7 +42,7 @@ public:
             const GeometryTileData&,
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
-            const CollisionTile*,
+            const CollisionIndex*,
             const float additionalQueryRadius) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(

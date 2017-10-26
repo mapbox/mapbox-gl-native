@@ -108,8 +108,6 @@ public:
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
-    
-    virtual float yStretch() const { return 1.0f; }
 
 protected:
     bool triedOptional = false;

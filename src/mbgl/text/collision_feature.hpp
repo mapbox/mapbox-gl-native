@@ -38,12 +38,6 @@ public:
 
     float tileUnitDistanceToAnchor;
     float radius;
-    
-    // TODO Placeholders for old collision tiles
-    float maxScale;
-    float placementScale;
-    float adjustedMaxScale(const std::array<float, 4>& , const float) const { return 1; }
-
 };
 
 class CollisionFeature {
