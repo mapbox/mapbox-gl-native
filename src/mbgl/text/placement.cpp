@@ -8,24 +8,27 @@
 
 namespace mbgl {
 
-OpacityState::OpacityState(float targetOpacity_) : opacity(0), targetOpacity(targetOpacity_) {}
+OpacityState::OpacityState(bool placed_) : opacity(0), placed(placed_) {}
 
-OpacityState::OpacityState(OpacityState& prevState, float increment, float targetOpacity) :
-    opacity(std::fmax(0, std::fmin(1, prevState.opacity + (prevState.targetOpacity == 1.0 ? increment : -increment)))),
-    targetOpacity(targetOpacity) {}
+OpacityState::OpacityState(OpacityState& prevState, float increment, bool placed_) :
+    opacity(std::fmax(0, std::fmin(1, prevState.opacity + (prevState.placed ? increment : -increment)))),
+    placed(placed_) {}
 
 bool OpacityState::isHidden() const {
-    return opacity == 0 && targetOpacity == 0;
+    return opacity == 0 && !placed;
 }
 
-JointOpacityState::JointOpacityState(float iconOpacity_, float textOpacity_) :
-    icon(OpacityState(iconOpacity_)),
-    text(OpacityState(textOpacity_)) {}
+JointOpacityState::JointOpacityState(bool placedIcon, bool placedText) :
+    icon(OpacityState(placedIcon)),
+    text(OpacityState(placedText)) {}
 
-JointOpacityState::JointOpacityState(JointOpacityState& prevOpacityState, float increment, float iconOpacity, float textOpacity) :
-    icon(OpacityState(prevOpacityState.icon, increment, iconOpacity)),
-    text(OpacityState(prevOpacityState.text, increment, textOpacity)) {}
+JointOpacityState::JointOpacityState(JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText) :
+    icon(OpacityState(prevOpacityState.icon, increment, placedIcon)),
+    text(OpacityState(prevOpacityState.text, increment, placedText)) {}
 
+bool JointOpacityState::isHidden() const {
+    return icon.isHidden() && text.isHidden();
+}
 
 uint32_t Placement::maxCrossTileID = 0;
 
@@ -60,20 +63,17 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, bool showCollisionBox
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolLayer, symbolBucket, renderTile.matrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, showCollisionBoxes);
+        placeLayerBucket(symbolBucket, renderTile.matrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, showCollisionBoxes);
     }
 }
 
 void Placement::placeLayerBucket(
-        RenderSymbolLayer&,
         SymbolBucket& bucket,
         const mat4& posMatrix,
         const mat4& textLabelPlaneMatrix,
         const mat4& iconLabelPlaneMatrix,
         const float scale,
         const bool showCollisionBoxes) {
-    //assert(dynamic_cast<const SymbolLayer::Impl*>(&*symbolLayer.baseImpl));
-    //const auto& impl = static_cast<const style::SymbolLayer::Impl&>(*symbolLayer.baseImpl);
 
     // TODO collision debug array clearing
 
@@ -152,14 +152,17 @@ void Placement::placeLayerBucket(
     } 
 }
 
-void Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) {
+bool Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) {
     commitTime = now;
+
+    bool placementChanged = false;
 
     if (!prevPlacement) {
         // First time doing placement. Fade in all labels from 0.
         for (auto& placementPair : placements) {
             opacities.emplace(placementPair.first, JointOpacityState(placementPair.second.icon, placementPair.second.text));
         }
+        placementChanged = true;
 
     } else {
         float increment = std::chrono::duration<float>(commitTime - prevPlacement->commitTime) / Duration(std::chrono::milliseconds(300));
@@ -170,22 +173,28 @@ void Placement::commit(std::unique_ptr<Placement> prevPlacement, TimePoint now) 
             auto prevOpacity = prevPlacement->opacities.find(placementPair.first);
             if (prevOpacity != prevPlacement->opacities.end()) {
                 opacities.emplace(placementPair.first, JointOpacityState(prevOpacity->second, increment, placementPair.second.icon, placementPair.second.text));
+                placementChanged = placementChanged ||
+                    placementPair.second.icon != prevOpacity->second.icon.placed ||
+                    placementPair.second.text != prevOpacity->second.text.placed;
             } else {
                 opacities.emplace(placementPair.first, JointOpacityState(placementPair.second.icon, placementPair.second.text));
+                placementChanged = true;
             }
         }
 
         // copy and update values from the previous placement that aren't in the current placement but haven't finished fading
         for (auto& prevOpacity : prevPlacement->opacities) {
             if (opacities.find(prevOpacity.first) != opacities.end()) {
-                JointOpacityState jointOpacity(prevOpacity.second, increment, 0, 0);
-                if (jointOpacity.icon.opacity != jointOpacity.icon.targetOpacity ||
-                    jointOpacity.text.opacity != jointOpacity.text.targetOpacity) {
+                JointOpacityState jointOpacity(prevOpacity.second, increment, false, false);
+                if (!jointOpacity.isHidden()) {
                     opacities.emplace(prevOpacity.first, jointOpacity);
+                    placementChanged = placementChanged || prevOpacity.second.icon.placed || prevOpacity.second.text.placed;
                 }
             }
         }
     }
+
+    return placementChanged;
 }
 
 void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer, gl::Context& context) {
@@ -214,14 +223,14 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
         // TODO check if hasText is the right thing here, or if there are cases where hasText is true but it's not added to the buffers
         if (symbolInstance.hasText) {
             // TODO mark PlacedSymbols as hidden so that they don't need to be projected at render time
-            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.targetOpacity, opacityState.text.opacity);
+            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
             for (size_t i = 0; i < symbolInstance.glyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
         }
         if (symbolInstance.hasIcon) {
             // TODO mark PlacedSymbols as hidden so that they don't need to be projected at render time
-            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.icon.targetOpacity, opacityState.icon.opacity);
+            auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.icon.placed, opacityState.icon.opacity);
             if (symbolInstance.iconQuad) {
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
@@ -247,8 +256,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, gl::Context& context
                 }
             }
         };
-        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.targetOpacity == 1.0);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.targetOpacity == 1.0);
+        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
     }
 
     if (bucket.hasTextData()) context.updateVertexBuffer(*bucket.text.opacityVertexBuffer, std::move(bucket.text.opacityVertices));
@@ -262,7 +271,7 @@ JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
     if (it != opacities.end()) {
         return it->second;
     } else {
-        return JointOpacityState(0, 0);
+        return JointOpacityState(false, false);
     }
 
 }
