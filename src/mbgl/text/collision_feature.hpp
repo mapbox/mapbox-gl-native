@@ -11,8 +11,8 @@ namespace mbgl {
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _tileUnitDistanceToAnchor = 0, float _radius = 0) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), tileUnitDistanceToAnchor(_tileUnitDistanceToAnchor), radius(_radius) {}
+    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0, float _radius = 0) :
+        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), signedDistanceFromAnchor(_signedDistanceFromAnchor), radius(_radius) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
@@ -36,7 +36,7 @@ public:
     float py;
     bool used;
 
-    float tileUnitDistanceToAnchor;
+    float signedDistanceFromAnchor;
     float radius;
 };
 

@@ -130,10 +130,10 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
     bool atLeastOneCirclePlaced = false;
     for (size_t i = 0; i < feature.boxes.size(); i++) {
         CollisionBox& circle = feature.boxes[i];
-        const float boxDistanceToAnchor = circle.tileUnitDistanceToAnchor;
+        const float boxSignedDistanceFromAnchor = circle.signedDistanceFromAnchor;
         if (!firstAndLastGlyph ||
-            (boxDistanceToAnchor < -firstTileDistance) ||
-            (boxDistanceToAnchor > lastTileDistance)) {
+            (boxSignedDistanceFromAnchor < -firstTileDistance) ||
+            (boxSignedDistanceFromAnchor > lastTileDistance)) {
             // The label either doesn't fit on its line or we
             // don't need to use this circle because the label
             // doesn't extend this far. Either way, mark the circle unused.
@@ -160,9 +160,9 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
                 const bool atLeastOneMoreCircle = (i + 1) < feature.boxes.size();
                 if (atLeastOneMoreCircle) {
                     const CollisionBox& nextCircle = feature.boxes[i + 1];
-                    const float nextBoxDistanceToAnchor = nextCircle.tileUnitDistanceToAnchor;
-                    if ((nextBoxDistanceToAnchor > -firstTileDistance) &&
-                    (nextBoxDistanceToAnchor < lastTileDistance)) {
+                    const float nextBoxDistanceFromAnchor = nextCircle.signedDistanceFromAnchor;
+                    if ((nextBoxDistanceFromAnchor > -firstTileDistance) &&
+                    (nextBoxDistanceFromAnchor < lastTileDistance)) {
                         // Hide significantly overlapping circles, unless this is the last one we can
                         // use, in which case we want to keep it in place even if it's tightly packed
                         // with the one before it.
