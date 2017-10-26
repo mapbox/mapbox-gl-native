@@ -26,8 +26,10 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
                           const std::string& sourceLayerName,
                           const std::string& bucketName) {
     for (const auto& ring : geometries) {
+        // TODO: Templatize grid units so feature index can stick with integers?
+        auto envelope = mapbox::geometry::envelope(ring);
         grid.insert(IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
-                    mapbox::geometry::envelope(ring));
+                    {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
     }
 }
 
@@ -58,7 +60,8 @@ void FeatureIndex::query(
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-    std::vector<IndexedSubfeature> features = grid.query({ box.min - additionalRadius, box.max + additionalRadius });
+    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalRadius),
+                                                           convertPoint<float>(box.max + additionalRadius) });
 
 
     std::sort(features.begin(), features.end(), topDown);

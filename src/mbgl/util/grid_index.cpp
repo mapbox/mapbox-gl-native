@@ -9,13 +9,13 @@ namespace mbgl {
 
 
 template <class T>
-GridIndex<T>::GridIndex(int32_t width_, int32_t height_, int32_t cellSize_) :
+GridIndex<T>::GridIndex(const float width_, const float height_, const int16_t cellSize_) :
     width(width_),
     height(height_),
-    xCellCount(std::ceil(float(width_) / cellSize_)),
-    yCellCount(std::ceil(float(height_) / cellSize_)),
-    xScale(float(xCellCount) / width_),
-    yScale(float(yCellCount) / height_)
+    xCellCount(std::ceil(width_ / cellSize_)),
+    yCellCount(std::ceil(height_ / cellSize_)),
+    xScale(xCellCount / width_),
+    yScale(yCellCount / height_)
     {
         boxCells.resize(xCellCount * yCellCount);
         circleCells.resize(xCellCount * yCellCount);
@@ -30,7 +30,7 @@ void GridIndex<T>::insert(T&& t, const BBox& bbox) {
     auto cx2 = convertToXCellCoord(bbox.max.x);
     auto cy2 = convertToYCellCoord(bbox.max.y);
 
-    int32_t x, y, cellIndex;
+    int16_t x, y, cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -50,7 +50,7 @@ void GridIndex<T>::insert(T&& t, const BCircle& bcircle) {
     auto cx2 = convertToXCellCoord(bcircle.center.x + bcircle.radius);
     auto cy2 = convertToYCellCoord(bcircle.center.y + bcircle.radius);
 
-    int32_t x, y, cellIndex;
+    int16_t x, y, cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -113,7 +113,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> r
     auto cx2 = convertToXCellCoord(queryBBox.max.x);
     auto cy2 = convertToYCellCoord(queryBBox.max.y);
 
-    int32_t x, y, cellIndex;
+    int16_t x, y, cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -160,7 +160,7 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
     auto cx2 = convertToXCellCoord(queryBCircle.center.x + queryBCircle.radius);
     auto cy2 = convertToYCellCoord(queryBCircle.center.y + queryBCircle.radius);
 
-    int32_t x, y, cellIndex;
+    int16_t x, y, cellIndex;
     for (x = cx1; x <= cx2; ++x) {
         for (y = cy1; y <= cy2; ++y) {
             cellIndex = xCellCount * y + x;
@@ -198,12 +198,12 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
 }
 
 template <class T>
-int32_t GridIndex<T>::convertToXCellCoord(int32_t x) const {
+int16_t GridIndex<T>::convertToXCellCoord(const float x) const {
     return util::max(0.0, util::min(xCellCount - 1.0, std::floor(x * xScale)));
 }
 
 template <class T>
-int32_t GridIndex<T>::convertToYCellCoord(int32_t y) const {
+int16_t GridIndex<T>::convertToYCellCoord(const float y) const {
     return util::max(0.0, util::min(yCellCount - 1.0, std::floor(y * yScale)));
 }
 
