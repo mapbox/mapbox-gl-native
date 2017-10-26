@@ -376,6 +376,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (placementChanged) placement = std::move(newPlacement);
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
+    // TODO only update when necessary
+    for (auto it = order.rbegin(); it != order.rend(); ++it) {
+        if (it->layer.is<RenderSymbolLayer>()) {
+            placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+        }
+    }
+
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
     {
@@ -389,14 +396,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             if (entry.second->isEnabled()) {
                 entry.second->startRender(parameters);
             }
-        }
-    }
-
-    // TODO only update when necessary
-    // TODO move this before the upload pass and use upload pass to update buffers
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>(), parameters.context);
         }
     }
 

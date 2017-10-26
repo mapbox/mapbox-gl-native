@@ -59,10 +59,15 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
+    void updateOpacity();
 
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
+
+    bool staticUploaded = false;
+    bool opacityUploaded = false;
+    bool dynamicUploaded = false;
 
     std::vector<SymbolInstance> symbolInstances;
 

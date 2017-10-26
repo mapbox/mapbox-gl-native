@@ -41,7 +41,7 @@ namespace mbgl {
             Placement(const TransformState&);
             void placeLayer(RenderSymbolLayer&, bool showCollisionBoxes);
             bool commit(const Placement& prevPlacement, TimePoint);
-            void updateLayerOpacities(RenderSymbolLayer&, gl::Context&);
+            void updateLayerOpacities(RenderSymbolLayer&);
             JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
             float symbolFadeChange(TimePoint now) const;
             bool hasTransitions(TimePoint now) const;
@@ -56,7 +56,7 @@ namespace mbgl {
                     const float scale,
                     const bool showCollisionBoxes);
 
-            void updateBucketOpacities(SymbolBucket&, gl::Context&);
+            void updateBucketOpacities(SymbolBucket&);
 
             CollisionIndex collisionIndex;
             TransformState state;
