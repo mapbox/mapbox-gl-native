@@ -16,7 +16,7 @@ struct TileDistance;
 class CollisionIndex {
 public:
     using CollisionGrid = GridIndex<IndexedSubfeature>;
-    using GridUnit = int16_t;
+    using GridUnit = float;
 
     explicit CollisionIndex(const TransformState&);
 
