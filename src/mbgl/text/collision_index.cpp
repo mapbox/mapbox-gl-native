@@ -204,10 +204,13 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
 
 void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement) {
     if (feature.alongLine) {
-        for (auto& box : feature.boxes) {
-            GridUnit px = box.px;
-            GridUnit py = box.py;
-            GridUnit radius = box.radius;
+        for (auto& circle : feature.boxes) {
+            if (!circle.used) {
+                continue;
+            }
+            GridUnit px = circle.px;
+            GridUnit py = circle.py;
+            GridUnit radius = circle.radius;
             if (ignorePlacement) {
                 // TODO: revisit whether GridIndex should move vs. copy on insert
                 ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px, py }, radius});
