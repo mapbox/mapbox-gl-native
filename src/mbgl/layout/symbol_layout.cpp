@@ -534,7 +534,7 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 Point<float> br{box.x2, box.y2};
 
                 static constexpr std::size_t vertexLength = 4;
-                const std::size_t indexLength = feature.alongLine ? 4 : 8;
+                const std::size_t indexLength = feature.alongLine ? 6 : 8;
 
                 if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
                     collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(),
