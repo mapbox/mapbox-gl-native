@@ -63,8 +63,6 @@ private:
     void addSymbol(Buffer&,
                    const Range<float> sizeData,
                    const SymbolQuad&,
-                   const bool keepUpright,
-                   const style::SymbolPlacementType,
                    const Anchor& labelAnchor,
                    PlacedSymbol& placedSymbol);
 
