@@ -39,7 +39,7 @@ namespace mbgl {
     class Placement {
         public:
             Placement(const TransformState&);
-            void placeLayer(RenderSymbolLayer&, bool showCollisionBoxes);
+            void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
             bool commit(const Placement& prevPlacement, TimePoint);
             void updateLayerOpacities(RenderSymbolLayer&);
             JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
