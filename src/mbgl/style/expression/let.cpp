@@ -5,7 +5,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult Let::evaluate(const EvaluationParameters& params) const {
+EvaluationResult Let::evaluate(const EvaluationContext& params) const {
     return result->evaluate(params);
 }
 
@@ -61,7 +61,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext ctx) {
     return ParseResult(std::make_unique<Let>(std::move(bindings_), std::move(*result_)));
 }
 
-EvaluationResult Var::evaluate(const EvaluationParameters& params) const {
+EvaluationResult Var::evaluate(const EvaluationContext& params) const {
     return value->evaluate(params);
 }
 

@@ -5,7 +5,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult ArrayAssertion::evaluate(const EvaluationParameters& params) const {
+EvaluationResult ArrayAssertion::evaluate(const EvaluationContext& params) const {
     auto result = input->evaluate(params);
     if (!result) {
         return result.error();

@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult Case::evaluate(const EvaluationParameters& params) const {
+EvaluationResult Case::evaluate(const EvaluationContext& params) const {
     for (const auto& branch : branches) {
         const EvaluationResult evaluatedTest = branch.first->evaluate(params);
         if (!evaluatedTest) {

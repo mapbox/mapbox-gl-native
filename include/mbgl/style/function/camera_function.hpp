@@ -44,7 +44,7 @@ public:
     {}
 
     T evaluate(float zoom) const {
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationParameters(zoom, nullptr));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(zoom, nullptr));
         if (result) {
            const optional<T> typed = expression::fromExpressionValue<T>(*result);
            return typed ? *typed : T();

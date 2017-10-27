@@ -146,7 +146,7 @@ ParseResult ParsingContext::parse(const Convertible& value)
     // it immediately and replace it with a literal value in the
     // parsed result.
     if (parsed && !dynamic_cast<Literal *>(parsed->get()) && isConstant(parsed->get())) {
-        EvaluationParameters params(nullptr);
+        EvaluationContext params(nullptr);
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {
             error(evaluated.error().message);

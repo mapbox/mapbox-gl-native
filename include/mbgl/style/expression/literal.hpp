@@ -14,7 +14,7 @@ class Literal : public Expression {
 public:
     Literal(Value value_) : Expression(typeOf(value_)), value(value_) {}
     Literal(type::Array type_, std::vector<Value> value_) : Expression(type_), value(value_) {}
-    EvaluationResult evaluate(const EvaluationParameters&) const override {
+    EvaluationResult evaluate(const EvaluationContext&) const override {
         return value;
     }
     

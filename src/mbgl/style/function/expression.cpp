@@ -30,7 +30,7 @@ public:
 
 EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const {
     GeoJSONFeature f(feature);
-    return this->evaluate(EvaluationParameters(zoom, &f, heatmapDensity));
+    return this->evaluate(EvaluationContext(zoom, &f, heatmapDensity));
 }
 
 } // namespace expression

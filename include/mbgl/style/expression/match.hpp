@@ -27,7 +27,7 @@ public:
 
     void eachChild(const std::function<void(const Expression*)>& visit) const override;
 
-    EvaluationResult evaluate(const EvaluationParameters& params) const override;
+    EvaluationResult evaluate(const EvaluationContext& params) const override;
     
 private:
     

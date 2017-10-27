@@ -79,7 +79,7 @@ public:
 
     template <class Feature>
     T evaluate(float zoom, const Feature& feature, T finalDefaultValue) const {
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationParameters({zoom}, &feature));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext({zoom}, &feature));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
             return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;

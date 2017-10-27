@@ -36,7 +36,7 @@ public:
     ErrorExpression(std::string message_) : Expression(type::Error), message(std::move(message_)) {}
     void eachChild(const std::function<void(const Expression*)>&) const override {}
 
-    EvaluationResult evaluate(const EvaluationParameters&) const override {
+    EvaluationResult evaluate(const EvaluationContext&) const override {
         return EvaluationError{message};
     }
 

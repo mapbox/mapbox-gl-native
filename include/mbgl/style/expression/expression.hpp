@@ -22,14 +22,14 @@ public:
     std::string message;
 };
 
-class EvaluationParameters {
+class EvaluationContext {
 public:
-    EvaluationParameters(float zoom_) : zoom(zoom_), feature(nullptr) {}
-    EvaluationParameters(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
-    EvaluationParameters(float zoom_, GeometryTileFeature const * feature_) :
+    EvaluationContext(float zoom_) : zoom(zoom_), feature(nullptr) {}
+    EvaluationContext(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
+    EvaluationContext(float zoom_, GeometryTileFeature const * feature_) :
         zoom(zoom_), feature(feature_)
     {}
-    EvaluationParameters(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> heatmapDensity_) :
+    EvaluationContext(optional<float> zoom_, GeometryTileFeature const * feature_, optional<double> heatmapDensity_) :
         zoom(std::move(zoom_)), feature(feature_), heatmapDensity(std::move(heatmapDensity_))
     {}
     
@@ -114,7 +114,7 @@ public:
     Expression(type::Type type_) : type(std::move(type_)) {}
     virtual ~Expression() = default;
     
-    virtual EvaluationResult evaluate(const EvaluationParameters& params) const = 0;
+    virtual EvaluationResult evaluate(const EvaluationContext& params) const = 0;
     virtual void eachChild(const std::function<void(const Expression*)>&) const = 0;
 
     type::Type getType() const { return type; };

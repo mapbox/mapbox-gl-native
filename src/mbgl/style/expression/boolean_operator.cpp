@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult Any::evaluate(const EvaluationParameters& params) const {
+EvaluationResult Any::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         const EvaluationResult result = (*it)->evaluate(params);
         if (!result) return result;
@@ -19,7 +19,7 @@ void Any::eachChild(const std::function<void(const Expression*)>& visit) const {
     }
 }
 
-EvaluationResult All::evaluate(const EvaluationParameters& params) const {
+EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         const EvaluationResult result = (*it)->evaluate(params);
         if (!result) return result;

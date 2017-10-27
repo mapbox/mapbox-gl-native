@@ -91,7 +91,7 @@ public:
         args(std::move(args_))
     {}
     
-    EvaluationResult evaluate(const EvaluationParameters& evaluationParams) const override {
+    EvaluationResult evaluate(const EvaluationContext& evaluationParams) const override {
         return signature.apply(evaluationParams, args);
     }
     

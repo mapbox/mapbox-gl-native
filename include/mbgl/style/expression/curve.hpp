@@ -78,7 +78,7 @@ public:
         stops(std::move(stops_))
     {}
     
-    EvaluationResult evaluate(const EvaluationParameters& params) const override {
+    EvaluationResult evaluate(const EvaluationContext& params) const override {
         const EvaluationResult evaluatedInput = input->evaluate(params);
         if (!evaluatedInput) { return evaluatedInput.error(); }
         float x = *fromExpressionValue<float>(*evaluatedInput);

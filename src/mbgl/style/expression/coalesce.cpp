@@ -4,7 +4,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult Coalesce::evaluate(const EvaluationParameters& params) const {
+EvaluationResult Coalesce::evaluate(const EvaluationContext& params) const {
     EvaluationResult result = Null;
     for (const auto& arg : args) {
         result = arg->evaluate(params);

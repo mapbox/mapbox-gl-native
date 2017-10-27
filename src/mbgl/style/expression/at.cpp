@@ -5,7 +5,7 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-EvaluationResult At::evaluate(const EvaluationParameters& params) const {
+EvaluationResult At::evaluate(const EvaluationContext& params) const {
     const EvaluationResult evaluatedIndex = index->evaluate(params);
     const EvaluationResult evaluatedInput = input->evaluate(params);
     if (!evaluatedIndex) {

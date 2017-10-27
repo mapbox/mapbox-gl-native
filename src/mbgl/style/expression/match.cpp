@@ -14,7 +14,7 @@ void Match<T>::eachChild(const std::function<void(const Expression*)>& visit) co
     visit(otherwise.get());
 }
 
-template<> EvaluationResult Match<std::string>::evaluate(const EvaluationParameters& params) const {
+template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext& params) const {
     const EvaluationResult inputValue = input->evaluate(params);
     if (!inputValue) {
         return inputValue.error();
@@ -28,7 +28,7 @@ template<> EvaluationResult Match<std::string>::evaluate(const EvaluationParamet
     return otherwise->evaluate(params);
 }
 
-template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationParameters& params) const {
+template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationContext& params) const {
     const EvaluationResult inputValue = input->evaluate(params);
     if (!inputValue) {
         return inputValue.error();

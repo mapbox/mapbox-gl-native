@@ -21,7 +21,7 @@ namespace detail {
     Wraps an evaluate function that takes an arbitrary number of arguments (via
     a Varargs<T>, which is just an alias for std::vector).
  
-    Signature<R (const EvaluationParameters&, Params...)>:
+    Signature<R (const EvaluationContext&, Params...)>:
     Wraps an evaluate function that needs to access the expression evaluation
     parameters in addition to its subexpressions, i.e.,
     (const EvaluationParams& const T0&, const T1&, ...) -> Result<U>.  Needed
@@ -46,7 +46,7 @@ struct Signature<R (Params...)> : SignatureBase {
         evaluate(evaluate_)
     {}
     
-    EvaluationResult apply(const EvaluationParameters& evaluationParameters, const Args& args) const {
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
     
@@ -60,7 +60,7 @@ struct Signature<R (Params...)> : SignatureBase {
     R (*evaluate)(Params...);
 private:
     template <std::size_t ...I>
-    EvaluationResult applyImpl(const EvaluationParameters& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
+    EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
         const std::array<EvaluationResult, sizeof...(I)> evaluated = {{std::get<I>(args)->evaluate(evaluationParameters)...}};
         for (const auto& arg : evaluated) {
             if(!arg) return arg.error();
@@ -89,7 +89,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
     };
     
-    EvaluationResult apply(const EvaluationParameters& evaluationParameters, const Args& args) const {
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         Varargs<T> evaluated;
         evaluated.reserve(args.size());
         for (const auto& arg : args) {
@@ -108,10 +108,10 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
 // Evaluate function needing parameter access,
 // (const EvaluationParams&, const T0&, const T1&, ...) -> Result<U>
 template <class R, class... Params>
-struct Signature<R (const EvaluationParameters&, Params...)> : SignatureBase {
+struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
     using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
     
-    Signature(R (*evaluate_)(const EvaluationParameters&, Params...)) :
+    Signature(R (*evaluate_)(const EvaluationContext&, Params...)) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
             std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...}
@@ -126,13 +126,13 @@ struct Signature<R (const EvaluationParameters&, Params...)> : SignatureBase {
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
     }
     
-    EvaluationResult apply(const EvaluationParameters& evaluationParameters, const Args& args) const {
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
     
 private:
     template <std::size_t ...I>
-    EvaluationResult applyImpl(const EvaluationParameters& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
+    EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
         const std::array<EvaluationResult, sizeof...(I)> evaluated = {{std::get<I>(args)->evaluate(evaluationParameters)...}};
         for (const auto& arg : evaluated) {
             if(!arg) return arg.error();
@@ -143,7 +143,7 @@ private:
         return *value;
     }
     
-    R (*evaluate)(const EvaluationParameters&, Params...);
+    R (*evaluate)(const EvaluationContext&, Params...);
 };
 
 // Machinery to pull out function types from class methods, lambdas, etc.
@@ -233,7 +233,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("rgba", rgba);
     define("rgb", [](double r, double g, double b) { return rgba(r, g, b, 1.0f); });
     
-    define("zoom", [](const EvaluationParameters& params) -> Result<double> {
+    define("zoom", [](const EvaluationContext& params) -> Result<double> {
         if (!params.zoom) {
             return EvaluationError {
                 "The 'zoom' expression is unavailable in the current evaluation context."
@@ -242,7 +242,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return *(params.zoom);
     });
     
-    define("heatmap-density", [](const EvaluationParameters& params) -> Result<double> {
+    define("heatmap-density", [](const EvaluationContext& params) -> Result<double> {
         if (!params.heatmapDensity) {
             return EvaluationError {
                 "The 'heatmap-density' expression is unavailable in the current evaluation context."
@@ -251,7 +251,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return *(params.heatmapDensity);
     });
     
-    define("has", [](const EvaluationParameters& params, const std::string& key) -> Result<bool> {
+    define("has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
@@ -264,7 +264,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return object.find(key) != object.end();
     });
     
-    define("get", [](const EvaluationParameters& params, const std::string& key) -> Result<Value> {
+    define("get", [](const EvaluationContext& params, const std::string& key) -> Result<Value> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
@@ -291,7 +291,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return s.size();
     });
     
-    define("properties", [](const EvaluationParameters& params) -> Result<std::unordered_map<std::string, Value>> {
+    define("properties", [](const EvaluationContext& params) -> Result<std::unordered_map<std::string, Value>> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
@@ -305,7 +305,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return result;
     });
     
-    define("geometry-type", [](const EvaluationParameters& params) -> Result<std::string> {
+    define("geometry-type", [](const EvaluationContext& params) -> Result<std::string> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
@@ -324,7 +324,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
     });
     
-    define("id", [](const EvaluationParameters& params) -> Result<Value> {
+    define("id", [](const EvaluationContext& params) -> Result<Value> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."

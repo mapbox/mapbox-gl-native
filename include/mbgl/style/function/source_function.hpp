@@ -47,7 +47,7 @@ public:
 
     template <class Feature>
     T evaluate(const Feature& feature, T finalDefaultValue) const {
-        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationParameters(&feature));
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature));
         if (result) {
             const optional<T> typed = expression::fromExpressionValue<T>(*result);
             return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
