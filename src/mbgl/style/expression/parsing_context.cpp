@@ -50,6 +50,25 @@ bool isConstant(const Expression* expression) {
 }
 
 using namespace mbgl::style::conversion;
+
+ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_) {
+    ParsingContext child(key + "[" + std::to_string(index_) + "]",
+                         errors,
+                         std::move(expected_),
+                         scope);
+    return child.parse(value);
+}
+
+ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_,
+                                  const std::map<std::string, std::shared_ptr<Expression>>& bindings) {
+    ParsingContext child(key + "[" + std::to_string(index_) + "]",
+                         errors,
+                         std::move(expected_),
+                         std::make_shared<detail::Scope>(bindings, scope));
+    return child.parse(value);
+}
+
+using namespace mbgl::style::conversion;
 ParseResult ParsingContext::parse(const Convertible& value)
 {
     ParseResult parsed;
@@ -117,7 +136,7 @@ ParseResult ParsingContext::parse(const Convertible& value)
     }
     
     if (!parsed) {
-        assert(errors.size() > 0);
+        assert(errors->size() > 0);
     } else if (expected) {
         auto wrapForType = [&](const type::Type& target, std::unique_ptr<Expression> expression) -> std::unique_ptr<Expression> {
             std::vector<std::unique_ptr<Expression>> args;
@@ -137,7 +156,7 @@ ParseResult ParsingContext::parse(const Convertible& value)
         }
     
         checkType((*parsed)->getType());
-        if (errors.size() > 0) {
+        if (errors->size() > 0) {
             return ParseResult();
         }
     }

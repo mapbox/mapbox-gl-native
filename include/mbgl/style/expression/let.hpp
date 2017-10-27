@@ -21,7 +21,7 @@ public:
         result(std::move(result_))
     {}
     
-    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext);
+    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
     
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>&) const override;
@@ -43,7 +43,7 @@ public:
         value(value_)
     {}
 
-    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext);
+    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>&) const override;

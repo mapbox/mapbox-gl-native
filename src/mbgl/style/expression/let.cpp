@@ -18,7 +18,7 @@ void Let::eachChild(const std::function<void(const Expression*)>& visit) const {
 
 using namespace mbgl::style::conversion;
 
-ParseResult Let::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
 
     std::size_t length = arrayLength(value);
@@ -44,7 +44,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext ctx) {
             return ParseResult();
         }
         
-        ParseResult bindingValue = ctx.concat(i + 1).parse(arrayMember(value, i + 1));
+        ParseResult bindingValue = ctx.parse(arrayMember(value, i + 1), i + 1);
         if (!bindingValue) {
             return ParseResult();
         }
@@ -52,8 +52,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext ctx) {
         bindings_.emplace(*name, std::move(*bindingValue));
     }
 
-    auto resultContext = ctx.concat(length - 1, ctx.expected, bindings_);
-    ParseResult result_ = resultContext.parse(arrayMember(value, length - 1));
+    ParseResult result_ = ctx.parse(arrayMember(value, length - 1), length - 1, ctx.getExpected(), bindings_);
     if (!result_) {
         return ParseResult();
     }
@@ -67,7 +66,7 @@ EvaluationResult Var::evaluate(const EvaluationContext& params) const {
 
 void Var::eachChild(const std::function<void(const Expression*)>&) const {}
 
-ParseResult Var::parse(const Convertible& value_, ParsingContext ctx) {
+ParseResult Var::parse(const Convertible& value_, ParsingContext& ctx) {
     assert(isArray(value_));
 
     if (arrayLength(value_) != 2 || !toString(arrayMember(value_, 1))) {

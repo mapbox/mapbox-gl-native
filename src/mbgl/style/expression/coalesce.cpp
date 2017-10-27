@@ -20,7 +20,7 @@ void Coalesce::eachChild(const std::function<void(const Expression*)>& visit) co
 }
 
 using namespace mbgl::style::conversion;
-ParseResult Coalesce::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 2) {
@@ -29,14 +29,14 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext ctx) {
     }
  
     optional<type::Type> outputType;
-    if (ctx.expected && *ctx.expected != type::Value) {
-        outputType = ctx.expected;
+    if (ctx.getExpected() && *ctx.getExpected() != type::Value) {
+        outputType = ctx.getExpected();
     }
 
     Coalesce::Args args;
     args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        auto parsed = ctx.concat(i, outputType).parse(arrayMember(value, i));
+        auto parsed = ctx.parse(arrayMember(value, i), i, outputType);
         if (!parsed) {
             return parsed;
         }

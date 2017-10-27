@@ -104,10 +104,9 @@ public:
     evaluation logic that can't be handled by CompoundExpression's inference
     mechanism.
     
-    Each Expression subclass has an accompanying 
-    template <class V> ParseResult ParseXxxx::parse(const V&, ParsingContext),
-    found in style/expression/parse/xxxx.hpp, which handles parsing a style-spec
-    JSON representation of the expression.
+    Each Expression subclass also provides a static
+    ParseResult ExpressionClass::parse(const V&, ParsingContext),
+    which handles parsing a style-spec JSON representation of the expression.
 */
 class Expression {
 public:

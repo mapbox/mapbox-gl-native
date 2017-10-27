@@ -55,7 +55,7 @@ public:
 };
 
 
-ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
+ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
 
 template <typename T>

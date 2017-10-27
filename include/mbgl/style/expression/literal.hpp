@@ -18,7 +18,7 @@ public:
         return value;
     }
     
-    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext);
+    static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
 
     void eachChild(const std::function<void(const Expression*)>&) const override {}
     

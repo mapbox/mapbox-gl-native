@@ -15,7 +15,7 @@ optional<Value> checkNumber(T n) {
 }
 
 using namespace mbgl::style::conversion;
-optional<Value> parseValue(const Convertible& value, ParsingContext ctx) {
+optional<Value> parseValue(const Convertible& value, ParsingContext& ctx) {
     if (isUndefined(value)) return {Null};
     if (isObject(value)) {
         std::unordered_map<std::string, Value> result;
@@ -61,7 +61,7 @@ optional<Value> parseValue(const Convertible& value, ParsingContext ctx) {
     );
 }
 
-ParseResult Literal::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult Literal::parse(const Convertible& value, ParsingContext& ctx) {
     const optional<Value> parsedValue = parseValue(value, ctx);
 
     if (!parsedValue) {
@@ -70,12 +70,12 @@ ParseResult Literal::parse(const Convertible& value, ParsingContext ctx) {
 
     // special case: infer the item type if possible for zero-length arrays
     if (
-        ctx.expected &&
-        ctx.expected->template is<type::Array>() &&
+        ctx.getExpected() &&
+        ctx.getExpected()->template is<type::Array>() &&
         parsedValue->template is<std::vector<Value>>()
     ) {
         auto type = typeOf(*parsedValue).template get<type::Array>();
-        auto expected = ctx.expected->template get<type::Array>();
+        auto expected = ctx.getExpected()->template get<type::Array>();
         if (
             type.N && (*type.N == 0) &&
             (!expected.N || (*expected.N == 0))

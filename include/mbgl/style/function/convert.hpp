@@ -55,10 +55,13 @@ struct Convert {
         return std::make_unique<Literal>(Value(toExpressionValue(value)));
     }
     
-    static std::unique_ptr<Expression> makeGet(type::Type type, const std::string& property, ParsingContext ctx) {
+    static std::unique_ptr<Expression> makeGet(type::Type type, const std::string& property) {
+        ParsingContext ctx;
         std::vector<std::unique_ptr<Expression>> getArgs;
         getArgs.push_back(makeLiteral(property));
         ParseResult get = createCompoundExpression("get", std::move(getArgs), ctx);
+        assert(get);
+        assert(ctx.getErrors().size() == 0);
 
         std::vector<std::unique_ptr<Expression>> assertionArgs;
         assertionArgs.push_back(std::move(*get));
@@ -66,8 +69,12 @@ struct Convert {
         return std::make_unique<Assertion>(type, std::move(assertionArgs));
     }
     
-    static std::unique_ptr<Expression> makeZoom(ParsingContext ctx) {
-        return std::move(*(createCompoundExpression("zoom", std::vector<std::unique_ptr<Expression>>(), ctx)));
+    static std::unique_ptr<Expression> makeZoom() {
+        ParsingContext ctx;
+        ParseResult zoom = createCompoundExpression("zoom", std::vector<std::unique_ptr<Expression>>(), ctx);
+        assert(zoom);
+        assert(ctx.getErrors().size() == 0);
+        return std::move(*zoom);
     }
     
     static std::unique_ptr<Expression> makeError(std::string message) {
@@ -145,19 +152,16 @@ struct Convert {
         
         type::Type type = valueTypeToExpressionType<T>();
 
-        std::vector<ParsingError> errors;
-        ParsingContext ctx(errors);
-
         const CategoricalValue& firstKey = stops.begin()->first;
         return firstKey.match(
             [&](bool) {
-                return makeCase(type, makeGet(type::Boolean, property, ctx), std::move(convertedStops));
+                return makeCase(type, makeGet(type::Boolean, property), std::move(convertedStops));
             },
             [&](const std::string&) {
-                return makeMatch<std::string>(type, makeGet(type::String, property, ctx), std::move(convertedStops));
+                return makeMatch<std::string>(type, makeGet(type::String, property), std::move(convertedStops));
             },
             [&](int64_t) {
-                return makeMatch<int64_t>(type, makeGet(type::Number, property, ctx), std::move(convertedStops));
+                return makeMatch<int64_t>(type, makeGet(type::Number, property), std::move(convertedStops));
             }
         );
     }
@@ -177,10 +181,9 @@ struct Convert {
     template <typename T>
     static std::unique_ptr<Expression> toExpression(const ExponentialStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(
                                          valueTypeToExpressionType<T>(),
-                                         makeZoom(ParsingContext(errors)),
+                                         makeZoom(),
                                          convertStops(stops.stops),
                                          ExponentialInterpolator(stops.base));
         assert(e);
@@ -190,9 +193,8 @@ struct Convert {
     template <typename T>
     static std::unique_ptr<Expression> toExpression(const IntervalStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                     makeZoom(ParsingContext(errors)),
+                                                                     makeZoom(),
                                                                      convertStops(stops.stops),
                                                                      StepInterpolator());
         assert(e);
@@ -203,9 +205,8 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const ExponentialStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                     makeGet(type::Number, property, ParsingContext(errors)),
+                                                                     makeGet(type::Number, property),
                                                                      convertStops(stops.stops),
                                                                      ExponentialInterpolator(stops.base));
         assert(e);
@@ -216,8 +217,7 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const IntervalStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
-        std::unique_ptr<Expression> get = makeGet(type::Number, property, ParsingContext(errors));
+        std::unique_ptr<Expression> get = makeGet(type::Number, property);
         ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
                                                                      std::move(get),
                                                                      convertStops(stops.stops),
@@ -250,10 +250,9 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const CompositeExponentialStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<float, T>>& stop : stops.stops) {
-            std::unique_ptr<Expression> get = makeGet(type::Number, property, ParsingContext(errors));
+            std::unique_ptr<Expression> get = makeGet(type::Number, property);
             ParseResult innerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
                                                                                   std::move(get),
                                                                                   convertStops(stop.second),
@@ -262,7 +261,7 @@ struct Convert {
             outerStops.emplace(stop.first, std::move(*innerCurve));
         }
         ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(ParsingContext(errors)),
+                                                                              makeZoom(),
                                                                               std::move(outerStops),
                                                                               zoomInterpolator<T>());
         assert(outerCurve);
@@ -273,10 +272,9 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const CompositeIntervalStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<float, T>>& stop : stops.stops) {
-            std::unique_ptr<Expression> get = makeGet(type::Number, property, ParsingContext(errors));
+            std::unique_ptr<Expression> get = makeGet(type::Number, property);
             ParseResult innerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
                                                                                   std::move(get),
                                                                                   convertStops(stop.second),
@@ -285,7 +283,7 @@ struct Convert {
             outerStops.emplace(stop.first, std::move(*innerCurve));
         }
         ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(ParsingContext(errors)),
+                                                                              makeZoom(),
                                                                               std::move(outerStops),
                                                                               zoomInterpolator<T>());
         assert(outerCurve);
@@ -296,7 +294,6 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const CompositeCategoricalStops<T>& stops)
     {
-        std::vector<ParsingError> errors;
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<CategoricalValue, T>>& stop : stops.stops) {
             ParseResult innerCurve = fromCategoricalStops(stop.second, property);
@@ -304,7 +301,7 @@ struct Convert {
             outerStops.emplace(stop.first, std::move(*innerCurve));
         }
         ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(ParsingContext(errors)),
+                                                                              makeZoom(),
                                                                               std::move(outerStops),
                                                                               zoomInterpolator<T>());
         assert(outerCurve);
@@ -316,27 +313,28 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const IdentityStops<T>&)
     {
-        std::vector<ParsingError> errors;
-
         std::unique_ptr<Expression> input = valueTypeToExpressionType<T>().match(
             [&] (const type::StringType&) {
-                return makeGet(type::String, property, ParsingContext(errors));
+                return makeGet(type::String, property);
             },
             [&] (const type::NumberType&) {
-                return makeGet(type::Number, property, ParsingContext(errors));
+                return makeGet(type::Number, property);
             },
             [&] (const type::BooleanType&) {
-                return makeGet(type::Boolean, property, ParsingContext(errors));
+                return makeGet(type::Boolean, property);
             },
             [&] (const type::ColorType&) {
                 std::vector<std::unique_ptr<Expression>> args;
-                args.push_back(makeGet(type::String, property, ParsingContext(errors)));
+                args.push_back(makeGet(type::String, property));
                 return std::make_unique<Coercion>(type::Color, std::move(args));
             },
             [&] (const type::Array& arr) {
                 std::vector<std::unique_ptr<Expression>> getArgs;
                 getArgs.push_back(makeLiteral(property));
-                ParseResult get = createCompoundExpression("get", std::move(getArgs), ParsingContext(errors));
+                ParsingContext ctx;
+                ParseResult get = createCompoundExpression("get", std::move(getArgs), ctx);
+                assert(get);
+                assert(ctx.getErrors().size() == 0);
                 return std::make_unique<ArrayAssertion>(arr, std::move(*get));
             },
             [&] (const auto&) -> std::unique_ptr<Expression> {

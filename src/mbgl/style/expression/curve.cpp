@@ -11,7 +11,7 @@ using Interpolator = variant<StepInterpolator,
 
 using namespace mbgl::style::conversion;
 
-ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
+ParseResult parseCurve(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
 
     auto length = arrayLength(value);
@@ -32,7 +32,6 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
     bool isStep = false;
     
     const optional<std::string> interpName = toString(arrayMember(interp, 0));
-    ParsingContext interpContext = ctx.concat(1);
     if (interpName && *interpName == "step") {
         interpolator = StepInterpolator();
         isStep = true;
@@ -44,7 +43,7 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
             base = toDouble(arrayMember(interp, 1));
         }
         if (!base) {
-            interpContext.error("Exponential interpolation requires a numeric base.", 1);
+            ctx.error("Exponential interpolation requires a numeric base.", 1, 1);
             return ParseResult();
         }
         interpolator = ExponentialInterpolator(*base);
@@ -66,13 +65,13 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
             *x2 < 0 || *x2 > 1 ||
             *y2 < 0 || *y2 > 1
         ) {
-            interpContext.error("Cubic bezier interpolation requires four numeric arguments with values between 0 and 1.");
+            ctx.error("Cubic bezier interpolation requires four numeric arguments with values between 0 and 1.", 1);
             return ParseResult();
             
         }
         interpolator = CubicBezierInterpolator(*x1, *y1, *x2, *y2);
     } else {
-        interpContext.error("Unknown interpolation type " + (interpName ? *interpName : ""), 0);
+        ctx.error("Unknown interpolation type " + (interpName ? *interpName : ""), 1, 0);
         return ParseResult();
     }
     
@@ -90,15 +89,15 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
     }
     
     
-    ParseResult input = ctx.concat(2, {type::Number}).parse(arrayMember(value, 2));
+    ParseResult input = ctx.parse(arrayMember(value, 2), 2, {type::Number});
     if (!input) {
         return input;
     }
     
     std::map<double, std::unique_ptr<Expression>> stops;
     optional<type::Type> outputType;
-    if (ctx.expected && *ctx.expected != type::Value) {
-        outputType = ctx.expected;
+    if (ctx.getExpected() && *ctx.getExpected() != type::Value) {
+        outputType = ctx.getExpected();
     }
     
     double previous = - std::numeric_limits<double>::infinity();
@@ -107,7 +106,7 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
     // than an input level, so consume that output value before proceeding into the
     // "stops" loop below.
     if (isStep) {
-        auto output = ctx.concat(3, outputType).parse(arrayMember(value, 3));
+        auto output = ctx.parse(arrayMember(value, 3), 3, outputType);
         if (!output) {
             return ParseResult();
         }
@@ -163,7 +162,7 @@ ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
         }
         previous = *label;
         
-        auto output = ctx.concat(i + 1, outputType).parse(arrayMember(value, i + 1));
+        auto output = ctx.parse(arrayMember(value, i + 1), i + 1, outputType);
         if (!output) {
             return ParseResult();
         }

@@ -26,7 +26,7 @@ void ArrayAssertion::eachChild(const std::function<void(const Expression*)>& vis
 }
 
 using namespace mbgl::style::conversion;
-ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext& ctx) {
 
     static std::unordered_map<std::string, type::Type> itemTypes {
         {"string", type::String},
@@ -69,7 +69,7 @@ ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext ctx) 
         N = optional<std::size_t>(*n);
     }
 
-    auto input = ctx.concat(length - 1, {type::Value}).parse(arrayMember(value, length - 1));
+    auto input = ctx.parse(arrayMember(value, length - 1), length - 1, {type::Value});
     if (!input) {
         return input;
     }

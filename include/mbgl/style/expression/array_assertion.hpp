@@ -18,7 +18,7 @@ public:
         input(std::move(input_))
     {}
 
-    static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
+    static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>& visit) const override;

@@ -38,7 +38,7 @@ void At::eachChild(const std::function<void(const Expression*)>& visit) const {
 }
 
 using namespace mbgl::style::conversion;
-ParseResult At::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult At::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
 
     std::size_t length = arrayLength(value);
@@ -47,8 +47,10 @@ ParseResult At::parse(const Convertible& value, ParsingContext ctx) {
         return ParseResult();
     }
 
-    ParseResult index = ctx.concat(1, {type::Number}).parse(arrayMember(value, 1));
-    ParseResult input = ctx.concat(2, {type::Array(ctx.expected ? *ctx.expected : type::Value)}).parse(arrayMember(value, 2));
+    ParseResult index = ctx.parse(arrayMember(value, 1), 1, {type::Number});
+    
+    type::Type inputType = type::Array(ctx.getExpected() ? *ctx.getExpected() : type::Value);
+    ParseResult input = ctx.parse(arrayMember(value, 2), 2, {inputType});
 
     if (!index || !input) return ParseResult();
 

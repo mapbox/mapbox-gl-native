@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/util.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/util/ignore.hpp>
@@ -437,7 +438,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 std::unordered_map<std::string, Definition> CompoundExpressionRegistry::definitions = initializeDefinitions();
 
 using namespace mbgl::style::conversion;
-ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext ctx) {
+ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value) && arrayLength(value) > 0);
 
     auto it = CompoundExpressionRegistry::definitions.find(name);
@@ -483,7 +484,7 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
             );
         }
     
-        auto parsed = ctx.concat(i, expected).parse(arrayMember(value, i));
+        auto parsed = ctx.parse(arrayMember(value, i), i, expected);
         if (!parsed) {
             return parsed;
         }
@@ -495,7 +496,7 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
 
 ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext ctx)
+                                     ParsingContext& ctx)
 {
     return createCompoundExpression(name, CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
 }
@@ -504,16 +505,12 @@ ParseResult createCompoundExpression(const std::string& name,
 ParseResult createCompoundExpression(const std::string& name,
                                      const Definition& definition,
                                      std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext ctx)
+                                     ParsingContext& ctx)
 {
-    std::vector<ParsingError> currentSignatureErrors;
-
-    ParsingContext signatureContext(currentSignatureErrors);
-    signatureContext.key = ctx.key;
+    ParsingContext signatureContext(ctx.getKey());
     
     for (const std::unique_ptr<detail::SignatureBase>& signature : definition) {
-        currentSignatureErrors.clear();
-        
+        signatureContext.clearErrors();
         
         if (signature->params.is<std::vector<type::Type>>()) {
             const std::vector<type::Type>& params = signature->params.get<std::vector<type::Type>>();
@@ -527,23 +524,29 @@ ParseResult createCompoundExpression(const std::string& name,
 
             for (std::size_t i = 0; i < args.size(); i++) {
                 const std::unique_ptr<Expression>& arg = args[i];
-                signatureContext.concat(i + 1, params.at(i)).checkType(arg->getType());
+                optional<std::string> err = type::checkSubtype(params.at(i), arg->getType());
+                if (err) {
+                    signatureContext.error(*err, i + 1);
+                }
             }
         } else if (signature->params.is<VarargsType>()) {
             const type::Type& paramType = signature->params.get<VarargsType>().type;
             for (std::size_t i = 0; i < args.size(); i++) {
                 const std::unique_ptr<Expression>& arg = args[i];
-                signatureContext.concat(i + 1, paramType).checkType(arg->getType());
+                optional<std::string> err = type::checkSubtype(paramType, arg->getType());
+                if (err) {
+                    signatureContext.error(*err, i + 1);
+                }
             }
         }
         
-        if (currentSignatureErrors.size() == 0) {
+        if (signatureContext.getErrors().size() == 0) {
             return ParseResult(signature->makeExpression(name, std::move(args)));
         }
     }
     
     if (definition.size() == 1) {
-        ctx.errors.insert(ctx.errors.end(), currentSignatureErrors.begin(), currentSignatureErrors.end());
+        ctx.appendErrors(std::move(signatureContext));
     } else {
         std::string signatures;
         for (const auto& signature : definition) {

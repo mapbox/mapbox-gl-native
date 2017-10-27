@@ -72,10 +72,10 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto expr = info[0];
 
     try {
-        std::vector<ParsingError> errors;
-        ParseResult parsed = ParsingContext(errors, expected).parse(mbgl::style::conversion::Convertible(expr));
+        ParsingContext ctx(expected);
+        ParseResult parsed = ctx.parse(mbgl::style::conversion::Convertible(expr));
         if (parsed) {
-            assert(errors.size() == 0);
+            assert(ctx.getErrors().size() == 0);
             auto nodeExpr = new NodeExpression(std::move(*parsed));
             const int argc = 0;
             v8::Local<v8::Value> argv[0] = {};
@@ -86,8 +86,8 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
         }
         
         v8::Local<v8::Array> result = Nan::New<v8::Array>();
-        for (std::size_t i = 0; i < errors.size(); i++) {
-            const auto& error = errors[i];
+        for (std::size_t i = 0; i < ctx.getErrors().size(); i++) {
+            const auto& error = ctx.getErrors()[i];
             v8::Local<v8::Object> err = Nan::New<v8::Object>();
             Nan::Set(err,
                     Nan::New("key").ToLocalChecked(),

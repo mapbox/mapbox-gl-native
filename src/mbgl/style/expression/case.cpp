@@ -27,7 +27,7 @@ void Case::eachChild(const std::function<void(const Expression*)>& visit) const 
 }
 
 using namespace mbgl::style::conversion;
-ParseResult Case::parse(const Convertible& value, ParsingContext ctx) {
+ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 4) {
@@ -42,19 +42,19 @@ ParseResult Case::parse(const Convertible& value, ParsingContext ctx) {
     }
 
     optional<type::Type> outputType;
-    if (ctx.expected && *ctx.expected != type::Value) {
-        outputType = ctx.expected;
+    if (ctx.getExpected() && *ctx.getExpected() != type::Value) {
+        outputType = ctx.getExpected();
     }
 
     std::vector<Case::Branch> branches;
     branches.reserve((length - 2) / 2);
     for (size_t i = 1; i + 1 < length; i += 2) {
-        auto test = ctx.concat(i, {type::Boolean}).parse(arrayMember(value, i));
+        auto test = ctx.parse(arrayMember(value, i), i, {type::Boolean});
         if (!test) {
             return test;
         }
 
-        auto output = ctx.concat(i + 1, outputType).parse(arrayMember(value, i + 1));
+        auto output = ctx.parse(arrayMember(value, i + 1), i + 1, outputType);
         if (!output) {
             return output;
         }
@@ -68,7 +68,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext ctx) {
 
     assert(outputType);
 
-    auto otherwise = ctx.concat(length - 1, outputType).parse(arrayMember(value, length - 1));
+    auto otherwise = ctx.parse(arrayMember(value, length - 1), length - 1, outputType);
     if (!otherwise) {
         return otherwise;
     }

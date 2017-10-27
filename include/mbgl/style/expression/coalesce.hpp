@@ -19,7 +19,7 @@ public:
         args(std::move(args_))
     {}
 
-    static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
+    static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;

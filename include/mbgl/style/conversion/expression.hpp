@@ -14,13 +14,13 @@ using namespace mbgl::style::expression;
 
 template<> struct Converter<std::unique_ptr<Expression>> {
     optional<std::unique_ptr<Expression>> operator()(const Convertible& value, Error& error, type::Type expected) const {
-        std::vector<ParsingError> errors;
-        ParseResult parsed = ParsingContext(errors, expected).parse(value);
+        ParsingContext ctx(optional<type::Type> {expected});
+        ParseResult parsed = ctx.parse(value);
         if (parsed) {
             return std::move(*parsed);
         }
         std::string combinedError;
-        for (const ParsingError& parsingError : errors) {
+        for (const ParsingError& parsingError : ctx.getErrors()) {
             if (combinedError.size() > 0) {
                 combinedError += "\n";
             }

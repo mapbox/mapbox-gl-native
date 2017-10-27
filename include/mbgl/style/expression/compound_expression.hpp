@@ -115,16 +115,16 @@ struct CompoundExpressionRegistry {
     static std::unordered_map<std::string, Definition> definitions;
 };
 
-ParseResult parseCompoundExpression(const std::string name, const mbgl::style::conversion::Convertible& value, ParsingContext ctx);
+ParseResult parseCompoundExpression(const std::string name, const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
 ParseResult createCompoundExpression(const std::string& name,
                                      const CompoundExpressionRegistry::Definition& definition,
                                      std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext ctx);
+                                     ParsingContext& ctx);
     
 ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
-                                     ParsingContext ctx);
+                                     ParsingContext& ctx);
 
 } // namespace expression
 } // namespace style
