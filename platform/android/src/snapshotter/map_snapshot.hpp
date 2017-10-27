@@ -26,6 +26,7 @@ public:
                                         PremultipliedImage&& image,
                                         float pixelRatio,
                                         std::vector<std::string> attributions,
+                                        bool showLogo,
                                         PointForFn pointForFn);
 
     MapSnapshot(jni::JNIEnv&) {};

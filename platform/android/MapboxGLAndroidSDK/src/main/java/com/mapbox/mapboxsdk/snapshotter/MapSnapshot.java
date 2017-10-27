@@ -15,14 +15,16 @@ public class MapSnapshot {
   private long nativePtr = 0;
   private Bitmap bitmap;
   private String[] attributions;
+  private boolean showLogo;
 
   /**
    * Created from native side
    */
-  private MapSnapshot(long nativePtr, Bitmap bitmap, String[] attributions) {
+  private MapSnapshot(long nativePtr, Bitmap bitmap, String[] attributions, boolean showLogo) {
     this.nativePtr = nativePtr;
     this.bitmap = bitmap;
     this.attributions = attributions;
+    this.showLogo = showLogo;
   }
 
   /**
@@ -45,6 +47,13 @@ public class MapSnapshot {
    */
   protected String[] getAttributions() {
     return attributions;
+  }
+
+  /**
+   * @return Flag indicating to show the Mapbox logo.
+   */
+  boolean isShowLogo() {
+    return showLogo;
   }
 
   // Unused, needed for peer binding
