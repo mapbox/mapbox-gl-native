@@ -51,6 +51,8 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
 
         const float scale = std::pow(2, state.getZoom() - renderTile.id.canonical.z);
 
+        const float pixelRatio = util::EXTENT / (util::tileSize * renderTile.tile.id.overscaleFactor());
+
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
         matrix::multiply(posMatrix, projMatrix, posMatrix);
@@ -67,7 +69,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, showCollisionBoxes);
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, pixelRatio, showCollisionBoxes);
     }
 }
 
@@ -77,6 +79,7 @@ void Placement::placeLayerBucket(
         const mat4& textLabelPlaneMatrix,
         const mat4& iconLabelPlaneMatrix,
         const float scale,
+        const float pixelRatio,
         const bool showCollisionBoxes) {
 
     // TODO collision debug array clearing
@@ -86,7 +89,6 @@ void Placement::placeLayerBucket(
 
     const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<TextOptional>();
     const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<IconOptional>();
-    float pixelRatio = util::EXTENT / util::tileSize;
 
     for (auto& symbolInstance : bucket.symbolInstances) {
 
@@ -108,7 +110,7 @@ void Placement::placeLayerBucket(
 
                 placeText = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
                         posMatrix, textLabelPlaneMatrix, pixelRatio,
-                        placedSymbol,scale, fontSize,
+                        placedSymbol, scale, fontSize,
                         bucket.layout.get<TextAllowOverlap>(),
                         bucket.layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
                         showCollisionBoxes);
