@@ -122,7 +122,7 @@ EvaluationResult Coercion::evaluate(const EvaluationParameters& params) const {
     return EvaluationResult();
 };
 
-void Coercion::eachChild(std::function<void(const Expression*)> visit) const {
+void Coercion::eachChild(const std::function<void(const Expression*)>& visit) const {
     for(const std::unique_ptr<Expression>& input : inputs) {
         visit(input.get());
     }

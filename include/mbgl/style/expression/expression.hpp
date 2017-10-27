@@ -115,7 +115,7 @@ public:
     virtual ~Expression() = default;
     
     virtual EvaluationResult evaluate(const EvaluationParameters& params) const = 0;
-    virtual void eachChild(std::function<void(const Expression*)>) const = 0;
+    virtual void eachChild(const std::function<void(const Expression*)>&) const = 0;
 
     type::Type getType() const { return type; };
     

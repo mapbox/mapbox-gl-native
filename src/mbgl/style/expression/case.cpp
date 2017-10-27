@@ -18,7 +18,7 @@ EvaluationResult Case::evaluate(const EvaluationParameters& params) const {
     return otherwise->evaluate(params);
 }
 
-void Case::eachChild(std::function<void(const Expression*)> visit) const {
+void Case::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (const Branch& branch : branches) {
         visit(branch.first.get());
         visit(branch.second.get());

@@ -116,7 +116,7 @@ public:
         
     }
     
-    void eachChild(std::function<void(const Expression*)> visit) const override {
+    void eachChild(const std::function<void(const Expression*)>& visit) const override {
         visit(input.get());
         for (auto it = stops.begin(); it != stops.end(); it++) {
             visit(it->second.get());

@@ -6,7 +6,7 @@ namespace style {
 namespace expression {
 
 template <typename T>
-void Match<T>::eachChild(std::function<void(const Expression*)> visit) const {
+void Match<T>::eachChild(const std::function<void(const Expression*)>& visit) const {
     visit(input.get());
     for (const std::pair<T, std::shared_ptr<Expression>>& branch : branches) {
         visit(branch.second.get());

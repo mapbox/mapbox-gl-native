@@ -32,7 +32,7 @@ EvaluationResult At::evaluate(const EvaluationParameters& params) const {
     return inputArray[static_cast<std::size_t>(i)];
 }
 
-void At::eachChild(std::function<void(const Expression*)> visit) const {
+void At::eachChild(const std::function<void(const Expression*)>& visit) const {
     visit(index.get());
     visit(input.get());
 }

@@ -13,7 +13,7 @@ EvaluationResult Coalesce::evaluate(const EvaluationParameters& params) const {
     return result;
 }
 
-void Coalesce::eachChild(std::function<void(const Expression*)> visit) const {
+void Coalesce::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (const std::unique_ptr<Expression>& arg : args) {
         visit(arg.get());
     }

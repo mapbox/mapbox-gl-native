@@ -9,7 +9,7 @@ EvaluationResult Let::evaluate(const EvaluationParameters& params) const {
     return result->evaluate(params);
 }
 
-void Let::eachChild(std::function<void(const Expression*)> visit) const {
+void Let::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (auto it = bindings.begin(); it != bindings.end(); it++) {
         visit(it->second.get());
     }
@@ -65,7 +65,7 @@ EvaluationResult Var::evaluate(const EvaluationParameters& params) const {
     return value->evaluate(params);
 }
 
-void Var::eachChild(std::function<void(const Expression*)>) const {}
+void Var::eachChild(const std::function<void(const Expression*)>&) const {}
 
 ParseResult Var::parse(const Convertible& value_, ParsingContext ctx) {
     assert(isArray(value_));

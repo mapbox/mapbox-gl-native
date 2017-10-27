@@ -13,7 +13,7 @@ EvaluationResult Any::evaluate(const EvaluationParameters& params) const {
     return EvaluationResult(false);
 }
 
-void Any::eachChild(std::function<void(const Expression*)> visit) const {
+void Any::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (const std::unique_ptr<Expression>& input : inputs) {
         visit(input.get());
     }
@@ -28,7 +28,7 @@ EvaluationResult All::evaluate(const EvaluationParameters& params) const {
     return EvaluationResult(true);
 }
 
-void All::eachChild(std::function<void(const Expression*)> visit) const {
+void All::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (const std::unique_ptr<Expression>& input : inputs) {
         visit(input.get());
     }

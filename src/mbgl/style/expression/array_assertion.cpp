@@ -21,7 +21,7 @@ EvaluationResult ArrayAssertion::evaluate(const EvaluationParameters& params) co
     return *result;
 }
 
-void ArrayAssertion::eachChild(std::function<void(const Expression*)> visit) const {
+void ArrayAssertion::eachChild(const std::function<void(const Expression*)>& visit) const {
     visit(input.get());
 }
 

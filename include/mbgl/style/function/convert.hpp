@@ -34,7 +34,7 @@ namespace detail {
 class ErrorExpression : public Expression {
 public:
     ErrorExpression(std::string message_) : Expression(type::Error), message(std::move(message_)) {}
-    void eachChild(std::function<void(const Expression*)>) const override {}
+    void eachChild(const std::function<void(const Expression*)>&) const override {}
 
     EvaluationResult evaluate(const EvaluationParameters&) const override {
         return EvaluationError{message};
