@@ -74,6 +74,7 @@ public class MapSnapshotter {
     private String styleUrl = Style.MAPBOX_STREETS;
     private LatLngBounds region;
     private CameraPosition cameraPosition;
+    private boolean showLogo = true;
 
     /**
      * @param width  the width of the image
@@ -120,6 +121,15 @@ public class MapSnapshotter {
      */
     public Options withCameraPosition(CameraPosition cameraPosition) {
       this.cameraPosition = cameraPosition;
+      return this;
+    }
+
+    /**
+     * @param showLogo The flag indicating to show the Mapbox logo.
+     * @return the mutated {@link Options}
+     */
+    public Options withLogo(boolean showLogo) {
+      this.showLogo = showLogo;
       return this;
     }
 
@@ -182,7 +192,7 @@ public class MapSnapshotter {
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUrl, options.region, options.cameraPosition,
-      programCacheDir);
+      options.showLogo, programCacheDir);
   }
 
   /**
@@ -266,7 +276,9 @@ public class MapSnapshotter {
    */
   protected void onSnapshotReady(MapSnapshot snapshot) {
     if (callback != null) {
-      addOverlay(snapshot.getBitmap());
+      if (snapshot.isShowLogo()) {
+        addOverlay(snapshot.getBitmap());
+      }
       callback.onSnapshotReady(snapshot);
       reset();
     }
@@ -294,7 +306,7 @@ public class MapSnapshotter {
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl,
                                          LatLngBounds region, CameraPosition position,
-                                         String programCacheDir);
+                                         boolean showLogo, String programCacheDir);
 
   protected native void nativeStart();
 
