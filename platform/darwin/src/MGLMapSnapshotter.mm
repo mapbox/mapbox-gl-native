@@ -144,7 +144,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     _loading = true;
     
     dispatch_async(queue, ^{
-        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::PointForFn pointForFn) {
+        _snapshotCallback = std::make_unique<mbgl::Actor<mbgl::MapSnapshotter::Callback>>(*mbgl::Scheduler::GetCurrent(), [=](std::exception_ptr mbglError, mbgl::PremultipliedImage image, mbgl::MapSnapshotter::Attributions attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
             _loading = false;
             if (mbglError) {
                 NSString *description = @(mbgl::util::toString(mbglError).c_str());
