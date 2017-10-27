@@ -76,10 +76,21 @@ void MapSnapshotter::Impl::snapshot(ActorRef<MapSnapshotter::Callback> callback)
             return transform.latLngToScreenCoordinate(unwrappedLatLng);
         }};
 
+        // Collect all source attributions
+        std::vector<std::string> attributions;
+        for (auto source : map.getStyle().getSources()) {
+            auto attribution = source->getAttribution();
+            if (attribution) {
+                attributions.push_back(*attribution);
+            }
+        }
+
+        // Invoke callback
         callback.invoke(
                 &MapSnapshotter::Callback::operator(),
                 error,
                 error ? PremultipliedImage() : frontend.readStillImage(),
+                std::move(attributions),
                 std::move(pointForFn)
         );
     });
