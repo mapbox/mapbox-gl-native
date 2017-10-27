@@ -54,6 +54,7 @@ namespace mbgl {
                     const mat4& textLabelPlaneMatrix,
                     const mat4& iconLabelPlaneMatrix,
                     const float scale,
+                    const float pixelRatio,
                     const bool showCollisionBoxes);
 
             void updateBucketOpacities(SymbolBucket&);
