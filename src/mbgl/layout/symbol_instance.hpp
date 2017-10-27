@@ -39,7 +39,8 @@ public:
     uint32_t index;
     bool hasText;
     bool hasIcon;
-    SymbolQuads glyphQuads;
+    SymbolQuads horizontalGlyphQuads;
+    SymbolQuads verticalGlyphQuads;
     optional<SymbolQuad> iconQuad;
     CollisionFeature textCollisionFeature;
     CollisionFeature iconCollisionFeature;

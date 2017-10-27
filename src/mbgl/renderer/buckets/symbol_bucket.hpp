@@ -19,24 +19,20 @@ namespace mbgl {
 class PlacedSymbol {
 public:
     PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
-            std::array<float, 2> lineOffset_, bool useVerticalMode_, const GeometryCoordinates& line_, const std::vector<float>& tileDistances_) :
+            std::array<float, 2> lineOffset_, WritingModeType writingModes_, const GeometryCoordinates& line_, const std::vector<float>& tileDistances_) :
         anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffset(lineOffset_), useVerticalMode(useVerticalMode_), line(line_), tileDistances(tileDistances_)
+        lineOffset(lineOffset_), writingModes(writingModes_), line(line_), tileDistances(tileDistances_), hidden(false)
     {
-        // TODO WIP hook these up
-        writingMode = WritingModeType::None;
-        hidden = false;
     }
     Point<float> anchorPoint;
     uint16_t segment;
     float lowerSize;
     float upperSize;
     std::array<float, 2> lineOffset;
-    bool useVerticalMode;
+    WritingModeType writingModes;
     GeometryCoordinates line;
     std::vector<float> tileDistances;
     std::vector<float> glyphOffsets;
-    WritingModeType writingMode;
     bool hidden;
 };
 
