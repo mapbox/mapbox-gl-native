@@ -14,13 +14,15 @@ public class MapSnapshot {
 
   private long nativePtr = 0;
   private Bitmap bitmap;
+  private String[] attributions;
 
   /**
    * Created from native side
    */
-  private MapSnapshot(long nativePtr, Bitmap bitmap) {
+  private MapSnapshot(long nativePtr, Bitmap bitmap, String[] attributions) {
     this.nativePtr = nativePtr;
     this.bitmap = bitmap;
+    this.attributions = attributions;
   }
 
   /**
@@ -37,6 +39,13 @@ public class MapSnapshot {
    * @return the point on the image
    */
   public native PointF pixelForLatLng(LatLng latLng);
+
+  /**
+   * @return The attributions for the sources of this snapshot.
+   */
+  protected String[] getAttributions() {
+    return attributions;
+  }
 
   // Unused, needed for peer binding
   private native void initialize();
