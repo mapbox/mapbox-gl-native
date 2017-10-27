@@ -8,6 +8,7 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <vector>
 #include <functional>
 
 namespace mbgl {
@@ -48,7 +49,8 @@ public:
     LatLngBounds getRegion() const;
 
     using PointForFn = std::function<ScreenCoordinate (const LatLng&)>;
-    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, PointForFn)>;
+    using Attributions = std::vector<std::string>;
+    using Callback = std::function<void (std::exception_ptr, PremultipliedImage, Attributions, PointForFn)>;
     void snapshot(ActorRef<Callback>);
 
 private:
