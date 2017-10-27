@@ -8,7 +8,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.2.0-beta.4 - TBA
 
-- Add Bulgarian localization [#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309)
+- Add Bulgarian and Hungarian localizations [#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309)
 
 ## 5.2.0-beta.3 - October 26, 2017
 
