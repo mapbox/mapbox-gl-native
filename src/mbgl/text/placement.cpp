@@ -218,7 +218,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
         // TODO check if hasText is the right thing here, or if there are cases where hasText is true but it's not added to the buffers
         if (symbolInstance.hasText) {
             auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
-            for (size_t i = 0; i < symbolInstance.glyphQuads.size() * 4; i++) {
+            for (size_t i = 0; i < symbolInstance.horizontalGlyphQuads.size() * 4; i++) {
+                bucket.text.opacityVertices.emplace_back(opacityVertex);
+            }
+            for (size_t i = 0; i < symbolInstance.verticalGlyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
             // TODO On JS we avoid setting this if it hasn't chnaged, but it may be cheap enough here we don't care

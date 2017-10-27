@@ -32,7 +32,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.second ?: shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
+    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
     iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, SymbolPlacementType::Point, indexedFeature),
     featureIndex(featureIndex_),
     textOffset(textOffset_),
@@ -45,12 +45,10 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
             iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
         }
         if (shapedTextOrientations.first) {
-            auto quads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
-            glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
+            horizontalGlyphQuads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
         }
         if (shapedTextOrientations.second) {
-            auto quads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
-            glyphQuads.insert(glyphQuads.end(), quads.begin(), quads.end());
+            verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
         }
     }
 

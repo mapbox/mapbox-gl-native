@@ -416,18 +416,6 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, symbolInstances);
 
-    // Calculate which labels can be shown and when they can be shown and
-    // create the bufers used for rendering.
-
-    const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
-    const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
-
-    const bool keepUpright = layout.get<TextKeepUpright>();
-
     // this iterates over the *bucket's* symbol instances so that it can set the placedsymbol index. TODO cleanup
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
@@ -439,16 +427,27 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
-            const bool useVerticalMode = false; // TODO: Add both versions of glyphs to buckets
             const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
             bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                    symbolInstance.textOffset, useVerticalMode, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
+                    symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
             symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
 
-            for (const auto& symbol : symbolInstance.glyphQuads) {
+            for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
                 addSymbol(
                     bucket->text, sizeData, symbol,
-                    keepUpright, textPlacement, symbolInstance.anchor, bucket->text.placedSymbols.back());
+                    symbolInstance.anchor, bucket->text.placedSymbols.back());
+            }
+            
+            if (symbolInstance.writingModes & WritingModeType::Vertical) {
+                bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                        symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
+                symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
+
+                for (const auto& symbol : symbolInstance.verticalGlyphQuads) {
+                    addSymbol(
+                        bucket->text, sizeData, symbol,
+                        symbolInstance.anchor, bucket->text.placedSymbols.back());
+                }
             }
         }
 
@@ -456,11 +455,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
             if (symbolInstance.iconQuad) {
                 const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
-                        symbolInstance.iconOffset, false, symbolInstance.line, std::vector<float>());
+                        symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
                 symbolInstance.placedIconIndices.push_back(bucket->icon.placedSymbols.size() - 1);
                 addSymbol(
                     bucket->icon, sizeData, *symbolInstance.iconQuad,
-                    keepUpright, iconPlacement, symbolInstance.anchor, bucket->icon.placedSymbols.back());
+                 symbolInstance.anchor, bucket->icon.placedSymbols.back());
             }
         }
         
@@ -481,8 +480,6 @@ template <typename Buffer>
 void SymbolLayout::addSymbol(Buffer& buffer,
                              const Range<float> sizeData,
                              const SymbolQuad& symbol,
-                             const bool keepUpright,
-                             const style::SymbolPlacementType placement,
                              const Anchor& labelAnchor,
                              PlacedSymbol& placedSymbol) {
     constexpr const uint16_t vertexLength = 4;
@@ -492,11 +489,6 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     const auto &bl = symbol.bl;
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
-
-    if (placement == style::SymbolPlacementType::Line && keepUpright) {
-        // drop incorrectly oriented glyphs
-        if ((symbol.writingMode == WritingModeType::Vertical) != placedSymbol.useVerticalMode) return;
-    }
 
     if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
         buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());

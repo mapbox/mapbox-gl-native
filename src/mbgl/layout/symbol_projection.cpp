@@ -261,7 +261,8 @@ namespace mbgl {
                               const mat4& labelPlaneMatrix,
                               const mat4& glCoordMatrix,
                               gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray,
-                              const Point<float>& projectedAnchorPoint) {
+                              const Point<float>& projectedAnchorPoint,
+                              const float aspectRatio) {
         const float fontScale = fontSize / 24.0;
         const float lineOffsetX = symbol.lineOffset[0] * fontSize;
         const float lineOffsetY = symbol.lineOffset[1] * fontSize;
@@ -278,29 +279,27 @@ namespace mbgl {
             const Point<float> firstPoint = project(firstAndLastGlyph->first.point, glCoordMatrix).first;
             const Point<float> lastPoint = project(firstAndLastGlyph->second.point, glCoordMatrix).first;
 
-            if (keepUpright && !flip &&
-                (symbol.useVerticalMode ? firstPoint.y < lastPoint.y : firstPoint.x > lastPoint.x)) {
-                return PlacementResult::NeedsFlipping;
-            }
-            
             if (keepUpright && !flip) {
-                if (symbol.writingMode == WritingModeType::Horizontal) {
+                if (symbol.writingModes == (WritingModeType::Horizontal | WritingModeType::Vertical)) {
                     // On top of choosing whether to flip, choose whether to render this version of the glyphs or the alternate
                     // vertical glyphs. We can't just filter out vertical glyphs in the horizontal range because the horizontal
                     // and vertical versions can have slightly different projections which could lead to angles where both or
                     // neither showed.
-                    if (std::abs(lastPoint.y - firstPoint.y) > std::abs(lastPoint.x - firstPoint.x)) {
+                    auto rise = std::abs(lastPoint.y - firstPoint.y);
+                    auto run = std::abs(lastPoint.x - firstPoint.x) * aspectRatio;
+                    if (rise > run) {
                         return PlacementResult::UseVertical;
                     }
                 }
 
-                if (symbol.writingMode == WritingModeType::Vertical ? firstPoint.y < lastPoint.y : firstPoint.x > lastPoint.x) {
+                if ((symbol.writingModes == WritingModeType::Vertical) ?
+                    (firstPoint.y < lastPoint.y) :
+                    (firstPoint.x > lastPoint.x)) {
                     // Includes "horizontalOnly" case for labels without vertical glyphs
                     return PlacementResult::NeedsFlipping;
                 }
 
             }
-
 
             placedGlyphs.push_back(firstAndLastGlyph->first);
             for (size_t glyphIndex = 1; glyphIndex < symbol.glyphOffsets.size() - 1; glyphIndex++) {
@@ -324,7 +323,7 @@ namespace mbgl {
                     projectedVertex.first :
                     projectTruncatedLineSegment(symbol.anchorPoint,tileSegmentEnd, a, 1, posMatrix);
                 
-                if (symbol.useVerticalMode ? b.y > a.y : b.x < a.x) {
+                if (symbol.writingModes == WritingModeType::Vertical ? b.y > a.y : b.x < a.x) {
                     return PlacementResult::NeedsFlipping;
                 }
             }
@@ -371,7 +370,7 @@ namespace mbgl {
             // Don't do calculations for vertical glyphs unless the previous symbol was horizontal
             // and we determined that vertical glyphs were necessary.
             // Also don't do calculations for symbols that are collided and fully faded out
-            if (placedSymbol.hidden || (placedSymbol.writingMode == WritingModeType::Vertical && !useVertical)) {
+            if (placedSymbol.hidden || (placedSymbol.writingModes == WritingModeType::Vertical && !useVertical)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
                 continue;
             }
@@ -397,13 +396,13 @@ namespace mbgl {
             
             const Point<float> anchorPoint = project(placedSymbol.anchorPoint, labelPlaneMatrix).first;
 
-            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint);
+            PlacementResult placeUnflipped = placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, false /*unflipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio());
             
             useVertical = placeUnflipped == PlacementResult::UseVertical;
 
             if (placeUnflipped == PlacementResult::NotEnoughRoom || useVertical ||
                 (placeUnflipped == PlacementResult::NeedsFlipping &&
-                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint) == PlacementResult::NotEnoughRoom)) {
+                 placeGlyphsAlongLine(placedSymbol, pitchScaledFontSize, true /*flipped*/, values.keepUpright, posMatrix, labelPlaneMatrix, glCoordMatrix, dynamicVertexArray, anchorPoint, state.getSize().aspectRatio()) == PlacementResult::NotEnoughRoom)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
             }
         }
