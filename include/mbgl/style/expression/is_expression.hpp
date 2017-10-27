@@ -1,7 +1,8 @@
 #pragma once
-#include <unordered_set>
+
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <unordered_set>
 
 namespace mbgl {
 namespace style {

@@ -1,11 +1,13 @@
 #pragma once
 
-#include <map>
-#include <string>
-#include <vector>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/conversion.hpp>
+
+#include <map>
+#include <string>
+#include <vector>
+#include <memory>
 
 namespace mbgl {
 namespace style {
@@ -108,7 +110,7 @@ private:
         : key(std::move(key_)),
           errors(errors_),
           expected(std::move(expected_)),
-          scope(scope_)
+          scope(std::move(scope_))
     {}
 };
 

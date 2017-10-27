@@ -16,8 +16,9 @@ void Let::eachChild(std::function<void(const Expression*)> visit) const {
     visit(result.get());
 }
 
-ParseResult Let::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+
+ParseResult Let::parse(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
 
     std::size_t length = arrayLength(value);
@@ -66,8 +67,7 @@ EvaluationResult Var::evaluate(const EvaluationParameters& params) const {
 
 void Var::eachChild(std::function<void(const Expression*)>) const {}
 
-ParseResult Var::parse(const mbgl::style::conversion::Convertible& value_, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+ParseResult Var::parse(const Convertible& value_, ParsingContext ctx) {
     assert(isArray(value_));
 
     if (arrayLength(value_) != 2 || !toString(arrayMember(value_, 1))) {

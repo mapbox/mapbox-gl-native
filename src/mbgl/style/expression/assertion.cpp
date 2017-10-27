@@ -5,8 +5,8 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-ParseResult Assertion::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+ParseResult Assertion::parse(const Convertible& value, ParsingContext ctx) {
     static std::unordered_map<std::string, type::Type> types {
         {"string", type::String},
         {"number", type::Number},

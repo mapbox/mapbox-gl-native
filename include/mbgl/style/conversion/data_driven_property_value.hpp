@@ -1,6 +1,5 @@
 #pragma once
 
-#include <unordered_set>
 #include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
@@ -9,6 +8,9 @@
 #include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
+
+#include <unordered_set>
+
 
 namespace mbgl {
 namespace style {
@@ -32,11 +34,9 @@ struct Converter<DataDrivenPropertyValue<T>> {
             
             bool zoomConstant = isZoomConstant(expression->get());
             
-            if (!zoomConstant) {
-                if (!CameraFunction<T>::Curve::findZoomCurve(expression->get())) {
-                    error = { R"("zoom" expression may only be used as input to a top-level "curve" expression.)" };
-                    return {};
-                }
+            if (!zoomConstant && !CameraFunction<T>::Curve::findZoomCurve(expression->get())) {
+                error = { R"("zoom" expression may only be used as input to a top-level "curve" expression.)" };
+                return {};
             }
             
             if (isFeatureConstant(expression->get())) {

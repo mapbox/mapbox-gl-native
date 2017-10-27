@@ -1,14 +1,11 @@
 #pragma once
 
-#include <vector>
-#include <memory>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/conversion.hpp>
+
+#include <memory>
 
 namespace mbgl {
 namespace style {

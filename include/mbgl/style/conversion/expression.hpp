@@ -1,9 +1,10 @@
 #pragma once
 
-#include <memory>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/conversion.hpp>
+
+#include <memory>
 
 namespace mbgl {
 namespace style {
@@ -12,7 +13,7 @@ namespace conversion {
 using namespace mbgl::style::expression;
 
 template<> struct Converter<std::unique_ptr<Expression>> {
-    optional<std::unique_ptr<Expression>> operator()(const mbgl::style::conversion::Convertible& value, Error& error, type::Type expected) const {
+    optional<std::unique_ptr<Expression>> operator()(const Convertible& value, Error& error, type::Type expected) const {
         std::vector<ParsingError> errors;
         ParseResult parsed = ParsingContext(errors, expected).parse(value);
         if (parsed) {

@@ -1,15 +1,14 @@
 #pragma once
 
-#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/conversion.hpp>
 
+#include <memory>
+
 namespace mbgl {
 namespace style {
 namespace expression {
-
-using InputType = variant<int64_t, std::string>;
 
 template <typename T>
 class Match : public Expression {

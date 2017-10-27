@@ -49,10 +49,9 @@ bool isConstant(const Expression* expression) {
         isGlobalPropertyConstant(expression, std::array<std::string, 2>{{"zoom", "heatmap-density"}});
 }
 
-ParseResult ParsingContext::parse(const mbgl::style::conversion::Convertible& value)
+using namespace mbgl::style::conversion;
+ParseResult ParsingContext::parse(const Convertible& value)
 {
-    using namespace mbgl::style::conversion;
-    
     ParseResult parsed;
     
     if (isArray(value)) {

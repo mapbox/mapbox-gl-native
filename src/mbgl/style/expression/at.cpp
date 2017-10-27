@@ -37,8 +37,8 @@ void At::eachChild(std::function<void(const Expression*)> visit) const {
     visit(input.get());
 }
 
-ParseResult At::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+ParseResult At::parse(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
 
     std::size_t length = arrayLength(value);

@@ -17,11 +17,13 @@ class GeometryTileFeature;
 namespace style {
 namespace expression {
 
-struct EvaluationError {
+class EvaluationError {
+public:
     std::string message;
 };
 
-struct EvaluationParameters {
+class EvaluationParameters {
+public:
     EvaluationParameters(float zoom_) : zoom(zoom_), feature(nullptr) {}
     EvaluationParameters(GeometryTileFeature const * feature_) : zoom(optional<float>()), feature(feature_) {}
     EvaluationParameters(float zoom_, GeometryTileFeature const * feature_) :
@@ -74,7 +76,8 @@ public:
     }
 };
 
-struct EvaluationResult : public Result<Value> {
+class EvaluationResult : public Result<Value> {
+public:
     using Result::Result;
     
     EvaluationResult(const std::array<double, 4>& arr) :

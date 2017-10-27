@@ -436,9 +436,8 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
 std::unordered_map<std::string, Definition> CompoundExpressionRegistry::definitions = initializeDefinitions();
 
-
-ParseResult parseCompoundExpression(const std::string name, const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+ParseResult parseCompoundExpression(const std::string name, const Convertible& value, ParsingContext ctx) {
     assert(isArray(value) && arrayLength(value) > 0);
 
     auto it = CompoundExpressionRegistry::definitions.find(name);

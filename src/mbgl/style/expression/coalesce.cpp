@@ -5,12 +5,12 @@ namespace style {
 namespace expression {
 
 EvaluationResult Coalesce::evaluate(const EvaluationParameters& params) const {
-    for (auto it = args.begin(); it != args.end(); it++) {
-        const EvaluationResult result = (*it)->evaluate(params);
-        if (!result || *result != Null || std::next(it) == args.end()) return result;
+    EvaluationResult result = Null;
+    for (const auto& arg : args) {
+        result = arg->evaluate(params);
+        if (!result || *result != Null) break;
     }
-    
-    return Null;
+    return result;
 }
 
 void Coalesce::eachChild(std::function<void(const Expression*)> visit) const {
@@ -19,8 +19,8 @@ void Coalesce::eachChild(std::function<void(const Expression*)> visit) const {
     }
 }
 
-ParseResult Coalesce::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+ParseResult Coalesce::parse(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 2) {

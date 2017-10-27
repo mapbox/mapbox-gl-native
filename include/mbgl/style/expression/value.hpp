@@ -1,6 +1,5 @@
 #pragma once
 
-#include <array>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/position.hpp>
 #include <mbgl/style/types.hpp>
@@ -9,6 +8,8 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/variant.hpp>
 
+#include <array>
+#include <vector>
 
 namespace mbgl {
 namespace style {

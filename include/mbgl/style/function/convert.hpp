@@ -1,7 +1,5 @@
 #pragma once
 
-#include <mbgl/util/enum.hpp>
-#include <mbgl/style/types.hpp>
 #include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/style/expression/assertion.hpp>
 #include <mbgl/style/expression/case.hpp>
@@ -20,6 +18,9 @@
 #include <mbgl/style/function/composite_interval_stops.hpp>
 #include <mbgl/style/function/composite_categorical_stops.hpp>
 #include <mbgl/style/function/identity_stops.hpp>
+
+#include <mbgl/util/enum.hpp>
+#include <mbgl/style/types.hpp>
 
 #include <string>
 

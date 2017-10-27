@@ -1,8 +1,11 @@
 #pragma once
 
-#include <map>
 #include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/conversion.hpp>
+
+#include <memory>
+#include <map>
 
 namespace mbgl {
 namespace style {

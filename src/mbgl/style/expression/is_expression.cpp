@@ -5,9 +5,9 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-bool isExpression(const conversion::Convertible& value) {
-    using namespace mbgl::style::conversion;
-    
+using namespace mbgl::style::conversion;
+
+bool isExpression(const Convertible& value) {
     static std::unordered_set<std::string> specialForms = {
         "all",
         "any",

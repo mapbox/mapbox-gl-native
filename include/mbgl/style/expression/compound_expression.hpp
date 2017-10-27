@@ -1,17 +1,16 @@
 #pragma once
 
-#include <array>
-#include <vector>
-#include <memory>
-#include <mbgl/util/optional.hpp>
-#include <mbgl/util/variant.hpp>
-#include <mbgl/util/color.hpp>
-#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/style/conversion.hpp>
+
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/variant.hpp>
+
+#include <memory>
+#include <vector>
 
 namespace mbgl {
 namespace style {

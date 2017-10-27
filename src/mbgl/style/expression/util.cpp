@@ -1,5 +1,5 @@
 
-#include "util.hpp"
+#include <mbgl/style/expression/util.hpp>
 #include <mbgl/style/expression/value.hpp>
 
 namespace mbgl {

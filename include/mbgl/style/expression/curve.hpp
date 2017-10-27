@@ -1,13 +1,18 @@
 #pragma once
 
-#include <map>
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/let.hpp>
+#include <mbgl/style/expression/coalesce.hpp>
+#include <mbgl/style/conversion.hpp>
+
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/unitbezier.hpp>
-#include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/style/expression/coalesce.hpp>
-#include <mbgl/style/expression/let.hpp>
+
+#include <memory>
+#include <map>
 
 
 namespace mbgl {

@@ -1,9 +1,9 @@
 #pragma once
 
-#include <exception>
-#include <memory>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/expression.hpp>
+#include <exception>
+#include <memory>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"

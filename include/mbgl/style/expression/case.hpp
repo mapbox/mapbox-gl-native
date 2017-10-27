@@ -1,9 +1,11 @@
 #pragma once
 
-#include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/conversion.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
+
+#include <memory>
+#include <vector>
 
 namespace mbgl {
 namespace style {

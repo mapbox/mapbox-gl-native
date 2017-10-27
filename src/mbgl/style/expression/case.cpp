@@ -26,9 +26,8 @@ void Case::eachChild(std::function<void(const Expression*)> visit) const {
     visit(otherwise.get());
 }
 
-ParseResult Case::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
-
+using namespace mbgl::style::conversion;
+ParseResult Case::parse(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 4) {

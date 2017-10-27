@@ -382,6 +382,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/conversion/filter.cpp
     src/mbgl/style/conversion/geojson.cpp
     src/mbgl/style/conversion/geojson_options.cpp
+    src/mbgl/style/conversion/get_json_type.cpp
     src/mbgl/style/conversion/json.hpp
     src/mbgl/style/conversion/layer.cpp
     src/mbgl/style/conversion/light.cpp

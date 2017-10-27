@@ -14,8 +14,8 @@ optional<Value> checkNumber(T n) {
     }
 }
 
-optional<Value> parseValue(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+optional<Value> parseValue(const Convertible& value, ParsingContext ctx) {
     if (isUndefined(value)) return {Null};
     if (isObject(value)) {
         std::unordered_map<std::string, Value> result;
@@ -61,7 +61,7 @@ optional<Value> parseValue(const mbgl::style::conversion::Convertible& value, Pa
     );
 }
 
-ParseResult Literal::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
+ParseResult Literal::parse(const Convertible& value, ParsingContext ctx) {
     const optional<Value> parsedValue = parseValue(value, ctx);
 
     if (!parsedValue) {

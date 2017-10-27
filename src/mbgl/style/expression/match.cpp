@@ -49,8 +49,10 @@ template<> EvaluationResult Match<int64_t>::evaluate(const EvaluationParameters&
 template class Match<int64_t>;
 template class Match<std::string>;
 
+using InputType = variant<int64_t, std::string>;
 
-optional<InputType> parseInputValue(const mbgl::style::conversion::Convertible& input, ParsingContext ctx, optional<type::Type>& inputType) {
+using namespace mbgl::style::conversion;
+optional<InputType> parseInputValue(const Convertible& input, ParsingContext ctx, optional<type::Type>& inputType) {
     using namespace mbgl::style::conversion;
     optional<InputType> result;
     optional<type::Type> type;
@@ -144,9 +146,7 @@ static ParseResult create(type::Type outputType,
     ));
 }
 
-ParseResult parseMatch(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
-
+ParseResult parseMatch(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 5) {

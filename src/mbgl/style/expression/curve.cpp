@@ -9,8 +9,9 @@ using Interpolator = variant<StepInterpolator,
                              ExponentialInterpolator,
                              CubicBezierInterpolator>;
 
-ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+
+ParseResult parseCurve(const Convertible& value, ParsingContext ctx) {
     assert(isArray(value));
 
     auto length = arrayLength(value);
@@ -21,7 +22,7 @@ ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, Parsin
         ctx.error("Expected an interpolation type expression.");
         return ParseResult();
     }
-    const mbgl::style::conversion::Convertible& interp = arrayMember(value, 1);
+    const Convertible& interp = arrayMember(value, 1);
     if (!isArray(interp) || arrayLength(interp) == 0) {
         ctx.error("Expected an interpolation type expression.");
         return ParseResult();

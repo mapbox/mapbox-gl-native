@@ -34,9 +34,11 @@ void All::eachChild(std::function<void(const Expression*)> visit) const {
     }
 }
 
+using namespace mbgl::style::conversion;
+
 template <class T>
-ParseResult parseBooleanOp(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+ParseResult parseBooleanOp(const Convertible& value, ParsingContext ctx) {
+    
     assert(isArray(value));
     auto length = arrayLength(value);
  
@@ -55,11 +57,11 @@ ParseResult parseBooleanOp(const mbgl::style::conversion::Convertible& value, Pa
     return ParseResult(std::make_unique<T>(std::move(parsedInputs)));
 }
 
-ParseResult Any::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
+ParseResult Any::parse(const Convertible& value, ParsingContext ctx) {
     return parseBooleanOp<Any>(value, ctx);
 }
 
-ParseResult All::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
+ParseResult All::parse(const Convertible& value, ParsingContext ctx) {
     return parseBooleanOp<All>(value, ctx);
 }
 

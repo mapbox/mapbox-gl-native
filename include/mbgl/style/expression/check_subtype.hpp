@@ -1,9 +1,8 @@
 #pragma once
 
-#include <memory>
-#include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/util/optional.hpp>
+#include <memory>
 
 namespace mbgl {
 namespace style {

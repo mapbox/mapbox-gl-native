@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/array_assertion.hpp>
+#include <mbgl/style/expression/check_subtype.hpp>
 
 namespace mbgl {
 namespace style {
@@ -24,8 +25,8 @@ void ArrayAssertion::eachChild(std::function<void(const Expression*)> visit) con
     visit(input.get());
 }
 
-ParseResult ArrayAssertion::parse(const mbgl::style::conversion::Convertible& value, ParsingContext ctx) {
-    using namespace mbgl::style::conversion;
+using namespace mbgl::style::conversion;
+ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext ctx) {
 
     static std::unordered_map<std::string, type::Type> itemTypes {
         {"string", type::String},

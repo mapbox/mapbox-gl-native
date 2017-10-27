@@ -1,10 +1,8 @@
 #pragma once
 
-#include <unordered_map>
-#include <vector>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/variant.hpp>
-
+#include <vector>
 
 namespace mbgl {
 namespace style {
