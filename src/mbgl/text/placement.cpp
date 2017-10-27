@@ -34,7 +34,7 @@ uint32_t Placement::maxCrossTileID = 0;
 
 Placement::Placement(const TransformState& state_) : collisionIndex(state_), state(state_) {}
 
-void Placement::placeLayer(RenderSymbolLayer& symbolLayer, bool showCollisionBoxes) {
+void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
 
         if (!renderTile.tile.isRenderable()) {
@@ -51,6 +51,10 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, bool showCollisionBox
 
         const float scale = std::pow(2, state.getZoom() - renderTile.id.canonical.z);
 
+        mat4 posMatrix;
+        state.matrixFor(posMatrix, renderTile.id);
+        matrix::multiply(posMatrix, projMatrix, posMatrix);
+
         mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(renderTile.matrix,
                 layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
                 layout.get<TextRotationAlignment>() == style::AlignmentType::Map,
@@ -63,7 +67,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, bool showCollisionBox
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolBucket, renderTile.matrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, showCollisionBoxes);
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, showCollisionBoxes);
     }
 }
 

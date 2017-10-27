@@ -367,7 +367,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     auto newPlacement = std::make_unique<Placement>(parameters.state);
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.debugOptions & MapDebugOptions::Collision);
+            newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
         }
     }
 
