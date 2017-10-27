@@ -51,12 +51,15 @@ public:
 class ParsingContext {
 public:
     ParsingContext() : errors(std::make_shared<std::vector<ParsingError>>()) {}
-    ParsingContext(std::string key) : key(std::move(key)), errors(std::make_shared<std::vector<ParsingError>>()) {}
+    ParsingContext(std::string key_) : key(std::move(key_)), errors(std::make_shared<std::vector<ParsingError>>()) {}
     explicit ParsingContext(optional<type::Type> expected_)
         : expected(std::move(expected_)),
           errors(std::make_shared<std::vector<ParsingError>>())
     {}
     ParsingContext(ParsingContext&&) = default;
+    
+    ParsingContext(const ParsingContext&) = delete;
+    ParsingContext& operator=(const ParsingContext&) = delete;
 
     std::string getKey() const { return key; }
     optional<type::Type> getExpected() const { return expected; }
@@ -127,9 +130,6 @@ private:
           scope(std::move(scope_)),
         errors(std::move(errors_))
     {}
-    
-    ParsingContext(const ParsingContext&) = delete;
-    ParsingContext& operator=(const ParsingContext&) = delete;
     
     std::string key;
     optional<type::Type> expected;
