@@ -775,6 +775,12 @@
 		DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLOfflineRegionTests.m; path = ../../darwin/test/MGLOfflineRegionTests.m; sourceTree = "<group>"; };
 		DA2E88601CC0382C00F24E7B /* MGLStyleTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLStyleTests.mm; path = ../../darwin/test/MGLStyleTests.mm; sourceTree = "<group>"; };
 		DA33895F1FA3EAB7001EA329 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Foundation.strings"; sourceTree = "<group>"; };
+		DA3389651FA3EE1B001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA3389661FA3EE28001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA3389671FA3EE2F001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = bg; path = bg.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA3389681FA3EE48001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA3389691FA3EE50001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = bg; path = bg.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DA33896A1FA3EE58001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Root.strings; sourceTree = "<group>"; };
 		DA35A29D1CC9E94C00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A01CC9E95F00E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCoordinateFormatter.m; sourceTree = "<group>"; };
 		DA35A2A91CCA058D00E826B2 /* MGLCoordinateFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatterTests.m; path = ../../darwin/test/MGLCoordinateFormatterTests.m; sourceTree = "<group>"; };
@@ -2110,6 +2116,7 @@
 				fi,
 				nl,
 				hu,
+				bg,
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2521,6 +2528,7 @@
 				DA618B2B1E68932D00CB7F44 /* fi */,
 				DAE8CCAD1E6E8C70009B5CB0 /* nl */,
 				DA5C09BA1EFC48550056B178 /* hu */,
+				DA3389651FA3EE1B001EA329 /* bg */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2545,6 +2553,7 @@
 				DA618B2C1E68933600CB7F44 /* fi */,
 				DAE8CCAE1E6E8C76009B5CB0 /* nl */,
 				DACCD9C81F1F473700BB09A1 /* hu */,
+				DA33896A1FA3EE58001EA329 /* bg */,
 			);
 			name = Root.strings;
 			sourceTree = "<group>";
@@ -2567,6 +2576,7 @@
 				DA1AC01B1E5B8774006DF1D6 /* lt */,
 				DA618B1B1E68884E00CB7F44 /* ca */,
 				DA5C09BB1EFC486C0056B178 /* hu */,
+				DA3389681FA3EE48001EA329 /* bg */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2587,6 +2597,7 @@
 				DA704CBB1F637311004B3F28 /* ru */,
 				DA704CC71F6663A3004B3F28 /* uk */,
 				DA33895F1FA3EAB7001EA329 /* pt-BR */,
+				DA3389661FA3EE28001EA329 /* bg */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -2606,6 +2617,7 @@
 				DA618B1D1E6888F500CB7F44 /* ca */,
 				DA618B261E68920D00CB7F44 /* lt */,
 				DACFE7981F66EA2100630DA8 /* vi */,
+				DA3389671FA3EE2F001EA329 /* bg */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
@@ -2633,6 +2645,7 @@
 				DA57D4AC1EBA922A00793288 /* vi */,
 				DA704CBC1F637405004B3F28 /* uk */,
 				DA704CBD1F63746E004B3F28 /* zh-Hant */,
+				DA3389691FA3EE50001EA329 /* bg */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
