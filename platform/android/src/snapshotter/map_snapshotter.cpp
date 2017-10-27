@@ -58,7 +58,9 @@ MapSnapshotter::~MapSnapshotter() = default;
 void MapSnapshotter::start(JNIEnv&) {
     MBGL_VERIFY_THREAD(tid);
 
-    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(*Scheduler::GetCurrent(), [this](std::exception_ptr err, PremultipliedImage image, mbgl::MapSnapshotter::PointForFn pointForFn) {
+    snapshotCallback = std::make_unique<Actor<mbgl::MapSnapshotter::Callback>>(
+            *Scheduler::GetCurrent(),
+            [this](std::exception_ptr err, PremultipliedImage image, std::vector<std::string> attributions, mbgl::MapSnapshotter::PointForFn pointForFn) {
         MBGL_VERIFY_THREAD(tid);
         android::UniqueEnv _env = android::AttachEnv();
 
@@ -68,7 +70,7 @@ void MapSnapshotter::start(JNIEnv&) {
             javaPeer->Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
         } else {
             // Create the wrapper
-            auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, pointForFn);
+            auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, pointForFn);
 
             // invoke callback
             static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");

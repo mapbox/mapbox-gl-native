@@ -7,6 +7,9 @@
 #include "../geometry/lat_lng.hpp"
 #include "../graphics/pointf.hpp"
 
+#include <vector>
+#include <string>
+
 namespace mbgl {
 namespace android {
 
@@ -22,6 +25,7 @@ public:
     static jni::Object<MapSnapshot> New(JNIEnv& env,
                                         PremultipliedImage&& image,
                                         float pixelRatio,
+                                        std::vector<std::string> attributions,
                                         PointForFn pointForFn);
 
     MapSnapshot(jni::JNIEnv&) {};
