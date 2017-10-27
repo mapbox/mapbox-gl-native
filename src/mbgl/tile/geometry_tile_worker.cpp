@@ -393,7 +393,7 @@ void GeometryTileWorker::attemptPlacement() {
             }
 
             symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
+                                  imageMap, imageAtlas.positions, id);
         }
 
         symbolLayoutsNeedPreparation = false;

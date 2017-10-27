@@ -2,6 +2,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
 
@@ -15,7 +16,6 @@ class RenderedQueryOptions;
 class RenderLayer;
 
 class CollisionIndex;
-class CanonicalTileID;
 
 class IndexedSubfeature {
 public:
@@ -24,6 +24,11 @@ public:
     std::string sourceLayerName;
     std::string bucketName;
     size_t sortIndex;
+    uint8_t z;
+    uint32_t x;
+    uint32_t y;
+    uint8_t overscaledZ;
+    int16_t wrap;
 };
 
 class FeatureIndex {
