@@ -216,7 +216,8 @@ void GeometryTile::queryRenderedFeatures(
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
-    const RenderedQueryOptions& options) {
+    const RenderedQueryOptions& options,
+    const CollisionIndex& collisionIndex) {
 
     if (!featureIndex || !data) return;
 
@@ -238,7 +239,7 @@ void GeometryTile::queryRenderedFeatures(
                         *data,
                         id.canonical,
                         layers,
-                        0, // TODO: hook up to global CollisionIndex
+                        collisionIndex, // TODO: hook up to global CollisionIndex
                         additionalRadius);
 }
 

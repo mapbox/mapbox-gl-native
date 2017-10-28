@@ -51,7 +51,7 @@ void FeatureIndex::query(
         const GeometryTileData& geometryTileData,
         const CanonicalTileID& tileID,
         const std::vector<const RenderLayer*>& layers,
-        const CollisionIndex* collisionIndex,
+        const CollisionIndex& collisionIndex,
         const float additionalQueryRadius) const {
 
     // Determine query radius
@@ -60,9 +60,15 @@ void FeatureIndex::query(
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalRadius),
+    typedef std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox> QueryResult;
+    std::vector<QueryResult> queryResults = grid.query({ convertPoint<float>(box.min - additionalRadius),
                                                            convertPoint<float>(box.max + additionalRadius) });
 
+    // TODO: clumsy way to discard this data
+    std::vector<IndexedSubfeature> features;
+    for (auto& queryResult : queryResults) {
+        features.push_back(queryResult.first);
+    }
 
     std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
@@ -75,12 +81,7 @@ void FeatureIndex::query(
         addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
     }
 
-    // Query symbol features, if they've been placed.
-    if (!collisionIndex) {
-        return;
-    }
-
-    std::vector<IndexedSubfeature> symbolFeatures;// = collisionIndex->queryRenderedSymbols(queryGeometry, UnwrappedTileID(), scale); // TODO: hook up
+    std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, UnwrappedTileID(0, tileID)); // TODO: hook up
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);

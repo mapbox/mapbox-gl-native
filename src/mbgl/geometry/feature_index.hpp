@@ -47,7 +47,7 @@ public:
             const GeometryTileData&,
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
-            const CollisionIndex*,
+            const CollisionIndex&,
             const float additionalQueryRadius) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
