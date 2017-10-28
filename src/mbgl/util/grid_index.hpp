@@ -65,8 +65,7 @@ public:
     void insert(T&& t, const BBox&);
     void insert(T&& t, const BCircle&);
     
-    std::vector<T> query(const BBox&) const;
-    std::vector<T> query(const BCircle&) const;
+    std::vector<std::pair<T,BBox>> query(const BBox&) const;
     
     bool hitTest(const BBox&) const;
     bool hitTest(const BCircle&) const;
@@ -78,8 +77,8 @@ private:
     bool completeIntersection(const BBox& query) const;
     BBox convertToBox(const BCircle& circle) const;
 
-    void query(const BBox&, std::function<bool (const T&)>) const;
-    void query(const BCircle&, std::function<bool (const T&)>) const;
+    void query(const BBox&, std::function<bool (const T&, const BBox&)>) const;
+    void query(const BCircle&, std::function<bool (const T&, const BBox&)>) const;
 
     int16_t convertToXCellCoord(const float x) const;
     int16_t convertToYCellCoord(const float y) const;

@@ -235,18 +235,20 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
     }
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID&, const float) const {
+std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID) const {
     std::vector<IndexedSubfeature> result;
-    if (true || queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
+    if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
     }
     
-    // TODO: reimplement queryRenderedSymbols
-/*
     mat4 posMatrix;
+    mat4 projMatrix;
+    transformState.getProjMatrix(projMatrix);
     transformState.matrixFor(posMatrix, tileID);
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
 
     GeometryCoordinates polygon;
+    // todo: use envelope?
     auto minX = std::numeric_limits<GridUnit>::max();
     auto minY = std::numeric_limits<GridUnit>::max();
     auto maxX = std::numeric_limits<GridUnit>::min();
@@ -263,92 +265,57 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         polygon.push_back(convertPoint<int16_t>(projected));
     }
     
-    std::vector<IndexedSubfeature> thisTileFeatures;
-    std::vector<IndexedSubfeature> features = collisionGrid.query({{minX, minY}, {maxX, maxY}});
-    // TODO: reimplement "thisTileFeatures" filter
-    // onst tileID = tileCoord.id;
-    for (auto& feature : features) {
-        //if (features[i].tileID === tileID) {
-            thisTileFeatures.push_back(feature);
-        //}
+    typedef std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox> QueryResult;
+    
+    std::vector<QueryResult> thisTileFeatures;
+    std::vector<QueryResult> features = collisionGrid.query({{minX, minY}, {maxX, maxY}});
+
+    for (auto& queryResult : features) {
+    auto& feature = queryResult.first;
+        UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
+        if (featureTileID == tileID) {
+            thisTileFeatures.push_back(queryResult);
+        }
     }
     
-    std::vector<IndexedSubfeature> ignoredFeatures = ignoredGrid.query({{minX, minY}, {maxX, maxY}});
-    // TODO: reimplement "thisTileFeatures" filter
-    // onst tileID = tileCoord.id;
-    for (auto& feature : ignoredFeatures) {
-        //if (features[i].tileID === tileID) {
-            thisTileFeatures.push_back(feature);
-        //}
+    std::vector<QueryResult> ignoredFeatures = ignoredGrid.query({{minX, minY}, {maxX, maxY}});
+    for (auto& queryResult : ignoredFeatures) {
+        auto& feature = queryResult.first;
+        UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
+        if (featureTileID == tileID) {
+            thisTileFeatures.push_back(queryResult);
+        }
     }
 
-    for (auto& feature : thisTileFeatures) {
-        for (let i = 0; i < thisTileFeatures.length; i++) {
-            const blocking = collisionBoxArray.get(thisTileFeatures[i]);
-            const sourceLayer = blocking.sourceLayerIndex;
-            const featureIndex = blocking.featureIndex;
-
-            // Skip already seen features.
-            if (sourceLayerFeatures[sourceLayer] === undefined) {
-                sourceLayerFeatures[sourceLayer] = {};
-            }
-            if (sourceLayerFeatures[sourceLayer][featureIndex]) continue;
-
-
-            // Check if query intersects with the feature box
-            // "Collision Circles" for line labels are treated as boxes here
-            // Since there's no actual collision taking place, the circle vs. square
-            // distinction doesn't matter as much, and box geometry is easier
-            // to work with.
-            const projectedPoint = this.projectAndGetPerspectiveRatio(posMatrix, blocking.anchorPointX, blocking.anchorPointY);
-            const tileToViewport = textPixelRatio * projectedPoint.perspectiveRatio;
-            const x1 = blocking.x1 / tileToViewport + projectedPoint.point.x;
-            const y1 = blocking.y1 / tileToViewport + projectedPoint.point.y;
-            const x2 = blocking.x2 / tileToViewport + projectedPoint.point.x;
-            const y2 = blocking.y2 / tileToViewport + projectedPoint.point.y;
-            const bbox = [
-                new Point(x1, y1),
-                new Point(x2, y1),
-                new Point(x2, y2),
-                new Point(x1, y2)
-            ];
-            if (!intersectionTests.polygonIntersectsPolygon(query, bbox)) continue;
-
-            sourceLayerFeatures[sourceLayer][featureIndex] = true;
-            result.push(thisTileFeatures[i]);
-        }
-
-        return result;
-
-    // Predicate for ruling out already seen features.
     std::unordered_map<std::string, std::unordered_set<std::size_t>> sourceLayerFeatures;
-    auto seenFeature = [&] (const CollisionTreeBox& treeBox) -> bool {
-        const IndexedSubfeature& feature = std::get<2>(treeBox);
-        const auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName];
-        return seenFeatures.find(feature.index) == seenFeatures.end();
-    };
+    for (auto& queryResult : thisTileFeatures) {
+        auto& feature = queryResult.first;
+        auto& bbox = queryResult.second;
 
+        // Skip already seen features.
+        auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName];
+        if (seenFeatures.find(feature.index) != seenFeatures.end())
+            continue;
 
-    // Check if query polygon intersects with the feature box at current scale.
-    auto intersectsAtScale = [&] (const CollisionTreeBox& treeBox) -> bool {
-        const CollisionBox& collisionBox = std::get<1>(treeBox);
-        const auto projectedAnchor = projectAndGetPerspectiveRatio(posMatrix, collisionBox.anchor);
-        const float tileToViewport = textPixelRatio * projectedAnchor.second;
+        seenFeatures.insert(feature.index);
 
-        const int16_t x1 = projectedAnchor.first.x + (collisionBox.x1 / tileToViewport);
-        const int16_t y1 = projectedAnchor.first.y + (collisionBox.y1 / tileToViewport);
-        const int16_t x2 = projectedAnchor.first.x + (collisionBox.x2 / tileToViewport);
-        const int16_t y2 = projectedAnchor.first.y + (collisionBox.y2 / tileToViewport);
-        auto bbox = GeometryCoordinates {
-            { x1, y1 }, { x2, y1 }, { x2, y2 }, { x1, y2 }
+        int16_t minX1 = bbox.min.x;
+        int16_t maxX1 = bbox.max.y;
+        int16_t minY1 = bbox.min.y;
+        int16_t maxY1 = bbox.max.y;
+
+        auto bboxPoints = GeometryCoordinates {
+            { minX1, minY1 }, { maxX1, minY1 }, { maxX1, maxY1 }, { minX1, maxY1 }
         };
-        return util::polygonIntersectsPolygon(polygon, bbox);
-    };
+        
+        if (!util::polygonIntersectsPolygon(polygon, bboxPoints))
+            continue;
 
-    auto predicates = bgi::satisfies(seenFeature) && bgi::satisfies(intersectsAtScale);
+        result.push_back(feature);
+    }
 
     return result;
-    */
+
 }
 
 std::pair<float,float> CollisionIndex::projectAnchor(const mat4& posMatrix, const Point<float>& point) const {

@@ -46,6 +46,9 @@ namespace mbgl {
             float symbolFadeChange(TimePoint now) const;
             bool hasTransitions(TimePoint now) const;
 
+            // TODO: public for queryRenderedFeatures
+            CollisionIndex collisionIndex;
+
         private:
 
             void placeLayerBucket(
@@ -59,7 +62,6 @@ namespace mbgl {
 
             void updateBucketOpacities(SymbolBucket&);
 
-            CollisionIndex collisionIndex;
             TransformState state;
             TimePoint commitTime;
 

@@ -62,21 +62,10 @@ void GridIndex<T>::insert(T&& t, const BCircle& bcircle) {
 }
 
 template <class T>
-std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
-    std::vector<T> result;
-    query(queryBBox, [&](const T& t) -> bool {
-        result.push_back(t);
-        return false;
-    });
-    return result;
-}
-
-// TODO: templatize this on geometry type
-template <class T>
-std::vector<T> GridIndex<T>::query(const BCircle& queryBCircle) const {
-    std::vector<T> result;
-    query(queryBCircle, [&](const T& t) -> bool {
-        result.push_back(t);
+std::vector<std::pair<T, typename GridIndex<T>::BBox>> GridIndex<T>::query(const BBox& queryBBox) const {
+    std::vector<std::pair<T, BBox>> result;
+    query(queryBBox, [&](const T& t, const BBox& bbox) -> bool {
+        result.push_back(std::make_pair(t, bbox));
         return false;
     });
     return result;
@@ -85,7 +74,7 @@ std::vector<T> GridIndex<T>::query(const BCircle& queryBCircle) const {
 template <class T>
 bool GridIndex<T>::hitTest(const BBox& queryBBox) const {
     bool hit = false;
-    query(queryBBox, [&](const T&) -> bool {
+    query(queryBBox, [&](const T&, const BBox&) -> bool {
         hit = true;
         return true;
     });
@@ -96,7 +85,7 @@ bool GridIndex<T>::hitTest(const BBox& queryBBox) const {
 template <class T>
 bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
     bool hit = false;
-    query(queryBCircle, [&](const T&) -> bool {
+    query(queryBCircle, [&](const T&, const BBox&) -> bool {
         hit = true;
         return true;
     });
@@ -120,7 +109,7 @@ typename GridIndex<T>::BBox GridIndex<T>::convertToBox(const BCircle& circle) co
 }
 
 template <class T>
-void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> resultFn) const {
+void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, const BBox&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
     
@@ -129,12 +118,12 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> r
     } else if (completeIntersection(queryBBox)) {
         // TODO: std::for_each?
         for (auto& element : boxElements) {
-            if (resultFn(element.first)) {
+            if (resultFn(element.first, element.second)) {
                 return;
             };
         }
         for (auto& element : circleElements) {
-            if (resultFn(element.first)) {
+            if (resultFn(element.first, convertToBox(element.second))) {
                 return;
             };
         }
@@ -157,7 +146,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> r
                     auto& pair = boxElements.at(uid);
                     auto& bbox = pair.second;
                     if (boxesCollide(queryBBox, bbox)) {
-                        if (resultFn(pair.first)) {
+                        if (resultFn(pair.first, bbox)) {
                             return;
                         }
                     }
@@ -172,7 +161,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> r
                     auto& pair = circleElements.at(uid);
                     auto& bcircle = pair.second;
                     if (circleAndBoxCollide(bcircle, queryBBox)) {
-                        if (resultFn(pair.first)) {
+                        if (resultFn(pair.first, convertToBox(bcircle))) {
                             return;
                         }
                     }
@@ -183,7 +172,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&)> r
 }
 
 template <class T>
-void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const T&)> resultFn) const {
+void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const T&, const BBox&)> resultFn) const {
     std::unordered_set<size_t> seenBoxes;
     std::unordered_set<size_t> seenCircles;
 
@@ -193,12 +182,12 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
     } else if (completeIntersection(queryBBox)) {
         // TODO: std::for_each?
         for (auto& element : boxElements) {
-            if (resultFn(element.first)) {
+            if (resultFn(element.first, element.second)) {
                 return;
             };
         }
         for (auto& element : circleElements) {
-            if (resultFn(element.first)) {
+            if (resultFn(element.first, convertToBox(element.second))) {
                 return;
             };
         }
@@ -221,7 +210,7 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
                     auto& pair = boxElements.at(uid);
                     auto& bbox = pair.second;
                     if (circleAndBoxCollide(queryBCircle, bbox)) {
-                        if (resultFn(pair.first)) {
+                        if (resultFn(pair.first, bbox)) {
                             return;
                         }
                     }
@@ -236,7 +225,7 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
                     auto& pair = circleElements.at(uid);
                     auto& bcircle = pair.second;
                     if (circlesCollide(queryBCircle, bcircle)) {
-                        if (resultFn(pair.first)) {
+                        if (resultFn(pair.first, convertToBox(bcircle))) {
                             return;
                         }
                     }
