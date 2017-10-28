@@ -300,9 +300,9 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         seenFeatures.insert(feature.index);
 
         int16_t minX1 = bbox.min.x;
-        int16_t maxX1 = bbox.max.y;
-        int16_t minY1 = bbox.min.y;
         int16_t maxY1 = bbox.max.y;
+        int16_t minY1 = bbox.min.y;
+        int16_t maxX1 = bbox.max.x;
 
         auto bboxPoints = GeometryCoordinates {
             { minX1, minY1 }, { maxX1, minY1 }, { maxX1, maxY1 }, { minX1, maxY1 }
