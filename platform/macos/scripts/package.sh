@@ -24,6 +24,14 @@ PROJ_VERSION=$(git rev-list --count HEAD)
 SEM_VERSION=$( git describe --tags --match=macos-v*.*.* --abbrev=0 | sed 's/^macos-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
 
+XCODEBUILD_SCHEME=dynamic
+XCODEBUILD_ACTION=build
+if [[ ${BUILDTYPE} == Release ]]; then
+    XCODEBUILD_SCHEME=macosapp
+    XCODEBUILD_ACTION=archive
+    mkdir -p ${APP_OUTPUT}
+fi
+
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
 xcodebuild \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
@@ -31,10 +39,12 @@ xcodebuild \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
     CURRENT_COMMIT_HASH=${HASH} \
     -derivedDataPath ${DERIVED_DATA} \
+    -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
     -workspace ./platform/macos/macos.xcworkspace \
-    -scheme dynamic \
+    -scheme ${XCODEBUILD_SCHEME} \
     -configuration ${BUILDTYPE} \
-    -jobs ${JOBS} | xcpretty
+    -jobs ${JOBS} \
+    ${XCODEBUILD_ACTION} | xcpretty
 
 step "Copying dynamic framework into place"
 mkdir -p "${OUTPUT}/${NAME}.framework"
@@ -67,6 +77,13 @@ if [[ ${BUILDTYPE} == Release ]]; then
     validate_dsym \
         "${OUTPUT}/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
         "${OUTPUT}/${NAME}.framework/${NAME}"
+    
+    step "Exporting Mapbox GL.app"
+    xcodebuild \
+        -exportArchive \
+        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
+        -exportPath "${APP_OUTPUT}" \
+        -exportOptionsPlist platform/macos/ExportOptions.plist
 fi
 
 function create_podspec {
@@ -92,27 +109,3 @@ make xdocument OUTPUT="${OUTPUT}/documentation"
 
 step "Checking that all public symbols are exported…"
 node platform/darwin/scripts/check-public-symbols.js macOS
-
-if [[ ${BUILDTYPE} == Release ]]; then
-    step "Building Mapbox GL.app (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
-    mkdir -p ${APP_OUTPUT}
-    xcodebuild \
-        CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
-        CURRENT_SHORT_VERSION=${SHORT_VERSION} \
-        CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
-        CURRENT_COMMIT_HASH=${HASH} \
-        -derivedDataPath ${DERIVED_DATA} \
-        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
-        -workspace ./platform/macos/macos.xcworkspace \
-        -scheme macosapp \
-        -configuration Release \
-        -jobs ${JOBS} \
-        archive | xcpretty
-    
-    step "Exporting Mapbox GL.app"
-    xcodebuild \
-        -exportArchive \
-        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
-        -exportPath "${APP_OUTPUT}" \
-        -exportOptionsPlist platform/macos/ExportOptions.plist
-fi
