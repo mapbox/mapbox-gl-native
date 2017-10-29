@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.util.DisplayMetrics;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -55,7 +56,7 @@ public class MapSnapshotter {
     void onError(String error);
   }
 
-  private static final int LOGO_MARGIN_PX = 4;
+  private static final int LOGO_MARGIN_DP = 4;
 
   // Holds the pointer to JNI NativeMapView
   private long nativePtr = 0;
@@ -252,10 +253,34 @@ public class MapSnapshotter {
   }
 
   protected void addOverlay(Bitmap original) {
-    float margin = context.getResources().getDisplayMetrics().density * LOGO_MARGIN_PX;
+    DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+    float margin = displayMetrics.density * LOGO_MARGIN_DP;
     Canvas canvas = new Canvas(original);
-    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, null);
-    canvas.drawBitmap(logo, margin, original.getHeight() - (logo.getHeight() + margin), null);
+
+    // Decode just the boundaries
+    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+    bitmapOptions.inJustDecodeBounds = true;
+    BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
+    int srcWidth = bitmapOptions.outWidth;
+    int srcHeight = bitmapOptions.outHeight;
+
+    // Ratio, preferred dimensions and resulting sample size
+    float widthRatio = displayMetrics.widthPixels / original.getWidth();
+    float heightRatio = displayMetrics.heightPixels / original.getHeight();
+    float prefWidth = srcWidth / widthRatio;
+    float prefHeight = srcHeight / heightRatio;
+    int sampleSize = MapSnaphotUtil.calculateInSampleSize(bitmapOptions, (int) prefWidth, (int) prefHeight);
+
+    // Scale bitmap
+    bitmapOptions.inJustDecodeBounds = false;
+    bitmapOptions.inScaled = true;
+    bitmapOptions.inSampleSize = sampleSize;
+    bitmapOptions.inDensity = srcWidth;
+    bitmapOptions.inTargetDensity = (int) prefWidth * bitmapOptions.inSampleSize;
+    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
+
+    float scaledHeight = bitmapOptions.outHeight * heightRatio / bitmapOptions.inSampleSize;
+    canvas.drawBitmap(logo, margin, original.getHeight() - scaledHeight - margin, null);
   }
 
   /**
