@@ -28,8 +28,6 @@ public:
     uint8_t z;
     uint32_t x;
     uint32_t y;
-    uint8_t overscaledZ;
-    int16_t wrap;
 };
 
 class FeatureIndex {

@@ -28,7 +28,7 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
     for (const auto& ring : geometries) {
         // TODO: Templatize grid units so feature index can stick with integers?
         auto envelope = mapbox::geometry::envelope(ring);
-        grid.insert(IndexedSubfeature { index, "", sourceLayerName, bucketName, sortIndex++, 0, 0, 0, 0, 0 }, // TODO: FeatureIndex doesn't need to care about tileIDs or source IDS, make this cleaner
+        grid.insert(IndexedSubfeature { index, "", sourceLayerName, bucketName, sortIndex++, 0, 0, 0 }, // TODO: FeatureIndex doesn't need to care about tileIDs or source IDS, make this cleaner
                     {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
     }
 }
@@ -82,7 +82,7 @@ void FeatureIndex::query(
         addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
     }
 
-    std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, UnwrappedTileID(0, tileID), sourceID); // TODO: hook up
+    std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
         addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
