@@ -21,7 +21,7 @@ public:
     PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
             std::array<float, 2> lineOffset_, WritingModeType writingModes_, const GeometryCoordinates& line_, const std::vector<float>& tileDistances_) :
         anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffset(lineOffset_), writingModes(writingModes_), line(line_), tileDistances(tileDistances_), hidden(false)
+        lineOffset(lineOffset_), writingModes(writingModes_), line(line_), tileDistances(tileDistances_), hidden(false), vertexStartIndex(0)
     {
     }
     Point<float> anchorPoint;
@@ -34,6 +34,7 @@ public:
     std::vector<float> tileDistances;
     std::vector<float> glyphOffsets;
     bool hidden;
+    size_t vertexStartIndex;
 };
 
 class SymbolBucket : public Bucket {
@@ -45,6 +46,7 @@ public:
                  float zoom,
                  bool sdfIcons,
                  bool iconsNeedLinear,
+                 bool sortFeaturesByY,
                  const std::vector<SymbolInstance>&);
 
     void upload(gl::Context&) override;
@@ -53,15 +55,21 @@ public:
     bool hasIconData() const;
     bool hasCollisionBoxData() const;
     bool hasCollisionCircleData() const;
+    
     void updateOpacity();
+    void sortFeatures(const float angle);
 
     const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
+    const bool sortFeaturesByY;
+    
+    float sortedAngle = 0;
 
     bool staticUploaded = false;
     bool opacityUploaded = false;
     bool dynamicUploaded = false;
+    bool sortUploaded = false;
 
     std::vector<SymbolInstance> symbolInstances;
 
