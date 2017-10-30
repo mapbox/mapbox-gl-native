@@ -846,6 +846,10 @@ public final class MapboxMap {
    */
   public final void easeCamera(final CameraUpdate update, final int durationMs, final boolean easingInterpolator,
                                final MapboxMap.CancelableCallback callback, final boolean isDismissable) {
+
+    if (durationMs <= 0) {
+      throw new IllegalArgumentException("Null duration passed into easeCamera");
+    }
     new Handler().post(new Runnable() {
       @Override
       public void run() {
@@ -918,6 +922,9 @@ public final class MapboxMap {
    */
   public final void animateCamera(final CameraUpdate update, final int durationMs,
                                   final MapboxMap.CancelableCallback callback) {
+    if (durationMs <= 0) {
+      throw new IllegalArgumentException("Null duration passed into animageCamera");
+    }
     new Handler().post(new Runnable() {
       @Override
       public void run() {
