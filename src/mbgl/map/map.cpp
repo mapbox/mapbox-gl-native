@@ -558,7 +558,7 @@ void Map::setBearing(double degrees, const EdgeInsets& padding, const AnimationO
 }
 
 double Map::getBearing() const {
-    return -impl->transform.getAngle() * util::RAD2DEG;
+    return -impl->transform.getScale();
 }
 
 void Map::resetNorth(const AnimationOptions& animation) {
@@ -626,6 +626,15 @@ ScreenCoordinate Map::pixelForLatLng(const LatLng& latLng) const {
     LatLng unwrappedLatLng = latLng.wrapped();
     unwrappedLatLng.unwrapForShortestPath(getLatLng());
     return impl->transform.latLngToScreenCoordinate(unwrappedLatLng);
+}
+
+ScreenCoordinate Map::pixelForLatLng2(const LatLng& latLng) const {
+    // If the center and point longitudes are not in the same side of the
+    // antimeridian, we unwrap the point longitude so it would be seen if
+    // e.g. the next antimeridian side is visible.
+    LatLng unwrappedLatLng = latLng.wrapped();
+    unwrappedLatLng.unwrapForShortestPath(getLatLng());
+    return impl->transform.latLngToScreenCoordinate2(unwrappedLatLng);
 }
 
 LatLng Map::latLngForPixel(const ScreenCoordinate& pixel) const {

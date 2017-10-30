@@ -210,13 +210,8 @@ void NativeMapView::setGestureInProgress(jni::JNIEnv&, jni::jboolean inProgress)
     map->setGestureInProgress(inProgress);
 }
 
-void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy, jni::jlong duration) {
-    mbgl::AnimationOptions animationOptions;
-    if (duration > 0) {
-       animationOptions.duration.emplace(mbgl::Milliseconds(duration));
-       animationOptions.easing.emplace(mbgl::util::UnitBezier {0.25, 0.46, 0.45, 0.94});
-    }
-    map->moveBy({dx, dy}, animationOptions);
+void NativeMapView::moveBy(jni::JNIEnv&, jni::jdouble dx, jni::jdouble dy) {
+    map->moveBy({dx, dy}, mbgl::AnimationOptions{});
 }
 
 void NativeMapView::jumpTo(jni::JNIEnv&, jni::jdouble angle, jni::jdouble latitude, jni::jdouble longitude, jni::jdouble pitch, jni::jdouble zoom) {
@@ -283,8 +278,8 @@ jni::Object<LatLng> NativeMapView::getLatLng(JNIEnv& env) {
     return LatLng::New(env, map->getLatLng(insets));
 }
 
-void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude, jni::jlong duration) {
-    map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble longitude) {
+    map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{});
 }
 
 jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds) {
@@ -310,12 +305,12 @@ jni::jdouble NativeMapView::getPitch(jni::JNIEnv&) {
     return map->getPitch();
 }
 
-void NativeMapView::setPitch(jni::JNIEnv&, jni::jdouble pitch, jni::jlong duration) {
-    map->setPitch(pitch, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setPitch(jni::JNIEnv&, jni::jdouble pitch) {
+    map->setPitch(pitch, mbgl::AnimationOptions{});
 }
 
-void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y, jni::jlong duration) {
-    map->setZoom(zoom, mbgl::ScreenCoordinate{x,y}, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setZoom(jni::JNIEnv&, jni::jdouble zoom, jni::jdouble x, jni::jdouble y) {
+    map->setZoom(zoom, mbgl::ScreenCoordinate{x,y}, mbgl::AnimationOptions{});
 }
 
 jni::jdouble NativeMapView::getZoom(jni::JNIEnv&) {
@@ -342,22 +337,26 @@ jni::jdouble NativeMapView::getMaxZoom(jni::JNIEnv&) {
     return map->getMaxZoom();
 }
 
-void NativeMapView::rotateBy(jni::JNIEnv&, jni::jdouble sx, jni::jdouble sy, jni::jdouble ex, jni::jdouble ey, jni::jlong duration) {
+void NativeMapView::rotateBy(jni::JNIEnv&, jni::jdouble sx, jni::jdouble sy, jni::jdouble ex, jni::jdouble ey) {
     mbgl::ScreenCoordinate first(sx, sy);
     mbgl::ScreenCoordinate second(ex, ey);
-    map->rotateBy(first, second, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->rotateBy(first, second, mbgl::AnimationOptions{});
 }
 
-void NativeMapView::setBearing(jni::JNIEnv&, jni::jdouble degrees, jni::jlong duration) {
-    map->setBearing(degrees, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+void NativeMapView::setBearing(jni::JNIEnv&, jni::jdouble degrees) {
+    map->setBearing(degrees, mbgl::AnimationOptions{});
 }
 
-void NativeMapView::setBearingXY(jni::JNIEnv&, jni::jdouble degrees, jni::jdouble cx, jni::jdouble cy, jni::jlong duration) {
+void NativeMapView::setBearingXY(jni::JNIEnv&, jni::jdouble degrees, jni::jdouble cx, jni::jdouble cy) {
     mbgl::ScreenCoordinate center(cx, cy);
-    map->setBearing(degrees, center, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
+    map->setBearing(degrees, center, mbgl::AnimationOptions{});
 }
 
 jni::jdouble NativeMapView::getBearing(jni::JNIEnv&) {
+    return map->getBearing();
+}
+
+jni::jdouble NativeMapView::getScale(jni::JNIEnv&) {
     return map->getBearing();
 }
 
@@ -365,7 +364,7 @@ void NativeMapView::resetNorth(jni::JNIEnv&) {
     map->resetNorth();
 }
 
-void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, jni::Array<jni::Object<LatLng>> coordinates, jni::Object<RectF> padding, jdouble direction, jni::jlong duration) {
+void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, jni::Array<jni::Object<LatLng>> coordinates, jni::Object<RectF> padding, jdouble direction) {
     NullCheck(env, &coordinates);
     std::size_t count = coordinates.Length(env);
 
@@ -385,14 +384,7 @@ void NativeMapView::setVisibleCoordinateBounds(JNIEnv& env, jni::Array<jni::Obje
         cameraOptions.angle = (-direction * M_PI) / 180;
     }
 
-    mbgl::AnimationOptions animationOptions;
-    if (duration > 0) {
-        animationOptions.duration.emplace(mbgl::Milliseconds(duration));
-        // equivalent to kCAMediaTimingFunctionDefault in iOS
-        animationOptions.easing.emplace(mbgl::util::UnitBezier { 0.25, 0.1, 0.25, 0.1 });
-    }
-
-    map->easeTo(cameraOptions, animationOptions);
+    map->easeTo(cameraOptions, mbgl::AnimationOptions{});
 }
 
 void NativeMapView::setContentPadding(JNIEnv&, double top, double left, double bottom, double right) {
@@ -490,8 +482,17 @@ jni::Object<PointF> NativeMapView::pixelForLatLng(JNIEnv& env, jdouble latitude,
     return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
 }
 
+jni::Object<PointF> NativeMapView::pixelForLatLng2(JNIEnv& env, jdouble latitude, jdouble longitude) {
+    mbgl::ScreenCoordinate pixel = map->pixelForLatLng2(mbgl::LatLng(latitude, longitude));
+    return PointF::New(env, static_cast<float>(pixel.x), static_cast<float>(pixel.y));
+}
+
 jni::Object<LatLng> NativeMapView::latLngForPixel(JNIEnv& env, jfloat x, jfloat y) {
     return LatLng::New(env, map->latLngForPixel(mbgl::ScreenCoordinate(x, y)));
+}
+
+jni::Object<LatLng> NativeMapView::latLngForPixel2(JNIEnv& env, jfloat x, jfloat y, jdouble startScale) {
+    return LatLng::New(env, Projection::unproject(mbgl::ScreenCoordinate(x, y), startScale));
 }
 
 jni::Array<jlong> NativeMapView::addPolylines(JNIEnv& env, jni::Array<jni::Object<Polyline>> polylines) {
@@ -990,6 +991,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::setBearing, "nativeSetBearing"),
             METHOD(&NativeMapView::setBearingXY, "nativeSetBearingXY"),
             METHOD(&NativeMapView::getBearing, "nativeGetBearing"),
+            METHOD(&NativeMapView::getScale, "nativeGetScale"),
             METHOD(&NativeMapView::resetNorth, "nativeResetNorth"),
             METHOD(&NativeMapView::setVisibleCoordinateBounds, "nativeSetVisibleCoordinateBounds"),
             METHOD(&NativeMapView::setContentPadding, "nativeSetContentPadding"),
@@ -1005,8 +1007,10 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getMetersPerPixelAtLatitude, "nativeGetMetersPerPixelAtLatitude"),
             METHOD(&NativeMapView::projectedMetersForLatLng, "nativeProjectedMetersForLatLng"),
             METHOD(&NativeMapView::pixelForLatLng, "nativePixelForLatLng"),
+            METHOD(&NativeMapView::pixelForLatLng2, "nativePixelForLatLng2"),
             METHOD(&NativeMapView::latLngForProjectedMeters, "nativeLatLngForProjectedMeters"),
             METHOD(&NativeMapView::latLngForPixel, "nativeLatLngForPixel"),
+            METHOD(&NativeMapView::latLngForPixel2, "nativeLatLngForPixel2"),
             METHOD(&NativeMapView::addPolylines, "nativeAddPolylines"),
             METHOD(&NativeMapView::addPolygons, "nativeAddPolygons"),
             METHOD(&NativeMapView::updatePolyline, "nativeUpdatePolyline"),

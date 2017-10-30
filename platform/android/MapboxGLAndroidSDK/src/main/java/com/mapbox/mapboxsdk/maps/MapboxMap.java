@@ -632,7 +632,7 @@ public final class MapboxMap {
     if (focalPoint == null) {
       focalPoint = new PointF(nativeMapView.getWidth() / 2, nativeMapView.getHeight() / 2);
     }
-    nativeMapView.setZoom(zoom, focalPoint, 0);
+    nativeMapView.setZoom(zoom, focalPoint);
   }
 
   /**
@@ -641,7 +641,7 @@ public final class MapboxMap {
    * @param tilt Tilt angle to change to
    */
   public void setTilt(@FloatRange(from = MapboxConstants.MINIMUM_TILT, to = MapboxConstants.MAXIMUM_TILT) double tilt) {
-    nativeMapView.setPitch(tilt, 0);
+    nativeMapView.setPitch(tilt);
   }
 
   /**
@@ -944,6 +944,7 @@ public final class MapboxMap {
    * @param duration The duration of the transformation
    */
   public void setFocalBearing(double bearing, float focalX, float focalY, long duration) {
+    // TODO remove obsolete public API
     transform.setBearing(bearing, focalX, focalY, duration);
   }
 

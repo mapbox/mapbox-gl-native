@@ -86,6 +86,11 @@ public class Projection {
     return nativeMapView.latLngForPixel(point);
   }
 
+  public LatLng fromScreenLocation(PointF point, double startScale) {
+    return nativeMapView.latLngForPixel(point, startScale);
+  }
+
+
   /**
    * Gets a projection of the viewing frustum for converting between screen coordinates and
    * geo-latitude/longitude coordinates.

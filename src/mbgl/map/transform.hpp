@@ -113,6 +113,8 @@ public:
     void setPitch(double pitch, optional<ScreenCoordinate> anchor, const AnimationOptions& = {});
     double getPitch() const;
 
+    double getScale() const;
+
     // North Orientation
     void setNorthOrientation(NorthOrientation);
     NorthOrientation getNorthOrientation() const;
@@ -144,6 +146,7 @@ public:
 
     // Conversion and projection
     ScreenCoordinate latLngToScreenCoordinate(const LatLng&) const;
+    ScreenCoordinate latLngToScreenCoordinate2(const LatLng&) const;
     LatLng screenCoordinateToLatLng(const ScreenCoordinate&) const;
 
 private:
