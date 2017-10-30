@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_light.hpp>
@@ -9,7 +10,6 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/zoom_history.hpp>
-#include <mbgl/map/mode.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 
 #include <memory>
