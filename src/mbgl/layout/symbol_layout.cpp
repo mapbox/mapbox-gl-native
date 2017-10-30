@@ -417,7 +417,10 @@ std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const
 }
 
 std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, symbolInstances);
+    const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
+        layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
+    
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, symbolInstances);
 
     // this iterates over the *bucket's* symbol instances so that it can set the placedsymbol index. TODO cleanup
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
@@ -502,6 +505,7 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     auto& segment = buffer.segments.back();
     assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
     uint16_t index = segment.vertexLength;
+    placedSymbol.vertexStartIndex = index;
 
     // coordinates (2 triangles)
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData));
