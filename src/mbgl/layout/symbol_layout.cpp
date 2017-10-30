@@ -295,7 +295,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
     IndexedSubfeature indexedFeature = { feature.index, sourceID, sourceLayer->getName(), bucketName,
-                                         symbolInstances.size(), tileID.canonical.z, tileID.canonical.x, tileID.canonical.y, tileID.overscaledZ, tileID.wrap };
+                                         symbolInstances.size(), tileID.canonical.z, tileID.canonical.x, tileID.canonical.y };
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers

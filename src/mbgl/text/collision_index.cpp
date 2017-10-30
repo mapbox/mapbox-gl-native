@@ -235,7 +235,7 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
     }
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const std::string& sourceID) const {
+std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const CanonicalTileID& tileID, const std::string& sourceID) const {
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
@@ -244,7 +244,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     mat4 posMatrix;
     mat4 projMatrix;
     transformState.getProjMatrix(projMatrix);
-    transformState.matrixFor(posMatrix, tileID);
+    transformState.matrixFor(posMatrix, UnwrappedTileID(0, tileID)); // TODO: This probably isn't right, I think it's working right now because both the wrapped and unwrapped version are getting queried, but I haven't thought through why it should work.
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
     GeometryCoordinates polygon;
@@ -272,7 +272,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
 
     for (auto& queryResult : features) {
         auto& feature = queryResult.first;
-        UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
+        CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
         if (feature.sourceID == sourceID && featureTileID == tileID) {
             thisTileFeatures.push_back(queryResult);
         }
@@ -281,7 +281,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     std::vector<QueryResult> ignoredFeatures = ignoredGrid.query({{minX, minY}, {maxX, maxY}});
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
-        UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
+        CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
         if (feature.sourceID == sourceID && featureTileID == tileID) {
             thisTileFeatures.push_back(queryResult);
         }
