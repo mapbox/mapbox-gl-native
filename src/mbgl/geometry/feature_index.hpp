@@ -21,6 +21,7 @@ class IndexedSubfeature {
 public:
     IndexedSubfeature() = delete;
     std::size_t index;
+    std::string sourceID;
     std::string sourceLayerName;
     std::string bucketName;
     size_t sortIndex;
@@ -46,6 +47,7 @@ public:
             const RenderedQueryOptions& options,
             const GeometryTileData&,
             const CanonicalTileID&,
+            const std::string&,
             const std::vector<const RenderLayer*>&,
             const CollisionIndex&,
             const float additionalQueryRadius) const;

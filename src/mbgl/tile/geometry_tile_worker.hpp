@@ -27,6 +27,7 @@ public:
     GeometryTileWorker(ActorRef<GeometryTileWorker> self,
                        ActorRef<GeometryTile> parent,
                        OverscaledTileID,
+                       const std::string&,
                        const std::atomic<bool>&,
                        const MapMode,
                        const float pixelRatio,
@@ -57,6 +58,7 @@ private:
     ActorRef<GeometryTile> parent;
 
     const OverscaledTileID id;
+    const std::string sourceID;
     const std::atomic<bool>& obsolete;
     const MapMode mode;
     const float pixelRatio;

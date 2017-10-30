@@ -51,6 +51,7 @@ GeometryTile::GeometryTile(const OverscaledTileID& id_,
       worker(parameters.workerScheduler,
              ActorRef<GeometryTile>(*this, mailbox),
              id_,
+             sourceID,
              obsolete,
              parameters.mode,
              parameters.pixelRatio,
@@ -238,6 +239,7 @@ void GeometryTile::queryRenderedFeatures(
                         options,
                         *data,
                         id.canonical,
+                        sourceID,
                         layers,
                         collisionIndex, // TODO: hook up to global CollisionIndex
                         additionalRadius);

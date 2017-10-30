@@ -31,7 +31,7 @@ public:
 
     void insertFeature(CollisionFeature& feature, bool ignorePlacement);
 
-    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const UnwrappedTileID& tileID) const;
+    std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const UnwrappedTileID& tileID, const std::string& sourceID) const;
 
     
 private:
