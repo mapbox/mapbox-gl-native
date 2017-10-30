@@ -34,7 +34,8 @@ public:
                  GlyphDependencies&);
 
     void prepare(const GlyphMap&, const GlyphPositions&,
-                                          const ImageMap&, const ImagePositions&, const OverscaledTileID&);
+                 const ImageMap&, const ImagePositions&,
+                 const OverscaledTileID&, const std::string&);
 
     std::unique_ptr<SymbolBucket> place(const bool showCollisionBoxes);
 
@@ -52,7 +53,8 @@ private:
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
                     const GlyphPositionMap&,
-                    const OverscaledTileID&);
+                    const OverscaledTileID&,
+                    const std::string&);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;

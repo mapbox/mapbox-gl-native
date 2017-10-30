@@ -235,7 +235,7 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
     }
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID) const {
+std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const std::string& sourceID) const {
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
@@ -271,9 +271,9 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     std::vector<QueryResult> features = collisionGrid.query({{minX, minY}, {maxX, maxY}});
 
     for (auto& queryResult : features) {
-    auto& feature = queryResult.first;
+        auto& feature = queryResult.first;
         UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
-        if (featureTileID == tileID) {
+        if (feature.sourceID == sourceID && featureTileID == tileID) {
             thisTileFeatures.push_back(queryResult);
         }
     }
@@ -282,7 +282,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
         UnwrappedTileID featureTileID(feature.z, feature.x, feature.y); // TODO: Think about overscaling/wrapping
-        if (featureTileID == tileID) {
+        if (feature.sourceID == sourceID && featureTileID == tileID) {
             thisTileFeatures.push_back(queryResult);
         }
     }

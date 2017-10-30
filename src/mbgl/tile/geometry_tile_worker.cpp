@@ -23,6 +23,7 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
+                                       const std::string& sourceID_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_,
                                        const float pixelRatio_,
@@ -30,6 +31,7 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
+      sourceID(sourceID_),
       obsolete(obsolete_),
       mode(mode_),
       pixelRatio(pixelRatio_),
@@ -393,7 +395,8 @@ void GeometryTileWorker::attemptPlacement() {
             }
 
             symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions, id);
+                                  imageMap, imageAtlas.positions,
+                                  id, sourceID);
         }
 
         symbolLayoutsNeedPreparation = false;

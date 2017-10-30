@@ -179,7 +179,7 @@ bool SymbolLayout::hasSymbolInstances() const {
 
 void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
                            const ImageMap& imageMap, const ImagePositions& imagePositions,
-                           const OverscaledTileID& tileID) {
+                           const OverscaledTileID& tileID, const std::string& sourceID) {
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
@@ -248,7 +248,7 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
 
         // if either shapedText or icon position is present, add the feature
         if (shapedTextOrientations.first || shapedIcon) {
-            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionMap, tileID);
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionMap, tileID, sourceID);
         }
         
         feature.geometry.clear();
@@ -262,7 +262,8 @@ void SymbolLayout::addFeature(const std::size_t index,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
                               const GlyphPositionMap& glyphPositionMap,
-                              const OverscaledTileID& tileID) {
+                              const OverscaledTileID& tileID,
+                              const std::string& sourceID) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
     
@@ -293,7 +294,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature = { feature.index, sourceLayer->getName(), bucketName,
+    IndexedSubfeature indexedFeature = { feature.index, sourceID, sourceLayer->getName(), bucketName,
                                          symbolInstances.size(), tileID.canonical.z, tileID.canonical.x, tileID.canonical.y, tileID.overscaledZ, tileID.wrap };
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
