@@ -329,8 +329,10 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onSaveInstanceState(@NonNull Bundle outState) {
-    outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
-    mapboxMap.onSaveInstanceState(outState);
+    if (mapboxMap != null) {
+      outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
+      mapboxMap.onSaveInstanceState(outState);
+    }
   }
 
   /**
