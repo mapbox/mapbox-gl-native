@@ -50,7 +50,7 @@ EvaluationResult Assertion::evaluate(const EvaluationContext& params) const {
     }
 
     assert(false);
-    return EvaluationResult();
+    return EvaluationError { "Unreachable" };
 };
 
 void Assertion::eachChild(const std::function<void(const Expression*)>& visit) const {
