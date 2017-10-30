@@ -78,7 +78,7 @@ public:
 
 class EvaluationResult : public Result<Value> {
 public:
-    using Result::Result;
+    using Result::Result; // NOLINT
     
     EvaluationResult(const std::array<double, 4>& arr) :
         Result(toExpressionValue(arr))
