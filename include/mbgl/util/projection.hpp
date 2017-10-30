@@ -92,8 +92,8 @@ public:
         const double t2z = tileSize * std::pow(2, zoom);
         Point<double> pt = project_(point, t2z);
         // Flip y coordinate
-        auto x = std::round(std::min(pt.x, t2z));
-        auto y = std::round(std::min(t2z - pt.y, t2z));
+        auto x = ::round(std::min(pt.x, t2z));
+        auto y = ::round(std::min(t2z - pt.y, t2z));
         return { x, y };
     }
 private:
