@@ -220,3 +220,9 @@ TEST(LatLngBounds, FromTileID) {
         ASSERT_DOUBLE_EQ(util::LATITUDE_MAX, bounds.north());
     }
 }
+
+TEST(LatLngBounds, Contains) {
+    const LatLngBounds bounds( CanonicalTileID(4,2,6));
+    const LatLngBounds innerBounds( CanonicalTileID(9,82,197));
+    EXPECT_TRUE(bounds.contains(innerBounds));
+}

@@ -161,6 +161,13 @@ public:
                 point.longitude() <= ne.longitude());
     }
 
+    bool contains(const LatLngBounds& area) const {
+        return (area.ne.latitude()  <= ne.latitude()  &&
+                area.sw.latitude()  >= sw.latitude()  &&
+                area.ne.longitude() <= ne.longitude() &&
+                area.sw.longitude() >= sw.longitude());
+    }
+
     bool intersects(const LatLngBounds area) const {
         return (area.ne.latitude()  > sw.latitude()  &&
                 area.sw.latitude()  < ne.latitude()  &&
