@@ -265,6 +265,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
     }
 
     bucket.updateOpacity();
+    bucket.sortFeatures(state.getAngle());
 }
 
 JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
