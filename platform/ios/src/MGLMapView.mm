@@ -18,6 +18,7 @@
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
+#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
