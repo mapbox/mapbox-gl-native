@@ -150,12 +150,8 @@ public final class MapboxMap {
     trackingSettings.onRestoreInstanceState(savedInstanceState);
 
     if (cameraPosition != null) {
-      easeCamera(CameraUpdateFactory.newCameraPosition(
-        new CameraPosition.Builder(cameraPosition).build()),
-        0,
-        false,
-        null,
-        !trackingSettings.isLocationTrackingDisabled()
+      moveCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder(cameraPosition).build())
       );
     }
 
