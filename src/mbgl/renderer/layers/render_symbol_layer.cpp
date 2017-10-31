@@ -89,7 +89,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& paintProperties)
         {
             // We clip symbols to their tile extent in still mode.
-            const bool needsClipping = parameters.mapMode == MapMode::Still;
+            const bool needsClipping = false; // TODO parameters.mapMode == MapMode::Still;
 
             program.get(paintProperties).draw(
                 parameters.context,
@@ -237,7 +237,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gl::Lines { 1.0f },
                 gl::DepthMode::disabled(),
-                parameters.stencilModeForClipping(tile.clip),
+                gl::StencilMode::disabled(), // TODO //parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
@@ -271,7 +271,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
-                parameters.stencilModeForClipping(tile.clip),
+                gl::StencilMode::disabled(), // TODO //parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
