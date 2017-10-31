@@ -5,12 +5,13 @@
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/actor/mailbox.hpp>
 
 namespace mbgl {
 
 class OverscaledTileID;
 class CanonicalTileID;
+template <class T>
+class Actor;
 
 namespace style {
 
@@ -43,8 +44,7 @@ public:
     class Impl;
     const Impl& impl() const;
 private:
-    std::shared_ptr<Mailbox> mailbox;    
-    std::unique_ptr<CustomTileLoader> loader;
+    std::unique_ptr<Actor<CustomTileLoader>> loader;
 };
 
 template <>
