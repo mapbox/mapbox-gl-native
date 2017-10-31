@@ -72,6 +72,9 @@
     <public name="mapbox_uiAttributionMarginRight" type="attr" />
     <public name="mapbox_uiAttributionMarginBottom" type="attr" />
 
+    <!-- Use TextureView-->
+    <public name="mapbox_renderTextureMode" type="attr" />
+
     <public name="mapbox_enableTilePrefetch" type="attr" />
     <public name="mapbox_enableZMediaOverlay" type="attr" />
 
