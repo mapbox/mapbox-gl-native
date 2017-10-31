@@ -63,7 +63,7 @@ private:
 
     // Adds placed items to the buffer.
     template <typename Buffer>
-    void addSymbol(Buffer&,
+    size_t addSymbol(Buffer&,
                    const Range<float> sizeData,
                    const SymbolQuad&,
                    const Anchor& labelAnchor,

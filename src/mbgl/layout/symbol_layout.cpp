@@ -437,22 +437,36 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
             bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                     symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
             symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
+            PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
 
+            bool firstHorizontal = true;
             for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
-                addSymbol(
+                size_t index = addSymbol(
                     bucket->text, sizeData, symbol,
-                    symbolInstance.anchor, bucket->text.placedSymbols.back());
+                    symbolInstance.anchor, horizontalSymbol);
+                if (firstHorizontal) {
+                    horizontalSymbol.vertexStartIndex = index;
+                    firstHorizontal = false;
+                }
             }
             
             if (symbolInstance.writingModes & WritingModeType::Vertical) {
                 bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
                 symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
-
+                
+                PlacedSymbol& verticalSymbol = bucket->text.placedSymbols.back();
+                bool firstVertical = true;
+                
                 for (const auto& symbol : symbolInstance.verticalGlyphQuads) {
-                    addSymbol(
+                    size_t index = addSymbol(
                         bucket->text, sizeData, symbol,
-                        symbolInstance.anchor, bucket->text.placedSymbols.back());
+                        symbolInstance.anchor, verticalSymbol);
+                    
+                    if (firstVertical) {
+                        verticalSymbol.vertexStartIndex = index;
+                        firstVertical = false;
+                    }
                 }
             }
         }
@@ -463,9 +477,10 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
                 symbolInstance.placedIconIndices.push_back(bucket->icon.placedSymbols.size() - 1);
-                addSymbol(
-                    bucket->icon, sizeData, *symbolInstance.iconQuad,
-                 symbolInstance.anchor, bucket->icon.placedSymbols.back());
+                PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
+                iconSymbol.vertexStartIndex = addSymbol(
+                                                        bucket->icon, sizeData, *symbolInstance.iconQuad,
+                                                        symbolInstance.anchor, iconSymbol);
             }
         }
         
@@ -483,7 +498,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
 }
 
 template <typename Buffer>
-void SymbolLayout::addSymbol(Buffer& buffer,
+size_t SymbolLayout::addSymbol(Buffer& buffer,
                              const Range<float> sizeData,
                              const SymbolQuad& symbol,
                              const Anchor& labelAnchor,
@@ -505,7 +520,6 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     auto& segment = buffer.segments.back();
     assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
     uint16_t index = segment.vertexLength;
-    placedSymbol.vertexStartIndex = index;
 
     // coordinates (2 triangles)
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData));
@@ -533,6 +547,8 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     segment.indexLength += 6;
 
     placedSymbol.glyphOffsets.push_back(symbol.glyphOffset.x);
+    
+    return index;
 }
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
