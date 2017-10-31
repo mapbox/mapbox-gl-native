@@ -1,9 +1,10 @@
-package com.mapbox.mapboxsdk.maps.renderer;
+package com.mapbox.mapboxsdk.maps.renderer.glsurfaceview;
 
 import android.content.Context;
 import android.opengl.GLSurfaceView;
 
-import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
+import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
+import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -31,16 +32,12 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
 
   @Override
   public void onPause() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onPause();
-    }
+    glSurfaceView.onPause();
   }
 
   @Override
   public void onResume() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onResume();
-    }
+    glSurfaceView.onResume();
   }
 
   @Override
