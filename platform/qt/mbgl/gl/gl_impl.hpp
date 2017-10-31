@@ -19,8 +19,13 @@
     #include <QOpenGLContext>
     #include <QOpenGLFunctions>
 
+    #ifndef GL_RGBA8_OES
     #define GL_RGBA8_OES GL_RGBA8
+    #endif
+
+    #ifndef GL_DEPTH24_STENCIL8_OES
     #define GL_DEPTH24_STENCIL8_OES GL_DEPTH24_STENCIL8
+    #endif
 
     #define glActiveTexture(...) QOpenGLContext::currentContext()->functions()->glActiveTexture(__VA_ARGS__)
     #define glAttachShader(...) QOpenGLContext::currentContext()->functions()->glAttachShader(__VA_ARGS__)
