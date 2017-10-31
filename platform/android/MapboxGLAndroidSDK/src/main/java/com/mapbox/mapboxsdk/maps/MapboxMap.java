@@ -149,12 +149,8 @@ public final class MapboxMap {
     trackingSettings.onRestoreInstanceState(savedInstanceState);
 
     if (cameraPosition != null) {
-      easeCamera(CameraUpdateFactory.newCameraPosition(
-        new CameraPosition.Builder(cameraPosition).build()),
-        0,
-        false,
-        null,
-        !trackingSettings.isLocationTrackingDisabled()
+      moveCamera(CameraUpdateFactory.newCameraPosition(
+        new CameraPosition.Builder(cameraPosition).build())
       );
     }
 
@@ -1677,9 +1673,9 @@ public final class MapboxMap {
   /**
    * Get a camera position that fits a provided shape with a given bearing and padding.
    *
-   * @param geometry     the geometry to constrain the map with
-   * @param bearing      the bearing at which to compute the geometry's bounds
-   * @param padding      the padding to apply to the bounds
+   * @param geometry the geometry to constrain the map with
+   * @param bearing  the bearing at which to compute the geometry's bounds
+   * @param padding  the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
