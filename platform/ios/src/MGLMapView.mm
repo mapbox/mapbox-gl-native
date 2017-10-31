@@ -1616,7 +1616,7 @@ public:
     if(annotation)
     {
         CGPoint calloutPoint = [singleTap locationInView:self];
-        CGRect positionRect = [self positioningRectForAnnotation:annotation withDefaultCalloutPoint:calloutPoint];
+        CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
         [self selectAnnotation:annotation animated:YES calloutPositioningRect:positionRect];
     }
     else
@@ -3982,7 +3982,7 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
-    CGRect positioningRect = [self positioningRectForAnnotation:annotation withDefaultCalloutPoint:CGPointZero];
+    CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
     [self selectAnnotation:annotation animated:animated calloutPositioningRect:positioningRect];
 }
 
@@ -4116,7 +4116,7 @@ public:
 /// and is appropriate for positioning a popover.
 /// If a shape annotation is visible but its centroid is not, and a default point is specified,
 /// the callout view is anchored to the default callout point.
-- (CGRect)positioningRectForAnnotation:(id <MGLAnnotation>)annotation withDefaultCalloutPoint:(CGPoint)calloutPoint
+- (CGRect)positioningRectForAnnotation:(id <MGLAnnotation>)annotation defaultCalloutPoint:(CGPoint)calloutPoint
 {
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
     CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
