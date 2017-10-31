@@ -64,7 +64,7 @@ public:
     const bool iconsNeedLinear;
     const bool sortFeaturesByY;
     
-    float sortedAngle = 0;
+    optional<float> sortedAngle;
 
     bool staticUploaded = false;
     bool opacityUploaded = false;

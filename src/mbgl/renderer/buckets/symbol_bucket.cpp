@@ -150,7 +150,7 @@ void SymbolBucket::sortFeatures(const float angle) {
         return;
     }
 
-    if (sortedAngle == angle) {
+    if (sortedAngle && *sortedAngle == angle) {
         return;
     }
     
