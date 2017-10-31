@@ -65,7 +65,8 @@ public:
     void insert(T&& t, const BBox&);
     void insert(T&& t, const BCircle&);
     
-    std::vector<std::pair<T,BBox>> query(const BBox&) const;
+    std::vector<T> query(const BBox&) const;
+    std::vector<std::pair<T,BBox>> queryWithBoxes(const BBox&) const;
     
     bool hitTest(const BBox&) const;
     bool hitTest(const BCircle&) const;

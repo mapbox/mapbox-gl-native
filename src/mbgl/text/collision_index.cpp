@@ -268,7 +268,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     typedef std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox> QueryResult;
     
     std::vector<QueryResult> thisTileFeatures;
-    std::vector<QueryResult> features = collisionGrid.query({{minX, minY}, {maxX, maxY}});
+    std::vector<QueryResult> features = collisionGrid.queryWithBoxes({{minX, minY}, {maxX, maxY}});
 
     for (auto& queryResult : features) {
         auto& feature = queryResult.first;
@@ -278,7 +278,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         }
     }
     
-    std::vector<QueryResult> ignoredFeatures = ignoredGrid.query({{minX, minY}, {maxX, maxY}});
+    std::vector<QueryResult> ignoredFeatures = ignoredGrid.queryWithBoxes({{minX, minY}, {maxX, maxY}});
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
         CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
