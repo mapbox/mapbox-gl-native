@@ -182,10 +182,10 @@ uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_)
     auto y1 = floor(sw.y/ tileSize_);
     auto y2 = floor((ne.y - 1) / tileSize_);
 
-    auto minX = std::fmax(std::min(x1, x2), 0);
+    auto minX = ::fmax(std::min(x1, x2), 0);
     auto maxX = std::max(x1, x2);
     auto minY = (std::pow(2, zoom) - 1) - std::max(y1, y2);
-    auto maxY = (std::pow(2, zoom) - 1) - std::fmax(std::min(y1, y2), 0);
+    auto maxY = (std::pow(2, zoom) - 1) - ::fmax(std::min(y1, y2), 0);
     
     return (maxX - minX + 1) * (maxY - minY + 1);
 }
