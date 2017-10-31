@@ -265,7 +265,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         polygon.push_back(convertPoint<int16_t>(projected));
     }
     
-    typedef std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox> QueryResult;
+    using QueryResult = std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox>;
     
     std::vector<QueryResult> thisTileFeatures;
     std::vector<QueryResult> features = collisionGrid.queryWithBoxes({{minX, minY}, {maxX, maxY}});
