@@ -32,7 +32,11 @@ bool JointOpacityState::isHidden() const {
 
 uint32_t Placement::maxCrossTileID = 0;
 
-Placement::Placement(const TransformState& state_) : collisionIndex(state_), state(state_) {}
+Placement::Placement(const TransformState& state_, MapMode mapMode_)
+    : collisionIndex(state_)
+    , state(state_)
+    , mapMode(mapMode_)
+{}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
@@ -161,7 +165,7 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     bool placementChanged = false;
 
-    float increment = std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
+    float increment = mapMode == MapMode::Still ? 1.0 : std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
 
     if (increment) {}
     // add the opacities from the current placement, and copy their current values from the previous placement
@@ -279,6 +283,9 @@ JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
+    if (mapMode == MapMode::Still) {
+        return 1.0;
+    }
     return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
 }
 

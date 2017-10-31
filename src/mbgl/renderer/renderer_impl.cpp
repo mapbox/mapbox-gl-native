@@ -57,7 +57,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
-    , placement(std::make_unique<Placement>(TransformState{})) {
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still)) {
     glyphManager->setObserver(this);
 }
 
@@ -364,7 +364,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
-    auto newPlacement = std::make_unique<Placement>(parameters.state);
+    auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
