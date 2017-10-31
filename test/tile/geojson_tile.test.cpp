@@ -66,7 +66,6 @@ TEST(GeoJSONTile, Issue7648) {
 
     tile.setLayers({{ layer.baseImpl }});
     tile.setObserver(&observer);
-    tile.setPlacementConfig({});
 
     while (!tile.isComplete()) {
         test.loop.runOnce();
@@ -93,7 +92,6 @@ TEST(GeoJSONTile, Issue9927) {
     GeoJSONTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, features);
 
     tile.setLayers({{ layer.baseImpl }});
-    tile.setPlacementConfig({});
 
     while (!tile.isComplete()) {
         test.loop.runOnce();
