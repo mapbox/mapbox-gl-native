@@ -59,7 +59,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/android_renderer_frontend.cpp
         PRIVATE platform/android/src/android_renderer_frontend.hpp
 
-        # Snapshots
+        # Snapshots (core)
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/default/mbgl/gl/headless_frontend.cpp
@@ -68,8 +68,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
         PRIVATE platform/linux/src/headless_backend_egl.cpp
         PRIVATE platform/linux/src/headless_display_egl.cpp
-        PRIVATE platform/android/src/snapshotter/map_snapshotter.cpp
-        PRIVATE platform/android/src/snapshotter/map_snapshotter.hpp
     )
 
     target_include_directories(mbgl-core
@@ -292,6 +290,12 @@ add_library(mbgl-android STATIC
     platform/android/src/offline/offline_region_error.hpp
     platform/android/src/offline/offline_region_status.cpp
     platform/android/src/offline/offline_region_status.hpp
+
+    # Snapshots (SDK)
+    platform/android/src/snapshotter/map_snapshotter.cpp
+    platform/android/src/snapshotter/map_snapshotter.hpp
+    platform/android/src/snapshotter/map_snapshot.cpp
+    platform/android/src/snapshotter/map_snapshot.hpp
 
     # Main jni bindings
     platform/android/src/attach_env.cpp
