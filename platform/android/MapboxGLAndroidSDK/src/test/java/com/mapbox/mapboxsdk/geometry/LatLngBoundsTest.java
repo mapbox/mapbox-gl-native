@@ -4,6 +4,7 @@ import android.os.Parcelable;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
+import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -271,5 +272,23 @@ public class LatLngBoundsTest {
       .build();
     Parcelable parcel = MockParcel.obtain(latLngBounds);
     assertEquals("Parcel should match original object", parcel, latLngBounds);
+  }
+
+  @Test
+  public void fromTileID() {
+    //GeoConstants.MAX_LATITUDE is not defined to a high enough precision
+    double MAX_LATITUDE = 85.05112877980659;
+    LatLngBounds bounds = LatLngBounds.from(0, 0, 0);
+    assertEquals(-GeoConstants.MAX_LONGITUDE, bounds.getLonWest(), DELTA);
+    assertEquals(-MAX_LATITUDE, bounds.getLatSouth(), DELTA);
+    assertEquals(GeoConstants.MAX_LONGITUDE, bounds.getLonEast(), DELTA);
+    assertEquals(MAX_LATITUDE, bounds.getLatNorth(), DELTA);
+
+    bounds = LatLngBounds.from(10, 288, 385);
+    assertEquals(-78.75, bounds.getLonWest(), DELTA);
+    assertEquals(40.446947059600497, bounds.getLatSouth(), DELTA);
+    assertEquals(-78.3984375, bounds.getLonEast(), DELTA);
+    assertEquals(40.713955826286039, bounds.getLatNorth(), DELTA);
+
   }
 }

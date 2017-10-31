@@ -12,6 +12,7 @@
 #include "raster_source.hpp"
 #include "unknown_source.hpp"
 #include "vector_source.hpp"
+#include "custom_geometry_source.hpp"
 
 namespace {
 
@@ -54,6 +55,7 @@ void registerNativeSources(jni::JNIEnv& env) {
     RasterSource::registerNative(env);
     UnknownSource::registerNative(env);
     VectorSource::registerNative(env);
+    CustomGeometrySource::registerNative(env);
 }
 
 }
