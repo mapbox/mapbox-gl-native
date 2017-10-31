@@ -9,7 +9,6 @@ CustomTileLoader::CustomTileLoader(const TileFunction& fetchTileFn, const TileFu
 }
 
 void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<SetTileDataFunction> callbackRef) {
-    std::lock_guard<std::mutex> lock(dataCacheMutex);
     auto cachedTileData = dataCache.find(tileID.canonical);
     if (cachedTileData != dataCache.end()) {
         callbackRef.invoke(&SetTileDataFunction::operator(), *(cachedTileData->second));
@@ -49,14 +48,12 @@ void CustomTileLoader::removeTile(const OverscaledTileID& tileID) {
         }
     }
     if (tileCallbacks->second.size() == 0) {
-        std::lock_guard<std::mutex> lock(dataCacheMutex);
         tileCallbackMap.erase(tileCallbacks);
         dataCache.erase(tileID.canonical);
     }
 }
 
 void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON& data) {
-    std::lock_guard<std::mutex> lock(dataCacheMutex);
 
     auto iter = tileCallbackMap.find(tileID);
     if (iter == tileCallbackMap.end()) return;
@@ -76,10 +73,7 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
         invokeTileCancel(tileID);
     }
     tileCallbackMap.erase(tileCallbacks);
-    {
-        std::lock_guard<std::mutex> lock(dataCacheMutex);
-        dataCache.erase(tileID);
-    }
+    dataCache.erase(tileID);
 }
 
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
@@ -87,7 +81,6 @@ void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_
         const LatLngBounds tileBounds(idtuple->first);
         if (tileBounds.intersects(bounds) || bounds.contains(tileBounds) || tileBounds.contains(bounds)) {
             for (auto iter = idtuple->second.begin(); iter != idtuple->second.end(); iter++) {
-                std::lock_guard<std::mutex> lock(dataCacheMutex);
                 auto actor = std::get<2>(*iter);
                 actor.invoke(&SetTileDataFunction::operator(), mapbox::geojson::feature_collection());
                 invokeTileCancel(idtuple->first);
