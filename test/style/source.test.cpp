@@ -25,7 +25,7 @@
 #include <mbgl/util/image.hpp>
 
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
@@ -552,7 +552,7 @@ TEST(Source, ImageSourceImageUpdate) {
 
 TEST(Source, CustomGeometrySourceSetTileData) {
     SourceTest test;
-
+    std::shared_ptr<ThreadPool> threadPool = sharedThreadPool();
     CustomGeometrySource source("source", CustomGeometrySource::Options());
     source.loadDescription(test.fileSource);
 
