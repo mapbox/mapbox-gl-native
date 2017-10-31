@@ -713,6 +713,10 @@ public final class MapboxMap {
         // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
         // invalidate camera position to provide OnCameraChange event.
         invalidateCameraPosition();
+
+        if (callback != null) {
+          callback.onFinish();
+        }
       }
     });
   }
