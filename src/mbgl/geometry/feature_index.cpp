@@ -61,15 +61,9 @@ void FeatureIndex::query(
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-    typedef std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox> QueryResult;
-    std::vector<QueryResult> queryResults = grid.query({ convertPoint<float>(box.min - additionalRadius),
+    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalRadius),
                                                            convertPoint<float>(box.max + additionalRadius) });
 
-    // TODO: clumsy way to discard this data
-    std::vector<IndexedSubfeature> features;
-    for (auto& queryResult : queryResults) {
-        features.push_back(queryResult.first);
-    }
 
     std::sort(features.begin(), features.end(), topDown);
     size_t previousSortIndex = std::numeric_limits<size_t>::max();

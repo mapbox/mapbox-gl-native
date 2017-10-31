@@ -62,7 +62,17 @@ void GridIndex<T>::insert(T&& t, const BCircle& bcircle) {
 }
 
 template <class T>
-std::vector<std::pair<T, typename GridIndex<T>::BBox>> GridIndex<T>::query(const BBox& queryBBox) const {
+std::vector<T> GridIndex<T>::query(const BBox& queryBBox) const {
+    std::vector<T> result;
+    query(queryBBox, [&](const T& t, const BBox&) -> bool {
+        result.push_back(t);
+        return false;
+    });
+    return result;
+}
+
+template <class T>
+std::vector<std::pair<T, typename GridIndex<T>::BBox>> GridIndex<T>::queryWithBoxes(const BBox& queryBBox) const {
     std::vector<std::pair<T, BBox>> result;
     query(queryBBox, [&](const T& t, const BBox& bbox) -> bool {
         result.push_back(std::make_pair(t, bbox));
@@ -116,7 +126,6 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
     if (noIntersection(queryBBox)) {
         return;
     } else if (completeIntersection(queryBBox)) {
-        // TODO: std::for_each?
         for (auto& element : boxElements) {
             if (resultFn(element.first, element.second)) {
                 return;
@@ -127,6 +136,7 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
                 return;
             };
         }
+        return;
     }
 
     auto cx1 = convertToXCellCoord(queryBBox.min.x);
