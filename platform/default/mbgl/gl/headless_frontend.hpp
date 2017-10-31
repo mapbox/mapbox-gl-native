@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/renderer/mode.hpp>
 #include <mbgl/renderer/renderer_frontend.hpp>
 #include <mbgl/gl/headless_backend.hpp>
 #include <mbgl/util/async_task.hpp>
@@ -14,11 +15,12 @@ class Scheduler;
 class Renderer;
 class RendererBackend;
 class Map;
+class TransformState;
 
 class HeadlessFrontend : public RendererFrontend {
 public:
-    HeadlessFrontend(float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {});
-    HeadlessFrontend(Size, float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {});
+    HeadlessFrontend(float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique);
+    HeadlessFrontend(Size, float pixelRatio_, FileSource&, Scheduler&, const optional<std::string> programCacheDir = {}, GLContextMode mode = GLContextMode::Unique);
     ~HeadlessFrontend() override;
 
     void reset() override;
@@ -33,6 +35,8 @@ public:
 
     PremultipliedImage readStillImage();
     PremultipliedImage render(Map&);
+
+    optional<TransformState> getTransformState() const;
 
 private:
     Size size;

@@ -248,7 +248,14 @@ UniqueTexture Context::createTexture() {
 }
 
 bool Context::supportsVertexArrays() const {
-    return vertexArray &&
+    static bool blacklisted = []() {
+        // Blacklist Adreno 3xx as it crashes on glBuffer(Sub)Data
+        const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        return renderer.find("Adreno (TM) 3") != std::string::npos;
+    }();
+
+    return !blacklisted &&
+           vertexArray &&
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
@@ -583,13 +590,14 @@ void Context::setDirtyState() {
 
 void Context::clear(optional<mbgl::Color> color,
                     optional<float> depth,
-                    optional<int32_t> stencil) {
+                    optional<int32_t> stencil,
+                    optional<ColorMode::Mask> colorMask_) {
     GLbitfield mask = 0;
 
     if (color) {
         mask |= GL_COLOR_BUFFER_BIT;
         clearColor = *color;
-        colorMask = { true, true, true, true };
+        colorMask = colorMask_ ? *colorMask_ : value::ColorMask::Default;
     }
 
     if (depth) {
@@ -605,6 +613,10 @@ void Context::clear(optional<mbgl::Color> color,
     }
 
     MBGL_CHECK_ERROR(glClear(mask));
+
+    if (colorMask_) {
+        colorMask = value::ColorMask::Default;
+    }
 }
 
 #if not MBGL_USE_GLES2

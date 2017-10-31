@@ -298,7 +298,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (layerImpl.get() == layerImpls->at(0).get() && paint.get<BackgroundPattern>().from.empty()) {
+            if (parameters.contextMode == GLContextMode::Unique
+                    && layerImpl.get() == layerImpls->at(0).get()
+                    && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
                 backgroundColor = paint.get<BackgroundColor>() * paint.get<BackgroundOpacity>();
             } else {
@@ -434,13 +436,19 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     // Renders the backdrop of the OpenGL view. This also paints in areas where we don't have any
     // tiles whatsoever.
     {
+        using namespace gl::value;
+
         MBGL_DEBUG_GROUP(parameters.context, "clear");
         parameters.backend.bind();
-        parameters.context.clear((parameters.debugOptions & MapDebugOptions::Overdraw)
-                        ? Color::black()
-                        : backgroundColor,
-                      1.0f,
-                      0);
+        if (parameters.debugOptions & MapDebugOptions::Overdraw) {
+            parameters.context.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
+        } else if (parameters.contextMode == GLContextMode::Shared) {
+            // Preserve the shared context background colors, clearing only alpha.
+            optional<gl::ColorMode::Mask> mask = { { false, false, false, true } };
+            parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default, mask);
+        } else {
+            parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);
+        }
     }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------

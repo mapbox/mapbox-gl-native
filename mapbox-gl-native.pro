@@ -2,7 +2,7 @@ TARGET = qmapboxgl
 
 load(qt_helper_lib)
 
-CONFIG += qt c++14 exceptions warn_off staticlib
+CONFIG += qt c++14 exceptions warn_off staticlib object_parallel_to_source
 
 QT += network-private \
       gui-private \
@@ -12,6 +12,7 @@ QMAKE_CXXFLAGS += \
     -DNDEBUG \
     -DQT_IMAGE_DECODERS \
     -DRAPIDJSON_HAS_STDSTRING=1 \
+    -DMBGL_USE_GLES2 \
     -D__QT__ \
     -O3 \
     -ftemplate-depth=1024 \
@@ -37,17 +38,6 @@ win32 {
         -DNOGDI \
         -DNOMINMAX \
         -D_USE_MATH_DEFINES
-}
-
-win32:qtConfig(dynamicgl) {
-    QMAKE_CXXFLAGS += \
-        -DMBGL_USE_GLES2 \
-        -DQT_OPENGL_ES_2
-}
-
-qtConfig(opengles2) {
-    QMAKE_CXXFLAGS += \
-        -DMBGL_USE_GLES2
 }
 
 qtConfig(system-zlib) {
@@ -76,6 +66,7 @@ SOURCES += \
     platform/qt/src/qmapbox.cpp \
     platform/qt/src/qmapboxgl.cpp \
     platform/qt/src/qmapboxgl_renderer_frontend_p.cpp \
+    platform/qt/src/qt_geojson.cpp \
     platform/qt/src/qt_image.cpp \
     platform/qt/src/run_loop.cpp \
     platform/qt/src/sqlite3.cpp \
@@ -190,7 +181,17 @@ SOURCES += \
     src/mbgl/storage/resource.cpp \
     src/mbgl/storage/resource_transform.cpp \
     src/mbgl/storage/response.cpp \
+    src/mbgl/style/conversion/constant.cpp \
+    src/mbgl/style/conversion/coordinate.cpp \
+    src/mbgl/style/conversion/filter.cpp \
     src/mbgl/style/conversion/geojson.cpp \
+    src/mbgl/style/conversion/geojson_options.cpp \
+    src/mbgl/style/conversion/layer.cpp \
+    src/mbgl/style/conversion/light.cpp \
+    src/mbgl/style/conversion/position.cpp \
+    src/mbgl/style/conversion/source.cpp \
+    src/mbgl/style/conversion/tileset.cpp \
+    src/mbgl/style/conversion/transition_options.cpp \
     src/mbgl/style/function/categorical_stops.cpp \
     src/mbgl/style/function/identity_stops.cpp \
     src/mbgl/style/image.cpp \
@@ -323,8 +324,8 @@ INCLUDEPATH += \
     deps/boost/1.62.0/include \
     deps/cheap-ruler/2.5.3 \
     deps/cheap-ruler/2.5.3/include \
-    deps/earcut/0.12.3 \
-    deps/earcut/0.12.3/include \
+    deps/earcut/0.12.4 \
+    deps/earcut/0.12.4/include \
     deps/geojson/0.4.2 \
     deps/geojson/0.4.2/include \
     deps/geojsonvt/6.3.0 \
@@ -355,8 +356,9 @@ INCLUDEPATH += \
     deps/wagyu/0.4.3/include \
     include \
     platform/default \
+    platform/qt \
     platform/qt/include \
     src
 
 QMAKE_CXXFLAGS += \
-    -DMBGL_VERSION_REV=\\\"qt-v1.1.0\\\"
+    -DMBGL_VERSION_REV=\\\"qt-v1.1.1\\\"
