@@ -49,6 +49,7 @@ import timber.log.Timber;
  * <p>
  * Use {@link MyLocationViewSettings} to manipulate the state of this view.
  * </p>
+ *
  * @deprecated use location layer plugin from
  * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
  */
@@ -639,8 +640,7 @@ public class MyLocationView extends View {
     if (location != null) {
       if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
         // center map directly
-        mapboxMap.easeCamera(CameraUpdateFactory.newLatLng(new LatLng(location)), 0, false /*linear interpolator*/,
-          null, true);
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(location)));
       } else {
         // do not use interpolated location from tracking mode
         latLng = null;
@@ -1022,8 +1022,7 @@ public class MyLocationView extends View {
         mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
           true);
       } else {
-        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), 0, false, null,
-          true);
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(builder.build()));
       }
     }
 
