@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.egl;
+package com.mapbox.mapboxsdk.maps.renderer.egl;
 
 /**
  * Used for EGL configuration exceptions
