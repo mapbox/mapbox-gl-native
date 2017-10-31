@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onData;
@@ -67,6 +68,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testMapboxStreetsMapboxAttributionLink() {
     validateTestSetup();
     if (urlSpans == null) {
@@ -87,6 +89,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testMapboxStreetsOpenStreetMapAttributionLink() {
     validateTestSetup();
     if (urlSpans == null) {
@@ -107,6 +110,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testImproveMapLink() {
     validateTestSetup();
     if (urlSpans == null) {
