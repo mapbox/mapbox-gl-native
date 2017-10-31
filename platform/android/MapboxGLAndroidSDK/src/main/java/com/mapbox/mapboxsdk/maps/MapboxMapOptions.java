@@ -85,6 +85,8 @@ public class MapboxMapOptions implements Parcelable {
 
   private String apiBaseUrl;
 
+  private boolean textureMode;
+
   private String style;
 
   /**
@@ -152,7 +154,7 @@ public class MapboxMapOptions implements Parcelable {
 
     style = in.readString();
     apiBaseUrl = in.readString();
-
+    textureMode = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
   }
@@ -296,6 +298,8 @@ public class MapboxMapOptions implements Parcelable {
           ColorUtils.getPrimaryColor(context)));
       mapboxMapOptions.myLocationAccuracyThreshold(
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyThreshold, 0));
+      mapboxMapOptions.textureMode(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
@@ -699,12 +703,29 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Enable {@link android.view.TextureView} as rendered surface.
+   * <p>
+   * Since the 5.2.0 release we replaced our TextureView with an {@link android.opengl.GLSurfaceView}
+   * implementation. Enabling this option will use the {@link android.view.TextureView} instead.
+   * {@link android.view.TextureView} can be useful in situations where you need to animate, scale
+   * or transform the view. This comes at a siginficant performance penalty and should not be considered
+   * unless absolutely needed.
+   * </p>
+   *
+   * @param textureMode True to enable texture mode
+   * @return This
+   */
+  public MapboxMapOptions textureMode(boolean textureMode) {
+    this.textureMode = textureMode;
+    return this;
+  }
+
+  /**
    * Enable tile pre-fetching. Loads tiles at a lower zoom-level to pre-render
    * a low resolution preview while more detailed tiles are loaded.
    * Enabled by default
    *
    * @param enable true to enable
-   *
    * @return This
    */
   public MapboxMapOptions setPrefetchesTiles(boolean enable) {
@@ -1049,6 +1070,15 @@ public class MapboxMapOptions implements Parcelable {
     return debugActive;
   }
 
+  /**
+   * Returns true if TextureView is being used the render view.
+   *
+   * @return True if TextureView is used.
+   */
+  public boolean getTextureMode() {
+    return textureMode;
+  }
+
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
       return new MapboxMapOptions(in);
@@ -1112,7 +1142,7 @@ public class MapboxMapOptions implements Parcelable {
 
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
-
+    dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
   }
@@ -1289,6 +1319,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (myLocationAccuracyThreshold != +0.0f
       ? Float.floatToIntBits(myLocationAccuracyThreshold) : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
+    result = 31 * result + (textureMode ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
