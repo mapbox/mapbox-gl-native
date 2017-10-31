@@ -437,10 +437,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         MBGL_DEBUG_GROUP(parameters.context, "clear");
         parameters.backend.bind();
         parameters.context.clear((parameters.debugOptions & MapDebugOptions::Overdraw)
-                        ? Color::black()
-                        : backgroundColor,
-                      1.0f,
-                      0);
+                        ? Color::black() : backgroundColor);
     }
 
     // - CLIPPING MASKS ----------------------------------------------------------------------------
