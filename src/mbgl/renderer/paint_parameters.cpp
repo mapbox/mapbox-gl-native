@@ -26,7 +26,7 @@ PaintParameters::PaintParameters(gl::Context& context_,
     debugOptions(updateParameters.debugOptions),
     contextMode(contextMode_),
     timePoint(updateParameters.timePoint),
-    symbolFadeChange(std::chrono::duration<float>(placementCommitTime - updateParameters.timePoint) / Duration(std::chrono::milliseconds(300))), // TODO don't hardcode
+    symbolFadeChange(updateParameters.mode == MapMode::Still ? 1 : std::chrono::duration<float>(placementCommitTime - updateParameters.timePoint) / Duration(std::chrono::milliseconds(300))), // TODO don't hardcode
     pixelRatio(pixelRatio_),
 #ifndef NDEBUG
     programs((debugOptions & MapDebugOptions::Overdraw) ? staticData_.overdrawPrograms : staticData_.programs)

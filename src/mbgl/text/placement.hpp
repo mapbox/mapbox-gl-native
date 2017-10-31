@@ -38,7 +38,7 @@ namespace mbgl {
 
     class Placement {
         public:
-            Placement(const TransformState&);
+            Placement(const TransformState&, MapMode mapMode);
             void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
             bool commit(const Placement& prevPlacement, TimePoint);
             void updateLayerOpacities(RenderSymbolLayer&);
@@ -63,6 +63,7 @@ namespace mbgl {
             void updateBucketOpacities(SymbolBucket&);
 
             TransformState state;
+            MapMode mapMode;
             TimePoint commitTime;
 
             static uint32_t maxCrossTileID; // TODO remove
