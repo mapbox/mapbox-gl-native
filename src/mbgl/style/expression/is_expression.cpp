@@ -1,5 +1,10 @@
 #include <mbgl/style/expression/is_expression.hpp>
+#include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
+
 #include <mbgl/style/conversion.hpp>
+
+#include <unordered_set>
 
 namespace mbgl {
 namespace style {
@@ -8,33 +13,13 @@ namespace expression {
 using namespace mbgl::style::conversion;
 
 bool isExpression(const Convertible& value) {
-    static std::unordered_set<std::string> specialForms = {
-        "all",
-        "any",
-        "array",
-        "at",
-        "boolean",
-        "case",
-        "coalesce",
-        "color",
-        "curve",
-        "let",
-        "literal",
-        "match",
-        "number",
-        "string",
-        "to-boolean",
-        "to-color",
-        "to-number",
-        "to-string",
-        "var",
-    };
+    const ExpressionRegistry& registry = getExpressionRegistry();
 
     if (!isArray(value) || arrayLength(value) == 0) return false;
     optional<std::string> name = toString(arrayMember(value, 0));
     if (!name) return false;
     
-    return (specialForms.find(*name) != specialForms.end()) ||
+    return (registry.find(*name) != registry.end()) ||
         (CompoundExpressionRegistry::definitions.find(*name) != CompoundExpressionRegistry::definitions.end());
 }
 

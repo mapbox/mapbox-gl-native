@@ -137,6 +137,10 @@ private:
     std::shared_ptr<std::vector<ParsingError>> errors;
 };
 
+using ParseFunction = ParseResult (*)(const conversion::Convertible&, ParsingContext&);
+using ExpressionRegistry = std::unordered_map<std::string, ParseFunction>;
+const ExpressionRegistry& getExpressionRegistry();
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

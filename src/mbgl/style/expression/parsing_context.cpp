@@ -68,7 +68,29 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
     return child.parse(value);
 }
 
-using namespace mbgl::style::conversion;
+const ExpressionRegistry& getExpressionRegistry() {
+    static ExpressionRegistry registry {{
+        {"all", All::parse},
+        {"any", Any::parse},
+        {"array", ArrayAssertion::parse},
+        {"at", At::parse},
+        {"boolean", Assertion::parse},
+        {"case", Case::parse},
+        {"coalesce", Coalesce::parse},
+        {"curve", parseCurve},
+        {"let", Let::parse},
+        {"literal", Literal::parse},
+        {"match", parseMatch},
+        {"number", Assertion::parse},
+        {"object", Assertion::parse},
+        {"string", Assertion::parse},
+        {"to-color", Coercion::parse},
+        {"to-number", Coercion::parse},
+        {"var", Var::parse}
+    }};
+    return registry;
+}
+
 ParseResult ParsingContext::parse(const Convertible& value)
 {
     ParseResult parsed;
@@ -90,48 +112,14 @@ ParseResult ParsingContext::parse(const Convertible& value)
             return ParseResult();
         }
         
-        if (*op == "literal") {
-            if (length != 2) {
-                error(
-                    "'literal' expression requires exactly one argument, but found " + std::to_string(length - 1) + " instead."
-                );
-                return ParseResult();
-            }
-            
-            parsed = Literal::parse(arrayMember(value, 1), *this);
-        } else if (*op == "match") {
-            parsed = parseMatch(value, *this);
-        } else if (*op == "curve") {
-            parsed = parseCurve(value, *this);
-        } else if (*op == "coalesce") {
-            parsed = Coalesce::parse(value, *this);
-        } else if (*op == "case") {
-            parsed = Case::parse(value, *this);
-        } else if (*op == "array") {
-            parsed = ArrayAssertion::parse(value, *this);
-        } else if (*op == "let") {
-            parsed = Let::parse(value, *this);
-        } else if (*op == "var") {
-            parsed = Var::parse(value, *this);
-        } else if (*op == "at") {
-            parsed = At::parse(value, *this);
-        } else if (*op == "string" || *op == "number" || *op == "boolean" || *op == "object") {
-            parsed = Assertion::parse(value, *this);
-        } else if (*op == "to-color" || *op == "to-number") {
-            parsed = Coercion::parse(value, *this);
-        } else if (*op == "any") {
-            parsed = Any::parse(value, *this);
-        } else if (*op == "all") {
-            parsed = All::parse(value, *this);
+        const ExpressionRegistry& registry = getExpressionRegistry();
+        auto parseFunction = registry.find(*op);
+        if (parseFunction != registry.end()) {
+            parsed = parseFunction->second(value, *this);
         } else {
             parsed = parseCompoundExpression(*op, value, *this);
         }
     } else {
-        if (isObject(value)) {
-            error(R"(Bare objects invalid. Use ["literal", {...}] instead.)");
-            return ParseResult();
-        }
-        
         parsed = Literal::parse(value, *this);
     }
     
