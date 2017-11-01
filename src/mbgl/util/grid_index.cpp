@@ -103,13 +103,13 @@ bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
 }
 
 template <class T>
-bool GridIndex<T>::noIntersection(const BBox& query) const {
-    return query.max.x < 0 || query.min.x > width || query.max.y < 0 || query.min.y > height;
+bool GridIndex<T>::noIntersection(const BBox& queryBBox) const {
+    return queryBBox.max.x < 0 || queryBBox.min.x > width || queryBBox.max.y < 0 || queryBBox.min.y > height;
 }
 
 template <class T>
-bool GridIndex<T>::completeIntersection(const BBox& query) const {
-    return query.min.x <= 0 && query.min.y <= 0 && width <= query.max.x && height <= query.max.y;
+bool GridIndex<T>::completeIntersection(const BBox& queryBBox) const {
+    return queryBBox.min.x <= 0 && queryBBox.min.y <= 0 && width <= queryBBox.max.x && height <= queryBBox.max.y;
 }
 
 template <class T>
