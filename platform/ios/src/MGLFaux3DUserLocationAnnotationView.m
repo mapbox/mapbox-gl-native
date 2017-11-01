@@ -245,7 +245,9 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
             _oldHeadingAccuracy = -1;
         }
 
-        if ( ! _headingIndicatorLayer && headingAccuracy)
+        bool validHeadingAccuracy = headingAccuracy > 0 && headingAccuracy < kCLLocationAccuracyNearestTenMeters;
+        
+        if ( ! _headingIndicatorLayer && validHeadingAccuracy)
         {
             if (headingTrackingModeEnabled)
             {
@@ -258,6 +260,9 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
                 [self.layer addSublayer:_headingIndicatorLayer];
                 _headingIndicatorLayer.zPosition = 1;
             }
+        }
+        else {
+            _headingIndicatorLayer.hidden = YES;
         }
 
         if (_oldHeadingAccuracy != headingAccuracy)
