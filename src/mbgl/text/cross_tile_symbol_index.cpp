@@ -4,8 +4,8 @@
 namespace mbgl {
 
 
-TileLayerIndex::TileLayerIndex(OverscaledTileID coord, std::shared_ptr<std::vector<SymbolInstance>> symbolInstances)
-    : coord(coord), symbolInstances(symbolInstances) {
+TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::shared_ptr<std::vector<SymbolInstance>> symbolInstances_)
+    : coord(coord_), symbolInstances(symbolInstances_) {
         for (SymbolInstance& symbolInstance : *symbolInstances) {
             if (indexedSymbolInstances.find(symbolInstance.key) == indexedSymbolInstances.end()) {
                 indexedSymbolInstances.emplace(symbolInstance.key, std::vector<IndexedSymbolInstance>());
