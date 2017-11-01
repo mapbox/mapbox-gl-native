@@ -1017,7 +1017,7 @@ public class MyLocationView extends View {
       // accuracy
       updateAccuracy(location);
 
-      if (locationChangeAnimationEnabled) {
+      if (locationChangeAnimationEnabled && animationDuration > 0) {
         // ease to new camera position with a linear interpolator
         mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(builder.build()), animationDuration, false, null,
           true);
