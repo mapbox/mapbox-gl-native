@@ -196,7 +196,7 @@ MGL_EXPORT
 @property (nonatomic) CGSize size;
 
 /**
- Indicates whether as snapshot is currently being generated.
+ Indicates whether a snapshot is currently being generated.
  */
 @property (nonatomic, readonly, getter=isLoading) BOOL loading;
 
