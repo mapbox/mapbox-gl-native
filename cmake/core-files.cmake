@@ -156,6 +156,7 @@ set(MBGL_CORE_FILES
 
     # renderer
     include/mbgl/renderer/backend_scope.hpp
+    include/mbgl/renderer/mode.hpp
     include/mbgl/renderer/query.hpp
     include/mbgl/renderer/renderer.hpp
     include/mbgl/renderer/renderer_backend.hpp

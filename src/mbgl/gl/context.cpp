@@ -590,13 +590,14 @@ void Context::setDirtyState() {
 
 void Context::clear(optional<mbgl::Color> color,
                     optional<float> depth,
-                    optional<int32_t> stencil) {
+                    optional<int32_t> stencil,
+                    optional<ColorMode::Mask> colorMask_) {
     GLbitfield mask = 0;
 
     if (color) {
         mask |= GL_COLOR_BUFFER_BIT;
         clearColor = *color;
-        colorMask = { true, true, true, true };
+        colorMask = colorMask_ ? *colorMask_ : value::ColorMask::Default;
     }
 
     if (depth) {
@@ -612,6 +613,10 @@ void Context::clear(optional<mbgl::Color> color,
     }
 
     MBGL_CHECK_ERROR(glClear(mask));
+
+    if (colorMask_) {
+        colorMask = value::ColorMask::Default;
+    }
 }
 
 #if not MBGL_USE_GLES2
