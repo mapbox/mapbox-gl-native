@@ -16,8 +16,8 @@ class SymbolInstance;
 
 class IndexedSymbolInstance {
     public:
-        IndexedSymbolInstance(SymbolInstance& symbolInstance, Point<double> coord)
-            : instance(symbolInstance), coord(coord) {};
+        IndexedSymbolInstance(SymbolInstance& symbolInstance, Point<double> coord_)
+            : instance(symbolInstance), coord(std::move(coord_)) {};
         SymbolInstance& instance;
         Point<double> coord;
 };

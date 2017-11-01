@@ -24,7 +24,7 @@ namespace mbgl {
     
     struct PlacedGlyph {
         PlacedGlyph(Point<float> point_, float angle_, optional<TileDistance> tileDistance_)
-            : point(point_), angle(angle_), tileDistance(tileDistance_)
+            : point(point_), angle(angle_), tileDistance(std::move(tileDistance_))
         {}
         Point<float> point;
         float angle;
