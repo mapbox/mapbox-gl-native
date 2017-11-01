@@ -14,6 +14,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
+const CLLocationDirection MGLLUserLocationHeadingAccuracyThreshold = 30;
+
 @implementation MGLFaux3DUserLocationAnnotationView
 {
     BOOL _puckModeActivated;
@@ -245,7 +247,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
             _oldHeadingAccuracy = -1;
         }
 
-        bool validHeadingAccuracy = headingAccuracy > 0 && headingAccuracy < kCLLocationAccuracyNearestTenMeters;
+        bool validHeadingAccuracy = headingAccuracy > 0 && headingAccuracy <= MGLLUserLocationHeadingAccuracyThreshold;
         
         if ( ! _headingIndicatorLayer && validHeadingAccuracy)
         {
