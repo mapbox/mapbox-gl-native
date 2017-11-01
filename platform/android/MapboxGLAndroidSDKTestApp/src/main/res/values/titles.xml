@@ -64,4 +64,7 @@
     <string name="activity_map_snapshotter_marker">Map Snapshot with marker</string>
     <string name="activity_camera_animator">Animator animation</string>
     <string name="activity_symbol_generator">SymbolGenerator</string>
+    <string name="activity_textureview_debug">TextureView debug</string>
+    <string name="activity_textureview_resize">TextureView resize</string>
+    <string name="activity_textureview_animate">TextureView animation</string>
 </resources>
