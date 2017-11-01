@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -262,35 +263,59 @@ public class MapSnapshotter {
     nativeCancel();
   }
 
-  protected void addOverlay(Bitmap original) {
+  /**
+   * Draw an overlay on the map snapshot.
+   *
+   * @param mapSnapshot the map snapshot to draw the overlay on
+   */
+  protected void addOverlay(MapSnapshot mapSnapshot) {
+    Bitmap original = mapSnapshot.getBitmap();
+    Canvas canvas = new Canvas(original);
+    addLogo(canvas, original);
+  }
+
+  /**
+   * Draw a logo on the canvas created from the map snapshot.
+   *
+   * @param canvas   the canvas to draw the bitmap on
+   * @param original the map snapshot image
+   */
+  private void addLogo(Canvas canvas, Bitmap original) {
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
     float margin = displayMetrics.density * LOGO_MARGIN_DP;
-    Canvas canvas = new Canvas(original);
+    Bitmap logo = createScaledLogo(original);
+    canvas.drawBitmap(logo, margin, original.getHeight() - logo.getHeight() - margin, null);
+  }
 
-    // Decode just the boundaries
-    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
-    bitmapOptions.inJustDecodeBounds = true;
-    BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
-    int srcWidth = bitmapOptions.outWidth;
-    int srcHeight = bitmapOptions.outHeight;
+  /**
+   * Create a scaled logo for a map snapshot.
+   *
+   * @param snapshot the map snapshot where the logo should be placed on
+   * @return the scaled bitmap logo
+   */
+  private Bitmap createScaledLogo(Bitmap snapshot) {
+    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, null);
+    float scale = calculateLogoScale(snapshot, logo);
+    Matrix matrix = new Matrix();
+    matrix.postScale(scale, scale);
+    return Bitmap.createBitmap(logo, 0, 0, logo.getWidth(), logo.getHeight(), matrix, true);
+  }
 
-    // Ratio, preferred dimensions and resulting sample size
-    float widthRatio = displayMetrics.widthPixels / original.getWidth();
-    float heightRatio = displayMetrics.heightPixels / original.getHeight();
-    float prefWidth = srcWidth / widthRatio;
-    float prefHeight = srcHeight / heightRatio;
-    int sampleSize = MapSnaphotUtil.calculateInSampleSize(bitmapOptions, (int) prefWidth, (int) prefHeight);
-
-    // Scale bitmap
-    bitmapOptions.inJustDecodeBounds = false;
-    bitmapOptions.inScaled = true;
-    bitmapOptions.inSampleSize = sampleSize;
-    bitmapOptions.inDensity = srcWidth;
-    bitmapOptions.inTargetDensity = (int) prefWidth * bitmapOptions.inSampleSize;
-    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
-
-    float scaledHeight = bitmapOptions.outHeight * heightRatio / bitmapOptions.inSampleSize;
-    canvas.drawBitmap(logo, margin, original.getHeight() - scaledHeight - margin, null);
+  /**
+   * Calculates the scale of the logo, only allow downscaling.
+   *
+   * @param snapshot the bitmap of the map snapshot
+   * @param logo     the bitmap of the mapbox logo
+   * @return the scale value
+   */
+  private float calculateLogoScale(Bitmap snapshot, Bitmap logo) {
+    DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+    float widthRatio = displayMetrics.widthPixels / snapshot.getWidth();
+    float heightRatio = displayMetrics.heightPixels / snapshot.getHeight();
+    float prefWidth = logo.getWidth() / widthRatio;
+    float prefHeight = logo.getHeight() / heightRatio;
+    float calculatedScale = Math.min(prefWidth / logo.getWidth(), prefHeight / logo.getHeight()) * 2;
+    return calculatedScale < 1 ? calculatedScale : 1.0f;
   }
 
   /**
@@ -302,7 +327,7 @@ public class MapSnapshotter {
   protected void onSnapshotReady(MapSnapshot snapshot) {
     if (callback != null) {
       if (snapshot.isShowLogo()) {
-        addOverlay(snapshot.getBitmap());
+        addOverlay(snapshot);
       }
       callback.onSnapshotReady(snapshot);
       reset();
