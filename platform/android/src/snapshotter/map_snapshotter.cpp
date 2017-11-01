@@ -22,6 +22,7 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
                                jni::String styleURL,
                                jni::Object<LatLngBounds> region,
                                jni::Object<CameraPosition> position,
+                               jni::jboolean _showLogo,
                                jni::String _programCacheDir)
         : javaPeer(SeizeGenericWeakRef(_env, jni::Object<MapSnapshotter>(jni::NewWeakGlobalRef(_env, _obj.Get()).release())))
         , pixelRatio(_pixelRatio)
@@ -40,6 +41,8 @@ MapSnapshotter::MapSnapshotter(jni::JNIEnv& _env,
     if (region) {
         bounds = LatLngBounds::getLatLngBounds(_env, region);
     }
+
+    showLogo = _showLogo;
 
     // Create the core snapshotter
     snapshotter = std::make_unique<mbgl::MapSnapshotter>(fileSource,
@@ -70,7 +73,7 @@ void MapSnapshotter::start(JNIEnv&) {
             javaPeer->Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
         } else {
             // Create the wrapper
-            auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, pointForFn);
+            auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, showLogo, pointForFn);
 
             // invoke callback
             static auto onSnapshotReady = javaClass.GetMethod<void (jni::Object<MapSnapshot>)>(*_env, "onSnapshotReady");
@@ -117,7 +120,7 @@ void MapSnapshotter::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<MapSnapshotter>(env, MapSnapshotter::javaClass, "nativePtr",
-                                            std::make_unique<MapSnapshotter, JNIEnv&, jni::Object<MapSnapshotter>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jint, jni::String, jni::Object<LatLngBounds>, jni::Object<CameraPosition>, jni::String>,
+                                            std::make_unique<MapSnapshotter, JNIEnv&, jni::Object<MapSnapshotter>, jni::Object<FileSource>, jni::jfloat, jni::jint, jni::jint, jni::String, jni::Object<LatLngBounds>, jni::Object<CameraPosition>, jni::jboolean, jni::String>,
                                            "nativeInitialize",
                                            "finalize",
                                             METHOD(&MapSnapshotter::setStyleUrl, "setStyleUrl"),

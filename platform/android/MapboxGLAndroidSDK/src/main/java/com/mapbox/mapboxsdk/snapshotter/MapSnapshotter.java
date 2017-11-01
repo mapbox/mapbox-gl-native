@@ -7,6 +7,7 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.util.DisplayMetrics;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -55,7 +56,7 @@ public class MapSnapshotter {
     void onError(String error);
   }
 
-  private static final int LOGO_MARGIN_PX = 4;
+  private static final int LOGO_MARGIN_DP = 4;
 
   // Holds the pointer to JNI NativeMapView
   private long nativePtr = 0;
@@ -74,6 +75,7 @@ public class MapSnapshotter {
     private String styleUrl = Style.MAPBOX_STREETS;
     private LatLngBounds region;
     private CameraPosition cameraPosition;
+    private boolean showLogo = true;
 
     /**
      * @param width  the width of the image
@@ -120,6 +122,15 @@ public class MapSnapshotter {
      */
     public Options withCameraPosition(CameraPosition cameraPosition) {
       this.cameraPosition = cameraPosition;
+      return this;
+    }
+
+    /**
+     * @param showLogo The flag indicating to show the Mapbox logo.
+     * @return the mutated {@link Options}
+     */
+    public Options withLogo(boolean showLogo) {
+      this.showLogo = showLogo;
       return this;
     }
 
@@ -182,7 +193,7 @@ public class MapSnapshotter {
 
     nativeInitialize(this, fileSource, options.pixelRatio, options.width,
       options.height, options.styleUrl, options.region, options.cameraPosition,
-      programCacheDir);
+      options.showLogo, programCacheDir);
   }
 
   /**
@@ -252,10 +263,34 @@ public class MapSnapshotter {
   }
 
   protected void addOverlay(Bitmap original) {
-    float margin = context.getResources().getDisplayMetrics().density * LOGO_MARGIN_PX;
+    DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+    float margin = displayMetrics.density * LOGO_MARGIN_DP;
     Canvas canvas = new Canvas(original);
-    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, null);
-    canvas.drawBitmap(logo, margin, original.getHeight() - (logo.getHeight() + margin), null);
+
+    // Decode just the boundaries
+    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+    bitmapOptions.inJustDecodeBounds = true;
+    BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
+    int srcWidth = bitmapOptions.outWidth;
+    int srcHeight = bitmapOptions.outHeight;
+
+    // Ratio, preferred dimensions and resulting sample size
+    float widthRatio = displayMetrics.widthPixels / original.getWidth();
+    float heightRatio = displayMetrics.heightPixels / original.getHeight();
+    float prefWidth = srcWidth / widthRatio;
+    float prefHeight = srcHeight / heightRatio;
+    int sampleSize = MapSnaphotUtil.calculateInSampleSize(bitmapOptions, (int) prefWidth, (int) prefHeight);
+
+    // Scale bitmap
+    bitmapOptions.inJustDecodeBounds = false;
+    bitmapOptions.inScaled = true;
+    bitmapOptions.inSampleSize = sampleSize;
+    bitmapOptions.inDensity = srcWidth;
+    bitmapOptions.inTargetDensity = (int) prefWidth * bitmapOptions.inSampleSize;
+    Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, bitmapOptions);
+
+    float scaledHeight = bitmapOptions.outHeight * heightRatio / bitmapOptions.inSampleSize;
+    canvas.drawBitmap(logo, margin, original.getHeight() - scaledHeight - margin, null);
   }
 
   /**
@@ -266,7 +301,9 @@ public class MapSnapshotter {
    */
   protected void onSnapshotReady(MapSnapshot snapshot) {
     if (callback != null) {
-      addOverlay(snapshot.getBitmap());
+      if (snapshot.isShowLogo()) {
+        addOverlay(snapshot.getBitmap());
+      }
       callback.onSnapshotReady(snapshot);
       reset();
     }
@@ -294,7 +331,7 @@ public class MapSnapshotter {
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl,
                                          LatLngBounds region, CameraPosition position,
-                                         String programCacheDir);
+                                         boolean showLogo, String programCacheDir);
 
   protected native void nativeStart();
 
