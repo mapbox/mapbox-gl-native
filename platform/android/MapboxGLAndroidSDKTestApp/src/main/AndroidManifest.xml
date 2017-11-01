@@ -728,6 +728,29 @@
                 android:value="@string/category_maplayout"/>
         </activity>
 
+        <!-- TextureView -->
+        <activity android:name=".activity.textureview.TextureViewDebugModeActivity"
+                  android:description="@string/description_textureview_debug"
+                  android:label="@string/activity_textureview_debug">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+        <activity android:name=".activity.textureview.TextureViewResizeActivity"
+                  android:description="@string/description_textureview_resize"
+                  android:label="@string/activity_textureview_resize">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+        <activity android:name=".activity.textureview.TextureViewAnimationActivity"
+                  android:description="@string/description_textureview_animate"
+                  android:label="@string/activity_textureview_animate">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+
         <!-- For Instrumentation tests -->
         <activity
             android:name=".activity.style.RuntimeStyleTestActivity"
