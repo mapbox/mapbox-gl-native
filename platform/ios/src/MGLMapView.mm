@@ -1615,7 +1615,9 @@ public:
     id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:singleTap persistingResults:YES];
     if(annotation)
     {
-        [self selectAnnotation:annotation animated:YES];
+        CGPoint calloutPoint = [singleTap locationInView:self];
+        CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
+        [self selectAnnotation:annotation animated:YES calloutPositioningRect:positionRect];
     }
     else
     {
@@ -3980,6 +3982,12 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
+    CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
+    [self selectAnnotation:annotation animated:animated calloutPositioningRect:positioningRect];
+}
+
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated calloutPositioningRect:(CGRect)calloutPositioningRect
+{
     if ( ! annotation) return;
 
     if (annotation == self.selectedAnnotation) return;
@@ -3995,9 +4003,6 @@ public:
         if (annotationTag == MGLAnnotationTagNotFound) return;
     }
 
-    // By default attempt to use the GL annotation image frame as the positioning rect.
-    CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
-
     MGLAnnotationView *annotationView = nil;
 
     if (annotation != self.userLocation)
@@ -4005,21 +4010,12 @@ public:
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             annotationView = annotationContext.annotationView;
             if (annotationView && annotationView.enabled) {
-            {
-                // Annotations represented by views use the view frame as the positioning rect.
-                positioningRect = annotationView.frame;
-                [annotationView.superview bringSubviewToFront:annotationView];
-                [annotationView setSelected:YES animated:animated];
+                    // Annotations represented by views use the view frame as the positioning rect.
+                    calloutPositioningRect = annotationView.frame;
+                    [annotationView.superview bringSubviewToFront:annotationView];
+                    [annotationView setSelected:YES animated:animated];
             }
         }
-    }
-
-     // The client can request that any annotation be selected (even ones that are offscreen).
-     // The annotation can’t be selected if no part of it is hittable.
-    if ( ! CGRectIntersectsRect(positioningRect, self.bounds) && annotation != self.userLocation)
-    {
-        return;
-    }
 
     self.selectedAnnotation = annotation;
 
@@ -4049,7 +4045,7 @@ public:
 
         if (_userLocationAnnotationIsSelected)
         {
-            positioningRect = [self.userLocationAnnotationView.layer.presentationLayer frame];
+            calloutPositioningRect = [self.userLocationAnnotationView.layer.presentationLayer frame];
 
             CGRect implicitAnnotationFrame = [self.userLocationAnnotationView.layer.presentationLayer frame];
             CGRect explicitAnnotationFrame = self.userLocationAnnotationView.frame;
@@ -4065,7 +4061,7 @@ public:
             if ([calloutView.leftAccessoryView isKindOfClass:[UIControl class]])
             {
                 UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+                                                                                                      action:@selector(handleCalloutAccessoryTapGesture:)];
 
                 [calloutView.leftAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
@@ -4078,7 +4074,7 @@ public:
             if ([calloutView.rightAccessoryView isKindOfClass:[UIControl class]])
             {
                 UITapGestureRecognizer *calloutAccessoryTap = [[UITapGestureRecognizer alloc] initWithTarget:self
-                                                                  action:@selector(handleCalloutAccessoryTapGesture:)];
+                                                                                                      action:@selector(handleCalloutAccessoryTapGesture:)];
 
                 [calloutView.rightAccessoryView addGestureRecognizer:calloutAccessoryTap];
             }
@@ -4088,7 +4084,7 @@ public:
         calloutView.delegate = self;
 
         // present popup
-        [calloutView presentCalloutFromRect:positioningRect
+        [calloutView presentCalloutFromRect:calloutPositioningRect
                                      inView:self.glView
                           constrainedToView:self.glView
                                    animated:animated];
@@ -4113,6 +4109,27 @@ public:
     calloutView.tintColor = self.tintColor;
 
     return calloutView;
+}
+
+/// Returns the rectangle that represents the annotation image of the annotation
+/// with the given tag. This rectangle is fitted to the image’s alignment rect
+/// and is appropriate for positioning a popover.
+/// If a shape annotation is visible but its centroid is not, and a default point is specified,
+/// the callout view is anchored to the default callout point.
+- (CGRect)positioningRectForAnnotation:(id <MGLAnnotation>)annotation defaultCalloutPoint:(CGPoint)calloutPoint
+{
+    MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
+    CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
+    
+    // For annotations which `coordinate` falls offscreen it will use the current tap point as anchor instead.
+    if ( ! CGRectIntersectsRect(positioningRect, self.bounds) && annotation != self.userLocation)
+    {
+        if (!CGPointEqualToPoint(calloutPoint, CGPointZero)) {
+            positioningRect = CGRectMake(calloutPoint.x, calloutPoint.y, positioningRect.size.width, positioningRect.size.height);
+        }
+    }
+    
+    return positioningRect;
 }
 
 /// Returns the rectangle that represents the annotation image of the annotation

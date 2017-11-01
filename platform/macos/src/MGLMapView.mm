@@ -1488,7 +1488,7 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
-            [self selectAnnotation:annotation];
+            [self selectAnnotation:annotation atPoint:gesturePoint];
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
@@ -2216,11 +2216,11 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
 {
-    // Only point annotations can be selected.
-    if (!annotation || [annotation isKindOfClass:[MGLMultiPoint class]]) {
-        return;
-    }
+    [self selectAnnotation:annotation atPoint:NSZeroPoint];
+}
 
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
+{
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2235,10 +2235,10 @@ public:
         [self addAnnotation:annotation];
     }
 
-    // The annotation can’t be selected if no part of it is hittable.
+    // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
     if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        return;
+        positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
     }
 
     self.selectedAnnotation = annotation;
