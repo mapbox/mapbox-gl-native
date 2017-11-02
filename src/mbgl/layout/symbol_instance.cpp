@@ -26,6 +26,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::size_t featureIndex_,
                                const std::u16string& key_) :
     anchor(anchor_),
+    insideTileBoundaries(0 <= anchor.point.x && 0 <= anchor.point.y && anchor.point.x < util::EXTENT && anchor.point.y < util::EXTENT),
     line(line_),
     index(index_),
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),

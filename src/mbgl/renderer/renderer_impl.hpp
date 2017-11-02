@@ -31,6 +31,7 @@ class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
+class CrossTileSymbolIndex;
 
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
@@ -104,6 +105,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
 
+    std::unique_ptr<CrossTileSymbolIndex> crossTileSymbolIndex;
     std::unique_ptr<Placement> placement;
 
     bool contextLost = false;

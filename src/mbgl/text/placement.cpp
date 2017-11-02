@@ -30,8 +30,6 @@ bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
 
-uint32_t Placement::maxCrossTileID = 0;
-
 Placement::Placement(const TransformState& state_, MapMode mapMode_)
     : collisionIndex(state_)
     , state(state_)
@@ -150,10 +148,7 @@ void Placement::placeLayerBucket(
                 collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
             }
 
-            if (symbolInstance.crossTileID == 0) {
-                // TODO properly assign these
-                symbolInstance.crossTileID = ++maxCrossTileID;
-            }
+            assert(symbolInstance.crossTileID != 0);
 
             placements.emplace(symbolInstance.crossTileID, PlacementPair(placeText, placeIcon));
         }

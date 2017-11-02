@@ -23,6 +23,7 @@
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
@@ -57,6 +58,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
+    , crossTileSymbolIndex(std::make_unique<CrossTileSymbolIndex>())
     , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still)) {
     glyphManager->setObserver(this);
 }
@@ -362,6 +364,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
         layer->setRenderTiles(std::move(sortedTilesForInsertion));
         order.emplace_back(RenderItem { *layer, source });
+    }
+
+    for (auto it = order.rbegin(); it != order.rend(); ++it) {
+        if (it->layer.is<RenderSymbolLayer>()) {
+            crossTileSymbolIndex->addLayer(*it->layer.as<RenderSymbolLayer>());
+        }
     }
 
     auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);

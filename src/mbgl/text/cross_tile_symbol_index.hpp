@@ -13,45 +13,48 @@
 namespace mbgl {
 
 class SymbolInstance;
+class RenderSymbolLayer;
+class SymbolBucket;
+
+class IndexEntry {
+    Point<float> anchorPoint;
+
+};
 
 class IndexedSymbolInstance {
     public:
-        IndexedSymbolInstance(SymbolInstance& symbolInstance, Point<double> coord_)
-            : instance(symbolInstance), coord(std::move(coord_)) {};
-        SymbolInstance& instance;
+        IndexedSymbolInstance(uint32_t crossTileID_, Point<double> coord_)
+            : crossTileID(crossTileID_), coord(coord_) {};
+        uint32_t crossTileID;
         Point<double> coord;
 };
 
 class TileLayerIndex {
     public:
-        TileLayerIndex(OverscaledTileID coord, std::shared_ptr<std::vector<SymbolInstance>>);
+        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&);
 
-        Point<double> getScaledCoordinates(SymbolInstance&, OverscaledTileID&);
-        optional<SymbolInstance> getMatchingSymbol(SymbolInstance& childTileSymbol, OverscaledTileID& childTileCoord);
+        Point<double> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
+        void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
         
         OverscaledTileID coord;
         std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
-        std::shared_ptr<std::vector<SymbolInstance>> symbolInstances;
 };
 
 class CrossTileSymbolLayerIndex {
     public:
         CrossTileSymbolLayerIndex();
-
-        void addTile(const OverscaledTileID&, std::shared_ptr<std::vector<SymbolInstance>>);
-        void removeTile(const OverscaledTileID&);
-        void blockLabels(TileLayerIndex& childIndex, TileLayerIndex& parentIndex, bool copyParentOpacity);
-        void unblockLabels(TileLayerIndex& childIndex, TileLayerIndex& parentIndex);
+        void addBucket(const OverscaledTileID&, SymbolBucket&);
     private:
         std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
+        uint32_t maxBucketInstanceId = 0;
+        static uint32_t maxCrossTileID;
 };
 
 class CrossTileSymbolIndex {
     public:
         CrossTileSymbolIndex();
 
-        void addTileLayer(std::string& layerId, const OverscaledTileID&, std::shared_ptr<std::vector<SymbolInstance>>);
-        void removeTileLayer(std::string& layerId, const OverscaledTileID&);
+        void addLayer(RenderSymbolLayer&);
     private:
         std::map<std::string,CrossTileSymbolLayerIndex> layerIndexes;
 };

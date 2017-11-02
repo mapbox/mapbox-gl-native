@@ -128,6 +128,8 @@ public:
         gl::IndexVector<gl::Triangles> triangles;
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } collisionCircle;
+
+    uint32_t bucketInstanceId = 0;
 };
 
 } // namespace mbgl
