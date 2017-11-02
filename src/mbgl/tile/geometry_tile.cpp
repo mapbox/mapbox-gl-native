@@ -241,7 +241,7 @@ void GeometryTile::queryRenderedFeatures(
                         id.canonical,
                         sourceID,
                         layers,
-                        collisionIndex, // TODO: hook up to global CollisionIndex
+                        collisionIndex,
                         additionalRadius);
 }
 
