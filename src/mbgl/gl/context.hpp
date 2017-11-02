@@ -146,8 +146,7 @@ public:
 
     void clear(optional<mbgl::Color> color,
                optional<float> depth,
-               optional<int32_t> stencil,
-               optional<ColorMode::Mask> colorMask = value::ColorMask::Default);
+               optional<int32_t> stencil);
 
     void setDrawMode(const Points&);
     void setDrawMode(const Lines&);
