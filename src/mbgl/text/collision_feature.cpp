@@ -12,7 +12,8 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
                                    const float boxScale,
                                    const float padding,
                                    const style::SymbolPlacementType placement,
-                                   IndexedSubfeature indexedFeature_)
+                                   IndexedSubfeature indexedFeature_,
+                                   const float overscaling)
         : indexedFeature(std::move(indexedFeature_))
         , alongLine(placement == style::SymbolPlacementType::Line) {
     if (top == 0 && bottom == 0 && left == 0 && right == 0) return;
@@ -31,20 +32,26 @@ CollisionFeature::CollisionFeature(const GeometryCoordinates& line,
         height = std::max(10.0f * boxScale, height);
 
         GeometryCoordinate anchorPoint = convertPoint<int16_t>(anchor.point);
-        bboxifyLabel(line, anchorPoint, anchor.segment, length, height);
+        bboxifyLabel(line, anchorPoint, anchor.segment, length, height, overscaling);
     } else {
         boxes.emplace_back(anchor.point, Point<float>{ 0, 0 }, x1, y1, x2, y2);
     }
 }
 
 void CollisionFeature::bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                                    const int segment, const float labelLength, const float boxSize) {
+                                    const int segment, const float labelLength, const float boxSize, const float overscaling) {
     const float step = boxSize / 2;
     const int nBoxes = std::floor(labelLength / step);
-    // We calculate line collision boxes out to 300% of what would normally be our
+    // We calculate line collision circles out to 300% of what would normally be our
     // max size, to allow collision detection to work on labels that expand as
     // they move into the distance
-    const int nPitchPaddingBoxes = std::floor(nBoxes / 2);
+    // Vertically oriented labels in the distant field can extend past this padding
+    // This is a noticeable problem in overscaled tiles where the pitch 0-based
+    // symbol spacing will put labels very close together in a pitched map.
+    // To reduce the cost of adding extra collision circles, we slowly increase
+    // them for overscaled tiles.
+    const float overscalingPaddingFactor = 1 + .4 * std::log(overscaling) / std::log(2);
+    const int nPitchPaddingBoxes = std::floor(nBoxes * overscalingPaddingFactor / 2);
 
     // offset the center of the first box by half a box so that the edge of the
     // box is at the edge of the label.

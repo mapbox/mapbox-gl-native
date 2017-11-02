@@ -56,7 +56,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
 
         const float scale = std::pow(2, state.getZoom() - renderTile.id.canonical.z);
 
-        const float pixelRatio = util::EXTENT / (util::tileSize * renderTile.tile.id.overscaleFactor());
+        const float textPixelRatio = util::EXTENT / util::tileSize;
 
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
@@ -74,7 +74,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, pixelRatio, showCollisionBoxes, seenCrossTileIDs);
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs);
     }
 }
 
@@ -84,7 +84,7 @@ void Placement::placeLayerBucket(
         const mat4& textLabelPlaneMatrix,
         const mat4& iconLabelPlaneMatrix,
         const float scale,
-        const float pixelRatio,
+        const float textPixelRatio,
         const bool showCollisionBoxes,
         std::unordered_set<uint32_t>& seenCrossTileIDs) {
 
@@ -114,7 +114,7 @@ void Placement::placeLayerBucket(
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
 
                 placeText = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
-                        posMatrix, textLabelPlaneMatrix, pixelRatio,
+                        posMatrix, textLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<TextAllowOverlap>(),
                         bucket.layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
@@ -127,7 +127,7 @@ void Placement::placeLayerBucket(
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
 
                 placeIcon = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
-                        posMatrix, iconLabelPlaneMatrix, pixelRatio,
+                        posMatrix, iconLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<IconAllowOverlap>(),
                         bucket.layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
