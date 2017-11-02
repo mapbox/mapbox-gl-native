@@ -16,19 +16,15 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapzen.android.lost.api.LocationListener;
-import com.mapzen.android.lost.api.LocationRequest;
-import com.mapzen.android.lost.api.LocationServices;
-import com.mapzen.android.lost.api.LostApiClient;
+import com.mapbox.services.android.core.location.LocationEngineListener;
 
 /**
  * Test activity showcasing how to change the MyLocationView drawable.
  */
-public class MyLocationDrawableActivity extends BaseLocationActivity implements LocationListener {
+public class MyLocationDrawableActivity extends BaseLocationActivity implements LocationEngineListener {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
-  private LostApiClient lostApiClient;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -66,15 +62,11 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
   @Override
   protected void enableLocation(boolean enabled) {
     mapboxMap.setMyLocationEnabled(enabled);
-    if (lostApiClient == null) {
-      lostApiClient = new LostApiClient.Builder(this).build();
-      lostApiClient.connect();
-      LocationRequest request = LocationRequest.create()
-        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
-        .setInterval(5000)
-        .setSmallestDisplacement(10);
-      LocationServices.FusedLocationApi.requestLocationUpdates(request, this);
-    }
+  }
+
+  @Override
+  public void onConnected() {
+    // Nothing
   }
 
   @Override
@@ -104,10 +96,6 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
   protected void onStop() {
     super.onStop();
     mapView.onStop();
-    if (lostApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(this);
-      lostApiClient.disconnect();
-    }
   }
 
   @Override
