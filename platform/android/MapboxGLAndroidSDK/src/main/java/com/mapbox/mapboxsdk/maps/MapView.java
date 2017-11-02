@@ -2,8 +2,8 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
 import android.graphics.PointF;
-import android.os.Build;
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.CallSuper;
 import android.support.annotation.IntDef;
@@ -15,6 +15,7 @@ import android.util.AttributeSet;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -27,8 +28,9 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.egl.EGLConfigChooser;
+import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
+import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
@@ -49,7 +51,6 @@ import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
-import static android.opengl.GLSurfaceView.RENDERMODE_WHEN_DIRTY;
 
 /**
  * <p>
@@ -86,7 +87,7 @@ public class MapView extends FrameLayout {
   private Bundle savedInstanceState;
   private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
-  private GLSurfaceView glSurfaceView;
+  private MapRenderer mapRenderer;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -138,7 +139,7 @@ public class MapView extends FrameLayout {
         } else {
           getViewTreeObserver().removeGlobalOnLayoutListener(this);
         }
-        initialiseDrawingSurface();
+        initialiseDrawingSurface(options);
       }
     });
   }
@@ -285,33 +286,52 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private void initialiseDrawingSurface() {
-    glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
-    glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-    glSurfaceView.setEGLContextClientVersion(2);
-    glSurfaceView.setEGLConfigChooser(new EGLConfigChooser());
-
-    MapRenderer mapRenderer = new MapRenderer(getContext(), glSurfaceView) {
-      @Override
-      public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-        MapView.this.post(new Runnable() {
-          @Override
-          public void run() {
-            // Initialise only once
-            if (mapboxMap == null) {
-              initialiseMap();
-              mapboxMap.onStart();
+  private void initialiseDrawingSurface(MapboxMapOptions options) {
+    if (options.getTextureMode()) {
+      TextureView textureView = new TextureView(getContext());
+      mapRenderer = new TextureViewMapRenderer(getContext(), textureView) {
+        @Override
+        protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
+          MapView.this.post(new Runnable() {
+            @Override
+            public void run() {
+              // Initialise only once
+              if (mapboxMap == null) {
+                initialiseMap();
+                mapboxMap.onStart();
+              }
             }
-          }
-        });
+          });
 
-        super.onSurfaceCreated(gl, config);
-      }
-    };
+          super.onSurfaceCreated(gl, config);
+        }
+      };
+      addView(textureView, 0);
+    } else {
+      GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+      glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
 
-    glSurfaceView.setRenderer(mapRenderer);
-    glSurfaceView.setRenderMode(RENDERMODE_WHEN_DIRTY);
-    glSurfaceView.setVisibility(View.VISIBLE);
+      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView) {
+        @Override
+        public void onSurfaceCreated(GL10 gl, EGLConfig config) {
+          MapView.this.post(new Runnable() {
+            @Override
+            public void run() {
+              // Initialise only once
+              if (mapboxMap == null) {
+                initialiseMap();
+                mapboxMap.onStart();
+              }
+            }
+          });
+
+          super.onSurfaceCreated(gl, config);
+        }
+      };
+
+      glSurfaceView.setVisibility(View.VISIBLE);
+
+    }
 
     nativeMapView = new NativeMapView(this, mapRenderer);
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
@@ -345,8 +365,8 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onResume() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onResume();
+    if (mapRenderer != null) {
+      mapRenderer.onResume();
     }
   }
 
@@ -355,8 +375,8 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onPause() {
-    if (glSurfaceView != null) {
-      glSurfaceView.onPause();
+    if (mapRenderer != null) {
+      mapRenderer.onPause();
     }
   }
 
@@ -378,6 +398,10 @@ public class MapView extends FrameLayout {
     mapCallback.clearOnMapReadyCallbacks();
     nativeMapView.destroy();
     nativeMapView = null;
+
+    if (mapRenderer != null) {
+      mapRenderer.onDestroy();
+    }
   }
 
   @Override
