@@ -16,13 +16,13 @@ TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstan
         }
     }
 
-Point<double> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstance, const OverscaledTileID& childTileCoord) {
+Point<int64_t> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstance, const OverscaledTileID& childTileCoord) {
     // Round anchor positions to roughly 4 pixel grid
     const double roundingFactor = 512.0 / util::EXTENT / 2.0;
     const double scale = roundingFactor / std::pow(2, childTileCoord.canonical.z - coord.canonical.z);
     return {
-        std::floor((childTileCoord.canonical.x * util::EXTENT + symbolInstance.anchor.point.x) * scale),
-        std::floor((childTileCoord.canonical.y * util::EXTENT + symbolInstance.anchor.point.y) * scale)
+        static_cast<int64_t>(std::floor((childTileCoord.canonical.x * util::EXTENT + symbolInstance.anchor.point.x) * scale)),
+        static_cast<int64_t>(std::floor((childTileCoord.canonical.y * util::EXTENT + symbolInstance.anchor.point.y) * scale))
     };
 }
 
@@ -36,13 +36,13 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
         auto it = indexedSymbolInstances.find(symbolInstance.key);
         if (it == indexedSymbolInstances.end()) continue;
 
-        Point<double> scaledSymbolCoord = getScaledCoordinates(symbolInstance, newCoord);
+        auto scaledSymbolCoord = getScaledCoordinates(symbolInstance, newCoord);
 
         for (IndexedSymbolInstance& thisTileSymbol: it->second) {
             // Return any symbol with the same keys whose coordinates are within 1
             // grid unit. (with a 4px grid, this covers a 12px by 12px area)
-            if (std::fabs(thisTileSymbol.coord.x - scaledSymbolCoord.x) <= tolerance &&
-                std::fabs(thisTileSymbol.coord.y - scaledSymbolCoord.y) <= tolerance) {
+            if (std::abs(thisTileSymbol.coord.x - scaledSymbolCoord.x) <= tolerance &&
+                std::abs(thisTileSymbol.coord.y - scaledSymbolCoord.y) <= tolerance) {
 
                 symbolInstance.crossTileID = thisTileSymbol.crossTileID;
                 break;

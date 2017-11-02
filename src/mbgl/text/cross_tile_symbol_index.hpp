@@ -24,17 +24,17 @@ class IndexEntry {
 
 class IndexedSymbolInstance {
     public:
-        IndexedSymbolInstance(uint32_t crossTileID_, Point<double> coord_)
+        IndexedSymbolInstance(uint32_t crossTileID_, Point<int64_t> coord_)
             : crossTileID(crossTileID_), coord(coord_) {};
         uint32_t crossTileID;
-        Point<double> coord;
+        Point<int64_t> coord;
 };
 
 class TileLayerIndex {
     public:
         TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
 
-        Point<double> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
+        Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
         void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
         
         OverscaledTileID coord;
