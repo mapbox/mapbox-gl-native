@@ -443,9 +443,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             parameters.context.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
         } else if (parameters.contextMode == GLContextMode::Shared) {
-            // Preserve the shared context background colors, clearing only alpha.
-            optional<gl::ColorMode::Mask> mask = { { false, false, false, true } };
-            parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default, mask);
+            parameters.context.clear({}, ClearDepth::Default, ClearStencil::Default);
         } else {
             parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);
         }
