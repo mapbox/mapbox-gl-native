@@ -23,6 +23,7 @@
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/text/glyph_manager.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/tile/tile.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/string.hpp>
@@ -57,6 +58,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , sourceImpls(makeMutable<std::vector<Immutable<style::Source::Impl>>>())
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
+    , crossTileSymbolIndex(std::make_unique<CrossTileSymbolIndex>())
     , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still)) {
     glyphManager->setObserver(this);
 }
@@ -364,6 +366,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
+    bool symbolBucketsChanged = false;
+    for (auto it = order.rbegin(); it != order.rend(); ++it) {
+        if (it->layer.is<RenderSymbolLayer>()) {
+            if (crossTileSymbolIndex->addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;
+        }
+    }
+
     auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
@@ -375,10 +384,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (placementChanged) placement = std::move(newPlacement);
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
-    // TODO only update when necessary
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+    if (placementChanged || symbolBucketsChanged) {
+        for (auto it = order.rbegin(); it != order.rend(); ++it) {
+            if (it->layer.is<RenderSymbolLayer>()) {
+                placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+            }
         }
     }
 

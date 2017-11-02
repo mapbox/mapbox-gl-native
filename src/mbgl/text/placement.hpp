@@ -5,6 +5,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/text/collision_index.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -58,7 +59,8 @@ namespace mbgl {
                     const mat4& iconLabelPlaneMatrix,
                     const float scale,
                     const float pixelRatio,
-                    const bool showCollisionBoxes);
+                    const bool showCollisionBoxes,
+                    std::unordered_set<uint32_t>& seenCrossTileIDs);
 
             void updateBucketOpacities(SymbolBucket&);
 
@@ -66,7 +68,6 @@ namespace mbgl {
             MapMode mapMode;
             TimePoint commitTime;
 
-            static uint32_t maxCrossTileID; // TODO remove
             std::unordered_map<uint32_t,PlacementPair> placements;
             std::unordered_map<uint32_t,JointOpacityState> opacities;
     };

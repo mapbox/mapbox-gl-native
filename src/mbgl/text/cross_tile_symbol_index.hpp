@@ -9,49 +9,55 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <unordered_set>
 
 namespace mbgl {
 
 class SymbolInstance;
+class RenderSymbolLayer;
+class SymbolBucket;
+
+class IndexEntry {
+    Point<float> anchorPoint;
+
+};
 
 class IndexedSymbolInstance {
     public:
-        IndexedSymbolInstance(SymbolInstance& symbolInstance, Point<double> coord_)
-            : instance(symbolInstance), coord(std::move(coord_)) {};
-        SymbolInstance& instance;
-        Point<double> coord;
+        IndexedSymbolInstance(uint32_t crossTileID_, Point<int64_t> coord_)
+            : crossTileID(crossTileID_), coord(coord_) {};
+        uint32_t crossTileID;
+        Point<int64_t> coord;
 };
 
 class TileLayerIndex {
     public:
-        TileLayerIndex(OverscaledTileID coord, std::shared_ptr<std::vector<SymbolInstance>>);
+        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
 
-        Point<double> getScaledCoordinates(SymbolInstance&, OverscaledTileID&);
-        optional<SymbolInstance> getMatchingSymbol(SymbolInstance& childTileSymbol, OverscaledTileID& childTileCoord);
+        Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
+        void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
         
         OverscaledTileID coord;
+        uint32_t bucketInstanceId;
         std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
-        std::shared_ptr<std::vector<SymbolInstance>> symbolInstances;
 };
 
 class CrossTileSymbolLayerIndex {
     public:
         CrossTileSymbolLayerIndex();
-
-        void addTile(const OverscaledTileID&, std::shared_ptr<std::vector<SymbolInstance>>);
-        void removeTile(const OverscaledTileID&);
-        void blockLabels(TileLayerIndex& childIndex, TileLayerIndex& parentIndex, bool copyParentOpacity);
-        void unblockLabels(TileLayerIndex& childIndex, TileLayerIndex& parentIndex);
+        void addBucket(const OverscaledTileID&, SymbolBucket&);
+        bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
     private:
         std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
+        uint32_t maxBucketInstanceId = 0;
+        static uint32_t maxCrossTileID;
 };
 
 class CrossTileSymbolIndex {
     public:
         CrossTileSymbolIndex();
 
-        void addTileLayer(std::string& layerId, const OverscaledTileID&, std::shared_ptr<std::vector<SymbolInstance>>);
-        void removeTileLayer(std::string& layerId, const OverscaledTileID&);
+        bool addLayer(RenderSymbolLayer&);
     private:
         std::map<std::string,CrossTileSymbolLayerIndex> layerIndexes;
 };

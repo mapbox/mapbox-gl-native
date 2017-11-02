@@ -30,8 +30,6 @@ bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
 
-uint32_t Placement::maxCrossTileID = 0;
-
 Placement::Placement(const TransformState& state_, MapMode mapMode_)
     : collisionIndex(state_)
     , state(state_)
@@ -39,6 +37,9 @@ Placement::Placement(const TransformState& state_, MapMode mapMode_)
 {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
+
+    std::unordered_set<uint32_t> seenCrossTileIDs;
+
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
 
         if (!renderTile.tile.isRenderable()) {
@@ -73,7 +74,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, pixelRatio, showCollisionBoxes);
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, pixelRatio, showCollisionBoxes, seenCrossTileIDs);
     }
 }
 
@@ -84,7 +85,8 @@ void Placement::placeLayerBucket(
         const mat4& iconLabelPlaneMatrix,
         const float scale,
         const float pixelRatio,
-        const bool showCollisionBoxes) {
+        const bool showCollisionBoxes,
+        std::unordered_set<uint32_t>& seenCrossTileIDs) {
 
     // TODO collision debug array clearing
 
@@ -101,10 +103,9 @@ void Placement::placeLayerBucket(
         const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
         if (!withinPlus0) continue;
 
-        bool placeText = false;
-        bool placeIcon = false;
-
-        if (true || !symbolInstance.isDuplicate) {
+        if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
+            bool placeText = false;
+            bool placeIcon = false;
 
             if (symbolInstance.placedTextIndices.size()) {
                 assert(symbolInstance.placedTextIndices.size() != 0);
@@ -150,12 +151,10 @@ void Placement::placeLayerBucket(
                 collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
             }
 
-            if (symbolInstance.crossTileID == 0) {
-                // TODO properly assign these
-                symbolInstance.crossTileID = ++maxCrossTileID;
-            }
+            assert(symbolInstance.crossTileID != 0);
 
             placements.emplace(symbolInstance.crossTileID, PlacementPair(placeText, placeIcon));
+            seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
     } 
 }

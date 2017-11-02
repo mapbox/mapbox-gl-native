@@ -35,6 +35,7 @@ public:
                    const std::u16string& key);
 
     Anchor anchor;
+    bool insideTileBoundaries;
     GeometryCoordinates line;
     uint32_t index;
     bool hasText;
