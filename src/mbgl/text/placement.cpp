@@ -32,6 +32,7 @@ bool JointOpacityState::isHidden() const {
 
 Placement::Placement(const TransformState& state_, MapMode mapMode_)
     : collisionIndex(state_)
+    , recentUntil(TimePoint::min())
     , state(state_)
     , mapMode(mapMode_)
 {}
@@ -290,7 +291,7 @@ float Placement::symbolFadeChange(TimePoint now) const {
 }
 
 bool Placement::hasTransitions(TimePoint now) const {
-    return symbolFadeChange(now) < 1.0;
+    return symbolFadeChange(now) < 1.0 || stale;
 }
 
 } // namespace mbgl

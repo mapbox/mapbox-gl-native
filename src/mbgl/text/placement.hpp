@@ -50,6 +50,9 @@ namespace mbgl {
             // TODO: public for queryRenderedFeatures
             CollisionIndex collisionIndex;
 
+            TimePoint recentUntil;
+            bool stale = false;
+
         private:
 
             void placeLayerBucket(

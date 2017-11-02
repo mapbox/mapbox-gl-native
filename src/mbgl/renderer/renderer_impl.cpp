@@ -373,15 +373,26 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+    bool placementChanged = false;
+    if (placement->recentUntil <= parameters.timePoint || updateParameters.mode == MapMode::Still) {
+        auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
+        for (auto it = order.rbegin(); it != order.rend(); ++it) {
+            if (it->layer.is<RenderSymbolLayer>()) {
+                newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+            }
         }
+
+        placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+        if (placementChanged) {
+            placement = std::move(newPlacement);
+        }
+
+        placement->stale = false;
+        placement->recentUntil = parameters.timePoint + Duration(std::chrono::milliseconds(300));
+    } else {
+        placement->stale = true;
     }
 
-    const bool placementChanged = newPlacement->commit(*placement, parameters.timePoint);
-    if (placementChanged) placement = std::move(newPlacement);
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
     if (placementChanged || symbolBucketsChanged) {
