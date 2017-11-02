@@ -5,10 +5,16 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.text.Html;
+import android.text.Spanned;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
@@ -266,12 +272,15 @@ public class MapSnapshotter {
   /**
    * Draw an overlay on the map snapshot.
    *
-   * @param mapSnapshot the map snapshot to draw the overlay on
+   * @param snapshot the map snapshot to draw the overlay on
    */
-  protected void addOverlay(MapSnapshot mapSnapshot) {
-    Bitmap original = mapSnapshot.getBitmap();
+  protected void addOverlay(MapSnapshot snapshot) {
+    Bitmap original = snapshot.getBitmap();
     Canvas canvas = new Canvas(original);
-    addLogo(canvas, original);
+    if (snapshot.isShowLogo()) {
+      Bitmap logo = addLogo(canvas, original);
+      addAttribution(canvas,logo,snapshot);
+    }
   }
 
   /**
@@ -280,11 +289,55 @@ public class MapSnapshotter {
    * @param canvas   the canvas to draw the bitmap on
    * @param original the map snapshot image
    */
-  private void addLogo(Canvas canvas, Bitmap original) {
+  private Bitmap addLogo(Canvas canvas, Bitmap original) {
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
     float margin = displayMetrics.density * LOGO_MARGIN_DP;
     Bitmap logo = createScaledLogo(original);
     canvas.drawBitmap(logo, margin, original.getHeight() - logo.getHeight() - margin, null);
+    return logo;
+  }
+
+  /**
+   * Draw source attribution on the canvas created from the map snapshot.
+   *
+   * @param canvas      the canvas to draw the attribution on
+   * @param mapSnapshot the map snapshot
+   */
+  private void addAttribution(Canvas canvas, Bitmap logo, MapSnapshot mapSnapshot) {
+    Bitmap original = mapSnapshot.getBitmap();
+    TextView textView = new TextView(context);
+    textView.setLayoutParams(new ViewGroup.LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT)
+    );
+    textView.setSingleLine(true);
+    textView.setTextSize(14);
+    for (String attr : mapSnapshot.getAttributions()) {
+      if (!attr.isEmpty()) {
+        textView.setText(fromHtml(attr));
+        int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(original.getWidth(), View.MeasureSpec.AT_MOST);
+        int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+        textView.measure(widthMeasureSpec, heightMeasureSpec);
+        textView.layout(0, 0, original.getWidth(), original.getHeight());
+        textView.draw(canvas);
+      }
+    }
+  }
+
+  /**
+   * Convert a string to a spanned html representation.
+   *
+   * @param html the string to convert
+   * @return the spanned html representation
+   */
+  private static Spanned fromHtml(String html) {
+    Spanned result;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+    } else {
+      result = Html.fromHtml(html);
+    }
+    return result;
   }
 
   /**
@@ -324,14 +377,17 @@ public class MapSnapshotter {
    *
    * @param snapshot the generated snapshot
    */
-  protected void onSnapshotReady(MapSnapshot snapshot) {
-    if (callback != null) {
-      if (snapshot.isShowLogo()) {
-        addOverlay(snapshot);
+  protected void onSnapshotReady(final MapSnapshot snapshot) {
+    new Handler().post(new Runnable() {
+      @Override
+      public void run() {
+        if (callback != null) {
+          addOverlay(snapshot);
+          callback.onSnapshotReady(snapshot);
+          reset();
+        }
       }
-      callback.onSnapshotReady(snapshot);
-      reset();
-    }
+    });
   }
 
   /**
