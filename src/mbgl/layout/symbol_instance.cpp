@@ -24,7 +24,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
                                const std::size_t featureIndex_,
-                               const std::u16string& key_) :
+                               const std::u16string& key_,
+                               const float overscaling) :
     anchor(anchor_),
     insideTileBoundaries(0 <= anchor.point.x && 0 <= anchor.point.y && anchor.point.x < util::EXTENT && anchor.point.y < util::EXTENT),
     line(line_),
@@ -33,7 +34,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
-    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature),
+    textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling),
     iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, SymbolPlacementType::Point, indexedFeature),
     featureIndex(featureIndex_),
     textOffset(textOffset_),

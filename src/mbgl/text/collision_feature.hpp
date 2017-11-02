@@ -50,8 +50,9 @@ public:
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType placement,
-                     const IndexedSubfeature& indexedFeature_)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_) {}
+                     const IndexedSubfeature& indexedFeature_,
+                     const float overscaling)
+        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling) {}
 
     // for icons
     CollisionFeature(const GeometryCoordinates& line,
@@ -66,7 +67,7 @@ public:
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
-                           boxScale, padding, placement, indexedFeature_) {}
+                           boxScale, padding, placement, indexedFeature_, 1) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
@@ -77,7 +78,8 @@ public:
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType,
-                     IndexedSubfeature);
+                     IndexedSubfeature,
+                     const float overscaling);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
@@ -85,7 +87,7 @@ public:
 
 private:
     void bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                      const int segment, const float length, const float height);
+                      const int segment, const float length, const float height, const float overscaling);
 };
 
 } // namespace mbgl
