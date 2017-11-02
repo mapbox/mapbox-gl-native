@@ -78,6 +78,9 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
                 childIndex.second.findMatches(bucket.symbolInstances, coord);
             }
         }
+        if (z == 0) {
+            break;
+        }
     }
 
     // make this tile block duplicate labels in lower-res parent tiles
@@ -89,6 +92,9 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
             if (parentIndex != zoomIndexes->second.end()) {
                 parentIndex->second.findMatches(bucket.symbolInstances, coord);
             }
+        }
+        if (z == 0) {
+            break;
         }
     }
     
