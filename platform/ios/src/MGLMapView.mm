@@ -4548,11 +4548,6 @@ public:
     NSString *fallbackReuseIdentifier = MGLDefaultStyleMarkerSymbolName;
     NSString *fallbackIconIdentifier = [MGLAnnotationSpritePrefix stringByAppendingString:fallbackReuseIdentifier];
 
-    // Remove the old icon from the style.
-    if ( ! [iconIdentifier isEqualToString:fallbackIconIdentifier]) {
-        _mbglMap->removeAnnotationImage(iconIdentifier.UTF8String);
-    }
-
     if (annotationImage.image)
     {
         // Add the new icon to the style.
