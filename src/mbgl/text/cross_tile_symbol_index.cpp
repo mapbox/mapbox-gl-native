@@ -28,7 +28,6 @@ Point<double> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstanc
 
 void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, const OverscaledTileID& newCoord) {
     float tolerance = coord.canonical.z < newCoord.canonical.z ? 1 : std::pow(2, coord.canonical.z - newCoord.canonical.z);
-    tolerance = 100;
 
     for (auto& symbolInstance : symbolInstances) {
         // already has a match, skip
