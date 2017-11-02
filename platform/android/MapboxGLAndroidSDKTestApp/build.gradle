@@ -68,6 +68,7 @@ dependencies {
     compile(rootProject.ext.dep.mapboxJavaServices) {
         transitive = true
     }
+    compile rootProject.ext.dep.lost
 
     // Testing dependencies
     androidTestCompile rootProject.ext.dep.testSpoonRunner
