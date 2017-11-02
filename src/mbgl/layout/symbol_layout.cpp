@@ -533,7 +533,7 @@ size_t SymbolLayout::addSymbol(Buffer& buffer,
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     
-    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0); // TODO
+    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0); // TODO: This data doesn't matter, it's just a kind-of-silly way to set the size of the opacity buffer
     buffer.opacityVertices.emplace_back(opacityVertex);
     buffer.opacityVertices.emplace_back(opacityVertex);
     buffer.opacityVertices.emplace_back(opacityVertex);
@@ -558,6 +558,9 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
     }
 
     for (const SymbolInstance &symbolInstance : symbolInstances) {
+        if (!symbolInstance.insideTileBoundaries) {
+            continue;
+        }
         auto populateCollisionBox = [&](const auto& feature) {
             SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
                 static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :
@@ -586,7 +589,7 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
                 collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
 
-                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(true, false); // TODO
+                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(false, false); // TODO: This data doesn't matter, it's just a kind-of-silly way to set the size of the opacity buffer
                 collisionBuffer.opacityVertices.emplace_back(opacityVertex);
                 collisionBuffer.opacityVertices.emplace_back(opacityVertex);
                 collisionBuffer.opacityVertices.emplace_back(opacityVertex);

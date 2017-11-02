@@ -246,25 +246,27 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
             }
         }
         
-        auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-            for (const CollisionBox& box : feature.boxes) {
-                if (feature.alongLine) {
-                   auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                } else {
-                    auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+        if (symbolInstance.insideTileBoundaries) {
+            auto updateCollisionBox = [&](const auto& feature, const bool placed) {
+                for (const CollisionBox& box : feature.boxes) {
+                    if (feature.alongLine) {
+                       auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
+                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    } else {
+                        auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
+                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    }
                 }
-            }
-        };
-        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+            };
+            updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
+        }
     }
 
     bucket.updateOpacity();
