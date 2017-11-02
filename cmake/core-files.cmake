@@ -404,14 +404,17 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/coalesce.hpp
     include/mbgl/style/expression/coercion.hpp
     include/mbgl/style/expression/compound_expression.hpp
-    include/mbgl/style/expression/curve.hpp
     include/mbgl/style/expression/expression.hpp
+    include/mbgl/style/expression/find_zoom_curve.hpp
+    include/mbgl/style/expression/get_covering_stops.hpp
+    include/mbgl/style/expression/interpolate.hpp
     include/mbgl/style/expression/is_constant.hpp
     include/mbgl/style/expression/is_expression.hpp
     include/mbgl/style/expression/let.hpp
     include/mbgl/style/expression/literal.hpp
     include/mbgl/style/expression/match.hpp
     include/mbgl/style/expression/parsing_context.hpp
+    include/mbgl/style/expression/step.hpp
     include/mbgl/style/expression/type.hpp
     include/mbgl/style/expression/value.hpp
     src/mbgl/style/expression/array_assertion.cpp
@@ -423,13 +426,15 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
     src/mbgl/style/expression/compound_expression.cpp
-    src/mbgl/style/expression/curve.cpp
+    src/mbgl/style/expression/get_covering_stops.cpp
+    src/mbgl/style/expression/interpolate.cpp
     src/mbgl/style/expression/is_constant.cpp
     src/mbgl/style/expression/is_expression.cpp
     src/mbgl/style/expression/let.cpp
     src/mbgl/style/expression/literal.cpp
     src/mbgl/style/expression/match.cpp
     src/mbgl/style/expression/parsing_context.cpp
+    src/mbgl/style/expression/step.cpp
     src/mbgl/style/expression/util.cpp
     src/mbgl/style/expression/util.hpp
     src/mbgl/style/expression/value.cpp

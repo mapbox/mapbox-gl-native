@@ -2,9 +2,7 @@
 
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
-#include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/style/expression/let.hpp>
-#include <mbgl/style/expression/coalesce.hpp>
+#include <mbgl/style/expression/get_covering_stops.hpp>
 #include <mbgl/style/conversion.hpp>
 
 #include <mbgl/util/interpolate.hpp>
@@ -19,13 +17,6 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-class StepInterpolator {
-public:
-    double interpolationFactor(const Range<double>&, const double) const {
-        return 0;
-    }
-    
-};
 
 class ExponentialInterpolator {
 public:
@@ -55,20 +46,15 @@ public:
 };
 
 
-ParseResult parseCurve(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
+ParseResult parseInterpolate(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
 
 template <typename T>
-class Curve : public Expression {
+class Interpolate : public Expression {
 public:
-    using Interpolator = std::conditional_t<
-        util::Interpolatable<T>::value,
-        variant<StepInterpolator,
-                ExponentialInterpolator,
-                CubicBezierInterpolator>,
-        variant<StepInterpolator>>;
+    using Interpolator = variant<ExponentialInterpolator, CubicBezierInterpolator>;
     
-    Curve(const type::Type& type_,
+    Interpolate(const type::Type& type_,
           Interpolator interpolator_,
           std::unique_ptr<Expression> input_,
           std::map<double, std::unique_ptr<Expression>> stops_
@@ -76,7 +62,9 @@ public:
         interpolator(std::move(interpolator_)),
         input(std::move(input_)),
         stops(std::move(stops_))
-    {}
+    {
+        static_assert(util::Interpolatable<T>::value, "Interpolate expression requires an interpolatable value type.");
+    }
     
     EvaluationResult evaluate(const EvaluationContext& params) const override {
         const EvaluationResult evaluatedInput = input->evaluate(params);
@@ -123,46 +111,11 @@ public:
         }
     }
     
-    static optional<Curve*> findZoomCurve(expression::Expression* e) {
-        if (auto curve = dynamic_cast<Curve*>(e)) {
-            auto z = dynamic_cast<CompoundExpressionBase*>(curve->input.get());
-            if (z && z->getName() == "zoom") {
-                return {curve};
-            } else {
-                return optional<Curve*>();
-            }
-        } else if (auto let = dynamic_cast<Let*>(e)) {
-            return findZoomCurve(let->getResult());
-        } else if (auto coalesce = dynamic_cast<Coalesce*>(e)) {
-            std::size_t length = coalesce->getLength();
-            for (std::size_t i = 0; i < length; i++) {
-                optional<Curve*> childCurve = findZoomCurve(coalesce->getChild(i));
-                if (!childCurve) {
-                    continue;
-                } else {
-                    return childCurve;
-                }
-            }
-        }
-        
-        return optional<Curve*>();
-    }
+    const std::unique_ptr<Expression>& getInput() const { return input; }
 
     // Return the smallest range of stops that covers the interval [lower, upper]
     Range<float> getCoveringStops(const double lower, const double upper) const {
-        assert(!stops.empty());
-        auto minIt = stops.lower_bound(lower);
-        auto maxIt = stops.lower_bound(upper);
-        
-        // lower_bound yields first element >= lowerZoom, but we want the *last*
-        // element <= lowerZoom, so if we found a stop > lowerZoom, back up by one.
-        if (minIt != stops.begin() && minIt != stops.end() && minIt->first > lower) {
-            minIt--;
-        }
-        return Range<float> {
-            static_cast<float>(minIt == stops.end() ? stops.rbegin()->first : minIt->first),
-            static_cast<float>(maxIt == stops.end() ? stops.rbegin()->first : maxIt->first)
-        };
+        return ::mbgl::style::expression::getCoveringStops(stops, lower, upper);
     }
     
     double interpolationFactor(const Range<double>& inputLevels, const double inputValue) const {
@@ -172,18 +125,7 @@ public:
     }
     
 private:
-    template <typename OutputType = T>
-    static EvaluationResult interpolate(const Range<Value>&, const double,
-                                        typename std::enable_if<!util::Interpolatable<OutputType>::value>::type* = nullptr) {
-        // Assume that Curve::evaluate() will always short circuit due to
-        // interpolationFactor always returning 0.
-        assert(false);
-        return Null;
-    }
-    
-    template <typename OutputType = T>
-    static EvaluationResult interpolate(const Range<Value>& outputs, const double t,
-                                        typename std::enable_if<util::Interpolatable<OutputType>::value>::type* = nullptr) {
+    static EvaluationResult interpolate(const Range<Value>& outputs, const double t) {
         optional<T> lower = fromExpressionValue<T>(outputs.min);
         if (!lower) {
             // TODO - refactor fromExpressionValue to return EvaluationResult<T> so as to
@@ -204,7 +146,6 @@ private:
         return toExpressionValue(result);
     }
     
-
     const Interpolator interpolator;
     const std::unique_ptr<Expression> input;
     const std::map<double, std::unique_ptr<Expression>> stops;

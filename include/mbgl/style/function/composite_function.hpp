@@ -1,7 +1,9 @@
 #pragma once
 
 #include <mbgl/style/expression/expression.hpp>
-#include <mbgl/style/expression/curve.hpp>
+#include <mbgl/style/expression/interpolate.hpp>
+#include <mbgl/style/expression/step.hpp>
+#include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/function/convert.hpp>
@@ -48,11 +50,11 @@ public:
             CompositeIntervalStops<T>,
             CompositeCategoricalStops<T>>>;
 
-    using Curve = expression::Curve<typename expression::ValueConverter<T>::ExpressionType>;
+    using ExpressionType = typename expression::ValueConverter<T>::ExpressionType;
 
     CompositeFunction(std::unique_ptr<expression::Expression> expression_)
     :   expression(std::move(expression_)),
-        zoomCurve(*Curve::findZoomCurve(expression.get()))
+        zoomCurve(*expression::findZoomCurve<ExpressionType>(expression.get()))
     {
         assert(!isZoomConstant(expression.get()));
         assert(!isFeatureConstant(expression.get()));
@@ -65,7 +67,7 @@ public:
         expression(stops.match([&] (const auto& s) {
             return expression::Convert::toExpression(property, s);
         })),
-        zoomCurve(*Curve::findZoomCurve(expression.get()))
+        zoomCurve(*expression::findZoomCurve<ExpressionType>(expression.get()))
     {}
 
     // Return the range obtained by evaluating the function at each of the zoom levels in zoomRange
@@ -88,11 +90,18 @@ public:
     }
     
     float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
-        return zoomCurve->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
+        return zoomCurve.match(
+            [&](expression::Interpolate<ExpressionType>* z) {
+                return z->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
+            },
+            [&](expression::Step*) { return 0.0f; }
+        );
     }
     
     Range<float> getCoveringStops(const float lower, const float upper) const {
-        return zoomCurve->getCoveringStops(lower, upper);
+        return zoomCurve.match(
+            [&](auto z) { return z->getCoveringStops(lower, upper); }
+        );
     }
 
     friend bool operator==(const CompositeFunction& lhs,
@@ -108,7 +117,7 @@ public:
     
 private:
     std::shared_ptr<expression::Expression> expression;
-    const Curve* zoomCurve;
+    const variant<expression::Interpolate<ExpressionType>*, expression::Step*> zoomCurve;
 };
 
 } // namespace style

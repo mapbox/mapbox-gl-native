@@ -2,6 +2,7 @@
 
 var suite = require('../../../mapbox-gl-js/test/integration').expression;
 var mbgl = require('../index');
+var ignores = require('./ignores.json');
 
 var tests;
 
@@ -29,7 +30,7 @@ function getExpectedType(spec) {
     return typeof spec.type === 'string' ? {kind: spec.type} : null;
 }
 
-suite.run('native', {tests: tests}, (fixture) => {
+suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
     const compiled = {};
     const result = {
         compiled

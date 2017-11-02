@@ -6,8 +6,8 @@
 #include <mbgl/style/conversion/function.hpp>
 #include <mbgl/style/conversion/expression.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
-#include <mbgl/style/expression/curve.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/expression/find_zoom_curve.hpp>
 
 #include <unordered_set>
 
@@ -34,8 +34,8 @@ struct Converter<DataDrivenPropertyValue<T>> {
             
             bool zoomConstant = isZoomConstant(expression->get());
             
-            if (!zoomConstant && !CameraFunction<T>::Curve::findZoomCurve(expression->get())) {
-                error = { R"("zoom" expression may only be used as input to a top-level "curve" expression.)" };
+            if (!zoomConstant && !findZoomCurve<typename CameraFunction<T>::ExpressionType>(expression->get())) {
+                error = { R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)" };
                 return {};
             }
             

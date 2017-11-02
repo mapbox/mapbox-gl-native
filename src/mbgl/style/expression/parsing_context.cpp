@@ -13,10 +13,11 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
-#include <mbgl/style/expression/curve.hpp>
+#include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/match.hpp>
+#include <mbgl/style/expression/step.hpp>
 
 #include <mbgl/style/conversion/get_json_type.hpp>
 
@@ -77,12 +78,13 @@ const ExpressionRegistry& getExpressionRegistry() {
         {"boolean", Assertion::parse},
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
-        {"curve", parseCurve},
+        {"interpolate", parseInterpolate},
         {"let", Let::parse},
         {"literal", Literal::parse},
         {"match", parseMatch},
         {"number", Assertion::parse},
         {"object", Assertion::parse},
+        {"step", Step::parse},
         {"string", Assertion::parse},
         {"to-color", Coercion::parse},
         {"to-number", Coercion::parse},

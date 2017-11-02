@@ -40,8 +40,10 @@ public:
         : property(std::move(property_)),
           stops(std::move(stops_)),
           defaultValue(std::move(defaultValue_)),
-          expression(stops.match([&] (const auto& s) {
-            return expression::Convert::toExpression(property, s);
+          expression(stops.match([&] (const IdentityStops<T>&) {
+              return expression::Convert::fromIdentityFunction(expression::valueTypeToExpressionType<T>(), property);
+          }, [&] (const auto& s) {
+              return expression::Convert::toExpression(property, s);
           }))
     {}
 

@@ -6,10 +6,11 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/coercion.hpp>
-#include <mbgl/style/expression/curve.hpp>
+#include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/match.hpp>
+#include <mbgl/style/expression/step.hpp>
 
 #include <mbgl/style/function/exponential_stops.hpp>
 #include <mbgl/style/function/interval_stops.hpp>
@@ -82,12 +83,12 @@ struct Convert {
     }
     
     template <typename OutputType>
-    static ParseResult makeCurve(type::Type type,
+    static ParseResult makeInterpolate(type::Type type,
                                  std::unique_ptr<Expression> input,
                                  std::map<double, std::unique_ptr<Expression>> convertedStops,
-                                 typename Curve<OutputType>::Interpolator interpolator)
+                                 typename Interpolate<OutputType>::Interpolator interpolator)
     {
-        ParseResult curve = ParseResult(std::make_unique<Curve<OutputType>>(
+        ParseResult curve = ParseResult(std::make_unique<Interpolate<OutputType>>(
             std::move(type),
             std::move(interpolator),
             std::move(input),
@@ -181,7 +182,7 @@ struct Convert {
     template <typename T>
     static std::unique_ptr<Expression> toExpression(const ExponentialStops<T>& stops)
     {
-        ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(
+        ParseResult e = makeInterpolate<typename ValueConverter<T>::ExpressionType>(
                                          valueTypeToExpressionType<T>(),
                                          makeZoom(),
                                          convertStops(stops.stops),
@@ -193,10 +194,9 @@ struct Convert {
     template <typename T>
     static std::unique_ptr<Expression> toExpression(const IntervalStops<T>& stops)
     {
-        ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                     makeZoom(),
-                                                                     convertStops(stops.stops),
-                                                                     StepInterpolator());
+        ParseResult e(std::make_unique<Step>(valueTypeToExpressionType<T>(),
+                                             makeZoom(),
+                                             convertStops(stops.stops)));
         assert(e);
         return std::move(*e);
     }
@@ -205,7 +205,7 @@ struct Convert {
     static std::unique_ptr<Expression> toExpression(const std::string& property,
                                                   const ExponentialStops<T>& stops)
     {
-        ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
+        ParseResult e = makeInterpolate<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
                                                                      makeGet(type::Number, property),
                                                                      convertStops(stops.stops),
                                                                      ExponentialInterpolator(stops.base));
@@ -218,10 +218,9 @@ struct Convert {
                                                   const IntervalStops<T>& stops)
     {
         std::unique_ptr<Expression> get = makeGet(type::Number, property);
-        ParseResult e = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                     std::move(get),
-                                                                     convertStops(stops.stops),
-                                                                     StepInterpolator());
+        ParseResult e(std::make_unique<Step>(valueTypeToExpressionType<T>(),
+                                             std::move(get),
+                                             convertStops(stops.stops)));
         assert(e);
         return std::move(*e);
     }
@@ -235,16 +234,22 @@ struct Convert {
         return std::move(*expr);
     }
 
+    // interpolatable zoom curve
     template <typename T>
-    static typename Curve<std::enable_if_t<util::Interpolatable<T>::value, T>>::Interpolator zoomInterpolator() {
-        return ExponentialInterpolator(1.0);
+    static typename std::enable_if_t<util::Interpolatable<T>::value,
+    ParseResult> makeZoomCurve(std::map<double, std::unique_ptr<Expression>> stops) {
+        return makeInterpolate<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
+                                                                           makeZoom(),
+                                                                           std::move(stops),
+                                                                           ExponentialInterpolator(1.0));
     }
     
+    // non-interpolatable zoom curve
     template <typename T>
-    static typename Curve<std::enable_if_t<!util::Interpolatable<T>::value, T>>::Interpolator zoomInterpolator() {
-        return StepInterpolator();
+    static typename std::enable_if_t<!util::Interpolatable<T>::value,
+    ParseResult> makeZoomCurve(std::map<double, std::unique_ptr<Expression>> stops) {
+        return ParseResult(std::make_unique<Step>(valueTypeToExpressionType<T>(), makeZoom(), std::move(stops)));
     }
-
 
     template <typename T>
     static std::unique_ptr<Expression> toExpression(const std::string& property,
@@ -253,19 +258,17 @@ struct Convert {
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<float, T>>& stop : stops.stops) {
             std::unique_ptr<Expression> get = makeGet(type::Number, property);
-            ParseResult innerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
+            ParseResult innerInterpolate = makeInterpolate<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
                                                                                   std::move(get),
                                                                                   convertStops(stop.second),
                                                                                   ExponentialInterpolator(stops.base));
-            assert(innerCurve);
-            outerStops.emplace(stop.first, std::move(*innerCurve));
+            assert(innerInterpolate);
+            outerStops.emplace(stop.first, std::move(*innerInterpolate));
         }
-        ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(),
-                                                                              std::move(outerStops),
-                                                                              zoomInterpolator<T>());
-        assert(outerCurve);
-        return std::move(*outerCurve);
+        
+        ParseResult zoomCurve = makeZoomCurve<T>(std::move(outerStops));
+        assert(zoomCurve);
+        return std::move(*zoomCurve);
     }
     
     template <typename T>
@@ -275,19 +278,16 @@ struct Convert {
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<float, T>>& stop : stops.stops) {
             std::unique_ptr<Expression> get = makeGet(type::Number, property);
-            ParseResult innerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                                  std::move(get),
-                                                                                  convertStops(stop.second),
-                                                                                  StepInterpolator());
-            assert(innerCurve);
-            outerStops.emplace(stop.first, std::move(*innerCurve));
+            ParseResult innerInterpolate(std::make_unique<Step>(valueTypeToExpressionType<T>(),
+                                                                std::move(get),
+                                                                convertStops(stop.second)));
+            assert(innerInterpolate);
+            outerStops.emplace(stop.first, std::move(*innerInterpolate));
         }
-        ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(),
-                                                                              std::move(outerStops),
-                                                                              zoomInterpolator<T>());
-        assert(outerCurve);
-        return std::move(*outerCurve);
+
+        ParseResult zoomCurve = makeZoomCurve<T>(std::move(outerStops));
+        assert(zoomCurve);
+        return std::move(*zoomCurve);
     }
     
     template <typename T>
@@ -296,24 +296,20 @@ struct Convert {
     {
         std::map<double, std::unique_ptr<Expression>> outerStops;
         for (const std::pair<float, std::map<CategoricalValue, T>>& stop : stops.stops) {
-            ParseResult innerCurve = fromCategoricalStops(stop.second, property);
-            assert(innerCurve);
-            outerStops.emplace(stop.first, std::move(*innerCurve));
+            ParseResult innerInterpolate = fromCategoricalStops(stop.second, property);
+            assert(innerInterpolate);
+            outerStops.emplace(stop.first, std::move(*innerInterpolate));
         }
-        ParseResult outerCurve = makeCurve<typename ValueConverter<T>::ExpressionType>(valueTypeToExpressionType<T>(),
-                                                                              makeZoom(),
-                                                                              std::move(outerStops),
-                                                                              zoomInterpolator<T>());
-        assert(outerCurve);
-        return std::move(*outerCurve);
+        
+        ParseResult zoomCurve = makeZoomCurve<T>(std::move(outerStops));
+        assert(zoomCurve);
+        return std::move(*zoomCurve);
     }
 
     
-    template <typename T>
-    static std::unique_ptr<Expression> toExpression(const std::string& property,
-                                                  const IdentityStops<T>&)
+    static std::unique_ptr<Expression> fromIdentityFunction(type::Type type, const std::string& property)
     {
-        std::unique_ptr<Expression> input = valueTypeToExpressionType<T>().match(
+        std::unique_ptr<Expression> input = type.match(
             [&] (const type::StringType&) {
                 return makeGet(type::String, property);
             },

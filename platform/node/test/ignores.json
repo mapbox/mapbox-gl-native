@@ -1,4 +1,6 @@
 {
+  "expression-tests/curve/step": "https://github.com/mapbox/mapbox-gl-js/issues/5580",
+  "expression-tests/curve/interpolate": "https://github.com/mapbox/mapbox-gl-js/issues/5580",
   "query-tests/circle-stroke-width/inside": "https://github.com/mapbox/mapbox-gl-native/issues/10307",
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
