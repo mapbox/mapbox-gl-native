@@ -366,9 +366,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
+    bool symbolBucketsChanged = false;
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
-            crossTileSymbolIndex->addLayer(*it->layer.as<RenderSymbolLayer>());
+            if (crossTileSymbolIndex->addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;
         }
     }
 
@@ -383,10 +384,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (placementChanged) placement = std::move(newPlacement);
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
 
-    // TODO only update when necessary
-    for (auto it = order.rbegin(); it != order.rend(); ++it) {
-        if (it->layer.is<RenderSymbolLayer>()) {
-            placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+    if (placementChanged || symbolBucketsChanged) {
+        for (auto it = order.rbegin(); it != order.rend(); ++it) {
+            if (it->layer.is<RenderSymbolLayer>()) {
+                placement->updateLayerOpacities(*it->layer.as<RenderSymbolLayer>());
+            }
         }
     }
 

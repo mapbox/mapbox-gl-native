@@ -7,8 +7,8 @@
 namespace mbgl {
 
 
-TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances) 
-    : coord(coord_) {
+TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_) 
+    : coord(coord_), bucketInstanceId(bucketInstanceId_) {
         for (SymbolInstance& symbolInstance : symbolInstances) {
             if (symbolInstance.insideTileBoundaries) {
                 indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
@@ -100,75 +100,49 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
         }
     }
 
-    TileLayerIndex tileIndex(coord, bucket.symbolInstances);
-    indexes[coord.overscaledZ].emplace(coord, std::move(tileIndex));
+    indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, bucket.symbolInstances, bucket.bucketInstanceId));
 }
 
-/*
-void CrossTileSymbolLayerIndex::removeTile(const OverscaledTileID& coord) {
-	
-	auto removedIndex = indexes.at(coord.overscaledZ).at(coord);
-
-    uint8_t minZoom = 25;
-    for (auto& it : indexes) {
-        auto z = it.first;
-        minZoom = std::min(minZoom, z);
-    }
-
-    for (auto z = coord.overscaledZ - 1; z >= minZoom; z--) {
-        auto parentCoord = coord.scaledTo(z);
-        auto zoomIndexes = indexes.find(z);
-        if (zoomIndexes != indexes.end()) {
-            auto parentIndex = zoomIndexes->second.find(parentCoord);
-            if (parentIndex != zoomIndexes->second.end()) {
-                unblockLabels(removedIndex, parentIndex->second);
+bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs) {
+    bool tilesChanged = false;
+    for (auto& zoomIndexes : indexes) {
+        for (auto it = zoomIndexes.second.begin(); it != zoomIndexes.second.end();) {
+            // TODO remove false condition when pyramid flickering is fixed
+            if (false && !currentIDs.count(it->second.bucketInstanceId)) {
+                it = zoomIndexes.second.erase(it);
+                tilesChanged = true;
+            } else {
+                ++it;
             }
         }
     }
-
-    indexes.at(coord.overscaledZ).erase(coord);
-    if (indexes.at(coord.overscaledZ).size() == 0) {
-        indexes.erase(coord.overscaledZ);
-    }
+    return tilesChanged;
 }
-*/
 
 CrossTileSymbolIndex::CrossTileSymbolIndex() {}
 
-void CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
+bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
 
     auto& layerIndex = layerIndexes[symbolLayer.getID()];
 
-     for (RenderTile& renderTile : symbolLayer.renderTiles) {
-         if (!renderTile.tile.isRenderable()) {
-             continue;
-         }
+    bool symbolBucketsChanged = false;
+    std::unordered_set<uint32_t> currentBucketIDs;
 
+    for (RenderTile& renderTile : symbolLayer.renderTiles) {
+        if (!renderTile.tile.isRenderable()) {
+            continue;
+        }
 
+        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
+        assert(dynamic_cast<SymbolBucket*>(bucket));
+        SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
-         auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
-         assert(dynamic_cast<SymbolBucket*>(bucket));
-         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
-
-         layerIndex.addBucket(renderTile.tile.id, symbolBucket);
-     }
-}
-
-/*
-void CrossTileSymbolIndex::addTileLayer(std::string& layerId, const OverscaledTileID& coord, std::shared_ptr<std::vector<SymbolInstance>> symbolInstances) {
-    if (layerIndexes.find(layerId) == layerIndexes.end()) {
-        layerIndexes.emplace(layerId, CrossTileSymbolLayerIndex());
+        if (!symbolBucket.bucketInstanceId) symbolBucketsChanged = true;
+        layerIndex.addBucket(renderTile.tile.id, symbolBucket);
+        currentBucketIDs.insert(symbolBucket.bucketInstanceId);
     }
 
-    CrossTileSymbolLayerIndex& layerIndex = layerIndexes.at(layerId);
-    layerIndex.addTile(coord, symbolInstances);
+    if (layerIndex.removeStaleBuckets(currentBucketIDs)) symbolBucketsChanged = true;
+    return symbolBucketsChanged;
 }
-
-void CrossTileSymbolIndex::removeTileLayer(std::string& layerId, const OverscaledTileID& coord) {
-    auto it = layerIndexes.find(layerId);
-    if (it != layerIndexes.end()) {
-        it->second.removeTile(coord);
-    }
-}
-*/
 } // namespace mbgl

@@ -9,6 +9,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#include <unordered_set>
 
 namespace mbgl {
 
@@ -31,12 +32,13 @@ class IndexedSymbolInstance {
 
 class TileLayerIndex {
     public:
-        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&);
+        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
 
         Point<double> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
         void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
         
         OverscaledTileID coord;
+        uint32_t bucketInstanceId;
         std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
 };
 
@@ -44,6 +46,7 @@ class CrossTileSymbolLayerIndex {
     public:
         CrossTileSymbolLayerIndex();
         void addBucket(const OverscaledTileID&, SymbolBucket&);
+        bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
     private:
         std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
         uint32_t maxBucketInstanceId = 0;
@@ -54,7 +57,7 @@ class CrossTileSymbolIndex {
     public:
         CrossTileSymbolIndex();
 
-        void addLayer(RenderSymbolLayer&);
+        bool addLayer(RenderSymbolLayer&);
     private:
         std::map<std::string,CrossTileSymbolLayerIndex> layerIndexes;
 };
