@@ -5,8 +5,7 @@ dependencies {
     compile rootProject.ext.dep.supportFragmentV4
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
-    compile(rootProject.ext.dep.lost) {
-        exclude group: 'com.google.guava'
+    provided(rootProject.ext.dep.lost) {
         exclude group: 'com.android.support'
     }
     testCompile rootProject.ext.dep.junit
@@ -22,6 +21,8 @@ dependencies {
         transitive = true
         exclude group: 'com.android.support'
     }
+
+    compile(rootProject.ext.dep.mapboxAndroidCore)
 }
 
 android {

@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.mapboxsdk.location.LocationSource;
+import com.mapbox.services.android.core.location.LocationEngine;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +25,13 @@ public class MapboxTest {
 
   private Context context;
   private Context appContext;
-  private LocationSource locationSource;
+  private LocationEngine locationSource;
 
   @Before
   public void before() {
     context = mock(Context.class);
     appContext = mock(Context.class);
-    locationSource = mock(LocationSource.class);
+    locationSource = mock(LocationEngine.class);
     when(context.getApplicationContext()).thenReturn(appContext);
   }
 
