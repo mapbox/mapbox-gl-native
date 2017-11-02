@@ -6,9 +6,7 @@ dependencies {
     compile rootProject.ext.dep.supportDesign
     compile rootProject.ext.dep.timber
     compile rootProject.ext.dep.okhttp3
-    compile(rootProject.ext.dep.lost) {
-        exclude group: 'com.google.guava'
-    }
+    provided rootProject.ext.dep.lost
     testCompile rootProject.ext.dep.junit
     testCompile rootProject.ext.dep.mockito
 
@@ -21,6 +19,8 @@ dependencies {
     compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
         transitive = true
     }
+
+    compile(rootProject.ext.dep.mapboxAndroidCore)
 }
 
 android {
