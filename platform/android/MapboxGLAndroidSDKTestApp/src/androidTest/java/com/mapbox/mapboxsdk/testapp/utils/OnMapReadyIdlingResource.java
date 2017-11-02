@@ -13,10 +13,8 @@ public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallb
 
   private MapboxMap mapboxMap;
   private IdlingResource.ResourceCallback resourceCallback;
-  private Activity activity;
 
   public OnMapReadyIdlingResource(Activity activity) {
-    this.activity = activity;
     try {
       Field field = activity.getClass().getDeclaredField("mapView");
       field.setAccessible(true);
@@ -24,7 +22,6 @@ public class OnMapReadyIdlingResource implements IdlingResource, OnMapReadyCallb
     } catch (Exception err) {
       throw new RuntimeException(err);
     }
-
   }
 
   @Override
