@@ -6,9 +6,28 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
-## 5.2.0-beta.4 - TBA
+## 5.2.0-beta.4 - November 3, 2017
 
-- Add Bulgarian and Hungarian localizations [#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309)
+- Revert adding mapbox-android-core dependency (#10354) [#10380](https://github.com/mapbox/mapbox-gl-native/pull/10380)
+- Asynchronous TextureView [#10370](https://github.com/mapbox/mapbox-gl-native/pull/10370)
+- Workaround OkHttp bug on Android O [10366](https://github.com/mapbox/mapbox-gl-native/pull/10366)
+- Revisit logo resize [10553](https://github.com/mapbox/mapbox-gl-native/pull/10353)
+- Logo resize for MapSnapshotter [#10312](https://github.com/mapbox/mapbox-gl-native/pull/10312)
+- Make location provider optional [#10354](https://github.com/mapbox/mapbox-gl-native/pull/10354)
+- Check for positive animation value [#10348](https://github.com/mapbox/mapbox-gl-native/pull/10348)
+- Fix IAE of ease/animate [#10338](https://github.com/mapbox/mapbox-gl-native/pull/10338)
+- Run full test suite on CI [#10333](https://github.com/mapbox/mapbox-gl-native/pull/10333)
+- Make sure camera position gets updated in onFinish() callback after camera.move [#10324](https://github.com/mapbox/mapbox-gl-native/pull/10324)
+- throw IAE in animate() and easeCamera() when duration <= 0 [#10321](https://github.com/mapbox/mapbox-gl-native/pull/10321)
+- Don't save state if map hasn't been initialised [#10320](https://github.com/mapbox/mapbox-gl-native/pull/10320)
+- Make map snapshot optional [#10310](https://github.com/mapbox/mapbox-gl-native/pull/10310)
+- Synchronise locationlastions with Transifex [#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309)
+- MapboxMap#addImages [#10281](https://github.com/mapbox/mapbox-gl-native/pull/10281)
+- Move shape annotation click handling to core [#10267](https://github.com/mapbox/mapbox-gl-native/pull/10267)
+- Map snapshotter additions [#10163](https://github.com/mapbox/mapbox-gl-native/pull/10163)
+- Add velocity to gestures / port animations to SDK animators [#10202](https://github.com/mapbox/mapbox-gl-native/pull/10202)
+- Don't save state if map hasn't been initialised [#10320](https://github.com/mapbox/mapbox-gl-native/pull/10320)
+- android.hardware.location.gps feature should not be required [#10347](https://github.com/mapbox/mapbox-gl-native/pull/10347)
 
 ## 5.2.0-beta.3 - October 26, 2017
 
