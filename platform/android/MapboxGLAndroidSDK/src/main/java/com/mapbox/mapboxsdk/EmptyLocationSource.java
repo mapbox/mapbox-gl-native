@@ -5,8 +5,8 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.location.LocationSource;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
 class EmptyLocationSource extends LocationSource {
 
