@@ -95,6 +95,8 @@ public:
     bool isComplete() const {
         return loaded && !pending;
     }
+    
+    virtual void resetCrossTileIDs() {};
 
     void dumpDebugLogs() const;
 

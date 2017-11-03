@@ -7,7 +7,7 @@
 namespace mbgl {
 
 
-TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_) 
+TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_)
     : coord(coord_), bucketInstanceId(bucketInstanceId_) {
         for (SymbolInstance& symbolInstance : symbolInstances) {
             if (symbolInstance.insideTileBoundaries) {
@@ -30,11 +30,16 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
     float tolerance = coord.canonical.z < newCoord.canonical.z ? 1 : std::pow(2, coord.canonical.z - newCoord.canonical.z);
 
     for (auto& symbolInstance : symbolInstances) {
-        // already has a match, skip
-        if (symbolInstance.crossTileID) continue;
+        if (symbolInstance.crossTileID) {
+            // already has a match, skip
+            continue;
+        }
 
         auto it = indexedSymbolInstances.find(symbolInstance.key);
-        if (it == indexedSymbolInstances.end()) continue;
+        if (it == indexedSymbolInstances.end()) {
+            // No symbol with this key in this bucket
+            continue;
+        }
 
         auto scaledSymbolCoord = getScaledCoordinates(symbolInstance, newCoord);
 
@@ -74,7 +79,9 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
         auto zoomIndexes = indexes.find(z);
         if (zoomIndexes != indexes.end()) {
             for (auto& childIndex : zoomIndexes->second) {
-                if (!childIndex.second.coord.isChildOf(coord)) continue;
+                if (!childIndex.second.coord.isChildOf(coord)) {
+                    continue;
+                }
                 childIndex.second.findMatches(bucket.symbolInstances, coord);
             }
         }
@@ -112,8 +119,7 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
     bool tilesChanged = false;
     for (auto& zoomIndexes : indexes) {
         for (auto it = zoomIndexes.second.begin(); it != zoomIndexes.second.end();) {
-            // TODO remove false condition when pyramid flickering is fixed
-            if (false && !currentIDs.count(it->second.bucketInstanceId)) {
+            if (!currentIDs.count(it->second.bucketInstanceId)) {
                 it = zoomIndexes.second.erase(it);
                 tilesChanged = true;
             } else {
@@ -142,12 +148,17 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
-        if (!symbolBucket.bucketInstanceId) symbolBucketsChanged = true;
+        if (!symbolBucket.bucketInstanceId) {
+            symbolBucketsChanged = true;
+        }
         layerIndex.addBucket(renderTile.tile.id, symbolBucket);
         currentBucketIDs.insert(symbolBucket.bucketInstanceId);
     }
 
-    if (layerIndex.removeStaleBuckets(currentBucketIDs)) symbolBucketsChanged = true;
+    if (layerIndex.removeStaleBuckets(currentBucketIDs)) {
+        symbolBucketsChanged = true;
+    }
     return symbolBucketsChanged;
 }
 } // namespace mbgl
+

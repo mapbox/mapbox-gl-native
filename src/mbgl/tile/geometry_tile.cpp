@@ -125,8 +125,9 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
 }
 
 void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
-    loaded = true;
-    renderable = true;
+    // Don't mark ourselves loaded or renderable until the first successful placement
+    // TODO: Ideally we'd render this tile without symbols as long as this tile wasn't
+    //  replacing a tile at a different zoom that _did_ have symbols.
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     featureIndex = std::move(result.featureIndex);
@@ -276,6 +277,18 @@ void GeometryTile::querySourceFeatures(
                 }
 
                 result.push_back(convertFeature(*feature, id.canonical));
+            }
+        }
+    }
+}
+
+void GeometryTile::resetCrossTileIDs() {
+    for (auto& bucket : symbolBuckets) {
+        SymbolBucket* symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
+        if (symbolBucket && symbolBucket->bucketInstanceId) {
+            symbolBucket->bucketInstanceId = 0;
+            for (auto& symbolInstance : symbolBucket->symbolInstances) {
+                symbolInstance.crossTileID = 0;
             }
         }
     }
