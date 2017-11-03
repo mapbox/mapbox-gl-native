@@ -96,6 +96,8 @@ public:
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
+    void resetCrossTileIDs() override;
+    
 protected:
     const GeometryTileData* getData() {
         return data.get();

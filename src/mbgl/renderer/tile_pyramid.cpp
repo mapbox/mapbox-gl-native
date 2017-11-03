@@ -119,6 +119,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     // use because they're still loading. In addition to that, we also need to retain all tiles that
     // we're actively using, e.g. as a replacement for tile that aren't loaded yet.
     std::set<OverscaledTileID> retain;
+    std::set<UnwrappedTileID> rendered;
 
     auto retainTileFn = [&](Tile& tile, TileNecessity necessity) -> void {
         if (retain.emplace(tile.id).second) {
@@ -149,6 +150,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     };
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         renderTiles.emplace_back(tileID, tile);
+        rendered.emplace(tileID);
     };
 
     renderTiles.clear();
@@ -176,6 +178,13 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         auto tilesIt = tiles.begin();
         auto retainIt = retain.begin();
         while (tilesIt != tiles.end()) {
+            auto renderedIt = rendered.find(tilesIt->first.toUnwrapped());
+            if (renderedIt == rendered.end()) {
+                // Since this tile isn't in the render set, crossTileIDs won't be kept
+                // updated by CrossTileSymbolIndex. We need to reset the stored crossTileIDs
+                // so they're not reused if/when this tile is re-added to the render set
+                tilesIt->second->resetCrossTileIDs();
+            }
             if (retainIt == retain.end() || tilesIt->first < *retainIt) {
                 if (!needsRelayout) {
                     tilesIt->second->setNecessity(TileNecessity::Optional);
