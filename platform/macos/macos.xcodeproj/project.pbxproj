@@ -670,6 +670,8 @@
 		352742791D4C235C00A1ECE6 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */,
+				1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */,
 				DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */,
 				DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */,
 			);
@@ -959,8 +961,6 @@
 		DAD1657F1CF4CF50001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */,
-				1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */,
 				408AA8601DAEED3300022900 /* MGLPolygon+MGLAdditions.h */,
 				408AA85C1DAEED3300022900 /* MGLPolygon+MGLAdditions.m */,
 				408AA8611DAEED3300022900 /* MGLPolyline+MGLAdditions.h */,
