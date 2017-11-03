@@ -59,8 +59,7 @@ public:
 
     friend bool operator==(const SourceFunction& lhs,
                            const SourceFunction& rhs) {
-        return std::tie(lhs.property, lhs.stops, lhs.defaultValue)
-            == std::tie(rhs.property, rhs.stops, rhs.defaultValue);
+        return lhs.expression == rhs.expression;
     }
 
     bool useIntegerZoom = false;

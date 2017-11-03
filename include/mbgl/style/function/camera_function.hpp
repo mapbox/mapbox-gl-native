@@ -71,7 +71,7 @@ public:
     
     friend bool operator==(const CameraFunction& lhs,
                            const CameraFunction& rhs) {
-        return lhs.stops == rhs.stops;
+        return lhs.expression == rhs.expression;
     }
 
     bool useIntegerZoom = false;
