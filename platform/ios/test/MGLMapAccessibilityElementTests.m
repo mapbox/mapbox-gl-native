@@ -28,4 +28,55 @@
     XCTAssertEqualObjects(element.accessibilityLabel, @"Cincinnati", @"Accessibility label should be romanized.");
 }
 
+- (void)testPlaceFeatureValues {
+    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
+    feature.attributes = @{
+        @"type": @"village_green",
+    };
+    MGLPlaceFeatureAccessibilityElement *element = [[MGLPlaceFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
+    XCTAssertEqualObjects(element.accessibilityValue, @"village green");
+    
+    feature = [[MGLPointFeature alloc] init];
+    feature.attributes = @{
+        @"maki": @"cat",
+    };
+    element = [[MGLPlaceFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
+    XCTAssertEqualObjects(element.accessibilityValue, @"cat");
+    
+    feature = [[MGLPointFeature alloc] init];
+    feature.attributes = @{
+        @"elevation_ft": @31337,
+        @"elevation_m": @1337,
+    };
+    element = [[MGLPlaceFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
+    XCTAssertEqualObjects(element.accessibilityValue, @"31,337 feet");
+}
+
+- (void)testRoadFeatureValues {
+    CLLocationCoordinate2D coordinates[] = {
+        CLLocationCoordinate2DMake(0, 0),
+        CLLocationCoordinate2DMake(0, 1),
+        CLLocationCoordinate2DMake(1, 2),
+        CLLocationCoordinate2DMake(2, 2),
+    };
+    MGLPolylineFeature *roadFeature = [MGLPolylineFeature polylineWithCoordinates:coordinates count:sizeof(coordinates) / sizeof(coordinates[0])];
+    roadFeature.attributes = @{
+        @"ref": @"42",
+    };
+    MGLRoadFeatureAccessibilityElement *element = [[MGLRoadFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:roadFeature];
+    XCTAssertEqualObjects(element.accessibilityValue, @"Route 42, southwest to northeast");
+    
+    CLLocationCoordinate2D opposingCoordinates[] = {
+        CLLocationCoordinate2DMake(1, 0),
+        CLLocationCoordinate2DMake(2, 1),
+    };
+    MGLPolylineFeature *opposingRoadFeature = [MGLPolylineFeature polylineWithCoordinates:opposingCoordinates count:sizeof(opposingCoordinates) / sizeof(opposingCoordinates[0])];
+    MGLMultiPolylineFeature *dividedRoadFeature = [MGLMultiPolylineFeature multiPolylineWithPolylines:@[roadFeature, opposingRoadFeature]];
+    dividedRoadFeature.attributes = @{
+        @"ref": @"42",
+    };
+    element = [[MGLRoadFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:dividedRoadFeature];
+    XCTAssertEqualObjects(element.accessibilityValue, @"Route 42, Divided road, southwest to northeast");
+}
+
 @end
