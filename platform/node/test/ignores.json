@@ -7,6 +7,7 @@
   "query-tests/geometry/polygon": "needs investigation",
   "query-tests/regressions/mapbox-gl-js#3534": "https://github.com/mapbox/mapbox-gl-native/issues/8193",
   "query-tests/regressions/mapbox-gl-js#4417": "https://github.com/mapbox/mapbox-gl-native/issues/8007",
+  "query-tests/regressions/mapbox-gl-js#5554": "https://github.com/mapbox/mapbox-gl-native/pull/10103",
   "query-tests/symbol/rotated-inside": "https://github.com/mapbox/mapbox-gl-native/pull/10103",
   "query-tests/symbol-features-in/pitched-screen": "https://github.com/mapbox/mapbox-gl-native/issues/6817",
   "query-tests/symbol-features-in/tilted-inside": "https://github.com/mapbox/mapbox-gl-native/issues/5056",
