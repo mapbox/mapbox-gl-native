@@ -1683,6 +1683,17 @@ public final class MapboxMap {
   }
 
   /**
+   * Sets a callback that is invoked when camera is about to move. {@link OnPreCameraMoveListener#onPreCameraMove(CameraPosition)}
+   * will let you change {@link CameraPosition} before it is dispatched.
+   *
+   * @param listener the listener to notify
+   */
+  @UiThread
+  public void setOnPreCameraMoveListener(@Nullable OnPreCameraMoveListener listener) {
+    cameraChangeDispatcher.setOnPreCameraMoveListener(listener);
+  }
+
+  /**
    * Sets a callback that is invoked when camera movement has ended.
    *
    * @param listener the listener to notify
@@ -2049,6 +2060,27 @@ public final class MapboxMap {
      * @param position The CameraPosition at the end of the last camera change.
      */
     void onCameraChange(CameraPosition position);
+  }
+
+  /**
+   * Interface definition for a callback to be invoked when when camera is about to move
+   * and {@link CameraPosition} object is already prepared.
+   */
+  public interface OnPreCameraMoveListener {
+
+    /**
+     * <p>Called when camera move is about to start.
+     * On this point we can change camera's destination parameters
+     * before they are dispatched.</p>
+     * <p>
+     * <p>This callback <b>is not called</b> for animations started by gestures.</p>
+     *
+     * @param cameraPosition currently generated destination
+     * @param duration       duration of animation (ms)
+     * @param reason         the reason for the camera change
+     * @return modified camera destination, or if you don't want to change anything - return provided {@link CameraPosition}
+     */
+    CameraPosition onPreCameraMove(CameraPosition cameraPosition, float duration, int reason);
   }
 
   /**

@@ -96,6 +96,8 @@ final class Transform implements MapView.OnMapChangedListener {
     if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
+      cameraPosition = cameraChangeDispatcher.onPreCameraMove(
+        cameraPosition, 0, OnCameraMoveStartedListener.REASON_API_ANIMATION);
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
       if (callback != null) {
@@ -112,6 +114,8 @@ final class Transform implements MapView.OnMapChangedListener {
     if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, isDismissable);
       cancelTransitions();
+      cameraPosition = cameraChangeDispatcher.onPreCameraMove(
+        cameraPosition, durationMs, OnCameraMoveStartedListener.REASON_API_ANIMATION);
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
       if (callback != null) {
@@ -130,6 +134,8 @@ final class Transform implements MapView.OnMapChangedListener {
     if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
+      cameraPosition = cameraChangeDispatcher.onPreCameraMove(
+        cameraPosition, durationMs, OnCameraMoveStartedListener.REASON_API_ANIMATION);
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
       if (callback != null) {
