@@ -98,11 +98,6 @@ void Placement::placeLayerBucket(
 
     for (auto& symbolInstance : bucket.symbolInstances) {
 
-        // TODO symbollayout handles a couple special cases related to this. copy those over if needed.
-        auto anchor = symbolInstance.anchor;
-        const bool withinPlus0 = anchor.point.x >= 0 && anchor.point.x < util::EXTENT && anchor.point.y >= 0 && anchor.point.y < util::EXTENT;
-        if (!withinPlus0) continue;
-
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
             bool placeText = false;
             bool placeIcon = false;
@@ -246,27 +241,25 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
             }
         }
         
-        if (symbolInstance.insideTileBoundaries) {
-            auto updateCollisionBox = [&](const auto& feature, const bool placed) {
-                for (const CollisionBox& box : feature.boxes) {
-                    if (feature.alongLine) {
-                       auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
-                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    } else {
-                        auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
-                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                        bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    }
+        auto updateCollisionBox = [&](const auto& feature, const bool placed) {
+            for (const CollisionBox& box : feature.boxes) {
+                if (feature.alongLine) {
+                   auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                } else {
+                    auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
                 }
-            };
-            updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
-            updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
-        }
+            }
+        };
+        updateCollisionBox(symbolInstance.textCollisionFeature, opacityState.text.placed);
+        updateCollisionBox(symbolInstance.iconCollisionFeature, opacityState.icon.placed);
     }
 
     bucket.updateOpacity();

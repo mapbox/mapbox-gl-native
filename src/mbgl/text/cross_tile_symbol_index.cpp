@@ -10,9 +10,7 @@ namespace mbgl {
 TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_) 
     : coord(coord_), bucketInstanceId(bucketInstanceId_) {
         for (SymbolInstance& symbolInstance : symbolInstances) {
-            if (symbolInstance.insideTileBoundaries) {
-                indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
-            }
+            indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
         }
     }
 
@@ -99,7 +97,7 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
     }
     
     for (auto& symbolInstance : bucket.symbolInstances) {
-        if (!symbolInstance.crossTileID && symbolInstance.insideTileBoundaries) {
+        if (!symbolInstance.crossTileID) {
             // symbol did not match any known symbol, assign a new id
             symbolInstance.crossTileID = ++maxCrossTileID;
         }

@@ -316,14 +316,16 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         if (avoidEdges && !inside) return;
 
-        const bool addToBuffers = mode == MapMode::Still || withinPlus0;
-
-        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
-                layout.evaluate(zoom, feature), layoutTextSize,
-                addToBuffers, symbolInstances.size(),
-                textBoxScale, textPadding, textPlacement, textOffset,
-                iconBoxScale, iconPadding, iconPlacement, iconOffset,
-                glyphPositionMap, indexedFeature, index, feature.text ? *feature.text : std::u16string{}, overscaling);
+        // TODO set this to make api-gl work
+        const bool singleTileMode = false && mode == MapMode::Still;
+        if (singleTileMode || withinPlus0) {
+            symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
+                    layout.evaluate(zoom, feature), layoutTextSize,
+                    symbolInstances.size(),
+                    textBoxScale, textPadding, textPlacement, textOffset,
+                    iconBoxScale, iconPadding, iconPlacement, iconOffset,
+                    glyphPositionMap, indexedFeature, index, feature.text ? *feature.text : std::u16string{}, overscaling);
+        }
     };
     
     const auto& type = feature.getType();
@@ -558,9 +560,6 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
     }
 
     for (const SymbolInstance &symbolInstance : symbolInstances) {
-        if (!symbolInstance.insideTileBoundaries) {
-            continue;
-        }
         auto populateCollisionBox = [&](const auto& feature) {
             SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
                 static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :

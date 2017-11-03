@@ -19,7 +19,6 @@ public:
                    optional<PositionedIcon> shapedIcon,
                    const style::SymbolLayoutProperties::Evaluated&,
                    const float layoutTextSize,
-                   const bool inside,
                    const uint32_t index,
                    const float textBoxScale,
                    const float textPadding,
@@ -36,7 +35,6 @@ public:
                    const float overscaling);
 
     Anchor anchor;
-    bool insideTileBoundaries;
     GeometryCoordinates line;
     uint32_t index;
     bool hasText;

@@ -11,7 +11,6 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                optional<PositionedIcon> shapedIcon,
                                const SymbolLayoutProperties::Evaluated& layout,
                                const float layoutTextSize,
-                               const bool addToBuffers,
                                const uint32_t index_,
                                const float textBoxScale,
                                const float textPadding,
@@ -27,7 +26,6 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::u16string& key_,
                                const float overscaling) :
     anchor(anchor_),
-    insideTileBoundaries(0 <= anchor.point.x && 0 <= anchor.point.y && anchor.point.x < util::EXTENT && anchor.point.y < util::EXTENT),
     line(line_),
     index(index_),
     hasText(shapedTextOrientations.first || shapedTextOrientations.second),
@@ -42,16 +40,14 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     key(key_) {
 
     // Create the quads used for rendering the icon and glyphs.
-    if (addToBuffers) {
-        if (shapedIcon) {
-            iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
-        }
-        if (shapedTextOrientations.first) {
-            horizontalGlyphQuads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
-        }
-        if (shapedTextOrientations.second) {
-            verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
-        }
+    if (shapedIcon) {
+        iconQuad = getIconQuad(*shapedIcon, layout, layoutTextSize, shapedTextOrientations.first);
+    }
+    if (shapedTextOrientations.first) {
+        horizontalGlyphQuads = getGlyphQuads(shapedTextOrientations.first, layout, textPlacement, positions);
+    }
+    if (shapedTextOrientations.second) {
+        verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
     }
 
     if (shapedTextOrientations.first && shapedTextOrientations.second) {
