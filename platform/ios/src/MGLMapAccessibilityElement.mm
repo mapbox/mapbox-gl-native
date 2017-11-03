@@ -142,6 +142,11 @@
             [facts addObject:ref];
         }
         
+        // Announce whether the road is a one-way road.
+        if ([attributes[@"oneway"] isEqualToString:@"true"]) {
+            [facts addObject:NSLocalizedStringWithDefaultValue(@"ROAD_ONEWAY_A11Y_VALUE", nil, nil, @"One way", @"Accessibility value indicating that a road is a one-way road")];
+        }
+        
         // Announce whether the road is a divided road.
         MGLPolyline *polyline;
         if ([feature isKindOfClass:[MGLMultiPolylineFeature class]]) {

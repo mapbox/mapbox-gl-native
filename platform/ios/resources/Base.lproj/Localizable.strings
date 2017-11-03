@@ -67,6 +67,9 @@
 /* Accessibility value indicating that a road is a divided road (dual carriageway) */
 "ROAD_DIVIDED_A11Y_VALUE" = "Divided road";
 
+/* Accessibility value indicating that a road is a one-way road */
+"ROAD_ONEWAY_A11Y_VALUE" = "One way";
+
 /* String format for accessibility value for road feature; {route number} */
 "ROAD_REF_A11Y_FMT" = "Route %@";
 
