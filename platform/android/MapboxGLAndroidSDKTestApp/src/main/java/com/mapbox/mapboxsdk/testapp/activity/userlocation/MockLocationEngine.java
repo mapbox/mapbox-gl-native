@@ -5,8 +5,8 @@ import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
 import android.location.Location;
 
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
 import timber.log.Timber;
 
