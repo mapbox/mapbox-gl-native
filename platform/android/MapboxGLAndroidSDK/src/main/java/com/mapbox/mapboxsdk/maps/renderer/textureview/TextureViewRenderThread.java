@@ -213,6 +213,12 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
                 break;
               }
 
+              // (re-)Initialize EGL Surface if needed
+              if (eglHolder.eglSurface == EGL10.EGL_NO_SURFACE) {
+                recreateSurface = true;
+                break;
+              }
+
               // Check if the size has changed
               if (sizeChanged) {
                 recreateSurface = true;
@@ -247,7 +253,14 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
         // Initialize EGL
         if (initializeEGL) {
           eglHolder.prepare();
-          eglHolder.createSurface();
+          if (!eglHolder.createSurface()) {
+            synchronized (lock) {
+              // Cleanup the surface if one could not be created
+              // and wait for another to be ready.
+              destroySurface = true;
+            }
+            continue;
+          }
           mapRenderer.onSurfaceCreated(gl, eglHolder.eglConfig);
           mapRenderer.onSurfaceChanged(gl, w, h);
           continue;
@@ -345,7 +358,7 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
         // No texture view present
         eglConfig = null;
         eglContext = EGL10.EGL_NO_CONTEXT;
-      } else /*if (eglContext == EGL10.EGL_NO_CONTEXT)*/ {
+      } else if (eglContext == EGL10.EGL_NO_CONTEXT) {
         eglConfig = new EGLConfigChooser().chooseConfig(egl, eglDisplay);
         int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
         eglContext = egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, attrib_list);
@@ -408,29 +421,33 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
       }
 
       if (!egl.eglDestroySurface(eglDisplay, eglSurface)) {
-        Timber.e("Could not destroy egl surface. Display %s, Surface %s", eglDisplay, eglSurface);
-        throw new RuntimeException("eglDestroyContext: " + egl.eglGetError());
+        Timber.w("Could not destroy egl surface. Display %s, Surface %s", eglDisplay, eglSurface);
       }
+
+      eglSurface = EGL10.EGL_NO_SURFACE;
     }
 
     private void destroyContext() {
-      if (eglSurface == null || eglSurface == EGL10.EGL_NO_SURFACE) {
+      if (eglContext == EGL10.EGL_NO_CONTEXT) {
         return;
       }
 
       if (!egl.eglDestroyContext(eglDisplay, eglContext)) {
-        Timber.e("Could not destroy egl context. Display %s, Context %s", eglDisplay, eglContext);
-        throw new RuntimeException("eglDestroyContext: " + egl.eglGetError());
+        Timber.w("Could not destroy egl context. Display %s, Context %s", eglDisplay, eglContext);
       }
+
+      eglContext = EGL10.EGL_NO_CONTEXT;
     }
 
     private void terminate() {
-      if (eglDisplay != EGL10.EGL_NO_DISPLAY) {
-        if (!egl.eglTerminate(eglDisplay)) {
-          Timber.w("Could not terminate egl. Display %s", eglDisplay);
-        }
-        eglDisplay = EGL10.EGL_NO_DISPLAY;
+      if (eglDisplay == EGL10.EGL_NO_DISPLAY) {
+        return;
       }
+
+      if (!egl.eglTerminate(eglDisplay)) {
+        Timber.w("Could not terminate egl. Display %s", eglDisplay);
+      }
+      eglDisplay = EGL10.EGL_NO_DISPLAY;
     }
 
     void cleanup() {
