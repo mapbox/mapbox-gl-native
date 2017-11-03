@@ -65,7 +65,7 @@ namespace mbgl {
                     const bool showCollisionBoxes,
                     std::unordered_set<uint32_t>& seenCrossTileIDs);
 
-            void updateBucketOpacities(SymbolBucket&);
+            void updateBucketOpacities(SymbolBucket&, std::unordered_set<uint32_t>&);
 
             TransformState state;
             MapMode mapMode;

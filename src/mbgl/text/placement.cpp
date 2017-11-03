@@ -191,6 +191,7 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
 }
 
 void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
+    std::unordered_set<uint32_t> seenCrossTileIDs;
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
         if (!renderTile.tile.isRenderable()) {
             continue;
@@ -199,11 +200,11 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
         auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
-        updateBucketOpacities(symbolBucket);
+        updateBucketOpacities(symbolBucket, seenCrossTileIDs);
     }
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket) {
+void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<uint32_t>& seenCrossTileIDs) {
     // TODO check if this clear is necessary, whether the vector has been moved out
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
@@ -211,7 +212,11 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket) {
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.opacityVertices.clear();
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
-        auto opacityState = getOpacity(symbolInstance.crossTileID);
+        auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
+            getOpacity(symbolInstance.crossTileID) :
+            JointOpacityState(false, false);
+
+        seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
         // TODO check if hasText is the right thing here, or if there are cases where hasText is true but it's not added to the buffers
         if (symbolInstance.hasText) {
