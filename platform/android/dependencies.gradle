@@ -7,8 +7,7 @@ ext {
     versionCode = 11
     versionName = "5.0.0"
 
-    mapboxServicesVersion = "2.2.7"
-    mapboxAndroidCoreVersion = "0.1.1"
+    mapboxServicesVersion = "2.2.8"
     supportLibVersion = "25.4.0"
     espressoVersion = '3.0.1'
     testRunnerVersion = '1.0.1'
@@ -19,10 +18,9 @@ ext {
             mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
             mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
-            mapboxAndroidCore      : "com.mapbox.mapboxsdk:mapbox-android-core:${mapboxAndroidCoreVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:3.0.4',
+            lost                   : 'com.mapzen.android:lost:1.1.1',
 
             // unit test
             junit                  : 'junit:junit:4.12',

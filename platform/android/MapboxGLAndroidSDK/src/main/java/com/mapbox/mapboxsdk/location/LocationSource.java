@@ -5,9 +5,9 @@ import android.location.Location;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
-import com.mapbox.services.android.core.location.LocationEnginePriority;
+import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;
@@ -32,7 +32,7 @@ import com.mapzen.android.lost.api.LostApiClient;
  * @deprecated Use a {@link Mapbox#getLocationEngine()} instead.
  */
 @Deprecated
-public class LocationSource extends LocationEngine implements LostApiClient.ConnectionCallbacks, LocationListener {
+public class LocationSource extends LocationEngine implements LocationListener {
 
   private Context context;
   private LostApiClient lostApiClient;
@@ -45,9 +45,7 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
   public LocationSource(Context context) {
     super();
     this.context = context.getApplicationContext();
-    lostApiClient = new LostApiClient.Builder(this.context)
-      .addConnectionCallbacks(this)
-      .build();
+    lostApiClient = new LostApiClient.Builder(this.context).build();
   }
 
   /**
@@ -63,8 +61,11 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
    */
   @Override
   public void activate() {
-    if (lostApiClient != null && !lostApiClient.isConnected()) {
+    if (!lostApiClient.isConnected()) {
       lostApiClient.connect();
+    }
+    for (LocationEngineListener listener : locationListeners) {
+      listener.onConnected();
     }
   }
 
@@ -75,7 +76,7 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
    */
   @Override
   public void deactivate() {
-    if (lostApiClient != null && lostApiClient.isConnected()) {
+    if (lostApiClient.isConnected()) {
       lostApiClient.disconnect();
     }
   }
@@ -92,24 +93,6 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
   }
 
   /**
-   * Invoked when the location provider has connected.
-   */
-  @Override
-  public void onConnected() {
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
-    }
-  }
-
-  /**
-   * Invoked when the location provider connection has been suspended.
-   */
-  @Override
-  public void onConnectionSuspended() {
-    // Intentionally left empty
-  }
-
-  /**
    * Returns the Last known location is the location provider is connected and location permissions are granted.
    *
    * @return the last known location
@@ -119,7 +102,7 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
   public Location getLastLocation() {
     if (lostApiClient.isConnected()) {
       //noinspection MissingPermission
-      return LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
+      return LocationServices.FusedLocationApi.getLastLocation();
     }
     return null;
   }
@@ -153,7 +136,7 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
 
     if (lostApiClient.isConnected()) {
       //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, this);
+      LocationServices.FusedLocationApi.requestLocationUpdates(request, this);
     }
   }
 
@@ -163,7 +146,7 @@ public class LocationSource extends LocationEngine implements LostApiClient.Conn
   @Override
   public void removeLocationUpdates() {
     if (lostApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, this);
+      LocationServices.FusedLocationApi.removeLocationUpdates(this);
     }
   }
 
