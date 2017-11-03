@@ -53,8 +53,16 @@
         // may be in the local language, which may be written in another script.
         // Romanize it.
         NSLocale *locale = [NSLocale localeWithLocaleIdentifier:languageCode];
-        NSString *scriptCode = [locale objectForKey:NSLocaleScriptCode];
-        if ([scriptCode isEqualToString:@"Latn"]) {
+        NSOrthography *orthography;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunguarded-availability-new"
+        if ([NSOrthography respondsToSelector:@selector(defaultOrthographyForLanguage:)]) {
+            orthography = [NSOrthography defaultOrthographyForLanguage:locale.localeIdentifier];
+        }
+#pragma clang diagnostic pop
+#endif
+        if ([orthography.dominantScript isEqualToString:@"Latn"]) {
             name = [name stringByApplyingTransform:NSStringTransformToLatin reverse:NO];
         }
         
