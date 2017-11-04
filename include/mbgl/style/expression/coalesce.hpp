@@ -26,6 +26,20 @@ public:
     
     void eachChild(const std::function<void(const Expression*)>& visit) const override;
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const Coalesce*>(&e)) {
+            if (getType() != rhs->getType() || args.size() != rhs->args.size()) return false;
+            for (auto leftChild = args.begin(), rightChild = rhs->args.begin();
+                 leftChild != args.end();
+                 leftChild++, rightChild++)
+             {
+                 if (**leftChild != **rightChild) return false;
+             }
+             return true;
+        }
+        return false;
+    }
+    
     std::size_t getLength() const {
         return args.size();
     }

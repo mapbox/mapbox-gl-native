@@ -59,7 +59,7 @@ public:
 
     friend bool operator==(const SourceFunction& lhs,
                            const SourceFunction& rhs) {
-        return lhs.expression == rhs.expression;
+        return *lhs.expression == *rhs.expression;
     }
 
     bool useIntegerZoom = false;

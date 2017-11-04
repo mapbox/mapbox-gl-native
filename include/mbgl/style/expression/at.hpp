@@ -21,6 +21,13 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>&) const override;
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const At*>(&e)) {
+            return *index == *(rhs->index) && *input == *(rhs->input);
+        }
+        return false;
+    }
+
 private:
     std::unique_ptr<Expression> index;
     std::unique_ptr<Expression> input;

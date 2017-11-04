@@ -32,6 +32,10 @@ public:
                                          },
                                          input);
     }
+    
+    bool operator==(const ExponentialInterpolator& rhs) const {
+        return base == rhs.base;
+    }
 };
 
 class CubicBezierInterpolator {
@@ -40,6 +44,10 @@ public:
     
     double interpolationFactor(const Range<double>& inputLevels, const double input) const {
         return ub.solve(input / (inputLevels.max - inputLevels.min), 1e-6);
+    }
+    
+    bool operator==(const CubicBezierInterpolator& rhs) const {
+        return ub == rhs.ub;
     }
     
     util::UnitBezier ub;
@@ -109,6 +117,30 @@ public:
         for (auto it = stops.begin(); it != stops.end(); it++) {
             visit(it->second.get());
         }
+    }
+    
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const Interpolate*>(&e)) {
+            if (interpolator != rhs->interpolator ||
+                *input != *(rhs->input) ||
+                stops.size() != rhs->stops.size())
+            {
+                return false;
+            }
+            
+            for (auto leftChild = stops.begin(), rightChild = rhs->stops.begin();
+                 leftChild != stops.end();
+                 leftChild++, rightChild++)
+             {
+                 if (leftChild->first != rightChild->first ||
+                     *(leftChild->second) != *(rightChild->second))
+                 {
+                     return false;
+                 }
+             }
+             return true;
+        }
+        return false;
     }
     
     const std::unique_ptr<Expression>& getInput() const { return input; }

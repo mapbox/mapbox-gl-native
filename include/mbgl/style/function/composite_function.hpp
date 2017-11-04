@@ -106,7 +106,7 @@ public:
 
     friend bool operator==(const CompositeFunction& lhs,
                            const CompositeFunction& rhs) {
-        return lhs.expression == rhs.expression;
+        return *lhs.expression == *rhs.expression;
     }
 
     std::string property;

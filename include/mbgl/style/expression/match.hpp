@@ -27,6 +27,30 @@ public:
 
     void eachChild(const std::function<void(const Expression*)>& visit) const override;
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const Match*>(&e)) {
+            if (*input != *(rhs->input) ||
+                *otherwise != *(rhs->otherwise) ||
+                branches.size() != rhs->branches.size())
+            {
+                return false;
+            }
+            
+            for (auto leftChild = branches.begin(), rightChild = rhs->branches.begin();
+                 leftChild != branches.end();
+                 leftChild++, rightChild++)
+             {
+                 if (leftChild->first != rightChild->first ||
+                     *(leftChild->second) != *(rightChild->second))
+                 {
+                     return false;
+                 }
+             }
+             return true;
+        }
+        return false;
+    }
+
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     
 private:

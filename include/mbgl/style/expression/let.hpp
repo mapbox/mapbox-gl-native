@@ -25,7 +25,14 @@ public:
     
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>&) const override;
-    
+
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const Let*>(&e)) {
+            return *result == *(rhs->result);
+        }
+        return false;
+    }
+
     Expression* getResult() const {
         return result.get();
     }
@@ -48,6 +55,13 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>&) const override;
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const Var*>(&e)) {
+            return *value == *(rhs->value);
+        }
+        return false;
+    }
+    
 private:
     std::string name;
     std::shared_ptr<Expression> value;

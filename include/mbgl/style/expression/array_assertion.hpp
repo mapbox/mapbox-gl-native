@@ -23,6 +23,13 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>& visit) const override;
 
+    bool operator==(const Expression& e) const override {
+        if (auto rhs = dynamic_cast<const ArrayAssertion*>(&e)) {
+            return getType() == rhs->getType() && *input == *(rhs->input);
+        }
+        return false;
+    }
+
 private:
     std::unique_ptr<Expression> input;
 };
