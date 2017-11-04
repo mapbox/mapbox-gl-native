@@ -32,6 +32,13 @@ void Step::eachChild(const std::function<void(const Expression*)>& visit) const 
     }
 }
 
+bool Step::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Step*>(&e)) {
+        return *input == *(rhs->input) && Expression::childrenEqual(stops, rhs->stops);
+    }
+    return false;
+}
+
 Range<float> Step::getCoveringStops(const double lower, const double upper) const {
     return ::mbgl::style::expression::getCoveringStops(stops, lower, upper);
 }

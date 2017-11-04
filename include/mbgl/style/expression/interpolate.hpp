@@ -128,17 +128,7 @@ public:
                 return false;
             }
             
-            for (auto leftChild = stops.begin(), rightChild = rhs->stops.begin();
-                 leftChild != stops.end();
-                 leftChild++, rightChild++)
-             {
-                 if (leftChild->first != rightChild->first ||
-                     *(leftChild->second) != *(rightChild->second))
-                 {
-                     return false;
-                 }
-             }
-             return true;
+            return Expression::childrenEqual(stops, rhs->stops);
         }
         return false;
     }

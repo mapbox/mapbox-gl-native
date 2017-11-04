@@ -31,28 +31,7 @@ public:
     const std::unique_ptr<Expression>& getInput() const { return input; }
     Range<float> getCoveringStops(const double lower, const double upper) const;
 
-    bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Step*>(&e)) {
-            if (*input != *(rhs->input) ||
-                stops.size() != rhs->stops.size())
-            {
-                return false;
-            }
-            
-            for (auto leftChild = stops.begin(), rightChild = rhs->stops.begin();
-                 leftChild != stops.end();
-                 leftChild++, rightChild++)
-             {
-                 if (leftChild->first != rightChild->first ||
-                     *(leftChild->second) != *(rightChild->second))
-                 {
-                     return false;
-                 }
-             }
-             return true;
-        }
-        return false;
-    }
+    bool operator==(const Expression& e) const override;
 
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 

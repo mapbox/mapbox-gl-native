@@ -19,6 +19,13 @@ void Coalesce::eachChild(const std::function<void(const Expression*)>& visit) co
     }
 }
 
+bool Coalesce::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Coalesce*>(&e)) {
+        return Expression::childrenEqual(args, rhs->args);
+    }
+    return false;
+}
+
 using namespace mbgl::style::conversion;
 ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));

@@ -15,6 +15,17 @@ void Match<T>::eachChild(const std::function<void(const Expression*)>& visit) co
     visit(otherwise.get());
 }
 
+template <typename T>
+bool Match<T>::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Match*>(&e)) {
+        return (*input == *(rhs->input) &&
+                *otherwise == *(rhs->otherwise) &&
+                Expression::childrenEqual(branches, rhs->branches));
+    }
+    return false;
+}
+
+
 template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext& params) const {
     const EvaluationResult inputValue = input->evaluate(params);
     if (!inputValue) {

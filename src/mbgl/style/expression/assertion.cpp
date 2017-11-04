@@ -59,6 +59,13 @@ void Assertion::eachChild(const std::function<void(const Expression*)>& visit) c
     }
 };
 
+bool Assertion::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Assertion*>(&e)) {
+        return getType() == rhs->getType() && Expression::childrenEqual(inputs, rhs->inputs);
+    }
+    return false;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

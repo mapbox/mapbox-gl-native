@@ -123,6 +123,43 @@ public:
     type::Type getType() const { return type; };
     
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;
+
+protected:
+    template <typename T>
+    static bool childrenEqual(const T& lhs, const T& rhs) {
+        if (lhs.size() != rhs.size()) return false;
+        for (auto leftChild = lhs.begin(), rightChild = rhs.begin();
+             leftChild != lhs.end();
+             leftChild++, rightChild++)
+         {
+             if (!Expression::childEqual(*leftChild, *rightChild)) return false;
+         }
+         return true;
+    }
+    
+    static bool childEqual(const std::unique_ptr<Expression>& lhs, const std::unique_ptr<Expression>& rhs) {
+        return *lhs == *rhs;
+    }
+    
+    template <typename T>
+    static bool childEqual(const std::pair<T, std::unique_ptr<Expression>>& lhs,
+                           const std::pair<T, std::unique_ptr<Expression>>& rhs) {
+        return lhs.first == rhs.first && *(lhs.second) == *(rhs.second);
+    }
+    
+    template <typename T>
+    static bool childEqual(const std::pair<T, std::shared_ptr<Expression>>& lhs,
+                           const std::pair<T, std::shared_ptr<Expression>>& rhs) {
+        return lhs.first == rhs.first && *(lhs.second) == *(rhs.second);
+    }
+    
+    static bool childEqual(const std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>& lhs,
+                           const std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>& rhs) {
+        return *(lhs.first) == *(rhs.first) && *(lhs.second) == *(rhs.second);
+    }
+    
+    
+
 private:
     type::Type type;
 };

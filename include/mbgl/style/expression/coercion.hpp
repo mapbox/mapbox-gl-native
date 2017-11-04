@@ -22,19 +22,7 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression*)>& visit) const override;
 
-    bool operator==(const Expression& e) const override {
-        if (auto rhs = dynamic_cast<const Coercion*>(&e)) {
-            if (getType() != rhs->getType() || inputs.size() != rhs->inputs.size()) return false;
-            for (auto leftChild = inputs.begin(), rightChild = rhs->inputs.begin();
-                 leftChild != inputs.end();
-                 leftChild++, rightChild++)
-             {
-                 if (**leftChild != **rightChild) return false;
-             }
-             return true;
-        }
-        return false;
-    }
+    bool operator==(const Expression& e) const override;
 private:
     EvaluationResult (*coerceSingleValue) (const Value& v);
     std::vector<std::unique_ptr<Expression>> inputs;

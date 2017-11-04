@@ -128,6 +128,13 @@ void Coercion::eachChild(const std::function<void(const Expression*)>& visit) co
     }
 };
 
+bool Coercion::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Coercion*>(&e)) {
+        return getType() == rhs->getType() && Expression::childrenEqual(inputs, rhs->inputs);
+    }
+    return false;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

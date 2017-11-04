@@ -26,6 +26,13 @@ void Case::eachChild(const std::function<void(const Expression*)>& visit) const 
     visit(otherwise.get());
 }
 
+bool Case::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Case*>(&e)) {
+        return *otherwise == *(rhs->otherwise) && Expression::childrenEqual(branches, rhs->branches);
+    }
+    return false;
+}
+
 using namespace mbgl::style::conversion;
 ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));

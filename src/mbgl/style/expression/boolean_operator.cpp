@@ -19,6 +19,14 @@ void Any::eachChild(const std::function<void(const Expression*)>& visit) const {
     }
 }
 
+bool Any::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const Any*>(&e)) {
+        return Expression::childrenEqual(inputs, rhs->inputs);
+    }
+    return false;
+}
+
+
 EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
         const EvaluationResult result = (*it)->evaluate(params);
@@ -32,6 +40,13 @@ void All::eachChild(const std::function<void(const Expression*)>& visit) const {
     for (const std::unique_ptr<Expression>& input : inputs) {
         visit(input.get());
     }
+}
+
+bool All::operator==(const Expression& e) const {
+    if (auto rhs = dynamic_cast<const All*>(&e)) {
+        return Expression::childrenEqual(inputs, rhs->inputs);
+    }
+    return false;
 }
 
 using namespace mbgl::style::conversion;

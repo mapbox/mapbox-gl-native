@@ -103,19 +103,7 @@ public:
 
     bool operator==(const Expression& e) const override {
         if (auto rhs = dynamic_cast<const CompoundExpression*>(&e)) {
-            if (getName() != rhs->getName() ||
-                args.size() != rhs->args.size())
-            {
-                return false;
-            }
-            
-            for (auto leftChild = args.begin(), rightChild = rhs->args.begin();
-                 leftChild != args.end();
-                 leftChild++, rightChild++)
-             {
-                 if (**leftChild != **rightChild) return false;
-             }
-             return true;
+            return getName() == rhs->getName() && Expression::childrenEqual(args, rhs->args);
         }
         return false;
     }
