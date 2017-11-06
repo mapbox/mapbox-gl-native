@@ -50,7 +50,7 @@ void SymbolBucket::upload(gl::Context& context) {
         if (!dynamicUploaded) {
             text.dynamicVertexBuffer = context.createVertexBuffer(std::move(text.dynamicVertices), gl::BufferUsage::StreamDraw);
         }
-        if (!opacityUploaded) {
+        if (!placementChangesUploaded) {
             if (!text.opacityVertexBuffer) {
                 text.opacityVertexBuffer = context.createVertexBuffer(std::move(text.opacityVertices), gl::BufferUsage::StreamDraw);
             } else {
@@ -69,7 +69,7 @@ void SymbolBucket::upload(gl::Context& context) {
         if (!dynamicUploaded) {
             icon.dynamicVertexBuffer = context.createVertexBuffer(std::move(icon.dynamicVertices), gl::BufferUsage::StreamDraw);
         }
-        if (!opacityUploaded) {
+        if (!placementChangesUploaded) {
             if (!icon.opacityVertexBuffer) {
                 icon.opacityVertexBuffer = context.createVertexBuffer(std::move(icon.opacityVertices), gl::BufferUsage::StreamDraw);
             } else {
@@ -83,11 +83,11 @@ void SymbolBucket::upload(gl::Context& context) {
             collisionBox.indexBuffer = context.createIndexBuffer(std::move(collisionBox.lines));
             collisionBox.vertexBuffer = context.createVertexBuffer(std::move(collisionBox.vertices));
         }
-        if (!opacityUploaded) {
-            if (!collisionBox.opacityVertexBuffer) {
-                collisionBox.opacityVertexBuffer = context.createVertexBuffer(std::move(collisionBox.opacityVertices), gl::BufferUsage::StreamDraw);
+        if (!placementChangesUploaded) {
+            if (!collisionBox.dynamicVertexBuffer) {
+                collisionBox.dynamicVertexBuffer = context.createVertexBuffer(std::move(collisionBox.dynamicVertices), gl::BufferUsage::StreamDraw);
             } else {
-                context.updateVertexBuffer(*collisionBox.opacityVertexBuffer, std::move(collisionBox.opacityVertices));
+                context.updateVertexBuffer(*collisionBox.dynamicVertexBuffer, std::move(collisionBox.dynamicVertices));
             }
         }
     }
@@ -97,11 +97,11 @@ void SymbolBucket::upload(gl::Context& context) {
             collisionCircle.indexBuffer = context.createIndexBuffer(std::move(collisionCircle.triangles));
             collisionCircle.vertexBuffer = context.createVertexBuffer(std::move(collisionCircle.vertices));
         }
-        if (!opacityUploaded) {
-            if (!collisionCircle.opacityVertexBuffer) {
-                collisionCircle.opacityVertexBuffer = context.createVertexBuffer(std::move(collisionCircle.opacityVertices), gl::BufferUsage::StreamDraw);
+        if (!placementChangesUploaded) {
+            if (!collisionCircle.dynamicVertexBuffer) {
+                collisionCircle.dynamicVertexBuffer = context.createVertexBuffer(std::move(collisionCircle.dynamicVertices), gl::BufferUsage::StreamDraw);
             } else {
-                context.updateVertexBuffer(*collisionCircle.opacityVertexBuffer, std::move(collisionCircle.opacityVertices));
+                context.updateVertexBuffer(*collisionCircle.dynamicVertexBuffer, std::move(collisionCircle.dynamicVertices));
             }
         }
     }
@@ -115,7 +115,7 @@ void SymbolBucket::upload(gl::Context& context) {
     
     uploaded = true;
     staticUploaded = true;
-    opacityUploaded = true;
+    placementChangesUploaded = true;
     dynamicUploaded = true;
     sortUploaded = true;
 }
@@ -141,7 +141,7 @@ bool SymbolBucket::hasCollisionCircleData() const {
 }
 
 void SymbolBucket::updateOpacity() {
-    opacityUploaded = false;
+    placementChangesUploaded = false;
     uploaded = false;
 }
 

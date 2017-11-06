@@ -529,13 +529,15 @@ size_t SymbolLayout::addSymbol(Buffer& buffer,
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData));
     buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData));
     
+    // Dynamic/Opacity vertices are initialized so that the vertex count always agrees with
+    // the layout vertex buffer, but they will always be updated before rendering happens
     auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(labelAnchor.point, 0);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     buffer.dynamicVertices.emplace_back(dynamicVertex);
     
-    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0); // TODO: This data doesn't matter, it's just a kind-of-silly way to set the size of the opacity buffer
+    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0);
     buffer.opacityVertices.emplace_back(opacityVertex);
     buffer.opacityVertices.emplace_back(opacityVertex);
     buffer.opacityVertices.emplace_back(opacityVertex);
@@ -588,11 +590,13 @@ void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
                 collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
                 collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
 
-                auto opacityVertex = CollisionBoxOpacityAttributes::vertex(false, false); // TODO: This data doesn't matter, it's just a kind-of-silly way to set the size of the opacity buffer
-                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
-                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
-                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
-                collisionBuffer.opacityVertices.emplace_back(opacityVertex);
+                // Dynamic vertices are initialized so that the vertex count always agrees with
+                // the layout vertex buffer, but they will always be updated before rendering happens
+                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(false, false);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
 
                 if (feature.alongLine) {
                     bucket.collisionCircle.triangles.emplace_back(index, index + 1, index + 2);

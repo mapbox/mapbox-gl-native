@@ -208,8 +208,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
     // TODO check if this clear is necessary, whether the vector has been moved out
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
-    if (bucket.hasCollisionBoxData()) bucket.collisionBox.opacityVertices.clear();
-    if (bucket.hasCollisionCircleData()) bucket.collisionCircle.opacityVertices.clear();
+    if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
+    if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
@@ -249,17 +249,17 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
         auto updateCollisionBox = [&](const auto& feature, const bool placed) {
             for (const CollisionBox& box : feature.boxes) {
                 if (feature.alongLine) {
-                   auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, !box.used);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionCircle.opacityVertices.emplace_back(opacityVertex);
+                   auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, !box.used);
+                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionCircle.dynamicVertices.emplace_back(dynamicVertex);
                 } else {
-                    auto opacityVertex = CollisionBoxOpacityAttributes::vertex(placed, false);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
-                    bucket.collisionBox.opacityVertices.emplace_back(opacityVertex);
+                    auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(placed, false);
+                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
+                    bucket.collisionBox.dynamicVertices.emplace_back(dynamicVertex);
                 }
             }
         };

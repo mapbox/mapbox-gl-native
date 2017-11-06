@@ -237,7 +237,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gl::Lines { 1.0f },
                 gl::DepthMode::disabled(),
-                gl::StencilMode::disabled(), // TODO //parameters.stencilModeForClipping(tile.clip),
+                gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
@@ -245,7 +245,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionBox.vertexBuffer,
-                *bucket.collisionBox.opacityVertexBuffer,
+                *bucket.collisionBox.dynamicVertexBuffer,
                 *bucket.collisionBox.indexBuffer,
                 bucket.collisionBox.segments,
                 paintAttributeData,
@@ -271,7 +271,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
-                gl::StencilMode::disabled(), // TODO //parameters.stencilModeForClipping(tile.clip),
+                gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
@@ -279,7 +279,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionCircle.vertexBuffer,
-                *bucket.collisionCircle.opacityVertexBuffer,
+                *bucket.collisionCircle.dynamicVertexBuffer,
                 *bucket.collisionCircle.indexBuffer,
                 bucket.collisionCircle.segments,
                 paintAttributeData,

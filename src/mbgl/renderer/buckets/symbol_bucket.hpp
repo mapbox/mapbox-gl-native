@@ -67,7 +67,7 @@ public:
     optional<float> sortedAngle;
 
     bool staticUploaded = false;
-    bool opacityUploaded = false;
+    bool placementChangesUploaded = false;
     bool dynamicUploaded = false;
     bool sortUploaded = false;
 
@@ -112,11 +112,11 @@ public:
 
     struct CollisionBuffer {
         gl::VertexVector<CollisionBoxLayoutAttributes::Vertex> vertices;
-        gl::VertexVector<CollisionBoxOpacityAttributes::Vertex> opacityVertices;
+        gl::VertexVector<CollisionBoxDynamicAttributes::Vertex> dynamicVertices;
         SegmentVector<CollisionBoxProgram::Attributes> segments;
 
         optional<gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>> vertexBuffer;
-        optional<gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>> opacityVertexBuffer;
+        optional<gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>> dynamicVertexBuffer;
     };
 
     struct CollisionBoxBuffer : public CollisionBuffer {
