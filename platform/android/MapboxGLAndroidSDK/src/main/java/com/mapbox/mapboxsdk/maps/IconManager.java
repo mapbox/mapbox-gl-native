@@ -143,11 +143,14 @@ class IconManager {
   }
 
   void iconCleanup(Icon icon) {
-    int refCounter = iconMap.get(icon) - 1;
-    if (refCounter == 0) {
-      remove(icon);
-    } else {
-      updateIconRefCounter(icon, refCounter);
+    Integer refCounter = iconMap.get(icon);
+    if (refCounter != null) {
+      refCounter--;
+      if (refCounter == 0) {
+        remove(icon);
+      } else {
+        updateIconRefCounter(icon, refCounter);
+      }
     }
   }
 
