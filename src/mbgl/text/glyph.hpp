@@ -75,10 +75,10 @@ class Shaping {
     explicit Shaping(float x, float y, WritingModeType writingMode_)
         : top(y), bottom(y), left(x), right(x), writingMode(writingMode_) {}
     std::vector<PositionedGlyph> positionedGlyphs;
-    int32_t top = 0;
-    int32_t bottom = 0;
-    int32_t left = 0;
-    int32_t right = 0;
+    float top = 0;
+    float bottom = 0;
+    float left = 0;
+    float right = 0;
     WritingModeType writingMode;
 
     explicit operator bool() const { return !positionedGlyphs.empty(); }
