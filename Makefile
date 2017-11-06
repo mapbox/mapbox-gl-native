@@ -595,9 +595,9 @@ run-android-ui-test-%: run-android-ui-test-arm-v7-%
 # Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
 run-android-unit-test-%: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
 
 # Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
 .PHONY: run-android-ui-test-aws
@@ -654,7 +654,7 @@ android-lint-test-app: platform/android/configuration.gradle
 android-javadoc: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
-# Symbolicate ndk stack traces for the arm-v7 abi	
+# Symbolicate ndk stack traces for the arm-v7 abi
 .PHONY: android-ndk-stack
 android-ndk-stack: android-ndk-stack-arm-v7
 
