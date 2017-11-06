@@ -383,7 +383,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         placementChanged = newPlacement->commit(*placement, parameters.timePoint);
-        if (placementChanged) {
+        if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
 
