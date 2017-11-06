@@ -54,7 +54,7 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
         return ParseResult();
     }
     
-    // [step, input, first_output_value, 2 * (n pairs)...]
+    // [step, input, firstOutput_value, 2 * (n pairs)...]
     if ((length - 1) % 2 != 0) {
         ctx.error("Expected an even number of arguments.");
         return ParseResult();
@@ -75,20 +75,19 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
     
     // consume the first output value, which doesn't have a corresponding input value,
     // before proceeding into the "stops" loop below.
-    auto first_output = ctx.parse(arrayMember(value, 2), 2, outputType);
-    if (!first_output) {
+    auto firstOutput = ctx.parse(arrayMember(value, 2), 2, outputType);
+    if (!firstOutput) {
         return ParseResult();
     }
     if (!outputType) {
-        outputType = (*first_output)->getType();
+        outputType = (*firstOutput)->getType();
     }
-    stops.emplace(-std::numeric_limits<double>::infinity(), std::move(*first_output));
+    stops.emplace(-std::numeric_limits<double>::infinity(), std::move(*firstOutput));
     
     
     for (std::size_t i = 3; i + 1 < length; i += 2) {
         const optional<mbgl::Value> labelValue = toValue(arrayMember(value, i));
         optional<double> label;
-        optional<std::string> labelError;
         if (labelValue) {
             labelValue->match(
                 [&](uint64_t n) {
@@ -116,13 +115,11 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
             );
         }
         if (!label) {
-            ctx.error(labelError ? *labelError :
-                R"(Input/output pairs for "step" expressions must be defined using literal numeric values (not computed expressions) for the input values.)",
-                i);
+            ctx.error(R"(Input/output pairs for "step" expressions must be defined using literal numeric values (not computed expressions) for the input values.)", i);
             return ParseResult();
         }
         
-        if (*label < previous) {
+        if (*label <= previous) {
             ctx.error(
                 R"(Input/output pairs for "step" expressions must be arranged with input values in strictly ascending order.)",
                 i

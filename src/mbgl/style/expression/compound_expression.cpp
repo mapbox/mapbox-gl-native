@@ -173,17 +173,6 @@ struct Signature<Lambda, std::enable_if_t<std::is_class<Lambda>::value>>
 using Definition = CompoundExpressionRegistry::Definition;
 
 template <typename T>
-Result<T> assertion(const Value& v) {
-    if (!v.is<T>()) {
-        return EvaluationError {
-            "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
-            ", but found " + toString(typeOf(v)) + " instead."
-        };
-    }
-    return v.get<T>();
-}
-
-template <typename T>
 Result<bool> equal(const T& lhs, const T& rhs) { return lhs == rhs; }
 
 template <typename T>
@@ -205,10 +194,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("ln2", []() -> Result<double> { return 0.6931471805599453; });
 
     define("typeof", [](const Value& v) -> Result<std::string> { return toString(typeOf(v)); });
-    define("number", assertion<double>);
-    define("string", assertion<std::string>);
-    define("boolean", assertion<bool>);
-    define("object", assertion<std::unordered_map<std::string, Value>>);
     
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(

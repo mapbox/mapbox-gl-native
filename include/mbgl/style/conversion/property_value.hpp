@@ -8,6 +8,7 @@
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
+#include <mbgl/style/expression/find_zoom_curve.hpp>
 
 namespace mbgl {
 namespace style {
@@ -24,6 +25,10 @@ struct Converter<PropertyValue<T>> {
                 return {};
             }
             if (isFeatureConstant(expression->get())) {
+                if (!isZoomConstant(expression->get()) && !findZoomCurve<typename CameraFunction<T>::ExpressionType>(expression->get())) {
+                    error = { R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)" };
+                    return {};
+                }
                 return { CameraFunction<T>(std::move(*expression)) };
             } else {
                 error = { "property expressions not supported" };

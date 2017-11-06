@@ -18,20 +18,17 @@ type::Type typeOf(const Value& value) {
             optional<type::Type> itemType;
             for (const auto& item : arr) {
                 const type::Type t = typeOf(item);
-                const std::string tname = type::toString(t);
                 if (!itemType) {
                     itemType = {t};
-                } else if (type::toString(*itemType) == tname) {
+                } else if (*itemType == t) {
                     continue;
                 } else {
                     itemType = {type::Value};
                     break;
                 }
             }
-            
-            if (!itemType) { itemType = {type::Value}; }
 
-            return type::Array(*itemType, arr.size());
+            return type::Array(itemType.value_or(type::Value), arr.size());
         }
     );
 }
@@ -56,7 +53,7 @@ void writeJSON(rapidjson::Writer<rapidjson::StringBuffer>& writer, const Value& 
         [&] (const std::unordered_map<std::string, Value>& obj) {
             writer.StartObject();
             for(const auto& entry : obj) {
-                writer.String(entry.first);
+                writer.Key(entry.first.c_str());
                 writeJSON(writer, entry.second);
             }
             writer.EndObject();

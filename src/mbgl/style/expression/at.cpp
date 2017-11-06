@@ -15,8 +15,8 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
         return evaluatedInput.error();
     }
     
-    const auto i = *fromExpressionValue<double>(*evaluatedIndex);
-    const auto inputArray = *fromExpressionValue<std::vector<Value>>(*evaluatedInput);
+    const auto i = evaluatedIndex->get<double>();
+    const auto inputArray = evaluatedInput->get<std::vector<Value>>();
     
     if (i < 0 || i >= inputArray.size()) {
         return EvaluationError {
