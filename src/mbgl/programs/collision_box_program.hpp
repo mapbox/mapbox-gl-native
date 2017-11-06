@@ -17,7 +17,7 @@ using CollisionBoxLayoutAttributes = gl::Attributes<
     attributes::a_anchor_pos,
     attributes::a_extrude>;
 
-struct CollisionBoxOpacityAttributes : gl::Attributes<attributes::a_placed> {
+struct CollisionBoxDynamicAttributes : gl::Attributes<attributes::a_placed> {
     static Vertex vertex(bool placed, bool notUsed) {
         return Vertex {
             {{ static_cast<uint8_t>(placed), static_cast<uint8_t>(notUsed)  }}
@@ -28,7 +28,7 @@ struct CollisionBoxOpacityAttributes : gl::Attributes<attributes::a_placed> {
 class CollisionBoxProgram : public Program<
     shaders::collision_box,
     gl::Line,
-    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxOpacityAttributes>,
+    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
@@ -63,7 +63,7 @@ public:
 				gl::ColorMode colorMode,
 				const UniformValues& uniformValues,
 				const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-                const gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>& opacityVertexBuffer,
+                const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
 				const gl::IndexBuffer<DrawMode>& indexBuffer,
 				const SegmentVector<Attributes>& segments,
 				const PaintPropertyBinders& paintPropertyBinders,
@@ -74,10 +74,10 @@ public:
 				.concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
 			typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(CollisionBoxOpacityAttributes::bindings(opacityVertexBuffer))
+                .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
 				.concat(paintPropertyBinders.attributeBindings(currentProperties));
 
-            assert(layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+            assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
 
 			for (auto& segment : segments) {
 				auto vertexArrayIt = segment.vertexArrays.find(layerID);
@@ -107,7 +107,7 @@ public:
 class CollisionCircleProgram : public Program<
     shaders::collision_circle,
     gl::Triangle,
-    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxOpacityAttributes>,
+    gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
@@ -142,7 +142,7 @@ public:
                 gl::ColorMode colorMode,
                 const UniformValues& uniformValues,
                 const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-                const gl::VertexBuffer<CollisionBoxOpacityAttributes::Vertex>& opacityVertexBuffer,
+                const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
                 const gl::IndexBuffer<DrawMode>& indexBuffer,
                 const SegmentVector<Attributes>& segments,
                 const PaintPropertyBinders& paintPropertyBinders,
@@ -153,7 +153,7 @@ public:
                 .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
             typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(CollisionBoxOpacityAttributes::bindings(opacityVertexBuffer))
+                .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
                 .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
             for (auto& segment : segments) {
