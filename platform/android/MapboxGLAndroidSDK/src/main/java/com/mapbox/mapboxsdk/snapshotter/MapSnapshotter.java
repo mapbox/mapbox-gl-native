@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.os.Build;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,12 +16,14 @@ import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * The map snapshotter creates a bitmap of the map, rendered
@@ -278,8 +281,8 @@ public class MapSnapshotter {
     Bitmap original = snapshot.getBitmap();
     Canvas canvas = new Canvas(original);
     if (snapshot.isShowLogo()) {
-      Bitmap logo = addLogo(canvas, original);
-      addAttribution(canvas,logo,snapshot);
+      Logo logo = addLogo(canvas, original);
+      addAttribution(canvas, logo, snapshot);
     }
   }
 
@@ -289,11 +292,13 @@ public class MapSnapshotter {
    * @param canvas   the canvas to draw the bitmap on
    * @param original the map snapshot image
    */
-  private Bitmap addLogo(Canvas canvas, Bitmap original) {
+  private Logo addLogo(Canvas canvas, Bitmap original) {
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
     float margin = displayMetrics.density * LOGO_MARGIN_DP;
-    Bitmap logo = createScaledLogo(original);
-    canvas.drawBitmap(logo, margin, original.getHeight() - logo.getHeight() - margin, null);
+    Logo logo = createScaledLogo(original);
+    logo.setLeft(margin);
+    logo.setTop(original.getHeight() - logo.bitmap.getHeight() - margin);
+    canvas.drawBitmap(logo.bitmap, logo.left, logo.top, null);
     return logo;
   }
 
@@ -303,7 +308,9 @@ public class MapSnapshotter {
    * @param canvas      the canvas to draw the attribution on
    * @param mapSnapshot the map snapshot
    */
-  private void addAttribution(Canvas canvas, Bitmap logo, MapSnapshot mapSnapshot) {
+  private void addAttribution(Canvas canvas, Logo logo, MapSnapshot mapSnapshot) {
+    DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
+    int margin = (int) displayMetrics.density * LOGO_MARGIN_DP;
     Bitmap original = mapSnapshot.getBitmap();
     TextView textView = new TextView(context);
     textView.setLayoutParams(new ViewGroup.LayoutParams(
@@ -311,17 +318,48 @@ public class MapSnapshotter {
       ViewGroup.LayoutParams.WRAP_CONTENT)
     );
     textView.setSingleLine(true);
-    textView.setTextSize(14);
+    textView.setTextSize(11 * logo.scale);
+    textView.setText(Html.fromHtml(createAttribution(mapSnapshot)));
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      textView.setClipToOutline(true);
+    }
+    canvas.save();
+    int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(original.getWidth(), View.MeasureSpec.AT_MOST);
+    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+    textView.setPadding(margin, 0, margin, margin);
+    textView.setBackgroundResource(R.drawable.mapbox_rounded_corner);
+    textView.measure(widthMeasureSpec, heightMeasureSpec);
+    textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
+    canvas.translate(logo.getWidth(), logo.getTop());
+    textView.draw(canvas);
+    canvas.restore();
+  }
+
+  private String createAttribution(MapSnapshot mapSnapshot) {
+    String[] urls = parseAttribution(mapSnapshot);
+    return filterAttribution(urls);
+  }
+
+  private String[] parseAttribution(MapSnapshot mapSnapshot) {
+    StringBuilder builder = new StringBuilder();
     for (String attr : mapSnapshot.getAttributions()) {
       if (!attr.isEmpty()) {
-        textView.setText(fromHtml(attr));
-        int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(original.getWidth(), View.MeasureSpec.AT_MOST);
-        int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
-        textView.measure(widthMeasureSpec, heightMeasureSpec);
-        textView.layout(0, 0, original.getWidth(), original.getHeight());
-        textView.draw(canvas);
+        builder.append(attr);
       }
     }
+    return builder.toString().split("(?=<a)");
+  }
+
+  private String filterAttribution(String[] urls) {
+    StringBuilder output = new StringBuilder();
+    List<String> uniqueList = new ArrayList<>();
+    for (String url : urls) {
+      if (!url.isEmpty() && !url.contains("mapbox-improve-map") && !uniqueList.contains(url)) {
+        output.append(url);
+        uniqueList.add(url);
+      }
+    }
+    return output.toString();
   }
 
   /**
@@ -346,12 +384,12 @@ public class MapSnapshotter {
    * @param snapshot the map snapshot where the logo should be placed on
    * @return the scaled bitmap logo
    */
-  private Bitmap createScaledLogo(Bitmap snapshot) {
+  private Logo createScaledLogo(Bitmap snapshot) {
     Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, null);
     float scale = calculateLogoScale(snapshot, logo);
     Matrix matrix = new Matrix();
     matrix.postScale(scale, scale);
-    return Bitmap.createBitmap(logo, 0, 0, logo.getWidth(), logo.getHeight(), matrix, true);
+    return new Logo(Bitmap.createBitmap(logo, 0, 0, logo.getWidth(), logo.getHeight(), matrix, true), scale);
   }
 
   /**
@@ -420,4 +458,44 @@ public class MapSnapshotter {
 
   @Override
   protected native void finalize() throws Throwable;
+
+  private class Logo {
+    Bitmap bitmap;
+    float left;
+    float top;
+    float scale;
+
+    public Logo(Bitmap bitmap, float scale) {
+      this.bitmap = bitmap;
+      this.scale = scale;
+    }
+
+    public Bitmap getBitmap() {
+      return bitmap;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+      this.bitmap = bitmap;
+    }
+
+    public float getLeft() {
+      return left;
+    }
+
+    public void setLeft(float left) {
+      this.left = left;
+    }
+
+    public float getTop() {
+      return top;
+    }
+
+    public void setTop(float top) {
+      this.top = top;
+    }
+
+    public int getWidth() {
+      return (int) (left + bitmap.getWidth() + left + left + left);
+    }
+  }
 }
