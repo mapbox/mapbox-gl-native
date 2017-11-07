@@ -290,9 +290,7 @@ void SymbolLayout::addFeature(const std::size_t index,
     const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
-    const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
+
     const float textRepeatDistance = symbolSpacing / 2;
     IndexedSubfeature indexedFeature = { feature.index, sourceID, sourceLayer->getName(), bucketName,
                                          symbolInstances.size(), tileID.canonical.z, tileID.canonical.x, tileID.canonical.y };
@@ -323,7 +321,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                     layout.evaluate(zoom, feature), layoutTextSize,
                     symbolInstances.size(),
                     textBoxScale, textPadding, textPlacement, textOffset,
-                    iconBoxScale, iconPadding, iconPlacement, iconOffset,
+                    iconBoxScale, iconPadding, iconOffset,
                     glyphPositionMap, indexedFeature, index, feature.text ? *feature.text : std::u16string{}, overscaling);
         }
     };

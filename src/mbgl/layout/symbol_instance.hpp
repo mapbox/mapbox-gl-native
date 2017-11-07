@@ -26,7 +26,6 @@ public:
                    const std::array<float, 2> textOffset,
                    const float iconBoxScale,
                    const float iconPadding,
-                   style::SymbolPlacementType iconPlacement,
                    const std::array<float, 2> iconOffset,
                    const GlyphPositionMap&,
                    const IndexedSubfeature&,

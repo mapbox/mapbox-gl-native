@@ -18,7 +18,6 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
                                const std::array<float, 2> textOffset_,
                                const float iconBoxScale,
                                const float iconPadding,
-                               const SymbolPlacementType, // TODO: vestigial?
                                const std::array<float, 2> iconOffset_,
                                const GlyphPositionMap& positions,
                                const IndexedSubfeature& indexedFeature,
