@@ -76,7 +76,7 @@ TEST(VectorTile, Issue7615) {
         std::map<
             std::string,
             std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>(),
-        16.0f, 1.0f, 0.0f, false, false, false, symbolInstances);
+        16.0f, 1.0f, 0.0f, false, false, false, std::move(symbolInstances));
     
     // Simulate placement of a symbol layer.
     tile.onPlacement(GeometryTile::PlacementResult {
