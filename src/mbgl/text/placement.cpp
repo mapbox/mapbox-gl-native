@@ -212,7 +212,6 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
-        // TODO check if hasText is the right thing here, or if there are cases where hasText is true but it's not added to the buffers
         if (symbolInstance.hasText) {
             auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
             for (size_t i = 0; i < symbolInstance.horizontalGlyphQuads.size() * 4; i++) {
