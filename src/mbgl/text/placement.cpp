@@ -32,9 +32,9 @@ bool JointOpacityState::isHidden() const {
 
 Placement::Placement(const TransformState& state_, MapMode mapMode_)
     : collisionIndex(state_)
-    , recentUntil(TimePoint::min())
     , state(state_)
     , mapMode(mapMode_)
+    , recentUntil(TimePoint::min())
 {}
 
 void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
@@ -291,5 +291,22 @@ float Placement::symbolFadeChange(TimePoint now) const {
 bool Placement::hasTransitions(TimePoint now) const {
     return symbolFadeChange(now) < 1.0 || stale;
 }
+
+bool Placement::stillRecent(TimePoint now) const {
+    return mapMode == MapMode::Continuous && recentUntil > now;
+}
+void Placement::setRecent(TimePoint now) {
+    stale = false;
+    if (mapMode == MapMode::Continuous) {
+        // Only set in continuous mode because "now" isn't defined in still mode
+        recentUntil = now + Duration(std::chrono::milliseconds(300));
+    }
+}
+
+void Placement::setStale() {
+    stale = true;
+}
+
+
 
 } // namespace mbgl

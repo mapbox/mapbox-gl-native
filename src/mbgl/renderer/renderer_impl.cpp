@@ -374,7 +374,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     bool placementChanged = false;
-    if (placement->recentUntil <= parameters.timePoint || updateParameters.mode == MapMode::Still) {
+    if (!placement->stillRecent(parameters.timePoint)) {
         auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
             if (it->layer.is<RenderSymbolLayer>()) {
@@ -387,10 +387,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             placement = std::move(newPlacement);
         }
 
-        placement->stale = false;
-        placement->recentUntil = parameters.timePoint + Duration(std::chrono::milliseconds(300));
+        placement->setRecent(parameters.timePoint);
     } else {
-        placement->stale = true;
+        placement->setStale();
     }
 
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
