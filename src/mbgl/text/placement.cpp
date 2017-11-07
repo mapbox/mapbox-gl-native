@@ -102,10 +102,8 @@ void Placement::placeLayerBucket(
             bool placeText = false;
             bool placeIcon = false;
 
-            if (symbolInstance.placedTextIndices.size()) {
-                assert(symbolInstance.placedTextIndices.size() != 0);
-
-                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(symbolInstance.placedTextIndices.at(0));
+            if (symbolInstance.placedTextIndex) {
+                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*symbolInstance.placedTextIndex);
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
 
                 placeText = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
@@ -116,9 +114,8 @@ void Placement::placeLayerBucket(
                         showCollisionBoxes);
             }
 
-            if (symbolInstance.placedIconIndices.size()) {
-
-                PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(symbolInstance.placedIconIndices.at(0));
+            if (symbolInstance.placedIconIndex) {
+                PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
 
                 placeIcon = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
@@ -227,9 +224,11 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
             for (size_t i = 0; i < symbolInstance.verticalGlyphQuads.size() * 4; i++) {
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
-            // TODO On JS we avoid setting this if it hasn't chnaged, but it may be cheap enough here we don't care
-            for (auto index : symbolInstance.placedTextIndices) {
-                bucket.text.placedSymbols[index].hidden = opacityState.isHidden();
+            if (symbolInstance.placedTextIndex) {
+                bucket.text.placedSymbols[*symbolInstance.placedTextIndex].hidden = opacityState.isHidden();
+            }
+            if (symbolInstance.placedVerticalTextIndex) {
+                bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
             }
         }
         if (symbolInstance.hasIcon) {
@@ -240,9 +239,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
             }
-            // TODO On JS we avoid setting this if it hasn't chnaged, but it may be cheap enough here we don't care
-            for (auto index : symbolInstance.placedIconIndices) {
-                bucket.icon.placedSymbols[index].hidden = opacityState.isHidden();
+            if (symbolInstance.placedIconIndex) {
+                bucket.icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
             }
         }
         
