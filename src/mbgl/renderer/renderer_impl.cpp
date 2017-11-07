@@ -256,8 +256,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         renderLight.getEvaluated(),
         *staticData,
         *imageManager,
-        *lineAtlas,
-        updateParameters.timePoint // TODO set this only when committing placement
+        *lineAtlas
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();

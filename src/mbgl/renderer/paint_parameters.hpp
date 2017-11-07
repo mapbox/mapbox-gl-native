@@ -32,8 +32,7 @@ public:
                     const EvaluatedLight&,
                     RenderStaticData&,
                     ImageManager&,
-                    LineAtlas&,
-                    TimePoint placementCommitTime);
+                    LineAtlas&);
 
     gl::Context& context;
     RendererBackend& backend;
