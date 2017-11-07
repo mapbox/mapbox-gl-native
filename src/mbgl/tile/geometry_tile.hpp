@@ -31,6 +31,8 @@ public:
                  const TileParameters&);
 
     ~GeometryTile() override;
+    
+    bool isFullyRenderable() const override;
 
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);

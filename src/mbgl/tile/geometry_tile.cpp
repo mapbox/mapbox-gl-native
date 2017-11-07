@@ -68,6 +68,10 @@ GeometryTile::~GeometryTile() {
     markObsolete();
 }
 
+bool GeometryTile::isFullyRenderable() const {
+    return renderable && !symbolBuckets.empty();
+}
+
 void GeometryTile::cancel() {
     markObsolete();
 }
@@ -125,11 +129,11 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
 }
 
 void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
-    // Don't mark ourselves loaded or renderable until the first successful placement
-    // TODO: Ideally we'd render this tile without symbols as long as this tile wasn't
-    //  replacing a tile at a different zoom that _did_ have symbols.
+    loaded = true;
+    renderable = true;
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
+    symbolBuckets.clear();
     featureIndex = std::move(result.featureIndex);
     data = std::move(result.tileData);
     observer->onTileChanged(*this);

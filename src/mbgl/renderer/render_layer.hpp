@@ -1,12 +1,15 @@
 #pragma once
 
 #include <mbgl/renderer/render_pass.hpp>
+#include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 
 #include <memory>
 #include <string>
+
+#include <iostream>
 
 namespace mbgl {
 
@@ -62,6 +65,14 @@ public:
     bool needsRendering(float zoom) const;
 
     virtual void render(PaintParameters&, RenderSource*) = 0;
+    void render(PaintParameters& parameters, RenderSource* source, const std::map<UnwrappedTileID, ClipID>& clipIDs) {
+        for (const RenderTile& tile : renderTiles) {
+            if (clipIDs.find(tile.id) == clipIDs.end()) {
+                std::cout << "Rendering tile without a clipping mask!" << std::endl;
+            }
+        }
+        render(parameters, source);
+    }
 
     // Check wether the given geometry intersects
     // with the feature

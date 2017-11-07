@@ -418,6 +418,8 @@ void GeometryTileWorker::attemptPlacement() {
             buckets.emplace(pair.first, bucket);
         }
     }
+    
+    //std::this_thread::sleep_for(Milliseconds(1500));
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),

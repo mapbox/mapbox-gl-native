@@ -52,6 +52,7 @@ std::unique_ptr<Tile> TileCache::get(const OverscaledTileID& key) {
     }
 
     return tile;
+    //return std::unique_ptr<Tile>();
 }
 
 bool TileCache::has(const OverscaledTileID& key) {

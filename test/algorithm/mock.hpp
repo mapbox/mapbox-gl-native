@@ -33,12 +33,17 @@ struct MockTileData {
     bool isRenderable() const {
         return renderable;
     }
+    
+    bool isFullyRenderable() const {
+        return fullyRenderable;
+    }
 
     bool isLoaded() const {
         return loaded;
     }
 
     bool renderable = false;
+    bool fullyRenderable = false;
     bool triedOptional = false;
     bool loaded = false;
     const mbgl::OverscaledTileID tileID;

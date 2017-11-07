@@ -79,6 +79,10 @@ public:
     bool isRenderable() const {
         return renderable;
     }
+    
+    virtual bool isFullyRenderable() const {
+        return renderable;
+    }
 
     // A tile is "Loaded" when we have received a response from a FileSource, and have attempted to
     // parse the tile (if applicable). Tile implementations should set this to true when a load

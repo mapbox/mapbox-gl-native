@@ -29,6 +29,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <iostream>
+
 namespace mbgl {
 
 using namespace style;
@@ -233,12 +235,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
             filteredLayers.push_back(layer);
         }
+//
+//        for (auto renderTile : renderSources.at(source->id)->getRenderTiles()) {
+//            //std::cout << source->id << " renderTile " << renderTile.get().id << std::endl;
+//        }
 
         renderSources.at(source->id)->update(source,
                                              filteredLayers,
                                              needsRendering,
                                              needsRelayout,
                                              tileParameters);
+        
+//         for (auto renderTile : renderSources.at(source->id)->getRenderTiles()) {
+//            //std::cout << source->id << " renderTile clip " << renderTile.get().clip << std::endl;
+//        }
+
     }
 
     transformState = updateParameters.transformState;
@@ -457,6 +468,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                       0);
     }
 
+    auto clipIDs = parameters.clipIDGenerator.getClipIDs();
     // - CLIPPING MASKS ----------------------------------------------------------------------------
     // Draws the clipping masks to the stencil buffer.
     {
@@ -464,8 +476,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         static const style::FillPaintProperties::PossiblyEvaluated properties {};
         static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+        
+        
+        //std::cout << "Drawing clipping masks" << std::endl;
+        
 
-        for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
+
+        for (const auto& clipID : clipIDs) {
+           // std::cout << clipID.first << ", " << clipID.second << std::endl;
             parameters.staticData.programs.fill.get(properties).draw(
                 parameters.context,
                 gl::Triangles(),
@@ -556,7 +574,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
-                it->layer.render(parameters, it->source);
+                it->layer.render(parameters, it->source, clipIDs);
             }
         }
     }
