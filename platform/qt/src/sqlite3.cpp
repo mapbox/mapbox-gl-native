@@ -102,7 +102,6 @@ public:
 class StatementImpl {
 public:
     StatementImpl(const QString& sql, const QSqlDatabase& db) : query(db) {
-        query.setForwardOnly(true);
         if (!query.prepare(sql)) {
             checkQueryError(query);
         }
@@ -170,8 +169,8 @@ void Database::exec(const std::string &sql) {
             statement.append(';');
         }
         QSqlQuery query(*impl->db);
-        query.setForwardOnly(true);
         query.prepare(statement);
+
         if (!query.exec()) {
             checkQueryError(query);
         }
@@ -296,12 +295,11 @@ void Statement::bindBlob(int offset, const std::vector<uint8_t>& value, bool ret
 
 bool Statement::run() {
     assert(impl);
+
     if (impl->query.isValid()) {
         return impl->query.next();
     }
 
-    assert(!impl->query.isActive());
-    impl->query.setForwardOnly(true);
     if (!impl->query.exec()) {
         checkQueryError(impl->query);
     }
