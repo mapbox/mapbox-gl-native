@@ -133,7 +133,7 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
             return ParseResult();
         }
         
-        if (*label < previous) {
+        if (*label <= previous) {
             ctx.error(
                 R"(Input/output pairs for "interpolate" expressions must be arranged with input values in strictly ascending order.)",
                 i
