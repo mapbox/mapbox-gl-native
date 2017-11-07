@@ -88,8 +88,6 @@ void Placement::placeLayerBucket(
         const bool showCollisionBoxes,
         std::unordered_set<uint32_t>& seenCrossTileIDs) {
 
-    // TODO collision debug array clearing
-
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
