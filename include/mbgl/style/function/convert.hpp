@@ -35,7 +35,7 @@ namespace detail {
 class ErrorExpression : public Expression {
 public:
     ErrorExpression(std::string message_) : Expression(type::Error), message(std::move(message_)) {}
-    void eachChild(const std::function<void(const Expression*)>&) const override {}
+    void eachChild(const std::function<void(const Expression&)>&) const override {}
     
     bool operator==(const Expression& e) const override {
         return dynamic_cast<const ErrorExpression*>(&e);

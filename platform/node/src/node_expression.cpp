@@ -218,13 +218,13 @@ void NodeExpression::GetType(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 void NodeExpression::IsFeatureConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
-    info.GetReturnValue().Set(Nan::New(isFeatureConstant(expression.get())));
+    info.GetReturnValue().Set(Nan::New(isFeatureConstant(*expression)));
 }
 
 void NodeExpression::IsZoomConstant(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
-    info.GetReturnValue().Set(Nan::New(isZoomConstant(expression.get())));
+    info.GetReturnValue().Set(Nan::New(isZoomConstant(*expression)));
 }
 
 } // namespace node_mbgl

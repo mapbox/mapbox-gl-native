@@ -25,20 +25,20 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-bool isConstant(const Expression* expression) {
-    if (dynamic_cast<const Var*>(expression)) {
+bool isConstant(const Expression& expression) {
+    if (dynamic_cast<const Var*>(&expression)) {
         return false;
     }
     
-    if (auto compound = dynamic_cast<const CompoundExpressionBase*>(expression)) {
+    if (auto compound = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
         if (compound->getName() == "error") {
             return false;
         }
     }
     
     bool literalArgs = true;
-    expression->eachChild([&](const Expression* child) {
-        if (!dynamic_cast<const Literal*>(child)) {
+    expression.eachChild([&](const Expression& child) {
+        if (!dynamic_cast<const Literal*>(&child)) {
             literalArgs = false;
         }
     });
@@ -154,7 +154,7 @@ ParseResult ParsingContext::parse(const Convertible& value)
     // If an expression's arguments are all literals, we can evaluate
     // it immediately and replace it with a literal value in the
     // parsed result.
-    if (parsed && !dynamic_cast<Literal *>(parsed->get()) && isConstant(parsed->get())) {
+    if (parsed && !dynamic_cast<Literal *>(parsed->get()) && isConstant(**parsed)) {
         EvaluationContext params(nullptr);
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {

@@ -32,8 +32,8 @@ public:
     SourceFunction(std::unique_ptr<expression::Expression> expression_)
         : expression(std::move(expression_))
     {
-        assert(isZoomConstant(expression.get()));
-        assert(!isFeatureConstant(expression.get()));
+        assert(expression::isZoomConstant(*expression));
+        assert(!expression::isFeatureConstant(*expression));
     }
     
     SourceFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})

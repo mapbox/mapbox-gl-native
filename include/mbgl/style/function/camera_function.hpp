@@ -33,8 +33,8 @@ public:
         : expression(std::move(expression_)),
           zoomCurve(*expression::findZoomCurve<ExpressionType>(expression.get()))
     {
-        assert(!isZoomConstant(expression.get()));
-        assert(isFeatureConstant(expression.get()));
+        assert(!expression::isZoomConstant(*expression));
+        assert(expression::isFeatureConstant(*expression));
     }
 
     CameraFunction(Stops stops_)

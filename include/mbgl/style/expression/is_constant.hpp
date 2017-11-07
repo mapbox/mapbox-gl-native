@@ -8,8 +8,8 @@ namespace style {
 namespace expression {
 
 template <typename T>
-bool isGlobalPropertyConstant(const Expression* expression, const T& properties) {
-    if (auto e = dynamic_cast<const CompoundExpressionBase*>(expression)) {
+bool isGlobalPropertyConstant(const Expression& expression, const T& properties) {
+    if (auto e = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
         for (const std::string& property : properties) {
             if (e->getName() == property) {
                 return false;
@@ -18,7 +18,7 @@ bool isGlobalPropertyConstant(const Expression* expression, const T& properties)
     }
     
     bool isConstant = true;
-    expression->eachChild([&](const Expression* e) {
+    expression.eachChild([&](const Expression& e) {
         if (isConstant && !isGlobalPropertyConstant(e, properties)) {
             isConstant = false;
         }
@@ -26,8 +26,8 @@ bool isGlobalPropertyConstant(const Expression* expression, const T& properties)
     return isConstant;
 };
 
-bool isFeatureConstant(const Expression* expression);
-bool isZoomConstant(const Expression* e);
+bool isFeatureConstant(const Expression& expression);
+bool isZoomConstant(const Expression& e);
 
 
 } // namespace expression

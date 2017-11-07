@@ -122,9 +122,9 @@ EvaluationResult Coercion::evaluate(const EvaluationContext& params) const {
     return EvaluationError { "Unreachable" };
 };
 
-void Coercion::eachChild(const std::function<void(const Expression*)>& visit) const {
+void Coercion::eachChild(const std::function<void(const Expression&)>& visit) const {
     for(const std::unique_ptr<Expression>& input : inputs) {
-        visit(input.get());
+        visit(*input);
     }
 };
 

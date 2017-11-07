@@ -24,7 +24,7 @@ public:
     static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
     
     EvaluationResult evaluate(const EvaluationContext& params) const override;
-    void eachChild(const std::function<void(const Expression*)>&) const override;
+    void eachChild(const std::function<void(const Expression&)>&) const override;
 
     bool operator==(const Expression& e) const override {
         if (auto rhs = dynamic_cast<const Let*>(&e)) {
@@ -53,7 +53,7 @@ public:
     static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
-    void eachChild(const std::function<void(const Expression*)>&) const override;
+    void eachChild(const std::function<void(const Expression&)>&) const override;
 
     bool operator==(const Expression& e) const override {
         if (auto rhs = dynamic_cast<const Var*>(&e)) {

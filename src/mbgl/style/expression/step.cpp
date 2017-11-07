@@ -25,10 +25,10 @@ EvaluationResult Step::evaluate(const EvaluationContext& params) const {
     }
 }
 
-void Step::eachChild(const std::function<void(const Expression*)>& visit) const {
-    visit(input.get());
+void Step::eachChild(const std::function<void(const Expression&)>& visit) const {
+    visit(*input);
     for (auto it = stops.begin(); it != stops.end(); it++) {
-        visit(it->second.get());
+        visit(*it->second);
     }
 }
 

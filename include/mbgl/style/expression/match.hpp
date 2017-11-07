@@ -25,7 +25,7 @@ public:
         otherwise(std::move(otherwise_))
     {}
 
-    void eachChild(const std::function<void(const Expression*)>& visit) const override;
+    void eachChild(const std::function<void(const Expression&)>& visit) const override;
 
     bool operator==(const Expression& e) const override;
 

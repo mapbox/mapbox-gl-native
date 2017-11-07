@@ -114,7 +114,7 @@ public:
     virtual ~Expression() = default;
     
     virtual EvaluationResult evaluate(const EvaluationContext& params) const = 0;
-    virtual void eachChild(const std::function<void(const Expression*)>&) const = 0;
+    virtual void eachChild(const std::function<void(const Expression&)>&) const = 0;
     virtual bool operator==(const Expression&) const = 0;
     bool operator!=(const Expression& rhs) const {
         return !operator==(rhs);

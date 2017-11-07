@@ -32,9 +32,9 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     return inputArray[static_cast<std::size_t>(i)];
 }
 
-void At::eachChild(const std::function<void(const Expression*)>& visit) const {
-    visit(index.get());
-    visit(input.get());
+void At::eachChild(const std::function<void(const Expression&)>& visit) const {
+    visit(*index);
+    visit(*input);
 }
 
 using namespace mbgl::style::conversion;

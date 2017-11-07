@@ -7,12 +7,12 @@ namespace style {
 namespace expression {
 
 template <typename T>
-void Match<T>::eachChild(const std::function<void(const Expression*)>& visit) const {
-    visit(input.get());
+void Match<T>::eachChild(const std::function<void(const Expression&)>& visit) const {
+    visit(*input);
     for (const std::pair<T, std::shared_ptr<Expression>>& branch : branches) {
-        visit(branch.second.get());
+        visit(*branch.second);
     }
-    visit(otherwise.get());
+    visit(*otherwise);
 }
 
 template <typename T>

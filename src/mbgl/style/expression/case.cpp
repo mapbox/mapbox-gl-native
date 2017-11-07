@@ -18,12 +18,12 @@ EvaluationResult Case::evaluate(const EvaluationContext& params) const {
     return otherwise->evaluate(params);
 }
 
-void Case::eachChild(const std::function<void(const Expression*)>& visit) const {
+void Case::eachChild(const std::function<void(const Expression&)>& visit) const {
     for (const Branch& branch : branches) {
-        visit(branch.first.get());
-        visit(branch.second.get());
+        visit(*branch.first);
+        visit(*branch.second);
     }
-    visit(otherwise.get());
+    visit(*otherwise);
 }
 
 bool Case::operator==(const Expression& e) const {

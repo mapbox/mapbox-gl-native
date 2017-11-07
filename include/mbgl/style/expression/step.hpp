@@ -26,7 +26,7 @@ public:
     {}
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
-    void eachChild(const std::function<void(const Expression*)>& visit) const override;
+    void eachChild(const std::function<void(const Expression&)>& visit) const override;
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
     Range<float> getCoveringStops(const double lower, const double upper) const;

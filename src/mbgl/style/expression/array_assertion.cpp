@@ -21,8 +21,8 @@ EvaluationResult ArrayAssertion::evaluate(const EvaluationContext& params) const
     return *result;
 }
 
-void ArrayAssertion::eachChild(const std::function<void(const Expression*)>& visit) const {
-    visit(input.get());
+void ArrayAssertion::eachChild(const std::function<void(const Expression&)>& visit) const {
+    visit(*input);
 }
 
 using namespace mbgl::style::conversion;
