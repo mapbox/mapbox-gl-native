@@ -81,19 +81,13 @@ public:
 
     friend std::string layoutKey(const RenderLayer&);
 
-    // TODO should this not be public?
-    //Stores current set of tiles to be rendered for this layer.
+    // Stores current set of tiles to be rendered for this layer.
     std::vector<std::reference_wrapper<RenderTile>> renderTiles;
 
 protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
-
-    // TODO: Placement needs access to the renderTiles -- figure out how best to coordinate
-    friend class LayerPlacementState;
-
-
 };
 
 } // namespace mbgl
