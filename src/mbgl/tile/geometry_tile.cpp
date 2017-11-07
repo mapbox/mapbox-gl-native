@@ -284,7 +284,7 @@ void GeometryTile::querySourceFeatures(
 
 void GeometryTile::resetCrossTileIDs() {
     for (auto& bucket : symbolBuckets) {
-        SymbolBucket* symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
+        auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
         if (symbolBucket && symbolBucket->bucketInstanceId) {
             symbolBucket->bucketInstanceId = 0;
             for (auto& symbolInstance : symbolBucket->symbolInstances) {
