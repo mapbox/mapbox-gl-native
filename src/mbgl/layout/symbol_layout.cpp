@@ -394,7 +394,8 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
     return false;
 }
 
-// TODO: this is a weird naive port of JS code; think harder about what makes sense in native
+// Analog of `addToLineVertexArray` in JS. This version doesn't need to build up a line array like the
+// JS version does, but it uses the same logic to calculate tile distances.
 std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
     std::vector<float> tileDistances(line.size());
     if (anchor.segment != -1) {
