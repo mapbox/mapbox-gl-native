@@ -91,7 +91,6 @@ bool GridIndex<T>::hitTest(const BBox& queryBBox) const {
     return hit;
 }
 
-// TODO: templatize this on geometry type
 template <class T>
 bool GridIndex<T>::hitTest(const BCircle& queryBCircle) const {
     bool hit = false;

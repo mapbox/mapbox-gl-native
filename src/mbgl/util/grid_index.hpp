@@ -8,14 +8,14 @@
 #include <vector>
 #include <functional>
 
-// TODO: Move into geometry.hpp project
-namespace mapbox {
+namespace mbgl {
+
 namespace geometry {
 
 template <typename T>
 struct circle
 {
-    using point_type = point<T>;
+    using point_type = mapbox::geometry::point<T>;
 
     constexpr circle(point_type const& center_, T const& radius_)
         : center(center_), radius(radius_)
@@ -38,9 +38,7 @@ constexpr bool operator!=(circle<T> const& lhs, circle<T> const& rhs)
 }
 
 } // namespace geometry
-} // namespace mapbox
 
-namespace mbgl {
 
 /*
  GridIndex is a data structure for testing the intersection of
@@ -57,10 +55,11 @@ namespace mbgl {
 template <class T>
 class GridIndex {
 public:
+
     GridIndex(const float width_, const float height_, const int16_t cellSize_);
 
     using BBox = mapbox::geometry::box<float>;
-    using BCircle = mapbox::geometry::circle<float>;
+    using BCircle = geometry::circle<float>;
 
     void insert(T&& t, const BBox&);
     void insert(T&& t, const BCircle&);
