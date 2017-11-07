@@ -1,26 +1,19 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportFragmentV4
-    compile rootProject.ext.dep.timber
-    compile rootProject.ext.dep.okhttp3
-    provided rootProject.ext.dep.lost
-    testCompile rootProject.ext.dep.junit
-    testCompile rootProject.ext.dep.mockito
+    implementation rootProject.ext.dep.supportAnnotations
+    implementation rootProject.ext.dep.supportFragmentV4
+    implementation rootProject.ext.dep.okhttp3
+    implementation rootProject.ext.dep.timber
+    implementation rootProject.ext.dep.mapboxJavaGeoJSON
 
-    // Mapbox Android Services (GeoJSON support)
-    compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
-        transitive = true
-    }
+    api rootProject.ext.dep.mapboxAndroidTelemetry
+    api rootProject.ext.dep.mapboxAndroidCore
 
-    // Mapbox Android Services (Telemetry support)
-    compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
-        transitive = true
-        exclude group: 'com.android.support'
-    }
+    compileOnly rootProject.ext.dep.lost
 
-    compile(rootProject.ext.dep.mapboxAndroidCore)
+    testImplementation rootProject.ext.dep.junit
+    testImplementation rootProject.ext.dep.mockito
 }
 
 android {
