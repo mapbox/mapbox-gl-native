@@ -8,10 +8,9 @@
 #include <mbgl/util/intersection_tests.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
 
-#include <mbgl/renderer/buckets/symbol_bucket.hpp> // For PlacedSymbol: pull out to another location
-
 #include <mapbox/geometry/envelope.hpp>
-#include <mapbox/geometry/multi_point.hpp>
+
+#include <mbgl/renderer/buckets/symbol_bucket.hpp> // For PlacedSymbol: pull out to another location
 
 #include <cmath>
 
@@ -67,13 +66,13 @@ bool CollisionIndex::placeFeature(CollisionFeature& feature,
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
         const float tileToViewport = textPixelRatio * projectedPoint.second;
-        GridUnit px1 = box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
-        GridUnit py1 = box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
-        GridUnit px2 = box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
-        GridUnit py2 = box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
+        box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
+        box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
+        box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
+        box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
         
         if (!allowOverlap) {
-            if (collisionGrid.hitTest({{ px1, py1 }, { px2, py2 }})) {
+            if (collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }})) {
                 return false;
             }
         }
@@ -181,12 +180,12 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         
         circle.used = true;
         
-        GridUnit px = circle.px = projectedPoint.x;
-        GridUnit py = circle.py = projectedPoint.y;
-        GridUnit r = circle.radius = radius;
+        circle.px = projectedPoint.x;
+        circle.py = projectedPoint.y;
+        circle.radius = radius;
 
         if (!allowOverlap) {
-            if (collisionGrid.hitTest({{px, py}, r})) {
+            if (collisionGrid.hitTest({{circle.px, circle.py}, circle.radius})) {
                 if (!collisionDebug) {
                     return false;
                 } else {
@@ -208,29 +207,22 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
             if (!circle.used) {
                 continue;
             }
-            GridUnit px = circle.px;
-            GridUnit py = circle.py;
-            GridUnit radius = circle.radius;
+
             if (ignorePlacement) {
                 // TODO: revisit whether GridIndex should move vs. copy on insert
-                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px, py }, radius});
+                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
             } else {
-                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px, py }, radius});
+                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
             }
         }
     } else {
-        for (auto& box : feature.boxes) {
-            // TODO: Iteration is vestigial, there should be only one box
-            GridUnit px1 = box.px1;
-            GridUnit py1 = box.py1;
-            GridUnit px2 = box.px2;
-            GridUnit py2 = box.py2;
-            if (ignorePlacement) {
-                // TODO: revisit whether GridIndex should move vs. copy on insert
-                ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px1, py1 }, { px2, py2 }});
-            } else {
-                collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ px1, py1 }, { px2, py2 }});
-            }
+        assert(feature.boxes.size() == 1);
+        auto& box = feature.boxes[0];
+        if (ignorePlacement) {
+            // TODO: revisit whether GridIndex should move vs. copy on insert
+            ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
+        } else {
+            collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
         }
     }
 }
@@ -247,28 +239,23 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     transformState.matrixFor(posMatrix, UnwrappedTileID(0, tileID)); // TODO: This probably isn't right, I think it's working right now because both the wrapped and unwrapped version are getting queried, but I haven't thought through why it should work.
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    GeometryCoordinates polygon;
-    // todo: use envelope?
-    auto minX = std::numeric_limits<GridUnit>::max();
-    auto minY = std::numeric_limits<GridUnit>::max();
-    auto maxX = std::numeric_limits<GridUnit>::min();
-    auto maxY = std::numeric_limits<GridUnit>::min();
-    
+    // Two versions of the query here just because util::polygonIntersectsPolygon requires
+    // GeometryCoordinates (based on int16_t). Otherwise, work with floats.
+    GeometryCoordinates projectedPolygon;
+    LineString<float> projectedQuery;
+
     for (const auto& point : queryGeometry) {
         auto projected = projectPoint(posMatrix, convertPoint<float>(point));
-        GridUnit px = projected.x;
-        GridUnit py = projected.y;
-        minX = std::min(minX, px);
-        minY = std::min(minY, py);
-        maxX = std::max(maxX, px);
-        maxY = std::max(maxY, py);
-        polygon.push_back(convertPoint<int16_t>(projected));
+        projectedPolygon.push_back(convertPoint<int16_t>(projected));
+        projectedQuery.push_back(projected);
     }
+    
+    auto envelope = mapbox::geometry::envelope(projectedQuery);
     
     using QueryResult = std::pair<IndexedSubfeature, GridIndex<IndexedSubfeature>::BBox>;
     
     std::vector<QueryResult> thisTileFeatures;
-    std::vector<QueryResult> features = collisionGrid.queryWithBoxes({{minX, minY}, {maxX, maxY}});
+    std::vector<QueryResult> features = collisionGrid.queryWithBoxes(envelope);
 
     for (auto& queryResult : features) {
         auto& feature = queryResult.first;
@@ -278,7 +265,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         }
     }
     
-    std::vector<QueryResult> ignoredFeatures = ignoredGrid.queryWithBoxes({{minX, minY}, {maxX, maxY}});
+    std::vector<QueryResult> ignoredFeatures = ignoredGrid.queryWithBoxes(envelope);
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
         CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
@@ -308,7 +295,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
             { minX1, minY1 }, { maxX1, minY1 }, { maxX1, maxY1 }, { minX1, maxY1 }
         };
         
-        if (!util::polygonIntersectsPolygon(polygon, bboxPoints))
+        if (!util::polygonIntersectsPolygon(projectedPolygon, bboxPoints))
             continue;
 
         result.push_back(feature);

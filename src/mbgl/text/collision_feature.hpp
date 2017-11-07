@@ -26,12 +26,13 @@ public:
     float x2;
     float y2;
 
-    // TODO Where's the right place to store the projected bounding box?
+    // Projected box geometry: generated/updated at placement time
     float px1;
     float py1;
     float px2;
     float py2;
-    // Placeholder for center of circles (can be derived from bounding box)
+    
+    // Projected circle geometry: generated/updated at placement time
     float px;
     float py;
     bool used;
