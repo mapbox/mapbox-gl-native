@@ -145,6 +145,14 @@ void SymbolBucket::updateOpacity() {
     uploaded = false;
 }
 
+void addPlacedSymbol(gl::IndexVector<gl::Triangles>& triangles, const PlacedSymbol& placedSymbol) {
+    auto endIndex = placedSymbol.vertexStartIndex + placedSymbol.glyphOffsets.size() * 4;
+    for (auto vertexIndex = placedSymbol.vertexStartIndex; vertexIndex < endIndex; vertexIndex += 4) {
+        triangles.emplace_back(vertexIndex + 0, vertexIndex + 1, vertexIndex + 2);
+        triangles.emplace_back(vertexIndex + 1, vertexIndex + 2, vertexIndex + 3);
+    }
+}
+
 void SymbolBucket::sortFeatures(const float angle) {
     if (!sortFeaturesByY) {
         return;
@@ -194,22 +202,14 @@ void SymbolBucket::sortFeatures(const float angle) {
     for (auto i : symbolInstanceIndexes) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
 
-        for (auto& placedTextSymbolIndex : symbolInstance.placedTextIndices) {
-            const PlacedSymbol& placedSymbol = text.placedSymbols[placedTextSymbolIndex];
-
-            auto endIndex = placedSymbol.vertexStartIndex + placedSymbol.glyphOffsets.size() * 4;
-            for (auto vertexIndex = placedSymbol.vertexStartIndex; vertexIndex < endIndex; vertexIndex += 4) {
-                text.triangles.emplace_back(vertexIndex + 0, vertexIndex + 1, vertexIndex + 2);
-                text.triangles.emplace_back(vertexIndex + 1, vertexIndex + 2, vertexIndex + 3);
-            }
+        if (symbolInstance.placedTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
         }
-
-        for (auto& placedIconSymbolIndex : symbolInstance.placedIconIndices) { // TODO: This iteration is an awkward way to say "if the symbol has an icon"
-            const PlacedSymbol& placedIcon = icon.placedSymbols[placedIconSymbolIndex];
-            
-            const auto vertexIndex = placedIcon.vertexStartIndex;
-            icon.triangles.emplace_back(vertexIndex + 0, vertexIndex + 1, vertexIndex + 2);
-            icon.triangles.emplace_back(vertexIndex + 1, vertexIndex + 2, vertexIndex + 3);
+        if (symbolInstance.placedVerticalTextIndex) {
+            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
+        }
+        if (symbolInstance.placedIconIndex) {
+            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
         }
     }
 }

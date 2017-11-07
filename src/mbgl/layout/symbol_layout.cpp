@@ -438,7 +438,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
             const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
             bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                     symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-            symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
+            symbolInstance.placedTextIndex = bucket->text.placedSymbols.size() - 1;
             PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
 
             bool firstHorizontal = true;
@@ -455,7 +455,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
             if (symbolInstance.writingModes & WritingModeType::Vertical) {
                 bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-                symbolInstance.placedTextIndices.push_back(bucket->text.placedSymbols.size() - 1);
+                symbolInstance.placedVerticalTextIndex = bucket->text.placedSymbols.size() - 1;
                 
                 PlacedSymbol& verticalSymbol = bucket->text.placedSymbols.back();
                 bool firstVertical = true;
@@ -478,7 +478,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
                 const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
                 bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
-                symbolInstance.placedIconIndices.push_back(bucket->icon.placedSymbols.size() - 1);
+                symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
                 PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(
                                                         bucket->icon, sizeData, *symbolInstance.iconQuad,
