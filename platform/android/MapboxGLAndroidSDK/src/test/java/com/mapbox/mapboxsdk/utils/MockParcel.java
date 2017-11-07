@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.utils;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 

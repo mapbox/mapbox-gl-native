@@ -4,7 +4,6 @@ import android.support.test.espresso.Espresso;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapViewUtils;
@@ -13,7 +12,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.TestConstants;
-
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Ignore;

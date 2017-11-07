@@ -10,7 +10,9 @@ dependencies {
     api rootProject.ext.dep.mapboxAndroidTelemetry
     api rootProject.ext.dep.mapboxAndroidCore
 
-    compileOnly rootProject.ext.dep.lost
+    compileOnly(rootProject.ext.dep.lost) {
+        exclude group: 'com.android.support'
+    }
 
     testImplementation rootProject.ext.dep.junit
     testImplementation rootProject.ext.dep.mockito
@@ -112,7 +114,7 @@ android {
     }
 
     lintOptions {
-        disable 'MissingTranslation', 'TypographyQuotes'
+        disable 'MissingTranslation', 'TypographyQuotes', 'ClickableViewAccessibility' , 'CustomViewStyleable', 'MissingPermission'
         baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false

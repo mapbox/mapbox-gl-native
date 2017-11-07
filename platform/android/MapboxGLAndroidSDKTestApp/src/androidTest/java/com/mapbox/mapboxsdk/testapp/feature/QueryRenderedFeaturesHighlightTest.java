@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.feature;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.feature.QueryRenderedFeaturesBoxHighlightActivity;
-
 import org.junit.Ignore;
 import org.junit.Test;
 

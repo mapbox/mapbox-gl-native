@@ -13,7 +13,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
@@ -26,7 +25,6 @@ import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.core.location.LocationEngineListener;
-
 import timber.log.Timber;
 
 /**
@@ -125,41 +123,35 @@ public class MyLocationTrackingModeActivity extends AppCompatActivity implements
     bearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
     setCheckBoxes();
 
-    mapboxMap.setOnMyLocationTrackingModeChangeListener(new MapboxMap.OnMyLocationTrackingModeChangeListener() {
-      @Override
-      public void onMyLocationTrackingModeChange(@MyLocationTracking.Mode int myLocationTrackingMode) {
-        locationSpinner.setOnItemSelectedListener(null);
-        switch (myLocationTrackingMode) {
-          case MyLocationTracking.TRACKING_NONE:
-            locationSpinner.setSelection(TRACKING_NONE_INDEX);
-            break;
-          case MyLocationTracking.TRACKING_FOLLOW:
-            locationSpinner.setSelection(TRACKING_FOLLOW_INDEX);
-            break;
-        }
-        locationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+    mapboxMap.setOnMyLocationTrackingModeChangeListener(myLocationTrackingMode -> {
+      locationSpinner.setOnItemSelectedListener(null);
+      switch (myLocationTrackingMode) {
+        case MyLocationTracking.TRACKING_NONE:
+          locationSpinner.setSelection(TRACKING_NONE_INDEX);
+          break;
+        case MyLocationTracking.TRACKING_FOLLOW:
+          locationSpinner.setSelection(TRACKING_FOLLOW_INDEX);
+          break;
       }
+      locationSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
     });
 
-    mapboxMap.setOnMyBearingTrackingModeChangeListener(new MapboxMap.OnMyBearingTrackingModeChangeListener() {
-      @Override
-      public void onMyBearingTrackingModeChange(@MyBearingTracking.Mode int myBearingTrackingMode) {
-        bearingSpinner.setOnItemSelectedListener(null);
-        switch (myBearingTrackingMode) {
-          case MyBearingTracking.NONE:
-            bearingSpinner.setSelection(BEARING_NONE_INDEX);
-            break;
+    mapboxMap.setOnMyBearingTrackingModeChangeListener(myBearingTrackingMode -> {
+      bearingSpinner.setOnItemSelectedListener(null);
+      switch (myBearingTrackingMode) {
+        case MyBearingTracking.NONE:
+          bearingSpinner.setSelection(BEARING_NONE_INDEX);
+          break;
 
-          case MyBearingTracking.GPS:
-            bearingSpinner.setSelection(BEARING_GPS_INDEX);
-            break;
+        case MyBearingTracking.GPS:
+          bearingSpinner.setSelection(BEARING_GPS_INDEX);
+          break;
 
-          case MyBearingTracking.COMPASS:
-            bearingSpinner.setSelection(BEARING_COMPASS_INDEX);
-            break;
-        }
-        bearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
+        case MyBearingTracking.COMPASS:
+          bearingSpinner.setSelection(BEARING_COMPASS_INDEX);
+          break;
       }
+      bearingSpinner.setOnItemSelectedListener(MyLocationTrackingModeActivity.this);
     });
   }
 

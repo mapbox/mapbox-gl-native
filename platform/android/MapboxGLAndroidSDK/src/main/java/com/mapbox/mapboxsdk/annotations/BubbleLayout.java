@@ -8,7 +8,6 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.widget.LinearLayout;
-
 import com.mapbox.mapboxsdk.R;
 
 /**

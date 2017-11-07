@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -15,7 +14,6 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.android.core.location.LocationEngineListener;
 import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
-
 import timber.log.Timber;
 
 /**

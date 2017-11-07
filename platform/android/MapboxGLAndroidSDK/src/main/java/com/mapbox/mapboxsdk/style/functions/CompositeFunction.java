@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.style.functions;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;

@@ -2,12 +2,10 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Color;
 import android.view.Gravity;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.junit.Test;
 
 import java.util.Arrays;

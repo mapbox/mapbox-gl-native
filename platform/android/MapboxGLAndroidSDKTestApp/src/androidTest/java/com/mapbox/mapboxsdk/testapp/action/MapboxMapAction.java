@@ -3,9 +3,7 @@ package com.mapbox.mapboxsdk.testapp.action;
 import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-
 import org.hamcrest.Matcher;
 
 import static android.support.test.espresso.Espresso.onView;

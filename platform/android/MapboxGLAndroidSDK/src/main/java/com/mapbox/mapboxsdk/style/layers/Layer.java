@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.style.functions.Function;
 
 /**

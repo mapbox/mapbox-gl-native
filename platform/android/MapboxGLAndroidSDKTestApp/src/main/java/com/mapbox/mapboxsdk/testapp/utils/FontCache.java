@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.graphics.Typeface;
-
 import timber.log.Timber;
 
 import java.util.Hashtable;

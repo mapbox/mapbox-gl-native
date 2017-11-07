@@ -16,7 +16,6 @@ import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -45,11 +44,10 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Geometry;
+import timber.log.Timber;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.List;
-
-import timber.log.Timber;
 
 /**
  * The general class to interact with in the Android Mapbox SDK. It exposes the entry point for all

@@ -5,7 +5,6 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -16,14 +15,12 @@ import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
 import com.mapbox.services.commons.geojson.Point;
-
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import timber.log.Timber;
 
 import java.io.IOException;
-
-import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;

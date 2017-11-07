@@ -1,12 +1,10 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;

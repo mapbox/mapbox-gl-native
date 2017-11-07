@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Color;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**

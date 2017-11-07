@@ -5,21 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
 import android.text.TextUtils;
-
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-
-import java.io.IOException;
-import java.io.InterruptedIOException;
-import java.net.NoRouteToHostException;
-import java.net.ProtocolException;
-import java.net.SocketException;
-import java.net.UnknownHostException;
-import java.util.concurrent.locks.ReentrantLock;
-
-import javax.net.ssl.SSLException;
-
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.HttpUrl;
@@ -28,6 +16,15 @@ import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.internal.Util;
 import timber.log.Timber;
+
+import javax.net.ssl.SSLException;
+import java.io.IOException;
+import java.io.InterruptedIOException;
+import java.net.NoRouteToHostException;
+import java.net.ProtocolException;
+import java.net.SocketException;
+import java.net.UnknownHostException;
+import java.util.concurrent.locks.ReentrantLock;
 
 class HTTPRequest implements Callback {
 

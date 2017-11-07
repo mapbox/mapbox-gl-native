@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.graphics.PointF;
 import android.support.annotation.FloatRange;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;

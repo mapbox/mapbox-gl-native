@@ -16,10 +16,9 @@ package com.mapbox.mapboxsdk.testapp.utils;
  */
 
 import android.os.SystemClock;
+import timber.log.Timber;
 
 import java.util.ArrayList;
-
-import timber.log.Timber;
 
 /**
  * A utility class to help log timings splits throughout a method call.

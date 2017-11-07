@@ -5,20 +5,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.ViewTreeObserver;
 import android.widget.GridLayout;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import com.mapbox.mapboxsdk.testapp.R;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import timber.log.Timber;
 
 /**
  * Test activity showing how to use a the {@link com.mapbox.mapboxsdk.snapshotter.MapSnapshotter}
@@ -95,17 +92,14 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
     MapSnapshotter snapshotter = new MapSnapshotter(MapSnapshotterActivity.this, options);
 
-    snapshotter.start(new MapSnapshotter.SnapshotReadyCallback() {
-      @Override
-      public void onSnapshotReady(MapSnapshot snapshot) {
-        Timber.i("Got the snapshot");
-        ImageView imageView = new ImageView(MapSnapshotterActivity.this);
-        imageView.setImageBitmap(snapshot.getBitmap());
-        grid.addView(
-          imageView,
-          new GridLayout.LayoutParams(GridLayout.spec(row), GridLayout.spec(column))
-        );
-      }
+    snapshotter.start(snapshot -> {
+      Timber.i("Got the snapshot");
+      ImageView imageView = new ImageView(MapSnapshotterActivity.this);
+      imageView.setImageBitmap(snapshot.getBitmap());
+      grid.addView(
+        imageView,
+        new GridLayout.LayoutParams(GridLayout.spec(row), GridLayout.spec(column))
+      );
     });
     snapshotters.add(snapshotter);
   }

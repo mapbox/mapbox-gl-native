@@ -1,8 +1,7 @@
 package com.mapbox.mapboxsdk.telemetry;
 
-import org.junit.Test;
-
 import okhttp3.internal.Util;
+import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
 

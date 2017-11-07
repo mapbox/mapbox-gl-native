@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.Mapbox;
 
 public class TokenUtils {

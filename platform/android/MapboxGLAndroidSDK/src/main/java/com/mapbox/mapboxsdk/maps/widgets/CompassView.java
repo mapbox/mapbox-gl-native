@@ -10,7 +10,6 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 
 /**

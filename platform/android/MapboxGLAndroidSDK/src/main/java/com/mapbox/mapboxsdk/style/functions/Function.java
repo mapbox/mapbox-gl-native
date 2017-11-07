@@ -2,17 +2,15 @@ package com.mapbox.mapboxsdk.style.functions;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.style.functions.stops.CategoricalStops;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.functions.stops.IntervalStops;
 import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
+import timber.log.Timber;
 
 import java.util.Map;
-
-import timber.log.Timber;
 
 /**
  * Functions are used to change properties in relation to the state of the map.

@@ -3,11 +3,9 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-
 import timber.log.Timber;
 
 /**

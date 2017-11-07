@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-
 import com.mapbox.services.android.telemetry.MapboxEvent;
 
 import java.util.Hashtable;

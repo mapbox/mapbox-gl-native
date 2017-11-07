@@ -4,7 +4,6 @@ import android.graphics.Point;
 import android.graphics.PointF;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapboxMap;

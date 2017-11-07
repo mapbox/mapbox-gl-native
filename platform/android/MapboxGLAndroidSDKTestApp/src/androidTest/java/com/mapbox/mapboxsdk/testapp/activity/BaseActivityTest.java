@@ -10,18 +10,14 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-
 import junit.framework.Assert;
-
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;

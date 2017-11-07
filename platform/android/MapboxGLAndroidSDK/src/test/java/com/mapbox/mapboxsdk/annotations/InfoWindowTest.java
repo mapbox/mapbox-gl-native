@@ -1,12 +1,10 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.PointF;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
-
 import org.junit.Test;
 import org.mockito.InjectMocks;
 

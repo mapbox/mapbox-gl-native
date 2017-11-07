@@ -3,10 +3,8 @@ package com.mapbox.mapboxsdk;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.services.android.core.location.LocationEngine;
-
 import org.junit.Before;
 import org.junit.Test;
 

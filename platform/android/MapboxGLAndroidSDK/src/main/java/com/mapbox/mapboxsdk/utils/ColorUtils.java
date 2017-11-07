@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.TypedValue;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 

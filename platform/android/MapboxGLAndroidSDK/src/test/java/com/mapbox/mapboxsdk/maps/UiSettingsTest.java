@@ -4,9 +4,7 @@ import android.view.Gravity;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

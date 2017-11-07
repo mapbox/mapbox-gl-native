@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 

@@ -67,7 +67,11 @@ dependencies {
     implementation(rootProject.ext.dep.mapboxJavaServices) {
         transitive = true
     }
-    implementation rootProject.ext.dep.lost
+
+    implementation (rootProject.ext.dep.lost) {
+        exclude group: 'com.android.support'
+    }
+
     implementation rootProject.ext.dep.timber
 
     // Testing dependencies

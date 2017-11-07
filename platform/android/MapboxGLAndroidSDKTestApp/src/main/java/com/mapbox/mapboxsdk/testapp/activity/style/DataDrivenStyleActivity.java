@@ -6,22 +6,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+import timber.log.Timber;
 
 import java.io.IOException;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.functions.Function.composite;
 import static com.mapbox.mapboxsdk.style.functions.Function.property;
@@ -54,18 +51,15 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
 
 
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        // Store for later
-        mapboxMap = map;
+    mapView.getMapAsync(map -> {
+      // Store for later
+      mapboxMap = map;
 
-        // Add a parks layer
-        addParksLayer();
+      // Add a parks layer
+      addParksLayer();
 
-        // Center and Zoom (Amsterdam, zoomed to streets)
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
-      }
+      // Center and Zoom (Amsterdam, zoomed to streets)
+      mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
     });
   }
 

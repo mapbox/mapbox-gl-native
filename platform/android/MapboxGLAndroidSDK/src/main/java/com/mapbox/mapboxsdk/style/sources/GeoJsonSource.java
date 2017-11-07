@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.style.sources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;

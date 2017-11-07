@@ -5,22 +5,19 @@ import android.os.Bundle;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonOptions;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import timber.log.Timber;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.all;
 import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
@@ -50,15 +47,12 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
     // noinspection ConstantConditions
     mapView.onCreate(savedInstanceState);
 
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.7749, 122.4194), 0));
 
-        // Add a clustered source with some layers
-        addClusteredGeoJsonSource();
-      }
+      // Add a clustered source with some layers
+      addClusteredGeoJsonSource();
     });
   }
 

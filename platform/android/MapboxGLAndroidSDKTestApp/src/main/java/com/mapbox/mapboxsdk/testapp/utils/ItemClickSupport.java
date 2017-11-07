@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.testapp.R;
 
 public class ItemClickSupport {

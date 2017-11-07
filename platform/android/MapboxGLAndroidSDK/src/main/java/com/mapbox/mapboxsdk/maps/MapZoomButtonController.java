@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.support.annotation.NonNull;
 import android.widget.ZoomButtonsController;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 
 /**

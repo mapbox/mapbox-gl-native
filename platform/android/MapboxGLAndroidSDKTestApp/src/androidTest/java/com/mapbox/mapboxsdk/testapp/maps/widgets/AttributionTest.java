@@ -11,13 +11,11 @@ import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.URLSpan;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
-
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
@@ -146,15 +144,12 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   private void buildUrlSpans() {
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
-      @Override
-      public void onViewAction(UiController uiController, View view) {
-        for (Source source : mapboxMap.getSources()) {
-          String attributionSource = source.getAttribution();
-          if (!TextUtils.isEmpty(attributionSource)) {
-            SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
-            urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
-          }
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
+      for (Source source : mapboxMap.getSources()) {
+        String attributionSource = source.getAttribution();
+        if (!TextUtils.isEmpty(attributionSource)) {
+          SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
+          urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
         }
       }
     }));

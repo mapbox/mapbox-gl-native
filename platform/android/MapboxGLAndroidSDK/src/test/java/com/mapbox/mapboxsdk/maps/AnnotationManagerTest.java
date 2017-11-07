@@ -1,14 +1,12 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.support.v4.util.LongSparseArray;
-
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.junit.Test;
 
 import java.util.ArrayList;

@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.support.annotation.NonNull;
 import android.support.v4.util.LongSparseArray;
-
 import com.mapbox.mapboxsdk.annotations.Annotation;
 
 import java.util.ArrayList;

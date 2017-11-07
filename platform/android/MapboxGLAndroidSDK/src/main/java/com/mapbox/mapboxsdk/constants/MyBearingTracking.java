@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.constants;
 
 import android.support.annotation.IntDef;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 

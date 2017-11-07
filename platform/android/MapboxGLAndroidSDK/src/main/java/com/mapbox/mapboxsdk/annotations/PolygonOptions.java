@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.ArrayList;

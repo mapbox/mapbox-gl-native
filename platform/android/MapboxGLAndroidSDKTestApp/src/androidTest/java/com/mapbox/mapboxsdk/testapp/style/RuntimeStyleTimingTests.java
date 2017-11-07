@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.style;
 
 import android.support.test.runner.AndroidJUnit4;
-
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTimingTestActivity;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 

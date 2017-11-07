@@ -7,7 +7,6 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
-
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.location.LocationSource;
@@ -16,7 +15,6 @@ import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.android.core.location.LocationEnginePriority;
 import com.mapbox.services.android.core.location.LocationEngineProvider;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
-
 import timber.log.Timber;
 
 /**
