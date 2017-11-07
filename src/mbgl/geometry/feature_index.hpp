@@ -20,11 +20,35 @@ class CollisionIndex;
 class IndexedSubfeature {
 public:
     IndexedSubfeature() = delete;
-    std::size_t index;
-    std::string sourceID;
+    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_)
+        : index(index_)
+        , sourceLayerName(std::move(sourceLayerName_))
+        , bucketName(std::move(bucketName_))
+        , sortIndex(sortIndex_)
+        , z(0)
+        , x(0)
+        , y(0)
+    {}
+    
+    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_,
+                      std::string sourceID_, uint8_t z_, uint32_t x_, uint32_t y_)
+        : index(index_)
+        , sourceLayerName(std::move(sourceLayerName_))
+        , bucketName(std::move(bucketName_))
+        , sortIndex(std::move(sortIndex_))
+        , sourceID(sourceID_)
+        , z(z_)
+        , x(x_)
+        , y(y_)
+    {}
+    
+    size_t index;
     std::string sourceLayerName;
     std::string bucketName;
     size_t sortIndex;
+
+    // Only used for symbol features
+    std::string sourceID;
     uint8_t z;
     uint32_t x;
     uint32_t y;
