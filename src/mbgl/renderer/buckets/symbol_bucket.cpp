@@ -18,12 +18,12 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sdfIcons_,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
-                           const std::vector<SymbolInstance>& symbolInstances_)
+                           const std::vector<SymbolInstance>&& symbolInstances_)
     : layout(std::move(layout_)),
       sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
-      symbolInstances(symbolInstances_), // TODO maybe not copy
+      symbolInstances(std::move(symbolInstances_)),
       textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
       iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
     
