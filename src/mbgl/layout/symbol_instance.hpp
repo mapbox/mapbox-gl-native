@@ -52,7 +52,6 @@ public:
     optional<size_t> placedTextIndex;
     optional<size_t> placedVerticalTextIndex;
     optional<size_t> placedIconIndex;
-    uint32_t crossTileID = 0;
 };
 
 } // namespace mbgl

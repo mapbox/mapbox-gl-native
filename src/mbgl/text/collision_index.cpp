@@ -56,7 +56,7 @@ bool CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
@@ -87,7 +87,7 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
@@ -201,7 +201,7 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
 }
 
 
-void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlacement) {
+void CollisionIndex::insertFeature(const CollisionFeature& feature, bool ignorePlacement) {
     if (feature.alongLine) {
         for (auto& circle : feature.boxes) {
             if (!circle.used) {

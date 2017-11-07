@@ -7,14 +7,18 @@
 namespace mbgl {
 
 
-TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, std::vector<SymbolInstance>& symbolInstances, uint32_t bucketInstanceId_)
+TileLayerIndex::TileLayerIndex(OverscaledTileID coord_, const std::vector<SymbolInstance>& symbolInstances, std::vector<uint32_t>& symbolCrossTileIDs, uint32_t bucketInstanceId_)
     : coord(coord_), bucketInstanceId(bucketInstanceId_) {
-        for (SymbolInstance& symbolInstance : symbolInstances) {
-            indexedSymbolInstances[symbolInstance.key].emplace_back(symbolInstance.crossTileID, getScaledCoordinates(symbolInstance, coord));
+        assert(symbolInstances.size() == symbolCrossTileIDs.size());
+        auto idIt = symbolCrossTileIDs.begin();
+        for (auto it = symbolInstances.begin(); it != symbolInstances.end(); it++, idIt++) {
+            auto& symbolInstance = *it;
+            auto crossTileID = *idIt;
+            indexedSymbolInstances[symbolInstance.key].emplace_back(crossTileID, getScaledCoordinates(symbolInstance, coord));
         }
     }
 
-Point<int64_t> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstance, const OverscaledTileID& childTileCoord) {
+Point<int64_t> TileLayerIndex::getScaledCoordinates(const SymbolInstance& symbolInstance, const OverscaledTileID& childTileCoord) const {
     // Round anchor positions to roughly 4 pixel grid
     const double roundingFactor = 512.0 / util::EXTENT / 2.0;
     const double scale = roundingFactor / std::pow(2, childTileCoord.canonical.z - coord.canonical.z);
@@ -24,30 +28,34 @@ Point<int64_t> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstan
     };
 }
 
-void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, const OverscaledTileID& newCoord) {
+void TileLayerIndex::findMatches(const std::vector<SymbolInstance>& symbolInstances, std::vector<uint32_t>& symbolCrossTileIDs, const OverscaledTileID& newCoord) {
     float tolerance = coord.canonical.z < newCoord.canonical.z ? 1 : std::pow(2, coord.canonical.z - newCoord.canonical.z);
 
-    for (auto& symbolInstance : symbolInstances) {
-        if (symbolInstance.crossTileID) {
+    assert(symbolInstances.size() == symbolCrossTileIDs.size());
+    auto idIt = symbolCrossTileIDs.begin();
+    for (auto it = symbolInstances.begin(); it != symbolInstances.end(); it++, idIt++) {
+        auto& symbolInstance = *it;
+        auto& crossTileID = *idIt;
+        if (crossTileID) {
             // already has a match, skip
             continue;
         }
 
-        auto it = indexedSymbolInstances.find(symbolInstance.key);
-        if (it == indexedSymbolInstances.end()) {
+        auto indexedSymbolInstance = indexedSymbolInstances.find(symbolInstance.key);
+        if (indexedSymbolInstance == indexedSymbolInstances.end()) {
             // No symbol with this key in this bucket
             continue;
         }
 
         auto scaledSymbolCoord = getScaledCoordinates(symbolInstance, newCoord);
 
-        for (IndexedSymbolInstance& thisTileSymbol: it->second) {
+        for (IndexedSymbolInstance& thisTileSymbol: indexedSymbolInstance->second) {
             // Return any symbol with the same keys whose coordinates are within 1
             // grid unit. (with a 4px grid, this covers a 12px by 12px area)
             if (std::abs(thisTileSymbol.coord.x - scaledSymbolCoord.x) <= tolerance &&
                 std::abs(thisTileSymbol.coord.y - scaledSymbolCoord.y) <= tolerance) {
 
-                symbolInstance.crossTileID = thisTileSymbol.crossTileID;
+                crossTileID = thisTileSymbol.crossTileID;
                 break;
             }
         }
@@ -62,6 +70,10 @@ uint32_t CrossTileSymbolLayerIndex::maxCrossTileID = 0;
 void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket) {
     if (bucket.bucketInstanceId) return;
     bucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    auto& symbolInstances = (*bucket.core)->symbolInstances;
+
+    Mutable<std::vector<uint32_t>> symbolCrossTileIDs = makeMutable<std::vector<uint32_t>>(symbolInstances.size(), 0);
 
     uint8_t minZoom = 25;
     uint8_t maxZoom = 0;
@@ -80,7 +92,7 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
                 if (!childIndex.second.coord.isChildOf(coord)) {
                     continue;
                 }
-                childIndex.second.findMatches(bucket.symbolInstances, coord);
+                childIndex.second.findMatches(symbolInstances, *symbolCrossTileIDs, coord);
             }
         }
         if (z == 0) {
@@ -95,7 +107,7 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
         if (zoomIndexes != indexes.end()) {
             auto parentIndex = zoomIndexes->second.find(parentCoord);
             if (parentIndex != zoomIndexes->second.end()) {
-                parentIndex->second.findMatches(bucket.symbolInstances, coord);
+                parentIndex->second.findMatches(symbolInstances, *symbolCrossTileIDs, coord);
             }
         }
         if (z == 0) {
@@ -103,14 +115,16 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
         }
     }
     
-    for (auto& symbolInstance : bucket.symbolInstances) {
-        if (!symbolInstance.crossTileID) {
+    for (auto& crossTileID : *symbolCrossTileIDs) {
+        if (!crossTileID) {
             // symbol did not match any known symbol, assign a new id
-            symbolInstance.crossTileID = ++maxCrossTileID;
+            crossTileID = ++maxCrossTileID;
         }
     }
 
-    indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, bucket.symbolInstances, bucket.bucketInstanceId));
+    indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, symbolInstances, *symbolCrossTileIDs, bucket.bucketInstanceId));
+
+    bucket.symbolCrossTileIDs = std::make_unique<Immutable<std::vector<uint32_t>>>(std::move(symbolCrossTileIDs));
 }
 
 bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs) {

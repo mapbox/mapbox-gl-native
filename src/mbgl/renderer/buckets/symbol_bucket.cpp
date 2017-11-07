@@ -8,6 +8,17 @@ namespace mbgl {
 
 using namespace style;
 
+SymbolBucket::Core::Core(
+        std::vector<SymbolInstance>&& symbolInstances_,
+        style::SymbolLayoutProperties::PossiblyEvaluated layout_,
+        std::unique_ptr<SymbolSizeBinder> textSizeBinder_,
+        std::unique_ptr<SymbolSizeBinder> iconSizeBinder_) :
+    symbolInstances(std::move(symbolInstances_)),
+    layout(std::move(layout_)),
+    textSizeBinder(std::move(textSizeBinder_)),
+    iconSizeBinder(std::move(iconSizeBinder_))
+    {}
+
 SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layout_,
                            const std::map<std::string, std::pair<
                                style::IconPaintProperties::PossiblyEvaluated,
@@ -18,14 +29,16 @@ SymbolBucket::SymbolBucket(style::SymbolLayoutProperties::PossiblyEvaluated layo
                            bool sdfIcons_,
                            bool iconsNeedLinear_,
                            bool sortFeaturesByY_,
-                           const std::vector<SymbolInstance>&& symbolInstances_)
-    : layout(std::move(layout_)),
-      sdfIcons(sdfIcons_),
+                           std::vector<SymbolInstance>&& symbolInstances_)
+    : sdfIcons(sdfIcons_),
       iconsNeedLinear(iconsNeedLinear_ || iconSize.isDataDriven() || !iconSize.isZoomConstant()),
       sortFeaturesByY(sortFeaturesByY_),
-      symbolInstances(std::move(symbolInstances_)),
-      textSizeBinder(SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue())),
-      iconSizeBinder(SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())) {
+      mutableCore(makeMutable<Core>(
+                  std::move(symbolInstances_),
+                  std::move(layout_),
+                  SymbolSizeBinder::create(zoom, textSize, TextSize::defaultValue()),
+                  SymbolSizeBinder::create(zoom, iconSize, IconSize::defaultValue())
+                  )) {
     
     for (const auto& pair : layerPaintProperties) {
         paintPropertyBinders.emplace(
@@ -177,6 +190,10 @@ void SymbolBucket::sortFeatures(const float angle) {
     // The index array buffer is rewritten to reference the (unchanged) vertices in the
     // sorted order.
 
+    auto& symbolInstances = (*core)->symbolInstances;
+    auto& placedTextSymbols = (*core)->placedTextSymbols;
+    auto& placedIconSymbols = (*core)->placedIconSymbols;
+
     // To avoid sorting the actual symbolInstance array we sort an array of indexes.
     std::vector<size_t> symbolInstanceIndexes;
     for (size_t i = 0; i < symbolInstances.size(); i++) {
@@ -186,9 +203,9 @@ void SymbolBucket::sortFeatures(const float angle) {
     const float sin = std::sin(angle);
     const float cos = std::cos(angle);
 
-    std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, this](size_t &aIndex, size_t &bIndex) {
-        const SymbolInstance& a = symbolInstances[aIndex];
-        const SymbolInstance& b = symbolInstances[bIndex];
+    std::sort(symbolInstanceIndexes.begin(), symbolInstanceIndexes.end(), [sin, cos, symbolInstances](size_t &aIndex, size_t &bIndex) {
+        const SymbolInstance& a = symbolInstances.at(aIndex);
+        const SymbolInstance& b = symbolInstances.at(bIndex);
         const int32_t aRotated = sin * a.anchor.point.x + cos * a.anchor.point.y;
         const int32_t bRotated = sin * b.anchor.point.x + cos * b.anchor.point.y;
         return aRotated != bRotated ?
@@ -200,16 +217,16 @@ void SymbolBucket::sortFeatures(const float angle) {
     icon.triangles.clear();
 
     for (auto i : symbolInstanceIndexes) {
-        const SymbolInstance& symbolInstance = symbolInstances[i];
+        const SymbolInstance& symbolInstance = symbolInstances.at(i);
 
         if (symbolInstance.placedTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);
+            addPlacedSymbol(text.triangles, placedTextSymbols[*symbolInstance.placedTextIndex]);
         }
         if (symbolInstance.placedVerticalTextIndex) {
-            addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedVerticalTextIndex]);
+            addPlacedSymbol(text.triangles, placedTextSymbols[*symbolInstance.placedVerticalTextIndex]);
         }
         if (symbolInstance.placedIconIndex) {
-            addPlacedSymbol(icon.triangles, icon.placedSymbols[*symbolInstance.placedIconIndex]);
+            addPlacedSymbol(icon.triangles, placedIconSymbols[*symbolInstance.placedIconIndex]);
         }
     }
 }

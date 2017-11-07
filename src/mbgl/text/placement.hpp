@@ -2,15 +2,16 @@
 
 #include <string>
 #include <unordered_map>
+#include <mbgl/actor/actor.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/text/collision_index.hpp>
+#include <mbgl/text/placement_worker.hpp>
 #include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <unordered_set>
 
 namespace mbgl {
 
     class RenderSymbolLayer;
-    class SymbolBucket;
 
     class OpacityState {
         public:
@@ -30,17 +31,12 @@ namespace mbgl {
             OpacityState text;
     };
 
-    class PlacementPair {
-        public:
-            PlacementPair(bool text_, bool icon_) : text(text_), icon(icon_) {}
-            bool text;
-            bool icon;
-    };
-
     class Placement {
         public:
-            Placement(const TransformState&, MapMode mapMode);
-            void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
+            Placement(const TransformState&, MapMode mapMode, const mat4& projMatrix, const bool showCollisionBoxes, Scheduler&);
+            void addLayer(RenderSymbolLayer&);
+            void place();
+            bool isReady();
             bool commit(const Placement& prevPlacement, TimePoint);
             void updateLayerOpacities(RenderSymbolLayer&);
             JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
@@ -48,7 +44,7 @@ namespace mbgl {
             bool hasTransitions(TimePoint now) const;
 
             // TODO: public for queryRenderedFeatures
-            CollisionIndex collisionIndex;
+            Immutable<PlacementResult> result;
         
             bool stillRecent(TimePoint now) const;
             void setRecent(TimePoint now);
@@ -56,22 +52,25 @@ namespace mbgl {
         private:
 
             void placeLayerBucket(
-                    SymbolBucket&,
-                    const mat4& posMatrix,
-                    const mat4& textLabelPlaneMatrix,
-                    const mat4& iconLabelPlaneMatrix,
-                    const float scale,
-                    const float pixelRatio,
-                    const bool showCollisionBoxes,
+                    const SymbolBucket::Core&,
+                    const std::vector<uint32_t>& symbolCrossTileIDs,
+                    const UnwrappedTileID&,
+                    const OverscaledTileID&,
                     std::unordered_set<uint32_t>& seenCrossTileIDs);
 
             void updateBucketOpacities(SymbolBucket&, std::unordered_set<uint32_t>&);
 
             TransformState state;
-            MapMode mapMode;
+            const MapMode mapMode;
             TimePoint commitTime;
+            const bool showCollisionBoxes;
+            const mat4 projMatrix;
 
-            std::unordered_map<uint32_t,PlacementPair> placements;
+            Actor<PlacementWorker> worker;
+            std::future<Immutable<PlacementResult>> future;
+
+            Mutable<std::vector<std::vector<PlacementBucket>>> placementBucketLayers;
+
             std::unordered_map<uint32_t,JointOpacityState> opacities;
         
             TimePoint recentUntil;

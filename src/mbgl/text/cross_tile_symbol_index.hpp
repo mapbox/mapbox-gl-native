@@ -32,10 +32,10 @@ class IndexedSymbolInstance {
 
 class TileLayerIndex {
     public:
-        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
+        TileLayerIndex(OverscaledTileID coord, const std::vector<SymbolInstance>&, std::vector<uint32_t>& symbolCrossTileIDs, uint32_t bucketInstanceId);
 
-        Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
-        void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
+        Point<int64_t> getScaledCoordinates(const SymbolInstance&, const OverscaledTileID&) const;
+        void findMatches(const std::vector<SymbolInstance>&, std::vector<uint32_t>& symbolCrossTileIDs, const OverscaledTileID&);
         
         OverscaledTileID coord;
         uint32_t bucketInstanceId;

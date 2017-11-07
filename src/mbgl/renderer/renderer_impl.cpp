@@ -59,7 +59,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
     , crossTileSymbolIndex(std::make_unique<CrossTileSymbolIndex>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still)) {
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still, mat4(), false, scheduler_)) {
     glyphManager->setObserver(this);
 }
 
@@ -376,21 +376,30 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
     }
 
-    bool placementChanged = false;
     if (!placement->stillRecent(parameters.timePoint)) {
-        auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
-        for (auto it = order.rbegin(); it != order.rend(); ++it) {
-            if (it->layer.is<RenderSymbolLayer>()) {
-                newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
+        if (!placementInProgress) {
+            placementInProgress = std::make_unique<Placement>(parameters.state, parameters.mapMode, parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision, scheduler);
+            for (auto it = order.rbegin(); it != order.rend(); ++it) {
+                if (it->layer.is<RenderSymbolLayer>()) {
+                    placementInProgress->addLayer(*it->layer.as<RenderSymbolLayer>());
+                }
+            }
+            placementInProgress->place();
+        }
+    }
+
+    bool placementChanged = false;
+    if (placementInProgress) {
+        if (placementInProgress->isReady()) {
+            placementChanged = placementInProgress->commit(*placement, parameters.timePoint);
+            if (placementChanged || symbolBucketsChanged) {
+                placement = std::move(placementInProgress);
+                placement->setStale();
+            } else {
+                placement->setRecent(parameters.timePoint);
+                placementInProgress.reset();
             }
         }
-
-        placementChanged = newPlacement->commit(*placement, parameters.timePoint);
-        if (placementChanged || symbolBucketsChanged) {
-            placement = std::move(newPlacement);
-        }
-
-        placement->setRecent(parameters.timePoint);
     } else {
         placement->setStale();
     }
@@ -654,7 +663,7 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
     for (const auto& sourceID : sourceIDs) {
         if (RenderSource* renderSource = getRenderSource(sourceID)) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, placement->collisionIndex);
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, placement->result->collisionIndex);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }
@@ -730,7 +739,7 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
         }
     }
 
-    if (placement->hasTransitions(timePoint)) {
+    if (placement->hasTransitions(timePoint) || placementInProgress) {
         return true;
     }
 

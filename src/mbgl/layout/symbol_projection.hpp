@@ -38,7 +38,8 @@ namespace mbgl {
     using PointAndCameraDistance = std::pair<Point<float>,float>;
     PointAndCameraDistance project(const Point<float>& point, const mat4& matrix);
 
-    void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>&, const std::vector<PlacedSymbol>&,
+    void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>&,
+            const std::vector<PlacedSymbol>&, const std::vector<bool>&,
             const mat4& posMatrix, const style::SymbolPropertyValues&,
             const RenderTile&, const SymbolSizeBinder& sizeBinder, const TransformState&);
     

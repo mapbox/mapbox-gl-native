@@ -287,9 +287,6 @@ void GeometryTile::resetCrossTileIDs() {
         auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
         if (symbolBucket && symbolBucket->bucketInstanceId) {
             symbolBucket->bucketInstanceId = 0;
-            for (auto& symbolInstance : symbolBucket->symbolInstances) {
-                symbolInstance.crossTileID = 0;
-            }
         }
     }
 }

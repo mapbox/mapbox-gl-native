@@ -107,6 +107,7 @@ private:
 
     std::unique_ptr<CrossTileSymbolIndex> crossTileSymbolIndex;
     std::unique_ptr<Placement> placement;
+    std::unique_ptr<Placement> placementInProgress;
 
     bool contextLost = false;
 };
