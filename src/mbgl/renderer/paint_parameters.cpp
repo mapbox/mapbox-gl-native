@@ -13,8 +13,7 @@ PaintParameters::PaintParameters(gl::Context& context_,
                     const EvaluatedLight& evaluatedLight_,
                     RenderStaticData& staticData_,
                     ImageManager& imageManager_,
-                    LineAtlas& lineAtlas_,
-                    TimePoint placementCommitTime)
+                    LineAtlas& lineAtlas_)
     : context(context_),
     backend(backend_),
     state(updateParameters.transformState),
@@ -26,7 +25,6 @@ PaintParameters::PaintParameters(gl::Context& context_,
     debugOptions(updateParameters.debugOptions),
     contextMode(contextMode_),
     timePoint(updateParameters.timePoint),
-    symbolFadeChange(updateParameters.mode == MapMode::Still ? 1 : std::chrono::duration<float>(placementCommitTime - updateParameters.timePoint) / Duration(std::chrono::milliseconds(300))), // TODO don't hardcode
     pixelRatio(pixelRatio_),
 #ifndef NDEBUG
     programs((debugOptions & MapDebugOptions::Overdraw) ? staticData_.overdrawPrograms : staticData_.programs)
