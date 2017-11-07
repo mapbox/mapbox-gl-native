@@ -47,7 +47,7 @@ public:
                  bool sdfIcons,
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
-                 const std::vector<SymbolInstance>&);
+                 const std::vector<SymbolInstance>&&);
 
     void upload(gl::Context&) override;
     bool hasData() const override;

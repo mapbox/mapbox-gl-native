@@ -422,9 +422,8 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
     
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, symbolInstances);
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, std::move(symbolInstances));
 
-    // this iterates over the *bucket's* symbol instances so that it can set the placedsymbol index. TODO cleanup
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
