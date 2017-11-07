@@ -49,10 +49,10 @@ namespace mbgl {
 
             // TODO: public for queryRenderedFeatures
             CollisionIndex collisionIndex;
-
-            TimePoint recentUntil;
-            bool stale = false;
-
+        
+            bool stillRecent(TimePoint now) const;
+            void setRecent(TimePoint now);
+            void setStale();
         private:
 
             void placeLayerBucket(
@@ -73,6 +73,9 @@ namespace mbgl {
 
             std::unordered_map<uint32_t,PlacementPair> placements;
             std::unordered_map<uint32_t,JointOpacityState> opacities;
+        
+            TimePoint recentUntil;
+            bool stale = false;
     };
 
 } // namespace mbgl
