@@ -239,7 +239,7 @@ void GeometryTile::queryRenderedFeatures(
                         std::pow(2, transformState.getZoom() - id.overscaledZ),
                         options,
                         *data,
-                        id.canonical,
+                        id.toUnwrapped(),
                         sourceID,
                         layers,
                         collisionIndex,

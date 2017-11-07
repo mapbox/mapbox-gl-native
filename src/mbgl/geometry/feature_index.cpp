@@ -48,7 +48,7 @@ void FeatureIndex::query(
         const double scale,
         const RenderedQueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
-        const CanonicalTileID& tileID,
+        const UnwrappedTileID& tileID,
         const std::string& sourceID,
         const std::vector<const RenderLayer*>& layers,
         const CollisionIndex& collisionIndex,
@@ -72,13 +72,13 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 
     std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 }
 

@@ -68,7 +68,7 @@ public:
             const double scale,
             const RenderedQueryOptions& options,
             const GeometryTileData&,
-            const CanonicalTileID&,
+            const UnwrappedTileID&,
             const std::string&,
             const std::vector<const RenderLayer*>&,
             const CollisionIndex&,

@@ -227,7 +227,7 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
     }
 }
 
-std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const CanonicalTileID& tileID, const std::string& sourceID) const {
+std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const std::string& sourceID) const {
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
         return result;
@@ -236,7 +236,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     mat4 posMatrix;
     mat4 projMatrix;
     transformState.getProjMatrix(projMatrix);
-    transformState.matrixFor(posMatrix, UnwrappedTileID(0, tileID)); // TODO: This probably isn't right, I think it's working right now because both the wrapped and unwrapped version are getting queried, but I haven't thought through why it should work.
+    transformState.matrixFor(posMatrix, tileID);
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
     // Two versions of the query here just because util::polygonIntersectsPolygon requires
@@ -260,7 +260,9 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     for (auto& queryResult : features) {
         auto& feature = queryResult.first;
         CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
-        if (feature.sourceID == sourceID && featureTileID == tileID) {
+        if (feature.sourceID == sourceID && featureTileID == tileID.canonical) {
+            // We only have to filter on the canonical ID because even if the feature is showing multiple times
+            // we treat it as one feature.
             thisTileFeatures.push_back(queryResult);
         }
     }
@@ -269,7 +271,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
         CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
-        if (feature.sourceID == sourceID && featureTileID == tileID) {
+        if (feature.sourceID == sourceID && featureTileID == tileID.canonical) {
             thisTileFeatures.push_back(queryResult);
         }
     }
