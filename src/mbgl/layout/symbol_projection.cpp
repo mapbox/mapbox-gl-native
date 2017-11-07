@@ -252,6 +252,28 @@ namespace mbgl {
 
         return std::make_pair(*firstPlacedGlyph, *lastPlacedGlyph);
     }
+    
+    optional<PlacementResult> requiresOrientationChange(const WritingModeType writingModes, const Point<float>& firstPoint,  const Point<float>& lastPoint, const float aspectRatio) {
+        if (writingModes == (WritingModeType::Horizontal | WritingModeType::Vertical)) {
+            // On top of choosing whether to flip, choose whether to render this version of the glyphs or the alternate
+            // vertical glyphs. We can't just filter out vertical glyphs in the horizontal range because the horizontal
+            // and vertical versions can have slightly different projections which could lead to angles where both or
+            // neither showed.
+            auto rise = std::abs(lastPoint.y - firstPoint.y);
+            auto run = std::abs(lastPoint.x - firstPoint.x) * aspectRatio;
+            if (rise > run) {
+                return PlacementResult::UseVertical;
+            }
+        }
+
+        if ((writingModes == WritingModeType::Vertical) ?
+            (firstPoint.y < lastPoint.y) :
+            (firstPoint.x > lastPoint.x)) {
+            // Includes "horizontalOnly" case for labels without vertical glyphs
+            return PlacementResult::NeedsFlipping;
+        }
+        return {};
+    }
 
     PlacementResult placeGlyphsAlongLine(const PlacedSymbol& symbol,
                               const float fontSize,
@@ -280,25 +302,10 @@ namespace mbgl {
             const Point<float> lastPoint = project(firstAndLastGlyph->second.point, glCoordMatrix).first;
 
             if (keepUpright && !flip) {
-                if (symbol.writingModes == (WritingModeType::Horizontal | WritingModeType::Vertical)) {
-                    // On top of choosing whether to flip, choose whether to render this version of the glyphs or the alternate
-                    // vertical glyphs. We can't just filter out vertical glyphs in the horizontal range because the horizontal
-                    // and vertical versions can have slightly different projections which could lead to angles where both or
-                    // neither showed.
-                    auto rise = std::abs(lastPoint.y - firstPoint.y);
-                    auto run = std::abs(lastPoint.x - firstPoint.x) * aspectRatio;
-                    if (rise > run) {
-                        return PlacementResult::UseVertical;
-                    }
+                auto orientationChange = requiresOrientationChange(symbol.writingModes, firstPoint, lastPoint, aspectRatio);
+                if (orientationChange) {
+                    return *orientationChange;
                 }
-
-                if ((symbol.writingModes == WritingModeType::Vertical) ?
-                    (firstPoint.y < lastPoint.y) :
-                    (firstPoint.x > lastPoint.x)) {
-                    // Includes "horizontalOnly" case for labels without vertical glyphs
-                    return PlacementResult::NeedsFlipping;
-                }
-
             }
 
             placedGlyphs.push_back(firstAndLastGlyph->first);
@@ -323,8 +330,9 @@ namespace mbgl {
                     projectedVertex.first :
                     projectTruncatedLineSegment(symbol.anchorPoint,tileSegmentEnd, a, 1, posMatrix);
                 
-                if (symbol.writingModes == WritingModeType::Vertical ? b.y > a.y : b.x < a.x) {
-                    return PlacementResult::NeedsFlipping;
+                auto orientationChange = requiresOrientationChange(symbol.writingModes, a, b, aspectRatio);
+                if (orientationChange) {
+                    return *orientationChange;
                 }
             }
             assert(symbol.glyphOffsets.size() == 1); // We are relying on SymbolInstance.hasText filtering out symbols without any glyphs at all
