@@ -200,7 +200,6 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
 }
 
 void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<uint32_t>& seenCrossTileIDs) {
-    // TODO check if this clear is necessary, whether the vector has been moved out
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
