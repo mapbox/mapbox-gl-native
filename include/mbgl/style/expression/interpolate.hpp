@@ -17,7 +17,6 @@ namespace mbgl {
 namespace style {
 namespace expression {
 
-
 class ExponentialInterpolator {
 public:
     ExponentialInterpolator(double base_) : base(base_) {}
@@ -56,13 +55,11 @@ public:
 
 ParseResult parseInterpolate(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
-
-template <typename T>
-class Interpolate : public Expression {
+class InterpolateBase : public Expression {
 public:
     using Interpolator = variant<ExponentialInterpolator, CubicBezierInterpolator>;
-    
-    Interpolate(const type::Type& type_,
+
+    InterpolateBase(const type::Type& type_,
           Interpolator interpolator_,
           std::unique_ptr<Expression> input_,
           std::map<double, std::unique_ptr<Expression>> stops_
@@ -70,6 +67,42 @@ public:
         interpolator(std::move(interpolator_)),
         input(std::move(input_)),
         stops(std::move(stops_))
+    {}
+
+    const std::unique_ptr<Expression>& getInput() const { return input; }
+
+    void eachChild(const std::function<void(const Expression&)>& visit) const override {
+        visit(*input);
+        for (auto it = stops.begin(); it != stops.end(); it++) {
+            visit(*(it->second));
+        }
+    }
+    
+    // Return the smallest range of stops that covers the interval [lower, upper]
+    Range<float> getCoveringStops(const double lower, const double upper) const {
+        return ::mbgl::style::expression::getCoveringStops(stops, lower, upper);
+    }
+    
+    double interpolationFactor(const Range<double>& inputLevels, const double inputValue) const {
+        return interpolator.match(
+            [&](const auto& interp) { return interp.interpolationFactor(inputLevels, inputValue); }
+        );
+    }
+
+protected:
+    const Interpolator interpolator;
+    const std::unique_ptr<Expression> input;
+    const std::map<double, std::unique_ptr<Expression>> stops;
+};
+
+template <typename T>
+class Interpolate : public InterpolateBase {
+public:
+    Interpolate(type::Type type_,
+          Interpolator interpolator_,
+          std::unique_ptr<Expression> input_,
+          std::map<double, std::unique_ptr<Expression>> stops_
+    ) : InterpolateBase(std::move(type_), std::move(interpolator_), std::move(input_), std::move(stops_))
     {
         static_assert(util::Interpolatable<T>::value, "Interpolate expression requires an interpolatable value type.");
     }
@@ -109,14 +142,6 @@ public:
 
             return interpolate({*lower, *upper}, t);
         }
-        
-    }
-    
-    void eachChild(const std::function<void(const Expression&)>& visit) const override {
-        visit(*input);
-        for (auto it = stops.begin(); it != stops.end(); it++) {
-            visit(*(it->second));
-        }
     }
     
     bool operator==(const Expression& e) const override {
@@ -132,19 +157,7 @@ public:
         }
         return false;
     }
-    
-    const std::unique_ptr<Expression>& getInput() const { return input; }
 
-    // Return the smallest range of stops that covers the interval [lower, upper]
-    Range<float> getCoveringStops(const double lower, const double upper) const {
-        return ::mbgl::style::expression::getCoveringStops(stops, lower, upper);
-    }
-    
-    double interpolationFactor(const Range<double>& inputLevels, const double inputValue) const {
-        return interpolator.match(
-            [&](const auto& interp) { return interp.interpolationFactor(inputLevels, inputValue); }
-        );
-    }
     
 private:
     static EvaluationResult interpolate(const Range<Value>& outputs, const double t) {
@@ -167,10 +180,6 @@ private:
         T result = util::interpolate(*lower, *upper, t);
         return toExpressionValue(result);
     }
-    
-    const Interpolator interpolator;
-    const std::unique_ptr<Expression> input;
-    const std::map<double, std::unique_ptr<Expression>> stops;
 };
 
 } // namespace expression

@@ -34,7 +34,7 @@ struct Converter<DataDrivenPropertyValue<T>> {
             
             bool zoomConstant = isZoomConstant(**expression);
             
-            if (!zoomConstant && !findZoomCurve<typename CameraFunction<T>::ExpressionType>(expression->get())) {
+            if (!zoomConstant && !findZoomCurve(expression->get())) {
                 error = { R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)" };
                 return {};
             }

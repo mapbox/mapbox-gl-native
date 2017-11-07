@@ -426,6 +426,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/coalesce.cpp
     src/mbgl/style/expression/coercion.cpp
     src/mbgl/style/expression/compound_expression.cpp
+    src/mbgl/style/expression/find_zoom_curve.cpp
     src/mbgl/style/expression/get_covering_stops.cpp
     src/mbgl/style/expression/interpolate.cpp
     src/mbgl/style/expression/is_constant.cpp
