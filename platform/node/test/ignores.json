@@ -96,5 +96,9 @@
   "render-tests/heatmap-radius/pitch30": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
   "render-tests/heatmap-weight/default": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
   "render-tests/heatmap-weight/identity-property-function": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
-  "render-tests/heatmap-weight/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146"
+  "render-tests/heatmap-weight/literal": "https://github.com/mapbox/mapbox-gl-native/issues/10146",
+  "render-tests/debug/collision-lines-pitched": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
+  "render-tests/debug/collision-lines": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
+  "render-tests/text-pitch-alignment/viewport-overzoomed-single-glyph": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
+  "render-tests/text-pitch-alignment/viewport-text-depthtest": "https://github.com/mapbox/mapbox-gl-native/issues/10412"
 }
