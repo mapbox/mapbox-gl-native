@@ -17,10 +17,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.attribution.Attribution;
+import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import timber.log.Timber;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -312,6 +315,11 @@ public class MapSnapshotter {
     DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
     int margin = (int) displayMetrics.density * LOGO_MARGIN_DP;
     Bitmap original = mapSnapshot.getBitmap();
+
+    for (String s : mapSnapshot.getAttributions()) {
+      Timber.e(s);
+    }
+
     TextView textView = new TextView(context);
     textView.setLayoutParams(new ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
