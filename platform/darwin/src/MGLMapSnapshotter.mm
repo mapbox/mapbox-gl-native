@@ -201,11 +201,17 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     UIImage *logoImage = [UIImage imageNamed:@"mapbox" inBundle:[NSBundle mgl_frameworkBundle] compatibleWithTraitCollection:nil];
                     
                     CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, mglImage.size.height - (MGLLogoImagePosition.y + logoImage.size.height), logoImage.size.width, logoImage.size.height);
+                    CGRect attributionBackgroundFrame = CGRectMake(mglImage.size.width - 10 - attributionBackgroundSize.width,
+                                                                   logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2) + 1,
+                                                                   attributionBackgroundSize.width,
+                                                                   attributionBackgroundSize.height);
+                    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
+                                                                  attributionBackgroundFrame.origin.y - 1);
                     
-                    CGPoint attributionTextPosition = CGPointMake(mglImage.size.width - 10 - attributionBackgroundSize.width,
-                                                                  logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2));
-                    
-                    CGRect cropRect = CGRectMake(attributionTextPosition.x * mglImage.scale, (attributionTextPosition.y + 1)  * mglImage.scale, attributionBackgroundSize.width  * mglImage.scale, attributionBackgroundSize.height  * mglImage.scale);
+                    CGRect cropRect = CGRectMake(attributionBackgroundFrame.origin.x * mglImage.scale,
+                                                 attributionBackgroundFrame.origin.y * mglImage.scale,
+                                                 attributionBackgroundSize.width * mglImage.scale,
+                                                 attributionBackgroundSize.height * mglImage.scale);
                     
                     
                     UIGraphicsBeginImageContextWithOptions(mglImage.size, NO, self.options.scale);
@@ -223,9 +229,9 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     
                     UIImage *blurredAttributionBackground = [self blurredAttributionBackground:ciAttributionImage];
                     
-                    [blurredAttributionBackground drawInRect:CGRectMake(attributionTextPosition.x, attributionTextPosition.y + 1, attributionBackgroundSize.width, attributionBackgroundSize.height)];
+                    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
                     
-                    [self drawAttributionText:infos origin:CGPointMake(attributionTextPosition.x + 10, attributionTextPosition.y)];
+                    [self drawAttributionText:infos origin:attributionTextPosition];
                     
                     UIImage *compositedImage = UIGraphicsGetImageFromCurrentImageContext();
                     
@@ -237,7 +243,11 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     NSSize targetSize = NSMakeSize(self.options.size.width, self.options.size.height);
                     NSRect targetFrame = NSMakeRect(0, 0, targetSize.width, targetSize.height);
                     CGRect logoImageRect = CGRectMake(MGLLogoImagePosition.x, MGLLogoImagePosition.y, logoImage.size.width, logoImage.size.height);
-                    CGPoint attributionTextPosition = CGPointMake(targetFrame.size.width - 10 - attributionBackgroundSize.width,
+                    CGRect attributionBackgroundFrame = CGRectMake(targetFrame.size.width - 10 - attributionBackgroundSize.width,
+                                                                   MGLLogoImagePosition.y + 1,
+                                                                   attributionBackgroundSize.width,
+                                                                   attributionBackgroundSize.height);
+                    CGPoint attributionTextPosition = CGPointMake(attributionBackgroundFrame.origin.x + 10,
                                                                   logoImageRect.origin.y + (logoImageRect.size.height / 2) - (attributionBackgroundSize.height / 2));
                     
                     
@@ -253,17 +263,15 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
                     
                     [logoImage drawInRect:logoImageRect];
                     
-                    NSRect cropRect = NSMakeRect(attributionTextPosition.x, MGLLogoImagePosition.y + 1, attributionBackgroundSize.width, attributionBackgroundSize.height);
-                    
-                    NSBitmapImageRep *attributionBackground = [[NSBitmapImageRep alloc] initWithFocusedViewRect: cropRect];
+                    NSBitmapImageRep *attributionBackground = [[NSBitmapImageRep alloc] initWithFocusedViewRect:attributionBackgroundFrame];
                     
                     CIImage *attributionBackgroundImage = [[CIImage alloc] initWithCGImage:[attributionBackground CGImage]];
                     
                     NSImage *blurredAttributionBackground = [self blurredAttributionBackground:attributionBackgroundImage];
 
-                    [blurredAttributionBackground drawInRect:CGRectMake(attributionTextPosition.x, MGLLogoImagePosition.y + 1, attributionBackgroundSize.width, attributionBackgroundSize.height)];
+                    [blurredAttributionBackground drawInRect:attributionBackgroundFrame];
                     
-                    [self drawAttributionText:infos origin:CGPointMake(attributionTextPosition.x + 10, attributionTextPosition.y)];
+                    [self drawAttributionText:infos origin:attributionTextPosition];
                     
                     [compositedImage unlockFocus];
                     
