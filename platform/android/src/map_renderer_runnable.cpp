@@ -8,11 +8,13 @@ namespace android {
 MapRendererRunnable::MapRendererRunnable(jni::JNIEnv& env, std::weak_ptr<Mailbox> mailbox_)
     : mailbox(std::move(mailbox_)) {
 
-    // Create the Java peer
+    // Create the Java peer and hold on to a global reference
+    // Not using a weak reference here as this might oerflow
+    // the weak reference table on some devices
     jni::UniqueLocalFrame frame = jni::PushLocalFrame(env, 5);
     static auto constructor = javaClass.GetConstructor<jlong>(env);
     auto instance = javaClass.New(env, constructor, reinterpret_cast<jlong>(this));
-    javaPeer = SeizeGenericWeakRef(env, jni::Object<MapRendererRunnable>(jni::NewWeakGlobalRef(env, instance.Get()).release()));
+    javaPeer = instance.NewGlobalRef(env);
 }
 
 MapRendererRunnable::~MapRendererRunnable() = default;
@@ -21,8 +23,8 @@ void MapRendererRunnable::run(jni::JNIEnv&) {
     Mailbox::maybeReceive(mailbox);
 }
 
-jni::Object<MapRendererRunnable> MapRendererRunnable::getPeer() {
-    return *javaPeer;
+jni::UniqueObject<MapRendererRunnable> MapRendererRunnable::peer() {
+    return std::move(javaPeer);
 }
 
 // Static methods //
