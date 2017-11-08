@@ -11,22 +11,16 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 import android.text.Html;
-import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import com.mapbox.mapboxsdk.R;
-import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
-import timber.log.Timber;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * The map snapshotter creates a bitmap of the map, rendered
@@ -316,27 +310,24 @@ public class MapSnapshotter {
     int margin = (int) displayMetrics.density * LOGO_MARGIN_DP;
     Bitmap original = mapSnapshot.getBitmap();
 
-    for (String s : mapSnapshot.getAttributions()) {
-      Timber.e(s);
-    }
-
     TextView textView = new TextView(context);
     textView.setLayoutParams(new ViewGroup.LayoutParams(
       ViewGroup.LayoutParams.WRAP_CONTENT,
       ViewGroup.LayoutParams.WRAP_CONTENT)
     );
     textView.setSingleLine(true);
-    textView.setTextSize(11 * logo.scale);
+    textView.setTextSize(10 * logo.scale);
     textView.setText(Html.fromHtml(createAttribution(mapSnapshot)));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       textView.setClipToOutline(true);
     }
-    canvas.save();
     int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(original.getWidth(), View.MeasureSpec.AT_MOST);
     int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
     textView.setPadding(margin, 0, margin, margin);
     textView.setBackgroundResource(R.drawable.mapbox_rounded_corner);
     textView.measure(widthMeasureSpec, heightMeasureSpec);
+
+    canvas.save();
     textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
     canvas.translate(logo.getWidth(), logo.getTop());
     textView.draw(canvas);
@@ -344,46 +335,13 @@ public class MapSnapshotter {
   }
 
   private String createAttribution(MapSnapshot mapSnapshot) {
-    String[] urls = parseAttribution(mapSnapshot);
-    return filterAttribution(urls);
-  }
+    AttributionParser attributionParser = new AttributionParser.Options()
+      .withAttributionData(mapSnapshot.getAttributions())
+      .withCopyrightSign(false)
+      .withImproveMap(false)
+      .build();
 
-  private String[] parseAttribution(MapSnapshot mapSnapshot) {
-    StringBuilder builder = new StringBuilder();
-    for (String attr : mapSnapshot.getAttributions()) {
-      if (!attr.isEmpty()) {
-        builder.append(attr);
-      }
-    }
-    return builder.toString().split("(?=<a)");
-  }
-
-  private String filterAttribution(String[] urls) {
-    StringBuilder output = new StringBuilder();
-    List<String> uniqueList = new ArrayList<>();
-    for (String url : urls) {
-      if (!url.isEmpty() && !url.contains("mapbox-improve-map") && !uniqueList.contains(url)) {
-        output.append(url);
-        uniqueList.add(url);
-      }
-    }
-    return output.toString();
-  }
-
-  /**
-   * Convert a string to a spanned html representation.
-   *
-   * @param html the string to convert
-   * @return the spanned html representation
-   */
-  private static Spanned fromHtml(String html) {
-    Spanned result;
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-      result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
-    } else {
-      result = Html.fromHtml(html);
-    }
-    return result;
+    return attributionParser.getAttributionString();
   }
 
   /**

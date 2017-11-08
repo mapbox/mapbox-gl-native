@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.attribution;
 
 import android.text.Html;
 import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.URLSpan;
 
 import java.util.LinkedHashSet;
@@ -30,13 +31,26 @@ public class AttributionParser {
     return attributions;
   }
 
+  public String getAttributionString() {
+    StringBuilder stringBuilder = new StringBuilder(withCopyrightSign ? "" : "© ");
+    int counter = 0;
+    for (Attribution attribution : attributions) {
+      counter++;
+      stringBuilder.append(attribution.getTitle());
+      if (counter != attributions.size()) {
+        stringBuilder.append(" / ");
+      }
+    }
+    return stringBuilder.toString();
+  }
+
   void parse() {
     parseAttributions();
     addAdditionalAttributions();
   }
 
   private void parseAttributions() {
-    SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionDataString);
+    SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) fromHtml(attributionDataString);
     URLSpan[] urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
     for (URLSpan urlSpan : urlSpans) {
       parseUrlSpan(htmlBuilder, urlSpan);
@@ -85,6 +99,22 @@ public class AttributionParser {
       String telemetryLink = "https://www.mapbox.com/telemetry/";
       attributions.add(new Attribution(telemetryKey, telemetryLink));
     }
+  }
+
+  /**
+   * Convert a string to a spanned html representation.
+   *
+   * @param html the string to convert
+   * @return the spanned html representation
+   */
+  private static Spanned fromHtml(String html) {
+    Spanned result;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      result = Html.fromHtml(html, Html.FROM_HTML_MODE_LEGACY);
+    } else {
+      result = Html.fromHtml(html);
+    }
+    return result;
   }
 
   public static class Options {
