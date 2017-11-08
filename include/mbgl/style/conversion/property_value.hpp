@@ -25,10 +25,6 @@ struct Converter<PropertyValue<T>> {
                 return {};
             }
             if (isFeatureConstant(**expression)) {
-                if (!isZoomConstant(**expression) && !findZoomCurve(expression->get())) {
-                    error = { R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)" };
-                    return {};
-                }
                 return { CameraFunction<T>(std::move(*expression)) };
             } else {
                 error = { "property expressions not supported" };

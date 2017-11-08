@@ -18,6 +18,7 @@ class Expression;
 struct ParsingError {
     std::string message;
     std::string key;
+    bool operator==(const ParsingError& rhs) const { return message == rhs.message && key == rhs.key; }
 };
 
 using ParseResult = optional<std::unique_ptr<Expression>>;

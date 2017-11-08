@@ -52,7 +52,7 @@ public:
 
     CompositeFunction(std::unique_ptr<expression::Expression> expression_)
     :   expression(std::move(expression_)),
-        zoomCurve(*expression::findZoomCurve(expression.get()))
+        zoomCurve(expression::findZoomCurveChecked(expression.get()))
     {
         assert(!expression::isZoomConstant(*expression));
         assert(!expression::isFeatureConstant(*expression));
@@ -65,7 +65,7 @@ public:
         expression(stops.match([&] (const auto& s) {
             return expression::Convert::toExpression(property, s);
         })),
-        zoomCurve(*expression::findZoomCurve(expression.get()))
+        zoomCurve(expression::findZoomCurveChecked(expression.get()))
     {}
 
     // Return the range obtained by evaluating the function at each of the zoom levels in zoomRange
@@ -89,10 +89,10 @@ public:
     
     float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
         return zoomCurve.match(
-            [&](expression::InterpolateBase* z) {
+            [&](const expression::InterpolateBase* z) {
                 return z->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
             },
-            [&](expression::Step*) { return 0.0f; }
+            [&](const expression::Step*) { return 0.0f; }
         );
     }
     
@@ -114,7 +114,7 @@ public:
     
 private:
     std::shared_ptr<expression::Expression> expression;
-    const variant<expression::InterpolateBase*, expression::Step*> zoomCurve;
+    const variant<const expression::InterpolateBase*, const expression::Step*> zoomCurve;
 };
 
 } // namespace style

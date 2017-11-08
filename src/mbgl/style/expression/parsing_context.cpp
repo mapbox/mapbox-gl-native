@@ -19,6 +19,8 @@
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/step.hpp>
 
+#include <mbgl/style/expression/find_zoom_curve.hpp>
+
 #include <mbgl/style/conversion/get_json_type.hpp>
 
 namespace mbgl {
@@ -174,7 +176,19 @@ ParseResult ParsingContext::parse(const Convertible& value)
             return ParseResult(std::make_unique<Literal>(*evaluated));
         }
     }
-    
+
+    // if this is the root expression, enforce constraints on the use ["zoom"].
+    if (key.size() == 0 && parsed && !isZoomConstant(**parsed)) {
+        optional<variant<const InterpolateBase*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
+        if (!zoomCurve) {
+            error(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)");
+            return ParseResult();
+        } else if (zoomCurve->is<ParsingError>()) {
+            error(zoomCurve->get<ParsingError>().message);
+            return ParseResult();
+        }
+    }
+
     return parsed;
 }
 

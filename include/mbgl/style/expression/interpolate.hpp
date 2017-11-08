@@ -73,8 +73,8 @@ public:
 
     void eachChild(const std::function<void(const Expression&)>& visit) const override {
         visit(*input);
-        for (auto it = stops.begin(); it != stops.end(); it++) {
-            visit(*(it->second));
+        for (const std::pair<const double, const std::unique_ptr<Expression>&>& stop : stops) {
+            visit(*stop.second);
         }
     }
     
