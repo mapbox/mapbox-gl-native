@@ -140,7 +140,20 @@ public:
                 return upper.error();
             }
 
-            return interpolate({*lower, *upper}, t);
+            if (!lower->is<T>()) {
+                return EvaluationError {
+                    "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
+                    ", but found " + toString(typeOf(*lower)) + " instead."
+                };
+            }
+            
+            if (!upper->is<T>()) {
+                return EvaluationError {
+                    "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
+                    ", but found " + toString(typeOf(*upper)) + " instead."
+                };
+            }
+            return util::interpolate(lower->get<T>(), upper->get<T>(), t);
         }
     }
     
@@ -156,29 +169,6 @@ public:
             return Expression::childrenEqual(stops, rhs->stops);
         }
         return false;
-    }
-
-    
-private:
-    static EvaluationResult interpolate(const Range<Value>& outputs, const double t) {
-        optional<T> lower = fromExpressionValue<T>(outputs.min);
-        if (!lower) {
-            // TODO - refactor fromExpressionValue to return EvaluationResult<T> so as to
-            // consolidate DRY up producing this error message.
-            return EvaluationError {
-                "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
-                ", but found " + toString(typeOf(outputs.min)) + " instead."
-            };
-        }
-        const optional<T> upper = fromExpressionValue<T>(outputs.max);
-        if (!upper) {
-            return EvaluationError {
-                "Expected value to be of type " + toString(valueTypeToExpressionType<T>()) +
-                ", but found " + toString(typeOf(outputs.min)) + " instead."
-            };
-        }
-        T result = util::interpolate(*lower, *upper, t);
-        return toExpressionValue(result);
     }
 };
 
