@@ -190,11 +190,11 @@ public:
     CompositeFunctionPaintPropertyBinder(style::CompositeFunction<T> function_, float zoom, T defaultValue_)
         : function(std::move(function_)),
           defaultValue(std::move(defaultValue_)),
-          rangeOfCoveringRanges(function.rangeOfCoveringRanges({zoom, zoom + 1})) {
+          zoomRange({zoom, zoom + 1}) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        Range<T> range = function.evaluate(rangeOfCoveringRanges, feature, defaultValue);
+        Range<T> range = function.evaluate(zoomRange, feature, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(
@@ -219,9 +219,9 @@ public:
 
     float interpolationFactor(float currentZoom) const override {
         if (function.useIntegerZoom) {
-            return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, std::floor(currentZoom));
+            return function.interpolationFactor(zoomRange, std::floor(currentZoom));
         } else {
-            return util::interpolationFactor(1.0f, { rangeOfCoveringRanges.min.zoom, rangeOfCoveringRanges.max.zoom }, currentZoom);
+            return function.interpolationFactor(zoomRange, currentZoom);
         }
     }
 
@@ -237,8 +237,7 @@ public:
 private:
     style::CompositeFunction<T> function;
     T defaultValue;
-    using CoveringRanges = typename style::CompositeFunction<T>::CoveringRanges;
-    Range<CoveringRanges> rangeOfCoveringRanges;
+    Range<float> zoomRange;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };

@@ -88,6 +88,10 @@ set(MBGL_TEST_FILES
     test/style/conversion/light.test.cpp
     test/style/conversion/stringify.test.cpp
 
+    # style/expression
+    test/style/expression/expression.test.cpp
+    test/style/expression/util.test.cpp
+
     # style
     test/style/filter.test.cpp
 

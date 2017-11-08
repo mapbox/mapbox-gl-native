@@ -1,0 +1,12 @@
+[
+  "match",
+  [
+    "get",
+    "x"
+  ],
+  "a",
+  "Apple",
+  "b",
+  "Banana",
+  "Kumquat_other"
+]

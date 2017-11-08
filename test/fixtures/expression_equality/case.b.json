@@ -1,0 +1,14 @@
+[
+  "case",
+  [
+    "get",
+    "x"
+  ],
+  "x",
+  [
+    "get",
+    "y"
+  ],
+  "y",
+  "otherwise_other"
+]
