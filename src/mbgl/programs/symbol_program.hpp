@@ -128,23 +128,6 @@ public:
     }
 };
 
-// Return the smallest range of stops that covers the interval [lowerZoom, upperZoom]
-template <class Stops>
-Range<float> getCoveringStops(Stops s, float lowerZoom, float upperZoom) {
-    assert(!s.stops.empty());
-    auto minIt = s.stops.lower_bound(lowerZoom);
-    auto maxIt = s.stops.lower_bound(upperZoom);
-    
-    // lower_bound yields first element >= lowerZoom, but we want the *last*
-    // element <= lowerZoom, so if we found a stop > lowerZoom, back up by one.
-    if (minIt != s.stops.begin() && minIt != s.stops.end() && minIt->first > lowerZoom) {
-        minIt--;
-    }
-    return Range<float> {
-        minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
-        maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
-    };
-}
 
 class ConstantSymbolSizeBinder final : public SymbolSizeBinder {
 public:
@@ -155,19 +138,12 @@ public:
       : layoutSize(defaultValue) {}
     
     ConstantSymbolSizeBinder(const float tileZoom, const style::CameraFunction<float>& function_, const float /*defaultValue*/)
-      : layoutSize(function_.evaluate(tileZoom + 1)) {
-        function_.stops.match(
-            [&] (const style::ExponentialStops<float>& stops) {
-                const auto& zoomLevels = getCoveringStops(stops, tileZoom, tileZoom + 1);
-                coveringRanges = std::make_tuple(
-                    zoomLevels,
-                    Range<float> { function_.evaluate(zoomLevels.min), function_.evaluate(zoomLevels.max) }
-                );
-                functionInterpolationBase = stops.base;
-            },
-            [&] (const style::IntervalStops<float>&) {
-                function = function_;
-            }
+      : layoutSize(function_.evaluate(tileZoom + 1)),
+        function(function_) {
+        const Range<float> zoomLevels = function_.getCoveringStops(tileZoom, tileZoom + 1);
+        coveringRanges = std::make_tuple(
+            zoomLevels,
+            Range<float> { function_.evaluate(zoomLevels.min), function_.evaluate(zoomLevels.max) }
         );
     }
     
@@ -185,7 +161,7 @@ public:
             const Range<float>& zoomLevels = std::get<0>(*coveringRanges);
             const Range<float>& sizeLevels = std::get<1>(*coveringRanges);
             float t = util::clamp(
-                util::interpolationFactor(*functionInterpolationBase, zoomLevels, currentZoom),
+                function->interpolationFactor(zoomLevels, currentZoom),
                 0.0f, 1.0f
             );
             size = sizeLevels.min + t * (sizeLevels.max - sizeLevels.min);
@@ -198,10 +174,7 @@ public:
     }
     
     float layoutSize;
-    // used for exponential functions
     optional<std::tuple<Range<float>, Range<float>>> coveringRanges;
-    optional<float> functionInterpolationBase;
-    // used for interval functions
     optional<style::CameraFunction<float>> function;
 };
 
@@ -226,7 +199,7 @@ public:
         return { true, false, unused, unused, unused };
     }
     
-    const style::SourceFunction<float>& function;
+    style::SourceFunction<float> function;
     const float defaultValue;
 };
 
@@ -237,9 +210,7 @@ public:
         : function(function_),
           defaultValue(defaultValue_),
           layoutZoom(tileZoom + 1),
-          coveringZoomStops(function.stops.match(
-            [&] (const auto& stops) {
-            return getCoveringStops(stops, tileZoom, tileZoom + 1); }))
+          coveringZoomStops(function.getCoveringStops(tileZoom, tileZoom + 1))
     {}
 
     Range<float> getVertexSizeData(const GeometryTileFeature& feature) override {
@@ -251,7 +222,7 @@ public:
     
     ZoomEvaluatedSize evaluateForZoom(float currentZoom) const override {
         float sizeInterpolationT = util::clamp(
-            util::interpolationFactor(1.0f, coveringZoomStops, currentZoom),
+            function.interpolationFactor(coveringZoomStops, currentZoom),
             0.0f, 1.0f
         );
 
@@ -259,7 +230,7 @@ public:
         return { false, false, sizeInterpolationT, unused, unused };
     }
     
-    const style::CompositeFunction<float>& function;
+    style::CompositeFunction<float> function;
     const float defaultValue;
     float layoutZoom;
     Range<float> coveringZoomStops;

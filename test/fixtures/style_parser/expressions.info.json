@@ -1,0 +1,12 @@
+{
+    "default": {
+        "log": [
+            [1, "WARNING", "ParseStyle", "Expected color but found number instead."],
+            [1, "WARNING", "ParseStyle", "[2]: Expected number but found string instead."],
+            [1, "WARNING", "ParseStyle", "\"zoom\" expression may only be used as input to a top-level \"step\" or \"interpolate\" expression."],
+            [1, "WARNING", "ParseStyle", "value must be a string"],
+            [1, "WARNING", "ParseStyle", "property expressions not supported"],
+            [1, "WARNING", "ParseStyle", "Type array<number> is not interpolatable."]
+        ]
+    }
+}

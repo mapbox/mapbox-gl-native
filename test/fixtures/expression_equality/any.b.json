@@ -1,0 +1,17 @@
+[
+  "any",
+  [
+    "boolean",
+    [
+      "get",
+      "x"
+    ]
+  ],
+  [
+    "boolean",
+    [
+      "get",
+      "y_other"
+    ]
+  ]
+]

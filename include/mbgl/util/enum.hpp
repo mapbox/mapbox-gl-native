@@ -11,6 +11,7 @@ namespace mbgl {
 template <typename T>
 class Enum {
 public:
+    using Type = T;
     static const char * toString(T);
     static optional<T> toEnum(const std::string&);
 };

@@ -1,0 +1,20 @@
+[
+  "number",
+  [
+    "at",
+    [
+      "number",
+      [
+        "get",
+        "i"
+      ]
+    ],
+    [
+      "array",
+      [
+        "get",
+        "arr_other"
+      ]
+    ]
+  ]
+]
