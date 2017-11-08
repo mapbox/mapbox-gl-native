@@ -1950,10 +1950,10 @@ public:
 - (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
 {
     CGFloat slope = (west.y - east.y) / (west.x - east.x);
-    
+             
     CGFloat angle = atan(fabs(slope));
     CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
-                 
+    
     return degrees;
 }
 
