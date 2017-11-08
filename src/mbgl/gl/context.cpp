@@ -237,6 +237,9 @@ UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size, cons
 }
 
 void Context::updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size) {
+    // Be sure to unbind any existing vertex array object before binding the index buffer
+    // so that we don't mess up another VAO
+    bindVertexArray = 0;
     globalVertexArrayState.indexBuffer = buffer;
     MBGL_CHECK_ERROR(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data));
 }
