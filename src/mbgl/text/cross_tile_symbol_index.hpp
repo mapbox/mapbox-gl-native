@@ -58,6 +58,8 @@ class CrossTileSymbolIndex {
         CrossTileSymbolIndex();
 
         bool addLayer(RenderSymbolLayer&);
+    
+        void reset();
     private:
         std::map<std::string,CrossTileSymbolLayerIndex> layerIndexes;
 };

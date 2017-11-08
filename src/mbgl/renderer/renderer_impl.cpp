@@ -366,6 +366,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     bool symbolBucketsChanged = false;
+    if (parameters.mapMode == MapMode::Still) {
+        // TODO: Think about right way for symbol index to handle still rendering
+        crossTileSymbolIndex->reset();
+    }
     for (auto it = order.rbegin(); it != order.rend(); ++it) {
         if (it->layer.is<RenderSymbolLayer>()) {
             if (crossTileSymbolIndex->addLayer(*it->layer.as<RenderSymbolLayer>())) symbolBucketsChanged = true;

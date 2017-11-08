@@ -158,5 +158,10 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
     }
     return symbolBucketsChanged;
 }
+
+void CrossTileSymbolIndex::reset() {
+    layerIndexes.clear();
+}
+
 } // namespace mbgl
 
