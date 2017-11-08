@@ -285,6 +285,10 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/fill_outline_pattern.hpp
     src/mbgl/shaders/fill_pattern.cpp
     src/mbgl/shaders/fill_pattern.hpp
+    src/mbgl/shaders/hillshade.cpp
+    src/mbgl/shaders/hillshade.hpp
+    src/mbgl/shaders/hillshade_prepare.cpp
+    src/mbgl/shaders/hillshade_prepare.hpp
     src/mbgl/shaders/line.cpp
     src/mbgl/shaders/line.hpp
     src/mbgl/shaders/line_pattern.cpp
