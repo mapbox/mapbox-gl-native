@@ -1953,7 +1953,7 @@ public:
     
     CGFloat angle = atan(fabs(slope));
     CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
-    
+                 
     return degrees;
 }
 
