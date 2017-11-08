@@ -10,6 +10,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -110,6 +111,7 @@ namespace android {
         void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support filters"); }
         void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support filters"); }
         void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support filters"); }
+        void operator()(style::HillshadeLayer&) { Log::Warning(mbgl::Event::JNI, "HillshadeLayer doesn't support filters"); }
 
         template <class LayerType>
         void operator()(LayerType& layer) {
@@ -137,6 +139,7 @@ namespace android {
         void operator()(style::BackgroundLayer&) { Log::Warning(mbgl::Event::JNI, "BackgroundLayer doesn't support source layer"); }
         void operator()(style::CustomLayer&) { Log::Warning(mbgl::Event::JNI, "CustomLayer doesn't support source layer"); }
         void operator()(style::RasterLayer&) { Log::Warning(mbgl::Event::JNI, "RasterLayer doesn't support source layer"); }
+        void operator()(style::HillshadeLayer&) { Log::Warning(mbgl::Event::JNI, "HillshadeLayer doesn't support source layer"); }
 
         template <class LayerType>
         void operator()(LayerType& layer) {
@@ -157,6 +160,7 @@ namespace android {
         std::string operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
         std::string operator()(style::CustomLayer&) { return noop("CustomLayer"); }
         std::string operator()(style::RasterLayer&) { return noop("RasterLayer"); }
+        std::string operator()(style::HillshadeLayer&) { return noop("HillshadeLayer"); }
 
         template <class LayerType>
         std::string operator()(LayerType& layer) {

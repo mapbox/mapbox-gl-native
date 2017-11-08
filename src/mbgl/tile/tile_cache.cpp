@@ -33,13 +33,22 @@ void TileCache::add(const OverscaledTileID& key, std::unique_ptr<Tile> tile) {
 
     // purge oldest key/tile if necessary
     if (orderedKeys.size() > size) {
-        get(orderedKeys.front());
+        pop(orderedKeys.front());
     }
 
     assert(orderedKeys.size() <= size);
 }
 
-std::unique_ptr<Tile> TileCache::get(const OverscaledTileID& key) {
+Tile* TileCache::get(const OverscaledTileID& key) {
+    auto it = tiles.find(key);
+    if (it != tiles.end()) {
+        return it->second.get();
+    } else {
+        return nullptr;
+    }
+}
+
+std::unique_ptr<Tile> TileCache::pop(const OverscaledTileID& key) {
 
     std::unique_ptr<Tile> tile;
 

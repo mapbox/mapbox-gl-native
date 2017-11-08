@@ -190,6 +190,7 @@ In style JSON | In the SDK
 `circle` | `MGLCircleStyleLayer`
 `fill` | `MGLFillStyleLayer`
 `fill-extrusion` | `MGLFillExtrusionStyleLayer`
+`hillshade` | `MGLHillshadeStyleLayer`
 `line` | `MGLLineStyleLayer`
 `raster` | `MGLRasterStyleLayer`
 `symbol` | `MGLSymbolStyleLayer`

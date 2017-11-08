@@ -9,6 +9,7 @@ enum class LayerType {
     Circle,
     Symbol,
     Raster,
+    Hillshade,
     Background,
     Custom,
     FillExtrusion,

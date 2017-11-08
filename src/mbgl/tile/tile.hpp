@@ -43,7 +43,7 @@ public:
     virtual void setNecessity(TileNecessity) {}
 
     // Mark this tile as no longer needed and cancel any pending work.
-    virtual void cancel() = 0;
+    virtual void cancel();
 
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
