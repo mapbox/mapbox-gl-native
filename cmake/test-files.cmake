@@ -112,7 +112,6 @@ set(MBGL_TEST_FILES
     test/text/quads.test.cpp
 
     # tile
-    test/tile/annotation_tile.test.cpp
     test/tile/geojson_tile.test.cpp
     test/tile/geometry_tile_data.test.cpp
     test/tile/raster_tile.test.cpp
@@ -124,6 +123,7 @@ set(MBGL_TEST_FILES
     test/util/async_task.test.cpp
     test/util/dtoa.test.cpp
     test/util/geo.test.cpp
+    test/util/grid_index.test.cpp
     test/util/http_timeout.test.cpp
     test/util/image.test.cpp
     test/util/mapbox.test.cpp

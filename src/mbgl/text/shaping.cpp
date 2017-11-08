@@ -313,7 +313,7 @@ void shapeLines(Shaping& shaping,
 
     align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
           lineHeight, lines.size());
-    const uint32_t height = lines.size() * lineHeight;
+    const float height = lines.size() * lineHeight;
 
     // Calculate the bounding box
     shaping.top += -anchorAlign.verticalAlign * height;

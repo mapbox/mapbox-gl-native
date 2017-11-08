@@ -23,10 +23,12 @@ namespace mbgl {
 class DebugBucket;
 class TransformState;
 class TileObserver;
-class PlacementConfig;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
+
+class CollisionIndex;
+struct CollisionFadeTimes;
 
 namespace gl {
 class Context;
@@ -47,7 +49,7 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
-    virtual void setPlacementConfig(const PlacementConfig&) {}
+    virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
 
@@ -56,7 +58,8 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>&,
-            const RenderedQueryOptions& options);
+            const RenderedQueryOptions& options,
+            const CollisionIndex&);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
@@ -92,6 +95,8 @@ public:
     bool isComplete() const {
         return loaded && !pending;
     }
+    
+    virtual void resetCrossTileIDs() {};
 
     void dumpDebugLogs() const;
 
@@ -101,8 +106,6 @@ public:
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
-    
-    virtual float yStretch() const { return 1.0f; }
 
 protected:
     bool triedOptional = false;

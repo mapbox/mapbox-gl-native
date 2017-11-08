@@ -35,6 +35,7 @@ private:
 template <class DrawMode>
 class IndexBuffer {
 public:
+    std::size_t indexCount;
     UniqueBuffer buffer;
 };
 
