@@ -6,6 +6,7 @@
 #include <QStringList>
 #include <QThread>
 #include <QVariant>
+#include <QAtomicInt>
 
 #include <cassert>
 #include <cstring>
@@ -60,20 +61,26 @@ void checkDatabaseOpenError(const QSqlDatabase &db) {
     }
 }
 
+namespace {
+    QString incrementCounter() {
+        static QAtomicInt count = 0;
+        return QString::number(count.fetchAndAddAcquire(1));
+    }
+}
+
 class DatabaseImpl {
 public:
-    DatabaseImpl(const char* filename, int flags) {
-        static uint64_t count = 0;
-        const QString connectionName = QString::number(uint64_t(QThread::currentThread())) + QString::number(count++);
-
+    DatabaseImpl(const char* filename, int flags)
+        : connectionName(QString::number(uint64_t(QThread::currentThread())) + incrementCounter())
+    {
         if (!QSqlDatabase::drivers().contains("QSQLITE")) {
             throw Exception { Exception::Code::CANTOPEN, "SQLite driver not found." };
         }
 
         assert(!QSqlDatabase::contains(connectionName));
-        db.reset(new QSqlDatabase(QSqlDatabase::addDatabase("QSQLITE", connectionName)));
+        auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
 
-        QString connectOptions = db->connectOptions();
+        QString connectOptions = db.connectOptions();
         if (flags & OpenFlag::ReadOnly) {
             if (!connectOptions.isEmpty()) connectOptions.append(';');
             connectOptions.append("QSQLITE_OPEN_READONLY");
@@ -83,20 +90,21 @@ public:
             connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
         }
 
-        db->setConnectOptions(connectOptions);
-        db->setDatabaseName(QString(filename));
+        db.setConnectOptions(connectOptions);
+        db.setDatabaseName(QString(filename));
 
-        if (!db->open()) {
-            checkDatabaseOpenError(*db);
+        if (!db.open()) {
+            checkDatabaseOpenError(db);
         }
     }
 
     ~DatabaseImpl() {
-        db->close();
-        checkDatabaseError(*db);
+        auto db = QSqlDatabase::database(connectionName);
+        db.close();
+        checkDatabaseError(db);
     }
 
-    QScopedPointer<QSqlDatabase> db;
+    QString connectionName;
 };
 
 class StatementImpl {
@@ -146,17 +154,18 @@ void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     // internally to int, so we need to make sure the limits apply.
     std::string timeoutStr = mbgl::util::toString(timeout.count() & INT_MAX);
 
-    QString connectOptions = impl->db->connectOptions();
+    auto db = QSqlDatabase::database(impl->connectionName);
+    QString connectOptions = db.connectOptions();
     if (connectOptions.isEmpty()) {
         if (!connectOptions.isEmpty()) connectOptions.append(';');
         connectOptions.append("QSQLITE_BUSY_TIMEOUT=").append(QString::fromStdString(timeoutStr));
     }
-    if (impl->db->isOpen()) {
-        impl->db->close();
+    if (db.isOpen()) {
+        db.close();
     }
-    impl->db->setConnectOptions(connectOptions);
-    if (!impl->db->open()) {
-        checkDatabaseOpenError(*impl->db);
+    db.setConnectOptions(connectOptions);
+    if (!db.open()) {
+        checkDatabaseOpenError(db);
     }
 }
 
@@ -168,7 +177,7 @@ void Database::exec(const std::string &sql) {
         if (!statement.endsWith(';')) {
             statement.append(';');
         }
-        QSqlQuery query(*impl->db);
+        QSqlQuery query(QSqlDatabase::database(impl->connectionName));
         query.prepare(statement);
 
         if (!query.exec()) {
@@ -182,7 +191,7 @@ Statement Database::prepare(const char *query) {
 }
 
 Statement::Statement(Database *db, const char *sql)
-        : impl(std::make_unique<StatementImpl>(QString(sql), *db->impl->db)) {
+        : impl(std::make_unique<StatementImpl>(QString(sql), QSqlDatabase::database(db->impl->connectionName))) {
     assert(impl);
 }
 
