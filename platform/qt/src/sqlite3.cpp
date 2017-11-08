@@ -305,18 +305,19 @@ void Statement::bindBlob(int offset, const std::vector<uint8_t>& value, bool ret
 bool Statement::run() {
     assert(impl);
 
-    if (impl->query.isValid()) {
-        return impl->query.next();
+    if (!impl->query.isValid()) {
+       if (impl->query.exec()) {
+           impl->lastInsertRowId = impl->query.lastInsertId().value<int64_t>();
+           impl->changes = impl->query.numRowsAffected();
+       } else {
+           checkQueryError(impl->query);
+       }
     }
 
-    if (!impl->query.exec()) {
-        checkQueryError(impl->query);
-    }
+    const bool hasNext = impl->query.next();
+    if (!hasNext) impl->query.finish();
 
-    impl->lastInsertRowId = impl->query.lastInsertId().value<int64_t>();
-    impl->changes = impl->query.numRowsAffected();
-
-    return impl->query.next();
+    return hasNext;
 }
 
 template bool Statement::get(int);
