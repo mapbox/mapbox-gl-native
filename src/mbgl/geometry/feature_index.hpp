@@ -36,7 +36,7 @@ public:
         , sourceLayerName(std::move(sourceLayerName_))
         , bucketName(std::move(bucketName_))
         , sortIndex(std::move(sortIndex_))
-        , sourceID(sourceID_)
+        , sourceID(std::move(sourceID_))
         , z(z_)
         , x(x_)
         , y(y_)
