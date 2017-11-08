@@ -8,8 +8,6 @@
 
 #include <jni/jni.hpp>
 
-#include "jni/generic_global_ref_deleter.hpp"
-
 namespace mbgl {
 namespace android {
 
@@ -39,10 +37,11 @@ public:
 
     void run(jni::JNIEnv&);
 
-    jni::Object<MapRendererRunnable> getPeer();
+    // Transfers ownership of the Peer object to the caller
+    jni::UniqueObject<MapRendererRunnable> peer();
 
 private:
-    GenericUniqueWeakObject<MapRendererRunnable> javaPeer;
+    jni::UniqueObject<MapRendererRunnable> javaPeer;
     std::weak_ptr<Mailbox> mailbox;
 };
 
