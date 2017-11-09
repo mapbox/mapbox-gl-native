@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.layers;
 
 import com.mapbox.mapboxsdk.style.functions.Function;
-
 import org.junit.Test;
 
 import static com.mapbox.mapboxsdk.style.functions.Function.zoom;

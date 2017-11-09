@@ -10,11 +10,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 
 import java.util.Arrays;
-import java.util.Comparator;
 
 public class FeatureSectionAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
@@ -126,14 +124,9 @@ public class FeatureSectionAdapter extends RecyclerView.Adapter<RecyclerView.Vie
   public void setSections(Section[] sections) {
     this.sections.clear();
 
-    Arrays.sort(sections, new Comparator<Section>() {
-      @Override
-      public int compare(Section section, Section section1) {
-        return (section.firstPosition == section1.firstPosition)
-          ? 0
-          : ((section.firstPosition < section1.firstPosition) ? -1 : 1);
-      }
-    });
+    Arrays.sort(sections, (section, section1) -> (section.firstPosition == section1.firstPosition)
+      ? 0
+      : ((section.firstPosition < section1.firstPosition) ? -1 : 1));
 
     int offset = 0;
     for (Section section : sections) {

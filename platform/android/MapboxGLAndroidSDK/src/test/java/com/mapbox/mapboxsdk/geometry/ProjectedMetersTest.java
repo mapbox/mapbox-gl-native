@@ -1,9 +1,7 @@
 package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

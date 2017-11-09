@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.espresso;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;

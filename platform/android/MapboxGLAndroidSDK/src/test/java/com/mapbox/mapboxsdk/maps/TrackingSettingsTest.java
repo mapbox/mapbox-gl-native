@@ -4,10 +4,8 @@ import android.Manifest;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.PointF;
-
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

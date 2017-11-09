@@ -2,11 +2,9 @@ package com.mapbox.mapboxsdk.camera;
 
 import android.content.res.TypedArray;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

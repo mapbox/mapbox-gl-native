@@ -2,16 +2,14 @@ package com.mapbox.mapboxsdk.maps.renderer.egl;
 
 import android.opengl.GLSurfaceView;
 import android.support.annotation.NonNull;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import timber.log.Timber;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
-
-import timber.log.Timber;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static com.mapbox.mapboxsdk.utils.Compare.compare;
 import static javax.microedition.khronos.egl.EGL10.EGL_ALPHA_MASK_SIZE;

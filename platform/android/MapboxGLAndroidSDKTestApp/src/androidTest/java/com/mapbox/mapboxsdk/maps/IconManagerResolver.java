@@ -1,12 +1,11 @@
 package com.mapbox.mapboxsdk.maps;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
+import timber.log.Timber;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
-
-import timber.log.Timber;
 
 public class IconManagerResolver {
 

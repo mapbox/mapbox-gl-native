@@ -1,26 +1,21 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportV4
-    compile rootProject.ext.dep.supportDesign
-    compile rootProject.ext.dep.timber
-    compile rootProject.ext.dep.okhttp3
-    provided rootProject.ext.dep.lost
-    testCompile rootProject.ext.dep.junit
-    testCompile rootProject.ext.dep.mockito
+    implementation rootProject.ext.dep.supportAnnotations
+    implementation rootProject.ext.dep.supportFragmentV4
+    implementation rootProject.ext.dep.okhttp3
+    implementation rootProject.ext.dep.timber
+    implementation rootProject.ext.dep.mapboxJavaGeoJSON
 
-    // Mapbox Android Services (GeoJSON support)
-    compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
-        transitive = true
+    api rootProject.ext.dep.mapboxAndroidTelemetry
+    api rootProject.ext.dep.mapboxAndroidCore
+
+    compileOnly(rootProject.ext.dep.lost) {
+        exclude group: 'com.android.support'
     }
 
-    // Mapbox Android Services (Telemetry support)
-    compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
-        transitive = true
-    }
-
-    compile(rootProject.ext.dep.mapboxAndroidCore)
+    testImplementation rootProject.ext.dep.junit
+    testImplementation rootProject.ext.dep.mockito
 }
 
 android {
@@ -114,12 +109,12 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     lintOptions {
-        disable 'MissingTranslation', 'TypographyQuotes'
+        disable 'MissingTranslation', 'TypographyQuotes', 'ClickableViewAccessibility' , 'CustomViewStyleable', 'MissingPermission'
         baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false

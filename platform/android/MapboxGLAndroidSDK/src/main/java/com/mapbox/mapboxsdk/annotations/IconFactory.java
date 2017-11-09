@@ -12,7 +12,6 @@ import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.TooManyIconsException;
 

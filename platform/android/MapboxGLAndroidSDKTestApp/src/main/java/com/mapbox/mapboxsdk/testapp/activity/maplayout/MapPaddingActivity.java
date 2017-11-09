@@ -1,11 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -13,7 +11,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -37,19 +34,16 @@ public class MapPaddingActivity extends AppCompatActivity {
     mapView.setTag(true);
     mapView.onCreate(savedInstanceState);
 
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        MapPaddingActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      MapPaddingActivity.this.mapboxMap = mapboxMap;
 
-        int paddingLeft = (int) getResources().getDimension(R.dimen.map_padding_left);
-        int paddingBottom = (int) getResources().getDimension(R.dimen.map_padding_bottom);
-        int paddingRight = (int) getResources().getDimension(R.dimen.map_padding_right);
-        int paddingTop = (int) getResources().getDimension(R.dimen.map_padding_top);
-        mapboxMap.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
+      int paddingLeft = (int) getResources().getDimension(R.dimen.map_padding_left);
+      int paddingBottom = (int) getResources().getDimension(R.dimen.map_padding_bottom);
+      int paddingRight = (int) getResources().getDimension(R.dimen.map_padding_right);
+      int paddingTop = (int) getResources().getDimension(R.dimen.map_padding_top);
+      mapboxMap.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
 
-        moveToBangalore();
-      }
+      moveToBangalore();
     });
   }
 

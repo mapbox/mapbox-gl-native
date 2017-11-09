@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.maps.renderer.textureview;
 import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.TextureView;
-
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 
 import javax.microedition.khronos.egl.EGLConfig;

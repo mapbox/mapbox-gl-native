@@ -2,20 +2,17 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.support.v7.app.AppCompatActivity;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-
+import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.gson.GsonBuilder;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -30,12 +27,10 @@ import com.mapbox.services.commons.geojson.Geometry;
 import com.mapbox.services.commons.geojson.custom.GeometryDeserializer;
 import com.mapbox.services.commons.geojson.custom.PositionDeserializer;
 import com.mapbox.services.commons.models.Position;
+import timber.log.Timber;
 
 import java.io.IOException;
-
 import java.util.List;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
@@ -110,19 +105,16 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   }
 
   private void addSymbolClickListener() {
-    mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-      @Override
-      public void onMapClick(@NonNull LatLng point) {
-        PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
-        List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
-        if (!features.isEmpty()) {
-          Feature feature = features.get(0);
-          Timber.v("Feature was clicked with data: %s", feature.toJson());
-          Toast.makeText(
-            SymbolGeneratorActivity.this,
-            "hello from: " + feature.getStringProperty(FEATURE_VALUE),
-            Toast.LENGTH_LONG).show();
-        }
+    mapboxMap.setOnMapClickListener(point -> {
+      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
+      List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
+      if (!features.isEmpty()) {
+        Feature feature = features.get(0);
+        Timber.v("Feature was clicked with data: %s", feature.toJson());
+        Toast.makeText(
+          SymbolGeneratorActivity.this,
+          "hello from: " + feature.getStringProperty(FEATURE_VALUE),
+          Toast.LENGTH_LONG).show();
       }
     });
   }

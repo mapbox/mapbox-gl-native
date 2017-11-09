@@ -2,11 +2,9 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

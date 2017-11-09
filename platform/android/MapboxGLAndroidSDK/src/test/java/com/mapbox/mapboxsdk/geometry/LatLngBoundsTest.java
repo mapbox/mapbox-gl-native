@@ -1,10 +1,8 @@
 package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-
 import org.junit.Before;
 import org.junit.Test;
 

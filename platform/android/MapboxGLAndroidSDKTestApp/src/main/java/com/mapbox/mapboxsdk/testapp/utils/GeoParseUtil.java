@@ -2,9 +2,7 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

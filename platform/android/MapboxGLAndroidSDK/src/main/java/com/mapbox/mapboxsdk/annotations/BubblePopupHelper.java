@@ -6,7 +6,6 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.view.ViewGroup;
 import android.widget.PopupWindow;
-
 import com.mapbox.mapboxsdk.R;
 
 class BubblePopupHelper {

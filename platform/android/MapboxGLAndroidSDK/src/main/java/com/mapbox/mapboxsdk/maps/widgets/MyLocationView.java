@@ -26,7 +26,6 @@ import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -39,10 +38,9 @@ import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.android.core.location.LocationEngineListener;
 import com.mapbox.services.android.core.location.LocationEnginePriority;
+import timber.log.Timber;
 
 import java.lang.ref.WeakReference;
-
-import timber.log.Timber;
 
 /**
  * UI element overlaid on a map to show the user's location.

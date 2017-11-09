@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
-
 import org.junit.Test;
 
 import java.util.ArrayList;

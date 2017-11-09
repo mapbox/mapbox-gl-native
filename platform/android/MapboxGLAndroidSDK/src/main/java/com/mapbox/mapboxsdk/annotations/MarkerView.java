@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.support.annotation.FloatRange;
 import android.support.annotation.Nullable;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;

@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;

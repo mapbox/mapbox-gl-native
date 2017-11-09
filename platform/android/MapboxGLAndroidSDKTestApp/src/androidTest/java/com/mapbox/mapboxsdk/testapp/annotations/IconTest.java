@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.annotations;
 
 import android.app.Activity;
 import android.support.v4.content.res.ResourcesCompat;
-
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -14,7 +13,6 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-
 import org.junit.Before;
 import org.junit.Test;
 

@@ -4,11 +4,8 @@ import android.graphics.SurfaceTexture;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.view.TextureView;
-
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
-
-import java.lang.ref.WeakReference;
-import java.util.ArrayList;
+import timber.log.Timber;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGL11;
@@ -17,8 +14,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.egl.EGLDisplay;
 import javax.microedition.khronos.egl.EGLSurface;
 import javax.microedition.khronos.opengles.GL10;
-
-import timber.log.Timber;
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 /**
  * The render thread is responsible for managing the communication between the

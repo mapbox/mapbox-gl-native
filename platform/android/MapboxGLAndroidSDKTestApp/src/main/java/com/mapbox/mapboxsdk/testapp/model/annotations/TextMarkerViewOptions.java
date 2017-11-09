@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.model.annotations;
 import android.graphics.Bitmap;
 import android.os.Parcel;
 import android.os.Parcelable;
-
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;

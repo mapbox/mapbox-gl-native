@@ -5,12 +5,12 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.util.TypedValue;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
 
@@ -30,10 +30,15 @@ public class ColorUtils {
    */
   @ColorInt
   public static int getPrimaryColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorPrimary", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_blue);
+    }
   }
 
   /**
@@ -44,10 +49,15 @@ public class ColorUtils {
    */
   @ColorInt
   public static int getPrimaryDarkColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorPrimaryDark", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_blue);
+    }
   }
 
   /**
@@ -58,10 +68,15 @@ public class ColorUtils {
    */
   @ColorInt
   public static int getAccentColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorAccent, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorAccent", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_gray);
+    }
   }
 
   /**
@@ -120,6 +135,14 @@ public class ColorUtils {
         normalizeColorComponent(m.group(2)), normalizeColorComponent(m.group(3)));
     } else {
       throw new ConversionException("Not a valid rgb/rgba value");
+    }
+  }
+
+  private static int getColorCompat(Context context, int id) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return context.getResources().getColor(id, context.getTheme());
+    } else {
+      return context.getResources().getColor(id);
     }
   }
 }

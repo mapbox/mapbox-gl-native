@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps.renderer;
 
 import android.content.Context;
 import android.support.annotation.CallSuper;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.storage.FileSource;
 

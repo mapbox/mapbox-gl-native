@@ -2,28 +2,24 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
+import timber.log.Timber;
 
 import java.net.MalformedURLException;
 import java.net.URL;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.layers.Filter.in;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
@@ -56,16 +52,12 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull
-                             final MapboxMap map) {
-        mapboxMap = map;
-        addBusStopSource();
-        addBusStopCircleLayer();
-        initFloatingActionButtons();
-        isLoadingStyle = false;
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      addBusStopSource();
+      addBusStopCircleLayer();
+      initFloatingActionButtons();
+      isLoadingStyle = false;
     });
   }
 
@@ -161,12 +153,9 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle(), new MapboxMap.OnStyleLoadedListener() {
-      @Override
-      public void onStyleLoaded(String style) {
-        addBusStop();
-        isLoadingStyle = false;
-      }
+    mapboxMap.setStyleUrl(getNextStyle(), style -> {
+      addBusStop();
+      isLoadingStyle = false;
     });
   }
 

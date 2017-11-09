@@ -7,12 +7,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
 import com.mapbox.mapboxsdk.style.functions.stops.Stop;
@@ -34,13 +32,12 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
+import timber.log.Timber;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.functions.Function.zoom;
 import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
@@ -85,18 +82,15 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
 
 
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        // Store for later
-        mapboxMap = map;
+    mapView.getMapAsync(map -> {
+      // Store for later
+      mapboxMap = map;
 
-        // Center and Zoom (Amsterdam, zoomed to streets)
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
+      // Center and Zoom (Amsterdam, zoomed to streets)
+      mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.379189, 4.899431), 14));
 
-        mapboxMap.setTransitionDuration(250);
-        mapboxMap.setTransitionDelay(50);
-      }
+      mapboxMap.setTransitionDuration(250);
+      mapboxMap.setTransitionDelay(50);
     });
   }
 
@@ -362,32 +356,29 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   private void animateParksSource(final FeatureCollection parks, final int counter) {
     Handler handler = new Handler(getMainLooper());
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        if (mapboxMap == null) {
-          return;
-        }
-
-        Timber.d("Updating parks source");
-        // change the source
-        int park = counter < parks.getFeatures().size() - 1 ? counter : 0;
-
-        GeoJsonSource source = mapboxMap.getSourceAs("dynamic-park-source");
-
-        if (source == null) {
-          Timber.e("Source not found");
-          Toast.makeText(RuntimeStyleActivity.this, "Source not found", Toast.LENGTH_SHORT).show();
-          return;
-        }
-
-        List<Feature> features = new ArrayList<>();
-        features.add(parks.getFeatures().get(park));
-        source.setGeoJson(FeatureCollection.fromFeatures(features));
-
-        // Re-post
-        animateParksSource(parks, park + 1);
+    handler.postDelayed(() -> {
+      if (mapboxMap == null) {
+        return;
       }
+
+      Timber.d("Updating parks source");
+      // change the source
+      int park = counter < parks.getFeatures().size() - 1 ? counter : 0;
+
+      GeoJsonSource source = mapboxMap.getSourceAs("dynamic-park-source");
+
+      if (source == null) {
+        Timber.e("Source not found");
+        Toast.makeText(RuntimeStyleActivity.this, "Source not found", Toast.LENGTH_SHORT).show();
+        return;
+      }
+
+      List<Feature> features = new ArrayList<>();
+      features.add(parks.getFeatures().get(park));
+      source.setGeoJson(FeatureCollection.fromFeatures(features));
+
+      // Re-post
+      animateParksSource(parks, park + 1);
     }, counter == 0 ? 100 : 1000);
   }
 
@@ -498,28 +489,25 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(31, -100), 3));
 
     Handler handler = new Handler(getMainLooper());
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        if (mapboxMap == null) {
-          return;
-        }
+    handler.postDelayed(() -> {
+      if (mapboxMap == null) {
+        return;
+      }
 
-        Timber.d("Styling filtered fill layer");
+      Timber.d("Styling filtered fill layer");
 
-        FillLayer states = (FillLayer) mapboxMap.getLayer("states");
+      FillLayer states = (FillLayer) mapboxMap.getLayer("states");
 
-        if (states != null) {
-          states.setFilter(eq("name", "Texas"));
-          states.setFillOpacityTransition(new TransitionOptions(2500, 0));
-          states.setFillColorTransition(new TransitionOptions(2500, 0));
-          states.setProperties(
-            fillColor(Color.RED),
-            fillOpacity(0.25f)
-          );
-        } else {
-          Toast.makeText(RuntimeStyleActivity.this, "No states layer in this style", Toast.LENGTH_SHORT).show();
-        }
+      if (states != null) {
+        states.setFilter(eq("name", "Texas"));
+        states.setFillOpacityTransition(new TransitionOptions(2500, 0));
+        states.setFillColorTransition(new TransitionOptions(2500, 0));
+        states.setProperties(
+          fillColor(Color.RED),
+          fillOpacity(0.25f)
+        );
+      } else {
+        Toast.makeText(RuntimeStyleActivity.this, "No states layer in this style", Toast.LENGTH_SHORT).show();
       }
     }, 2000);
   }
@@ -529,28 +517,25 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        if (mapboxMap == null) {
-          return;
-        }
+    handler.postDelayed(() -> {
+      if (mapboxMap == null) {
+        return;
+      }
 
-        Timber.d("Styling filtered line layer");
+      Timber.d("Styling filtered line layer");
 
-        LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
+      LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
 
-        if (counties != null) {
-          counties.setFilter(eq("NAME10", "Washington"));
+      if (counties != null) {
+        counties.setFilter(eq("NAME10", "Washington"));
 
-          counties.setProperties(
-            lineColor(Color.RED),
-            lineOpacity(0.75f),
-            lineWidth(5f)
-          );
-        } else {
-          Toast.makeText(RuntimeStyleActivity.this, "No counties layer in this style", Toast.LENGTH_SHORT).show();
-        }
+        counties.setProperties(
+          lineColor(Color.RED),
+          lineOpacity(0.75f),
+          lineWidth(5f)
+        );
+      } else {
+        Toast.makeText(RuntimeStyleActivity.this, "No counties layer in this style", Toast.LENGTH_SHORT).show();
       }
     }, 2000);
   }
@@ -560,27 +545,24 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(40, -97), 5));
 
     Handler handler = new Handler(getMainLooper());
-    handler.postDelayed(new Runnable() {
-      @Override
-      public void run() {
-        if (mapboxMap == null) {
-          return;
-        }
+    handler.postDelayed(() -> {
+      if (mapboxMap == null) {
+        return;
+      }
 
-        Timber.d("Styling numeric fill layer");
+      Timber.d("Styling numeric fill layer");
 
-        FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
+      FillLayer regions = (FillLayer) mapboxMap.getLayer("regions");
 
-        if (regions != null) {
-          regions.setFilter(all(gte("HRRNUM", 200), lt("HRRNUM", 300)));
+      if (regions != null) {
+        regions.setFilter(all(gte("HRRNUM", 200), lt("HRRNUM", 300)));
 
-          regions.setProperties(
-            fillColor(Color.BLUE),
-            fillOpacity(0.5f)
-          );
-        } else {
-          Toast.makeText(RuntimeStyleActivity.this, "No regions layer in this style", Toast.LENGTH_SHORT).show();
-        }
+        regions.setProperties(
+          fillColor(Color.BLUE),
+          fillOpacity(0.5f)
+        );
+      } else {
+        Toast.makeText(RuntimeStyleActivity.this, "No regions layer in this style", Toast.LENGTH_SHORT).show();
       }
     }, 2000);
   }

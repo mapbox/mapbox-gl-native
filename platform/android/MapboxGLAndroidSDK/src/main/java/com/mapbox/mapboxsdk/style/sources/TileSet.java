@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.style.sources;
 
 import android.support.annotation.Size;
-
 import com.mapbox.mapboxsdk.geometry.LatLng;
 
 import java.util.HashMap;

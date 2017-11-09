@@ -2,11 +2,9 @@ package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
-
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;

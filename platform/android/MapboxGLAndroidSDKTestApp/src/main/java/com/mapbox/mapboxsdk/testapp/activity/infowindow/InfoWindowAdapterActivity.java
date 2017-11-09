@@ -6,13 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.TextView;
-
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarker;
 import com.mapbox.mapboxsdk.testapp.model.annotations.CityStateMarkerOptions;
@@ -33,13 +31,10 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap map) {
-        mapboxMap = map;
-        addMarkers();
-        addCustomInfoWindowAdapter();
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      addMarkers();
+      addCustomInfoWindowAdapter();
     });
   }
 

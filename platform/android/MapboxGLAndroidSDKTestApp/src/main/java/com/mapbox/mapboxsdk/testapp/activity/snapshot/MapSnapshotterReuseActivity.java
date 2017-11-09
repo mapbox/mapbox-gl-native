@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
-
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -31,24 +30,21 @@ public class MapSnapshotterReuseActivity extends AppCompatActivity implements Ma
 
     fab = findViewById(R.id.fab);
     fab.setVisibility(View.INVISIBLE);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        fab.setVisibility(View.INVISIBLE);
+    fab.setOnClickListener(v -> {
+      fab.setVisibility(View.INVISIBLE);
 
-        mapSnapshotter.setStyleUrl(getRandomStyle());
-        if (random.nextInt(2) == 0) {
-          mapSnapshotter.setCameraPosition(getRandomCameraPosition());
-        } else {
-          mapSnapshotter.setRegion(getRandomBounds());
-        }
-        if (random.nextInt(2) == 0) {
-          mapSnapshotter.setSize(512, 512);
-        } else {
-          mapSnapshotter.setSize(256, 256);
-        }
-        mapSnapshotter.start(MapSnapshotterReuseActivity.this);
+      mapSnapshotter.setStyleUrl(getRandomStyle());
+      if (random.nextInt(2) == 0) {
+        mapSnapshotter.setCameraPosition(getRandomCameraPosition());
+      } else {
+        mapSnapshotter.setRegion(getRandomBounds());
       }
+      if (random.nextInt(2) == 0) {
+        mapSnapshotter.setSize(512, 512);
+      } else {
+        mapSnapshotter.setSize(256, 256);
+      }
+      mapSnapshotter.start(MapSnapshotterReuseActivity.this);
     });
 
     mapSnapshotter = new MapSnapshotter(
