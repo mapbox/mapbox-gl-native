@@ -2,6 +2,7 @@
 
 #include <mbgl/style/types.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
 
@@ -14,16 +15,43 @@ namespace mbgl {
 class RenderedQueryOptions;
 class RenderLayer;
 
-class CollisionTile;
-class CanonicalTileID;
+class CollisionIndex;
 
 class IndexedSubfeature {
 public:
     IndexedSubfeature() = delete;
-    std::size_t index;
+    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_)
+        : index(index_)
+        , sourceLayerName(std::move(sourceLayerName_))
+        , bucketName(std::move(bucketName_))
+        , sortIndex(sortIndex_)
+        , z(0)
+        , x(0)
+        , y(0)
+    {}
+    
+    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_,
+                      std::string sourceID_, uint8_t z_, uint32_t x_, uint32_t y_)
+        : index(index_)
+        , sourceLayerName(std::move(sourceLayerName_))
+        , bucketName(std::move(bucketName_))
+        , sortIndex(std::move(sortIndex_))
+        , sourceID(std::move(sourceID_))
+        , z(z_)
+        , x(x_)
+        , y(y_)
+    {}
+    
+    size_t index;
     std::string sourceLayerName;
     std::string bucketName;
     size_t sortIndex;
+
+    // Only used for symbol features
+    std::string sourceID;
+    uint8_t z;
+    uint32_t x;
+    uint32_t y;
 };
 
 class FeatureIndex {
@@ -40,9 +68,10 @@ public:
             const double scale,
             const RenderedQueryOptions& options,
             const GeometryTileData&,
-            const CanonicalTileID&,
+            const UnwrappedTileID&,
+            const std::string&,
             const std::vector<const RenderLayer*>&,
-            const CollisionTile*,
+            const CollisionIndex&,
             const float additionalQueryRadius) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
