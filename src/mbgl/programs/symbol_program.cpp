@@ -37,6 +37,7 @@ Values makeValues(const bool isText,
                   const bool alongLine,
                   const RenderTile& tile,
                   const TransformState& state,
+                  const float symbolFadeChange,
                   Args&&... args) {
     std::array<float, 2> extrudeScale;
     
@@ -82,9 +83,8 @@ Values makeValues(const bool isText,
         uniforms::u_extrude_scale::Value{ extrudeScale },
         uniforms::u_texsize::Value{ texsize },
         uniforms::u_texture::Value{ 0 },
-        uniforms::u_fadetexture::Value{ 1 },
+        uniforms::u_fade_change::Value{ symbolFadeChange },
         uniforms::u_is_text::Value{ isText },
-        uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
         uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
         uniforms::u_pitch::Value{ state.getPitch() },
         uniforms::u_pitch_with_map::Value{ pitchWithMap },
@@ -102,7 +102,8 @@ SymbolIconProgram::uniformValues(const bool isText,
                                  const std::array<float, 2>& pixelsToGLUnits,
                                  const bool alongLine,
                                  const RenderTile& tile,
-                                 const TransformState& state)
+                                 const TransformState& state,
+                                 const float symbolFadeChange)
 {
     return makeValues<SymbolIconProgram::UniformValues>(
         isText,
@@ -111,7 +112,8 @@ SymbolIconProgram::uniformValues(const bool isText,
         pixelsToGLUnits,
         alongLine,
         tile,
-        state
+        state,
+        symbolFadeChange
     );
 }
 
@@ -124,6 +126,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const bool alongLine,
       const RenderTile& tile,
       const TransformState& state,
+      const float symbolFadeChange,
       const SymbolSDFPart part)
 {
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
@@ -138,6 +141,7 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
         alongLine,
         tile,
         state,
+        symbolFadeChange,
         uniforms::u_gamma_scale::Value{ gammaScale },
         uniforms::u_is_halo::Value{ part == SymbolSDFPart::Halo }
     );
