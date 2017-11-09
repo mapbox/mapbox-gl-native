@@ -156,7 +156,6 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     float increment = mapMode == MapMode::Still ? 1.0 : std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
 
-    if (increment) {}
     // add the opacities from the current placement, and copy their current values from the previous placement
     for (auto& placementPair : placements) {
         auto prevOpacity = prevPlacement.opacities.find(placementPair.first);
