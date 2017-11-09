@@ -4,7 +4,6 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_light.hpp>
-#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
@@ -90,7 +89,6 @@ private:
     };
 
     RenderState renderState = RenderState::Never;
-    FrameHistory frameHistory;
     ZoomHistory zoomHistory;
     TransformState transformState;
 
