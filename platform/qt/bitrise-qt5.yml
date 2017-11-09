@@ -25,6 +25,7 @@ workflows:
             ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
             export BUILDTYPE=Debug
             make qt-app
+            make qt-offline
             make run-qt-test
         - is_debug: 'yes'
     - deploy-to-bitrise-io:

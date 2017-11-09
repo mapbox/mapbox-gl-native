@@ -1,6 +1,12 @@
-add_executable(mbgl-offline
-    bin/offline.cpp
-)
+if (MBGL_OFFLINE_QT)
+    add_executable(mbgl-offline
+        platform/qt/src/offline.cpp
+        )
+else()
+    add_executable(mbgl-offline
+        bin/offline.cpp
+        )
+endif()
 
 target_sources(mbgl-offline
     PRIVATE platform/default/mbgl/util/default_styles.hpp

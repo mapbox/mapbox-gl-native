@@ -20,6 +20,7 @@ workflows:
             brew linkapps qt
             export BUILDTYPE=Debug
             make qt-app
+            make qt-offline
             make run-qt-test
         - is_debug: 'yes'
     - slack:

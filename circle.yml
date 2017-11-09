@@ -93,6 +93,10 @@ step-library:
       run:
         name: Build qt-app
         command: make qt-app
+  - &build-qt-offline
+      run:
+        name: Build qt-offline
+        command: make qt-offline
   - &build-qt-test
       run:
         name: Build qt-test
@@ -549,6 +553,7 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - *build-qt-app
+      - *build-qt-offline
       - *build-qt-test
       - *show-ccache-stats
       - *save-cache
@@ -576,6 +581,7 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - *build-qt-app
+      - *build-qt-offline
       - *build-qt-test
       - run:
           name: Build qt-docs
