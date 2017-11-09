@@ -226,15 +226,24 @@ void Context::updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::si
     MBGL_CHECK_ERROR(glBufferSubData(GL_ARRAY_BUFFER, 0, size, data));
 }
 
-UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size) {
+UniqueBuffer Context::createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage) {
     BufferID id = 0;
     MBGL_CHECK_ERROR(glGenBuffers(1, &id));
     UniqueBuffer result { std::move(id), { this } };
     bindVertexArray = 0;
     globalVertexArrayState.indexBuffer = result;
-    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, GL_STATIC_DRAW));
+    MBGL_CHECK_ERROR(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size, data, static_cast<GLenum>(usage)));
     return result;
 }
+
+void Context::updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size) {
+    // Be sure to unbind any existing vertex array object before binding the index buffer
+    // so that we don't mess up another VAO
+    bindVertexArray = 0;
+    globalVertexArrayState.indexBuffer = buffer;
+    MBGL_CHECK_ERROR(glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, size, data));
+}
+
 
 UniqueTexture Context::createTexture() {
     if (pooledTextures.empty()) {
