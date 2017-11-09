@@ -78,7 +78,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(dynamic_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl)));
         SymbolBucket& bucket = *reinterpret_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl));
 
-        const auto& layout = bucket.layout;
+        const auto& core = **bucket.core;
+        const auto& layout = core.layout;
 
         auto draw = [&] (auto& program,
                          auto&& uniformValues,
@@ -127,11 +128,12 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (alongLine) {
                 reprojectLineLabels(bucket.icon.dynamicVertices,
-                                    bucket.icon.placedSymbols,
+                                    core.placedIconSymbols,
+                                    bucket.icon.placedSymbolVisibility,
                                     tile.matrix,
                                     values,
                                     tile,
-                                    *bucket.iconSizeBinder,
+                                    *core.iconSizeBinder,
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
@@ -151,7 +153,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     draw(parameters.programs.symbolIconSDF,
                          SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
-                         bucket.iconSizeBinder,
+                         core.iconSizeBinder,
                          values,
                          bucket.paintPropertyBinders.at(getID()).first,
                          paintPropertyValues);
@@ -161,7 +163,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                     draw(parameters.programs.symbolIconSDF,
                          SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
-                         bucket.iconSizeBinder,
+                         core.iconSizeBinder,
                          values,
                          bucket.paintPropertyBinders.at(getID()).first,
                          paintPropertyValues);
@@ -170,7 +172,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 draw(parameters.programs.symbolIcon,
                      SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
-                     bucket.iconSizeBinder,
+                     core.iconSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).first,
                      paintPropertyValues);
@@ -188,11 +190,12 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (alongLine) {
                 reprojectLineLabels(bucket.text.dynamicVertices,
-                                    bucket.text.placedSymbols,
+                                    core.placedTextSymbols,
+                                    bucket.text.placedSymbolVisibility,
                                     tile.matrix,
                                     values,
                                     tile,
-                                    *bucket.textSizeBinder,
+                                    *core.textSizeBinder,
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
@@ -204,7 +207,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 draw(parameters.programs.symbolGlyph,
                      SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
-                     bucket.textSizeBinder,
+                     core.textSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).second,
                      paintPropertyValues);
@@ -214,7 +217,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 draw(parameters.programs.symbolGlyph,
                      SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
-                     bucket.textSizeBinder,
+                     core.textSizeBinder,
                      values,
                      bucket.paintPropertyBinders.at(getID()).second,
                      paintPropertyValues);

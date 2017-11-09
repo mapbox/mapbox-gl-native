@@ -21,7 +21,7 @@ public:
     PlacedSymbol(Point<float> anchorPoint_, uint16_t segment_, float lowerSize_, float upperSize_,
             std::array<float, 2> lineOffset_, WritingModeType writingModes_, GeometryCoordinates line_, std::vector<float> tileDistances_) :
         anchorPoint(anchorPoint_), segment(segment_), lowerSize(lowerSize_), upperSize(upperSize_),
-        lineOffset(lineOffset_), writingModes(writingModes_), line(std::move(line_)), tileDistances(std::move(tileDistances_)), hidden(false), vertexStartIndex(0)
+        lineOffset(lineOffset_), writingModes(writingModes_), line(std::move(line_)), tileDistances(std::move(tileDistances_)), vertexStartIndex(0)
     {
     }
     Point<float> anchorPoint;
@@ -33,7 +33,6 @@ public:
     GeometryCoordinates line;
     std::vector<float> tileDistances;
     std::vector<float> glyphOffsets;
-    bool hidden;
     size_t vertexStartIndex;
 };
 
@@ -47,7 +46,7 @@ public:
                  bool sdfIcons,
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
-                 const std::vector<SymbolInstance>&&);
+                 std::vector<SymbolInstance>&&);
 
     void upload(gl::Context&) override;
     bool hasData() const override;
@@ -59,7 +58,6 @@ public:
     void updateOpacity();
     void sortFeatures(const float angle);
 
-    const style::SymbolLayoutProperties::PossiblyEvaluated layout;
     const bool sdfIcons;
     const bool iconsNeedLinear;
     const bool sortFeaturesByY;
@@ -71,21 +69,35 @@ public:
     bool dynamicUploaded = false;
     bool sortUploaded = false;
 
-    std::vector<SymbolInstance> symbolInstances;
+    std::unique_ptr<Immutable<std::vector<uint32_t>>> symbolCrossTileIDs;
+
+    class Core {
+        public:
+        Core(std::vector<SymbolInstance>&&, style::SymbolLayoutProperties::PossiblyEvaluated, std::unique_ptr<SymbolSizeBinder>, std::unique_ptr<SymbolSizeBinder>);
+        std::vector<SymbolInstance> symbolInstances;
+        const style::SymbolLayoutProperties::PossiblyEvaluated layout;
+        const std::unique_ptr<SymbolSizeBinder> textSizeBinder;
+        const std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
+        std::vector<PlacedSymbol> placedTextSymbols;
+        std::vector<PlacedSymbol> placedIconSymbols;
+        bool hasTextData;
+        bool hasIconData;
+    };
+
+    Mutable<Core> mutableCore;
+    std::unique_ptr<Immutable<Core>> core;
 
     std::map<std::string, std::pair<
         SymbolIconProgram::PaintPropertyBinders,
         SymbolSDFTextProgram::PaintPropertyBinders>> paintPropertyBinders;
     
-    std::unique_ptr<SymbolSizeBinder> textSizeBinder;
-
     struct TextBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolTextAttributes> segments;
-        std::vector<PlacedSymbol> placedSymbols;
+        std::vector<bool> placedSymbolVisibility;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;
         optional<gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>> dynamicVertexBuffer;
@@ -93,15 +105,13 @@ public:
         optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
     } text;
     
-    std::unique_ptr<SymbolSizeBinder> iconSizeBinder;
-    
     struct IconBuffer {
         gl::VertexVector<SymbolLayoutVertex> vertices;
         gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex> dynamicVertices;
         gl::VertexVector<SymbolOpacityAttributes::Vertex> opacityVertices;
         gl::IndexVector<gl::Triangles> triangles;
         SegmentVector<SymbolIconAttributes> segments;
-        std::vector<PlacedSymbol> placedSymbols;
+        std::vector<bool> placedSymbolVisibility;
         PremultipliedImage atlasImage;
 
         optional<gl::VertexBuffer<SymbolLayoutVertex>> vertexBuffer;

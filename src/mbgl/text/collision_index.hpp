@@ -21,14 +21,14 @@ public:
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
-                                      PlacedSymbol& symbol,
+                                      const PlacedSymbol& symbol,
                                       const float scale,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
                                       const bool collisionDebug);
 
-    void insertFeature(CollisionFeature& feature, bool ignorePlacement);
+    void insertFeature(const CollisionFeature& feature, bool ignorePlacement);
 
     std::vector<IndexedSubfeature> queryRenderedSymbols(const GeometryCoordinates&, const UnwrappedTileID& tileID, const std::string& sourceID) const;
 
@@ -38,7 +38,7 @@ private:
                                   const mat4& posMatrix,
                                   const mat4& labelPlaneMatrix,
                                   const float textPixelRatio,
-                                  PlacedSymbol& symbol,
+                                  const PlacedSymbol& symbol,
                                   const float scale,
                                   const float fontSize,
                                   const bool allowOverlap,

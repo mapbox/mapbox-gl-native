@@ -353,7 +353,8 @@ namespace mbgl {
     }
 
 
-    void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray, const std::vector<PlacedSymbol>& placedSymbols,
+    void reprojectLineLabels(gl::VertexVector<SymbolDynamicLayoutAttributes::Vertex>& dynamicVertexArray,
+            const std::vector<PlacedSymbol>& placedSymbols, const std::vector<bool>& placedSymbolVisibility,
 			const mat4& posMatrix, const style::SymbolPropertyValues& values,
             const RenderTile& tile, const SymbolSizeBinder& sizeBinder, const TransformState& state) {
 
@@ -374,11 +375,17 @@ namespace mbgl {
         
         bool useVertical = false;
 
-        for (auto& placedSymbol : placedSymbols) {
+        assert(placedSymbols.size() == placedSymbolVisibility.size());
+        auto visibilityIt = placedSymbolVisibility.begin();
+        for (auto it = placedSymbols.begin(); it != placedSymbols.end(); it++, visibilityIt++) {
+
+            const PlacedSymbol& placedSymbol = *it;
+            const bool hidden = *visibilityIt;
+
             // Don't do calculations for vertical glyphs unless the previous symbol was horizontal
             // and we determined that vertical glyphs were necessary.
             // Also don't do calculations for symbols that are collided and fully faded out
-            if (placedSymbol.hidden || (placedSymbol.writingModes == WritingModeType::Vertical && !useVertical)) {
+            if (hidden || (placedSymbol.writingModes == WritingModeType::Vertical && !useVertical)) {
                 hideGlyphs(placedSymbol.glyphOffsets.size(), dynamicVertexArray);
                 continue;
             }

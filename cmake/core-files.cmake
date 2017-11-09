@@ -495,6 +495,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_range.hpp
     src/mbgl/text/placement.cpp
     src/mbgl/text/placement.hpp
+    src/mbgl/text/placement_worker.cpp
+    src/mbgl/text/placement_worker.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp
     src/mbgl/text/shaping.cpp

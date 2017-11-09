@@ -30,16 +30,21 @@ bool JointOpacityState::isHidden() const {
     return icon.isHidden() && text.isHidden();
 }
 
-Placement::Placement(const TransformState& state_, MapMode mapMode_)
-    : collisionIndex(state_)
+Placement::Placement(const TransformState& state_, MapMode mapMode_, const mat4& projMatrix_, const bool showCollisionBoxes_, Scheduler& scheduler)
+    : result(makeMutable<PlacementResult>(state_))
     , state(state_)
     , mapMode(mapMode_)
+    , showCollisionBoxes(showCollisionBoxes_)
+    , projMatrix(projMatrix_)
+    , worker(scheduler, state_, projMatrix_, showCollisionBoxes_)
+    , placementBucketLayers(makeMutable<std::vector<std::vector<PlacementBucket>>>())
     , recentUntil(TimePoint::min())
 {}
 
-void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatrix, bool showCollisionBoxes) {
+void Placement::addLayer(RenderSymbolLayer& symbolLayer) {
 
-    std::unordered_set<uint32_t> seenCrossTileIDs;
+    placementBucketLayers->emplace_back();
+    auto& placementBuckets = placementBucketLayers->back();
 
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
 
@@ -51,110 +56,46 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
-        auto& layout = symbolBucket.layout;
-
-        const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
-
-        const float scale = std::pow(2, state.getZoom() - renderTile.tile.id.overscaledZ);
-        const float textPixelRatio = util::EXTENT / (util::tileSize * renderTile.tile.id.overscaleFactor());
-
-        mat4 posMatrix;
-        state.matrixFor(posMatrix, renderTile.id);
-        matrix::multiply(posMatrix, projMatrix, posMatrix);
-
-        mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(renderTile.matrix,
-                layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<TextRotationAlignment>() == style::AlignmentType::Map,
-                state,
-                pixelsToTileUnits);
-
-        mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(renderTile.matrix,
-                layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<IconRotationAlignment>() == style::AlignmentType::Map,
-                state,
-                pixelsToTileUnits);
-
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs);
+        assert(symbolBucket.core);
+        placementBuckets.emplace_back(*symbolBucket.core, *symbolBucket.symbolCrossTileIDs, renderTile.id, renderTile.tile.id);
     }
 }
 
-void Placement::placeLayerBucket(
-        SymbolBucket& bucket,
-        const mat4& posMatrix,
-        const mat4& textLabelPlaneMatrix,
-        const mat4& iconLabelPlaneMatrix,
-        const float scale,
-        const float textPixelRatio,
-        const bool showCollisionBoxes,
-        std::unordered_set<uint32_t>& seenCrossTileIDs) {
+void Placement::place() {
+    if (mapMode == MapMode::Still) {
+        // synchronous
+        PlacementWorker placement(state, projMatrix, showCollisionBoxes);
+        result = placement.place(std::move(placementBucketLayers));
+    } else {
+        // asynchronous
+        future = worker.ask(&PlacementWorker::place, std::move(placementBucketLayers));
+    }
+}
 
-    auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
-    auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
-
-    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<TextOptional>();
-    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<IconOptional>();
-
-    for (auto& symbolInstance : bucket.symbolInstances) {
-
-        if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
-            bool placeText = false;
-            bool placeIcon = false;
-
-            if (symbolInstance.placedTextIndex) {
-                PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*symbolInstance.placedTextIndex);
-                const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
-
-                placeText = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
-                        posMatrix, textLabelPlaneMatrix, textPixelRatio,
-                        placedSymbol, scale, fontSize,
-                        bucket.layout.get<TextAllowOverlap>(),
-                        bucket.layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
-            }
-
-            if (symbolInstance.placedIconIndex) {
-                PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
-                const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
-
-                placeIcon = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
-                        posMatrix, iconLabelPlaneMatrix, textPixelRatio,
-                        placedSymbol, scale, fontSize,
-                        bucket.layout.get<IconAllowOverlap>(),
-                        bucket.layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
-                        showCollisionBoxes);
-            }
-
-            // combine placements for icon and text
-            if (!iconWithoutText && !textWithoutIcon) {
-                placeText = placeIcon = placeText && placeIcon;
-            } else if (!textWithoutIcon) {
-                placeText = placeText && placeIcon;
-            } else if (!iconWithoutText) {
-                placeIcon = placeText && placeIcon;
-            }
-
-            if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<TextIgnorePlacement>());
-            }
-
-            if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
-            }
-
-            assert(symbolInstance.crossTileID != 0);
-
-            placements.emplace(symbolInstance.crossTileID, PlacementPair(placeText, placeIcon));
-            seenCrossTileIDs.insert(symbolInstance.crossTileID);
-        }
-    } 
+bool Placement::isReady() {
+    if (mapMode == MapMode::Still) {
+        // synchronous
+        return true;
+    } else {
+        // asynchronous
+        return future.wait_for(Duration(0)) == std::future_status::ready;
+    }
 }
 
 bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
+
+    if (mapMode != MapMode::Still) {
+        // asynchronous result
+        result = future.get();
+    }
+
     commitTime = now;
 
     bool placementChanged = false;
 
     float increment = mapMode == MapMode::Still ? 1.0 : std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
+
+    auto& placements = result->placements;
 
     if (increment) {}
     // add the opacities from the current placement, and copy their current values from the previous placement
@@ -200,17 +141,29 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
 }
 
 void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<uint32_t>& seenCrossTileIDs) {
-    if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
-    if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
+    if (bucket.hasTextData()) {
+        bucket.text.opacityVertices.clear();
+        bucket.text.placedSymbolVisibility.clear();
+    }
+    if (bucket.hasIconData()) {
+        bucket.icon.opacityVertices.clear();
+        bucket.icon.placedSymbolVisibility.clear();
+    }
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
-    for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
-        auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
-            getOpacity(symbolInstance.crossTileID) :
+    auto& symbolInstances = (*bucket.core)->symbolInstances;
+
+    auto idIt = (*bucket.symbolCrossTileIDs)->begin();
+    for (auto it = symbolInstances.begin(); it != symbolInstances.end(); it++, idIt++) {
+        auto& symbolInstance = *it;
+        auto crossTileID = *idIt;
+
+        auto opacityState = seenCrossTileIDs.count(crossTileID) == 0 ?
+            getOpacity(crossTileID) :
             JointOpacityState(false, false);
 
-        seenCrossTileIDs.insert(symbolInstance.crossTileID);
+        seenCrossTileIDs.insert(crossTileID);
 
         if (symbolInstance.hasText) {
             auto opacityVertex = SymbolOpacityAttributes::vertex(opacityState.text.placed, opacityState.text.opacity);
@@ -221,10 +174,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
                 bucket.text.opacityVertices.emplace_back(opacityVertex);
             }
             if (symbolInstance.placedTextIndex) {
-                bucket.text.placedSymbols[*symbolInstance.placedTextIndex].hidden = opacityState.isHidden();
+                bucket.text.placedSymbolVisibility.push_back(opacityState.isHidden());
             }
             if (symbolInstance.placedVerticalTextIndex) {
-                bucket.text.placedSymbols[*symbolInstance.placedVerticalTextIndex].hidden = opacityState.isHidden();
+                bucket.text.placedSymbolVisibility.push_back(opacityState.isHidden());
             }
         }
         if (symbolInstance.hasIcon) {
@@ -236,7 +189,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<u
                 bucket.icon.opacityVertices.emplace_back(opacityVertex);
             }
             if (symbolInstance.placedIconIndex) {
-                bucket.icon.placedSymbols[*symbolInstance.placedIconIndex].hidden = opacityState.isHidden();
+                bucket.icon.placedSymbolVisibility.push_back(opacityState.isHidden());
             }
         }
         

@@ -423,7 +423,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
     
     auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, std::move(symbolInstances));
 
-    for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
+    auto& core = *bucket->mutableCore;
+    auto& placedTextSymbols = core.placedTextSymbols;
+    auto& placedIconSymbols = core.placedIconSymbols;
+
+    for (SymbolInstance &symbolInstance : bucket->mutableCore->symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
@@ -433,11 +437,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
-            const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
-            bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+            const Range<float> sizeData = core.textSizeBinder->getVertexSizeData(feature);
+            placedTextSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                     symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-            symbolInstance.placedTextIndex = bucket->text.placedSymbols.size() - 1;
-            PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
+            symbolInstance.placedTextIndex = placedTextSymbols.size() - 1;
+            PlacedSymbol& horizontalSymbol = placedTextSymbols.back();
 
             bool firstHorizontal = true;
             for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
@@ -451,11 +455,10 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
             }
             
             if (symbolInstance.writingModes & WritingModeType::Vertical) {
-                bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                placedTextSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
-                symbolInstance.placedVerticalTextIndex = bucket->text.placedSymbols.size() - 1;
-                
-                PlacedSymbol& verticalSymbol = bucket->text.placedSymbols.back();
+                symbolInstance.placedVerticalTextIndex = placedTextSymbols.size() - 1;
+                PlacedSymbol& verticalSymbol = placedTextSymbols.back();
                 bool firstVertical = true;
                 
                 for (const auto& symbol : symbolInstance.verticalGlyphQuads) {
@@ -473,11 +476,11 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
 
         if (hasIcon) {
             if (symbolInstance.iconQuad) {
-                const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
-                bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                const Range<float> sizeData = core.iconSizeBinder->getVertexSizeData(feature);
+                placedIconSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
                         symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
-                symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
-                PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
+                symbolInstance.placedIconIndex = placedIconSymbols.size() - 1;
+                PlacedSymbol& iconSymbol = placedIconSymbols.back();
                 iconSymbol.vertexStartIndex = addSymbol(
                                                         bucket->icon, sizeData, *symbolInstance.iconQuad,
                                                         symbolInstance.anchor, iconSymbol);
@@ -490,9 +493,14 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
         }
     }
 
+    core.hasTextData = bucket->hasTextData();
+    core.hasIconData = bucket->hasIconData();
+
     if (showCollisionBoxes) {
         addToDebugBuffers(*bucket);
     }
+
+    bucket->core = std::make_unique<Immutable<SymbolBucket::Core>>(std::move(bucket->mutableCore));
 
     return bucket;
 }
@@ -555,11 +563,7 @@ size_t SymbolLayout::addSymbol(Buffer& buffer,
 
 void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
 
-    if (!hasSymbolInstances()) {
-        return;
-    }
-
-    for (const SymbolInstance &symbolInstance : symbolInstances) {
+    for (const SymbolInstance &symbolInstance : bucket.mutableCore->symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature) {
             SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
                 static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :
