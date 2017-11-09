@@ -17,7 +17,6 @@ namespace mbgl {
 class RendererBackend;
 class UpdateParameters;
 class RenderStaticData;
-class FrameHistory;
 class Programs;
 class TransformState;
 class ImageManager;
@@ -33,7 +32,6 @@ public:
                     const UpdateParameters&,
                     const EvaluatedLight&,
                     RenderStaticData&,
-                    FrameHistory&,
                     ImageManager&,
                     LineAtlas&);
 
@@ -44,7 +42,6 @@ public:
     const EvaluatedLight& evaluatedLight;
 
     RenderStaticData& staticData;
-    FrameHistory& frameHistory;
     ImageManager& imageManager;
     LineAtlas& lineAtlas;
 
