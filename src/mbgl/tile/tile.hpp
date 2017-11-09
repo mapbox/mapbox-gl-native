@@ -27,6 +27,8 @@ class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 
+class CollisionIndex;
+
 namespace gl {
 class Context;
 } // namespace gl
@@ -55,7 +57,8 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>&,
-            const RenderedQueryOptions& options);
+            const RenderedQueryOptions& options,
+            const CollisionIndex&);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
