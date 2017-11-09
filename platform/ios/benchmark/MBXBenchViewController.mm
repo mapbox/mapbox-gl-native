@@ -36,8 +36,8 @@
     [super viewDidLoad];
 
     // Use a local style and local assets if they’ve been downloaded.
-    NSURL *tileSourceURL = [[NSBundle mainBundle] URLForResource:@"mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6" withExtension:nil subdirectory:@"tiles"];
-    NSURL *url = [NSURL URLWithString:tileSourceURL ? @"asset://styles/streets-v8.json" : @"mapbox://styles/mapbox/streets-v8"];
+    NSURL *tileSourceURL = [[NSBundle mainBundle] URLForResource:@"mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7" withExtension:nil subdirectory:@"tiles"];
+    NSURL *url = [NSURL URLWithString:tileSourceURL ? @"asset://styles/streets-v8.json" : @"mapbox://styles/mapbox/streets-v10"];
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds styleURL:url];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;
@@ -91,13 +91,19 @@ std::chrono::steady_clock::time_point started;
 std::vector<std::pair<std::string, double>> result;
 
 static const int warmupDuration = 20; // frames
-static const int benchmarkDuration = 200; // frames
+static const int benchmarkDuration = 600; // frames
 
 - (void)startBenchmarkIteration
 {
     if (mbgl::bench::locations.size() > idx) {
         const auto& location = mbgl::bench::locations[idx];
+        [self.mapView resetPosition];
         [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(location.latitude, location.longitude) zoomLevel:location.zoom animated:NO];
+        if (location.pitch) {
+            MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:self.mapView.centerCoordinate fromDistance:self.mapView.camera.altitude pitch:location.pitch heading:location.bearing];
+            [self.mapView setCamera:camera animated:NO];
+        }
+
         self.mapView.direction = location.bearing;
         state = State::WaitingForAssets;
         NSLog(@"Benchmarking \"%s\"", location.name.c_str());
@@ -151,6 +157,18 @@ static const int benchmarkDuration = 200; // frames
         if (frames >= warmupDuration)
         {
             frames = 0;
+            const auto& location = mbgl::bench::locations[idx];
+            if (location.pitch) {
+                MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:self.mapView.centerCoordinate fromDistance:self.mapView.camera.altitude pitch:location.pitch heading:location.endBearing];
+                [self.mapView setCamera:camera withDuration:10 animationTimingFunction:nil];
+            } else if (location.endZoom) {
+                [self.mapView setCenterCoordinate:self.mapView.centerCoordinate zoomLevel:location.endZoom animated:NO];
+                CLLocationDistance targetAltitude = self.mapView.camera.altitude; // Yikes, why is the API making me do this?
+                [self.mapView setCenterCoordinate:self.mapView.centerCoordinate zoomLevel:location.zoom animated:NO];
+                MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:self.mapView.centerCoordinate fromDistance:targetAltitude pitch:location.pitch heading:location.endBearing];
+                [self.mapView setCamera:camera withDuration:10 animationTimingFunction:nil];
+            }
+
             state = State::Benchmarking;
             started = std::chrono::steady_clock::now();
             NSLog(@"- Benchmarking for %d frames...", benchmarkDuration);

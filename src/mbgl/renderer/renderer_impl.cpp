@@ -29,6 +29,8 @@
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <iostream>
+
 namespace mbgl {
 
 using namespace style;
@@ -83,6 +85,9 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
+    static uint32_t frameID = 0;
+    std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
+    std::cout << frameID++ << ", ";
     if (updateParameters.mode == MapMode::Still) {
         // Don't load/render anyting in still mode until explicitly requested.
         if (!updateParameters.stillImageRequest) {
@@ -365,6 +370,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
+    std::chrono::steady_clock::time_point builtTiles = std::chrono::steady_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(builtTiles - started).count() << ", ";
+
     bool symbolBucketsChanged = false;
     if (parameters.mapMode == MapMode::Still) {
         // TODO: Think about right way for symbol index to handle still rendering
@@ -396,6 +404,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     parameters.symbolFadeChange = placement->symbolFadeChange(parameters.timePoint);
+    
+    std::chrono::steady_clock::time_point placementTime = std::chrono::steady_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(placementTime - builtTiles).count() << ", ";
 
     if (placementChanged || symbolBucketsChanged) {
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
@@ -404,6 +415,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
     }
+    
+    std::chrono::steady_clock::time_point updateOpacities = std::chrono::steady_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(updateOpacities - placementTime).count() << ", ";
 
     // - UPLOAD PASS -------------------------------------------------------------------------------
     // Uploads all required buffers and images before we do any actual rendering.
@@ -420,6 +434,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             }
         }
     }
+    
+    std::chrono::steady_clock::time_point uploadTime = std::chrono::steady_clock::now();
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(uploadTime - updateOpacities).count() << ", ";
 
     // - 3D PASS -------------------------------------------------------------------------------------
     // Renders any 3D layers bottom-to-top to unique FBOs with texture attachments, but share the same
@@ -530,6 +547,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Actually render the layers
 
+    uint64_t reprojectTime = 0;
+    uint64_t symbolTime = 0;
+
     parameters.depthRangeSize = 1 - (order.size() + 2) * parameters.numSublayers * parameters.depthEpsilon;
 
     // - OPAQUE PASS -------------------------------------------------------------------------------
@@ -559,7 +579,14 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
             parameters.currentLayer = i;
             if (it->layer.hasRenderPass(parameters.pass)) {
                 MBGL_DEBUG_GROUP(parameters.context, it->layer.getID());
-                it->layer.render(parameters, it->source);
+                if (it->layer.as<RenderSymbolLayer>()) {
+                    auto timing = it->layer.as<RenderSymbolLayer>()->renderWithTiming(parameters, it->source);
+                    reprojectTime += timing.first;
+                    symbolTime += timing.second;
+                } else {
+                    it->layer.render(parameters, it->source);
+                }
+
             }
         }
     }
@@ -630,6 +657,18 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     // Cleanup only after signaling completion
     parameters.context.performCleanup();
+    
+    std::chrono::steady_clock::time_point renderTime = std::chrono::steady_clock::now();
+    
+    symbolTime -= reprojectTime;
+    std::cout << reprojectTime << ", " << symbolTime << ", ";
+    
+    uint64_t totalRenderTime = std::chrono::duration_cast<std::chrono::microseconds>(renderTime - uploadTime).count();
+    std::cout << totalRenderTime - symbolTime - reprojectTime << ", ";
+
+    
+    std::cout << std::chrono::duration_cast<std::chrono::microseconds>(renderTime - started).count() << std::endl;
+    
 }
 
 std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineString& geometry, const RenderedQueryOptions& options) const {

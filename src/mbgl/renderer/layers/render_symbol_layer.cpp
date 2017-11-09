@@ -69,10 +69,17 @@ bool RenderSymbolLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource* source) {
+    renderWithTiming(parameters, source);
+}
+
+std::pair<uint64_t,uint64_t> RenderSymbolLayer::renderWithTiming(PaintParameters& parameters, RenderSource*) {
+    uint64_t reprojectTime = 0;
+    std::chrono::steady_clock::time_point started = std::chrono::steady_clock::now();
     if (parameters.pass == RenderPass::Opaque) {
-        return;
+        return std::make_pair(0,0);
     }
+
 
     for (const RenderTile& tile : renderTiles) {
         assert(dynamic_cast<SymbolBucket*>(tile.tile.getBucket(*baseImpl)));
@@ -126,6 +133,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 layout.get<IconRotationAlignment>() == AlignmentType::Map;
 
             if (alongLine) {
+                std::chrono::steady_clock::time_point startedReproject = std::chrono::steady_clock::now();
+
                 reprojectLineLabels(bucket.icon.dynamicVertices,
                                     bucket.icon.placedSymbols,
                                     tile.matrix,
@@ -135,6 +144,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
+                std::chrono::steady_clock::time_point finishedReproject = std::chrono::steady_clock::now();
+                reprojectTime += std::chrono::duration_cast<std::chrono::microseconds>(finishedReproject - startedReproject).count();
+
             }
 
             const bool iconScaled = layout.get<IconSize>().constantOr(1.0) != 1.0 || bucket.iconsNeedLinear;
@@ -187,6 +199,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 layout.get<TextRotationAlignment>() == AlignmentType::Map;
 
             if (alongLine) {
+                std::chrono::steady_clock::time_point startedReproject = std::chrono::steady_clock::now();
+
                 reprojectLineLabels(bucket.text.dynamicVertices,
                                     bucket.text.placedSymbols,
                                     tile.matrix,
@@ -196,6 +210,9 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
+                std::chrono::steady_clock::time_point finishedReproject = std::chrono::steady_clock::now();
+                reprojectTime += std::chrono::duration_cast<std::chrono::microseconds>(finishedReproject - startedReproject).count();
+
             }
 
             const Size texsize = geometryTile.glyphAtlasTexture->size;
@@ -290,6 +307,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
         }
     }
+    std::chrono::steady_clock::time_point finished = std::chrono::steady_clock::now();
+    uint64_t totalTime = std::chrono::duration_cast<std::chrono::microseconds>(finished - started).count();
+    return std::make_pair(reprojectTime, totalTime);
+
 }
 
 style::IconPaintProperties::PossiblyEvaluated RenderSymbolLayer::iconPaintProperties() const {

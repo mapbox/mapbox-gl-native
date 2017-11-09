@@ -67,6 +67,8 @@ public:
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
     void render(PaintParameters&, RenderSource*) override;
+    std::pair<uint64_t,uint64_t> renderWithTiming(PaintParameters&, RenderSource*);
+
 
     style::IconPaintProperties::PossiblyEvaluated iconPaintProperties() const;
     style::TextPaintProperties::PossiblyEvaluated textPaintProperties() const;

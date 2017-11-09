@@ -12,6 +12,9 @@ struct Location {
     const double latitude;
     const double zoom;
     const double bearing;
+    const double pitch;
+    const double endBearing;
+    const double endZoom;
 };
 
 extern const std::vector<Location> locations;
