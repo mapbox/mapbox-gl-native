@@ -44,6 +44,8 @@ set(MBGL_CORE_FILES
     # geometry
     src/mbgl/geometry/anchor.hpp
     src/mbgl/geometry/debug_font_data.hpp
+    src/mbgl/geometry/dem_pyramid.hpp
+    src/mbgl/geometry/dem_pyramid.cpp
     src/mbgl/geometry/feature_index.cpp
     src/mbgl/geometry/feature_index.hpp
     src/mbgl/geometry/line_atlas.cpp
