@@ -11,6 +11,7 @@
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/zoom_history.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
+#include <mbgl/text/placement.hpp>
 
 #include <memory>
 #include <string>
@@ -31,6 +32,7 @@ class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
+class CrossTileSymbolIndex;
 
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
@@ -55,7 +57,7 @@ public:
 
 private:
     bool isLoaded() const;
-    bool hasTransitions() const;
+    bool hasTransitions(TimePoint) const;
 
     RenderSource* getRenderSource(const std::string& id) const;
 
@@ -104,6 +106,9 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderSource>> renderSources;
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
+
+    std::unique_ptr<CrossTileSymbolIndex> crossTileSymbolIndex;
+    std::unique_ptr<Placement> placement;
 
     bool contextLost = false;
 };
