@@ -387,10 +387,9 @@ public:
     self.accessibilityTraits = UIAccessibilityTraitAllowsDirectInteraction | UIAccessibilityTraitAdjustable;
     _accessibilityCompassFormatter = [[MGLCompassDirectionFormatter alloc] init];
     _accessibilityCompassFormatter.unitStyle = NSFormattingUnitStyleLong;
-
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
-
+    if (@available(iOS 11.0, *)) { self.accessibilityIgnoresInvertColors = YES; }
     // setup mbgl view
     _mbglView = new MBGLView(self);
 
@@ -441,9 +440,6 @@ public:
     _logoView.accessibilityTraits = UIAccessibilityTraitStaticText;
     _logoView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"LOGO_A11Y_LABEL", nil, nil, @"Mapbox", @"Accessibility label");
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if ([_logoView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _logoView.accessibilityIgnoresInvertColors = YES; }
-#endif
     [self addSubview:_logoView];
     _logoViewConstraints = [NSMutableArray array];
 
@@ -452,9 +448,6 @@ public:
     _attributionButton = [UIButton buttonWithType:UIButtonTypeInfoLight];
     _attributionButton.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_LABEL", nil, nil, @"About this map", @"Accessibility label");
     _attributionButton.accessibilityHint = NSLocalizedStringWithDefaultValue(@"INFO_A11Y_HINT", nil, nil, @"Shows credits, a feedback form, and more", @"Accessibility hint");
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if ([_attributionButton respondsToSelector:@selector(accessibilityIgnoresInvertColors)])  { _attributionButton.accessibilityIgnoresInvertColors = YES; }
-#endif
     [_attributionButton addTarget:self action:@selector(showAttribution:) forControlEvents:UIControlEventTouchUpInside];
     _attributionButton.translatesAutoresizingMaskIntoConstraints = NO;
     [self addSubview:_attributionButton];
@@ -471,9 +464,6 @@ public:
     _compassView.accessibilityLabel = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_LABEL", nil, nil, @"Compass", @"Accessibility label");
     _compassView.accessibilityHint = NSLocalizedStringWithDefaultValue(@"COMPASS_A11Y_HINT", nil, nil, @"Rotates the map to face due north", @"Accessibility hint");
     _compassView.translatesAutoresizingMaskIntoConstraints = NO;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if ([_compassView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _compassView.accessibilityIgnoresInvertColors = YES; }
-#endif
     [self addSubview:_compassView];
     _compassViewConstraints = [NSMutableArray array];
     
@@ -481,9 +471,6 @@ public:
     //
     _scaleBar = [[MGLScaleBar alloc] init];
     _scaleBar.translatesAutoresizingMaskIntoConstraints = NO;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if ([_scaleBar respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _scaleBar.accessibilityIgnoresInvertColors = YES; }
-#endif
     [self addSubview:_scaleBar];
     _scaleBarConstraints = [NSMutableArray array];
     
@@ -598,9 +585,7 @@ public:
     _glView.contentScaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _glView.layer.opaque = _opaque;
     _glView.delegate = self;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
-    if ([_glView respondsToSelector:@selector(accessibilityIgnoresInvertColors)]) { _glView.accessibilityIgnoresInvertColors = YES; }
-#endif
+
     [_glView bindDrawable];
     [self insertSubview:_glView atIndex:0];
     _glView.contentMode = UIViewContentModeCenter;
@@ -1960,14 +1945,14 @@ public:
 
     return ([validSimultaneousGestures containsObject:gestureRecognizer] && [validSimultaneousGestures containsObject:otherGestureRecognizer]);
 }
-             
+
 - (CLLocationDegrees)angleBetweenPoints:(CGPoint)west east:(CGPoint)east
 {
     CGFloat slope = (west.y - east.y) / (west.x - east.x);
-                 
+    
     CGFloat angle = atan(fabs(slope));
     CLLocationDegrees degrees = MGLDegreesFromRadians(angle);
-                 
+    
     return degrees;
 }
 
