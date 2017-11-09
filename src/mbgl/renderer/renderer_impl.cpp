@@ -255,7 +255,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         updateParameters,
         renderLight.getEvaluated(),
         *staticData,
-        frameHistory,
         *imageManager,
         *lineAtlas
     };
@@ -368,9 +367,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         order.emplace_back(RenderItem { *layer, source });
     }
 
-    frameHistory.record(parameters.timePoint,
-                        parameters.state.getZoom(),
-                        parameters.mapMode == MapMode::Continuous ? util::DEFAULT_TRANSITION_DURATION : Milliseconds(0));
     bool symbolBucketsChanged = false;
     if (parameters.mapMode == MapMode::Still) {
         // TODO: Think about right way for symbol index to handle still rendering
@@ -418,8 +414,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
-        parameters.frameHistory.upload(parameters.context, 0);
-
+        
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
