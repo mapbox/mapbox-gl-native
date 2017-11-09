@@ -277,9 +277,13 @@ void Statement::bind(int offset, const char* value, std::size_t length, bool ret
         throw std::range_error("value too long");
     }
 
+    // Qt SQLite driver treats QByteArray as blob: we need to explicitly
+    // declare the variant type as string.
+    QVariant text(QVariant::Type::String);
+    text.setValue(retain ? QByteArray(value, length) : QByteArray::fromRawData(value, length));
+
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
-            QByteArray::fromRawData(value, length), QSql::In);
+    impl->query.bindValue(offset - 1, std::move(text), QSql::In);
 
     checkQueryError(impl->query);
 }
@@ -289,7 +293,12 @@ void Statement::bind(int offset, const std::string& value, bool retain) {
 }
 
 void Statement::bindBlob(int offset, const void* value_, std::size_t length, bool retain) {
+    assert(impl);
     const char* value = reinterpret_cast<const char*>(value_);
+    if (length > std::numeric_limits<int>::max()) {
+        // Kept for consistence with the default implementation.
+        throw std::range_error("value too long");
+    }
 
     // Field numbering starts at 0.
     impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
