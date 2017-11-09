@@ -1,5 +1,6 @@
 include(platform/qt/qt.cmake)
 
+mason_use(boost_libprogram_options VERSION 1.62.0${MASON_CXXABI_SUFFIX})
 mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 
@@ -62,6 +63,28 @@ macro(mbgl_filesource)
     )
 endmacro()
 
+set(MBGL_OFFLINE_QT ON)
+macro(mbgl_platform_offline)
+    target_sources(mbgl-offline
+        PRIVATE platform/default/mbgl/util/default_styles.hpp
+    )
+
+    target_compile_options(mbgl-offline
+        PRIVATE -fvisibility-inlines-hidden
+    )
+
+    target_include_directories(mbgl-offline
+        PRIVATE platform/default
+    )
+
+    target_add_mason_package(mbgl-offline PRIVATE boost)
+    target_add_mason_package(mbgl-offline PRIVATE boost_libprogram_options)
+
+    target_link_libraries(mbgl-offline
+        PRIVATE mbgl-core
+        PRIVATE mbgl-filesource
+    )
+endmacro()
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test

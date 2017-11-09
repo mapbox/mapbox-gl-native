@@ -419,6 +419,14 @@ qt-app: $(QT_BUILD)
 run-qt-app: qt-app
 	$(QT_OUTPUT_PATH)/mbgl-qt
 
+.PHONY: qt-offline
+qt-offline: $(QT_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-offline
+
+.PHONY: run-qt-offline
+run-qt-offline: qt-offline
+	$(QT_OUTPUT_PATH)/mbgl-offline
+
 .PHONY: qt-test
 qt-test: $(QT_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(QT_OUTPUT_PATH) mbgl-test
