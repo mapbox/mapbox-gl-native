@@ -209,7 +209,6 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
             }
 
             if (ignorePlacement) {
-                // TODO: revisit whether GridIndex should move vs. copy on insert
                 ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
             } else {
                 collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ circle.px, circle.py }, circle.radius});
@@ -219,7 +218,6 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
         assert(feature.boxes.size() == 1);
         auto& box = feature.boxes[0];
         if (ignorePlacement) {
-            // TODO: revisit whether GridIndex should move vs. copy on insert
             ignoredGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
         } else {
             collisionGrid.insert(IndexedSubfeature(feature.indexedFeature), {{ box.px1, box.py1 }, { box.px2, box.py2 }});
