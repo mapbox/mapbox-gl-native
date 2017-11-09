@@ -47,8 +47,7 @@ namespace mbgl {
             float symbolFadeChange(TimePoint now) const;
             bool hasTransitions(TimePoint now) const;
 
-            // TODO: public for queryRenderedFeatures
-            CollisionIndex collisionIndex;
+            const CollisionIndex& getCollisionIndex() const;
         
             bool stillRecent(TimePoint now) const;
             void setRecent(TimePoint now);
@@ -66,6 +65,8 @@ namespace mbgl {
                     std::unordered_set<uint32_t>& seenCrossTileIDs);
 
             void updateBucketOpacities(SymbolBucket&, std::unordered_set<uint32_t>&);
+        
+            CollisionIndex collisionIndex;
 
             TransformState state;
             MapMode mapMode;

@@ -300,6 +300,8 @@ void Placement::setStale() {
     stale = true;
 }
 
-
+const CollisionIndex& Placement::getCollisionIndex() const {
+    return collisionIndex;
+}
 
 } // namespace mbgl
