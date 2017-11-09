@@ -52,7 +52,7 @@ QNetworkRequest HTTPRequest::networkRequest() const
     return req;
 }
 
-void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
+void HTTPRequest::handleNetworkReply(QNetworkReply *reply, const QByteArray& data)
 {
     m_handled = true;
 
@@ -98,11 +98,10 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
 
     switch(responseCode) {
     case 200: {
-        QByteArray bytes = reply->readAll();
-        if (bytes.isEmpty()) {
+        if (data.isEmpty()) {
             response.data = std::make_shared<std::string>();
         } else {
-            response.data = std::make_shared<std::string>(bytes.constData(), bytes.size());
+            response.data = std::make_shared<std::string>(data.constData(), data.size());
         }
         break;
     }

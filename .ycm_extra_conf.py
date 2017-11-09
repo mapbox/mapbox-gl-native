@@ -38,6 +38,8 @@ import ycm_core
 
 compilation_database_folders = [
   'build/linux-x86_64/Debug',
+  'build/qt-linux-x86_64/Debug',
+  'build/qt4-linux-x86_64/Debug',
   'build/macos/compdb/Debug',
 ]
 
