@@ -1816,16 +1816,18 @@ public:
     return panCamera;
 }
 
-- (MGLMapCamera *)cameraByZoomingToZoomLevel:(double)zoom  aroundAnchorPoint:(CGPoint)anchorPoint
+- (MGLMapCamera *)cameraByZoomingToZoomLevel:(double)zoom aroundAnchorPoint:(CGPoint)anchorPoint
 {
-    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
-    MGLMapCamera *camera;
-    
     mbgl::ScreenCoordinate anchor = mbgl::ScreenCoordinate { anchorPoint.x, anchorPoint.y };
+    mbgl::EdgeInsets padding = mbgl::EdgeInsets(anchor.y, anchor.x, self.size.height - anchor.y, self.size.width - anchor.x);
+    mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
+
     currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
     currentCameraOptions.anchor = anchor;
-    camera = [self cameraForCameraOptions:currentCameraOptions];
+    MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(_mbglMap->latLngBoundsForCamera(currentCameraOptions));
+    
+    MGLMapCamera *camera;
+    camera = [self cameraThatFitsCoordinateBounds:bounds];
     
     return camera;
 }
