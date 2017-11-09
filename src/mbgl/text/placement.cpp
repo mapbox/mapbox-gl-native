@@ -62,13 +62,13 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         state.matrixFor(posMatrix, renderTile.id);
         matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-        mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(renderTile.matrix,
+        mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
                 layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
                 layout.get<TextRotationAlignment>() == style::AlignmentType::Map,
                 state,
                 pixelsToTileUnits);
 
-        mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(renderTile.matrix,
+        mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
                 layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
                 layout.get<IconRotationAlignment>() == style::AlignmentType::Map,
                 state,

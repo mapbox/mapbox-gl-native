@@ -11,10 +11,8 @@ namespace mbgl {
 
 class CollisionBox {
 public:
-    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _maxScale) :
-        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), maxScale(_maxScale) {}
-
-    float adjustedMaxScale(const std::array<float, 4>& rotationMatrix, const float yStretch) const;
+    CollisionBox(Point<float> _anchor, Point<float> _offset, float _x1, float _y1, float _x2, float _y2, float _signedDistanceFromAnchor = 0, float _radius = 0) :
+        anchor(std::move(_anchor)), offset(_offset), x1(_x1), y1(_y1), x2(_x2), y2(_y2), used(true), signedDistanceFromAnchor(_signedDistanceFromAnchor), radius(_radius) {}
 
     // the box is centered around the anchor point
     Point<float> anchor;
@@ -28,20 +26,23 @@ public:
     float x2;
     float y2;
 
-    // the box is only valid for scales < maxScale.
-    // The box does not block other boxes at scales >= maxScale;
-    float maxScale;
+    // Projected box geometry: generated/updated at placement time
+    float px1;
+    float py1;
+    float px2;
+    float py2;
+    
+    // Projected circle geometry: generated/updated at placement time
+    float px;
+    float py;
+    bool used;
 
-    // the scale at which the label can first be shown
-    float placementScale = 0.0f;
+    float signedDistanceFromAnchor;
+    float radius;
 };
 
 class CollisionFeature {
 public:
-    enum class AlignmentType : bool {
-        Straight = false,
-        Curved
-    };
 
     // for text
     CollisionFeature(const GeometryCoordinates& line,
@@ -50,8 +51,9 @@ public:
                      const float boxScale,
                      const float padding,
                      const style::SymbolPlacementType placement,
-                     const IndexedSubfeature& indexedFeature_)
-        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, AlignmentType::Curved) {}
+                     const IndexedSubfeature& indexedFeature_,
+                     const float overscaling)
+        : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling) {}
 
     // for icons
     CollisionFeature(const GeometryCoordinates& line,
@@ -66,7 +68,7 @@ public:
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
-                           boxScale, padding, placement, indexedFeature_, AlignmentType::Straight) {}
+                           boxScale, padding, placement, indexedFeature_, 1) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
@@ -78,14 +80,15 @@ public:
                      const float padding,
                      const style::SymbolPlacementType,
                      IndexedSubfeature,
-                     const AlignmentType);
+                     const float overscaling);
 
     std::vector<CollisionBox> boxes;
     IndexedSubfeature indexedFeature;
+    bool alongLine;
 
 private:
     void bboxifyLabel(const GeometryCoordinates& line, GeometryCoordinate& anchorPoint,
-                      const int segment, const float length, const float height);
+                      const int segment, const float length, const float height, const float overscaling);
 };
 
 } // namespace mbgl

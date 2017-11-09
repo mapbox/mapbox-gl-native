@@ -74,6 +74,8 @@ public:
     uint32_t currentLayer;
     float depthRangeSize;
     const float depthEpsilon = 1.0f / (1 << 16);
+    
+    float symbolFadeChange;
 };
 
 } // namespace mbgl

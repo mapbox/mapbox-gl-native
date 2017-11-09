@@ -1,7 +1,6 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
@@ -24,15 +23,19 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
+                                       const std::string& sourceID_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_,
-                                       const float pixelRatio_)
+                                       const float pixelRatio_,
+                                       const bool showCollisionBoxes_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
+      sourceID(sourceID_),
       obsolete(obsolete_),
       mode(mode_),
-      pixelRatio(pixelRatio_) {
+      pixelRatio(pixelRatio_),
+      showCollisionBoxes(showCollisionBoxes_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() = default;
@@ -116,9 +119,9 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
     }
 }
 
-void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, uint64_t correlationID_) {
+void GeometryTileWorker::setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_) {
     try {
-        placementConfig = std::move(placementConfig_);
+        showCollisionBoxes = showCollisionBoxes_;
         correlationID = correlationID_;
 
         switch (state) {
@@ -372,7 +375,7 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
 }
 
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
+    if (!data || !layers || hasPendingSymbolDependencies()) {
         return;
     }
     
@@ -392,13 +395,13 @@ void GeometryTileWorker::attemptPlacement() {
             }
 
             symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
+                                  imageMap, imageAtlas.positions,
+                                  id, sourceID);
         }
 
         symbolLayoutsNeedPreparation = false;
     }
 
-    auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     for (auto& symbolLayout : symbolLayouts) {
@@ -410,7 +413,7 @@ void GeometryTileWorker::attemptPlacement() {
             continue;
         }
 
-        std::shared_ptr<Bucket> bucket = symbolLayout->place(*collisionTile);
+        std::shared_ptr<Bucket> bucket = symbolLayout->place(showCollisionBoxes);
         for (const auto& pair : symbolLayout->layerPaintProperties) {
             buckets.emplace(pair.first, bucket);
         }
@@ -418,7 +421,6 @@ void GeometryTileWorker::attemptPlacement() {
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
-        std::move(collisionTile),
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage),
     }, correlationID);
