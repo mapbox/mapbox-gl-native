@@ -81,14 +81,13 @@ public:
 
     friend std::string layoutKey(const RenderLayer&);
 
+    // Stores current set of tiles to be rendered for this layer.
+    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
+
 protected:
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
-
-    //Stores current set of tiles to be rendered for this layer.
-    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
-
 };
 
 } // namespace mbgl

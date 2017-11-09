@@ -4,12 +4,11 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
-#include <mbgl/text/placement_config.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/layout/symbol_layout.hpp>
 
 #include <atomic>
 #include <memory>
@@ -36,9 +35,9 @@ public:
     void setError(std::exception_ptr);
     void setData(std::unique_ptr<const GeometryTileData>);
 
-    void setPlacementConfig(const PlacementConfig&) override;
     void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) override;
-    
+    void setShowCollisionBoxes(const bool showCollisionBoxes) override;
+
     void onGlyphsAvailable(GlyphMap) override;
     void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) override;
     
@@ -56,7 +55,8 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>& layers,
-            const RenderedQueryOptions& options) override;
+            const RenderedQueryOptions& options,
+            const CollisionIndex& collisionIndex) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,
@@ -82,16 +82,13 @@ public:
     class PlacementResult {
     public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
-        std::unique_ptr<CollisionTile> collisionTile;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
         PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
-                        std::unique_ptr<CollisionTile> collisionTile_,
                         optional<AlphaImage> glyphAtlasImage_,
                         optional<PremultipliedImage> iconAtlasImage_)
             : symbolBuckets(std::move(symbolBuckets_)),
-              collisionTile(std::move(collisionTile_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
@@ -99,7 +96,7 @@ public:
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
-    float yStretch() const override;
+    void resetCrossTileIDs() override;
     
 protected:
     const GeometryTileData* getData() {
@@ -108,7 +105,6 @@ protected:
 
 private:
     void markObsolete();
-    void invokePlacement();
 
     const std::string sourceID;
 
@@ -122,7 +118,6 @@ private:
     ImageManager& imageManager;
 
     uint64_t correlationID = 0;
-    optional<PlacementConfig> requestedConfig;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
@@ -132,10 +127,11 @@ private:
     optional<PremultipliedImage> iconAtlasImage;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
-    std::unique_ptr<CollisionTile> collisionTile;
+    std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayouts;
 
-    float lastYStretch;
     const MapMode mode;
+    
+    bool showCollisionBoxes;
 
 public:
     optional<gl::Texture> glyphAtlasTexture;
