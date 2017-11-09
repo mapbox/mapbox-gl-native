@@ -67,7 +67,8 @@
       "type": "symbol",
       "source": "source1",
       "layout": {
-        "icon-image": "test-icon"
+        "icon-image": "test-icon",
+        "icon-allow-overlap": true
       }
     },
     {
@@ -75,7 +76,8 @@
       "type": "symbol",
       "source": "source2",
       "layout": {
-        "icon-image": "test-icon"
+        "icon-image": "test-icon",
+        "icon-allow-overlap": true
       }
     },
     {
@@ -83,7 +85,8 @@
       "type": "symbol",
       "source": "source3",
       "layout": {
-        "icon-image": "test-icon"
+        "icon-image": "test-icon",
+        "icon-allow-overlap": true
       }
     },
     {
@@ -91,7 +94,8 @@
       "type": "symbol",
       "source": "source4",
       "layout": {
-        "icon-image": "test-icon"
+        "icon-image": "test-icon",
+        "icon-allow-overlap": true
       }
     }
   ]
