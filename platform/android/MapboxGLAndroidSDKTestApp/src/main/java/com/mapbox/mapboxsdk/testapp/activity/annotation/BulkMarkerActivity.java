@@ -100,11 +100,11 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   }
 
   private void showMarkers(int amount) {
-    mapboxMap.clear();
-
-    if (locations == null) {
+    if (mapboxMap == null || locations == null) {
       return;
     }
+
+    mapboxMap.clear();
 
     if (locations.size() < amount) {
       amount = locations.size();
