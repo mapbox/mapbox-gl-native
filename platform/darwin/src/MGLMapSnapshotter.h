@@ -109,7 +109,9 @@ MGL_EXPORT
 typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapshot, NSError* _Nullable error);
 
 /**
- An immutable utility object for capturing map-based images.
+ An immutable utility object for capturing map-based images. To adjust the camera,
+ zoom level, style URL, or coordinate bounds of a snapshot, create a
+ `MGLMapSnapshotOptions` object.
  
  ### Example
  
