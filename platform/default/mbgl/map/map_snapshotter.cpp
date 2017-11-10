@@ -50,7 +50,7 @@ MapSnapshotter::Impl::Impl(FileSource& fileSource,
            const optional<LatLngBounds> region,
            const optional<std::string> programCacheDir)
     : frontend(size, pixelRatio, fileSource, scheduler, programCacheDir)
-    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler, MapMode::Still) {
+    , map(frontend, MapObserver::nullObserver(), size, pixelRatio, fileSource, scheduler, MapMode::Static) {
 
     map.getStyle().loadURL(styleURL);
 
