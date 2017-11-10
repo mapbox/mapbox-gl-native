@@ -553,6 +553,11 @@ final class MapGestureDetector {
     // Called when fingers leave screen
     @Override
     public void onScaleEnd(final ScaleGestureDetector detector) {
+      if (velocityTracker == null) {
+        return;
+      }
+
+
       if (rotateGestureOccurred || quickZoom) {
         reset();
         return;
