@@ -175,10 +175,15 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     return [self usesMetricSystem] ? self.metersPerPoint : self.metersPerPoint * MGLFeetPerMeter;
 }
 
-#pragma mark - Convenient methods
+#pragma mark - Convenience methods
 
 - (BOOL)usesRightToLeftLayout {
-    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+    // semanticContentAttribute is iOS 9+
+    if ([self.superview respondsToSelector:@selector(semanticContentAttribute)]) {
+        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
+    } else {
+        return UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
+    }
 }
 
 - (BOOL)usesMetricSystem {
@@ -241,7 +246,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
     
     CGFloat alpha = maximumDistance > allowedDistance ? .0f : 1.0f;
     
-    if(self.alpha != alpha) {
+    if (self.alpha != alpha) {
         [UIView animateWithDuration:.2f delay:0 options:UIViewAnimationOptionBeginFromCurrentState animations:^{
             self.alpha = alpha;
         } completion:nil];
@@ -331,7 +336,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutBars {
-    CGFloat barWidth = (CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count;
+    CGFloat barWidth = round((CGRectGetWidth(self.bounds) - self.borderWidth * 2.0f) / self.bars.count);
     
     NSUInteger i = 0;
     for (UIView *bar in self.bars) {
@@ -354,11 +359,11 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 }
 
 - (void)layoutLabels {
-    CGFloat barWidth = self.bounds.size.width / self.bars.count;
+    CGFloat barWidth = round(self.bounds.size.width / self.bars.count);
     BOOL RTL = [self usesRightToLeftLayout];
     NSUInteger i = RTL ? self.bars.count : 0;
     for (MGLScaleBarLabel *label in self.labels) {
-        CGFloat xPosition = barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth;
+        CGFloat xPosition = round(barWidth * i - CGRectGetMidX(label.bounds) + self.borderWidth);
         label.frame = CGRectMake(xPosition, 0,
                                  CGRectGetWidth(label.bounds),
                                  CGRectGetHeight(label.bounds));

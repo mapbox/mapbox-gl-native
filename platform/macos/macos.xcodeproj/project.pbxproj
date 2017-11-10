@@ -385,6 +385,12 @@
 		DA2207BB1DC076940002F84D /* MGLStyleValueTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLStyleValueTests.swift; sourceTree = "<group>"; };
 		DA2784FD1DF03060001D5B8D /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Media.xcassets; path = ../../darwin/test/Media.xcassets; sourceTree = "<group>"; };
 		DA2987591E1A4290002299F5 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
+		DA3389601FA3EAC4001EA329 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Foundation.strings"; sourceTree = "<group>"; };
+		DA3389611FA3EDCE001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA3389621FA3EDEF001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DA3389631FA3EDF5001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = bg; path = bg.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DA3389641FA3EE00001EA329 /* bg */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = bg; path = bg.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA33896C1FA3EF51001EA329 /* hu */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = hu; path = hu.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA35A2A31CC9EB1A00E826B2 /* MGLCoordinateFormatter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCoordinateFormatter.h; sourceTree = "<group>"; };
 		DA35A2A51CC9EB2700E826B2 /* MGLCoordinateFormatter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCoordinateFormatter.m; sourceTree = "<group>"; };
 		DA35A2A71CC9F41600E826B2 /* MGLCoordinateFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLCoordinateFormatterTests.m; path = ../../darwin/test/MGLCoordinateFormatterTests.m; sourceTree = "<group>"; };
@@ -664,6 +670,8 @@
 		352742791D4C235C00A1ECE6 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
+				1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */,
+				1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */,
 				DA8F25A61D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.h */,
 				DA8F25A71D51CB270010E6B5 /* NSValue+MGLStyleAttributeAdditions.mm */,
 			);
@@ -727,6 +735,14 @@
 			name = "Test Helpers";
 			sourceTree = "<group>";
 		};
+		DA33895E1FA3E997001EA329 /* Recovered References */ = {
+			isa = PBXGroup;
+			children = (
+				30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */,
+			);
+			name = "Recovered References";
+			sourceTree = "<group>";
+		};
 		DA839E891CC2E3400062CAFB = {
 			isa = PBXGroup;
 			children = (
@@ -736,6 +752,7 @@
 				DAE6C31E1CC308BC00DB3429 /* Frameworks */,
 				DAE6C3C41CC31F7800DB3429 /* Configuration */,
 				DA839E931CC2E3400062CAFB /* Products */,
+				DA33895E1FA3E997001EA329 /* Recovered References */,
 			);
 			sourceTree = "<group>";
 		};
@@ -944,8 +961,6 @@
 		DAD1657F1CF4CF50001FF4B9 /* Categories */ = {
 			isa = PBXGroup;
 			children = (
-				1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */,
-				1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */,
 				408AA8601DAEED3300022900 /* MGLPolygon+MGLAdditions.h */,
 				408AA85C1DAEED3300022900 /* MGLPolygon+MGLAdditions.m */,
 				408AA8611DAEED3300022900 /* MGLPolyline+MGLAdditions.h */,
@@ -1345,6 +1360,7 @@
 				fi,
 				nl,
 				hu,
+				bg,
 			);
 			mainGroup = DA839E891CC2E3400062CAFB;
 			productRefGroup = DA839E931CC2E3400062CAFB /* Products */;
@@ -1573,6 +1589,7 @@
 				DA618B271E68926E00CB7F44 /* fi */,
 				DAE8CCAB1E6E8B72009B5CB0 /* nl */,
 				DA704CBE1F637531004B3F28 /* hu */,
+				DA3389611FA3EDCE001EA329 /* bg */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1622,6 +1639,7 @@
 				DA618B2A1E6892B500CB7F44 /* fi */,
 				DAE8CCAC1E6E8B8D009B5CB0 /* nl */,
 				DA704CBF1F637548004B3F28 /* hu */,
+				DA3389641FA3EE00001EA329 /* bg */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -1642,6 +1660,8 @@
 				DACCD9C71F1F443B00BB09A1 /* fr */,
 				DA704CBA1F6372E8004B3F28 /* ru */,
 				DA704CC61F666385004B3F28 /* uk */,
+				DA3389601FA3EAC4001EA329 /* pt-BR */,
+				DA3389621FA3EDEF001EA329 /* bg */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -1661,6 +1681,8 @@
 				DA618B151E6886DF00CB7F44 /* ca */,
 				DA618B241E6891F300CB7F44 /* lt */,
 				DACFE7971F66EA0C00630DA8 /* vi */,
+				DA3389631FA3EDF5001EA329 /* bg */,
+				DA33896C1FA3EF51001EA329 /* hu */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";

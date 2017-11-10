@@ -4,6 +4,10 @@
 
 #import <mbgl/util/projection.hpp>
 
+#if !TARGET_OS_IPHONE && !TARGET_OS_SIMULATOR
+#import <Cocoa/Cocoa.h>
+#endif
+
 /** Vertical field of view, measured in degrees, for determining the altitude
     of the viewpoint.
 
@@ -56,4 +60,49 @@ double MGLZoomLevelForAltitude(CLLocationDistance altitude, CGFloat pitch, CLLoc
     CLLocationDistance metersPerPixel = metersTall / size.height;
     CGFloat mapPixelWidthAtZoom = std::cos(MGLRadiansFromDegrees(latitude)) * mbgl::util::M2PI * mbgl::util::EARTH_RADIUS_M / metersPerPixel;
     return ::log2(mapPixelWidthAtZoom / mbgl::util::tileSize);
+}
+
+MGLRadianDistance MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to) {
+    double a = pow(sin((to.latitude - from.latitude) / 2), 2)
+        + pow(sin((to.longitude - from.longitude) / 2), 2) * cos(from.latitude) * cos(to.latitude);
+    
+    return 2 * atan2(sqrt(a), sqrt(1 - a));
+}
+
+MGLRadianDirection MGLRadianCoordinatesDirection(MGLRadianCoordinate2D from, MGLRadianCoordinate2D to) {
+    double a = sin(to.longitude - from.longitude) * cos(to.latitude);
+    double b = cos(from.latitude) * sin(to.latitude)
+    - sin(from.latitude) * cos(to.latitude) * cos(to.longitude - from.longitude);
+    return atan2(a, b);
+}
+
+MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoordinate2D coordinate,
+                                                                   MGLRadianDistance distance,
+                                                                   MGLRadianDirection direction) {
+    double otherLatitude = asin(sin(coordinate.latitude) * cos(distance)
+                                + cos(coordinate.latitude) * sin(distance) * cos(direction));
+    double otherLongitude = coordinate.longitude + atan2(sin(direction) * sin(distance) * cos(coordinate.latitude),
+                                                         cos(distance) - sin(coordinate.latitude) * sin(otherLatitude));
+    return MGLRadianCoordinate2DMake(otherLatitude, otherLongitude);
+}
+
+CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate) {
+    // Ported from https://github.com/mapbox/turf-swift/blob/857e2e8060678ef4a7a9169d4971b0788fdffc37/Turf/Turf.swift#L23-L31
+    MGLRadianCoordinate2D firstRadianCoordinate = MGLRadianCoordinateFromLocationCoordinate(firstCoordinate);
+    MGLRadianCoordinate2D secondRadianCoordinate = MGLRadianCoordinateFromLocationCoordinate(secondCoordinate);
+    
+    CGFloat a = sin(secondRadianCoordinate.longitude - firstRadianCoordinate.longitude) * cos(secondRadianCoordinate.latitude);
+    CGFloat b = (cos(firstRadianCoordinate.latitude) * sin(secondRadianCoordinate.latitude)
+                 - sin(firstRadianCoordinate.latitude) * cos(secondRadianCoordinate.latitude) * cos(secondRadianCoordinate.longitude - firstRadianCoordinate.longitude));
+    MGLRadianDirection radianDirection = atan2(a, b);
+    return radianDirection * 180 / M_PI;
+}
+
+CGPoint MGLPointRounded(CGPoint point) {
+#if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
+    CGFloat scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [UIScreen mainScreen].nativeScale : [UIScreen mainScreen].scale;
+#elif TARGET_OS_MAC
+    CGFloat scaleFactor = [NSScreen mainScreen].backingScaleFactor;
+#endif
+    return CGPointMake(round(point.x * scaleFactor) / scaleFactor, round(point.y * scaleFactor) / scaleFactor);
 }

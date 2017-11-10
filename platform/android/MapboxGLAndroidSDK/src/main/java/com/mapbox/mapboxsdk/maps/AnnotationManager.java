@@ -21,7 +21,6 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
-import com.mapbox.services.commons.geojson.Feature;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,7 +40,6 @@ import timber.log.Timber;
  */
 class AnnotationManager {
 
-  private static final String LAYER_ID_SHAPE_ANNOTATIONS = "com.mapbox.annotations.shape.";
   private static final long NO_ANNOTATION_ID = -1;
 
   private final MapView mapView;
@@ -50,7 +48,6 @@ class AnnotationManager {
   private final MarkerViewManager markerViewManager;
   private final LongSparseArray<Annotation> annotationsArray;
   private final List<Marker> selectedMarkers = new ArrayList<>();
-  private final List<String> shapeAnnotationIds = new ArrayList<>();
 
   private MapboxMap mapboxMap;
   private MapboxMap.OnMarkerClickListener onMarkerClickListener;
@@ -58,13 +55,14 @@ class AnnotationManager {
   private MapboxMap.OnPolylineClickListener onPolylineClickListener;
 
   private Annotations annotations;
+  private ShapeAnnotations shapeAnnotations;
   private Markers markers;
   private Polygons polygons;
   private Polylines polylines;
 
   AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
                     MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
-                    Markers markers, Polygons polygons, Polylines polylines) {
+                    Markers markers, Polygons polygons, Polylines polylines, ShapeAnnotations shapeAnnotations) {
     this.mapView = mapView;
     this.annotationsArray = annotationsArray;
     this.markerViewManager = markerViewManager;
@@ -73,6 +71,7 @@ class AnnotationManager {
     this.markers = markers;
     this.polygons = polygons;
     this.polylines = polylines;
+    this.shapeAnnotations = shapeAnnotations;
     if (view != null) {
       // null checking needed for unit tests
       view.addOnMapChangedListener(markerViewManager);
@@ -122,9 +121,6 @@ class AnnotationManager {
         // do icon cleanup
         iconManager.iconCleanup(marker.getIcon());
       }
-    } else {
-      // instanceOf Polygon/Polyline
-      shapeAnnotationIds.remove(annotation.getId());
     }
     annotations.removeBy(annotation);
   }
@@ -143,9 +139,6 @@ class AnnotationManager {
         } else {
           iconManager.iconCleanup(marker.getIcon());
         }
-      } else {
-        // instanceOf Polygon/Polyline
-        shapeAnnotationIds.remove(annotation.getId());
       }
     }
     annotations.removeBy(annotationList);
@@ -167,9 +160,6 @@ class AnnotationManager {
         } else {
           iconManager.iconCleanup(marker.getIcon());
         }
-      } else {
-        // instanceOf Polygon/Polyline
-        shapeAnnotationIds.remove(annotation.getId());
       }
     }
     annotations.removeAll();
@@ -227,17 +217,11 @@ class AnnotationManager {
   //
 
   Polygon addPolygon(@NonNull PolygonOptions polygonOptions, @NonNull MapboxMap mapboxMap) {
-    Polygon polygon = polygons.addBy(polygonOptions, mapboxMap);
-    shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + polygon.getId());
-    return polygon;
+    return polygons.addBy(polygonOptions, mapboxMap);
   }
 
   List<Polygon> addPolygons(@NonNull List<PolygonOptions> polygonOptionsList, @NonNull MapboxMap mapboxMap) {
-    List<Polygon> polygonList = polygons.addBy(polygonOptionsList, mapboxMap);
-    for (Polygon polygon : polygonList) {
-      shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + polygon.getId());
-    }
-    return polygonList;
+    return polygons.addBy(polygonOptionsList, mapboxMap);
   }
 
   void updatePolygon(Polygon polygon) {
@@ -257,17 +241,11 @@ class AnnotationManager {
   //
 
   Polyline addPolyline(@NonNull PolylineOptions polylineOptions, @NonNull MapboxMap mapboxMap) {
-    Polyline polyline = polylines.addBy(polylineOptions, mapboxMap);
-    shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + polyline.getId());
-    return polyline;
+    return polylines.addBy(polylineOptions, mapboxMap);
   }
 
   List<Polyline> addPolylines(@NonNull List<PolylineOptions> polylineOptionsList, @NonNull MapboxMap mapboxMap) {
-    List<Polyline> polylineList = polylines.addBy(polylineOptionsList, mapboxMap);
-    for (Polyline polyline : polylineList) {
-      shapeAnnotationIds.add(LAYER_ID_SHAPE_ANNOTATIONS + polyline.getId());
-    }
-    return polylineList;
+    return polylines.addBy(polylineOptionsList, mapboxMap);
   }
 
   void updatePolyline(Polyline polyline) {
@@ -397,11 +375,11 @@ class AnnotationManager {
   //
 
   boolean onTap(PointF tapPoint) {
-    if (!shapeAnnotationIds.isEmpty()) {
-      ShapeAnnotationHit shapeAnnotationHit = getShapeAnnotationHitFromTap(tapPoint);
-      long shapeAnnotationId = new ShapeAnnotationHitResolver(mapboxMap).execute(shapeAnnotationHit);
-      if (shapeAnnotationId != NO_ANNOTATION_ID) {
-        handleClickForShapeAnnotation(shapeAnnotationId);
+    ShapeAnnotationHit shapeAnnotationHit = getShapeAnnotationHitFromTap(tapPoint);
+    Annotation annotation = new ShapeAnnotationHitResolver(shapeAnnotations).execute(shapeAnnotationHit);
+    if (annotation != null) {
+      if (handleClickForShapeAnnotation(annotation)) {
+        return true;
       }
     }
 
@@ -418,16 +396,18 @@ class AnnotationManager {
       tapPoint.x + touchTargetSide,
       tapPoint.y + touchTargetSide
     );
-    return new ShapeAnnotationHit(tapRect, shapeAnnotationIds.toArray(new String[shapeAnnotationIds.size()]));
+    return new ShapeAnnotationHit(tapRect);
   }
 
-  private void handleClickForShapeAnnotation(long shapeAnnotationId) {
-    Annotation annotation = getAnnotation(shapeAnnotationId);
+  private boolean handleClickForShapeAnnotation(Annotation annotation) {
     if (annotation instanceof Polygon && onPolygonClickListener != null) {
       onPolygonClickListener.onPolygonClick((Polygon) annotation);
+      return true;
     } else if (annotation instanceof Polyline && onPolylineClickListener != null) {
       onPolylineClickListener.onPolylineClick((Polyline) annotation);
+      return true;
     }
+    return false;
   }
 
   private MarkerHit getMarkerHitFromTouchArea(PointF tapPoint) {
@@ -470,28 +450,19 @@ class AnnotationManager {
 
   private static class ShapeAnnotationHitResolver {
 
-    private MapboxMap mapboxMap;
+    private ShapeAnnotations shapeAnnotations;
 
-    ShapeAnnotationHitResolver(MapboxMap mapboxMap) {
-      this.mapboxMap = mapboxMap;
+    ShapeAnnotationHitResolver(ShapeAnnotations shapeAnnotations) {
+      this.shapeAnnotations = shapeAnnotations;
     }
 
-    public long execute(ShapeAnnotationHit shapeHit) {
-      long foundAnnotationId = NO_ANNOTATION_ID;
-      List<Feature> features = mapboxMap.queryRenderedFeatures(shapeHit.tapPoint, shapeHit.layerIds);
-      if (!features.isEmpty()) {
-        foundAnnotationId = getIdFromFeature(features.get(0));
+    public Annotation execute(ShapeAnnotationHit shapeHit) {
+      Annotation foundAnnotation = null;
+      List<Annotation> annotations = shapeAnnotations.obtainAllIn(shapeHit.tapPoint);
+      if (annotations.size() > 0) {
+        foundAnnotation = annotations.get(0);
       }
-      return foundAnnotationId;
-    }
-
-    private long getIdFromFeature(Feature feature) {
-      try {
-        return Long.valueOf(feature.getId());
-      } catch (NumberFormatException exception) {
-        Timber.e(exception, "Couldn't parse feature id to a long, with id: %s", feature.getId());
-        return NO_ANNOTATION_ID;
-      }
+      return foundAnnotation;
     }
   }
 
@@ -567,11 +538,9 @@ class AnnotationManager {
 
   private static class ShapeAnnotationHit {
     private final RectF tapPoint;
-    private final String[] layerIds;
 
-    ShapeAnnotationHit(RectF tapRect, String[] layerIds) {
-      this.tapPoint = tapRect;
-      this.layerIds = layerIds;
+    ShapeAnnotationHit(RectF tapPoint) {
+      this.tapPoint = tapPoint;
     }
   }
 

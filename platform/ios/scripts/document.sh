@@ -6,7 +6,7 @@ set -u
 
 if [ -z `which jazzy` ]; then
     echo "Installing jazzy…"
-    gem install jazzy
+    gem install jazzy --no-rdoc --no-ri
     if [ -z `which jazzy` ]; then
         echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/INSTALL.md"
         exit 1

@@ -12,6 +12,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -32,6 +33,7 @@ import static com.mapbox.mapboxsdk.style.functions.stops.Stops.interval;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.visibility;
 
 /**
  * Test activity showcasing changing the icon with a zoom function and adding selection state to a SymbolLayer.
@@ -49,9 +51,11 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   private MapView mapView;
   private MapboxMap mapboxMap;
   private GeoJsonSource source;
+  private SymbolLayer layer;
 
   private boolean isInitialPosition = true;
   private boolean isSelected = false;
+  private boolean isShowingSymbolLayer = true;
 
   @Override
   public void onCreate(Bundle savedInstanceState) {
@@ -81,6 +85,13 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
     }
   }
 
+  private void toggleSymbolLayerVisibility() {
+    layer.setProperties(
+      visibility(isShowingSymbolLayer ? Property.NONE : Property.VISIBLE)
+    );
+    isShowingSymbolLayer = !isShowingSymbolLayer;
+  }
+
   private FeatureCollection createFeatureCollection() {
     Position position = isInitialPosition
       ? Position.fromCoordinates(-74.01618140, 40.701745)
@@ -95,7 +106,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   }
 
   private void addLayer() {
-    SymbolLayer layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
+    layer = new SymbolLayer(LAYER_ID, SOURCE_ID);
     layer.setProperties(
       iconImage(
         zoom(
@@ -145,9 +156,13 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    if (mapboxMap != null && item.getItemId() == R.id.menu_action_change_location) {
-      isInitialPosition = !isInitialPosition;
-      updateSource();
+    if (mapboxMap != null) {
+      if (item.getItemId() == R.id.menu_action_change_location) {
+        isInitialPosition = !isInitialPosition;
+        updateSource();
+      } else if (item.getItemId() == R.id.menu_action_toggle_source) {
+        toggleSymbolLayerVisibility();
+      }
     }
     return super.onOptionsItemSelected(item);
   }

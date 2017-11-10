@@ -112,6 +112,11 @@ AnnotationIDs AndroidRendererFrontend::queryPointAnnotations(const ScreenBox& bo
     return mapRenderer.actor().ask(&Renderer::queryPointAnnotations, box).get();
 }
 
+AnnotationIDs AndroidRendererFrontend::queryShapeAnnotations(const ScreenBox& box) const {
+    // Waits for the result from the orchestration thread and returns
+    return mapRenderer.actor().ask(&Renderer::queryShapeAnnotations, box).get();
+}
+
 } // namespace android
 } // namespace mbgl
 

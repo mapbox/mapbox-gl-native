@@ -638,7 +638,7 @@ static NSURL *MGLStyleURL_trafficNight;
             self.URL ? [NSString stringWithFormat:@"\"%@\"", self.URL] : self.URL];
 }
 
-#pragma mark Style language preferences
+#pragma mark Mapbox Streets source introspection
 
 - (void)setLocalizesLabels:(BOOL)localizesLabels
 {
@@ -747,6 +747,31 @@ static NSURL *MGLStyleURL_trafficNight;
 
         self.localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
+}
+
+- (NS_SET_OF(MGLVectorSource *) *)mapboxStreetsSources {
+    return [self.sources objectsPassingTest:^BOOL (__kindof MGLVectorSource * _Nonnull source, BOOL * _Nonnull stop) {
+        return [source isKindOfClass:[MGLVectorSource class]] && source.mapboxStreets;
+    }];
+}
+
+- (NS_ARRAY_OF(MGLStyleLayer *) *)placeStyleLayers {
+    NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
+    
+    NSSet *placeSourceLayerIdentifiers = [NSSet setWithObjects:@"marine_label", @"country_label", @"state_label", @"place_label", @"water_label", @"poi_label", @"rail_station_label", @"mountain_peak_label", nil];
+    NSPredicate *isPlacePredicate = [NSPredicate predicateWithBlock:^BOOL (MGLVectorStyleLayer * _Nullable layer, NSDictionary<NSString *, id> * _Nullable bindings) {
+        return [layer isKindOfClass:[MGLVectorStyleLayer class]] && [streetsSourceIdentifiers containsObject:layer.sourceIdentifier] && [placeSourceLayerIdentifiers containsObject:layer.sourceLayerIdentifier];
+    }];
+    return [self.layers filteredArrayUsingPredicate:isPlacePredicate];
+}
+
+- (NS_ARRAY_OF(MGLStyleLayer *) *)roadStyleLayers {
+    NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
+    
+    NSPredicate *isPlacePredicate = [NSPredicate predicateWithBlock:^BOOL (MGLVectorStyleLayer * _Nullable layer, NSDictionary<NSString *, id> * _Nullable bindings) {
+        return [layer isKindOfClass:[MGLVectorStyleLayer class]] && [streetsSourceIdentifiers containsObject:layer.sourceIdentifier] && [layer.sourceLayerIdentifier isEqualToString:@"road_label"];
+    }];
+    return [self.layers filteredArrayUsingPredicate:isPlacePredicate];
 }
 
 @end

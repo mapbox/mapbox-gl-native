@@ -1488,7 +1488,7 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
-            [self selectAnnotation:annotation];
+            [self selectAnnotation:annotation atPoint:gesturePoint];
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
@@ -1791,6 +1791,12 @@ public:
     }
 
     std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
+    std::vector<MGLAnnotationTag> shapeAnnotationTags = [self shapeAnnotationTagsInRect:rect];
+    
+    if (shapeAnnotationTags.size()) {
+        annotationTags.insert(annotationTags.end(), shapeAnnotationTags.begin(), shapeAnnotationTags.end());
+    }
+    
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
@@ -2050,13 +2056,18 @@ public:
     queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
                             -MGLAnnotationImagePaddingForHitTest);
     std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
+    std::vector<MGLAnnotationTag> nearbyShapeAnnotations = [self shapeAnnotationTagsInRect:queryRect];
+    
+    if (nearbyShapeAnnotations.size()) {
+        nearbyAnnotations.insert(nearbyAnnotations.end(), nearbyShapeAnnotations.begin(), nearbyShapeAnnotations.end());
+    }
 
     if (nearbyAnnotations.size()) {
         // Assume that the user is fat-fingering an annotation.
         NSRect hitRect = NSInsetRect({ point, NSZeroSize },
                                      -MGLAnnotationImagePaddingForHitTest,
                                      -MGLAnnotationImagePaddingForHitTest);
-
+        
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
@@ -2065,12 +2076,17 @@ public:
             if (!annotation) {
                 return true;
             }
-
+            
+            if ([annotation isKindOfClass:[MGLShape class]])
+            {
+                return false;
+            }
+            
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             if (!annotationImage.selectable) {
                 return true;
             }
-
+            
             // Filter out the annotation if the fattened finger didn’t land on a
             // translucent or opaque pixel in the image.
             NSRect annotationRect = [self frameOfImage:annotationImage.image
@@ -2149,6 +2165,14 @@ public:
     });
 }
 
+- (std::vector<MGLAnnotationTag>)shapeAnnotationTagsInRect:(NSRect)rect {
+    // Cocoa origin is at the lower-left corner.
+    return _rendererFrontend->getRenderer()->queryShapeAnnotations({
+        { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
+        { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
+    });
+}
+
 - (id <MGLAnnotation>)selectedAnnotation {
     if ( ! _annotationContextsByAnnotationTag.count(_selectedAnnotationTag) ||
         _selectedAnnotationTag == MGLAnnotationTagNotFound) {
@@ -2192,11 +2216,11 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
 {
-    // Only point annotations can be selected.
-    if (!annotation || [annotation isKindOfClass:[MGLMultiPoint class]]) {
-        return;
-    }
+    [self selectAnnotation:annotation atPoint:NSZeroPoint];
+}
 
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
+{
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2211,10 +2235,10 @@ public:
         [self addAnnotation:annotation];
     }
 
-    // The annotation can’t be selected if no part of it is hittable.
+    // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
     if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        return;
+        positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
     }
 
     self.selectedAnnotation = annotation;
@@ -2314,6 +2338,13 @@ public:
     if (!annotation) {
         return NSZeroRect;
     }
+    if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
+        CLLocationCoordinate2D origin = annotation.coordinate;
+        CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
+        return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
+        
+    }
+    
     NSImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if (!image) {
         image = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName].image;

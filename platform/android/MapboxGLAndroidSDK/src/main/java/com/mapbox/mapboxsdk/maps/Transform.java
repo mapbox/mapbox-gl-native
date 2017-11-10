@@ -98,9 +98,6 @@ final class Transform implements MapView.OnMapChangedListener {
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
-      if (callback != null) {
-        callback.onFinish();
-      }
       cameraChangeDispatcher.onCameraIdle();
     }
   }
@@ -210,11 +207,26 @@ final class Transform implements MapView.OnMapChangedListener {
     return cameraPosition.zoom;
   }
 
+  double getRawZoom() {
+    return mapView.getZoom();
+  }
+
   void zoom(boolean zoomIn, @NonNull PointF focalPoint) {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
       int newZoom = (int) Math.round(cameraPosition.zoom + (zoomIn ? 1 : -1));
       setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION);
+    } else {
+      // we are not transforming, notify about being idle
+      cameraChangeDispatcher.onCameraIdle();
+    }
+  }
+
+  void zoom(double zoomAddition, @NonNull PointF focalPoint, long duration) {
+    CameraPosition cameraPosition = invalidateCameraPosition();
+    if (cameraPosition != null) {
+      int newZoom = (int) Math.round(cameraPosition.zoom + zoomAddition);
+      setZoom(newZoom, focalPoint, duration);
     } else {
       // we are not transforming, notify about being idle
       cameraChangeDispatcher.onCameraIdle();

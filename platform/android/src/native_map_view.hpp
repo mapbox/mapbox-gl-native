@@ -22,6 +22,7 @@
 #include "style/sources/sources.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include "map/image.hpp"
 #include "style/light.hpp"
 #include "bitmap.hpp"
 
@@ -197,6 +198,8 @@ public:
 
     jni::Array<jlong> queryPointAnnotations(JNIEnv&, jni::Object<RectF>);
 
+    jni::Array<jlong> queryShapeAnnotations(JNIEnv&, jni::Object<RectF>);
+
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
                                                                    jni::Array<jni::String>,
                                                                    jni::Array<jni::Object<>> jfilter);
@@ -234,6 +237,8 @@ public:
     void removeSource(JNIEnv&, jlong);
 
     void addImage(JNIEnv&, jni::String, jni::jint, jni::jint, jni::jfloat, jni::Array<jbyte>);
+
+    void addImages(JNIEnv&, jni::Array<jni::Object<mbgl::android::Image>>);
 
     void removeImage(JNIEnv&, jni::String);
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
+import android.os.AsyncTask;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -34,7 +35,9 @@ import com.mapbox.services.commons.geojson.Geometry;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import timber.log.Timber;
 
@@ -468,6 +471,13 @@ final class NativeMapView {
     return nativeQueryPointAnnotations(rect);
   }
 
+  public long[] queryShapeAnnotations(RectF rectF) {
+    if (isDestroyedOn("queryShapeAnnotations")) {
+      return new long[] {};
+    }
+    return nativeQueryShapeAnnotations(rectF);
+  }
+
   public void addAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels) {
     if (isDestroyedOn("addAnnotationIcon")) {
       return;
@@ -746,6 +756,7 @@ final class NativeMapView {
     if (isDestroyedOn("addImage")) {
       return;
     }
+
     // Check/correct config
     if (image.getConfig() != Bitmap.Config.ARGB_8888) {
       image = image.copy(Bitmap.Config.ARGB_8888, false);
@@ -760,6 +771,14 @@ final class NativeMapView {
     float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
 
     nativeAddImage(name, image.getWidth(), image.getHeight(), pixelRatio, buffer.array());
+  }
+
+  public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
+    if (isDestroyedOn("addImages")) {
+      return;
+    }
+    //noinspection unchecked
+    new BitmapImageConversionTask(this).execute(bitmapHashMap);
   }
 
   public void removeImage(String name) {
@@ -823,6 +842,15 @@ final class NativeMapView {
 
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  RectF getDensityDependantRectangle(final RectF rectangle) {
+    return new RectF(
+      rectangle.left / pixelRatio,
+      rectangle.top / pixelRatio,
+      rectangle.right / pixelRatio,
+      rectangle.bottom / pixelRatio
+    );
   }
 
   //
@@ -927,6 +955,8 @@ final class NativeMapView {
 
   private native long[] nativeQueryPointAnnotations(RectF rect);
 
+  private native long[] nativeQueryShapeAnnotations(RectF rect);
+
   private native void nativeAddAnnotationIcon(String symbol, int width, int height, float scale, byte[] pixels);
 
   private native void nativeRemoveAnnotationIcon(String symbol);
@@ -1005,6 +1035,8 @@ final class NativeMapView {
 
   private native void nativeAddImage(String name, int width, int height, float pixelRatio,
                                      byte[] array);
+
+  private native void nativeAddImages(Image[] images);
 
   private native void nativeRemoveImage(String name);
 
@@ -1092,5 +1124,56 @@ final class NativeMapView {
       }
 
     });
+  }
+
+
+  //
+  // Image conversion
+  //
+
+  private static class BitmapImageConversionTask extends AsyncTask<HashMap<String, Bitmap>, Void, List<Image>> {
+
+    private NativeMapView nativeMapView;
+
+    BitmapImageConversionTask(NativeMapView nativeMapView) {
+      this.nativeMapView = nativeMapView;
+    }
+
+    @Override
+    protected List<Image> doInBackground(HashMap<String, Bitmap>... params) {
+      HashMap<String, Bitmap> bitmapHashMap = params[0];
+
+      List<Image> images = new ArrayList<>();
+      ByteBuffer buffer;
+      String name;
+      Bitmap bitmap;
+
+      for (Map.Entry<String, Bitmap> stringBitmapEntry : bitmapHashMap.entrySet()) {
+        name = stringBitmapEntry.getKey();
+        bitmap = stringBitmapEntry.getValue();
+
+        if (bitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+          bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, false);
+        }
+
+        buffer = ByteBuffer.allocate(bitmap.getByteCount());
+        bitmap.copyPixelsToBuffer(buffer);
+
+        float density = bitmap.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : bitmap.getDensity();
+        float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
+
+        images.add(new Image(buffer.array(), pixelRatio, name, bitmap.getWidth(), bitmap.getHeight()));
+      }
+
+      return images;
+    }
+
+    @Override
+    protected void onPostExecute(List<Image> images) {
+      super.onPostExecute(images);
+      if (nativeMapView != null && !nativeMapView.isDestroyedOn("nativeAddImages")) {
+        nativeMapView.nativeAddImages(images.toArray(new Image[images.size()]));
+      }
+    }
   }
 }
