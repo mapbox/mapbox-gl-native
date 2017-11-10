@@ -235,8 +235,10 @@ final class MapGestureDetector {
         velocityTracker = null;
         break;
       case MotionEvent.ACTION_MOVE:
-        velocityTracker.addMovement(event);
-        velocityTracker.computeCurrentVelocity(1000);
+        if (velocityTracker != null) {
+          velocityTracker.addMovement(event);
+          velocityTracker.computeCurrentVelocity(1000);
+        }
         break;
     }
 
@@ -551,6 +553,11 @@ final class MapGestureDetector {
     // Called when fingers leave screen
     @Override
     public void onScaleEnd(final ScaleGestureDetector detector) {
+      if (velocityTracker == null) {
+        return;
+      }
+
+
       if (rotateGestureOccurred || quickZoom) {
         reset();
         return;
