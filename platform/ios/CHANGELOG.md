@@ -37,6 +37,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Users of VoiceOver can now swipe left and right to navigate among visible places, points of interest, and roads. ([#9950](https://github.com/mapbox/mapbox-gl-native/pull/9950))
 * Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
+* Fixed an issue that causes `mapView:shouldChangeFromCamera:toCamera:` delegate pass the wrong `centerCoordinate` in `toCamera` parameter. ([#10433](https://github.com/mapbox/mapbox-gl-native/pull/10433))
 
 ### Other changes
 
