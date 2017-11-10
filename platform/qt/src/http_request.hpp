@@ -20,7 +20,7 @@ public:
     QUrl requestUrl() const;
     QNetworkRequest networkRequest() const;
 
-    void handleNetworkReply(QNetworkReply *);
+    void handleNetworkReply(QNetworkReply *, const QByteArray& data);
 
 private:
     HTTPFileSource::Impl* m_context;

@@ -46,6 +46,7 @@ public:
 
     static const std::string SourceID;
     static const std::string PointLayerID;
+    static const std::string ShapeLayerID;
 
 private:
     void add(const AnnotationID&, const SymbolAnnotation&, const uint8_t);

@@ -186,13 +186,36 @@ SOURCES += \
     src/mbgl/style/conversion/filter.cpp \
     src/mbgl/style/conversion/geojson.cpp \
     src/mbgl/style/conversion/geojson_options.cpp \
+    src/mbgl/style/conversion/get_json_type.cpp \
     src/mbgl/style/conversion/layer.cpp \
     src/mbgl/style/conversion/light.cpp \
     src/mbgl/style/conversion/position.cpp \
     src/mbgl/style/conversion/source.cpp \
     src/mbgl/style/conversion/tileset.cpp \
     src/mbgl/style/conversion/transition_options.cpp \
+    src/mbgl/style/expression/array_assertion.cpp \
+    src/mbgl/style/expression/assertion.cpp \
+    src/mbgl/style/expression/at.cpp \
+    src/mbgl/style/expression/boolean_operator.cpp \
+    src/mbgl/style/expression/case.cpp \
+    src/mbgl/style/expression/check_subtype.cpp \
+    src/mbgl/style/expression/coalesce.cpp \
+    src/mbgl/style/expression/coercion.cpp \
+    src/mbgl/style/expression/compound_expression.cpp \
+    src/mbgl/style/expression/find_zoom_curve.cpp \
+    src/mbgl/style/expression/get_covering_stops.cpp \
+    src/mbgl/style/expression/interpolate.cpp \
+    src/mbgl/style/expression/is_constant.cpp \
+    src/mbgl/style/expression/is_expression.cpp \
+    src/mbgl/style/expression/let.cpp \
+    src/mbgl/style/expression/literal.cpp \
+    src/mbgl/style/expression/match.cpp \
+    src/mbgl/style/expression/parsing_context.cpp \
+    src/mbgl/style/expression/step.cpp \
+    src/mbgl/style/expression/util.cpp \
+    src/mbgl/style/expression/value.cpp \
     src/mbgl/style/function/categorical_stops.cpp \
+    src/mbgl/style/function/expression.cpp \
     src/mbgl/style/function/identity_stops.cpp \
     src/mbgl/style/image.cpp \
     src/mbgl/style/image_impl.cpp \

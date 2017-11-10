@@ -18,6 +18,7 @@ using namespace style;
 
 const std::string AnnotationManager::SourceID = "com.mapbox.annotations";
 const std::string AnnotationManager::PointLayerID = "com.mapbox.annotations.points";
+const std::string AnnotationManager::ShapeLayerID = "com.mapbox.annotations.shape.";
 
 AnnotationManager::AnnotationManager(Style& style_)
         : style(style_) {

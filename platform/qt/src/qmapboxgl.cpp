@@ -1578,7 +1578,9 @@ mbgl::Size QMapboxGLPrivate::getFramebufferSize() const {
 
 void QMapboxGLPrivate::updateAssumedState() {
     assumeFramebufferBinding(fbObject);
+#if QT_VERSION >= 0x050600
     assumeViewport(0, 0, getFramebufferSize());
+#endif
 }
 
 void QMapboxGLPrivate::bind() {

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/function/convert.hpp>
 #include <mbgl/style/function/exponential_stops.hpp>
 #include <mbgl/style/function/interval_stops.hpp>
 #include <mbgl/style/function/categorical_stops.hpp>
@@ -27,33 +29,48 @@ public:
             CategoricalStops<T>,
             IdentityStops<T>>>;
 
+    SourceFunction(std::unique_ptr<expression::Expression> expression_)
+        : expression(std::move(expression_))
+    {
+        assert(expression::isZoomConstant(*expression));
+        assert(!expression::isFeatureConstant(*expression));
+    }
+    
     SourceFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
         : property(std::move(property_)),
           stops(std::move(stops_)),
-          defaultValue(std::move(defaultValue_)) {
-    }
+          defaultValue(std::move(defaultValue_)),
+          expression(stops.match([&] (const IdentityStops<T>&) {
+              return expression::Convert::fromIdentityFunction(expression::valueTypeToExpressionType<T>(), property);
+          }, [&] (const auto& s) {
+              return expression::Convert::toExpression(property, s);
+          }))
+    {}
 
     template <class Feature>
     T evaluate(const Feature& feature, T finalDefaultValue) const {
-        optional<Value> v = feature.getValue(property);
-        if (!v) {
-            return defaultValue.value_or(finalDefaultValue);
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext(&feature));
+        if (result) {
+            const optional<T> typed = expression::fromExpressionValue<T>(*result);
+            return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
         }
-        return stops.match([&] (const auto& s) -> T {
-            return s.evaluate(*v).value_or(defaultValue.value_or(finalDefaultValue));
-        });
+        return defaultValue ? *defaultValue : finalDefaultValue;
     }
 
     friend bool operator==(const SourceFunction& lhs,
                            const SourceFunction& rhs) {
-        return std::tie(lhs.property, lhs.stops, lhs.defaultValue)
-            == std::tie(rhs.property, rhs.stops, rhs.defaultValue);
+        return *lhs.expression == *rhs.expression;
     }
 
+    bool useIntegerZoom = false;
+
+    // retained for compatibility with pre-expression function API
     std::string property;
     Stops stops;
     optional<T> defaultValue;
-    bool useIntegerZoom = false;
+
+private:
+    std::shared_ptr<expression::Expression> expression;
 };
 
 } // namespace style
