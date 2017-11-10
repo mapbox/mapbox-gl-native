@@ -187,7 +187,9 @@ namespace mbgl {
             currentIndex += dir;
 
             // offset does not fit on the projected line
-            if (currentIndex < 0 || currentIndex >= static_cast<int32_t>(line.size())) return {};
+            if (currentIndex < 0 || currentIndex >= static_cast<int32_t>(line.size())) {
+                return {};
+            }
 
             prev = current;
             PointAndCameraDistance projection = project(convertPoint<float>(line.at(currentIndex)), labelPlaneMatrix);
