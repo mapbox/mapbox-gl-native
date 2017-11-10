@@ -24,7 +24,7 @@ module.exports = function (style, options, callback) {
             maps.set(key, new mbgl.Map({
                 ratio: options.pixelRatio,
                 request: mapRequest,
-                tile: tileMode
+                mode: options.mapMode
             }));
             var map = maps.get(key);
         }
@@ -32,7 +32,7 @@ module.exports = function (style, options, callback) {
         var map = new mbgl.Map({
             ratio: options.pixelRatio,
             request: mapRequest,
-            tile: tileMode
+            mode: options.mapMode
         });
     }
 

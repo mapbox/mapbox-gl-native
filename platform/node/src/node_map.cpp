@@ -1076,8 +1076,8 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
       }())
     , mode([&] {
             Nan::HandleScope scope;
-            if (Nan::Has(options, Nan::New("tile").ToLocalChecked()).FromJust() &&
-                Nan::Get(options, Nan::New("tile").ToLocalChecked()).ToLocalChecked()->BooleanValue()) {
+            if (Nan::Has(options, Nan::New("mode").ToLocalChecked()).FromJust() &&
+                std::string(*v8::String::Utf8Value(Nan::Get(options, Nan::New("mode").ToLocalChecked()).ToLocalChecked()->ToString())) == "tile") {
                 return mbgl::MapMode::Tile;
             } else {
                 return mbgl::MapMode::Static;

@@ -1,3 +1,6 @@
+# master
+- The `Map` constructor now accepts a `mode` option which can be either `"static"` (default) or `"tile"`. It must be set to `"tile"` when rendering individual tiles in order for the symbols to match across tiles.
+
 # 3.5.8 - October 19, 2017
 - Fixes an issue that causes memory leaks when not deleting the frontend object
   in NodeMap::release()
