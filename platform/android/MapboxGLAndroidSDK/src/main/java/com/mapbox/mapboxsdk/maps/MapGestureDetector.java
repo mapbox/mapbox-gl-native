@@ -235,8 +235,10 @@ final class MapGestureDetector {
         velocityTracker = null;
         break;
       case MotionEvent.ACTION_MOVE:
-        velocityTracker.addMovement(event);
-        velocityTracker.computeCurrentVelocity(1000);
+        if (velocityTracker != null) {
+          velocityTracker.addMovement(event);
+          velocityTracker.computeCurrentVelocity(1000);
+        }
         break;
     }
 
