@@ -1082,7 +1082,9 @@ final class NativeMapView {
   //
 
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    mapView.addOnMapChangedListener(listener);
+    if (mapView != null) {
+      mapView.addOnMapChangedListener(listener);
+    }
   }
 
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
