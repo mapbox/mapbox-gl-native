@@ -154,7 +154,9 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
 
     bool placementChanged = false;
 
-    float increment = mapMode == MapMode::Still ? 1.0 : std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300));
+    float increment = mapMode == MapMode::Continuous ?
+        std::chrono::duration<float>(commitTime - prevPlacement.commitTime) / Duration(std::chrono::milliseconds(300)) :
+        1.0;
 
     // add the opacities from the current placement, and copy their current values from the previous placement
     for (auto& placementPair : placements) {
@@ -275,10 +277,11 @@ JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
-    if (mapMode == MapMode::Still) {
+    if (mapMode == MapMode::Continuous) {
+        return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
+    } else {
         return 1.0;
     }
-    return std::chrono::duration<float>(now - commitTime) / Duration(std::chrono::milliseconds(300));
 }
 
 bool Placement::hasTransitions(TimePoint now) const {

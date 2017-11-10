@@ -314,9 +314,7 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         if (avoidEdges && !inside) return;
 
-        // TODO set this to make api-gl work
-        const bool singleTileMode = false && mode == MapMode::Still;
-        if (singleTileMode || withinPlus0) {
+        if (mode == MapMode::Tile || withinPlus0) {
             symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
                     layout.evaluate(zoom, feature), layoutTextSize,
                     symbolInstances.size(),

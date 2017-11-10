@@ -11,7 +11,8 @@ using EnumType = uint32_t;
 
 enum class MapMode : EnumType {
     Continuous, // continually updating map
-    Still, // a once-off still image
+    Static, // a once-off still image of an arbitrary viewport
+    Tile // a once-off still image of a single tile
 };
 
 // We can choose to constrain the map both horizontally or vertically, or only

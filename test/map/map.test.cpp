@@ -72,14 +72,14 @@ public:
     HeadlessFrontend frontend;
     Map map;
 
-    MapTest(float pixelRatio = 1, MapMode mode = MapMode::Still)
+    MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
         : frontend(pixelRatio, fileSource, threadPool)
         , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
     }
 
     template <typename T = FileSource>
     MapTest(const std::string& cachePath, const std::string& assetRoot,
-            float pixelRatio = 1, MapMode mode = MapMode::Still,
+            float pixelRatio = 1, MapMode mode = MapMode::Static,
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
             : fileSource { cachePath, assetRoot }
             , frontend(pixelRatio, fileSource, threadPool)
