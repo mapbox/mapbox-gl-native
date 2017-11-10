@@ -236,12 +236,14 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
     stopped = true;
 
-    // Stop ongoing animations, prevent memory lekas
-    MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
-    for (MarkerView markerView : markerViews) {
-      View view = markerViewManager.getView(markerView);
-      if (view != null) {
-        view.animate().cancel();
+    // Stop ongoing animations, prevent memory leaks
+    if (mapboxMap != null) {
+      MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
+      for (MarkerView markerView : markerViews) {
+        View view = markerViewManager.getView(markerView);
+        if (view != null) {
+          view.animate().cancel();
+        }
       }
     }
 
