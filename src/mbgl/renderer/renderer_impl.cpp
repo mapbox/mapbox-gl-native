@@ -59,7 +59,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , layerImpls(makeMutable<std::vector<Immutable<style::Layer::Impl>>>())
     , renderLight(makeMutable<Light::Impl>())
     , crossTileSymbolIndex(std::make_unique<CrossTileSymbolIndex>())
-    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Still)) {
+    , placement(std::make_unique<Placement>(TransformState{}, MapMode::Static)) {
     glyphManager->setObserver(this);
 }
 
@@ -83,7 +83,7 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 }
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
-    if (updateParameters.mode == MapMode::Still) {
+    if (updateParameters.mode != MapMode::Continuous) {
         // Don't load/render anyting in still mode until explicitly requested.
         if (!updateParameters.stillImageRequest) {
             return;
@@ -260,7 +260,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     };
 
     bool loaded = updateParameters.styleLoaded && isLoaded();
-    if (updateParameters.mode == MapMode::Still && !loaded) {
+    if (updateParameters.mode != MapMode::Continuous && !loaded) {
         return;
     }
 
@@ -355,10 +355,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 sortedTilesForInsertion.emplace_back(tile);
                 tile.used = true;
 
-                // We only need clipping when we're _not_ drawing a symbol layer. The only exception
-                // for symbol layers is when we're rendering still images. See render_symbol_layer.cpp
-                // for the exception we make there.
-                if (!symbolLayer || parameters.mapMode == MapMode::Still) {
+                // We only need clipping when we're _not_ drawing a symbol layer.
+                if (!symbolLayer) {
                     tile.needsClipping = true;
                 }
             }
@@ -368,7 +366,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     }
 
     bool symbolBucketsChanged = false;
-    if (parameters.mapMode == MapMode::Still) {
+    if (parameters.mapMode != MapMode::Continuous) {
         // TODO: Think about right way for symbol index to handle still rendering
         crossTileSymbolIndex->reset();
     }

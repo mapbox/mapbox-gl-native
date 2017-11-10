@@ -47,7 +47,7 @@ TEST(Buckets, CircleBucket) {
     BackendScope scope { backend };
 
     gl::Context context;
-    CircleBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
+    CircleBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
@@ -66,7 +66,7 @@ TEST(Buckets, FillBucket) {
     BackendScope scope { backend };
 
     gl::Context context;
-    FillBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {} };
+    FillBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0 }, {} };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 
@@ -84,7 +84,7 @@ TEST(Buckets, LineBucket) {
     BackendScope scope { backend };
 
     gl::Context context;
-    LineBucket bucket { { {0, 0, 0}, MapMode::Still, 1.0 }, {}, {} };
+    LineBucket bucket { { {0, 0, 0}, MapMode::Static, 1.0 }, {}, {} };
     ASSERT_FALSE(bucket.hasData());
     ASSERT_FALSE(bucket.needsUpload());
 

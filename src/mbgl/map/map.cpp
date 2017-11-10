@@ -149,8 +149,8 @@ void Map::renderStill(StillImageCallback callback) {
         return;
     }
 
-    if (impl->mode != MapMode::Still) {
-        callback(std::make_exception_ptr(util::MisuseException("Map is not in still image render mode")));
+    if (impl->mode != MapMode::Static && impl->mode != MapMode::Tile) {
+        callback(std::make_exception_ptr(util::MisuseException("Map is not in static or tile image render modes")));
         return;
     }
 
@@ -794,7 +794,7 @@ void Map::Impl::onStyleError(std::exception_ptr error) {
 }
 
 void Map::Impl::onResourceError(std::exception_ptr error) {
-    if (mode == MapMode::Still && stillImageRequest) {
+    if (mode != MapMode::Continuous && stillImageRequest) {
         auto request = std::move(stillImageRequest);
         request->callback(error);
     }
