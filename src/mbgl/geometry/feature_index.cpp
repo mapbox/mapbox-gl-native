@@ -18,7 +18,7 @@
 namespace mbgl {
 
 FeatureIndex::FeatureIndex()
-    : grid(util::EXTENT, util::EXTENT, util::EXTENT >> 5) {
+    : grid(util::EXTENT, util::EXTENT, util::EXTENT / 16) { // 16x16 grid -> 32px cell
 }
 
 void FeatureIndex::insert(const GeometryCollection& geometries,

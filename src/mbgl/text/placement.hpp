@@ -64,7 +64,7 @@ namespace mbgl {
                     const bool showCollisionBoxes,
                     std::unordered_set<uint32_t>& seenCrossTileIDs);
 
-            void updateBucketOpacities(SymbolBucket&, std::unordered_set<uint32_t>&);
+            void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
         
             CollisionIndex collisionIndex;
 
@@ -72,8 +72,8 @@ namespace mbgl {
             MapMode mapMode;
             TimePoint commitTime;
 
-            std::unordered_map<uint32_t,PlacementPair> placements;
-            std::unordered_map<uint32_t,JointOpacityState> opacities;
+            std::unordered_map<uint32_t, PlacementPair> placements;
+            std::unordered_map<uint32_t, JointOpacityState> opacities;
         
             TimePoint recentUntil;
             bool stale = false;

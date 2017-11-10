@@ -17,51 +17,48 @@ class SymbolInstance;
 class RenderSymbolLayer;
 class SymbolBucket;
 
-class IndexEntry {
-    Point<float> anchorPoint;
-
-};
-
 class IndexedSymbolInstance {
-    public:
-        IndexedSymbolInstance(uint32_t crossTileID_, Point<int64_t> coord_)
-            : crossTileID(crossTileID_), coord(coord_) {};
-        uint32_t crossTileID;
-        Point<int64_t> coord;
+public:
+    IndexedSymbolInstance(uint32_t crossTileID_, Point<int64_t> coord_)
+        : crossTileID(crossTileID_), coord(coord_)
+    {}
+
+    uint32_t crossTileID;
+    Point<int64_t> coord;
 };
 
 class TileLayerIndex {
-    public:
-        TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
+public:
+    TileLayerIndex(OverscaledTileID coord, std::vector<SymbolInstance>&, uint32_t bucketInstanceId);
 
-        Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
-        void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
-        
-        OverscaledTileID coord;
-        uint32_t bucketInstanceId;
-        std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
+    Point<int64_t> getScaledCoordinates(SymbolInstance&, const OverscaledTileID&);
+    void findMatches(std::vector<SymbolInstance>&, const OverscaledTileID&);
+    
+    OverscaledTileID coord;
+    uint32_t bucketInstanceId;
+    std::map<std::u16string,std::vector<IndexedSymbolInstance>> indexedSymbolInstances;
 };
 
 class CrossTileSymbolLayerIndex {
-    public:
-        CrossTileSymbolLayerIndex();
-        void addBucket(const OverscaledTileID&, SymbolBucket&);
-        bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
-    private:
-        std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
-        uint32_t maxBucketInstanceId = 0;
-        static uint32_t maxCrossTileID;
+public:
+    CrossTileSymbolLayerIndex();
+    void addBucket(const OverscaledTileID&, SymbolBucket&);
+    bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
+private:
+    std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
+    uint32_t maxBucketInstanceId = 0;
+    static uint32_t maxCrossTileID;
 };
 
 class CrossTileSymbolIndex {
-    public:
-        CrossTileSymbolIndex();
+public:
+    CrossTileSymbolIndex();
 
-        bool addLayer(RenderSymbolLayer&);
-    
-        void reset();
-    private:
-        std::map<std::string,CrossTileSymbolLayerIndex> layerIndexes;
+    bool addLayer(RenderSymbolLayer&);
+
+    void reset();
+private:
+    std::map<std::string, CrossTileSymbolLayerIndex> layerIndexes;
 };
 
 } // namespace mbgl
