@@ -32,7 +32,7 @@ public:
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapMode::Still };
+              threadPool, MapMode::Static};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,

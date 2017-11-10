@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
 
     ThreadPool threadPool(4);
     HeadlessFrontend frontend({ width, height }, pixelRatio, fileSource, threadPool);
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Still);
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
 
     if (style_path.find("://") == std::string::npos) {
         style_path = std::string("file://") + style_path;

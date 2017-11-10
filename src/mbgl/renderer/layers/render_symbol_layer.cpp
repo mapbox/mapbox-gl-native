@@ -88,18 +88,13 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& binders,
                          const auto& paintProperties)
         {
-            // We clip symbols to their tile extent in still mode.
-            const bool needsClipping = false; // TODO parameters.mapMode == MapMode::Still;
-
             program.get(paintProperties).draw(
                 parameters.context,
                 gl::Triangles(),
                 values_.pitchAlignment == AlignmentType::Map
                     ? parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
                     : gl::DepthMode::disabled(),
-                needsClipping
-                    ? parameters.stencilModeForClipping(tile.clip)
-                    : gl::StencilMode::disabled(),
+                gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *buffers.vertexBuffer,

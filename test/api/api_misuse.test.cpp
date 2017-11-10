@@ -27,7 +27,7 @@ TEST(API, RenderWithoutCallback) {
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
 
     auto map = std::make_unique<Map>(frontend, MapObserver::nullObserver(), frontend.getSize(),
-                                     pixelRatio, fileSource, threadPool, MapMode::Still);
+                                     pixelRatio, fileSource, threadPool, MapMode::Static);
     map->renderStill(nullptr);
 
     // Force Map thread to join.
