@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/at.hpp>
+#include <mbgl/util/string.hpp>
 
 
 namespace mbgl {
@@ -21,7 +22,7 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     if (i < 0 || i >= inputArray.size()) {
         return EvaluationError {
             "Array index out of bounds: " + stringify(i) +
-            " > " + std::to_string(inputArray.size()) + "."
+            " > " + util::toString(inputArray.size()) + "."
         };
     }
     if (i != std::floor(i)) {
@@ -43,7 +44,7 @@ ParseResult At::parse(const Convertible& value, ParsingContext& ctx) {
 
     std::size_t length = arrayLength(value);
     if (length != 3) {
-        ctx.error("Expected 2 arguments, but found " + std::to_string(length - 1) + " instead.");
+        ctx.error("Expected 2 arguments, but found " + util::toString(length - 1) + " instead.");
         return ParseResult();
     }
 

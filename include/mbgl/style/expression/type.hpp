@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/util/variant.hpp>
 #include <vector>
 
@@ -88,7 +89,7 @@ struct Array {
     Array(Type itemType_, optional<std::size_t> N_) : itemType(std::move(itemType_)), N(std::move(N_)) {}
     std::string getName() const {
         if (N) {
-            return "array<" + toString(itemType) + ", " + std::to_string(*N) + ">";
+            return "array<" + toString(itemType) + ", " + util::toString(*N) + ">";
         } else if (itemType == Value) {
             return "array";
         } else {

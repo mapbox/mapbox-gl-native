@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/string.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/conversion.hpp>
 
@@ -104,11 +105,11 @@ public:
     }
     
     void error(std::string message, std::size_t child) {
-        errors->push_back({message, key + "[" + std::to_string(child) + "]"});
+        errors->push_back({message, key + "[" + util::toString(child) + "]"});
     }
     
     void error(std::string message, std::size_t child, std::size_t grandchild) {
-        errors->push_back({message, key + "[" + std::to_string(child) + "][" + std::to_string(grandchild) + "]"});
+        errors->push_back({message, key + "[" + util::toString(child) + "][" + util::toString(grandchild) + "]"});
     }
     
     void appendErrors(ParsingContext&& ctx) {
