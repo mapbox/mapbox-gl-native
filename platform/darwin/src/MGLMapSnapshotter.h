@@ -132,6 +132,12 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
 MGL_EXPORT
 @interface MGLMapSnapshotter : NSObject
 
+/**
+ Creates a snapshotter object with `MGLMapSnapshotOptions`.
+ 
+ @param options The snapshot options to use when creating a snapshotter object.
+ */
+
 - (instancetype)initWithOptions:(MGLMapSnapshotOptions*)options;
 
 /**
