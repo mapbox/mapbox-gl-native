@@ -23,6 +23,8 @@
 
 #include <mbgl/style/conversion/get_json_type.hpp>
 
+#include <mbgl/util/string.hpp>
+
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -55,7 +57,7 @@ bool isConstant(const Expression& expression) {
 using namespace mbgl::style::conversion;
 
 ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_) {
-    ParsingContext child(key + "[" + std::to_string(index_) + "]",
+    ParsingContext child(key + "[" + util::toString(index_) + "]",
                          errors,
                          std::move(expected_),
                          scope);
@@ -64,7 +66,7 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
 
 ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_,
                                   const std::map<std::string, std::shared_ptr<Expression>>& bindings) {
-    ParsingContext child(key + "[" + std::to_string(index_) + "]",
+    ParsingContext child(key + "[" + util::toString(index_) + "]",
                          errors,
                          std::move(expected_),
                          std::make_shared<detail::Scope>(bindings, scope));

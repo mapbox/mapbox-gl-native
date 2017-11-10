@@ -1,5 +1,6 @@
 #include <mbgl/style/expression/step.hpp>
 #include <mbgl/style/expression/get_covering_stops.hpp>
+#include <mbgl/util/string.hpp>
 
 
 namespace mbgl {
@@ -50,7 +51,7 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
     auto length = arrayLength(value);
 
     if (length - 1 < 4) {
-        ctx.error("Expected at least 4 arguments, but found only " + std::to_string(length - 1) + ".");
+        ctx.error("Expected at least 4 arguments, but found only " + util::toString(length - 1) + ".");
         return ParseResult();
     }
     

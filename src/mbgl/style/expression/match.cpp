@@ -1,6 +1,7 @@
 #include <mbgl/style/expression/match.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -75,7 +76,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
         value->match(
             [&] (uint64_t n) {
                 if (!Value::isSafeInteger(n)) {
-                    parentContext.error("Branch labels must be integers no larger than " + std::to_string(Value::maxSafeInteger()) + ".", index);
+                    parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
                     result = {static_cast<int64_t>(n)};
@@ -83,7 +84,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
             },
             [&] (int64_t n) {
                 if (!Value::isSafeInteger(n)) {
-                    parentContext.error("Branch labels must be integers no larger than " + std::to_string(Value::maxSafeInteger()) + ".", index);
+                    parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else {
                     type = {type::Number};
                     result = {n};
@@ -91,7 +92,7 @@ optional<InputType> parseInputValue(const Convertible& input, ParsingContext& pa
             },
             [&] (double n) {
                 if (!Value::isSafeInteger(n)) {
-                    parentContext.error("Branch labels must be integers no larger than " + std::to_string(Value::maxSafeInteger()) + ".", index);
+                    parentContext.error("Branch labels must be integers no larger than " + util::toString(Value::maxSafeInteger()) + ".", index);
                 } else if (n != std::floor(n)) {
                     parentContext.error("Numeric branch labels must be integer values.", index);
                 } else {
@@ -167,7 +168,7 @@ ParseResult parseMatch(const Convertible& value, ParsingContext& ctx) {
     auto length = arrayLength(value);
     if (length < 5) {
         ctx.error(
-            "Expected at least 4 arguments, but found only " + std::to_string(length - 1) + "."
+            "Expected at least 4 arguments, but found only " + util::toString(length - 1) + "."
         );
         return ParseResult();
     }

@@ -1,5 +1,5 @@
-
 #include <mbgl/style/expression/literal.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -70,7 +70,7 @@ ParseResult Literal::parse(const Convertible& value, ParsingContext& ctx) {
     } else if (isArray(value)) {
         // object or array value, quoted with ["literal", value]
         if (arrayLength(value) != 2) {
-            ctx.error("'literal' expression requires exactly one argument, but found " + std::to_string(arrayLength(value) - 1) + " instead.");
+            ctx.error("'literal' expression requires exactly one argument, but found " + util::toString(arrayLength(value) - 1) + " instead.");
             return ParseResult();
         }
         const optional<Value> parsedValue = parseValue(arrayMember(value, 1), ctx);

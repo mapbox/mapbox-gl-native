@@ -1,5 +1,5 @@
-
 #include <mbgl/style/expression/interpolate.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -73,7 +73,7 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
     
     std::size_t minArgs = 4;
     if (length - 1 < minArgs) {
-        ctx.error("Expected at least 4 arguments, but found only " + std::to_string(length - 1) + ".");
+        ctx.error("Expected at least 4 arguments, but found only " + util::toString(length - 1) + ".");
         return ParseResult();
     }
     

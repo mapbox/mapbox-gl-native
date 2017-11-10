@@ -25,6 +25,10 @@ inline int stoi(const std::string &str)
     return atoi(str.c_str());
 }
 
+inline float stof(const std::string &str) {
+    return static_cast<float>(atof(str.c_str()));
+}
+
 } // namespace std
 
 #endif
@@ -63,6 +67,10 @@ inline std::string toString(std::exception_ptr error) {
     } catch (...) {
         return "Unknown exception type";
     }
+}
+
+inline float stof(const std::string& str) {
+    return std::stof(str);
 }
 
 } // namespace util
