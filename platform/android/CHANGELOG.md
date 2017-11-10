@@ -4,11 +4,110 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 ## 5.2.0 - TBA
 
-* Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
-* Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
-* Added `MapboxMap.getCameraForGeometry()` to get a camera with zoom level and center coordinate computed to fit a shape. ([#10107](https://github.com/mapbox/mapbox-gl-native/pull/10107))
+## 5.2.0-beta.4 - November 3, 2017
 
-### 5.1.4 - September 25, 2017
+- Revert adding mapbox-android-core dependency (#10354) [#10380](https://github.com/mapbox/mapbox-gl-native/pull/10380)
+- Asynchronous TextureView [#10370](https://github.com/mapbox/mapbox-gl-native/pull/10370)
+- Workaround OkHttp bug on Android O [10366](https://github.com/mapbox/mapbox-gl-native/pull/10366)
+- Revisit logo resize [10553](https://github.com/mapbox/mapbox-gl-native/pull/10353)
+- Logo resize for MapSnapshotter [#10312](https://github.com/mapbox/mapbox-gl-native/pull/10312)
+- Make location provider optional [#10354](https://github.com/mapbox/mapbox-gl-native/pull/10354)
+- Check for positive animation value [#10348](https://github.com/mapbox/mapbox-gl-native/pull/10348)
+- Fix IAE of ease/animate [#10338](https://github.com/mapbox/mapbox-gl-native/pull/10338)
+- Run full test suite on CI [#10333](https://github.com/mapbox/mapbox-gl-native/pull/10333)
+- Make sure camera position gets updated in onFinish() callback after camera.move [#10324](https://github.com/mapbox/mapbox-gl-native/pull/10324)
+- throw IAE in animate() and easeCamera() when duration <= 0 [#10321](https://github.com/mapbox/mapbox-gl-native/pull/10321)
+- Don't save state if map hasn't been initialised [#10320](https://github.com/mapbox/mapbox-gl-native/pull/10320)
+- Make map snapshot optional [#10310](https://github.com/mapbox/mapbox-gl-native/pull/10310)
+- Synchronise locationlastions with Transifex [#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309)
+- MapboxMap#addImages [#10281](https://github.com/mapbox/mapbox-gl-native/pull/10281)
+- Move shape annotation click handling to core [#10267](https://github.com/mapbox/mapbox-gl-native/pull/10267)
+- Map snapshotter additions [#10163](https://github.com/mapbox/mapbox-gl-native/pull/10163)
+- Add velocity to gestures / port animations to SDK animators [#10202](https://github.com/mapbox/mapbox-gl-native/pull/10202)
+- Don't save state if map hasn't been initialised [#10320](https://github.com/mapbox/mapbox-gl-native/pull/10320)
+- android.hardware.location.gps feature should not be required [#10347](https://github.com/mapbox/mapbox-gl-native/pull/10347)
+
+## 5.2.0-beta.3 - October 26, 2017
+
+- Reorganize dependencies [#10268](https://github.com/mapbox/mapbox-gl-native/pull/10268)
+- Blacklist VAO usage on adreno 3xx [#10291](https://github.com/mapbox/mapbox-gl-native/pull/10291)
+- On stop null check [#10259](https://github.com/mapbox/mapbox-gl-native/pull/10259)
+
+## 5.2.0-beta.2 - October 19, 2017
+
+- Wire up MapZoomButtonController with camera change events [#10221](https://github.com/mapbox/mapbox-gl-native/pull/10221)
+- Execute callbacks only when not idle [#10220](https://github.com/mapbox/mapbox-gl-native/pull/10220)
+- Cleanup unused gradle plugins [#10211](https://github.com/mapbox/mapbox-gl-native/pull/10211)
+- add FileSource pause/resume [#9977](https://github.com/mapbox/mapbox-gl-native/pull/9977)
+- add make target for ndk-stack [#10185](https://github.com/mapbox/mapbox-gl-native/pull/10185)
+- Add interpolator examples [#10067](https://github.com/mapbox/mapbox-gl-native/pull/10067)
+- Add an UnsatisfiedLinkError safeguard [#10180](https://github.com/mapbox/mapbox-gl-native/pull/10180)
+- Hold off handling hover events untill map has been created [#10142](https://github.com/mapbox/mapbox-gl-native/pull/10142)
+- Added `MapboxMap.getCameraForGeometry()` to get a camera with zoom level and center coordinate computed to fit a shape [#10107](https://github.com/mapbox/mapbox-gl-native/pull/10107)
+- Fine tune gesture zoom & rotation [#10134](https://github.com/mapbox/mapbox-gl-native/pull/10134)
+
+## 5.2.0-beta.1 - October 6, 2017
+
+- Allow multiple listeners for camera events, deprecate old API [#10141](https://github.com/mapbox/mapbox-gl-native/pull/10141)
+- Update symbol layer example with location [#10092](https://github.com/mapbox/mapbox-gl-native/pull/10092)
+- Make OfflineTilePyramidRegionDefinition parceable [#10080](https://github.com/mapbox/mapbox-gl-native/pull/10080)
+- Fix 5.2.0-SNAPSHOT CI build failing [#10079](https://github.com/mapbox/mapbox-gl-native/pull/10079)
+- Deprecate MarkerView [#9782](https://github.com/mapbox/mapbox-gl-native/pull/9782)
+- Hide overlain views on initalisation [#10068](https://github.com/mapbox/mapbox-gl-native/pull/10068)
+- API for platform side animations [#10001](https://github.com/mapbox/mapbox-gl-native/pull/10001)
+- Android asynchronous rendering [#9576](https://github.com/mapbox/mapbox-gl-native/pull/9576)
+- Set error handler when starting snapshotter [#10035](https://github.com/mapbox/mapbox-gl-native/pull/10035)
+- Hook camera events into compass [#10019](https://github.com/mapbox/mapbox-gl-native/pull/10019)
+- Testapp cleanup [#10006](https://github.com/mapbox/mapbox-gl-native/pull/10006)
+- Update zoom function example with selected state [#9987](https://github.com/mapbox/mapbox-gl-native/pull/9987)
+- Add style inspection to debug activity [#9773](https://github.com/mapbox/mapbox-gl-native/pull/9773)
+- Bump external dependencies [#9972](https://github.com/mapbox/mapbox-gl-native/pull/9972)
+- Don't recycle bitmap for icon reuse. [#9966](https://github.com/mapbox/mapbox-gl-native/pull/9966)
+- Android snapshotter [#9748](https://github.com/mapbox/mapbox-gl-native/pull/9748)
+- Revert #9764 [#9851](https://github.com/mapbox/mapbox-gl-native/pull/9851)
+- Update docs replacing Bitrise mentions with CircleCI [#9515](https://github.com/mapbox/mapbox-gl-native/pull/9515)
+- Style image accessor [#9763](https://github.com/mapbox/mapbox-gl-native/pull/9763)
+- Update readme with checkstyle and ndk-stack [#9788](https://github.com/mapbox/mapbox-gl-native/pull/9788)
+- make android-check [#9787](https://github.com/mapbox/mapbox-gl-native/pull/9787)
+- Deprecate MyLocationView in favor of LocationLayer plugin [#9771](https://github.com/mapbox/mapbox-gl-native/pull/9771)
+- Increase firebase timeout for CI testing [#9774](https://github.com/mapbox/mapbox-gl-native/pull/9774)
+- Restore max zoom to 25.5 [#9765](https://github.com/mapbox/mapbox-gl-native/pull/9765)
+- Update example of camera zoom function on a symbol layer. [#9743](https://github.com/mapbox/mapbox-gl-native/pull/9743)
+- Optimise icon management [#9643](https://github.com/mapbox/mapbox-gl-native/pull/9643)
+- Expose setStyleJson and getStyleJson [#9714](https://github.com/mapbox/mapbox-gl-native/pull/9714)
+- update LatLngBounds activity with BottomSheet interaction [#9736](https://github.com/mapbox/mapbox-gl-native/pull/9736)
+- post updating InfoWindow update for InfoWindowAdapter [#9716](https://github.com/mapbox/mapbox-gl-native/pull/9716)
+- Annotate MapboxMap class with UiThread [#9712](https://github.com/mapbox/mapbox-gl-native/pull/9712)
+- Move ZoomButtonController creation to view initalisation [#9587](https://github.com/mapbox/mapbox-gl-native/pull/9587)
+- Solve lint issues, reduce baseline [#9627](https://github.com/mapbox/mapbox-gl-native/pull/9627)
+- Remove wear module from project [#9618](https://github.com/mapbox/mapbox-gl-native/pull/9618)
+- Add zMediaOverlay configuration + bottom sheet integration [#9592](https://github.com/mapbox/mapbox-gl-native/pull/9592)
+- Forward getMapAsync to map for fragment [#9621](https://github.com/mapbox/mapbox-gl-native/pull/9621)
+- Make target for dumping system gfx information [#9616](https://github.com/mapbox/mapbox-gl-native/pull/9616)
+- Make target documentation [#9617](https://github.com/mapbox/mapbox-gl-native/pull/9617)
+- onGlobalLayout hook for map creation [#9607](https://github.com/mapbox/mapbox-gl-native/pull/9607)
+- Custom viewpager for horizontal swiping [#9601](https://github.com/mapbox/mapbox-gl-native/pull/9601)
+- Disable program caching on Adreno 3xx, 4xx, and 5xx GPUs due to known bugs [#9574](https://github.com/mapbox/mapbox-gl-native/pull/9574)
+- Avoid creating InfoWindow iterator if no InfoWindows are shown [#9477](https://github.com/mapbox/mapbox-gl-native/pull/9477)
+- Rewire map initialisation [#9462](https://github.com/mapbox/mapbox-gl-native/pull/9462)
+- Trying to update non-existent polyline fix [#9544](https://github.com/mapbox/mapbox-gl-native/pull/9544)
+- Location accuracy threshold [#9472](https://github.com/mapbox/mapbox-gl-native/pull/9472)
+- Rewire gesture handling and telemetry event push [#9494](https://github.com/mapbox/mapbox-gl-native/pull/9494)
+- run style instrumentation tests on CI [#9353](https://github.com/mapbox/mapbox-gl-native/pull/9353)
+- Fix javadoc comment for public setOfflineMapboxTileCountLimit method [#9454](https://github.com/mapbox/mapbox-gl-native/pull/9454)
+- add Map change & visibility test activities [#9425](https://github.com/mapbox/mapbox-gl-native/pull/9425)
+- build release package once during ci build [#9351](https://github.com/mapbox/mapbox-gl-native/pull/9351)
+- Add support for ImageSource [#9110](https://github.com/mapbox/mapbox-gl-native/pull/9110)
+- Increased the default maximum zoom level from 20 to 22. [#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835)
+
+## 5.1.5 - October 31, 2017
+
+* Remove obsolete terminate context/display calls [#10162](https://github.com/mapbox/mapbox-gl-native/pull/10162)
+* Determine need for clip ID based on actual layers/tiles [#10216](https://github.com/mapbox/mapbox-gl-native/pull/10216)
+* Correctly alter sprite URLs [#10217](https://github.com/mapbox/mapbox-gl-native/pull/10217)
+* Russian and Ukrainian localizations [#9945](https://github.com/mapbox/mapbox-gl-native/pull/9945)
+
+## 5.1.4 - September 25, 2017
 
 * Update translations [#10033](https://github.com/mapbox/mapbox-gl-native/pull/10033) & [#9945](https://github.com/mapbox/mapbox-gl-native/pull/9945)
 * Continue rendering tiles despite erros [#10012](https://github.com/mapbox/mapbox-gl-native/pull/10012)
@@ -101,7 +200,7 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 * Infinite location animation updates [#9194](https://github.com/mapbox/mapbox-gl-native/pull/9194)
 * Invoke callback with valid fling gestures [#9192](https://github.com/mapbox/mapbox-gl-native/pull/9192)
 * Keep location tracking after screen rotation [#9187](https://github.com/mapbox/mapbox-gl-native/pull/9187)
-* Update components with camera values when animating [#9174](https://github.com/mapbox/mapbox-gl-native/pull/9174) 
+* Update components with camera values when animating [#9174](https://github.com/mapbox/mapbox-gl-native/pull/9174)
 * Validate if gestures should execute [#9173](https://github.com/mapbox/mapbox-gl-native/pull/9173)
 * Custom location source and LOST integration [#9142](https://github.com/mapbox/mapbox-gl-native/pull/9142)
 
@@ -503,12 +602,6 @@ Mapbox Android 4.0.0 is the most ambitious Android release to date with 3 major 
 - Satellite Streets Style ([#2739](https://github.com/mapbox/mapbox-gl-native/issues/2739))
 - **RESOLVED** Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
 
-
 ## 2.1.0 - October 21, 2015
 
 - Initial Android release.
-
-Known issues:
-
-- Black Screen On Ice Cream Sandwich and Jelly Bean devices ([#2802](https://github.com/mapbox/mapbox-gl-native/issues/2802))
-  - Resolved in 2.2.0

@@ -13,8 +13,7 @@ global.camelize = function (str) {
   });
 }
 
-
-const excludeActivities = ["BaseLocationActivity","MockLocationEngine","DeleteRegionActivity","RealTimeGeoJsonActivity","UpdateMetadataActivity","CarDrivingActivity","MyLocationTrackingModeActivity","MyLocationToggleActivity","MyLocationTintActivity","MyLocationDrawableActivity","DoubleMapActivity", "LocationPickerActivity","GeoJsonClusteringActivity","RuntimeStyleTestActivity", "AnimatedMarkerActivity", "ViewPagerActivity","MapFragmentActivity","SupportMapFragmentActivity","SnapshotActivity","NavigationDrawerActivity", "QueryRenderedFeaturesBoxHighlightActivity", "MultiMapActivity", "MapInDialogActivity", "SimpleMapActivity"];
+const excludeClasses = JSON.parse(fs.readFileSync('platform/android/scripts/exclude-activity-gen.json', 'utf8'));
 const appBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity';
 const testBasePath = 'platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen';
 const subPackages = fs.readdirSync(appBasePath);
@@ -24,7 +23,9 @@ if (!fs.existsSync(testBasePath)){
   fs.mkdirSync(testBasePath);
 }
 
-console.log("Generating test activities:");
+console.log("\nGenerating test activities:\n");
+var generatedClasses = [];
+var excludedClasses = [];
 for(const subPackage of subPackages) {
   if(!(subPackage.slice(-5) == '.java')) {
     const activities = fs.readdirSync(appBasePath+'/'+subPackage);
@@ -45,18 +46,22 @@ for(const subPackage of subPackages) {
       try {
         fs.accessSync(filePath, fs.F_OK);
         fs.unlinkSync(filePath);
-        console.log("Removed file: "+filePath);
       } catch (e) {
-        console.log("No file found: "+filePath);
       }
 
-      // only generate test file if not part of exclude list
-      if (!(excludeActivities.indexOf(activityName) > -1)) {
-        console.log("Created file:  "+filePath);
+      // only generate test file if not part of exclude list + if contains Activity in name
+      if ((!(excludeClasses.indexOf(activityName) > -1)) && activityName.includes("Activity")) {
         fs.writeFileSync(filePath, ejsConversionTask([activityName, subPackage]));
+        generatedClasses.push(activityName);
       }else{
-        console.log("Excluding file:  "+filePath);
+        excludedClasses.push(activityName);
       }
     }
   }
 }
+
+for(const generatedClass of generatedClasses){
+  console.log(generatedClass+"Test");
+}
+
+console.log("\nFinished generating " + generatedClasses.length + " activity sanity tests, excluded " + excludeClasses.length + " classes.\n");

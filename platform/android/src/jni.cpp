@@ -172,6 +172,7 @@ void registerNatives(JavaVM *vm) {
 
     // Map
     CameraPosition::registerNative(env);
+    Image::registerNative(env);
 
     // Connectivity
     ConnectivityListener::registerNative(env);

@@ -30,6 +30,10 @@ workflows:
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
+      - ios-debug
+      #- ios-sanitize-address
+      - ios-sanitize-thread
+      - macos-debug
 
 step-library:
   - &generate-cache-key
@@ -47,7 +51,7 @@ step-library:
   - &save-cache
       save_cache:
         key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
-        paths: [ "node_modules", "/root/.ccache", "mason_packages/.binaries" ]
+        paths: [ "node_modules", "/root/.ccache", "~/.ccache", "mason_packages/.binaries" ]
 
 
   - &reset-ccache-stats
@@ -97,6 +101,28 @@ step-library:
       run:
         name: Build qt-test
         command: make qt-test
+  - &build-ios-test
+      run:
+        name: Build ios-test
+        command: make ios-test
+  - &build-macos-test
+      run:
+        name: Build and run macOS tests
+        command: make run-test
+
+
+  - &check-public-symbols
+      run:
+        name: Check public symbols
+        command: make check-public-symbols
+
+
+  - &install-macos-dependencies
+      run:
+        name: Install dependencies
+        command: |
+          brew install cmake
+          brew install ccache
 
 
   - &run-node-tests
@@ -225,7 +251,7 @@ jobs:
               --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk \
               --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
               --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 20m \
-              --test-targets "package com.mapbox.mapboxsdk.testapp.style" 2>&1 | tee firebase.log) || EXIT_CODE=$?
+              2>&1 | tee firebase.log) || EXIT_CODE=$?
 
             FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
             echo "Downloading from: ${FIREBASE_TEST_BUCKET}"
@@ -294,7 +320,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "release-agua" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------
@@ -589,3 +615,80 @@ jobs:
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+
+# ------------------------------------------------------------------------------
+  ios-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-ios-test
+      - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-address:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with address sanitizer
+          command: make ios-sanitize-address
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-thread:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread sanitizer
+          command: make ios-sanitize-thread
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  macos-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-macos-test
+      - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+      - store_artifacts:
+          path: test/fixtures
+          destination: test/fixtures

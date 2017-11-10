@@ -12,6 +12,11 @@
     <string name="menuitem_title_change_location_source_null">Reset location source to null</string>
     <string name="menuitem_change_icon_overlap">Toggle icon overlap</string>
     <string name="menuitem_change_location">Change location</string>
+    <string name="menuitem_title_accelerate_decelerate">Accelerate/Decelerate interpolator</string>
+    <string name="menuitem_title_bounce">Bounce interpolator</string>
+    <string name="menuitem_title_anticipate_overshoot">Anticipate/Overshoot interpolator</string>
+    <string name="menuitem_title_path">PathInterpolator interpolator</string>
+    <string name="menuitem_toggle_symbol_layer_visibility">Toggle Symbol Layer Visibility</string>
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
     <string name="button_camera_animate">Animate</string>

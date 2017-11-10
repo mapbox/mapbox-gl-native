@@ -14,6 +14,7 @@ import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
+import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidMarkerPositionException;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -31,9 +32,12 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
+import timber.log.Timber;
+
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
+import static com.mapbox.mapboxsdk.testapp.utils.TestConstants.LAT_LNG_DELTA;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertNotNull;
 import static org.junit.Assert.assertEquals;
@@ -90,8 +94,33 @@ public class MapboxMapTest extends BaseActivityTest {
   }
 
   //
-  // CameraForLatLngBounds
+  // Camera tests
   //
+  @Test
+  public void testCameraPositionOnFinish() {
+    ViewUtils.checkViewIsDisplayed(R.id.mapView);
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
+      @Override
+      public void onViewAction(UiController uiController, View view) {
+
+        final LatLng latLng = new LatLng(30.0, 30.0);
+        mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(latLng), new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+          }
+
+          @Override
+          public void onFinish() {
+            LatLng cameraPositionLatLng = mapboxMap.getCameraPosition().target;
+            Timber.d(cameraPositionLatLng.toString());
+            assertEquals(cameraPositionLatLng.getLatitude(), latLng.getLatitude(), LAT_LNG_DELTA);
+            assertEquals(cameraPositionLatLng.getLongitude(), latLng.getLongitude(), LAT_LNG_DELTA);
+          }
+        });
+      }
+    }));
+  }
+
   @Test
   public void testCameraForLatLngBounds() {
     ViewUtils.checkViewIsDisplayed(R.id.mapView);

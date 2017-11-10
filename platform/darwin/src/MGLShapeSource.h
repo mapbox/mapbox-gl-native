@@ -85,7 +85,8 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationT
  or they may be defined by local or external
  <a href="http://geojson.org/">GeoJSON</a> code. A shape source is added to an
  `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style
- layer defines the appearance of any content supplied by the shape source.
+ layer defines the appearance of any content supplied by the shape source. You
+ can update a shape source by setting its `shape` or `URL` property.
 
  Each
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson"><code>geojson</code></a>

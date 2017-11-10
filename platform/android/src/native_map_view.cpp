@@ -49,6 +49,7 @@
 #include "java/util.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include  "map/image.hpp"
 #include "style/light.hpp"
 #include "bitmap_factory.hpp"
 
@@ -633,6 +634,26 @@ jni::Array<jlong> NativeMapView::queryPointAnnotations(JNIEnv& env, jni::Object<
     return result;
 }
 
+jni::Array<jlong> NativeMapView::queryShapeAnnotations(JNIEnv &env, jni::Object<RectF> rect) {
+    using namespace mbgl::style;
+    using namespace mbgl::style::conversion;
+
+    // Convert input
+    mbgl::ScreenBox box = {
+         {RectF::getLeft(env, rect),  RectF::getTop(env, rect)},
+         {RectF::getRight(env, rect), RectF::getBottom(env, rect)},
+    };
+
+    mbgl::AnnotationIDs ids = rendererFrontend->queryShapeAnnotations(box);
+
+    // Convert result
+    std::vector<jlong> longIds(ids.begin(), ids.end());
+    auto result = jni::Array<jni::jlong>::New(env, ids.size());
+    result.SetRegion<std::vector<jni::jlong>>(env, 0, longIds);
+
+    return result;
+}
+
 jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
                                                                               jni::Array<jni::String> layerIds,
                                                                               jni::Array<jni::Object<>> jfilter) {
@@ -904,6 +925,18 @@ void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::ji
         float(scale)));
 }
 
+void NativeMapView::addImages(JNIEnv& env, jni::Array<jni::Object<mbgl::android::Image>> jimages) {
+    jni::NullCheck(env, &jimages);
+    std::size_t len = jimages.Length(env);
+
+    for (std::size_t i = 0; i < len; i++) {
+        jni::Object<mbgl::android::Image> jimage = jimages.Get(env, i);
+        auto image = mbgl::android::Image::getImage(env, jimage);
+        map->getStyle().addImage(std::make_unique<mbgl::style::Image>(image));
+        jni::DeleteLocalRef(env, jimage);
+    }
+}
+
 void NativeMapView::removeImage(JNIEnv& env, jni::String name) {
     map->getStyle().removeImage(jni::Make<std::string>(env, name));
 }
@@ -1000,6 +1033,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::getTransitionDelay, "nativeGetTransitionDelay"),
             METHOD(&NativeMapView::setTransitionDelay, "nativeSetTransitionDelay"),
             METHOD(&NativeMapView::queryPointAnnotations, "nativeQueryPointAnnotations"),
+            METHOD(&NativeMapView::queryShapeAnnotations, "nativeQueryShapeAnnotations"),
             METHOD(&NativeMapView::queryRenderedFeaturesForPoint, "nativeQueryRenderedFeaturesForPoint"),
             METHOD(&NativeMapView::queryRenderedFeaturesForBox, "nativeQueryRenderedFeaturesForBox"),
             METHOD(&NativeMapView::getLight, "nativeGetLight"),
@@ -1017,6 +1051,7 @@ void NativeMapView::registerNative(jni::JNIEnv& env) {
             METHOD(&NativeMapView::removeSourceById, "nativeRemoveSourceById"),
             METHOD(&NativeMapView::removeSource, "nativeRemoveSource"),
             METHOD(&NativeMapView::addImage, "nativeAddImage"),
+            METHOD(&NativeMapView::addImages, "nativeAddImages"),
             METHOD(&NativeMapView::removeImage, "nativeRemoveImage"),
             METHOD(&NativeMapView::getImage, "nativeGetImage"),
             METHOD(&NativeMapView::setLatLngBounds, "nativeSetLatLngBounds"),

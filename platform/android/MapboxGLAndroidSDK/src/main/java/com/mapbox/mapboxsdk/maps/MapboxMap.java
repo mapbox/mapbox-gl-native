@@ -47,6 +47,7 @@ import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Geometry;
 
 import java.lang.reflect.ParameterizedType;
+import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -463,6 +464,13 @@ public final class MapboxMap {
   }
 
   /**
+   * Adds an images to be used in the map's style
+   */
+  public void addImages(@NonNull HashMap<String, Bitmap> images) {
+    nativeMapView.addImages(images);
+  }
+
+  /**
    * Removes an image from the map's style
    *
    * @param name the name of the image to remove
@@ -709,6 +717,10 @@ public final class MapboxMap {
         // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
         // invalidate camera position to provide OnCameraChange event.
         invalidateCameraPosition();
+
+        if (callback != null) {
+          callback.onFinish();
+        }
       }
     });
   }
@@ -1753,36 +1765,120 @@ public final class MapboxMap {
    * Sets a callback that is invoked when camera movement has ended.
    *
    * @param listener the listener to notify
+   * @deprecated use {@link #addOnCameraIdleListener(OnCameraIdleListener)}
+   * and {@link #removeOnCameraIdleListener(OnCameraIdleListener)} instead
    */
+  @Deprecated
   public void setOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
     cameraChangeDispatcher.setOnCameraIdleListener(listener);
+  }
+
+  /**
+   * Adds a callback that is invoked when camera movement has ended.
+   *
+   * @param listener the listener to notify
+   */
+  public void addOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
+    cameraChangeDispatcher.addOnCameraIdleListener(listener);
+  }
+
+  /**
+   * Removes a callback that is invoked when camera movement has ended.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
+    cameraChangeDispatcher.removeOnCameraIdleListener(listener);
   }
 
   /**
    * Sets a callback that is invoked when camera movement was cancelled.
    *
    * @param listener the listener to notify
+   * @deprecated use {@link #addOnCameraMoveCancelListener(OnCameraMoveCanceledListener)} and
+   * {@link #removeOnCameraMoveCancelListener(OnCameraMoveCanceledListener)} instead
    */
+  @Deprecated
   public void setOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
     cameraChangeDispatcher.setOnCameraMoveCanceledListener(listener);
+  }
+
+  /**
+   * Adds a callback that is invoked when camera movement was cancelled.
+   *
+   * @param listener the listener to notify
+   */
+  public void addOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
+    cameraChangeDispatcher.addOnCameraMoveCancelListener(listener);
+  }
+
+  /**
+   * Removes a callback that is invoked when camera movement was cancelled.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
+    cameraChangeDispatcher.removeOnCameraMoveCancelListener(listener);
   }
 
   /**
    * Sets a callback that is invoked when camera movement has started.
    *
    * @param listener the listener to notify
+   * @deprecated use {@link #addOnCameraMoveStartedListener(OnCameraMoveStartedListener)} and
+   * {@link #removeOnCameraMoveStartedListener(OnCameraMoveStartedListener)} instead
    */
+  @Deprecated
   public void setOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
     cameraChangeDispatcher.setOnCameraMoveStartedListener(listener);
+  }
+
+  /**
+   * Adds a callback that is invoked when camera movement has started.
+   *
+   * @param listener the listener to notify
+   */
+  public void addOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
+    cameraChangeDispatcher.addOnCameraMoveStartedListener(listener);
+  }
+
+  /**
+   * Removes a callback that is invoked when camera movement has started.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
+    cameraChangeDispatcher.removeOnCameraMoveStartedListener(listener);
   }
 
   /**
    * Sets a callback that is invoked when camera position changes.
    *
    * @param listener the listener to notify
+   * @deprecated use {@link #addOnCameraMoveListener(OnCameraMoveListener)} and
+   * {@link #removeOnCameraMoveListener(OnCameraMoveListener)}instead
    */
+  @Deprecated
   public void setOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
     cameraChangeDispatcher.setOnCameraMoveListener(listener);
+  }
+
+  /**
+   * Adds a callback that is invoked when camera position changes.
+   *
+   * @param listener the listener to notify
+   */
+  public void addOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
+    cameraChangeDispatcher.addOnCameraMoveListener(listener);
+  }
+
+  /**
+   * Removes a callback that is invoked when camera position changes.
+   *
+   * @param listener the listener to remove
+   */
+  public void removeOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
+    cameraChangeDispatcher.removeOnCameraMoveListener(listener);
   }
 
   /**

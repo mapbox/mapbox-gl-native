@@ -74,15 +74,6 @@ public class LatLngBoundsTest {
   }
 
   @Test
-  public void emptySpan() {
-    latLngBounds = new LatLngBounds.Builder()
-      .include(LAT_LNG_NOT_NULL_ISLAND)
-      .include(LAT_LNG_NOT_NULL_ISLAND)
-      .build();
-    assertTrue("Should be empty", latLngBounds.isEmptySpan());
-  }
-
-  @Test
   public void notEmptySpan() {
     latLngBounds = new LatLngBounds.Builder()
       .include(LAT_LNG_NOT_NULL_ISLAND)

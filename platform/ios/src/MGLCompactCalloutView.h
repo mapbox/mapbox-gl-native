@@ -7,7 +7,7 @@
  callout view displays the represented annotation’s title, subtitle, and
  accessory views in a compact, two-line layout.
  */
-@interface MGLCompactCalloutView : SMCalloutView <MGLCalloutView>
+@interface MGLCompactCalloutView : MGLSMCalloutView <MGLCalloutView>
 
 + (instancetype)platformCalloutView;
 

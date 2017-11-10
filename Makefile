@@ -222,6 +222,14 @@ iproj: $(IOS_PROJ_PATH)
 ios-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: ios-sanitize-address
+ios-sanitize-address: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
+
+.PHONY: ios-sanitize-thread
+ios-sanitize-thread: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES test $(XCPRETTY)
+
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
@@ -553,6 +561,11 @@ run-android-ui-test-$1-%: platform/android/configuration.gradle
 	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
 
+# Symbolicate native stack trace with the specified abi
+.PHONY: android-ndk-stack-$1
+android-ndk-stack-$1: platform/android/configuration.gradle
+	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
+
 endef
 
 # Explodes the arguments into individual variables
@@ -582,9 +595,9 @@ run-android-ui-test-%: run-android-ui-test-arm-v7-%
 # Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
 run-android-unit-test-%: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
 
 # Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
 .PHONY: run-android-ui-test-aws
@@ -640,6 +653,10 @@ android-lint-test-app: platform/android/configuration.gradle
 .PHONY: android-javadoc
 android-javadoc: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
+
+# Symbolicate ndk stack traces for the arm-v7 abi
+.PHONY: android-ndk-stack
+android-ndk-stack: android-ndk-stack-arm-v7
 
 # Open Android Studio if machine is macos
 ifeq ($(HOST_PLATFORM), macos)

@@ -10,7 +10,7 @@ const CGFloat MGLUserLocationAnnotationDotSize = 22.0;
 const CGFloat MGLUserLocationAnnotationHaloSize = 115.0;
 
 const CGFloat MGLUserLocationAnnotationPuckSize = 45.0;
-const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.6;
+const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuckSize * 0.5;
 
 const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
@@ -175,11 +175,15 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
         _puckArrow = [CAShapeLayer layer];
         _puckArrow.path = [[self puckArrow] CGPath];
         _puckArrow.fillColor = [self.mapView.tintColor CGColor];
-        _puckArrow.bounds = CGRectMake(0, 0, MGLUserLocationAnnotationArrowSize, MGLUserLocationAnnotationArrowSize);
-        _puckArrow.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
+        _puckArrow.bounds = CGRectMake(0, 0, round(MGLUserLocationAnnotationArrowSize), round(MGLUserLocationAnnotationArrowSize));
+        _puckArrow.position = CGPointMake(CGRectGetMidX(super.bounds), CGRectGetMidY(super.bounds));
         _puckArrow.shouldRasterize = YES;
         _puckArrow.rasterizationScale = [UIScreen mainScreen].scale;
         _puckArrow.drawsAsynchronously = YES;
+
+        _puckArrow.lineJoin = @"round";
+        _puckArrow.lineWidth = 1.f;
+        _puckArrow.strokeColor = _puckArrow.fillColor;
 
         [self.layer addSublayer:_puckArrow];
     }
@@ -302,7 +306,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
             [CATransaction setDisableActions:shouldDisableActions];
 
             _accuracyRingLayer.bounds = CGRectMake(0, 0, accuracyRingSize, accuracyRingSize);
-            _accuracyRingLayer.cornerRadius = accuracyRingSize / 2;
+            _accuracyRingLayer.cornerRadius = accuracyRingSize / 2.0;
 
             // match the halo to the accuracy ring
             _haloLayer.bounds = _accuracyRingLayer.bounds;
@@ -431,9 +435,11 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
 - (CALayer *)circleLayerWithSize:(CGFloat)layerSize
 {
+    layerSize = round(layerSize);
+
     CALayer *circleLayer = [CALayer layer];
     circleLayer.bounds = CGRectMake(0, 0, layerSize, layerSize);
-    circleLayer.position = CGPointMake(super.bounds.size.width / 2.0, super.bounds.size.height / 2.0);
+    circleLayer.position = CGPointMake(CGRectGetMidX(super.bounds), CGRectGetMidY(super.bounds));
     circleLayer.cornerRadius = layerSize / 2.0;
     circleLayer.shouldRasterize = YES;
     circleLayer.rasterizationScale = [UIScreen mainScreen].scale;
@@ -456,7 +462,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 - (CGFloat)calculateAccuracyRingSize
 {
     // diameter in screen points
-    return self.userLocation.location.horizontalAccuracy / [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude] * 2.0;
+    return round(self.userLocation.location.horizontalAccuracy / [self.mapView metersPerPointAtLatitude:self.userLocation.coordinate.latitude] * 2.0);
 }
 
 @end

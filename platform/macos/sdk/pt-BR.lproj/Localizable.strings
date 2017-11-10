@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Falha ao carregar mapa devido a um erro desconhecido.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Falha ao carregar mapa porque o estilo não pode ser carregado.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Falha ao carregar mapa porque o estilo está corrompido.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Falha ao carregar mapa porque o estilo não pode ser encontrado ou é incompatível.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";
