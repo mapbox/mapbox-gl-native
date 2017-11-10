@@ -23,7 +23,7 @@ TEST(Map, PrefetchTiles) {
     ThreadPool threadPool(4);
     StubFileSource fileSource;
     HeadlessFrontend frontend { { 512, 512 }, 1, fileSource, threadPool };
-    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), 1, fileSource, threadPool, MapMode::Still);
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), 1, fileSource, threadPool, MapMode::Static);
 
     std::vector<int> tiles;
 
