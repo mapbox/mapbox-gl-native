@@ -238,16 +238,18 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
-    mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-      @Override
-      public void onMapChanged(int change) {
-        if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
-          cameraChangeDispatcher.onCameraIdle();
-          mapView.removeOnMapChangedListener(this);
+    if (mapView != null) {
+      mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
+        @Override
+        public void onMapChanged(int change) {
+          if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
+            cameraChangeDispatcher.onCameraIdle();
+            mapView.removeOnMapChangedListener(this);
+          }
         }
-      }
-    });
-    mapView.setZoom(zoom, focalPoint, duration);
+      });
+      mapView.setZoom(zoom, focalPoint, duration);
+    }
   }
 
   // Direction
