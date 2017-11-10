@@ -1,5 +1,15 @@
 # Changelog for Mapbox macOS SDK
 
+## master
+
+### Annotations and user interaction
+
+* Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
+
+### Styles
+
+* Fixed an issue preventing a dynamically-added `MGLRasterStyleLayer` from drawing until the map pans. ([#10270](https://github.com/mapbox/mapbox-gl-native/pull/10270))
+
 ## v0.6.0
 
 ### Networking and storage
