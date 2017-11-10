@@ -128,12 +128,12 @@ void GridIndex<T>::query(const BBox& queryBBox, std::function<bool (const T&, co
         for (auto& element : boxElements) {
             if (resultFn(element.first, element.second)) {
                 return;
-            };
+            }
         }
         for (auto& element : circleElements) {
             if (resultFn(element.first, convertToBox(element.second))) {
                 return;
-            };
+            }
         }
         return;
     }
@@ -189,16 +189,15 @@ void GridIndex<T>::query(const BCircle& queryBCircle, std::function<bool (const 
     if (noIntersection(queryBBox)) {
         return;
     } else if (completeIntersection(queryBBox)) {
-        // TODO: std::for_each?
         for (auto& element : boxElements) {
             if (resultFn(element.first, element.second)) {
                 return;
-            };
+            }
         }
         for (auto& element : circleElements) {
             if (resultFn(element.first, convertToBox(element.second))) {
                 return;
-            };
+            }
         }
     }
 

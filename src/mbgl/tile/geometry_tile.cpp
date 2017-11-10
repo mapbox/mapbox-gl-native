@@ -118,8 +118,8 @@ void GeometryTile::setLayers(const std::vector<Immutable<Layer::Impl>>& layers) 
 
 void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
     if (showCollisionBoxes != showCollisionBoxes_) {
-       showCollisionBoxes = showCollisionBoxes_;
-       ++correlationID;
+        showCollisionBoxes = showCollisionBoxes_;
+        ++correlationID;
         worker.invoke(&GeometryTileWorker::setShowCollisionBoxes, showCollisionBoxes, correlationID);
     }
 }
