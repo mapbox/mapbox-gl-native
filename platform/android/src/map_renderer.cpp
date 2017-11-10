@@ -41,15 +41,19 @@ ActorRef<Renderer> MapRenderer::actor() const {
 }
 
 void MapRenderer::schedule(std::weak_ptr<Mailbox> scheduled) {
-    // Create a runnable and schedule it on the gl thread
+    // Create a runnable
     android::UniqueEnv _env = android::AttachEnv();
     auto runnable = std::make_unique<MapRendererRunnable>(*_env, std::move(scheduled));
 
+    // Obtain ownership of the peer (gets transferred to the MapRenderer on the JVM for later GC)
+    auto peer = runnable->peer();
+
+    // Queue the event on the Java Peer
     static auto queueEvent = javaClass.GetMethod<void(
             jni::Object<MapRendererRunnable>)>(*_env, "queueEvent");
-    javaPeer->Call(*_env, queueEvent, runnable->getPeer());
+    javaPeer->Call(*_env, queueEvent, *peer);
 
-    // Release the object as it will be destroyed on GC of the Java Peer
+    // Release the c++ peer as it will be destroyed on GC of the Java Peer
     runnable.release();
 }
 
