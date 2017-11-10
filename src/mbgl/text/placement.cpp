@@ -185,7 +185,7 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
 }
 
 void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
-    std::unordered_set<uint32_t> seenCrossTileIDs;
+    std::set<uint32_t> seenCrossTileIDs;
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
         if (!renderTile.tile.isRenderable()) {
             continue;
@@ -198,7 +198,7 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
     }
 }
 
-void Placement::updateBucketOpacities(SymbolBucket& bucket, std::unordered_set<uint32_t>& seenCrossTileIDs) {
+void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& seenCrossTileIDs) {
     if (bucket.hasTextData()) bucket.text.opacityVertices.clear();
     if (bucket.hasIconData()) bucket.icon.opacityVertices.clear();
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
