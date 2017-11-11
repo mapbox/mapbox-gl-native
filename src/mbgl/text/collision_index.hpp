@@ -17,7 +17,7 @@ public:
 
     explicit CollisionIndex(const TransformState&);
 
-    bool placeFeature(CollisionFeature& feature,
+    std::pair<bool,bool> placeFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
@@ -34,7 +34,10 @@ public:
 
     
 private:
-    bool placeLineFeature(CollisionFeature& feature,
+    bool isOffscreen(const CollisionBox&) const;
+    bool isInsideGrid(const CollisionBox&) const;
+
+    std::pair<bool,bool> placeLineFeature(CollisionFeature& feature,
                                   const mat4& posMatrix,
                                   const mat4& labelPlaneMatrix,
                                   const float textPixelRatio,
@@ -51,11 +54,17 @@ private:
     std::pair<Point<float>,float> projectAndGetPerspectiveRatio(const mat4& posMatrix, const Point<float>& point) const;
     Point<float> projectPoint(const mat4& posMatrix, const Point<float>& point) const;
 
-    TransformState transformState;
-    float pitchFactor;
+    const TransformState transformState;
 
     CollisionGrid collisionGrid;
     CollisionGrid ignoredGrid;
+    
+    const float screenRightBoundary;
+    const float screenBottomBoundary;
+    const float gridRightBoundary;
+    const float gridBottomBoundary;
+    
+    const float pitchFactor;
 };
 
 } // namespace mbgl
