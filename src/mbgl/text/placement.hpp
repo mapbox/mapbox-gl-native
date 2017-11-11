@@ -14,7 +14,7 @@ namespace mbgl {
 
     class OpacityState {
         public:
-            OpacityState(bool placed);
+            OpacityState(bool placed, bool offscreen);
             OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
             bool isHidden() const;
             float opacity;
@@ -23,18 +23,26 @@ namespace mbgl {
 
     class JointOpacityState {
         public:
-            JointOpacityState(bool placedIcon, bool placedText);
+            JointOpacityState(bool placedIcon, bool placedText, bool offscreen);
             JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
             bool isHidden() const;
             OpacityState icon;
             OpacityState text;
     };
 
-    class PlacementPair {
+    class JointPlacement {
         public:
-            PlacementPair(bool text_, bool icon_) : text(text_), icon(icon_) {}
-            bool text;
-            bool icon;
+            JointPlacement(bool text_, bool icon_, bool offscreen_)
+                : text(text_), icon(icon_), offscreen(offscreen_)
+            {}
+        
+            const bool text;
+            const bool icon;
+            // offscreen = outside viewport, but within CollisionIndex::viewportPadding px of the edge
+            // Because these symbols aren't onscreen yet, we can skip the "fade in" animation,
+            // and if a subsequent viewport change brings them into view, they'll be fully
+            // visible right away.
+            const bool offscreen;
     };
 
     class Placement {
@@ -72,7 +80,7 @@ namespace mbgl {
             MapMode mapMode;
             TimePoint commitTime;
 
-            std::unordered_map<uint32_t, PlacementPair> placements;
+            std::unordered_map<uint32_t, JointPlacement> placements;
             std::unordered_map<uint32_t, JointOpacityState> opacities;
         
             TimePoint recentUntil;
