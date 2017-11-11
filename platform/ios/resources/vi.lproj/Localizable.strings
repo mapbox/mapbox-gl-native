@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Hiển thị thêm thông tin";
 
 /* No comment provided by engineer. */
@@ -34,6 +34,9 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Giới thiệu về bản đồ này";
 
+/* List separator */
+"LIST_SEPARATOR" = ", ";
+
 /* User-friendly error description */
 "LOAD_MAP_FAILED_DESC" = "Bản đồ bị thất bại khi tải vì lỗi không rõ.";
 
@@ -46,11 +49,29 @@
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Bản đồ";
 
-/* Map accessibility value */
-"MAP_A11Y_VALUE" = "Thu phóng gấp %1$d lần\n%2$ld chú thích đang xuất hiện";
+/* Map accessibility value; {number of visible annotations} */
+"MAP_A11Y_VALUE_ANNOTATIONS" = "%ld chú thích đang xuất hiện.";
+
+/* Map accessibility value; {list of visible places} */
+"MAP_A11Y_VALUE_PLACES" = "Địa điểm đang xuất hiện: %@.";
+
+/* Map accessibility value; {number of visible roads} */
+"MAP_A11Y_VALUE_ROADS" = "%ld con đường đang xuất hiện.";
+
+/* Map accessibility value; {zoom level} */
+"MAP_A11Y_VALUE_ZOOM" = "Thu phóng gấp %d lần.";
 
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "Bản đồ bị thất bại khi tải vì bảng kiểu bị hỏng.";
+
+/* Accessibility value indicating that a road is a divided road (dual carriageway) */
+"ROAD_DIVIDED_A11Y_VALUE" = "Đường phân làn";
+
+/* Accessibility value indicating that a road is a one-way road */
+"ROAD_ONEWAY_A11Y_VALUE" = "Một chiều";
+
+/* String format for accessibility value for road feature; {route number} */
+"ROAD_REF_A11Y_FMT" = "Đường số %@";
 
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
