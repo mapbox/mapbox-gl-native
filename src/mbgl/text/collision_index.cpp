@@ -27,9 +27,13 @@ static const float viewportPadding = 100;
 CollisionIndex::CollisionIndex(const TransformState& transformState_)
     : transformState(transformState_)
     , collisionGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25)
-    , ignoredGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25) {
-    pitchFactor = std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance();
-}
+    , ignoredGrid(transformState.getSize().width + 2 * viewportPadding, transformState.getSize().height + 2 * viewportPadding, 25)
+    , screenRightBoundary(transformState.getSize().width + viewportPadding)
+    , screenBottomBoundary(transformState.getSize().height + viewportPadding)
+    , gridRightBoundary(transformState.getSize().width + 2 * viewportPadding)
+    , gridBottomBoundary(transformState.getSize().height + 2 * viewportPadding)
+    , pitchFactor(std::cos(transformState.getPitch()) * transformState.getCameraToCenterDistance())
+{}
 
 float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap) {
     // This is a quick and dirty solution for chosing which collision circles to use (since collision circles are
@@ -51,8 +55,16 @@ float CollisionIndex::approximateTileDistance(const TileDistance& tileDistance, 
         (incidenceStretch - 1) * lastSegmentTile * std::abs(std::sin(lastSegmentAngle));
 }
 
+bool CollisionIndex::isOffscreen(const CollisionBox& box) const {
+    return box.px2 < viewportPadding || box.px1 >= screenRightBoundary || box.py2 < viewportPadding || box.py1 >= screenBottomBoundary;
+}
 
-bool CollisionIndex::placeFeature(CollisionFeature& feature,
+bool CollisionIndex::isInsideGrid(const CollisionBox& box) const {
+    return box.px2 >= 0 && box.px1 < gridRightBoundary && box.py2 >= 0 && box.py1 < gridBottomBoundary;
+}
+
+
+std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
@@ -70,20 +82,19 @@ bool CollisionIndex::placeFeature(CollisionFeature& feature,
         box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
         box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
         box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
-        
-        if (!allowOverlap) {
-            if (collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }})) {
-                return false;
-            }
+
+        if (!isInsideGrid(box) ||
+            (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
+            return { false, false };
         }
 
-        return true;
+        return {true, isOffscreen(box)};
     } else {
         return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug);
     }
 }
 
-bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
+std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const mat4& posMatrix,
                                       const mat4& labelPlaneMatrix,
                                       const float textPixelRatio,
@@ -115,6 +126,8 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         /*return tile distance*/ true);
 
     bool collisionDetected = false;
+    bool inGrid = false;
+    bool entirelyOffscreen = true;
 
     const auto tileToViewport = projectedAnchor.first * textPixelRatio;
     // equivalent to pixel_to_tile_units
@@ -183,11 +196,14 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         circle.px = projectedPoint.x;
         circle.py = projectedPoint.y;
         circle.radius = radius;
+        
+        entirelyOffscreen &= isOffscreen(circle);
+        inGrid |= isInsideGrid(circle);
 
         if (!allowOverlap) {
             if (collisionGrid.hitTest({{circle.px, circle.py}, circle.radius})) {
                 if (!collisionDebug) {
-                    return false;
+                    return {false, false};
                 } else {
                     // Don't early exit if we're showing the debug circles because we still want to calculate
                     // which circles are in use
@@ -197,7 +213,7 @@ bool CollisionIndex::placeLineFeature(CollisionFeature& feature,
         }
     }
 
-    return !collisionDetected && firstAndLastGlyph;
+    return {!collisionDetected && firstAndLastGlyph && inGrid, entirelyOffscreen};
 }
 
 
