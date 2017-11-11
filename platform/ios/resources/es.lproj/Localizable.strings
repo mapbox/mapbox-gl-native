@@ -34,6 +34,9 @@
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Acerca de este mapa";
 
+/* List separator */
+"LIST_SEPARATOR" = ", ";
+
 /* User-friendly error description */
 "LOAD_MAP_FAILED_DESC" = "No se pudo cargar el mapa debido a un error desconocido.";
 
@@ -46,11 +49,29 @@
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Mapa";
 
-/* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom x%1$d\nAnotaciones visibles: %2$ld";
+/* Map accessibility value; {number of visible annotations} */
+"MAP_A11Y_VALUE_ANNOTATIONS" = "%ld anotacion(es) visible(s).";
+
+/* Map accessibility value; {list of visible places} */
+"MAP_A11Y_VALUE_PLACES" = "Lugares visibles: %@.";
+
+/* Map accessibility value; {number of visible roads} */
+"MAP_A11Y_VALUE_ROADS" = "%ld camino(s) visible(s).";
+
+/* Map accessibility value; {zoom level} */
+"MAP_A11Y_VALUE_ZOOM" = "Zoom %dx.";
 
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "No se pudo cargar el mapa debido a que el estilo está dañado.";
+
+/* Accessibility value indicating that a road is a divided road (dual carriageway) */
+"ROAD_DIVIDED_A11Y_VALUE" = "Vía de doble carril";
+
+/* Accessibility value indicating that a road is a one-way road */
+"ROAD_ONEWAY_A11Y_VALUE" = "Unidireccional";
+
+/* String format for accessibility value for road feature; {route number} */
+"ROAD_REF_A11Y_FMT" = "Ruta %@";
 
 /* Action sheet title */
 "SDK_NAME" = "Mapbox iOS SDK";
