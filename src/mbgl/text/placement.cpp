@@ -8,7 +8,11 @@
 
 namespace mbgl {
 
-OpacityState::OpacityState(bool placed_) : opacity(0), placed(placed_) {}
+OpacityState::OpacityState(bool placed_, bool offscreen)
+    : opacity((offscreen && placed_) ? 1 : 0)
+    , placed(placed_)
+{
+}
 
 OpacityState::OpacityState(const OpacityState& prevState, float increment, bool placed_) :
     opacity(std::fmax(0, std::fmin(1, prevState.opacity + (prevState.placed ? increment : -increment)))),
@@ -18,9 +22,9 @@ bool OpacityState::isHidden() const {
     return opacity == 0 && !placed;
 }
 
-JointOpacityState::JointOpacityState(bool placedIcon, bool placedText) :
-    icon(OpacityState(placedIcon)),
-    text(OpacityState(placedText)) {}
+JointOpacityState::JointOpacityState(bool placedIcon, bool placedText, bool offscreen) :
+    icon(OpacityState(placedIcon, offscreen)),
+    text(OpacityState(placedText, offscreen)) {}
 
 JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText) :
     icon(OpacityState(prevOpacityState.icon, increment, placedIcon)),
@@ -99,29 +103,34 @@ void Placement::placeLayerBucket(
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
             bool placeText = false;
             bool placeIcon = false;
+            bool offscreen = true;
 
             if (symbolInstance.placedTextIndex) {
                 PlacedSymbol& placedSymbol = bucket.text.placedSymbols.at(*symbolInstance.placedTextIndex);
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedTextSize, placedSymbol);
 
-                placeText = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
+                auto placed = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
                         posMatrix, textLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<TextAllowOverlap>(),
                         bucket.layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
                         showCollisionBoxes);
+                placeText = placed.first;
+                offscreen &= placed.second;
             }
 
             if (symbolInstance.placedIconIndex) {
                 PlacedSymbol& placedSymbol = bucket.icon.placedSymbols.at(*symbolInstance.placedIconIndex);
                 const float fontSize = evaluateSizeForFeature(partiallyEvaluatedIconSize, placedSymbol);
 
-                placeIcon = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
+                auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
                         posMatrix, iconLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
                         bucket.layout.get<IconAllowOverlap>(),
                         bucket.layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
                         showCollisionBoxes);
+                placeIcon = placed.first;
+                offscreen &= placed.second;
             }
 
             // combine placements for icon and text
@@ -143,7 +152,7 @@ void Placement::placeLayerBucket(
 
             assert(symbolInstance.crossTileID != 0);
 
-            placements.emplace(symbolInstance.crossTileID, PlacementPair(placeText, placeIcon));
+            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText, placeIcon, offscreen));
             seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
     } 
@@ -159,16 +168,16 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
         1.0;
 
     // add the opacities from the current placement, and copy their current values from the previous placement
-    for (auto& placementPair : placements) {
-        auto prevOpacity = prevPlacement.opacities.find(placementPair.first);
+    for (auto& jointPlacement : placements) {
+        auto prevOpacity = prevPlacement.opacities.find(jointPlacement.first);
         if (prevOpacity != prevPlacement.opacities.end()) {
-            opacities.emplace(placementPair.first, JointOpacityState(prevOpacity->second, increment, placementPair.second.icon, placementPair.second.text));
+            opacities.emplace(jointPlacement.first, JointOpacityState(prevOpacity->second, increment, jointPlacement.second.icon, jointPlacement.second.text));
             placementChanged = placementChanged ||
-                placementPair.second.icon != prevOpacity->second.icon.placed ||
-                placementPair.second.text != prevOpacity->second.text.placed;
+                jointPlacement.second.icon != prevOpacity->second.icon.placed ||
+                jointPlacement.second.text != prevOpacity->second.text.placed;
         } else {
-            opacities.emplace(placementPair.first, JointOpacityState(placementPair.second.icon, placementPair.second.text));
-            placementChanged = placementChanged || placementPair.second.icon || placementPair.second.text;
+            opacities.emplace(jointPlacement.first, JointOpacityState(jointPlacement.second.icon, jointPlacement.second.text, jointPlacement.second.offscreen));
+            placementChanged = placementChanged || jointPlacement.second.icon || jointPlacement.second.text;
         }
     }
 
@@ -209,7 +218,7 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
             getOpacity(symbolInstance.crossTileID) :
-            JointOpacityState(false, false);
+            JointOpacityState(false, false, false);
 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
@@ -271,7 +280,7 @@ JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
     if (it != opacities.end()) {
         return it->second;
     } else {
-        return JointOpacityState(false, false);
+        return JointOpacityState(false, false, false);
     }
 
 }
