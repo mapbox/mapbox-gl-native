@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/case.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -38,7 +39,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));
     auto length = arrayLength(value);
     if (length < 4) {
-        ctx.error("Expected at least 3 arguments, but found only " + std::to_string(length - 1) + ".");
+        ctx.error("Expected at least 3 arguments, but found only " + util::toString(length - 1) + ".");
         return ParseResult();
     }
 

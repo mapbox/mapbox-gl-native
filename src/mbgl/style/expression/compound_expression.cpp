@@ -2,7 +2,9 @@
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/util.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/math/log2.hpp>
 #include <mbgl/util/ignore.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -350,7 +352,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("sqrt", [](double x) -> Result<double> { return sqrt(x); });
     define("log10", [](double x) -> Result<double> { return log10(x); });
     define("ln", [](double x) -> Result<double> { return log(x); });
-    define("log2", [](double x) -> Result<double> { return log2(x); });
+    define("log2", [](double x) -> Result<double> { return util::log2(x); });
     define("sin", [](double x) -> Result<double> { return sin(x); });
     define("cos", [](double x) -> Result<double> { return cos(x); });
     define("tan", [](double x) -> Result<double> { return tan(x); });
@@ -501,8 +503,8 @@ ParseResult createCompoundExpression(const std::string& name,
             const std::vector<type::Type>& params = signature->params.get<std::vector<type::Type>>();
             if (params.size() != args.size()) {
                 signatureContext.error(
-                    "Expected " + std::to_string(params.size()) +
-                    " arguments, but found " + std::to_string(args.size()) + " instead."
+                    "Expected " + util::toString(params.size()) +
+                    " arguments, but found " + util::toString(args.size()) + " instead."
                 );
                 continue;
             }

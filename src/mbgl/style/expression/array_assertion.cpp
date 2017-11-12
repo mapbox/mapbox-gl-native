@@ -1,5 +1,6 @@
 #include <mbgl/style/expression/array_assertion.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -36,7 +37,7 @@ ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext& ctx)
 
     auto length = arrayLength(value);
     if (length < 2 || length > 4) {
-        ctx.error("Expected 1, 2, or 3 arguments, but found " + std::to_string(length - 1) + " instead.");
+        ctx.error("Expected 1, 2, or 3 arguments, but found " + util::toString(length - 1) + " instead.");
         return ParseResult();
     }
 

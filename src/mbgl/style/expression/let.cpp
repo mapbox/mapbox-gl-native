@@ -1,5 +1,6 @@
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/conversion/get_json_type.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -24,7 +25,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
     std::size_t length = arrayLength(value);
 
     if (length < 4) {
-        ctx.error("Expected at least 3 arguments, but found " + std::to_string(length - 1) + " instead.");
+        ctx.error("Expected at least 3 arguments, but found " + util::toString(length - 1) + " instead.");
         return ParseResult();
     }
 

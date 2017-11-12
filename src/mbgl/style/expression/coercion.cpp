@@ -1,6 +1,7 @@
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/util.hpp>
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace style {
@@ -11,7 +12,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const double f) -> optional<double> { return f; },
         [](const std::string& s) -> optional<double> {
             try {
-                return std::stof(s);
+                return util::stof(s);
             } catch(std::exception) {
                 return optional<double>();
             }
