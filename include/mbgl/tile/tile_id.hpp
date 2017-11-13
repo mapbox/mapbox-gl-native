@@ -30,9 +30,9 @@ public:
     CanonicalTileID scaledTo(uint8_t z) const;
     std::array<CanonicalTileID, 4> children() const;
 
-    const uint8_t z;
-    const uint32_t x;
-    const uint32_t y;
+    uint8_t z;
+    uint32_t x;
+    uint32_t y;
 };
 
 ::std::ostream& operator<<(::std::ostream& os, const CanonicalTileID& rhs);

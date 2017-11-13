@@ -9,82 +9,82 @@
 
 namespace mbgl {
 
-    class RenderSymbolLayer;
-    class SymbolBucket;
+class RenderSymbolLayer;
+class SymbolBucket;
 
-    class OpacityState {
-        public:
-            OpacityState(bool placed, bool offscreen);
-            OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
-            bool isHidden() const;
-            float opacity;
-            bool placed;
-    };
+class OpacityState {
+public:
+    OpacityState(bool placed, bool offscreen);
+    OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
+    bool isHidden() const;
+    float opacity;
+    bool placed;
+};
 
-    class JointOpacityState {
-        public:
-            JointOpacityState(bool placedIcon, bool placedText, bool offscreen);
-            JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
-            bool isHidden() const;
-            OpacityState icon;
-            OpacityState text;
-    };
+class JointOpacityState {
+public:
+    JointOpacityState(bool placedIcon, bool placedText, bool offscreen);
+    JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
+    bool isHidden() const;
+    OpacityState icon;
+    OpacityState text;
+};
 
-    class JointPlacement {
-        public:
-            JointPlacement(bool text_, bool icon_, bool offscreen_)
-                : text(text_), icon(icon_), offscreen(offscreen_)
-            {}
-        
-            const bool text;
-            const bool icon;
-            // offscreen = outside viewport, but within CollisionIndex::viewportPadding px of the edge
-            // Because these symbols aren't onscreen yet, we can skip the "fade in" animation,
-            // and if a subsequent viewport change brings them into view, they'll be fully
-            // visible right away.
-            const bool offscreen;
-    };
+class JointPlacement {
+public:
+    JointPlacement(bool text_, bool icon_, bool offscreen_)
+        : text(text_), icon(icon_), offscreen(offscreen_)
+    {}
 
-    class Placement {
-        public:
-            Placement(const TransformState&, MapMode mapMode);
-            void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
-            bool commit(const Placement& prevPlacement, TimePoint);
-            void updateLayerOpacities(RenderSymbolLayer&);
-            JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
-            float symbolFadeChange(TimePoint now) const;
-            bool hasTransitions(TimePoint now) const;
+    const bool text;
+    const bool icon;
+    // offscreen = outside viewport, but within CollisionIndex::viewportPadding px of the edge
+    // Because these symbols aren't onscreen yet, we can skip the "fade in" animation,
+    // and if a subsequent viewport change brings them into view, they'll be fully
+    // visible right away.
+    const bool offscreen;
+};
 
-            const CollisionIndex& getCollisionIndex() const;
-        
-            bool stillRecent(TimePoint now) const;
-            void setRecent(TimePoint now);
-            void setStale();
-        private:
+class Placement {
+public:
+    Placement(const TransformState&, MapMode mapMode);
+    void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
+    bool commit(const Placement& prevPlacement, TimePoint);
+    void updateLayerOpacities(RenderSymbolLayer&);
+    JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
+    float symbolFadeChange(TimePoint now) const;
+    bool hasTransitions(TimePoint now) const;
 
-            void placeLayerBucket(
-                    SymbolBucket&,
-                    const mat4& posMatrix,
-                    const mat4& textLabelPlaneMatrix,
-                    const mat4& iconLabelPlaneMatrix,
-                    const float scale,
-                    const float pixelRatio,
-                    const bool showCollisionBoxes,
-                    std::unordered_set<uint32_t>& seenCrossTileIDs);
+    const CollisionIndex& getCollisionIndex() const;
 
-            void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
-        
-            CollisionIndex collisionIndex;
+    bool stillRecent(TimePoint now) const;
+    void setRecent(TimePoint now);
+    void setStale();
+private:
 
-            TransformState state;
-            MapMode mapMode;
-            TimePoint commitTime;
+    void placeLayerBucket(
+            SymbolBucket&,
+            const mat4& posMatrix,
+            const mat4& textLabelPlaneMatrix,
+            const mat4& iconLabelPlaneMatrix,
+            const float scale,
+            const float pixelRatio,
+            const bool showCollisionBoxes,
+            std::unordered_set<uint32_t>& seenCrossTileIDs);
 
-            std::unordered_map<uint32_t, JointPlacement> placements;
-            std::unordered_map<uint32_t, JointOpacityState> opacities;
-        
-            TimePoint recentUntil;
-            bool stale = false;
-    };
+    void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
+
+    CollisionIndex collisionIndex;
+
+    TransformState state;
+    MapMode mapMode;
+    TimePoint commitTime;
+
+    std::unordered_map<uint32_t, JointPlacement> placements;
+    std::unordered_map<uint32_t, JointOpacityState> opacities;
+
+    TimePoint recentUntil;
+    bool stale = false;
+};
 
 } // namespace mbgl

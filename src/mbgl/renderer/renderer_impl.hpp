@@ -9,6 +9,7 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/zoom_history.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/placement.hpp>
 
@@ -105,7 +106,7 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
 
-    std::unique_ptr<CrossTileSymbolIndex> crossTileSymbolIndex;
+    CrossTileSymbolIndex crossTileSymbolIndex;
     std::unique_ptr<Placement> placement;
 
     bool contextLost = false;

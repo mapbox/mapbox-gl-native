@@ -25,21 +25,17 @@ public:
         , sourceLayerName(std::move(sourceLayerName_))
         , bucketName(std::move(bucketName_))
         , sortIndex(sortIndex_)
-        , z(0)
-        , x(0)
-        , y(0)
+        , tileID(0, 0, 0)
     {}
     
     IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_,
-                      std::string sourceID_, uint8_t z_, uint32_t x_, uint32_t y_)
+                      std::string sourceID_, CanonicalTileID tileID_)
         : index(index_)
         , sourceLayerName(std::move(sourceLayerName_))
         , bucketName(std::move(bucketName_))
         , sortIndex(std::move(sortIndex_))
         , sourceID(std::move(sourceID_))
-        , z(z_)
-        , x(x_)
-        , y(y_)
+        , tileID(std::move(tileID_))
     {}
     
     size_t index;
@@ -49,9 +45,7 @@ public:
 
     // Only used for symbol features
     std::string sourceID;
-    uint8_t z;
-    uint32_t x;
-    uint32_t y;
+    CanonicalTileID tileID;
 };
 
 class FeatureIndex {
