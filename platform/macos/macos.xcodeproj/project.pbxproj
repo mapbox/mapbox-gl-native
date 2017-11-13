@@ -16,6 +16,7 @@
 		1F7454A51ECFB00300021D39 /* MGLLight.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A21ECFB00300021D39 /* MGLLight.mm */; };
 		1F7454AB1ED1DDBD00021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */; };
 		1F95931B1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */; };
+		1F9EF4061FBA1B0E0063FBB0 /* mapbox_helmet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */; };
 		1FCDF1421F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */; };
 		1FCDF1431F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */; };
 		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
@@ -289,6 +290,7 @@
 		1F7454A21ECFB00300021D39 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
 		1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
+		1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = mapbox_helmet.pdf; sourceTree = "<group>"; };
 		1FCDF1401F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLVectorSource+MGLAdditions.h"; sourceTree = "<group>"; };
 		1FCDF1411F2A4F3600A46694 /* MGLVectorSource+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLVectorSource+MGLAdditions.m"; sourceTree = "<group>"; };
 		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
@@ -826,6 +828,7 @@
 				DA8933AB1CCD290700E68420 /* Localizable.strings */,
 				DAE6C3BB1CC31F2E00DB3429 /* default_marker.pdf */,
 				DAE6C3BC1CC31F2E00DB3429 /* mapbox.pdf */,
+				1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */,
 				DA8933A71CCD287300E68420 /* MGLAnnotationCallout.xib */,
 			);
 			name = "Kit Resources";
@@ -1400,6 +1403,7 @@
 				DA8933A51CCD287300E68420 /* MGLAnnotationCallout.xib in Resources */,
 				DA8933B51CCD2C2500E68420 /* Foundation.strings in Resources */,
 				DA8933B81CCD2C2D00E68420 /* Foundation.stringsdict in Resources */,
+				1F9EF4061FBA1B0E0063FBB0 /* mapbox_helmet.pdf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

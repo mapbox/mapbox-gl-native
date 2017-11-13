@@ -127,6 +127,15 @@
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    MGLAttributionInfo *info = [[[self class] allocWithZone:zone] initWithTitle:_title
+                                                                            URL:_URL];
+    info.feedbackLink = _feedbackLink;
+    
+    return info;
+}
+
 - (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel {
     return [self feedbackURLForStyleURL:nil atCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:0 pitch:0];
 }
