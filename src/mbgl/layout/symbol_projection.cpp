@@ -294,7 +294,7 @@ namespace mbgl {
         std::vector<PlacedGlyph> placedGlyphs;
         if (symbol.glyphOffsets.size() > 1) {
 
-            const optional<std::pair<PlacedGlyph,PlacedGlyph>> firstAndLastGlyph =
+            const optional<std::pair<PlacedGlyph, PlacedGlyph>> firstAndLastGlyph =
                 placeFirstAndLastGlyph(fontScale, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol, labelPlaneMatrix, false);
             if (!firstAndLastGlyph) {
                 return PlacementResult::NotEnoughRoom;
