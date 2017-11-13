@@ -61,7 +61,7 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex, class DrawMode>
-    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, const BufferUsage usage=BufferUsage::StaticDraw) {
+    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return VertexBuffer<Vertex, DrawMode> {
             v.vertexSize(),
             createVertexBuffer(v.data(), v.byteSize(), usage)
@@ -75,7 +75,7 @@ public:
     }
 
     template <class DrawMode>
-    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v, const BufferUsage usage=BufferUsage::StaticDraw) {
+    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return IndexBuffer<DrawMode> {
             v.indexSize(),
             createIndexBuffer(v.data(), v.byteSize(), usage)
