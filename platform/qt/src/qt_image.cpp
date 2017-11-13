@@ -54,8 +54,13 @@ PremultipliedImage decodeImage(const std::string& string) {
         throw std::runtime_error("Unsupported image type");
     }
 
+#if QT_VERSION >= 0x051000
+    auto img = std::make_unique<uint8_t[]>(image.sizeInBytes());
+    memcpy(img.get(), image.constBits(), image.sizeInBytes());
+#else
     auto img = std::make_unique<uint8_t[]>(image.byteCount());
     memcpy(img.get(), image.constBits(), image.byteCount());
+#endif
 
     return { { static_cast<uint32_t>(image.width()), static_cast<uint32_t>(image.height()) },
              std::move(img) };
