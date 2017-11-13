@@ -207,7 +207,11 @@ public class AttributionParseTest {
       .withImproveMap(false)
       .build();
 
-    assertEquals("Attribution string should match", "© Mapbox / OpenStreetMap" ,attributionParser.getAttributionString());
+    assertEquals(
+      "Attribution string should match",
+      "© Mapbox / OpenStreetMap",
+      attributionParser.createAttributionString()
+    );
   }
 
 
@@ -218,9 +222,12 @@ public class AttributionParseTest {
       .withImproveMap(false)
       .build();
 
-    assertEquals("Attribution string should match", "© Mapbox / © OpenStreetMap" ,attributionParser.getAttributionString());
+    assertEquals(
+      "Attribution string should match",
+      "© Mapbox / © OpenStreetMap",
+      attributionParser.createAttributionString()
+    );
   }
-
 
   @Test
   public void testOutputWithoutCopyRightWithoutMapboxString() throws Exception {
@@ -231,9 +238,12 @@ public class AttributionParseTest {
       .withMapboxAttribution(false)
       .build();
 
-    assertEquals("Attribution string should match", "© OpenStreetMap" ,attributionParser.getAttributionString());
+    assertEquals(
+      "Attribution string should match",
+      "© OpenStreetMap",
+      attributionParser.createAttributionString()
+    );
   }
-
 
   @Test
   public void testOutputWithCopyRightWithoutMapboxString() throws Exception {
@@ -243,18 +253,57 @@ public class AttributionParseTest {
       .withMapboxAttribution(false)
       .build();
 
-    assertEquals("Attribution string should match", "© OpenStreetMap" ,attributionParser.getAttributionString());
+    assertEquals(
+      "Attribution string should match",
+      "© OpenStreetMap",
+      attributionParser.createAttributionString()
+    );
   }
 
   @Test
   public void testOutputSatelliteString() throws Exception {
     AttributionParser attributionParser = new AttributionParser.Options()
-      .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla","")
+      .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
       .withImproveMap(false)
       .withCopyrightSign(false)
       .withMapboxAttribution(false)
       .build();
 
-    assertEquals("Attribution string should match", "© OpenStreetMap / DigitalGlobe" ,attributionParser.getAttributionString());
+    assertEquals(
+      "Attribution string should match",
+      "© OpenStreetMap / DigitalGlobe",
+      attributionParser.createAttributionString()
+    );
+  }
+
+  @Test
+  public void testShortOpenStreetMapString() throws Exception {
+    AttributionParser attributionParser = new AttributionParser.Options()
+      .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
+      .withImproveMap(false)
+      .withCopyrightSign(false)
+      .withMapboxAttribution(false)
+      .build();
+
+    assertEquals(
+      "Attribution string should match",
+      "© OSM / DigitalGlobe",
+      attributionParser.createAttributionString(true)
+    );
+  }
+
+  @Test
+  public void testShortOpenStreetMapWithoutCopyrightString() throws Exception {
+    AttributionParser attributionParser = new AttributionParser.Options()
+      .withAttributionData(STREETS_ATTRIBUTION, SATELLITE_ATTRIBUTION, "blabla", "")
+      .withImproveMap(false)
+      .withCopyrightSign(false)
+      .build();
+
+    assertEquals(
+      "Attribution string should match",
+      "© Mapbox / OSM / DigitalGlobe",
+      attributionParser.createAttributionString(true)
+    );
   }
 }

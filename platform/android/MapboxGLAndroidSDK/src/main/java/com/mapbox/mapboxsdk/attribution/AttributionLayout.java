@@ -4,14 +4,16 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.support.annotation.Nullable;
 
-public class AttributionPlacement {
+public class AttributionLayout {
 
   private Bitmap logo;
   private PointF anchorPoint;
+  private boolean shortText;
 
-  public AttributionPlacement(@Nullable Bitmap logo, @Nullable PointF anchorPoint) {
+  public AttributionLayout(@Nullable Bitmap logo, @Nullable PointF anchorPoint, boolean shortText) {
     this.logo = logo;
     this.anchorPoint = anchorPoint;
+    this.shortText = shortText;
   }
 
   public Bitmap getLogo() {
@@ -20,6 +22,10 @@ public class AttributionPlacement {
 
   public PointF getAnchorPoint() {
     return anchorPoint;
+  }
+
+  public boolean isShortText() {
+    return shortText;
   }
 
   @Override
@@ -31,7 +37,7 @@ public class AttributionPlacement {
       return false;
     }
 
-    AttributionPlacement that = (AttributionPlacement) o;
+    AttributionLayout that = (AttributionLayout) o;
 
     if (logo != null ? !logo.equals(that.logo) : that.logo != null) {
       return false;
@@ -48,9 +54,9 @@ public class AttributionPlacement {
 
   @Override
   public String toString() {
-    return "AttributionPlacement{" +
-      "logo=" + logo +
-      ", anchorPoint=" + anchorPoint +
-      '}';
+    return "AttributionLayout{"
+      + "logo=" + logo
+      + ", anchorPoint=" + anchorPoint
+      + '}';
   }
 }
