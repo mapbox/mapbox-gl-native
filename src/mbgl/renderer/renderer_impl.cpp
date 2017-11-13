@@ -622,7 +622,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     observer->onDidFinishRenderingFrame(
         loaded ? RendererObserver::RenderMode::Full : RendererObserver::RenderMode::Partial,
-        updateParameters.mode == MapMode::Continuous && (hasTransitions(parameters.timePoint))
+        updateParameters.mode == MapMode::Continuous && hasTransitions(parameters.timePoint)
     );
 
     if (!loaded) {
