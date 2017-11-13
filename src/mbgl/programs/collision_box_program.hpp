@@ -56,51 +56,50 @@ public:
     }
 
 	template <class DrawMode>
-		void draw(gl::Context& context,
-				DrawMode drawMode,
-				gl::DepthMode depthMode,
-				gl::StencilMode stencilMode,
-				gl::ColorMode colorMode,
-				const UniformValues& uniformValues,
-				const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-                const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
-				const gl::IndexBuffer<DrawMode>& indexBuffer,
-				const SegmentVector<Attributes>& segments,
-				const PaintPropertyBinders& paintPropertyBinders,
-				const typename PaintProperties::PossiblyEvaluated& currentProperties,
-				float currentZoom,
-				const std::string& layerID) {
-			typename AllUniforms::Values allUniformValues = uniformValues
-				.concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    void draw(gl::Context& context,
+              DrawMode drawMode,
+              gl::DepthMode depthMode,
+              gl::StencilMode stencilMode,
+              gl::ColorMode colorMode,
+              const UniformValues& uniformValues,
+              const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
+              const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
+              const gl::IndexBuffer<DrawMode>& indexBuffer,
+              const SegmentVector<Attributes>& segments,
+              const PaintPropertyBinders& paintPropertyBinders,
+              const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              float currentZoom,
+              const std::string& layerID) {
+        typename AllUniforms::Values allUniformValues = uniformValues
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-			typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
-				.concat(paintPropertyBinders.attributeBindings(currentProperties));
+        typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
-            assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
+        assert(layoutVertexBuffer.vertexCount == dynamicVertexBuffer.vertexCount);
 
-			for (auto& segment : segments) {
-				auto vertexArrayIt = segment.vertexArrays.find(layerID);
+        for (auto& segment : segments) {
+            auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
-				if (vertexArrayIt == segment.vertexArrays.end()) {
-					vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
-				}
+            if (vertexArrayIt == segment.vertexArrays.end()) {
+                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+            }
 
-				program.draw(
-						context,
-						std::move(drawMode),
-						std::move(depthMode),
-						std::move(stencilMode),
-						std::move(colorMode),
-						allUniformValues,
-						vertexArrayIt->second,
-						Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
-						indexBuffer,
-						segment.indexOffset,
-						segment.indexLength);
-			}
-		}
-
+            program.draw(
+                    context,
+                    std::move(drawMode),
+                    std::move(depthMode),
+                    std::move(stencilMode),
+                    std::move(colorMode),
+                    allUniformValues,
+                    vertexArrayIt->second,
+                    Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    indexBuffer,
+                    segment.indexOffset,
+                    segment.indexLength);
+        }
+    }
 };
 
 
@@ -135,49 +134,48 @@ public:
     }
 
     template <class DrawMode>
-        void draw(gl::Context& context,
-                DrawMode drawMode,
-                gl::DepthMode depthMode,
-                gl::StencilMode stencilMode,
-                gl::ColorMode colorMode,
-                const UniformValues& uniformValues,
-                const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
-                const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
-                const gl::IndexBuffer<DrawMode>& indexBuffer,
-                const SegmentVector<Attributes>& segments,
-                const PaintPropertyBinders& paintPropertyBinders,
-                const typename PaintProperties::PossiblyEvaluated& currentProperties,
-                float currentZoom,
-                const std::string& layerID) {
-            typename AllUniforms::Values allUniformValues = uniformValues
-                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    void draw(gl::Context& context,
+              DrawMode drawMode,
+              gl::DepthMode depthMode,
+              gl::StencilMode stencilMode,
+              gl::ColorMode colorMode,
+              const UniformValues& uniformValues,
+              const gl::VertexBuffer<CollisionBoxLayoutAttributes::Vertex>& layoutVertexBuffer,
+              const gl::VertexBuffer<CollisionBoxDynamicAttributes::Vertex>& dynamicVertexBuffer,
+              const gl::IndexBuffer<DrawMode>& indexBuffer,
+              const SegmentVector<Attributes>& segments,
+              const PaintPropertyBinders& paintPropertyBinders,
+              const typename PaintProperties::PossiblyEvaluated& currentProperties,
+              float currentZoom,
+              const std::string& layerID) {
+        typename AllUniforms::Values allUniformValues = uniformValues
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
 
-            typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
-                .concat(paintPropertyBinders.attributeBindings(currentProperties));
+        typename Attributes::Bindings allAttributeBindings = CollisionBoxLayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(CollisionBoxDynamicAttributes::bindings(dynamicVertexBuffer))
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
 
-            for (auto& segment : segments) {
-                auto vertexArrayIt = segment.vertexArrays.find(layerID);
+        for (auto& segment : segments) {
+            auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
-                if (vertexArrayIt == segment.vertexArrays.end()) {
-                    vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
-                }
-
-                program.draw(
-                        context,
-                        std::move(drawMode),
-                        std::move(depthMode),
-                        std::move(stencilMode),
-                        std::move(colorMode),
-                        allUniformValues,
-                        vertexArrayIt->second,
-                        Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
-                        indexBuffer,
-                        segment.indexOffset,
-                        segment.indexLength);
+            if (vertexArrayIt == segment.vertexArrays.end()) {
+                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
             }
-        }
 
+            program.draw(
+                    context,
+                    std::move(drawMode),
+                    std::move(depthMode),
+                    std::move(stencilMode),
+                    std::move(colorMode),
+                    allUniformValues,
+                    vertexArrayIt->second,
+                    Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                    indexBuffer,
+                    segment.indexOffset,
+                    segment.indexLength);
+        }
+    }
 };
 
 using CollisionBoxVertex = CollisionBoxProgram::LayoutVertex;
