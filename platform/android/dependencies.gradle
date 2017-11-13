@@ -1,5 +1,5 @@
 ext {
-    minSdkVersion = 15
+    minSdkVersion = 14
     targetSdkVersion = 25
     compileSdkVersion = 25
     buildToolsVersion = "25.0.2"
@@ -7,7 +7,7 @@ ext {
     versionCode = 11
     versionName = "5.0.0"
 
-    mapboxServicesVersion = "2.2.8"
+    mapboxServicesVersion = "2.2.9"
     supportLibVersion = "25.4.0"
     espressoVersion = '3.0.1'
     testRunnerVersion = '1.0.1'
@@ -20,7 +20,7 @@ ext {
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:1.1.1',
+            lost                   : 'com.mapzen.android:lost:3.0.4',
 
             // unit test
             junit                  : 'junit:junit:4.12',
