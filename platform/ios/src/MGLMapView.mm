@@ -389,7 +389,9 @@ public:
     _accessibilityCompassFormatter.unitStyle = NSFormattingUnitStyleLong;
     self.backgroundColor = [UIColor clearColor];
     self.clipsToBounds = YES;
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
     if (@available(iOS 11.0, *)) { self.accessibilityIgnoresInvertColors = YES; }
+#endif
     // setup mbgl view
     _mbglView = new MBGLView(self);
 
