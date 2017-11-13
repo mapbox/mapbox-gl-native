@@ -56,19 +56,26 @@ public:
         : CollisionFeature(line, anchor, shapedText.top, shapedText.bottom, shapedText.left, shapedText.right, boxScale, padding, placement, indexedFeature_, overscaling) {}
 
     // for icons
+    // Icons collision features are always SymbolPlacementType::Point, which means the collision feature
+    // will be viewport-rotation-aligned even if the icon is map-rotation-aligned (e.g. `icon-rotation-alignment: map`
+    // _or_ `symbol-placement: line`). We're relying on most icons being "close enough" to square that having
+    // incorrect rotation alignment doesn't throw off collision detection too much.
+    // See: https://github.com/mapbox/mapbox-gl-js/issues/4861
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor& anchor,
                      optional<PositionedIcon> shapedIcon,
                      const float boxScale,
                      const float padding,
-                     const style::SymbolPlacementType placement,
                      const IndexedSubfeature& indexedFeature_)
         : CollisionFeature(line, anchor,
                            (shapedIcon ? shapedIcon->top() : 0),
                            (shapedIcon ? shapedIcon->bottom() : 0),
                            (shapedIcon ? shapedIcon->left() : 0),
                            (shapedIcon ? shapedIcon->right() : 0),
-                           boxScale, padding, placement, indexedFeature_, 1) {}
+                           boxScale,
+                           padding,
+                           style::SymbolPlacementType::Point,
+                           indexedFeature_, 1) {}
 
     CollisionFeature(const GeometryCoordinates& line,
                      const Anchor&,
