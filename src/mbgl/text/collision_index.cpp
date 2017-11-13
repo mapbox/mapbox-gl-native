@@ -288,8 +288,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
 
     for (auto& queryResult : features) {
         auto& feature = queryResult.first;
-        CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
-        if (feature.sourceID == sourceID && featureTileID == tileID.canonical) {
+        if (feature.sourceID == sourceID && feature.tileID == tileID.canonical) {
             // We only have to filter on the canonical ID because even if the feature is showing multiple times
             // we treat it as one feature.
             thisTileFeatures.push_back(queryResult);
@@ -299,8 +298,7 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     std::vector<QueryResult> ignoredFeatures = ignoredGrid.queryWithBoxes(envelope);
     for (auto& queryResult : ignoredFeatures) {
         auto& feature = queryResult.first;
-        CanonicalTileID featureTileID(feature.z, feature.x, feature.y);
-        if (feature.sourceID == sourceID && featureTileID == tileID.canonical) {
+        if (feature.sourceID == sourceID && feature.tileID == tileID.canonical) {
             thisTileFeatures.push_back(queryResult);
         }
     }
