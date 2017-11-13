@@ -1826,10 +1826,7 @@ public:
     currentCameraOptions.anchor = anchor;
     MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(_mbglMap->latLngBoundsForCamera(currentCameraOptions));
     
-    MGLMapCamera *camera;
-    camera = [self cameraThatFitsCoordinateBounds:bounds];
-    
-    return camera;
+    return [self cameraThatFitsCoordinateBounds:bounds];
 }
 
 - (MGLMapCamera *)cameraByRotatingToDirection:(CLLocationDirection)degrees aroundAnchorPoint:(CGPoint)anchorPoint
