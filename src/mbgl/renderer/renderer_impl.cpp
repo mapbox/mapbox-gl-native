@@ -336,7 +336,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 auto par = util::rotate(pa, parameters.state.getAngle());
                 auto pbr = util::rotate(pb, parameters.state.getAngle());
 
-                return std::tie(par.y, par.x) < std::tie(pbr.y, pbr.x);
+                return std::tie(b.id.canonical.z, par.y, par.x) < std::tie(a.id.canonical.z, pbr.y, pbr.x);
             });
         } else {
             std::sort(sortedTiles.begin(), sortedTiles.end(),
