@@ -241,6 +241,25 @@ void CollisionIndex::insertFeature(CollisionFeature& feature, bool ignorePlaceme
     }
 }
 
+bool polygonIntersectsBox(const LineString<float>& polygon, const GridIndex<IndexedSubfeature>::BBox& bbox) {
+    // This is just a wrapper that allows us to use the integer-based util::polygonIntersectsPolygon
+    // Conversion limits our query accuracy to single-pixel resolution
+    GeometryCoordinates integerPolygon;
+    for (const auto& point : polygon) {
+        integerPolygon.push_back(convertPoint<int16_t>(point));
+    }
+    int16_t minX1 = bbox.min.x;
+    int16_t maxY1 = bbox.max.y;
+    int16_t minY1 = bbox.min.y;
+    int16_t maxX1 = bbox.max.x;
+
+    auto bboxPoints = GeometryCoordinates {
+        { minX1, minY1 }, { maxX1, minY1 }, { maxX1, maxY1 }, { minX1, maxY1 }
+    };
+    
+    return util::polygonIntersectsPolygon(integerPolygon, bboxPoints);
+}
+
 std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const GeometryCoordinates& queryGeometry, const UnwrappedTileID& tileID, const std::string& sourceID) const {
     std::vector<IndexedSubfeature> result;
     if (queryGeometry.empty() || (collisionGrid.empty() && ignoredGrid.empty())) {
@@ -253,14 +272,10 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
     transformState.matrixFor(posMatrix, tileID);
     matrix::multiply(posMatrix, projMatrix, posMatrix);
 
-    // Two versions of the query here just because util::polygonIntersectsPolygon requires
-    // GeometryCoordinates (based on int16_t). Otherwise, work with floats.
-    GeometryCoordinates projectedPolygon;
+    // queryGeometry is specified in integer tile units, but in projecting we switch to float pixels
     LineString<float> projectedQuery;
-
     for (const auto& point : queryGeometry) {
         auto projected = projectPoint(posMatrix, convertPoint<float>(point));
-        projectedPolygon.push_back(convertPoint<int16_t>(projected));
         projectedQuery.push_back(projected);
     }
     
@@ -301,18 +316,10 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
             continue;
 
         seenFeatures.insert(feature.index);
-
-        int16_t minX1 = bbox.min.x;
-        int16_t maxY1 = bbox.max.y;
-        int16_t minY1 = bbox.min.y;
-        int16_t maxX1 = bbox.max.x;
-
-        auto bboxPoints = GeometryCoordinates {
-            { minX1, minY1 }, { maxX1, minY1 }, { maxX1, maxY1 }, { minX1, maxY1 }
-        };
         
-        if (!util::polygonIntersectsPolygon(projectedPolygon, bboxPoints))
+        if (!polygonIntersectsBox(projectedQuery, bbox)) {
             continue;
+        }
 
         result.push_back(feature);
     }
