@@ -8,7 +8,6 @@
 #include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
-#include <mbgl/layout/symbol_layout.hpp>
 
 #include <atomic>
 #include <memory>
@@ -127,7 +126,6 @@ private:
     optional<PremultipliedImage> iconAtlasImage;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
-    std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayouts;
 
     const MapMode mode;
     
