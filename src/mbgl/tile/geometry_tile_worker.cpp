@@ -41,6 +41,18 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
 GeometryTileWorker::~GeometryTileWorker() = default;
 
 /*
+   NOTE: The comments below are technically correct, but currently
+   conceptually misleading. The change to foreground label placement
+   means that:
+   (1) "placement" here is a misnomer: the remaining role of
+    "attemptPlacement" is symbol buffer generation
+   (2) Once a tile has completed layout, we will only run
+    "attemptPlacement" once
+   (3) Tiles won't be rendered until "attemptPlacement" has run once
+ 
+   TODO: Simplify GeometryTileWorker to fit its new role
+    https://github.com/mapbox/mapbox-gl-native/issues/10457
+
    GeometryTileWorker is a state machine. This is its transition diagram.
    States are indicated by [state], lines are transitions triggered by
    messages, (parentheses) are actions taken on transition.

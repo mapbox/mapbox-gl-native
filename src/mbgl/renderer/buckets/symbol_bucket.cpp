@@ -179,6 +179,7 @@ void SymbolBucket::sortFeatures(const float angle) {
 
     // To avoid sorting the actual symbolInstance array we sort an array of indexes.
     std::vector<size_t> symbolInstanceIndexes;
+    symbolInstanceIndexes.reserve(symbolInstances.size());
     for (size_t i = 0; i < symbolInstances.size(); i++) {
         symbolInstanceIndexes.push_back(i);
     }

@@ -32,7 +32,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
     textCollisionFeature(line_, anchor, shapedTextOrientations.first, textBoxScale, textPadding, textPlacement, indexedFeature, overscaling),
-    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, SymbolPlacementType::Point, indexedFeature),
+    iconCollisionFeature(line_, anchor, shapedIcon, iconBoxScale, iconPadding, indexedFeature),
     featureIndex(featureIndex_),
     textOffset(textOffset_),
     iconOffset(iconOffset_),
