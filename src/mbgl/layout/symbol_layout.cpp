@@ -320,7 +320,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                     symbolInstances.size(),
                     textBoxScale, textPadding, textPlacement, textOffset,
                     iconBoxScale, iconPadding, iconOffset,
-                    glyphPositionMap, indexedFeature, index, feature.text ? *feature.text : std::u16string{}, overscaling);
+                    glyphPositionMap, indexedFeature, index, feature.text.value_or(std::u16string()), overscaling);
         }
     };
     
