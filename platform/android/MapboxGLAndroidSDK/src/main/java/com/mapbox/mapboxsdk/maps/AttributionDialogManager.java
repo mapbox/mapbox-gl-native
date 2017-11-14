@@ -7,22 +7,20 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.text.Html;
-import android.text.SpannableStringBuilder;
-import android.text.TextUtils;
-import android.text.style.URLSpan;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.attribution.Attribution;
+import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Responsible for managing attribution interactions on the map.
@@ -39,8 +37,8 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
 
   private final Context context;
   private final MapboxMap mapboxMap;
-  private String[] attributionKeys;
-  private HashMap<String, String> attributionMap;
+  private String[] attributionTitles;
+  private Set<Attribution> attributionSet;
 
   AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
     this.context = context;
@@ -50,16 +48,24 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   // Called when someone presses the attribution icon on the map
   @Override
   public void onClick(View view) {
-    attributionMap = new AttributionBuilder(context, mapboxMap).build();
+    attributionSet = new AttributionBuilder(mapboxMap).build();
     showAttributionDialog();
   }
 
   private void showAttributionDialog() {
-    attributionKeys = attributionMap.keySet().toArray(new String[attributionMap.size()]);
+    attributionTitles = getAttributionTitles();
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
-    builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionKeys), this);
+    builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionTitles), this);
     builder.show();
+  }
+
+  private String[] getAttributionTitles() {
+    List<String> titles = new ArrayList<>();
+    for (Attribution attribution : attributionSet) {
+      titles.add(attribution.getTitle());
+    }
+    return titles.toArray(new String[titles.size()]);
   }
 
   // Called when someone selects an attribution or telemetry settings from the dialog
@@ -73,7 +79,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   }
 
   private boolean isLatestEntry(int attributionKeyIndex) {
-    return attributionKeyIndex == attributionKeys.length - 1;
+    return attributionKeyIndex == attributionTitles.length - 1;
   }
 
   private void showTelemetryDialog() {
@@ -105,7 +111,8 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   }
 
   private void showMapFeedbackWebPage(int which) {
-    String url = attributionMap.get(attributionKeys[which]);
+    Attribution[] attributions = attributionSet.toArray(new Attribution[attributionSet.size()]);
+    String url = attributions[which].getUrl();
     if (url.contains(MAP_FEEDBACK_URL)) {
       url = buildMapFeedbackMapUrl(mapboxMap.getCameraPosition());
     }
@@ -132,46 +139,24 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
 
   private static class AttributionBuilder {
 
-    private final HashMap<String, String> map = new LinkedHashMap<>();
-    private final Context context;
     private final MapboxMap mapboxMap;
 
-    AttributionBuilder(Context context, MapboxMap mapboxMap) {
-      this.context = context.getApplicationContext();
+    AttributionBuilder(MapboxMap mapboxMap) {
       this.mapboxMap = mapboxMap;
     }
 
-    private HashMap<String, String> build() {
+    private Set<Attribution> build() {
+      List<String> attributions = new ArrayList<>();
       for (Source source : mapboxMap.getSources()) {
-        parseAttribution(source.getAttribution());
+        attributions.add(source.getAttribution());
       }
-      addTelemetryEntryToAttributionMap();
-      return map;
-    }
 
-    private void parseAttribution(String attributionSource) {
-      if (!TextUtils.isEmpty(attributionSource)) {
-        SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
-        URLSpan[] urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
-        for (URLSpan urlSpan : urlSpans) {
-          map.put(resolveAnchorValue(htmlBuilder, urlSpan), urlSpan.getURL());
-        }
-      }
-    }
-
-    private String resolveAnchorValue(SpannableStringBuilder htmlBuilder, URLSpan urlSpan) {
-      int start = htmlBuilder.getSpanStart(urlSpan);
-      int end = htmlBuilder.getSpanEnd(urlSpan);
-      int length = end - start;
-      char[] charKey = new char[length];
-      htmlBuilder.getChars(start, end, charKey, 0);
-      return String.valueOf(charKey);
-    }
-
-    private void addTelemetryEntryToAttributionMap() {
-      String telemetryKey = context.getString(R.string.mapbox_telemetrySettings);
-      String telemetryLink = context.getString(R.string.mapbox_telemetryLink);
-      map.put(telemetryKey, telemetryLink);
+      return new AttributionParser.Options()
+        .withCopyrightSign(true)
+        .withImproveMap(true)
+        .withTelemetryAttribution(true)
+        .withAttributionData(attributions.toArray(new String[attributions.size()]))
+        .build().getAttributions();
     }
   }
 }

@@ -55,6 +55,7 @@ class HTTPRequest implements Callback {
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
     mNativePtr = nativePtr;
 
+    Timber.e("requesting: %s",resourceUrl);
     try {
       HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
       final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
