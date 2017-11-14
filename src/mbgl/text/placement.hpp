@@ -14,7 +14,7 @@ class SymbolBucket;
 
 class OpacityState {
 public:
-    OpacityState(bool placed, bool offscreen);
+    OpacityState(bool placed, bool skipFadeIn);
     OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
     bool isHidden() const;
     float opacity;
@@ -23,17 +23,18 @@ public:
 
 class JointOpacityState {
 public:
-    JointOpacityState(bool placedIcon, bool placedText, bool offscreen);
+    JointOpacityState(bool placedIcon, bool placedText, bool skipFadeIn, bool outsideGrid);
     JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
     bool isHidden() const;
     OpacityState icon;
     OpacityState text;
+    bool outsideGrid;
 };
 
 class JointPlacement {
 public:
-    JointPlacement(bool text_, bool icon_, bool offscreen_)
-        : text(text_), icon(icon_), offscreen(offscreen_)
+    JointPlacement(bool text_, bool icon_, bool offscreen_, bool lineLabel_, bool outsideGrid_)
+        : text(text_), icon(icon_), offscreen(offscreen_), lineLabel(lineLabel_), outsideGrid(outsideGrid_)
     {}
 
     const bool text;
@@ -43,6 +44,8 @@ public:
     // and if a subsequent viewport change brings them into view, they'll be fully
     // visible right away.
     const bool offscreen;
+    const bool lineLabel;
+    const bool outsideGrid;
 };
 
 class Placement {
