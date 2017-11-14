@@ -74,6 +74,8 @@ private:
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
+    void updateFadingTiles();
+
     friend class Renderer;
 
     RendererBackend& backend;
@@ -113,6 +115,7 @@ private:
     std::unique_ptr<Placement> placement;
 
     bool contextLost = false;
+    bool fadingTiles = false;
 };
 
 } // namespace mbgl

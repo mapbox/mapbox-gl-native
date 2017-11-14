@@ -46,7 +46,6 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
-
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
@@ -78,7 +77,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 state,
                 pixelsToTileUnits);
 
-        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs);
+        placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade());
     }
 }
 
@@ -90,7 +89,8 @@ void Placement::placeLayerBucket(
         const float scale,
         const float textPixelRatio,
         const bool showCollisionBoxes,
-        std::unordered_set<uint32_t>& seenCrossTileIDs) {
+        std::unordered_set<uint32_t>& seenCrossTileIDs,
+        const bool holdingForFade) {
 
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
@@ -101,6 +101,13 @@ void Placement::placeLayerBucket(
     for (auto& symbolInstance : bucket.symbolInstances) {
 
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
+            if (holdingForFade) {
+                // Mark all symbols from this tile as "not placed", but don't add to seenCrossTileIDs, because we don't
+                // know yet if we have a duplicate in a parent tile that _should_ be placed.
+                placements.emplace(symbolInstance.crossTileID, JointPlacement(false, false, false));
+                continue;
+            }
+
             bool placeText = false;
             bool placeIcon = false;
             bool offscreen = true;
@@ -152,6 +159,12 @@ void Placement::placeLayerBucket(
 
             assert(symbolInstance.crossTileID != 0);
 
+            if (placements.find(symbolInstance.crossTileID) != placements.end()) {
+                // If there's a previous placement with this ID, it comes from a tile that's fading out
+                // Erase it so that the placement result from the non-fading tile supersedes it
+                placements.erase(symbolInstance.crossTileID);
+            }
+            
             placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText, placeIcon, offscreen));
             seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
