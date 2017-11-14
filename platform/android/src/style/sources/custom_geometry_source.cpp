@@ -46,6 +46,12 @@ namespace android {
         javaPeer(_obj.NewGlobalRef(env))  {
     }
 
+    CustomGeometrySource::CustomGeometrySource(jni::JNIEnv& env,
+                                               mbgl::style::Source& coreSource,
+                                               AndroidRendererFrontend& frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {
+    }
+
     CustomGeometrySource::~CustomGeometrySource() = default;
 
     void CustomGeometrySource::fetchTile (const mbgl::CanonicalTileID& tileID) {
@@ -94,9 +100,9 @@ namespace android {
 
     jni::Class<CustomGeometrySource> CustomGeometrySource::javaClass;
 
-    jni::jobject* CustomGeometrySource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> CustomGeometrySource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = CustomGeometrySource::javaClass.template GetConstructor<jni::jlong>(env);
-        return CustomGeometrySource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(CustomGeometrySource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void CustomGeometrySource::registerNative(jni::JNIEnv& env) {

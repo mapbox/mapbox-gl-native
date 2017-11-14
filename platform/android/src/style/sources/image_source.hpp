@@ -21,7 +21,7 @@ public:
 
     ImageSource(jni::JNIEnv&, jni::String, jni::Object<LatLngQuad>);
 
-    ImageSource(mbgl::style::ImageSource&);
+    ImageSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     ~ImageSource();
 
@@ -30,7 +30,8 @@ public:
 
     void setImage(jni::JNIEnv&, jni::Object<Bitmap>);
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+private:
+    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
 }; // class ImageSource
 

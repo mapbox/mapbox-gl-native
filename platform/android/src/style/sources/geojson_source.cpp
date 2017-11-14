@@ -43,8 +43,10 @@ namespace android {
             ) {
     }
 
-    GeoJSONSource::GeoJSONSource(mbgl::style::GeoJSONSource& coreSource)
-        : Source(coreSource) {
+    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
+                                 mbgl::style::Source& coreSource,
+                                 AndroidRendererFrontend& frontend)
+            : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;
@@ -118,9 +120,9 @@ namespace android {
 
     jni::Class<GeoJSONSource> GeoJSONSource::javaClass;
 
-    jni::jobject* GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = GeoJSONSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return GeoJSONSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(GeoJSONSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void GeoJSONSource::registerNative(jni::JNIEnv& env) {

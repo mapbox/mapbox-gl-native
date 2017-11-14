@@ -12,15 +12,17 @@ namespace {
 namespace mbgl {
 namespace android {
 
-    UnknownSource::UnknownSource(mbgl::style::Source& coreSource)
-            : Source(coreSource) {
+    UnknownSource::UnknownSource(jni::JNIEnv& env,
+                                 mbgl::style::Source& coreSource,
+                                 AndroidRendererFrontend& frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     jni::Class<UnknownSource> UnknownSource::javaClass;
 
-    jni::jobject* UnknownSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> UnknownSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = UnknownSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return UnknownSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(UnknownSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void UnknownSource::registerNative(jni::JNIEnv& env) {
