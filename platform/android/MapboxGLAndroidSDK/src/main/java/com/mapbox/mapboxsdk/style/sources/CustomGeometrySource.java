@@ -51,7 +51,7 @@ public class CustomGeometrySource extends Source {
   public CustomGeometrySource(String id, GeometryTileProvider provider, GeoJsonOptions options) {
     this.provider = provider;
     executor = Executors.newFixedThreadPool(4);
-    initialize(this, id, options);
+    initialize(id, options);
   }
 
   /**
@@ -103,7 +103,7 @@ public class CustomGeometrySource extends Source {
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
-  protected native void initialize(CustomGeometrySource self, String sourceId, Object options);
+  protected native void initialize(String sourceId, Object options);
 
   private native Feature[] querySourceFeatures(Object[] filter);
 
@@ -127,7 +127,7 @@ public class CustomGeometrySource extends Source {
     TileID tileID = new TileID(z, x, y);
     cancelledTileRequests.put(tileID, cancelFlag);
     GeometryTileRequest request = new GeometryTileRequest(tileID, provider, this, cancelFlag);
-    executor.submit(request);
+    executor.execute(request);
   }
 
   @WorkerThread
