@@ -32,8 +32,8 @@ public:
 
 class JointPlacement {
 public:
-    JointPlacement(bool text_, bool icon_, bool offscreen_)
-        : text(text_), icon(icon_), offscreen(offscreen_)
+    JointPlacement(bool text_, bool icon_, bool offscreen_, bool lineLabel_)
+        : text(text_), icon(icon_), offscreen(offscreen_), lineLabel(lineLabel_)
     {}
 
     const bool text;
@@ -43,6 +43,7 @@ public:
     // and if a subsequent viewport change brings them into view, they'll be fully
     // visible right away.
     const bool offscreen;
+    const bool lineLabel;
 };
 
 class Placement {
