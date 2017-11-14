@@ -14,49 +14,49 @@ template <class T>
 std::string toString(const T& t);
 
 struct NullType {
-    constexpr NullType() = default;
+    constexpr NullType() {};
     std::string getName() const { return "null"; }
     bool operator==(const NullType&) const { return true; }
 };
 
 struct NumberType {
-    constexpr NumberType() = default;
+    constexpr NumberType() {};
     std::string getName() const { return "number"; }
     bool operator==(const NumberType&) const { return true; }
 };
 
 struct BooleanType {
-    constexpr BooleanType() = default;
+    constexpr BooleanType() {};
     std::string getName() const { return "boolean"; }
     bool operator==(const BooleanType&) const { return true; }
 };
 
 struct StringType {
-    constexpr StringType() = default;
+    constexpr StringType() {};
     std::string getName() const { return "string"; }
     bool operator==(const StringType&) const { return true; }
 };
 
 struct ColorType {
-    constexpr ColorType() = default;
+    constexpr ColorType() {};
     std::string getName() const { return "color"; }
     bool operator==(const ColorType&) const { return true; }
 };
 
 struct ObjectType {
-    constexpr ObjectType() = default;
+    constexpr ObjectType() {};
     std::string getName() const { return "object"; }
     bool operator==(const ObjectType&) const { return true; }
 };
 
 struct ErrorType {
-    constexpr ErrorType() = default;
+    constexpr ErrorType() {};
     std::string getName() const { return "error"; }
     bool operator==(const ErrorType&) const { return true; }
 };
 
 struct ValueType {
-    constexpr ValueType() = default;
+    constexpr ValueType() {};
     std::string getName() const { return "value"; }
     bool operator==(const ValueType&) const { return true; }
 };
