@@ -19,7 +19,7 @@
 #include "geometry/lat_lng.hpp"
 #include "geometry/projected_meters.hpp"
 #include "style/layers/layers.hpp"
-#include "style/sources/sources.hpp"
+#include "style/sources/source.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
 #include "map/image.hpp"
@@ -230,11 +230,11 @@ public:
 
     jni::Object<Source> getSource(JNIEnv&, jni::String);
 
-    void addSource(JNIEnv&, jni::jlong);
+    void addSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
     jni::Object<Source> removeSourceById(JNIEnv&, jni::String);
 
-    void removeSource(JNIEnv&, jlong);
+    void removeSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
     void addImage(JNIEnv&, jni::String, jni::jint, jni::jint, jni::jfloat, jni::Array<jbyte>);
 

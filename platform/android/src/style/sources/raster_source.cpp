@@ -22,8 +22,10 @@ namespace android {
         ) {
     }
 
-    RasterSource::RasterSource(mbgl::style::RasterSource& coreSource)
-        : Source(coreSource) {
+    RasterSource::RasterSource(jni::JNIEnv& env,
+                               mbgl::style::Source& coreSource,
+                               AndroidRendererFrontend& frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     RasterSource::~RasterSource() = default;
@@ -35,9 +37,9 @@ namespace android {
 
     jni::Class<RasterSource> RasterSource::javaClass;
 
-    jni::jobject* RasterSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> RasterSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = RasterSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return RasterSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(RasterSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void RasterSource::registerNative(jni::JNIEnv& env) {

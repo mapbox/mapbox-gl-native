@@ -19,7 +19,7 @@ public:
 
     VectorSource(jni::JNIEnv&, jni::String, jni::Object<>);
 
-    VectorSource(mbgl::style::VectorSource&);
+    VectorSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     ~VectorSource();
 
@@ -28,7 +28,8 @@ public:
 
     jni::String getURL(jni::JNIEnv&);
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+private:
+    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
 }; // class VectorSource
 

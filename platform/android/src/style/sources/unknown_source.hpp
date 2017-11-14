@@ -16,11 +16,12 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    UnknownSource(mbgl::style::Source&);
+    UnknownSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     ~UnknownSource() = default;
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+private:
+    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
 }; // class UnknownSource
 

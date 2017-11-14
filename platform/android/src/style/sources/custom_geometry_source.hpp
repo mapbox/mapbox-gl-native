@@ -27,6 +27,8 @@ public:
                        jni::String,
                        jni::Object<>);
 
+    CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
+
     ~CustomGeometrySource();
 
     void fetchTile(const mbgl::CanonicalTileID& tileID);
@@ -39,7 +41,8 @@ public:
     jni::Array<jni::Object<geojson::Feature>> querySourceFeatures(jni::JNIEnv&,
                                                                   jni::Array<jni::Object<>> );
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+private:
+    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
     jni::UniqueObject<CustomGeometrySource> javaPeer;
 }; // class CustomGeometrySource
