@@ -44,6 +44,8 @@ public:
     using variant<EvaluationError, T>::variant;
     using Value = T;
     
+    Result() = default;
+
     explicit operator bool () const {
         return this->template is<T>();
     }
@@ -80,6 +82,8 @@ class EvaluationResult : public Result<Value> {
 public:
     using Result::Result; // NOLINT
     
+    EvaluationResult() = default;
+
     EvaluationResult(const std::array<double, 4>& arr) :
         Result(toExpressionValue(arr))
     {}
