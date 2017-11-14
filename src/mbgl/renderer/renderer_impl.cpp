@@ -339,6 +339,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         } else {
             std::sort(sortedTiles.begin(), sortedTiles.end(),
                       [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
+            // Don't render non-symbol layers for tiles that we're only holding on to for symbol fading
+            sortedTiles.erase(std::remove_if(sortedTiles.begin(), sortedTiles.end(),
+                                             [](const auto& tile) { return tile.get().tile.holdForFade(); }),
+                              sortedTiles.end());
         }
 
         std::vector<std::reference_wrapper<RenderTile>> sortedTilesForInsertion;
@@ -389,6 +393,8 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         placement->setRecent(parameters.timePoint);
+        
+        updateFadingTiles();
     } else {
         placement->setStale();
     }
@@ -735,8 +741,25 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     if (placement->hasTransitions(timePoint)) {
         return true;
     }
+    
+    if (fadingTiles) {
+        return true;
+    }
 
     return false;
+}
+
+void Renderer::Impl::updateFadingTiles() {
+    fadingTiles = false;
+    for (auto& source : renderSources) {
+        for (auto& renderTile : source.second->getRenderTiles()) {
+            Tile& tile = renderTile.get().tile;
+            if (tile.holdForFade()) {
+                fadingTiles = true;
+                tile.performedFadePlacement();
+            }
+        }
+    }
 }
 
 bool Renderer::Impl::isLoaded() const {

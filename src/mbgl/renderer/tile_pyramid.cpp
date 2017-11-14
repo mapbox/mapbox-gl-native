@@ -148,9 +148,17 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         }
         return tiles.emplace(tileID, std::move(tile)).first->second.get();
     };
+
+    std::map<UnwrappedTileID, Tile*> previouslyRenderedTiles;
+    for (auto& renderTile : renderTiles) {
+        previouslyRenderedTiles[renderTile.id] = &renderTile.tile;
+    }
+
     auto renderTileFn = [&](const UnwrappedTileID& tileID, Tile& tile) {
         renderTiles.emplace_back(tileID, tile);
         rendered.emplace(tileID);
+        previouslyRenderedTiles.erase(tileID); // Still rendering this tile, no need for special fading logic.
+        tile.markRenderedIdeal();
     };
 
     renderTiles.clear();
@@ -162,6 +170,18 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 
     algorithm::updateRenderables(getTileFn, createTileFn, retainTileFn, renderTileFn,
                                  idealTiles, zoomRange, tileZoom);
+    
+    for (auto previouslyRenderedTile : previouslyRenderedTiles) {
+        Tile& tile = *previouslyRenderedTile.second;
+        tile.markRenderedPreviously();
+        if (tile.holdForFade()) {
+            // Since it was rendered in the last frame, we know we have it
+            // Don't mark the tile "Required" to avoid triggering a new network request
+            retainTileFn(tile, TileNecessity::Optional);
+            renderTiles.emplace_back(previouslyRenderedTile.first, tile);
+            rendered.emplace(previouslyRenderedTile.first);
+        }
+    }
 
     if (type != SourceType::Annotations) {
         size_t conservativeCacheSize =

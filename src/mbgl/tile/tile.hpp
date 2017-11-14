@@ -95,6 +95,20 @@ public:
         return loaded && !pending;
     }
     
+    // "holdForFade" is used to keep tiles in the render tree after they're no longer
+    // ideal tiles in order to allow symbols to fade out
+    virtual bool holdForFade() const {
+        return false;
+    }
+    // Set whenever this tile is used as an ideal tile
+    virtual void markRenderedIdeal() {}
+    // Set when the tile is removed from the ideal render set but may still be held for fading
+    virtual void markRenderedPreviously() {}
+    // Placement operation performed while this tile is fading
+    // We hold onto a tile for two placements: fading starts with the first placement
+    // and will have time to finish by the second placement.
+    virtual void performedFadePlacement() {}
+    
     virtual void resetCrossTileIDs() {};
 
     void dumpDebugLogs() const;
