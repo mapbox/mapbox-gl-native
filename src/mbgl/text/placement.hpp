@@ -70,7 +70,8 @@ private:
             const float scale,
             const float pixelRatio,
             const bool showCollisionBoxes,
-            std::unordered_set<uint32_t>& seenCrossTileIDs);
+            std::unordered_set<uint32_t>& seenCrossTileIDs,
+            const bool holdingForFade);
 
     void updateBucketOpacities(SymbolBucket&, std::set<uint32_t>&);
 

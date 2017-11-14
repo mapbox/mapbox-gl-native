@@ -97,6 +97,11 @@ public:
     
     void resetCrossTileIDs() override;
     
+    bool holdForFade() const override;
+    void markRenderedIdeal() override;
+    void markRenderedPreviously() override;
+    void performedFadePlacement() override;
+    
 protected:
     const GeometryTileData* getData() {
         return data.get();
@@ -130,7 +135,15 @@ private:
     const MapMode mode;
     
     bool showCollisionBoxes;
+    
+    enum class FadeState {
+        Loaded,
+        NeedsFirstPlacement,
+        NeedsSecondPlacement,
+        CanRemove
+    };
 
+    FadeState fadeState = FadeState::Loaded;
 public:
     optional<gl::Texture> glyphAtlasTexture;
     optional<gl::Texture> iconAtlasTexture;

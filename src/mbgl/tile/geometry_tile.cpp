@@ -294,4 +294,25 @@ void GeometryTile::resetCrossTileIDs() {
     }
 }
 
+bool GeometryTile::holdForFade() const {
+    return mode == MapMode::Continuous &&
+           (fadeState == FadeState::NeedsFirstPlacement || fadeState == FadeState::NeedsSecondPlacement);
+}
+
+void GeometryTile::markRenderedIdeal() {
+    fadeState = FadeState::Loaded;
+}
+void GeometryTile::markRenderedPreviously() {
+    if (fadeState == FadeState::Loaded) {
+        fadeState = FadeState::NeedsFirstPlacement;
+    }
+}
+void GeometryTile::performedFadePlacement() {
+    if (fadeState == FadeState::NeedsFirstPlacement) {
+        fadeState = FadeState::NeedsSecondPlacement;
+    } else if (fadeState == FadeState::NeedsSecondPlacement) {
+        fadeState = FadeState::CanRemove;
+    }
+}
+
 } // namespace mbgl
