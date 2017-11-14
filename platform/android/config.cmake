@@ -181,8 +181,6 @@ add_library(mbgl-android STATIC
     platform/android/src/style/sources/custom_geometry_source.hpp
     platform/android/src/style/sources/source.cpp
     platform/android/src/style/sources/source.hpp
-    platform/android/src/style/sources/sources.cpp
-    platform/android/src/style/sources/sources.hpp
     platform/android/src/style/sources/raster_source.cpp
     platform/android/src/style/sources/raster_source.hpp
     platform/android/src/style/sources/unknown_source.cpp

@@ -23,8 +23,10 @@ namespace android {
             ) {
     }
 
-    ImageSource::ImageSource(mbgl::style::ImageSource& coreSource)
-        : Source(coreSource) {
+    ImageSource::ImageSource(jni::JNIEnv& env,
+                             mbgl::style::Source& coreSource,
+                             AndroidRendererFrontend& frontend)
+            : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     ImageSource::~ImageSource() = default;
@@ -45,9 +47,9 @@ namespace android {
 
     jni::Class<ImageSource> ImageSource::javaClass;
 
-    jni::jobject* ImageSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> ImageSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = ImageSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return ImageSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(ImageSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void ImageSource::registerNative(jni::JNIEnv& env) {

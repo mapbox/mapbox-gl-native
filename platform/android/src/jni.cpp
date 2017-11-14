@@ -47,7 +47,7 @@
 #include "style/functions/interval_stops.hpp"
 #include "style/functions/stop.hpp"
 #include "style/layers/layers.hpp"
-#include "style/sources/sources.hpp"
+#include "style/sources/source.hpp"
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
@@ -161,7 +161,7 @@ void registerNatives(JavaVM *vm) {
     // Style
     TransitionOptions::registerNative(env);
     registerNativeLayers(env);
-    registerNativeSources(env);
+    Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
     Stop::registerNative(env);
