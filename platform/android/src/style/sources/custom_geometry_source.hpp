@@ -22,10 +22,7 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    CustomGeometrySource(jni::JNIEnv&,
-                       jni::Object<CustomGeometrySource>,
-                       jni::String,
-                       jni::Object<>);
+    CustomGeometrySource(jni::JNIEnv&, jni::String, jni::Object<>);
 
     CustomGeometrySource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
@@ -44,7 +41,6 @@ public:
 private:
     jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
-    jni::UniqueObject<CustomGeometrySource> javaPeer;
 }; // class CustomGeometrySource
 
 } // namespace android
