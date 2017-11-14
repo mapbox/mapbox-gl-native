@@ -26,7 +26,8 @@ public:
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug);
+                                      const bool collisionDebug,
+                                      bool& outsideGrid);
 
     void insertFeature(CollisionFeature& feature, bool ignorePlacement);
 
@@ -46,7 +47,8 @@ private:
                                   const float fontSize,
                                   const bool allowOverlap,
                                   const bool pitchWithMap,
-                                  const bool collisionDebug);
+                                  const bool collisionDebug,
+                                  bool& outsideGrid);
     
     float approximateTileDistance(const TileDistance& tileDistance, const float lastSegmentAngle, const float pixelsToTileUnits, const float cameraToAnchorDistance, const bool pitchWithMap);
     

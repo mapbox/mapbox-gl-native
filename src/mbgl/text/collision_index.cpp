@@ -73,7 +73,8 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      bool& outsideGrid) {
     if (!feature.alongLine) {
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
@@ -82,6 +83,8 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
         box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
         box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
         box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
+        
+        outsideGrid &= !isInsideGrid(box);
 
         if (!isInsideGrid(box) ||
             (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
@@ -90,7 +93,7 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
 
         return {true, isOffscreen(box)};
     } else {
-        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug);
+        return placeLineFeature(feature, posMatrix, labelPlaneMatrix, textPixelRatio, symbol, scale, fontSize, allowOverlap, pitchWithMap, collisionDebug, outsideGrid);
     }
 }
 
@@ -103,7 +106,8 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
                                       const float fontSize,
                                       const bool allowOverlap,
                                       const bool pitchWithMap,
-                                      const bool collisionDebug) {
+                                      const bool collisionDebug,
+                                      bool& outsideGrid) {
 
     const auto tileUnitAnchorPoint = symbol.anchorPoint;
     const auto projectedAnchor = projectAnchor(posMatrix, tileUnitAnchorPoint);
@@ -213,6 +217,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
         }
     }
 
+    outsideGrid &= !inGrid;
     return {!collisionDetected && firstAndLastGlyph && inGrid, entirelyOffscreen};
 }
 
