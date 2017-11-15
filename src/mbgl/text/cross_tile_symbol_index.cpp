@@ -57,9 +57,7 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
 CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
-uint32_t CrossTileSymbolLayerIndex::maxCrossTileID = 0;
-
-void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket) {
+void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
     if (bucket.bucketInstanceId) return;
     bucket.bucketInstanceId = ++maxBucketInstanceId;
 
@@ -149,7 +147,7 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         if (!symbolBucket.bucketInstanceId) {
             symbolBucketsChanged = true;
         }
-        layerIndex.addBucket(renderTile.tile.id, symbolBucket);
+        layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
         currentBucketIDs.insert(symbolBucket.bucketInstanceId);
     }
 

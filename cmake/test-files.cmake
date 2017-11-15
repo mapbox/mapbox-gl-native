@@ -22,8 +22,8 @@ set(MBGL_TEST_FILES
 
     # gl
     test/gl/bucket.test.cpp
-    test/gl/object.test.cpp
     test/gl/context.test.cpp
+    test/gl/object.test.cpp
 
     # include/mbgl
     test/include/mbgl/test.hpp
@@ -111,6 +111,7 @@ set(MBGL_TEST_FILES
     test/style/style_parser.test.cpp
 
     # text
+    test/text/cross_tile_symbol_index.test.cpp
     test/text/glyph_loader.test.cpp
     test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
