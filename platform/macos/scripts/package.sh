@@ -6,6 +6,7 @@ set -u
 
 NAME=Mapbox
 OUTPUT=build/macos/pkg
+APP_OUTPUT=build/macos/app
 DERIVED_DATA=build/macos
 PRODUCTS=${DERIVED_DATA}
 
@@ -16,12 +17,20 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-rm -rf ${OUTPUT}
+rm -rf ${OUTPUT} ${APP_OUTPUT}
 
 HASH=`git log | head -1 | awk '{ print $2 }' | cut -c 1-10` && true
 PROJ_VERSION=$(git rev-list --count HEAD)
 SEM_VERSION=$( git describe --tags --match=macos-v*.*.* --abbrev=0 | sed 's/^macos-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
+
+XCODEBUILD_SCHEME=dynamic
+XCODEBUILD_ACTION=build
+if [[ ${BUILDTYPE} == Release ]]; then
+    XCODEBUILD_SCHEME=macosapp
+    XCODEBUILD_ACTION=archive
+    mkdir -p ${APP_OUTPUT}
+fi
 
 step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
 xcodebuild \
@@ -30,10 +39,12 @@ xcodebuild \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
     CURRENT_COMMIT_HASH=${HASH} \
     -derivedDataPath ${DERIVED_DATA} \
+    -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
     -workspace ./platform/macos/macos.xcworkspace \
-    -scheme dynamic \
+    -scheme ${XCODEBUILD_SCHEME} \
     -configuration ${BUILDTYPE} \
-    -jobs ${JOBS} | xcpretty
+    -jobs ${JOBS} \
+    ${XCODEBUILD_ACTION} | xcpretty
 
 step "Copying dynamic framework into place"
 mkdir -p "${OUTPUT}/${NAME}.framework"
@@ -66,6 +77,13 @@ if [[ ${BUILDTYPE} == Release ]]; then
     validate_dsym \
         "${OUTPUT}/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
         "${OUTPUT}/${NAME}.framework/${NAME}"
+    
+    step "Exporting Mapbox GL.app"
+    xcodebuild \
+        -exportArchive \
+        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
+        -exportPath "${APP_OUTPUT}" \
+        -exportOptionsPlist platform/macos/ExportOptions.plist
 fi
 
 function create_podspec {
