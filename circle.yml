@@ -63,6 +63,15 @@ step-library:
         paths: [ "node_modules", "/root/.ccache", "~/.ccache", "mason_packages/.binaries" ]
 
 
+  - &restore-gradle-cache
+      restore_cache:
+        keys:
+          - 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+  - &save-gradle-cache
+      save_cache:
+        key: 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+        paths: [ "/root/.gradle" ]
+
   - &reset-ccache-stats
       run:
         name: Clear ccache statistics
@@ -207,7 +216,7 @@ jobs:
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/ci:r4-linux-clang-3.9
+      - image: mbgl/de3c86c2ff:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -233,7 +242,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
+      - image: mbgl/de3c86c2ff:android-ndk-r16
     resource_class: large
     working_directory: /src
     environment:
@@ -245,6 +254,7 @@ jobs:
       - checkout
       - *generate-cache-key
       - *restore-cache
+      - *restore-gradle-cache
       - *reset-ccache-stats
       - run:
           name: Build libmapbox-gl.so for arm-v7
@@ -276,6 +286,7 @@ jobs:
             make android-ui-test-arm-v7
       - *show-ccache-stats
       - *save-cache
+      - *save-gradle-cache
       - run:
           name: Log in to Google Cloud Platform
           shell: /bin/bash -euo pipefail
@@ -335,6 +346,7 @@ jobs:
       - checkout
       - *generate-cache-key
       - *restore-cache
+      - *restore-gradle-cache
       - *reset-ccache-stats
       - run:
           name: Generate Maven credentials
@@ -351,6 +363,7 @@ jobs:
           command: make apackage
       - *show-ccache-stats
       - *save-cache
+      - *save-gradle-cache
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
           destination: .
@@ -368,7 +381,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node4-clang39-release:
     docker:
-      - image: mbgl/ci:r4-linux-clang-3.9-node-4
+      - image: mbgl/de3c86c2ff:linux-clang-3.9-node-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -391,7 +404,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node6-clang39-release:
     docker:
-      - image: mbgl/ci:r4-linux-clang-3.9
+      - image: mbgl/de3c86c2ff:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -414,7 +427,7 @@ jobs:
 # ------------------------------------------------------------------------------
   node6-clang39-debug:
     docker:
-      - image: mbgl/ci:r4-linux-clang-3.9
+      - image: mbgl/de3c86c2ff:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -437,7 +450,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang39-debug:
     docker:
-      - image: mbgl/ci:r4-linux-clang-3.9
+      - image: mbgl/de3c86c2ff:linux-clang-3.9
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -459,7 +472,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
     docker:
-      - image: mbgl/ci:r4-linux-clang-4
+      - image: mbgl/de3c86c2ff:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -489,7 +502,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-undefined:
     docker:
-      - image: mbgl/ci:r4-linux-clang-4
+      - image: mbgl/de3c86c2ff:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -519,7 +532,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-thread:
     docker:
-      - image: mbgl/ci:r4-linux-clang-4
+      - image: mbgl/de3c86c2ff:linux-clang-4
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -549,7 +562,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc4.9-debug:
     docker:
-      - image: mbgl/ci:r4-linux-gcc-4.9
+      - image: mbgl/de3c86c2ff:linux-gcc-4.9
     resource_class: large
     working_directory: /src
     environment:
@@ -574,7 +587,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
-      - image: mbgl/ci:r4-linux-gcc-5
+      - image: mbgl/de3c86c2ff:linux-gcc-5
     resource_class: large
     working_directory: /src
     environment:
@@ -602,7 +615,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt4:
     docker:
-      - image: mbgl/ci:r4-linux-gcc-5-qt-4
+      - image: mbgl/de3c86c2ff:linux-gcc-5-qt-4
     resource_class: large
     working_directory: /src
     environment:
@@ -630,7 +643,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt5:
     docker:
-      - image: mbgl/ci:r4-linux-gcc-5-qt-5
+      - image: mbgl/de3c86c2ff:linux-gcc-5-qt-5.9
     resource_class: large
     working_directory: /src
     environment:
@@ -656,7 +669,7 @@ jobs:
             JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
-              scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
 
 # ------------------------------------------------------------------------------
   ios-debug:
