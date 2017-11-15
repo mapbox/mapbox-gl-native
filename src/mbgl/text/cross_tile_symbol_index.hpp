@@ -42,12 +42,11 @@ public:
 class CrossTileSymbolLayerIndex {
 public:
     CrossTileSymbolLayerIndex();
-    void addBucket(const OverscaledTileID&, SymbolBucket&);
+    void addBucket(const OverscaledTileID&, SymbolBucket&, uint32_t& maxCrossTileID);
     bool removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs);
 private:
     std::map<uint8_t,std::map<OverscaledTileID,TileLayerIndex>> indexes;
     uint32_t maxBucketInstanceId = 0;
-    static uint32_t maxCrossTileID;
 };
 
 class CrossTileSymbolIndex {
@@ -59,6 +58,7 @@ public:
     void reset();
 private:
     std::map<std::string, CrossTileSymbolLayerIndex> layerIndexes;
+    uint32_t maxCrossTileID = 0;
 };
 
 } // namespace mbgl
