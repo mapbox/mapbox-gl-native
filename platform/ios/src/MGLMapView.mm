@@ -1049,7 +1049,7 @@ public:
     }
 
     // Compass, logo and attribution button constraints needs to be updated.
-    [self setNeedsLayout];
+    [self setNeedsUpdateConstraints];
 }
 
 /// Returns the frame of inset content within the map view.
