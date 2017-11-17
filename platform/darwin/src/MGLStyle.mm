@@ -221,7 +221,7 @@ static NSURL *MGLStyleURL_trafficNight;
 }
 
 - (MGLSource *)sourceFromMBGLSource:(mbgl::style::Source *)rawSource {
-    if (MGLSource *source = rawSource->peer.empty() ? nil : mbgl::any_cast<SourceWrapper>(rawSource->peer).source) {
+    if (MGLSource *source = rawSource->peer.has_value() ? mbgl::util::any_cast<SourceWrapper>(rawSource->peer).source : nil) {
         return source;
     }
 
@@ -383,7 +383,7 @@ static NSURL *MGLStyleURL_trafficNight;
 {
     NSParameterAssert(rawLayer);
 
-    if (MGLStyleLayer *layer = rawLayer->peer.empty() ? nil : mbgl::any_cast<LayerWrapper>(rawLayer->peer).layer) {
+    if (MGLStyleLayer *layer = rawLayer->peer.has_value() ? mbgl::util::any_cast<LayerWrapper>(&(rawLayer->peer))->layer : nil) {
         return layer;
     }
 

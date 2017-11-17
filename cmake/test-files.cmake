@@ -147,5 +147,6 @@ set(MBGL_TEST_FILES
     test/util/tile_cover.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
+    test/util/unique_any.test.cpp
     test/util/url.test.cpp
 )

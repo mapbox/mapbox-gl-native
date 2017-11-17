@@ -26,7 +26,6 @@ add_library(mbgl-filesource STATIC
 
 target_add_mason_package(mbgl-filesource PUBLIC geometry)
 target_add_mason_package(mbgl-filesource PUBLIC variant)
-target_add_mason_package(mbgl-filesource PUBLIC any)
 target_add_mason_package(mbgl-filesource PRIVATE rapidjson)
 target_add_mason_package(mbgl-filesource PRIVATE boost)
 target_add_mason_package(mbgl-filesource PRIVATE geojson)
