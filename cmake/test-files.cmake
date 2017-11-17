@@ -23,8 +23,8 @@ set(MBGL_TEST_FILES
 
     # gl
     test/gl/bucket.test.cpp
-    test/gl/object.test.cpp
     test/gl/context.test.cpp
+    test/gl/object.test.cpp
 
     # include/mbgl
     test/include/mbgl/test.hpp
@@ -146,5 +146,6 @@ set(MBGL_TEST_FILES
     test/util/tile_cover.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
+    test/util/unique_any.test.cpp
     test/util/url.test.cpp
 )

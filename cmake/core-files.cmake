@@ -591,7 +591,6 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/vector_tile_data.hpp
 
     # util
-    include/mbgl/util/any.hpp
     include/mbgl/util/async_request.hpp
     include/mbgl/util/async_task.hpp
     include/mbgl/util/char_array_buffer.hpp
@@ -628,6 +627,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/timer.hpp
     include/mbgl/util/traits.hpp
     include/mbgl/util/type_list.hpp
+    include/mbgl/util/unique_any.hpp
     include/mbgl/util/unitbezier.hpp
     include/mbgl/util/util.hpp
     include/mbgl/util/variant.hpp

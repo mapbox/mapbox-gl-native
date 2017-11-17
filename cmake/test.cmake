@@ -27,7 +27,6 @@ target_link_libraries(mbgl-test
 
 target_add_mason_package(mbgl-test PRIVATE geometry)
 target_add_mason_package(mbgl-test PRIVATE variant)
-target_add_mason_package(mbgl-test PRIVATE any)
 target_add_mason_package(mbgl-test PRIVATE unique_resource)
 target_add_mason_package(mbgl-test PRIVATE rapidjson)
 target_add_mason_package(mbgl-test PRIVATE gtest)
