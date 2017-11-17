@@ -2,9 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.2.0 - TBA
+## 5.3.0 - TBA
 
 * TBA
+
+## 5.2.0 - November 17, 2017
+
+- Monkey crashes [#10472](https://github.com/mapbox/mapbox-gl-native/pull/10472)
 
 ## 5.2.0-beta.5 - November 14, 2017
 
