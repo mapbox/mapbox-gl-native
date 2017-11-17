@@ -4,6 +4,8 @@ default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 trigger_map:
 - tag: "node-v*"
   workflow: publish
+- tag: "*"
+  workflow: primary
 - push_branch: "*"
   workflow: primary
 - pull_request_target_branch: "*"
