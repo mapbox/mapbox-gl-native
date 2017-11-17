@@ -6,6 +6,16 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
+## 5.2.0-beta.5 - November 14, 2017
+
+- MapSnapshot attribution [#10362](https://github.com/mapbox/mapbox-gl-native/pull/10362)
+- Downgrade min sdk to 14 [#10355](https://github.com/mapbox/mapbox-gl-native/pull/10355)
+- Harden deselection mechanism for markers [#10403](https://github.com/mapbox/mapbox-gl-native/pull/10403)
+- Cherry picks to agua [#10442](https://github.com/mapbox/mapbox-gl-native/pull/10442)
+- Rework test activity gen script setup [#10365](https://github.com/mapbox/mapbox-gl-native/pull/10365)
+- Fix broken android unit tests, update test make target to SDK [#10387](https://github.com/mapbox/mapbox-gl-native/pull/10387)
+- Check for null value when calling mapboxMap.clear [#10388](https://github.com/mapbox/mapbox-gl-native/pull/10388)
+
 ## 5.2.0-beta.4 - November 3, 2017
 
 - Revert adding mapbox-android-core dependency (#10354) [#10380](https://github.com/mapbox/mapbox-gl-native/pull/10380)
