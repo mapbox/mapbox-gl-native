@@ -168,8 +168,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/cross_faded_property_evaluator.cpp
     src/mbgl/renderer/cross_faded_property_evaluator.hpp
     src/mbgl/renderer/data_driven_property_evaluator.hpp
-    src/mbgl/renderer/frame_history.cpp
-    src/mbgl/renderer/frame_history.hpp
     src/mbgl/renderer/group_by_layout.cpp
     src/mbgl/renderer/group_by_layout.hpp
     src/mbgl/renderer/image_atlas.cpp
@@ -258,6 +256,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/circle.hpp
     src/mbgl/shaders/collision_box.cpp
     src/mbgl/shaders/collision_box.hpp
+    src/mbgl/shaders/collision_circle.cpp
+    src/mbgl/shaders/collision_circle.hpp
     src/mbgl/shaders/debug.cpp
     src/mbgl/shaders/debug.hpp
     src/mbgl/shaders/extrusion_texture.cpp
@@ -529,8 +529,10 @@ set(MBGL_CORE_FILES
     src/mbgl/text/check_max_angle.hpp
     src/mbgl/text/collision_feature.cpp
     src/mbgl/text/collision_feature.hpp
-    src/mbgl/text/collision_tile.cpp
-    src/mbgl/text/collision_tile.hpp
+    src/mbgl/text/collision_index.cpp
+    src/mbgl/text/collision_index.hpp
+    src/mbgl/text/cross_tile_symbol_index.cpp
+    src/mbgl/text/cross_tile_symbol_index.hpp
     src/mbgl/text/get_anchors.cpp
     src/mbgl/text/get_anchors.hpp
     src/mbgl/text/glyph.cpp
@@ -543,7 +545,8 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
-    src/mbgl/text/placement_config.hpp
+    src/mbgl/text/placement.cpp
+    src/mbgl/text/placement.hpp
     src/mbgl/text/quads.cpp
     src/mbgl/text/quads.hpp
     src/mbgl/text/shaping.cpp

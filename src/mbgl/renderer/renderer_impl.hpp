@@ -4,13 +4,14 @@
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/render_light.hpp>
-#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/style/image.hpp>
 #include <mbgl/style/source.hpp>
 #include <mbgl/style/layer.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/map/zoom_history.hpp>
+#include <mbgl/text/cross_tile_symbol_index.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
+#include <mbgl/text/placement.hpp>
 
 #include <memory>
 #include <string>
@@ -31,6 +32,7 @@ class Scheduler;
 class GlyphManager;
 class ImageManager;
 class LineAtlas;
+class CrossTileSymbolIndex;
 
 class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
@@ -56,7 +58,7 @@ public:
 
 private:
     bool isLoaded() const;
-    bool hasTransitions() const;
+    bool hasTransitions(TimePoint) const;
 
     RenderSource* getRenderSource(const std::string& id) const;
 
@@ -71,6 +73,8 @@ private:
     // RenderSourceObserver implementation.
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
+
+    void updateFadingTiles();
 
     friend class Renderer;
 
@@ -91,7 +95,6 @@ private:
     };
 
     RenderState renderState = RenderState::Never;
-    FrameHistory frameHistory;
     ZoomHistory zoomHistory;
     TransformState transformState;
 
@@ -108,7 +111,11 @@ private:
     std::unordered_map<std::string, std::unique_ptr<RenderLayer>> renderLayers;
     RenderLight renderLight;
 
+    CrossTileSymbolIndex crossTileSymbolIndex;
+    std::unique_ptr<Placement> placement;
+
     bool contextLost = false;
+    bool fadingTiles = false;
 };
 
 } // namespace mbgl

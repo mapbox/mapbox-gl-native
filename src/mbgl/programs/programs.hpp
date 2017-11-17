@@ -32,7 +32,8 @@ public:
           symbolIconSDF(context, programParameters),
           symbolGlyph(context, programParameters),
           debug(context, programParameters),
-          collisionBox(context, programParameters) {
+          collisionBox(context, programParameters),
+          collisionCircle(context, programParameters) {
     }
 
     ProgramMap<CircleProgram> circle;
@@ -53,6 +54,7 @@ public:
 
     DebugProgram debug;
     CollisionBoxProgram collisionBox;
+    CollisionCircleProgram collisionCircle;
 };
 
 } // namespace mbgl

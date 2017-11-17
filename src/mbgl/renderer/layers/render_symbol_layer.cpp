@@ -4,7 +4,6 @@
 #include <mbgl/renderer/property_evaluation_parameters.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
-#include <mbgl/renderer/frame_history.hpp>
 #include <mbgl/text/glyph_atlas.hpp>
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -81,8 +80,6 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
         const auto& layout = bucket.layout;
 
-        parameters.frameHistory.bind(parameters.context, 1);
-
         auto draw = [&] (auto& program,
                          auto&& uniformValues,
                          const auto& buffers,
@@ -91,22 +88,18 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                          const auto& binders,
                          const auto& paintProperties)
         {
-            // We clip symbols to their tile extent in still mode.
-            const bool needsClipping = parameters.mapMode == MapMode::Still;
-
             program.get(paintProperties).draw(
                 parameters.context,
                 gl::Triangles(),
                 values_.pitchAlignment == AlignmentType::Map
                     ? parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly)
                     : gl::DepthMode::disabled(),
-                needsClipping
-                    ? parameters.stencilModeForClipping(tile.clip)
-                    : gl::StencilMode::disabled(),
+                gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *buffers.vertexBuffer,
                 *buffers.dynamicVertexBuffer,
+                *buffers.opacityVertexBuffer,
                 *symbolSizeBinder,
                 *buffers.indexBuffer,
                 buffers.segments,
@@ -134,8 +127,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     values,
                                     tile,
                                     *bucket.iconSizeBinder,
-                                    parameters.state,
-                                    parameters.frameHistory);
+                                    parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.icon.dynamicVertexBuffer, std::move(bucket.icon.dynamicVertices));
             }
@@ -152,7 +144,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             if (bucket.sdfIcons) {
                 if (values.hasHalo) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -162,7 +154,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 if (values.hasFill) {
                     draw(parameters.programs.symbolIconSDF,
-                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
+                         SymbolSDFIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                          bucket.icon,
                          bucket.iconSizeBinder,
                          values,
@@ -171,7 +163,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
             } else {
                 draw(parameters.programs.symbolIcon,
-                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state),
+                     SymbolIconProgram::uniformValues(false, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange),
                      bucket.icon,
                      bucket.iconSizeBinder,
                      values,
@@ -196,8 +188,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                                     values,
                                     tile,
                                     *bucket.textSizeBinder,
-                                    parameters.state,
-                                    parameters.frameHistory);
+                                    parameters.state);
 
                 parameters.context.updateVertexBuffer(*bucket.text.dynamicVertexBuffer, std::move(bucket.text.dynamicVertices));
             }
@@ -206,7 +197,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasHalo) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Halo),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Halo),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -216,7 +207,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
             if (values.hasFill) {
                 draw(parameters.programs.symbolGlyph,
-                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, SymbolSDFPart::Fill),
+                     SymbolSDFTextProgram::uniformValues(true, values, texsize, parameters.pixelsToGLUnits, alongLine, tile, parameters.state, parameters.symbolFadeChange, SymbolSDFPart::Fill),
                      bucket.text,
                      bucket.textSizeBinder,
                      values,
@@ -229,23 +220,27 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
             static const style::Properties<>::PossiblyEvaluated properties {};
             static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+            auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
+            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            std::array<float,2> extrudeScale =
+                {{
+                    parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
+                    parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
+                    
+                }};
             parameters.programs.collisionBox.draw(
                 parameters.context,
                 gl::Lines { 1.0f },
                 gl::DepthMode::disabled(),
-                parameters.stencilModeForClipping(tile.clip),
+                gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
                 CollisionBoxProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
-                    uniforms::u_scale::Value{ std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ)) },
-                    uniforms::u_zoom::Value{ float(parameters.state.getZoom() * 10) },
-                    uniforms::u_maxzoom::Value{ float((tile.id.canonical.z + 1) * 10) },
-                    uniforms::u_collision_y_stretch::Value{ tile.tile.yStretch() },
-                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
-                    uniforms::u_pitch::Value{ parameters.state.getPitch() },
-                    uniforms::u_fadetexture::Value{ 1 }
+                    uniforms::u_extrude_scale::Value{ extrudeScale },
+                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionBox.vertexBuffer,
+                *bucket.collisionBox.dynamicVertexBuffer,
                 *bucket.collisionBox.indexBuffer,
                 bucket.collisionBox.segments,
                 paintAttributeData,
@@ -253,6 +248,41 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.state.getZoom(),
                 getID()
             );
+        }
+        if (bucket.hasCollisionCircleData()) {
+            static const style::Properties<>::PossiblyEvaluated properties {};
+            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+
+            auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
+            auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
+            std::array<float,2> extrudeScale =
+                {{
+                    parameters.pixelsToGLUnits[0] / (pixelRatio * scale),
+                    parameters.pixelsToGLUnits[1] / (pixelRatio * scale)
+                    
+                }};
+
+            parameters.programs.collisionCircle.draw(
+                parameters.context,
+                gl::Triangles(),
+                gl::DepthMode::disabled(),
+                gl::StencilMode::disabled(),
+                parameters.colorModeForRenderPass(),
+                CollisionBoxProgram::UniformValues {
+                    uniforms::u_matrix::Value{ tile.matrix },
+                    uniforms::u_extrude_scale::Value{ extrudeScale },
+                    uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
+                },
+                *bucket.collisionCircle.vertexBuffer,
+                *bucket.collisionCircle.dynamicVertexBuffer,
+                *bucket.collisionCircle.indexBuffer,
+                bucket.collisionCircle.segments,
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom(),
+                getID()
+            );
+
         }
     }
 }

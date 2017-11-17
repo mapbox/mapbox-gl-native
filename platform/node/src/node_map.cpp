@@ -548,7 +548,7 @@ void NodeMap::cancel() {
 
     frontend = std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size{ 256, 256 }, pixelRatio, *this, threadpool);
     map = std::make_unique<mbgl::Map>(*frontend, mapObserver, frontend->getSize(), pixelRatio,
-                                      *this, threadpool, mbgl::MapMode::Still);
+                                      *this, threadpool, mode);
 
     // FIXME: Reload the style after recreating the map. We need to find
     // a better way of canceling an ongoing rendering on the core level
@@ -1074,6 +1074,15 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                            ->NumberValue()
                      : 1.0;
       }())
+    , mode([&] {
+            Nan::HandleScope scope;
+            if (Nan::Has(options, Nan::New("mode").ToLocalChecked()).FromJust() &&
+                std::string(*v8::String::Utf8Value(Nan::Get(options, Nan::New("mode").ToLocalChecked()).ToLocalChecked()->ToString())) == "tile") {
+                return mbgl::MapMode::Tile;
+            } else {
+                return mbgl::MapMode::Static;
+            }
+      }())
     , mapObserver(NodeMapObserver())
     , frontend(std::make_unique<mbgl::HeadlessFrontend>(mbgl::Size { 256, 256 }, pixelRatio, *this, threadpool))
     , map(std::make_unique<mbgl::Map>(*frontend,
@@ -1082,7 +1091,7 @@ NodeMap::NodeMap(v8::Local<v8::Object> options)
                                       pixelRatio,
                                       *this,
                                       threadpool,
-                                      mbgl::MapMode::Still)),
+                                      mode)),
       async(new uv_async_t) {
 
     async->data = this;

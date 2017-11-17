@@ -14,21 +14,25 @@ mbgl.on('message', function(msg) {
 var maps = new Map();
 
 module.exports = function (style, options, callback) {
+    var tileMode = options.mapMode === 'tile';
     if (options.recycleMap) {
-        if (maps.has(options.pixelRatio)) {
-            var map = maps.get(options.pixelRatio);
+        var key = options.pixelRatio + '/' + tileMode;
+        if (maps.has(key)) {
+            var map = maps.get(key);
             map.request = mapRequest;
         } else {
-            maps.set(options.pixelRatio, new mbgl.Map({
+            maps.set(key, new mbgl.Map({
                 ratio: options.pixelRatio,
-                request: mapRequest
+                request: mapRequest,
+                mode: options.mapMode
             }));
-            var map = maps.get(options.pixelRatio);
+            var map = maps.get(key);
         }
     } else {
         var map = new mbgl.Map({
             ratio: options.pixelRatio,
-            request: mapRequest
+            request: mapRequest,
+            mode: options.mapMode
         });
     }
 

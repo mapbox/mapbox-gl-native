@@ -32,7 +32,7 @@ public:
     float pixelRatio { 1 };
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool };
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource,
-              threadPool, MapMode::Still };
+              threadPool, MapMode::Static};
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/annotations/") + name,
@@ -366,8 +366,8 @@ TEST(Annotations, QueryFractionalZoomLevels) {
     test.map.addAnnotationImage(namedMarker("default_marker"));
 
     std::vector<mbgl::AnnotationID> ids;
-    for (int longitude = 0; longitude < 10; ++longitude) {
-        for (int latitude = 0; latitude < 10; ++latitude) {
+    for (int longitude = 0; longitude < 10; longitude += 2) {
+        for (int latitude = 0; latitude < 10; latitude += 2) {
             ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
         }
     }
@@ -399,8 +399,8 @@ TEST(Annotations, VisibleFeatures) {
     test.map.setLatLngZoom({ 5, 5 }, 3);
 
     std::vector<mbgl::AnnotationID> ids;
-    for (int longitude = 0; longitude < 10; ++longitude) {
-        for (int latitude = 0; latitude <= 10; ++latitude) {
+    for (int longitude = 0; longitude < 10; longitude += 2) {
+        for (int latitude = 0; latitude <= 10; latitude += 2) {
             ids.push_back(test.map.addAnnotation(SymbolAnnotation { { double(latitude), double(longitude) }, "default_marker" }));
         }
     }

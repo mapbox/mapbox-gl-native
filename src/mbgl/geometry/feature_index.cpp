@@ -2,7 +2,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
-#include <mbgl/text/collision_tile.hpp>
+#include <mbgl/text/collision_index.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/math/minmax.hpp>
@@ -18,7 +18,7 @@
 namespace mbgl {
 
 FeatureIndex::FeatureIndex()
-    : grid(util::EXTENT, 16, 0) {
+    : grid(util::EXTENT, util::EXTENT, util::EXTENT / 16) { // 16x16 grid -> 32px cell
 }
 
 void FeatureIndex::insert(const GeometryCollection& geometries,
@@ -26,8 +26,9 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
                           const std::string& sourceLayerName,
                           const std::string& bucketName) {
     for (const auto& ring : geometries) {
-        grid.insert(IndexedSubfeature { index, sourceLayerName, bucketName, sortIndex++ },
-                    mapbox::geometry::envelope(ring));
+        auto envelope = mapbox::geometry::envelope(ring);
+        grid.insert(IndexedSubfeature(index, sourceLayerName, bucketName, sortIndex++),
+                    {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
     }
 }
 
@@ -47,9 +48,10 @@ void FeatureIndex::query(
         const double scale,
         const RenderedQueryOptions& queryOptions,
         const GeometryTileData& geometryTileData,
-        const CanonicalTileID& tileID,
+        const UnwrappedTileID& tileID,
+        const std::string& sourceID,
         const std::vector<const RenderLayer*>& layers,
-        const CollisionTile* collisionTile,
+        const CollisionIndex& collisionIndex,
         const float additionalQueryRadius) const {
 
     // Determine query radius
@@ -58,7 +60,8 @@ void FeatureIndex::query(
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-    std::vector<IndexedSubfeature> features = grid.query({ box.min - additionalRadius, box.max + additionalRadius });
+    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalRadius),
+                                                           convertPoint<float>(box.max + additionalRadius) });
 
 
     std::sort(features.begin(), features.end(), topDown);
@@ -69,18 +72,13 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 
-    // Query symbol features, if they've been placed.
-    if (!collisionTile) {
-        return;
-    }
-
-    std::vector<IndexedSubfeature> symbolFeatures = collisionTile->queryRenderedSymbols(queryGeometry, scale);
+    std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID, layers, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 }
 
