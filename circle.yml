@@ -187,6 +187,7 @@ jobs:
       - run:
           name: Run Clang checks
           command: make check
+          no_output_timeout: 20m
 
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
