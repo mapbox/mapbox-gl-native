@@ -34,6 +34,7 @@ workflows:
       #- ios-sanitize-address
       - ios-sanitize-thread
       - macos-debug
+      - macos-debug-qt5
 
 step-library:
   - &generate-cache-key
@@ -119,11 +120,23 @@ step-library:
 
   - &install-macos-dependencies
       run:
-        name: Install dependencies
+        name: Install macOS dependencies
         command: |
           brew install cmake
           brew install ccache
 
+  - &install-macos-qt-dependencies
+      run:
+        name: Install macOS Qt dependencies
+        command: |
+          sudo chown -R $USER /usr/local
+          brew install qt
+          brew link qt --force
+          brew linkapps qt
+          export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
+          export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
+          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
   - &run-node-tests
       run:
@@ -688,6 +701,31 @@ jobs:
       - *reset-ccache-stats
       - *build-macos-test
       - *check-public-symbols
+      - *show-ccache-stats
+      - *save-cache
+      - store_artifacts:
+          path: test/fixtures
+          destination: test/fixtures
+
+# ------------------------------------------------------------------------------
+  macos-debug-qt5:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-qt-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - run:
+          name: Run qt-test
+          command: make run-qt-test
       - *show-ccache-stats
       - *save-cache
       - store_artifacts:
