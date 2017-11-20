@@ -33,11 +33,19 @@ public abstract class MapRenderer implements MapRendererScheduler {
     nativeInitialize(this, fileSource, pixelRatio, programCacheDir);
   }
 
+  public void onStart() {
+    // Implement if needed
+  }
+
   public void onPause() {
     // Implement if needed
   }
 
   public void onResume() {
+    // Implement if needed
+  }
+
+  public void onStop() {
     // Implement if needed
   }
 

@@ -365,6 +365,10 @@ public class MapView extends FrameLayout {
     if (mapboxMap != null) {
       mapboxMap.onStart();
     }
+
+    if (mapRenderer != null) {
+      mapRenderer.onStart();
+    }
   }
 
   /**
@@ -396,6 +400,11 @@ public class MapView extends FrameLayout {
       // map was destroyed before it was started
       mapboxMap.onStop();
     }
+
+    if (mapRenderer != null) {
+      mapRenderer.onStop();
+    }
+
     ConnectivityReceiver.instance(getContext()).deactivate();
     FileSource.getInstance(getContext()).deactivate();
   }
