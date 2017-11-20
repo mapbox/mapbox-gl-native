@@ -74,7 +74,8 @@ MACOS_XCODEBUILD = xcodebuild \
 
 $(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
-	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
+	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../.. \
+		-DWITH_EGL=${WITH_EGL})
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
@@ -174,6 +175,7 @@ $(MACOS_COMPDB_PATH)/Makefile:
 	mkdir -p $(MACOS_COMPDB_PATH)
 	(cd $(MACOS_COMPDB_PATH) && cmake ../../../.. \
 		-DCMAKE_BUILD_TYPE=$(BUILDTYPE) \
+		-DWITH_EGL=${WITH_EGL} \
 		-DCMAKE_EXPORT_COMPILE_COMMANDS=ON)
 
 .PHONY:
