@@ -74,7 +74,7 @@ public class TextureViewMapRenderer extends MapRenderer {
    * {@inheritDoc}
    */
   @Override
-  public void onPause() {
+  public void onStop() {
     renderThread.onPause();
   }
 
@@ -82,7 +82,7 @@ public class TextureViewMapRenderer extends MapRenderer {
    * {@inheritDoc}
    */
   @Override
-  public void onResume() {
+  public void onStart() {
     renderThread.onResume();
   }
 

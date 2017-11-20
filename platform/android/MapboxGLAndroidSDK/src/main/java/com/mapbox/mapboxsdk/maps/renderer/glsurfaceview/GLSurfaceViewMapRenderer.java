@@ -31,12 +31,12 @@ public class GLSurfaceViewMapRenderer extends MapRenderer implements GLSurfaceVi
   }
 
   @Override
-  public void onPause() {
+  public void onStop() {
     glSurfaceView.onPause();
   }
 
   @Override
-  public void onResume() {
+  public void onStart() {
     glSurfaceView.onResume();
   }
 
