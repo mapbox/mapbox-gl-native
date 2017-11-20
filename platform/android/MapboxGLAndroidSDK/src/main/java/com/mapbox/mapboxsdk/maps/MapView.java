@@ -401,7 +401,7 @@ public class MapView extends FrameLayout {
   }
 
   /**
-   * You must call this method from the parent's Activity#onDestroy() or Fragment#onDestroy().
+   * You must call this method from the parent's Activity#onDestroy() or Fragment#onDestroyView().
    */
   @UiThread
   public void onDestroy() {
