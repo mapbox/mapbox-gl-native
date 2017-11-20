@@ -165,7 +165,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
+      - image: mbgl/ci:20171116130301-android-ndk-r15c
     resource_class: large
     working_directory: /src
     environment:
@@ -255,7 +255,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci@sha256:c34e221294d81da80918d3e9a9df5de795b067e88f86d7c9a5e262763332536e
+      - image: mbgl/ci:20171116130301-android-ndk-r15c
     resource_class: large
     working_directory: /src
     environment:
