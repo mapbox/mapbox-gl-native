@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Styles
 
 * Fixed an issue preventing a dynamically-added `MGLRasterStyleLayer` from drawing until the map pans. ([#10270](https://github.com/mapbox/mapbox-gl-native/pull/10270))
+* Added `MGLComputedShapeSource` source class that allows applications to supply vector data on a per-tile basis.
 
 ## 3.7.0
 
