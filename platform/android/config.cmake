@@ -1,4 +1,5 @@
-add_definitions(-DMBGL_USE_GLES2=1)
+set(USE_GLES2 ON)
+
 include(cmake/test-files.cmake)
 
 # Build thin archives.
