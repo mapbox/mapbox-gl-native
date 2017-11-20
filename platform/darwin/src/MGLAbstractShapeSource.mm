@@ -79,3 +79,39 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
     return geoJSONOptions;
 }
 
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
+    mbgl::style::CustomGeometrySource::Options sourceOptions;
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.min = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.max = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionBuffer]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionBuffer must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.buffer = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionSimplificationTolerance]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionSimplificationTolerance must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.tolerance = value.doubleValue;
+    }
+    return sourceOptions;
+}
