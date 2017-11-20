@@ -23,7 +23,7 @@ if(WITH_OSMESA AND WITH_EGL)
 endif()
 
 if(WITH_EGL)
-    add_definitions(-DMBGL_USE_GLES2=1)
+    set(USE_GLES2 ON)
 endif()
 
 if($ENV{CI})
@@ -128,6 +128,14 @@ if(NOT EXISTS ${CMAKE_SOURCE_DIR}/platform/${MBGL_PLATFORM}/config.cmake)
 endif()
 
 include(platform/${MBGL_PLATFORM}/config.cmake)
+
+if(WITH_EGL)
+    add_definitions(-DMBGL_WITH_EGL=1)
+endif()
+
+if(USE_GLES2)
+    add_definitions(-DMBGL_USE_GLES2=1)
+endif()
 
 if (COMMAND mbgl_filesource)
     include(cmake/filesource.cmake)

@@ -31,9 +31,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-        PRIVATE platform/darwin/src/headless_backend_cgl.cpp
         PRIVATE platform/default/mbgl/gl/headless_display.hpp
-        PRIVATE platform/darwin/src/headless_display_cgl.cpp
 
         # Snapshotting
         PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
@@ -45,6 +43,23 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp
     )
+
+    if(WITH_EGL)
+        target_sources(mbgl-core
+            PRIVATE platform/linux/src/headless_backend_egl.cpp
+            PRIVATE platform/linux/src/headless_display_egl.cpp
+        )
+        mason_use(swiftshader VERSION 2017-11-20)
+        target_add_mason_package(mbgl-core PUBLIC swiftshader)
+    else()
+        target_sources(mbgl-core
+            PRIVATE platform/darwin/src/headless_backend_cgl.cpp
+            PRIVATE platform/darwin/src/headless_display_cgl.cpp
+        )
+        target_link_libraries(mbgl-core
+            PUBLIC "-framework OpenGL"
+        )
+    endif()
 
     target_add_mason_package(mbgl-core PUBLIC geojson)
     target_add_mason_package(mbgl-core PUBLIC polylabel)
@@ -64,7 +79,6 @@ macro(mbgl_platform_core)
         PUBLIC "-lz"
         PUBLIC "-framework Foundation"
         PUBLIC "-framework CoreGraphics"
-        PUBLIC "-framework OpenGL"
         PUBLIC "-framework ImageIO"
         PUBLIC "-framework CoreServices"
         PUBLIC "-framework SystemConfiguration"

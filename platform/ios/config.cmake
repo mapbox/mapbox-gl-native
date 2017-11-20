@@ -1,4 +1,4 @@
-add_definitions(-DMBGL_USE_GLES2=1)
+set(USE_GLES2 ON)
 
 mason_use(icu VERSION 58.1-min-size)
 
