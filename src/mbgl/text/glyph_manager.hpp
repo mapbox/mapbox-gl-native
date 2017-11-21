@@ -3,6 +3,7 @@
 #include <mbgl/text/glyph.hpp>
 #include <mbgl/text/glyph_manager_observer.hpp>
 #include <mbgl/text/glyph_range.hpp>
+#include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/font_stack.hpp>
 #include <mbgl/util/immutable.hpp>
@@ -24,7 +25,7 @@ public:
 
 class GlyphManager : public util::noncopyable {
 public:
-    GlyphManager(FileSource&);
+    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>());
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
@@ -42,6 +43,8 @@ public:
     void setObserver(GlyphManagerObserver*);
 
 private:
+    Glyph generateLocalSDF(const FontStack& fontStack, GlyphID glyphID);
+
     FileSource& fileSource;
     std::string glyphURL;
 
@@ -61,8 +64,10 @@ private:
     void requestRange(GlyphRequest&, const FontStack&, const GlyphRange&);
     void processResponse(const Response&, const FontStack&, const GlyphRange&);
     void notify(GlyphRequestor&, const GlyphDependencies&);
-
+    
     GlyphManagerObserver* observer = nullptr;
+    
+    std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer;
 };
 
 } // namespace mbgl
