@@ -86,14 +86,7 @@ class HTTPRequest implements Callback {
       }
       mRequest = builder.build();
       mCall = mClient.newCall(mRequest);
-
-      // TODO remove code block for workaround in #10303
-      if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.N_MR1) {
-        mCall.enqueue(this);
-      } else {
-        // Calling execute instead of enqueue is a workaround for #10303
-        onResponse(mCall, mCall.execute());
-      }
+      mCall.enqueue(this);
     } catch (Exception exception) {
       onFailure(exception);
     }
