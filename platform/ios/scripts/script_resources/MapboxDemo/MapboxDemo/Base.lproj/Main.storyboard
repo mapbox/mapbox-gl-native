@@ -22,7 +22,7 @@
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                             </view>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lwK-ip-Hxt">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="lwK-ip-Hxt" userLabel="Annotation Context View">
                                 <rect key="frame" x="8" y="589" width="359" height="184"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" alignment="top" spacing="4" translatesAutoresizingMaskIntoConstraints="NO" id="ZvJ-iH-zYi">
@@ -174,7 +174,7 @@
                     </view>
                     <connections>
                         <outlet property="accessTokenWarningView" destination="3ue-Nm-4DV" id="p7e-Ux-82T"/>
-                        <outlet property="calloutView" destination="lwK-ip-Hxt" id="P3x-YR-HxK"/>
+                        <outlet property="annotationContextView" destination="lwK-ip-Hxt" id="53f-xt-pJT"/>
                         <outlet property="mapViewContainer" destination="XSu-1W-VIV" id="CyQ-EP-Qwf"/>
                     </connections>
                 </viewController>
@@ -184,6 +184,6 @@
         </scene>
     </scenes>
     <resources>
-        <image name="yose" width="170" height="176"/>
+        <image name="yose" width="234" height="209"/>
     </resources>
 </document>

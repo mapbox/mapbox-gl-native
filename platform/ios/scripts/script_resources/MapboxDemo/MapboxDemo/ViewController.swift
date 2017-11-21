@@ -17,7 +17,7 @@ import Mapbox
 class ViewController: UIViewController {
 
     @IBOutlet weak var mapViewContainer: UIView!
-    @IBOutlet weak var calloutView: UIView!
+    @IBOutlet weak var annotationContextView: UIView!
     @IBOutlet weak var accessTokenWarningView: UIView!
     
     var mapView: MGLMapView!
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        setupCalloutView()
+        setupAnnotationContextView()
         setupAndAddMapView()
         setupGestureHandling()
     }
@@ -56,13 +56,13 @@ class ViewController: UIViewController {
                 layer.fillExtrusionHeight = MGLStyleValue(rawValue: 5000)
                 let camera = MGLMapCamera(lookingAtCenter: centerCoordinate, fromDistance: 100000, pitch: 60, heading: 180)
                 mapView.fly(to: camera, withDuration: 8, completionHandler: nil)
-                calloutView.alpha = 1.0
+                annotationContextView.alpha = 1.0
             } else {
                 layer.fillExtrusionOpacity = MGLStyleValue(rawValue: 0.5)
                 layer.fillExtrusionHeight = MGLStyleValue(rawValue: 0)
                 let camera = MGLMapCamera(lookingAtCenter: centerCoordinate, fromDistance: 100000, pitch: 60, heading: 0)
                 mapView.fly(to: camera, withDuration: 1, completionHandler: nil)
-                calloutView.alpha = 0
+                annotationContextView.alpha = 0
             }
         }
     }
@@ -73,18 +73,18 @@ class ViewController: UIViewController {
      Simple (but somewhat styled) stub of a view to present
      contextual information about tapped objects on the map.
      */
-    fileprivate func setupCalloutView() {
-        calloutView.alpha = 0
+    fileprivate func setupAnnotationContextView() {
+        annotationContextView.alpha = 0
         let blurView = UIVisualEffectView(effect: UIBlurEffect(style: .light))
-        blurView.frame = calloutView.bounds
+        blurView.frame = annotationContextView.bounds
         blurView.layer.cornerRadius = 5
         blurView.clipsToBounds = true
         blurView.translatesAutoresizingMaskIntoConstraints = false
-        calloutView.insertSubview(blurView, at: 0)
-        blurView.topAnchor.constraint(equalTo: calloutView.topAnchor).isActive = true
-        blurView.leftAnchor.constraint(equalTo: calloutView.leftAnchor).isActive = true
-        blurView.rightAnchor.constraint(equalTo: calloutView.rightAnchor).isActive = true
-        blurView.bottomAnchor.constraint(equalTo: calloutView.bottomAnchor).isActive = true
+        annotationContextView.insertSubview(blurView, at: 0)
+        blurView.topAnchor.constraint(equalTo: annotationContextView.topAnchor).isActive = true
+        blurView.leftAnchor.constraint(equalTo: annotationContextView.leftAnchor).isActive = true
+        blurView.rightAnchor.constraint(equalTo: annotationContextView.rightAnchor).isActive = true
+        blurView.bottomAnchor.constraint(equalTo: annotationContextView.bottomAnchor).isActive = true
     }
     
     /*
@@ -163,8 +163,8 @@ extension ViewController: MGLMapViewDelegate {
 
 /*
  An extention of the Mapbox map view class that offers a simplified
- API for a small subset of Runtime Styling (https://www.mapbox.com/ios-sdk/api/3.6.4/runtime-styling.html)
- used in this application. This could be extended.
+ API for a small subset of the runtime styling APIs used in this application.
+ This could be extended.
  */
 extension MGLMapView {
     
