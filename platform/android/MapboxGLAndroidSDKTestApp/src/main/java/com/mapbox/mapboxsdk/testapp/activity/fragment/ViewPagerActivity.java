@@ -48,6 +48,7 @@ public class ViewPagerActivity extends AppCompatActivity {
     public Fragment getItem(int position) {
       SupportMapFragment fragment = null;
       MapboxMapOptions options = new MapboxMapOptions();
+      options.textureMode(true);
 
       switch (position) {
         case 0:
