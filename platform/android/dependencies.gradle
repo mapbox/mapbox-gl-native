@@ -2,7 +2,7 @@ ext {
     minSdkVersion = 15
     targetSdkVersion = 25
     compileSdkVersion = 25
-    buildToolsVersion = "26.0.2"
+    buildToolsVersion = "26.0.3"
 
     versionCode = 11
     versionName = "5.0.0"
@@ -16,36 +16,36 @@ ext {
 
     dep = [
             // mapbox
-            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
-            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
-            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
-            mapboxAndroidCore      : "com.mapbox.mapboxsdk:mapbox-android-core:${mapboxAndroidCoreVersion}@aar",
+            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
+            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
+            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
+            mapboxAndroidCore     : "com.mapbox.mapboxsdk:mapbox-android-core:${mapboxAndroidCoreVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:3.0.4',
+            lost                  : 'com.mapzen.android:lost:3.0.4',
 
             // unit test
-            junit                  : 'junit:junit:4.12',
-            mockito                : 'org.mockito:mockito-core:2.10.0',
+            junit                 : 'junit:junit:4.12',
+            mockito               : 'org.mockito:mockito-core:2.10.0',
 
             // instrumentation test
-            testSpoonRunner        : 'com.squareup.spoon:spoon-client:1.7.1',
-            testRunner             : "com.android.support.test:runner:${testRunnerVersion}",
-            testRules              : "com.android.support.test:rules:${testRunnerVersion}",
-            testEspressoCore       : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
-            testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
+            testSpoonRunner       : 'com.squareup.spoon:spoon-client:1.7.1',
+            testRunner            : "com.android.support.test:runner:${testRunnerVersion}",
+            testRules             : "com.android.support.test:rules:${testRunnerVersion}",
+            testEspressoCore      : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
+            testEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
 
             // support
-            supportAnnotations     : "com.android.support:support-annotations:${supportLibVersion}",
-            supportAppcompatV7     : "com.android.support:appcompat-v7:${supportLibVersion}",
-            supportFragmentV4      : "com.android.support:support-fragment:${supportLibVersion}",
-            supportDesign          : "com.android.support:design:${supportLibVersion}",
-            supportRecyclerView    : "com.android.support:recyclerview-v7:${supportLibVersion}",
+            supportAnnotations    : "com.android.support:support-annotations:${supportLibVersion}",
+            supportAppcompatV7    : "com.android.support:appcompat-v7:${supportLibVersion}",
+            supportFragmentV4     : "com.android.support:support-fragment:${supportLibVersion}",
+            supportDesign         : "com.android.support:design:${supportLibVersion}",
+            supportRecyclerView   : "com.android.support:recyclerview-v7:${supportLibVersion}",
 
             // square crew
-            timber                 : 'com.jakewharton.timber:timber:4.5.1',
-            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.0',
-            leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
-            leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+            timber                : 'com.jakewharton.timber:timber:4.5.1',
+            okhttp3               : 'com.squareup.okhttp3:okhttp:3.9.0',
+            leakCanaryDebug       : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
+            leakCanaryRelease     : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     ]
 }
