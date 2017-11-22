@@ -12,6 +12,7 @@ MBGL_DEFINE_ENUM(SourceType, {
     { SourceType::Video, "video" },
     { SourceType::Annotations, "annotations" },
     { SourceType::Image, "image" },
+    { SourceType::CustomVector, "customvector" }
 });
 
 MBGL_DEFINE_ENUM(VisibilityType, {

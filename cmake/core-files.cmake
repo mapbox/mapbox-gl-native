@@ -242,6 +242,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/layers/render_symbol_layer.hpp
 
     # renderer/sources
+    src/mbgl/renderer/sources/render_custom_geometry_source.cpp
+    src/mbgl/renderer/sources/render_custom_geometry_source.hpp
     src/mbgl/renderer/sources/render_geojson_source.cpp
     src/mbgl/renderer/sources/render_geojson_source.hpp
     src/mbgl/renderer/sources/render_image_source.cpp
@@ -334,6 +336,8 @@ set(MBGL_CORE_FILES
     include/mbgl/style/types.hpp
     include/mbgl/style/undefined.hpp
     src/mbgl/style/collection.hpp
+    src/mbgl/style/custom_tile_loader.cpp
+    src/mbgl/style/custom_tile_loader.hpp
     src/mbgl/style/image.cpp
     src/mbgl/style/image_impl.cpp
     src/mbgl/style/image_impl.hpp
@@ -364,6 +368,7 @@ set(MBGL_CORE_FILES
     # style/conversion
     include/mbgl/style/conversion/constant.hpp
     include/mbgl/style/conversion/coordinate.hpp
+    include/mbgl/style/conversion/custom_geometry_source_options.hpp
     include/mbgl/style/conversion/data_driven_property_value.hpp
     include/mbgl/style/conversion/expression.hpp
     include/mbgl/style/conversion/filter.hpp
@@ -506,10 +511,14 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layers/symbol_layer_properties.hpp
 
     # style/sources
+    include/mbgl/style/sources/custom_geometry_source.hpp
     include/mbgl/style/sources/geojson_source.hpp
     include/mbgl/style/sources/image_source.hpp
     include/mbgl/style/sources/raster_source.hpp
     include/mbgl/style/sources/vector_source.hpp
+    src/mbgl/style/sources/custom_geometry_source.cpp
+    src/mbgl/style/sources/custom_geometry_source_impl.cpp
+    src/mbgl/style/sources/custom_geometry_source_impl.hpp
     src/mbgl/style/sources/geojson_source.cpp
     src/mbgl/style/sources/geojson_source_impl.cpp
     src/mbgl/style/sources/geojson_source_impl.hpp
@@ -555,6 +564,8 @@ set(MBGL_CORE_FILES
     # tile
     include/mbgl/tile/tile_id.hpp
     include/mbgl/tile/tile_necessity.hpp
+    src/mbgl/tile/custom_geometry_tile.cpp
+    src/mbgl/tile/custom_geometry_tile.hpp
     src/mbgl/tile/geojson_tile.cpp
     src/mbgl/tile/geojson_tile.hpp
     src/mbgl/tile/geojson_tile_data.hpp
