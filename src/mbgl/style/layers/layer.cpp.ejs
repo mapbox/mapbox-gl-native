@@ -59,7 +59,7 @@ const std::string& <%- camelize(type) %>Layer::getSourceID() const {
     return impl().source;
 }
 
-<% if (type !== 'raster') { -%>
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
 void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
     auto impl_ = mutableImpl();
     impl_->sourceLayer = sourceLayer;

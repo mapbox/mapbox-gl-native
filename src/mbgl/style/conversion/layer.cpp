@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -96,6 +97,23 @@ static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id
     return { std::make_unique<RasterLayer>(id, *source) };
 }
 
+static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string& id, const Convertible& value, Error& error) {
+    auto sourceValue = objectMember(value, "source");
+    if (!sourceValue) {
+        error = { "layer must have a source" };
+        return {};
+    }
+
+    optional<std::string> source = toString(*sourceValue);
+    if (!source) {
+        error = { "layer source must be a string" };
+        return {};
+    }
+
+    return { std::make_unique<HillshadeLayer>(id, *source) };
+}
+
+
 static optional<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string& id, const Convertible&, Error&) {
     return { std::make_unique<BackgroundLayer>(id) };
 }
@@ -144,6 +162,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
         converted = convertVectorLayer<SymbolLayer>(*id, value, error);
     } else if (*type == "raster") {
         converted = convertRasterLayer(*id, value, error);
+    } else if (*type == "hillshade") {
+        converted = convertHillshadeLayer(*id, value, error);
     } else if (*type == "background") {
         converted = convertBackgroundLayer(*id, value, error);
     } else {

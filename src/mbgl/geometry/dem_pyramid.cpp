@@ -7,7 +7,7 @@ void DEMPyramid::buildLevels() {
     while (true) {
         auto& prev = levels.back();
         const int32_t dim = std::ceil(prev.dim / 2);
-        const int32_t border = std::max<int32_t>(std::ceil(prev.border / 2), 1);
+        const size_t border = std::max<int32_t>(std::ceil(prev.border / 2), 1);
 
         if (dim == 1) {
             break;
@@ -19,14 +19,16 @@ void DEMPyramid::buildLevels() {
 
     // Build remaining two levels. They aren't actually used in rendering, but we
     // need them for OpenGL's mipmapping feature.
-    levels.emplace_back(2, 2, 0);
-    levels.emplace_back(1, 1, 0);
+    levels.emplace_back(2, 0);
+    levels.emplace_back(1, 0);
 }
 
 void DEMPyramid::loadFromImage(PremultipliedImage& image){
     assert(image.size.height == image.size.width);
     
-    Level first(image.size.height, image.size.height/2.0);
+    const size_t border = std::max<int32_t>(std::ceil(image.size.height / 2), 1);
+    
+    Level first(image.size.height, border);
     
     for (int32_t y = 0; y < first.dim; y++) {
         for (int32_t x = 0; x < first.dim; x++) {

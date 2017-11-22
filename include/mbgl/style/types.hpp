@@ -10,6 +10,7 @@ namespace style {
 enum class SourceType : uint8_t {
     Vector,
     Raster,
+    RasterDEM,
     GeoJSON,
     Video,
     Annotations,

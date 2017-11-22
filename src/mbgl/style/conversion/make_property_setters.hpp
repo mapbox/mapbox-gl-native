@@ -10,6 +10,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 
 #include <unordered_map>
@@ -65,6 +66,7 @@ inline auto makeLayoutPropertySetters() {
     result["text-allow-overlap"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextAllowOverlap>;
     result["text-ignore-placement"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextIgnorePlacement>;
     result["text-optional"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextOptional>;
+
 
 
 
@@ -193,6 +195,13 @@ inline auto makePaintPropertySetters() {
     result["raster-contrast-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterContrastTransition>;
     result["raster-fade-duration"] = &setProperty<RasterLayer, PropertyValue<float>, &RasterLayer::setRasterFadeDuration>;
     result["raster-fade-duration-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterFadeDurationTransition>;
+
+    result["hillshade-shadow-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeShadowColor>;
+    result["hillshade-shadow-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeShadowColorTransition>;
+    result["hillshade-highlight-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeHighlightColor>;
+    result["hillshade-highlight-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeHighlightColorTransition>;
+    result["hillshade-accent-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeAccentColor>;
+    result["hillshade-accent-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeAccentColorTransition>;
 
     result["background-color"] = &setProperty<BackgroundLayer, PropertyValue<Color>, &BackgroundLayer::setBackgroundColor>;
     result["background-color-transition"] = &setTransition<BackgroundLayer, &BackgroundLayer::setBackgroundColorTransition>;
