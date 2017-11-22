@@ -2,6 +2,7 @@
 #include <mbgl/renderer/render_source_observer.hpp>
 #include <mbgl/renderer/sources/render_geojson_source.hpp>
 #include <mbgl/renderer/sources/render_raster_source.hpp>
+#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/annotation/render_annotation_source.hpp>
@@ -19,6 +20,8 @@ std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl)
         return std::make_unique<RenderVectorSource>(staticImmutableCast<VectorSource::Impl>(impl));
     case SourceType::Raster:
         return std::make_unique<RenderRasterSource>(staticImmutableCast<RasterSource::Impl>(impl));
+    case SourceType::RasterDEM:
+        return std::make_unique<RenderRasterDEMSource>(staticImmutableCast<RasterDEMSource::Impl>(impl));
     case SourceType::GeoJSON:
         return std::make_unique<RenderGeoJSONSource>(staticImmutableCast<GeoJSONSource::Impl>(impl));
     case SourceType::Video:
