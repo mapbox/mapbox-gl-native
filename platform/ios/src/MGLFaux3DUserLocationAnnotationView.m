@@ -14,6 +14,8 @@ const CGFloat MGLUserLocationAnnotationArrowSize = MGLUserLocationAnnotationPuck
 
 const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
 
+const CLLocationDirection MGLLUserLocationHeadingAccuracyThreshold = 30;
+
 @implementation MGLFaux3DUserLocationAnnotationView
 {
     BOOL _puckModeActivated;
@@ -246,7 +248,9 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
             _oldHeadingAccuracy = -1;
         }
 
-        if ( ! _headingIndicatorLayer && headingAccuracy)
+        bool validHeadingAccuracy = headingAccuracy > 0 && headingAccuracy <= MGLLUserLocationHeadingAccuracyThreshold;
+        
+        if ( ! _headingIndicatorLayer && validHeadingAccuracy)
         {
             if (headingTrackingModeEnabled)
             {
@@ -259,6 +263,9 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
                 [self.layer addSublayer:_headingIndicatorLayer];
                 _headingIndicatorLayer.zPosition = 1;
             }
+        }
+        else {
+            _headingIndicatorLayer.hidden = YES;
         }
 
         if (_oldHeadingAccuracy != headingAccuracy)
