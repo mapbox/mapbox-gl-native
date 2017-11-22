@@ -217,8 +217,10 @@ LOOP_HANDLE RunLoop::getLoopHandle() {
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(std::move(task)); });
-    impl->wake();
+    withMutex([&] {
+        queue.push(std::move(task));
+        impl->wake();
+    });
 }
 
 void RunLoop::run() {

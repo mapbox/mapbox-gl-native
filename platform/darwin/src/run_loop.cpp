@@ -30,8 +30,10 @@ RunLoop::~RunLoop() {
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(std::move(task)); });
-    impl->async->send();
+    withMutex([&] {
+        queue.push(std::move(task));
+        impl->async->send();
+    });
 }
 
 void RunLoop::run() {
