@@ -4046,7 +4046,7 @@ public:
             }
             else
             {
-                if ([annotation isKindOfClass:[MGLShape class]])
+                if ([annotation isKindOfClass:[MGLMultiPoint class]])
                 {
                     return false;
                 }
