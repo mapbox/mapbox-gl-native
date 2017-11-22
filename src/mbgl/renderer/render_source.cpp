@@ -6,6 +6,7 @@
 #include <mbgl/renderer/tile_parameters.hpp>
 #include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/renderer/sources/render_image_source.hpp>
+#include <mbgl/renderer/sources/render_custom_geometry_source.hpp>
 #include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
@@ -27,6 +28,8 @@ std::unique_ptr<RenderSource> RenderSource::create(Immutable<Source::Impl> impl)
         return std::make_unique<RenderAnnotationSource>(staticImmutableCast<AnnotationSource::Impl>(impl));
     case SourceType::Image:
         return std::make_unique<RenderImageSource>(staticImmutableCast<ImageSource::Impl>(impl));
+    case SourceType::CustomVector:
+        return std::make_unique<RenderCustomGeometrySource>(staticImmutableCast<CustomGeometrySource::Impl>(impl));
     }
 
     // Not reachable, but placate GCC.

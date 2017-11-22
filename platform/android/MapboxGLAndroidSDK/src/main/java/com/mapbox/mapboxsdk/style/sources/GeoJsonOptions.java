@@ -16,6 +16,17 @@ public class GeoJsonOptions extends HashMap<String, Object> {
    * @param maxZoom the maximum zoom - Defaults to 18.
    * @return the current instance for chaining
    */
+  public GeoJsonOptions withMinZoom(int minZoom) {
+    this.put("minzoom", minZoom);
+    return this;
+  }
+
+  /**
+   * Maximum zoom level at which to create vector tiles (higher means greater detail at high zoom levels).
+   *
+   * @param maxZoom the maximum zoom - Defaults to 18.
+   * @return the current instance for chaining
+   */
   public GeoJsonOptions withMaxZoom(int maxZoom) {
     this.put("maxzoom", maxZoom);
     return this;

@@ -21,7 +21,7 @@ public:
 
     GeoJSONSource(jni::JNIEnv&, jni::String, jni::Object<>);
 
-    GeoJSONSource(mbgl::style::GeoJSONSource&);
+    GeoJSONSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     ~GeoJSONSource();
 
@@ -40,7 +40,8 @@ public:
 
     jni::String getURL(jni::JNIEnv&);
 
-    jni::jobject* createJavaPeer(jni::JNIEnv&);
+private:
+    jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 
 }; // class GeoJSONSource
 

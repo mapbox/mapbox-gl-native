@@ -30,8 +30,10 @@ namespace android {
         ) {
     }
 
-    VectorSource::VectorSource(mbgl::style::VectorSource& coreSource)
-        : Source(coreSource) {
+    VectorSource::VectorSource(jni::JNIEnv& env,
+                               mbgl::style::Source& coreSource,
+                               AndroidRendererFrontend& frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     VectorSource::~VectorSource() = default;
@@ -56,9 +58,9 @@ namespace android {
 
     jni::Class<VectorSource> VectorSource::javaClass;
 
-    jni::jobject* VectorSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> VectorSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = VectorSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return VectorSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(VectorSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void VectorSource::registerNative(jni::JNIEnv& env) {

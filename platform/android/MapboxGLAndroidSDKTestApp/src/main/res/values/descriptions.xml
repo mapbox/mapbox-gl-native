@@ -43,7 +43,7 @@
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
     <string name="description_query_rendered_features_box_symbol_count">Count all rendered symbols in box</string>
-    <string name="description_query_rendered_features_box_highlight">Hightligh buildings in box</string>
+    <string name="description_query_rendered_features_box_highlight">Highlight buildings in box</string>
     <string name="description_query_source_features">Query source for features</string>
     <string name="description_simple_map">Shows a simple map</string>
     <string name="description_map_change">Logs map change events to Logcat</string>
@@ -67,4 +67,5 @@
     <string name="description_textureview_debug">Use TextureView to render the map</string>
     <string name="description_textureview_resize">Resize a map rendered on a TextureView</string>
     <string name="description_textureview_animate">Animate a map rendered on a TextureView</string>
+    <string name="description_grid_source">Example Custom Geometry Source</string>
 </resources>
