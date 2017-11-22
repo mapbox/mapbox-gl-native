@@ -36,7 +36,7 @@ public class Icon {
    * @return The bitmap being used for the icon.
    */
   public Bitmap getBitmap() {
-    if (mBitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+    if (mBitmap != null && mBitmap.getConfig() != Bitmap.Config.ARGB_8888) {
       mBitmap = mBitmap.copy(Bitmap.Config.ARGB_8888, false);
     }
     return mBitmap;
