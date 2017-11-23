@@ -1,74 +1,15 @@
-format_version: 1.3.0
+format_version: 1.1.0
 default_step_lib_source: https://github.com/bitrise-io/bitrise-steplib.git
 
 trigger_map:
-- tag: "node-v*"
-  workflow: publish
-- push_branch: "*"
+- pattern: "*"
+  is_pull_request_allowed: true
   workflow: primary
-- pull_request_target_branch: "*"
-  workflow: primary
-
-shortcuts:
-  slack: &slack
-    title: Post to Slack
-    inputs:
-    - webhook_url: "$SLACK_HOOK_URL"
-    - channel: "#gl-bots"
-    - from_username: 'Bitrise Node macOS'
-    - from_username_on_error: 'Bitrise Node macOS'
-    - message: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}>
-        for <https://github.com/mapbox/mapbox-gl-native/compare/${BITRISE_GIT_BRANCH}|mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}>
-        by ${GIT_CLONE_COMMIT_COMMITER_NAME}
-        passed'
-    - message_on_error: '<${BITRISE_BUILD_URL}|Build #${BITRISE_BUILD_NUMBER}>
-        for <https://github.com/mapbox/mapbox-gl-native/compare/${BITRISE_GIT_BRANCH}|mapbox/mapbox-gl-native@${BITRISE_GIT_BRANCH}>
-        by ${GIT_CLONE_COMMIT_COMMITER_NAME}
-        failed'
-    - icon_url: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-icon-128.png
-    - icon_url_on_error: https://bitrise-public-content-production.s3.amazonaws.com/slack/bitrise-slack-error-icon-128.png
 
 workflows:
   primary:
     steps:
     - script:
-        title: Test
+        title: Skip Workflow
         inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            brew update
-            brew unlink node
-            brew install cmake awscli node@4 node@6
-            brew link node@4 --force
-            gem install xcpretty --no-rdoc --no-ri
-            make test-node || RESULT=$?
-            brew unlink node@4
-            brew link --overwrite node@6  --force
-            make clean
-            make test-node || RESULT=$?
-            ./platform/node/scripts/after_script.sh ${BITRISE_BUILD_NUMBER}
-            exit ${RESULT:-0}
-    - slack: *slack
-
-  publish:
-    steps:
-    - script:
-        title: Publish
-        inputs:
-        - content: |-
-            #!/bin/bash
-            set -eu -o pipefail
-            brew update
-            brew unlink node
-            brew install cmake awscli node@4 node@6
-            brew link node@4 --force
-            gem install xcpretty --no-rdoc --no-ri
-            export BUILDTYPE=RelWithDebInfo
-            export PUBLISH=true
-            make test-node && ./platform/node/scripts/after_success.sh
-            brew unlink node@4
-            brew link --overwrite node@6 --force
-            make clean
-            make test-node && ./platform/node/scripts/after_success.sh
-    - slack: *slack
+        - content: echo "This workflow is obsolete — see CircleCi."
