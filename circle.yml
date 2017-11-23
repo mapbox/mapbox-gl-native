@@ -301,22 +301,22 @@ jobs:
           command: |
             gcloud firebase test android models list
             (gcloud firebase test android run --type instrumentation \
-              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk \
-              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
               --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 20m \
               2>&1 | tee firebase.log) || EXIT_CODE=$?
 
             FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
             echo "Downloading from: ${FIREBASE_TEST_BUCKET}"
-            gsutil -m cp -n -R -Z "$FIREBASE_TEST_BUCKET*" platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+            gsutil -m cp -n -R -Z "$FIREBASE_TEST_BUCKET*" platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
 
             echo "Try running ndk-stack on downloaded logcat to symbolicate the stacktraces:"
-            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | \
+            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug -type f -name "logcat" -print0 | \
               xargs -0 -I '{}' ${ANDROID_NDK_HOME}/ndk-stack -sym build/android-arm-v7/Debug -dump {}
 
             exit ${EXIT_CODE:-0}
       - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
@@ -365,7 +365,7 @@ jobs:
       - *save-cache
       - *save-gradle-cache
       - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
       - deploy:
           name: Show statistics

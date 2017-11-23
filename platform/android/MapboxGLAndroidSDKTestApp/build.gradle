@@ -52,31 +52,32 @@ android {
 }
 
 dependencies {
-    compile(project(':MapboxGLAndroidSDK')) {
-        transitive = true
-    }
+    implementation(project(':MapboxGLAndroidSDK'))
 
     // Support libraries
-    compile rootProject.ext.dep.supportAppcompatV7
-    compile rootProject.ext.dep.supportRecyclerView
-    compile rootProject.ext.dep.supportDesign
+    implementation rootProject.ext.dep.supportAppcompatV7
+    implementation rootProject.ext.dep.supportRecyclerView
+    implementation rootProject.ext.dep.supportDesign
 
     // Leak Canary
-    debugCompile rootProject.ext.dep.leakCanaryDebug
-    releaseCompile rootProject.ext.dep.leakCanaryRelease
+    debugImplementation rootProject.ext.dep.leakCanaryDebug
+    releaseImplementation rootProject.ext.dep.leakCanaryRelease
+
+    // Timber
+    implementation rootProject.ext.dep.timber
 
     // Mapbox Android Services (Java component)
-    compile(rootProject.ext.dep.mapboxJavaServices) {
+    implementation(rootProject.ext.dep.mapboxJavaServices) {
         transitive = true
     }
-    compile rootProject.ext.dep.lost
+    implementation rootProject.ext.dep.lost
 
     // Testing dependencies
-    androidTestCompile rootProject.ext.dep.supportAnnotations
-    androidTestCompile rootProject.ext.dep.testRunner
-    androidTestCompile rootProject.ext.dep.testRules
-    androidTestCompile rootProject.ext.dep.testEspressoCore
-    androidTestCompile rootProject.ext.dep.testEspressoIntents
+    androidTestImplementation rootProject.ext.dep.supportAnnotations
+    androidTestImplementation rootProject.ext.dep.testRunner
+    androidTestImplementation rootProject.ext.dep.testRules
+    androidTestImplementation rootProject.ext.dep.testEspressoCore
+    androidTestImplementation rootProject.ext.dep.testEspressoIntents
 }
 
 apply from: 'gradle-make.gradle'
