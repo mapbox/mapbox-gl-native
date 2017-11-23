@@ -15,6 +15,11 @@
     <application>
         <!-- Include the telemetry service to simplify set up (https://www.mapbox.com/telemetry) -->
         <service android:name="com.mapbox.services.android.telemetry.service.TelemetryService"/>
+
+        <!-- Enable the CN endpoint -->
+        <meta-data
+            android:name="com.mapbox.CnEventsServer"
+            android:value="true"/>
     </application>
 
 </manifest>
