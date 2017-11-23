@@ -21,9 +21,6 @@ set(MBGL_QT_CORE_FILES
     PRIVATE platform/default/mbgl/gl/headless_display.hpp
     PRIVATE platform/qt/src/headless_backend_qt.cpp
 
-    # Misc
-    PRIVATE platform/default/logging_stderr.cpp
-
     # Thread pool
     PRIVATE platform/default/mbgl/util/shared_thread_pool.cpp
     PRIVATE platform/default/mbgl/util/shared_thread_pool.hpp
@@ -36,6 +33,7 @@ set(MBGL_QT_CORE_FILES
     # Platform integration
     PRIVATE platform/qt/src/async_task.cpp
     PRIVATE platform/qt/src/async_task_impl.hpp
+    PRIVATE platform/qt/src/qt_logging.cpp
     PRIVATE platform/qt/src/qt_image.cpp
     PRIVATE platform/qt/src/run_loop.cpp
     PRIVATE platform/qt/src/run_loop_impl.hpp
