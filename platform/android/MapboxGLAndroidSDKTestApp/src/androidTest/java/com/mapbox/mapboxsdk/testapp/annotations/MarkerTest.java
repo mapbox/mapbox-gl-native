@@ -1,11 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.annotations;
 
-import android.support.test.espresso.UiController;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
@@ -34,25 +31,22 @@ public class MarkerTest extends BaseActivityTest {
   @Ignore
   public void addMarkerTest() {
     validateTestSetup();
-    MapboxMapAction.invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
+    MapboxMapAction.invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
 
-        MarkerOptions options = new MarkerOptions();
-        options.setPosition(new LatLng());
-        options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.setTitle(TestConstants.TEXT_MARKER_TITLE);
-        marker = mapboxMap.addMarker(options);
+      MarkerOptions options = new MarkerOptions();
+      options.setPosition(new LatLng());
+      options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
+      options.setTitle(TestConstants.TEXT_MARKER_TITLE);
+      marker = mapboxMap.addMarker(options);
 
-        assertEquals("Markers size should be 1, ", 1, mapboxMap.getMarkers().size());
-        assertEquals("Marker id should be 0", 0, marker.getId());
-        assertEquals("Marker target should match", new LatLng(), marker.getPosition());
-        assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
-        assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
-        mapboxMap.clear();
-        assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
-      }
+      assertEquals("Markers size should be 1, ", 1, mapboxMap.getMarkers().size());
+      assertEquals("Marker id should be 0", 0, marker.getId());
+      assertEquals("Marker target should match", new LatLng(), marker.getPosition());
+      assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
+      assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
+      mapboxMap.clear();
+      assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
     });
   }
 
@@ -60,16 +54,13 @@ public class MarkerTest extends BaseActivityTest {
   @Ignore
   public void showInfoWindowTest() {
     validateTestSetup();
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        final MarkerOptions options = new MarkerOptions();
-        options.setPosition(new LatLng());
-        options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.setTitle(TestConstants.TEXT_MARKER_TITLE);
-        marker = mapboxMap.addMarker(options);
-        mapboxMap.selectMarker(marker);
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      final MarkerOptions options = new MarkerOptions();
+      options.setPosition(new LatLng());
+      options.setSnippet(TestConstants.TEXT_MARKER_SNIPPET);
+      options.setTitle(TestConstants.TEXT_MARKER_TITLE);
+      marker = mapboxMap.addMarker(options);
+      mapboxMap.selectMarker(marker);
     });
     onView(withText(TestConstants.TEXT_MARKER_TITLE)).check(matches(isDisplayed()));
     onView(withText(TestConstants.TEXT_MARKER_SNIPPET)).check(matches(isDisplayed()));

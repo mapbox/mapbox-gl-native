@@ -9,7 +9,6 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -39,25 +38,17 @@ public class TextureViewResizeActivity extends AppCompatActivity {
 
   private void setupMapView(Bundle savedInstanceState) {
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap mapboxMap) {
-        TextureViewResizeActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> TextureViewResizeActivity.this.mapboxMap = mapboxMap);
   }
 
   private void setupFab() {
     FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabResize);
-    fabDebug.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mapView != null) {
-          View parent = findViewById(R.id.coordinator_layout);
-          int width = parent.getWidth() == mapView.getWidth() ? parent.getWidth() / 2 : parent.getWidth();
-          int height = parent.getHeight() == mapView.getHeight() ? parent.getHeight() / 2 : parent.getHeight();
-          mapView.setLayoutParams(new CoordinatorLayout.LayoutParams(width, height));
-        }
+    fabDebug.setOnClickListener(view -> {
+      if (mapView != null) {
+        View parent = findViewById(R.id.coordinator_layout);
+        int width = parent.getWidth() == mapView.getWidth() ? parent.getWidth() / 2 : parent.getWidth();
+        int height = parent.getHeight() == mapView.getHeight() ? parent.getHeight() / 2 : parent.getHeight();
+        mapView.setLayoutParams(new CoordinatorLayout.LayoutParams(width, height));
       }
     });
   }

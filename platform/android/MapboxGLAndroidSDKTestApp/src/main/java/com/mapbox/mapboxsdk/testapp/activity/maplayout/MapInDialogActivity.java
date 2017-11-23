@@ -29,13 +29,10 @@ public class MapInDialogActivity extends AppCompatActivity {
     setContentView(R.layout.activity_map_in_dialog);
 
     Button button = (Button) findViewById(R.id.button_open_dialog);
-    button.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        FragmentManager fm = getSupportFragmentManager();
-        MapDialogFragment editNameDialogFragment = MapDialogFragment.newInstance("Map Dialog");
-        editNameDialogFragment.show(fm, "fragment_dialog_map");
-      }
+    button.setOnClickListener(view -> {
+      FragmentManager fm = getSupportFragmentManager();
+      MapDialogFragment editNameDialogFragment = MapDialogFragment.newInstance("Map Dialog");
+      editNameDialogFragment.show(fm, "fragment_dialog_map");
     });
   }
 

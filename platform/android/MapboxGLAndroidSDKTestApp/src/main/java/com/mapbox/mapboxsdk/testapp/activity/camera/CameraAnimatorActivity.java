@@ -35,44 +35,30 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
 
   private final LongSparseArray<AnimatorBuilder> animators = new LongSparseArray<AnimatorBuilder>() {
     {
-      put(R.id.menu_action_accelerate_decelerate_interpolator, new AnimatorBuilder() {
-        @Override
-        public Animator build() {
-          AnimatorSet animatorSet = new AnimatorSet();
-          animatorSet.playTogether(
-            createLatLngAnimator(START_LAT_LNG, new LatLng(37.826715, -122.422795)),
-            obtainExampleInterpolator(new FastOutSlowInInterpolator(), 2500)
-          );
-          return animatorSet;
-        }
+      put(R.id.menu_action_accelerate_decelerate_interpolator, () -> {
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(
+          createLatLngAnimator(START_LAT_LNG, new LatLng(37.826715, -122.422795)),
+          obtainExampleInterpolator(new FastOutSlowInInterpolator(), 2500)
+        );
+        return animatorSet;
       });
 
-      put(R.id.menu_action_bounce_interpolator, new AnimatorBuilder() {
-        @Override
-        public Animator build() {
-          AnimatorSet animatorSet = new AnimatorSet();
-          animatorSet.playTogether(
-            createLatLngAnimator(START_LAT_LNG, new LatLng(37.787947, -122.407432)),
-            obtainExampleInterpolator(new BounceInterpolator(), 3750)
-          );
-          return animatorSet;
-        }
+      put(R.id.menu_action_bounce_interpolator, () -> {
+        AnimatorSet animatorSet = new AnimatorSet();
+        animatorSet.playTogether(
+          createLatLngAnimator(START_LAT_LNG, new LatLng(37.787947, -122.407432)),
+          obtainExampleInterpolator(new BounceInterpolator(), 3750)
+        );
+        return animatorSet;
       });
 
-      put(R.id.menu_action_anticipate_overshoot_interpolator, new AnimatorBuilder() {
-        @Override
-        public Animator build() {
-          return obtainExampleInterpolator(new AnticipateOvershootInterpolator(), 2500);
-        }
-      });
+      put(R.id.menu_action_anticipate_overshoot_interpolator, () ->
+        obtainExampleInterpolator(new AnticipateOvershootInterpolator(), 2500)
+      );
 
-      put(R.id.menu_action_path_interpolator, new AnimatorBuilder() {
-        @Override
-        public Animator build() {
-          return obtainExampleInterpolator(
-            PathInterpolatorCompat.create(.22f, .68f, 0, 1.71f), 2500);
-        }
-      });
+      put(R.id.menu_action_path_interpolator, () -> obtainExampleInterpolator(
+        PathInterpolatorCompat.create(.22f, .68f, 0, 1.71f), 2500));
     }
   };
 
@@ -98,20 +84,17 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
   }
 
   private void initFab() {
-    findViewById(R.id.fab).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        view.setVisibility(View.GONE);
+    findViewById(R.id.fab).setOnClickListener(view -> {
+      view.setVisibility(View.GONE);
 
-        CameraPosition animatedPosition = new CameraPosition.Builder()
-          .target(new LatLng(37.789992, -122.402214))
-          .tilt(60)
-          .zoom(14.5f)
-          .bearing(135)
-          .build();
+      CameraPosition animatedPosition = new CameraPosition.Builder()
+        .target(new LatLng(37.789992, -122.402214))
+        .tilt(60)
+        .zoom(14.5f)
+        .bearing(135)
+        .build();
 
-        createExampleAnimator(mapboxMap.getCameraPosition(), animatedPosition).start();
-      }
+      createExampleAnimator(mapboxMap.getCameraPosition(), animatedPosition).start();
     });
   }
 
@@ -132,12 +115,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator latLngAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), currentPosition, targetPosition);
     latLngAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     latLngAnimator.setInterpolator(new FastOutSlowInInterpolator());
-    latLngAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        mapboxMap.setLatLng((LatLng) animation.getAnimatedValue());
-      }
-    });
+    latLngAnimator.addUpdateListener(animation -> mapboxMap.setLatLng((LatLng) animation.getAnimatedValue()));
     return latLngAnimator;
   }
 
@@ -146,12 +124,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     zoomAnimator.setDuration((long) (2200 * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setStartDelay((long) (600 * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setInterpolator(new AnticipateOvershootInterpolator());
-    zoomAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        mapboxMap.setZoom((Float) animation.getAnimatedValue());
-      }
-    });
+    zoomAnimator.addUpdateListener(animation -> mapboxMap.setZoom((Float) animation.getAnimatedValue()));
     return zoomAnimator;
   }
 
@@ -160,12 +133,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     bearingAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     bearingAnimator.setStartDelay((long) (1000 * ANIMATION_DELAY_FACTOR));
     bearingAnimator.setInterpolator(new FastOutLinearInInterpolator());
-    bearingAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        mapboxMap.setBearing((Float) animation.getAnimatedValue());
-      }
-    });
+    bearingAnimator.addUpdateListener(animation -> mapboxMap.setBearing((Float) animation.getAnimatedValue()));
     return bearingAnimator;
   }
 
@@ -173,12 +141,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator tiltAnimator = ValueAnimator.ofFloat((float) currentTilt, (float) targetTilt);
     tiltAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     tiltAnimator.setStartDelay((long) (1500 * ANIMATION_DELAY_FACTOR));
-    tiltAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        mapboxMap.setTilt((Float) animation.getAnimatedValue());
-      }
-    });
+    tiltAnimator.addUpdateListener(animation -> mapboxMap.setTilt((Float) animation.getAnimatedValue()));
     return tiltAnimator;
   }
 
@@ -229,12 +192,7 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator zoomAnimator = ValueAnimator.ofFloat(11.0f, 16.0f);
     zoomAnimator.setDuration((long) (duration * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setInterpolator(interpolator);
-    zoomAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        mapboxMap.setZoom((Float) animation.getAnimatedValue());
-      }
-    });
+    zoomAnimator.addUpdateListener(animation -> mapboxMap.setZoom((Float) animation.getAnimatedValue()));
     return zoomAnimator;
   }
 

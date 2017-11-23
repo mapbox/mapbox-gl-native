@@ -162,13 +162,7 @@ public class CameraPositionActivity extends AppCompatActivity implements OnMapRe
     }
   };
 
-  private MapboxMap.OnCameraMoveCanceledListener moveCanceledListener = new MapboxMap.OnCameraMoveCanceledListener() {
-    @Override
-    public void onCameraMoveCanceled() {
-      Timber.e("OnCameraMoveCanceled");
-
-    }
-  };
+  private MapboxMap.OnCameraMoveCanceledListener moveCanceledListener = () -> Timber.e("OnCameraMoveCanceled");
 
   private MapboxMap.OnCameraMoveStartedListener moveStartedListener = new MapboxMap.OnCameraMoveStartedListener() {
 

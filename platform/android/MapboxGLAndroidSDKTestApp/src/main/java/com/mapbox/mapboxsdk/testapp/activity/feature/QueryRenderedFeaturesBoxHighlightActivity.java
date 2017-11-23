@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -41,41 +40,34 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @SuppressWarnings("ConstantConditions")
-      @Override
-      public void onMapReady(final MapboxMap mapboxMap) {
-        QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
 
-        // Add layer / source
-        final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
-        mapboxMap.addSource(source);
-        mapboxMap.addLayer(
-          new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
-            .withProperties(fillColor(Color.RED))
-        );
+      // Add layer / source
+      final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(
+        new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+          .withProperties(fillColor(Color.RED))
+      );
 
-        selectionBox.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            // Query
-            int top = selectionBox.getTop() - mapView.getTop();
-            int left = selectionBox.getLeft() - mapView.getLeft();
-            RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i("Querying box %s for buildings", box);
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
+      selectionBox.setOnClickListener(view -> {
+        // Query
+        int top = selectionBox.getTop() - mapView.getTop();
+        int left = selectionBox.getLeft() - mapView.getLeft();
+        RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
+        Timber.i("Querying box %s for buildings", box);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
 
-            // Show count
-            Toast.makeText(
-              QueryRenderedFeaturesBoxHighlightActivity.this,
-              String.format("%s features in box", features.size()),
-              Toast.LENGTH_SHORT).show();
+        // Show count
+        Toast.makeText(
+          QueryRenderedFeaturesBoxHighlightActivity.this,
+          String.format("%s features in box", features.size()),
+          Toast.LENGTH_SHORT).show();
 
-            // Update source data
-            source.setGeoJson(FeatureCollection.fromFeatures(features));
-          }
-        });
-      }
+        // Update source data
+        source.setGeoJson(FeatureCollection.fromFeatures(features));
+      });
     });
   }
 

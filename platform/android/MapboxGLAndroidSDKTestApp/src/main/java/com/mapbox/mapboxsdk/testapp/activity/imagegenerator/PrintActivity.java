@@ -2,14 +2,12 @@ package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.print.PrintHelper;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -27,21 +25,13 @@ public class PrintActivity extends AppCompatActivity implements MapboxMap.Snapsh
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        PrintActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> PrintActivity.this.mapboxMap = mapboxMap);
 
     final View fab = findViewById(R.id.fab);
     if (fab != null) {
-      fab.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          if (mapboxMap != null) {
-            mapboxMap.snapshot(PrintActivity.this);
-          }
+      fab.setOnClickListener(view -> {
+        if (mapboxMap != null) {
+          mapboxMap.snapshot(PrintActivity.this);
         }
       });
     }

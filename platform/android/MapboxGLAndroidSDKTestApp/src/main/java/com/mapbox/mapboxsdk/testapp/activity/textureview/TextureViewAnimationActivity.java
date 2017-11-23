@@ -11,7 +11,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
@@ -56,22 +55,19 @@ public class TextureViewAnimationActivity extends AppCompatActivity {
 
   private void setupMapView(Bundle savedInstanceState) {
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap mapboxMap) {
-        TextureViewAnimationActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      TextureViewAnimationActivity.this.mapboxMap = mapboxMap;
 
-        setFpsView(mapboxMap);
+      setFpsView(mapboxMap);
 
-        // Animate the map view
-        ObjectAnimator animation = ObjectAnimator.ofFloat(mapView, "rotationY", 0.0f, 360f);
-        animation.setDuration(3600);
-        animation.setRepeatCount(ObjectAnimator.INFINITE);
-        animation.start();
+      // Animate the map view
+      ObjectAnimator animation = ObjectAnimator.ofFloat(mapView, "rotationY", 0.0f, 360f);
+      animation.setDuration(3600);
+      animation.setRepeatCount(ObjectAnimator.INFINITE);
+      animation.start();
 
-        // Start an animation on the map as well
-        flyTo(mapboxMap, 0, 14);
-      }
+      // Start an animation on the map as well
+      flyTo(mapboxMap, 0, 14);
     });
   }
 
@@ -82,12 +78,9 @@ public class TextureViewAnimationActivity extends AppCompatActivity {
       new MapboxMap.CancelableCallback() {
         @Override
         public void onCancel() {
-          delayed = new Runnable() {
-            @Override
-            public void run() {
-              delayed = null;
-              flyTo(mapboxMap, place, zoom);
-            }
+          delayed = () -> {
+            delayed = null;
+            flyTo(mapboxMap, place, zoom);
           };
           handler.postDelayed(delayed, 2000);
         }
@@ -101,12 +94,7 @@ public class TextureViewAnimationActivity extends AppCompatActivity {
 
   private void setFpsView(MapboxMap mapboxMap) {
     final TextView fpsView = (TextView) findViewById(R.id.fpsView);
-    mapboxMap.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
-      @Override
-      public void onFpsChanged(double fps) {
-        fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps));
-      }
-    });
+    mapboxMap.setOnFpsChangedListener(fps -> fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps)));
   }
 
   @Override

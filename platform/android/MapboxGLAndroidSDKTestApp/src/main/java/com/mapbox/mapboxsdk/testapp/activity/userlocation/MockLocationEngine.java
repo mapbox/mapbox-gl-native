@@ -21,12 +21,9 @@ public class MockLocationEngine extends LocationEngine {
   private static int counter;
 
   MockLocationEngine(Location start, Location end) {
-    locationAnimator = new LocationAnimator(start, end, new ValueAnimator.AnimatorUpdateListener() {
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        for (LocationEngineListener listener : locationListeners) {
-          listener.onLocationChanged((Location) animation.getAnimatedValue());
-        }
+    locationAnimator = new LocationAnimator(start, end, animation -> {
+      for (LocationEngineListener listener : locationListeners) {
+        listener.onLocationChanged((Location) animation.getAnimatedValue());
       }
     });
   }

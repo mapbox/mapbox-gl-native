@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -19,13 +18,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
@@ -58,12 +55,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        BulkMarkerActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> BulkMarkerActivity.this.mapboxMap = mapboxMap);
 
     final View fab = findViewById(R.id.fab);
     if (fab != null) {
@@ -232,29 +224,22 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
         viewCountView = (TextView) findViewById(R.id.countView);
 
-        mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-          @Override
-          public void onMapChanged(@MapView.MapChange int change) {
-            if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-              if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
-                viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
-                  mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
-              }
+        mapView.addOnMapChangedListener(change -> {
+          if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
+            if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
+              viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
+                mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
             }
           }
         });
 
         mapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(
-          new MapboxMap.OnMarkerViewClickListener() {
-            @Override
-            public boolean onMarkerClick(
-              @NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-              Toast.makeText(
-                BulkMarkerActivity.this,
-                "Hello " + marker.getId(),
-                Toast.LENGTH_SHORT).show();
-              return false;
-            }
+          (marker, view1, adapter) -> {
+            Toast.makeText(
+              BulkMarkerActivity.this,
+              "Hello " + marker.getId(),
+              Toast.LENGTH_SHORT).show();
+            return false;
           });
       }
     }

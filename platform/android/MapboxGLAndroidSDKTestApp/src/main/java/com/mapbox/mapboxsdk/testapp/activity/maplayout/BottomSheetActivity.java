@@ -47,19 +47,9 @@ public class BottomSheetActivity extends AppCompatActivity {
       actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
-    findViewById(R.id.fabFragment).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        addMapFragment();
-      }
-    });
+    findViewById(R.id.fabFragment).setOnClickListener(v -> addMapFragment());
 
-    findViewById(R.id.fabBottomSheet).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        toggleBottomSheetMapFragment();
-      }
-    });
+    findViewById(R.id.fabBottomSheet).setOnClickListener(v -> toggleBottomSheetMapFragment());
 
     BottomSheetBehavior bottomSheetBehavior = BottomSheetBehavior.from(findViewById(R.id.bottom_sheet));
     bottomSheetBehavior.setPeekHeight((int) (64 * getResources().getDisplayMetrics().density));

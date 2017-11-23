@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -14,7 +13,6 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
@@ -65,46 +63,35 @@ public class PolylineActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-        PolylineActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      PolylineActivity.this.mapboxMap = mapboxMap;
 
-        mapboxMap.setOnPolylineClickListener(new MapboxMap.OnPolylineClickListener() {
-          @Override
-          public void onPolylineClick(@NonNull Polyline polyline) {
-            Toast.makeText(
-              PolylineActivity.this,
-              "You clicked on polygon with id = " + polyline.getId(),
-              Toast.LENGTH_SHORT
-            ).show();
-          }
-        });
+      mapboxMap.setOnPolylineClickListener(polyline -> Toast.makeText(
+        PolylineActivity.this,
+        "You clicked on polygon with id = " + polyline.getId(),
+        Toast.LENGTH_SHORT
+      ).show());
 
-        polylines = mapboxMap.addPolylines(polylineOptions);
-      }
+      polylines = mapboxMap.addPolylines(polylineOptions);
     });
 
     View fab = findViewById(R.id.fab);
     if (fab != null) {
-      fab.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          if (mapboxMap != null) {
-            if (polylines != null && polylines.size() > 0) {
-              if (polylines.size() == 1) {
-                // test for removing annotation
-                mapboxMap.removeAnnotation(polylines.get(0));
-              } else {
-                // test for removing annotations
-                mapboxMap.removeAnnotations(polylines);
-              }
+      fab.setOnClickListener(view -> {
+        if (mapboxMap != null) {
+          if (polylines != null && polylines.size() > 0) {
+            if (polylines.size() == 1) {
+              // test for removing annotation
+              mapboxMap.removeAnnotation(polylines.get(0));
+            } else {
+              // test for removing annotations
+              mapboxMap.removeAnnotations(polylines);
             }
-            polylineOptions.clear();
-            polylineOptions.addAll(getRandomLine());
-            polylines = mapboxMap.addPolylines(polylineOptions);
-
           }
+          polylineOptions.clear();
+          polylineOptions.addAll(getRandomLine());
+          polylines = mapboxMap.addPolylines(polylineOptions);
+
         }
       });
     }
