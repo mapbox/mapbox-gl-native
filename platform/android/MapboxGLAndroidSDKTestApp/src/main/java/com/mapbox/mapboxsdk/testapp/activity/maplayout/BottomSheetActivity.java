@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.BottomSheetBehavior;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -35,7 +36,6 @@ public class BottomSheetActivity extends AppCompatActivity {
   private static final String TAG_BOTTOM_FRAGMENT = "com.mapbox.mapboxsdk.fragment.tag.bottom";
 
   private boolean bottomSheetFragmentAdded;
-  private int mapViewCounter;
 
   @Override
   protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -44,7 +44,6 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     ActionBar actionBar = getSupportActionBar();
     if (actionBar != null) {
-      actionBar.setDisplayHomeAsUpEnabled(true);
       actionBar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -78,25 +77,29 @@ public class BottomSheetActivity extends AppCompatActivity {
 
   @Override
   public void onBackPressed() {
-    super.onBackPressed();
-    if (mapViewCounter > 0) {
-      mapViewCounter--;
-      Toast.makeText(this, "Amount of main map fragments: " + mapViewCounter, Toast.LENGTH_SHORT).show();
+    FragmentManager fragmentManager = getSupportFragmentManager();
+
+    if (fragmentManager.getBackStackEntryCount() > 0) {
+      fragmentManager.popBackStack();
+    } else {
+      super.onBackPressed();
     }
   }
 
   private void addMapFragment() {
-    FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-    MainMapFragment mainMapFragment = MainMapFragment.newInstance(mapViewCounter);
-    if (mapViewCounter == 0) {
+    FragmentManager fragmentManager = getSupportFragmentManager();
+    int fragmentCount = fragmentManager.getBackStackEntryCount();
+
+    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+    MainMapFragment mainMapFragment = MainMapFragment.newInstance(fragmentCount);
+    if (fragmentCount == 0) {
       fragmentTransaction.add(R.id.fragment_container, mainMapFragment, TAG_MAIN_FRAGMENT);
     } else {
       fragmentTransaction.replace(R.id.fragment_container, mainMapFragment, TAG_MAIN_FRAGMENT);
     }
-    fragmentTransaction.addToBackStack(null);
+    fragmentTransaction.addToBackStack(String.valueOf(mainMapFragment.hashCode()));
     fragmentTransaction.commit();
-    mapViewCounter++;
-    Toast.makeText(this, "Amount of main map fragments: " + mapViewCounter, Toast.LENGTH_SHORT).show();
+    Toast.makeText(this, "Amount of main map fragments: " + (fragmentCount + 1), Toast.LENGTH_SHORT).show();
   }
 
   private void toggleBottomSheetMapFragment() {
