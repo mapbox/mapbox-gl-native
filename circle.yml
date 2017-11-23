@@ -35,6 +35,14 @@ workflows:
       - ios-sanitize-thread
       - macos-debug
       - macos-debug-qt5
+      - macos-release-node4:
+          filters:
+            tags:
+              only: /node-.*/
+      - macos-release-node6:
+          filters:
+            tags:
+              only: /node-.*/
 
 step-library:
   - &generate-cache-key
@@ -125,6 +133,20 @@ step-library:
           brew install cmake
           brew install ccache
 
+  - &install-macos-node4-dependencies
+      run:
+        name: Install macOS Node@4 dependencies
+        command: |
+          brew install node@4
+          brew link node@4 --force --overwrite
+
+  - &install-macos-node6-dependencies
+      run:
+        name: Install macOS Node@6 dependencies
+        command: |
+          brew install node@6
+          brew link node@6 --force --overwrite
+
   - &install-macos-qt-dependencies
       run:
         name: Install macOS Qt dependencies
@@ -138,18 +160,25 @@ step-library:
           ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
           ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
-  - &run-node-tests
+  - &run-node-macos-tests
+      run:
+        name: Run node tests
+        command: make test-node
+
+  - &run-node-linux-tests
       run:
         name: Run node tests
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node
-  - &run-node-tests-recycle-map
+
+  - &run-node-linux-tests-recycle-map
       run:
         name: Run node tests (recycling the map object)
         command: |
           xvfb-run --server-args="-screen 0 1024x768x24" \
             logbt -- apitrace trace --api=egl -v make test-node-recycle-map
+
   - &run-unit-tests
       run:
         name: Run tests
@@ -356,7 +385,7 @@ jobs:
       - *build-node
       - *show-ccache-stats
       - *save-cache
-      - *run-node-tests
+      - *run-node-linux-tests
       - *publish-node-package
       - *upload-render-tests
 
@@ -379,7 +408,7 @@ jobs:
       - *build-node
       - *show-ccache-stats
       - *save-cache
-      - *run-node-tests
+      - *run-node-linux-tests
       - *publish-node-package
       - *upload-render-tests
 
@@ -402,7 +431,7 @@ jobs:
       - *build-node
       - *show-ccache-stats
       - *save-cache
-      - *run-node-tests-recycle-map
+      - *run-node-linux-tests-recycle-map
       - *publish-node-package
       - *upload-render-tests-recycle-map
 
@@ -731,3 +760,45 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
+
+# ------------------------------------------------------------------------------
+  macos-release-node4:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-node4-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests
+
+# ------------------------------------------------------------------------------
+  macos-release-node6:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-node6-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests
