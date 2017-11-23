@@ -29,8 +29,7 @@ RunLoop::~RunLoop() {
     Scheduler::SetCurrent(nullptr);
 }
 
-void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(std::move(task)); });
+void RunLoop::wake() {
     impl->async->send();
 }
 
