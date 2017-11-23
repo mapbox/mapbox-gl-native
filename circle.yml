@@ -566,7 +566,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_CXX11ABI: 0
@@ -591,7 +591,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
@@ -619,7 +619,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2 # OOM, causing the compiler to crash.
+      JOBS: 4
       BUILDTYPE: Release
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
@@ -647,7 +647,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2 # OOM, causing the compiler to crash.
+      JOBS: 4
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:
