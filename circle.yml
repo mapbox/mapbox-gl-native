@@ -191,8 +191,20 @@ step-library:
       run:
         name: Publish node package
         when: on_success
-        command: platform/node/scripts/after_success.sh
-
+        environment:
+          PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
+        command: |
+          echo "Node package version: ${PACKAGE_JSON_VERSION}"
+          if [[ "${CIRCLE_TAG}" == "node-v${PACKAGE_JSON_VERSION}" ]]; then
+            if [[ "${BUILDTYPE}" == "RelWithDebInfo" ]]; then
+              ./node_modules/.bin/node-pre-gyp package publish info
+            elif [[ "${BUILDTYPE}" == "Debug" ]]; then
+              ./node_modules/.bin/node-pre-gyp package publish info --debug
+            else
+              echo "error: must provide either Debug or RelWithDebInfo for BUILDTYPE"
+              exit 1
+            fi
+          fi
 
   - &upload-render-tests
       store_artifacts:
