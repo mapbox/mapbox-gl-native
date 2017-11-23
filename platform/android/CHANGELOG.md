@@ -6,6 +6,10 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
+## 5.2.0-cn.1 - November 23, 2017
+
+- Enable CN endpoint [#10520](https://github.com/mapbox/mapbox-gl-native/pull/10520)
+
 ## 5.2.0 - November 17, 2017
 
 - Monkey crashes [#10472](https://github.com/mapbox/mapbox-gl-native/pull/10472)
