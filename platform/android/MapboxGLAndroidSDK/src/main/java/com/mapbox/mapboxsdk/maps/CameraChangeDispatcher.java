@@ -58,9 +58,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
     }
 
     // new API
-    if (!onCameraMoveStartedListenerList.isEmpty()) {
-      for (OnCameraMoveStartedListener cameraMoveStartedListener : onCameraMoveStartedListenerList) {
-        cameraMoveStartedListener.onCameraMoveStarted(reason);
+    synchronized (onCameraMoveStartedListenerList) {
+      if (!onCameraMoveStartedListenerList.isEmpty()) {
+        for (OnCameraMoveStartedListener cameraMoveStartedListener : onCameraMoveStartedListenerList) {
+          cameraMoveStartedListener.onCameraMoveStarted(reason);
+        }
       }
     }
   }
@@ -73,9 +75,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
     }
 
     // new API
-    if (!onCameraMoveListenerList.isEmpty() && !idle) {
-      for (OnCameraMoveListener cameraMoveListener : onCameraMoveListenerList) {
-        cameraMoveListener.onCameraMove();
+    synchronized (onCameraMoveListenerList) {
+      if (!onCameraMoveListenerList.isEmpty() && !idle) {
+        for (OnCameraMoveListener cameraMoveListener : onCameraMoveListenerList) {
+          cameraMoveListener.onCameraMove();
+        }
       }
     }
   }
@@ -88,9 +92,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
     }
 
     // new API
-    if (!onCameraMoveCanceledListenerList.isEmpty() && !idle) {
-      for (OnCameraMoveCanceledListener cameraMoveCanceledListener : onCameraMoveCanceledListenerList) {
-        cameraMoveCanceledListener.onCameraMoveCanceled();
+    synchronized (onCameraMoveCanceledListenerList) {
+      if (!onCameraMoveCanceledListenerList.isEmpty() && !idle) {
+        for (OnCameraMoveCanceledListener cameraMoveCanceledListener : onCameraMoveCanceledListenerList) {
+          cameraMoveCanceledListener.onCameraMoveCanceled();
+        }
       }
     }
   }
@@ -105,51 +111,69 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
       }
 
       // new API
-      if (!onCameraIdleListenerList.isEmpty()) {
-        for (OnCameraIdleListener cameraIdleListener : onCameraIdleListenerList) {
-          cameraIdleListener.onCameraIdle();
+      synchronized (onCameraIdleListenerList) {
+        if (!onCameraIdleListenerList.isEmpty()) {
+          for (OnCameraIdleListener cameraIdleListener : onCameraIdleListenerList) {
+            cameraIdleListener.onCameraIdle();
+          }
         }
       }
     }
   }
 
   void addOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
-    onCameraIdleListenerList.add(listener);
+    synchronized (onCameraIdleListenerList) {
+      onCameraIdleListenerList.add(listener);
+    }
   }
 
   void removeOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
-    if (onCameraIdleListenerList.contains(listener)) {
-      onCameraIdleListenerList.remove(listener);
+    synchronized (onCameraIdleListenerList) {
+      if (onCameraIdleListenerList.contains(listener)) {
+        onCameraIdleListenerList.remove(listener);
+      }
     }
   }
 
   void addOnCameraMoveCancelListener(OnCameraMoveCanceledListener listener) {
-    onCameraMoveCanceledListenerList.add(listener);
+    synchronized (onCameraMoveCanceledListenerList) {
+      onCameraMoveCanceledListenerList.add(listener);
+    }
   }
 
   void removeOnCameraMoveCancelListener(OnCameraMoveCanceledListener listener) {
-    if (onCameraMoveCanceledListenerList.contains(listener)) {
-      onCameraMoveCanceledListenerList.remove(listener);
+    synchronized (onCameraMoveCanceledListenerList) {
+      if (onCameraMoveCanceledListenerList.contains(listener)) {
+        onCameraMoveCanceledListenerList.remove(listener);
+      }
     }
   }
 
   void addOnCameraMoveStartedListener(OnCameraMoveStartedListener listener) {
-    onCameraMoveStartedListenerList.add(listener);
+    synchronized (onCameraMoveStartedListenerList) {
+      onCameraMoveStartedListenerList.add(listener);
+    }
   }
 
   void removeOnCameraMoveStartedListener(OnCameraMoveStartedListener listener) {
-    if (onCameraMoveStartedListenerList.contains(listener)) {
-      onCameraMoveStartedListenerList.remove(listener);
+    synchronized (onCameraMoveStartedListenerList) {
+      if (onCameraMoveStartedListenerList.contains(listener)) {
+        onCameraMoveStartedListenerList.remove(listener);
+      }
     }
   }
 
   void addOnCameraMoveListener(OnCameraMoveListener listener) {
-    onCameraMoveListenerList.add(listener);
+    synchronized (onCameraMoveListenerList) {
+      onCameraMoveListenerList.add(listener);
+    }
   }
 
   void removeOnCameraMoveListener(OnCameraMoveListener listener) {
-    if (onCameraMoveListenerList.contains(listener)) {
-      onCameraMoveListenerList.remove(listener);
+    synchronized (onCameraMoveListenerList) {
+      if (onCameraMoveListenerList.contains(listener)) {
+        onCameraMoveListenerList.remove(listener);
+      }
     }
   }
 }
