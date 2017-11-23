@@ -42,7 +42,7 @@ ext {
 
             // square crew
             timber                 : 'com.jakewharton.timber:timber:4.5.1',
-            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.0',
+            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.1',
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
             leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     ]
