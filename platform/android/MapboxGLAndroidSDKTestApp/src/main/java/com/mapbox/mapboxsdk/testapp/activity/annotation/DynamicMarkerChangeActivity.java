@@ -1,19 +1,16 @@
 package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 
@@ -37,29 +34,23 @@ public class DynamicMarkerChangeActivity extends AppCompatActivity {
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setTag(false);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        DynamicMarkerChangeActivity.this.mapboxMap = mapboxMap;
-        // Create marker
-        MarkerOptions markerOptions = new MarkerOptions()
-          .position(LAT_LNG_CHELSEA)
-          .icon(IconUtils.drawableToIcon(DynamicMarkerChangeActivity.this, R.drawable.ic_stars,
-            ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())))
-          .title(getString(R.string.dynamic_marker_chelsea_title))
-          .snippet(getString(R.string.dynamic_marker_chelsea_snippet));
-        marker = mapboxMap.addMarker(markerOptions);
-      }
+    mapView.getMapAsync(mapboxMap -> {
+      DynamicMarkerChangeActivity.this.mapboxMap = mapboxMap;
+      // Create marker
+      MarkerOptions markerOptions = new MarkerOptions()
+        .position(LAT_LNG_CHELSEA)
+        .icon(IconUtils.drawableToIcon(DynamicMarkerChangeActivity.this, R.drawable.ic_stars,
+          ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme())))
+        .title(getString(R.string.dynamic_marker_chelsea_title))
+        .snippet(getString(R.string.dynamic_marker_chelsea_snippet));
+      marker = mapboxMap.addMarker(markerOptions);
     });
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setColorFilter(ContextCompat.getColor(this, R.color.primary));
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mapboxMap != null) {
-          updateMarker();
-        }
+    fab.setOnClickListener(view -> {
+      if (mapboxMap != null) {
+        updateMarker();
       }
     });
   }

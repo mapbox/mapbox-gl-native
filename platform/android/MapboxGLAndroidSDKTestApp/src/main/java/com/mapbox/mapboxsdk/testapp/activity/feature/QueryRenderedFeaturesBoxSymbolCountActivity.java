@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -43,49 +42,42 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @SuppressWarnings("ConstantConditions")
-      @Override
-      public void onMapReady(final MapboxMap mapboxMap) {
-        QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
 
-        // Add a symbol layer (also works with annotations)
-        try {
-          mapboxMap.addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
-            QueryRenderedFeaturesBoxSymbolCountActivity.this, R.raw.test_points_utrecht)));
-        } catch (IOException ioException) {
-          Timber.e(ioException, "Could not load geojson");
-          return;
-        }
-        mapboxMap.addImage(
-          "test-icon",
-          BitmapFactory.decodeResource(getResources(),
-            R.drawable.mapbox_marker_icon_default)
-        );
-        mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
-
-        selectionBox.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            // Query
-            int top = selectionBox.getTop() - mapView.getTop();
-            int left = selectionBox.getLeft() - mapView.getLeft();
-            RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i("Querying box %s", box);
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
-
-            // Show count
-            if (toast != null) {
-              toast.cancel();
-            }
-            toast = Toast.makeText(
-              QueryRenderedFeaturesBoxSymbolCountActivity.this,
-              String.format("%s features in box", features.size()),
-              Toast.LENGTH_SHORT);
-            toast.show();
-          }
-        });
+      // Add a symbol layer (also works with annotations)
+      try {
+        mapboxMap.addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
+          QueryRenderedFeaturesBoxSymbolCountActivity.this, R.raw.test_points_utrecht)));
+      } catch (IOException ioException) {
+        Timber.e(ioException, "Could not load geojson");
+        return;
       }
+      mapboxMap.addImage(
+        "test-icon",
+        BitmapFactory.decodeResource(getResources(),
+          R.drawable.mapbox_marker_icon_default)
+      );
+      mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
+
+      selectionBox.setOnClickListener(view -> {
+        // Query
+        int top = selectionBox.getTop() - mapView.getTop();
+        int left = selectionBox.getLeft() - mapView.getLeft();
+        RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
+        Timber.i("Querying box %s", box);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(box, "symbols-layer");
+
+        // Show count
+        if (toast != null) {
+          toast.cancel();
+        }
+        toast = Toast.makeText(
+          QueryRenderedFeaturesBoxSymbolCountActivity.this,
+          String.format("%s features in box", features.size()),
+          Toast.LENGTH_SHORT);
+        toast.show();
+      });
     });
   }
 

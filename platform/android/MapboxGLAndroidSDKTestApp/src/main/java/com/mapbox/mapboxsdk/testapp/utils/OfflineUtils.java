@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.support.annotation.NonNull;
 
-import timber.log.Timber;
-
 import org.json.JSONObject;
+
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON_CHARSET;
 import static com.mapbox.mapboxsdk.testapp.activity.offline.OfflineActivity.JSON_FIELD_REGION_NAME;

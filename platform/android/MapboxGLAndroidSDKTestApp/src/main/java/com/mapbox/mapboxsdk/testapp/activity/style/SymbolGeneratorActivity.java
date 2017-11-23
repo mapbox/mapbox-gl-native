@@ -16,7 +16,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.gson.GsonBuilder;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -92,19 +91,16 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   }
 
   private void addSymbolClickListener() {
-    mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-      @Override
-      public void onMapClick(@NonNull LatLng point) {
-        PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
-        List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
-        if (!features.isEmpty()) {
-          Feature feature = features.get(0);
-          Timber.v("Feature was clicked with data: %s", feature.toJson());
-          Toast.makeText(
-            SymbolGeneratorActivity.this,
-            "hello from: " + feature.getStringProperty(FEATURE_NAME),
-            Toast.LENGTH_LONG).show();
-        }
+    mapboxMap.setOnMapClickListener(point -> {
+      PointF screenPoint = mapboxMap.getProjection().toScreenLocation(point);
+      List<Feature> features = mapboxMap.queryRenderedFeatures(screenPoint, LAYER_ID);
+      if (!features.isEmpty()) {
+        Feature feature = features.get(0);
+        Timber.v("Feature was clicked with data: %s", feature.toJson());
+        Toast.makeText(
+          SymbolGeneratorActivity.this,
+          "hello from: " + feature.getStringProperty(FEATURE_NAME),
+          Toast.LENGTH_LONG).show();
       }
     });
   }

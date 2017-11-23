@@ -16,7 +16,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureAdapter;
@@ -62,19 +61,16 @@ public class FeatureOverviewActivity extends AppCompatActivity implements Permis
     recyclerView.addOnItemTouchListener(new RecyclerView.SimpleOnItemTouchListener());
     recyclerView.setHasFixedSize(true);
 
-    ItemClickSupport.addTo(recyclerView).setOnItemClickListener(new ItemClickSupport.OnItemClickListener() {
-      @Override
-      public void onItemClicked(RecyclerView recyclerView, int position, View view) {
-        if (!sectionAdapter.isSectionHeaderPosition(position)) {
-          int itemPosition = sectionAdapter.getConvertedPosition(position);
-          Feature feature = features.get(itemPosition);
-          if (feature.isRequiresLocationPermission()) {
-            if (requestLocationPermission(itemPosition)) {
-              return;
-            }
+    ItemClickSupport.addTo(recyclerView).setOnItemClickListener((recyclerView, position, view) -> {
+      if (!sectionAdapter.isSectionHeaderPosition(position)) {
+        int itemPosition = sectionAdapter.getConvertedPosition(position);
+        Feature feature = features.get(itemPosition);
+        if (feature.isRequiresLocationPermission()) {
+          if (requestLocationPermission(itemPosition)) {
+            return;
           }
-          startFeature(feature);
         }
+        startFeature(feature);
       }
     });
 
@@ -188,15 +184,12 @@ public class FeatureOverviewActivity extends AppCompatActivity implements Permis
       }
 
       if (!features.isEmpty()) {
-        Comparator<Feature> comparator = new Comparator<Feature>() {
-          @Override
-          public int compare(Feature lhs, Feature rhs) {
-            int result = lhs.getCategory().compareToIgnoreCase(rhs.getCategory());
-            if (result == 0) {
-              result = lhs.getLabel().compareToIgnoreCase(rhs.getLabel());
-            }
-            return result;
+        Comparator<Feature> comparator = (lhs, rhs) -> {
+          int result = lhs.getCategory().compareToIgnoreCase(rhs.getCategory());
+          if (result == 0) {
+            result = lhs.getLabel().compareToIgnoreCase(rhs.getLabel());
           }
+          return result;
         };
         Collections.sort(features, comparator);
       }

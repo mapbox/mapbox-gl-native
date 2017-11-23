@@ -2,11 +2,9 @@ package com.mapbox.mapboxsdk.testapp.activity.userlocation;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
@@ -27,20 +25,12 @@ public class MyLocationToggleActivity extends BaseLocationActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-      }
-    });
+    mapView.getMapAsync(map -> mapboxMap = map);
 
     locationToggleFab = (FloatingActionButton) findViewById(R.id.fabLocationToggle);
-    locationToggleFab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mapboxMap != null) {
-          toggleGps(!mapboxMap.isMyLocationEnabled());
-        }
+    locationToggleFab.setOnClickListener(view -> {
+      if (mapboxMap != null) {
+        toggleGps(!mapboxMap.isMyLocationEnabled());
       }
     });
   }

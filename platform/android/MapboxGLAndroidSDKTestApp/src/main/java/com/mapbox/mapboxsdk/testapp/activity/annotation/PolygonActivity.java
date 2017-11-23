@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,16 +77,11 @@ public class PolygonActivity extends AppCompatActivity implements OnMapReadyCall
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
 
-    map.setOnPolygonClickListener(new MapboxMap.OnPolygonClickListener() {
-      @Override
-      public void onPolygonClick(@NonNull Polygon polygon) {
-        Toast.makeText(
-          PolygonActivity.this,
-          "You clicked on polygon with id = " + polygon.getId(),
-          Toast.LENGTH_SHORT
-        ).show();
-      }
-    });
+    map.setOnPolygonClickListener(polygon -> Toast.makeText(
+      PolygonActivity.this,
+      "You clicked on polygon with id = " + polygon.getId(),
+      Toast.LENGTH_SHORT
+    ).show());
 
     polygon = mapboxMap.addPolygon(new PolygonOptions()
       .addAll(STAR_SHAPE_POINTS)

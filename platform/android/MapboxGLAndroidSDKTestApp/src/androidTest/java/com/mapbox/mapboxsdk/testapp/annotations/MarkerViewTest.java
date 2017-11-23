@@ -1,11 +1,7 @@
 package com.mapbox.mapboxsdk.testapp.annotations;
 
-import android.support.test.espresso.UiController;
-
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.annotation.MarkerViewActivity;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
@@ -36,24 +32,21 @@ public class MarkerViewTest extends BaseActivityTest {
   public void addMarkerViewTest() {
     validateTestSetup();
     addAdapter();
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertEquals("Markers should be empty", 0, mapboxMap.getMarkers().size());
 
-        TextMarkerViewOptions options = new TextMarkerViewOptions();
-        options.text(TestConstants.TEXT_MARKER_TEXT);
-        options.position(new LatLng());
-        options.snippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.title(TestConstants.TEXT_MARKER_TITLE);
-        marker = mapboxMap.addMarker(options);
-        assertEquals("Markers size should be 1, ", 1, mapboxMap.getMarkers().size());
-        assertEquals("Marker id should be 0", 0, marker.getId());
-        assertEquals("Marker target should match", new LatLng(), marker.getPosition());
-        assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
-        assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
-        uiController.loopMainThreadForAtLeast(500);
-      }
+      TextMarkerViewOptions options = new TextMarkerViewOptions();
+      options.text(TestConstants.TEXT_MARKER_TEXT);
+      options.position(new LatLng());
+      options.snippet(TestConstants.TEXT_MARKER_SNIPPET);
+      options.title(TestConstants.TEXT_MARKER_TITLE);
+      marker = mapboxMap.addMarker(options);
+      assertEquals("Markers size should be 1, ", 1, mapboxMap.getMarkers().size());
+      assertEquals("Marker id should be 0", 0, marker.getId());
+      assertEquals("Marker target should match", new LatLng(), marker.getPosition());
+      assertEquals("Marker snippet should match", TestConstants.TEXT_MARKER_SNIPPET, marker.getSnippet());
+      assertEquals("Marker target should match", TestConstants.TEXT_MARKER_TITLE, marker.getTitle());
+      uiController.loopMainThreadForAtLeast(500);
     });
     onView(withText(TestConstants.TEXT_MARKER_TEXT)).check(matches(isDisplayed()));
   }
@@ -63,18 +56,15 @@ public class MarkerViewTest extends BaseActivityTest {
   public void showInfoWindowTest() {
     validateTestSetup();
     addAdapter();
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        final TextMarkerViewOptions options = new TextMarkerViewOptions();
-        options.position(new LatLng());
-        options.text(TestConstants.TEXT_MARKER_TEXT);
-        options.snippet(TestConstants.TEXT_MARKER_SNIPPET);
-        options.title(TestConstants.TEXT_MARKER_TITLE);
-        marker = mapboxMap.addMarker(options);
-        uiController.loopMainThreadForAtLeast(500);
-        mapboxMap.selectMarker(marker);
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      final TextMarkerViewOptions options = new TextMarkerViewOptions();
+      options.position(new LatLng());
+      options.text(TestConstants.TEXT_MARKER_TEXT);
+      options.snippet(TestConstants.TEXT_MARKER_SNIPPET);
+      options.title(TestConstants.TEXT_MARKER_TITLE);
+      marker = mapboxMap.addMarker(options);
+      uiController.loopMainThreadForAtLeast(500);
+      mapboxMap.selectMarker(marker);
     });
     onView(withText(TestConstants.TEXT_MARKER_TEXT)).check(matches(isDisplayed()));
     onView(withText(TestConstants.TEXT_MARKER_TITLE)).check(matches(isDisplayed()));
@@ -82,13 +72,8 @@ public class MarkerViewTest extends BaseActivityTest {
   }
 
   private void addAdapter() {
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        mapboxMap.getMarkerViewManager().addMarkerViewAdapter(
-          new MarkerViewActivity.TextAdapter(rule.getActivity(), mapboxMap));
-      }
-    });
+    invoke(mapboxMap, (uiController, mapboxMap) -> mapboxMap.getMarkerViewManager().addMarkerViewAdapter(
+      new MarkerViewActivity.TextAdapter(rule.getActivity(), mapboxMap)));
   }
 
 }

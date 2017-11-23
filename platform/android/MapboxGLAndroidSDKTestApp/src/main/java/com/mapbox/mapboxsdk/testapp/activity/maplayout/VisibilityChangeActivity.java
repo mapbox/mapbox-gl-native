@@ -9,7 +9,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -29,13 +28,10 @@ public class VisibilityChangeActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-          new LatLng(55.754020, 37.620948), 12), 9000);
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+        new LatLng(55.754020, 37.620948), 12), 9000);
     });
   }
 

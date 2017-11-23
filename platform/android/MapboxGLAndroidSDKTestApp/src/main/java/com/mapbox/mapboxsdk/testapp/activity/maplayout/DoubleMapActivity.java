@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -14,10 +13,8 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -90,47 +87,38 @@ public class DoubleMapActivity extends AppCompatActivity {
       // MapView large
       mapView = (MapView) view.findViewById(R.id.mapView);
       mapView.onCreate(savedInstanceState);
-      mapView.getMapAsync(new OnMapReadyCallback() {
-        @Override
-        public void onMapReady(@NonNull MapboxMap mapboxMap) {
-          if (activity != null) {
-            activity.setMapboxMap(mapboxMap);
-          }
+      mapView.getMapAsync(mapboxMap -> {
+        if (activity != null) {
+          activity.setMapboxMap(mapboxMap);
         }
       });
 
       // MapView mini
       mapViewMini = (MapView) view.findViewById(R.id.mini_map);
       mapViewMini.onCreate(savedInstanceState);
-      mapViewMini.getMapAsync(new OnMapReadyCallback() {
-        @Override
-        public void onMapReady(@NonNull MapboxMap mapboxMap) {
-          mapboxMap.setStyleUrl(Style.LIGHT);
-          mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
+      mapViewMini.getMapAsync(mapboxMap -> {
+        mapboxMap.setStyleUrl(Style.LIGHT);
+        mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
 
-          UiSettings uiSettings = mapboxMap.getUiSettings();
-          uiSettings.setAllGesturesEnabled(false);
-          uiSettings.setCompassEnabled(false);
-          uiSettings.setAttributionEnabled(false);
-          uiSettings.setLogoEnabled(false);
+        UiSettings uiSettings = mapboxMap.getUiSettings();
+        uiSettings.setAllGesturesEnabled(false);
+        uiSettings.setCompassEnabled(false);
+        uiSettings.setAttributionEnabled(false);
+        uiSettings.setLogoEnabled(false);
 
-          try {
-            mapboxMap.setMyLocationEnabled(true);
-            TrackingSettings settings = mapboxMap.getTrackingSettings();
-            settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-          } catch (SecurityException securityException) {
-            // permission is handled in MainActivity
-            getActivity().finish();
-          }
-
-          mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(@NonNull LatLng point) {
-              // test if we can open 2 activities after each other
-              startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
-            }
-          });
+        try {
+          mapboxMap.setMyLocationEnabled(true);
+          TrackingSettings settings = mapboxMap.getTrackingSettings();
+          settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+        } catch (SecurityException securityException) {
+          // permission is handled in MainActivity
+          getActivity().finish();
         }
+
+        mapboxMap.setOnMapClickListener(point -> {
+          // test if we can open 2 activities after each other
+          startActivity(new Intent(mapViewMini.getContext(), DoubleMapActivity.class));
+        });
       });
     }
 

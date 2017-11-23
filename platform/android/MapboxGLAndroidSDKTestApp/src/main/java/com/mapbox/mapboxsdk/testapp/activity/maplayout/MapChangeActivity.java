@@ -8,7 +8,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import timber.log.Timber;
@@ -28,21 +27,13 @@ public class MapChangeActivity extends AppCompatActivity {
 
     final LongSparseArray<String> mapChangeMap = buildMapChangeStringValueSparseArray();
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-      @Override
-      public void onMapChanged(int change) {
-        Timber.e("OnMapChange: %s, %s", change, mapChangeMap.get(change));
-      }
-    });
+    mapView.addOnMapChangedListener(change -> Timber.e("OnMapChange: %s, %s", change, mapChangeMap.get(change)));
 
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
-          new LatLng(55.754020, 37.620948), 12), 9000);
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      mapboxMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
+        new LatLng(55.754020, 37.620948), 12), 9000);
     });
   }
 

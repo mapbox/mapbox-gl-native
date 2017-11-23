@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -51,43 +50,40 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull final MapboxMap map) {
-        mapboxMap = map;
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
 
-        // Add a image for the makers
-        mapboxMap.addImage(
-          "my-marker-image",
-          BitmapFactory.decodeResource(SymbolLayerActivity.this.getResources(),
-            R.drawable.mapbox_marker_icon_default)
-        );
+      // Add a image for the makers
+      mapboxMap.addImage(
+        "my-marker-image",
+        BitmapFactory.decodeResource(SymbolLayerActivity.this.getResources(),
+          R.drawable.mapbox_marker_icon_default)
+      );
 
-        // Add a source
-        FeatureCollection markers = FeatureCollection.fromFeatures(new Feature[] {
-          Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35673}), featureProperties("Marker 1")),
-          Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.34673}), featureProperties("Marker 2"))
-        });
-        mapboxMap.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
+      // Add a source
+      FeatureCollection markers = FeatureCollection.fromFeatures(new Feature[] {
+        Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35673}), featureProperties("Marker 1")),
+        Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.34673}), featureProperties("Marker 2"))
+      });
+      mapboxMap.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
 
-        // Add the symbol-layer
-        mapboxMap.addLayer(
-          new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
-            .withProperties(
-              iconImage("my-marker-image"),
-              iconAllowOverlap(true),
-              textField("{title}"),
-              textColor(Color.RED),
-              textSize(10f)
-            )
-        );
+      // Add the symbol-layer
+      mapboxMap.addLayer(
+        new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
+          .withProperties(
+            iconImage("my-marker-image"),
+            iconAllowOverlap(true),
+            textField("{title}"),
+            textColor(Color.RED),
+            textSize(10f)
+          )
+      );
 
-        // Show
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.35273, 4.91638), 14));
+      // Show
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(52.35273, 4.91638), 14));
 
-        // Set a click-listener so we can manipulate the map
-        mapboxMap.setOnMapClickListener(SymbolLayerActivity.this);
-      }
+      // Set a click-listener so we can manipulate the map
+      mapboxMap.setOnMapClickListener(SymbolLayerActivity.this);
     });
   }
 

@@ -10,7 +10,6 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -95,17 +94,14 @@ public class MapSnapshotterActivity extends AppCompatActivity {
 
     MapSnapshotter snapshotter = new MapSnapshotter(MapSnapshotterActivity.this, options);
 
-    snapshotter.start(new MapSnapshotter.SnapshotReadyCallback() {
-      @Override
-      public void onSnapshotReady(MapSnapshot snapshot) {
-        Timber.i("Got the snapshot");
-        ImageView imageView = new ImageView(MapSnapshotterActivity.this);
-        imageView.setImageBitmap(snapshot.getBitmap());
-        grid.addView(
-          imageView,
-          new GridLayout.LayoutParams(GridLayout.spec(row), GridLayout.spec(column))
-        );
-      }
+    snapshotter.start(snapshot -> {
+      Timber.i("Got the snapshot");
+      ImageView imageView = new ImageView(MapSnapshotterActivity.this);
+      imageView.setImageBitmap(snapshot.getBitmap());
+      grid.addView(
+        imageView,
+        new GridLayout.LayoutParams(GridLayout.spec(row), GridLayout.spec(column))
+      );
     });
     snapshotters.add(snapshotter);
   }
