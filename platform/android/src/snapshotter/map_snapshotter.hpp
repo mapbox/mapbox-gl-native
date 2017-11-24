@@ -65,6 +65,11 @@ private:
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<Actor<mbgl::MapSnapshotter::Callback>> snapshotCallback;
     std::unique_ptr<mbgl::MapSnapshotter> snapshotter;
+
+    FileSource *jFileSource;
+    void activateFilesource(JNIEnv&);
+    void deactivateFilesource(JNIEnv&);
+    bool activatedFilesource = false;
 };
 
 } // namespace android
