@@ -66,8 +66,9 @@ public:
     EGLConfig config = 0;
 };
 
-struct EGLImpl : public HeadlessBackend::Impl {
-    EGLImpl() {
+class EGLBackendImpl : public HeadlessBackend::Impl {
+public:
+    EGLBackendImpl() {
         // EGL initializes the context client version to 1 by default. We want to
         // use OpenGL ES 2.0 which has the ability to create shader and program
         // objects and also to write vertex and fragment shaders in the OpenGL ES
@@ -101,7 +102,7 @@ struct EGLImpl : public HeadlessBackend::Impl {
         }
     }
 
-    ~EGLImpl() final {
+    ~EGLBackendImpl() final {
         if (eglSurface != EGL_NO_SURFACE) {
             if (!eglDestroySurface(eglDisplay->display, eglSurface)) {
                 Log::Error(Event::OpenGL, "Failed to destroy EGL surface.");
@@ -111,6 +112,10 @@ struct EGLImpl : public HeadlessBackend::Impl {
         if (!eglDestroyContext(eglDisplay->display, eglContext)) {
             Log::Error(Event::OpenGL, "Failed to destroy EGL context.");
         }
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        return eglGetProcAddress(name);
     }
 
     void activateContext() final {
@@ -131,13 +136,9 @@ private:
     EGLSurface eglSurface = EGL_NO_SURFACE;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    return eglGetProcAddress(name);
-}
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl = std::make_unique<EGLImpl>();
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<EGLBackendImpl>();
 }
 
 } // namespace mbgl

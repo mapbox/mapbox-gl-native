@@ -6,8 +6,9 @@
 
 namespace mbgl {
 
-struct EAGLImpl : public HeadlessBackend::Impl {
-    EAGLImpl() {
+class EAGLBackendImpl : public HeadlessBackend::Impl {
+public:
+    EAGLBackendImpl() {
         glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
         if (glContext == nil) {
             throw std::runtime_error("Error creating GL context object");
@@ -16,7 +17,21 @@ struct EAGLImpl : public HeadlessBackend::Impl {
     }
 
     // Required for ARC to deallocate correctly.
-    ~EAGLImpl() final = default;
+    ~EAGLBackendImpl() final = default;
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
+        }
+
+        CFStringRef str =
+            CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
+
+        return reinterpret_cast<gl::ProcAddress>(symbol);
+    }
 
     void activateContext() final {
         [EAGLContext setCurrentContext:glContext];
@@ -30,22 +45,9 @@ private:
     EAGLContext* glContext = nullptr;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
-    if (!framework) {
-        throw std::runtime_error("Failed to load OpenGL framework.");
-    }
-
-    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-    void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-    CFRelease(str);
-
-    return reinterpret_cast<gl::ProcAddress>(symbol);
-}
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl = std::make_unique<EAGLImpl>();
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<EAGLBackendImpl>();
 }
 
 } // namespace mbgl

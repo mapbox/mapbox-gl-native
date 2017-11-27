@@ -66,7 +66,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
         PRIVATE platform/default/mbgl/map/map_snapshotter.hpp
         PRIVATE platform/linux/src/headless_backend_egl.cpp
-        PRIVATE platform/linux/src/headless_display_egl.cpp
     )
 
     target_include_directories(mbgl-core
@@ -341,15 +340,6 @@ macro(mbgl_platform_test)
 
         # Main test entry point
         platform/android/src/test/main.jni.cpp
-
-        # Headless view
-        platform/default/mbgl/gl/headless_frontend.cpp
-        platform/default/mbgl/gl/headless_frontend.hpp
-        platform/default/mbgl/gl/headless_backend.cpp
-        platform/default/mbgl/gl/headless_backend.hpp
-
-        platform/linux/src/headless_backend_egl.cpp
-        platform/linux/src/headless_display_egl.cpp
     )
 
     target_include_directories(mbgl-test

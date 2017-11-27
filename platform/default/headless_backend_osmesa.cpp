@@ -7,8 +7,9 @@
 
 namespace mbgl {
 
-struct OSMesaImpl : public HeadlessBackend::Impl {
-    OSMesaImpl() {
+class OSMesaBackendImpl : public HeadlessBackend::Impl {
+public:
+    OSMesaBackendImpl() {
 #if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
         glContext = OSMesaCreateContextExt(OSMESA_RGBA, 16, 0, 0, nullptr);
 #else
@@ -19,8 +20,12 @@ struct OSMesaImpl : public HeadlessBackend::Impl {
         }
     }
 
-    ~OSMesaImpl() final {
+    ~OSMesaBackendImpl() final {
         OSMesaDestroyContext(glContext);
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        return OSMesaGetProcAddress(name);
     }
 
     void activateContext() final {
@@ -34,13 +39,9 @@ private:
     GLubyte fakeBuffer = 0;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    return OSMesaGetProcAddress(name);
-}
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl = std::make_unique<OSMesaImpl>();
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<OSMesaBackendImpl>();
 }
 
 } // namespace mbgl

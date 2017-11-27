@@ -61,7 +61,7 @@ public:
     bool dirty { false };
 
 private:
-    mbgl::gl::ProcAddress initializeExtension(const char*) override;
+    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char*) override;
 
 public slots:
     void connectionEstablished();

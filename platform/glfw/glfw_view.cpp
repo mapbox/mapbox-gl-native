@@ -540,7 +540,7 @@ mbgl::Size GLFWView::getFramebufferSize() const {
     return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
 }
 
-mbgl::gl::ProcAddress GLFWView::initializeExtension(const char* name) {
+mbgl::gl::ProcAddress GLFWView::getExtensionFunctionPointer(const char* name) {
     return glfwGetProcAddress(name);
 }
 
