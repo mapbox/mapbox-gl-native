@@ -217,7 +217,7 @@ public:
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
     if (self = [super initWithFrame:frameRect]) {
-        [self commonInit];
+        [self commonInit:nil];
         self.styleURL = nil;
     }
     return self;
@@ -225,7 +225,7 @@ public:
 
 - (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL {
     if (self = [super initWithFrame:frame]) {
-        [self commonInit];
+        [self commonInit:nil];
         self.styleURL = styleURL;
     }
     return self;
@@ -233,7 +233,7 @@ public:
 
 - (instancetype)initWithCoder:(nonnull NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
-        [self commonInit];
+        [self commonInit:nil];
     }
     return self;
 }
@@ -252,7 +252,7 @@ public:
     return @[@"camera", @"debugMask"];
 }
 
-- (void)commonInit {
+- (void)commonInit:(nullable NSString*)fontFamily {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
@@ -274,7 +274,7 @@ public:
 
     _mbglThreadPool = mbgl::sharedThreadPool();
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique, mbgl::optional<std::string>(), fontFamily ? std::string([fontFamily UTF8String]) : mbgl::optional<std::string>());
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
