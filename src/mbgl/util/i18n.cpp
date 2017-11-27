@@ -392,6 +392,11 @@ bool allowsIdeographicBreaking(char16_t chr) {
     //        || isInCJKCompatibilityIdeographsSupplement(chr));
 }
 
+bool allowsFixedWidthGlyphGeneration(char16_t chr) {
+    // Mirrors conservative set of characters used in glyph_manager.js/_tinySDF
+    return isInCJKUnifiedIdeographs(chr) || isInHangulSyllables(chr);
+}
+
 bool allowsVerticalWritingMode(const std::u16string& string) {
     for (char32_t chr : string) {
         if (hasUprightVerticalOrientation(chr)) {
