@@ -7,8 +7,6 @@
 
 namespace mbgl {
 
-class HeadlessDisplay;
-
 class HeadlessBackend : public RendererBackend {
 public:
     HeadlessBackend(Size = { 256, 256 });
@@ -35,11 +33,9 @@ private:
     void deactivate() override;
 
     bool hasContext() const { return bool(impl); }
-    bool hasDisplay();
 
     void createContext();
 
-    std::shared_ptr<HeadlessDisplay> display;
     std::unique_ptr<Impl> impl;
 
     Size size;

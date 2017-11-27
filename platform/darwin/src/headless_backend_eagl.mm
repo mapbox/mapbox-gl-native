@@ -7,23 +7,26 @@
 namespace mbgl {
 
 struct EAGLImpl : public HeadlessBackend::Impl {
-    EAGLImpl(EAGLContext* glContext_) : glContext(glContext_) {
-        [reinterpret_cast<EAGLContext*>(glContext) retain];
-        reinterpret_cast<EAGLContext*>(glContext).multiThreaded = YES;
+    EAGLImpl() {
+        glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        if (glContext == nil) {
+            throw std::runtime_error("Error creating GL context object");
+        }
+        glContext.multiThreaded = YES;
     }
 
-    ~EAGLImpl() {
-        [glContext release];
-    }
+    // Required for ARC to deallocate correctly.
+    ~EAGLImpl() final = default;
 
-    void activateContext() {
+    void activateContext() final {
         [EAGLContext setCurrentContext:glContext];
     }
 
-    void deactivateContext() {
+    void deactivateContext() final {
         [EAGLContext setCurrentContext:nil];
     }
 
+private:
     EAGLContext* glContext = nullptr;
 };
 
@@ -40,17 +43,9 @@ gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
     return reinterpret_cast<gl::ProcAddress>(symbol);
 }
 
-bool HeadlessBackend::hasDisplay() {
-    return true;
-}
-
 void HeadlessBackend::createContext() {
-    EAGLContext* glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    if (glContext == nil) {
-        throw std::runtime_error("Error creating GL context object");
-    }
-
-    impl.reset(new EAGLImpl(glContext));
+    assert(!hasContext());
+    impl = std::make_unique<EAGLImpl>();
 }
 
 } // namespace mbgl

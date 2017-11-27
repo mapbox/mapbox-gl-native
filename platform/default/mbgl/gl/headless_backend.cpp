@@ -1,5 +1,4 @@
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/gl/context.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
 
@@ -36,9 +35,6 @@ void HeadlessBackend::activate() {
     active = true;
 
     if (!hasContext()) {
-        if (!hasDisplay()) {
-            throw std::runtime_error("Display is not set");
-        }
         createContext();
     }
 

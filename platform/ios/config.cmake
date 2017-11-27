@@ -46,8 +46,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/darwin/src/headless_backend_eagl.mm
-        PRIVATE platform/default/mbgl/gl/headless_display.cpp
-        PRIVATE platform/default/mbgl/gl/headless_display.hpp
 
         # Snapshotting
         PRIVATE platform/default/mbgl/map/map_snapshotter.cpp
@@ -66,13 +64,6 @@ macro(mbgl_platform_core)
 
     target_compile_options(mbgl-core
         PRIVATE -fvisibility=hidden
-    )
-
-    # TODO: Remove this by converting to ARC
-    set_source_files_properties(
-        platform/darwin/src/headless_backend_eagl.mm
-            PROPERTIES
-        COMPILE_FLAGS -fno-objc-arc
     )
 
     target_include_directories(mbgl-core
