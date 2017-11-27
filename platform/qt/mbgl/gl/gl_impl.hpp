@@ -4,7 +4,12 @@
 
 // Qt4
 #if QT_VERSION < 0x050000
-    #if MBGL_USE_GLES2
+    #if __APPLE__
+        #include "TargetConditionals.h"
+        #include <OpenGL/OpenGL.h>
+        #include <OpenGL/gl.h>
+        #include <OpenGL/glext.h>
+    #elif MBGL_USE_GLES2
         #define GL_GLEXT_PROTOTYPES
         #include <GLES2/gl2.h>
         #include <GLES2/gl2ext.h>
