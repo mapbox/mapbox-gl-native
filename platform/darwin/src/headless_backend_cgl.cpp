@@ -65,8 +65,9 @@ public:
     CGLPixelFormatObj pixelFormat = nullptr;
 };
 
-struct CGLImpl : public HeadlessBackend::Impl {
-    CGLImpl() {
+class CGLBackendImpl : public HeadlessBackend::Impl {
+public:
+    CGLBackendImpl() {
         CGLError error = CGLCreateContext(cglDisplay->pixelFormat, nullptr, &glContext);
         if (error != kCGLNoError) {
             throw std::runtime_error(std::string("Error creating GL context object:") +
@@ -80,8 +81,22 @@ struct CGLImpl : public HeadlessBackend::Impl {
         }
     }
 
-    ~CGLImpl() final {
+    ~CGLBackendImpl() final {
         CGLDestroyContext(glContext);
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
+        if (!framework) {
+            throw std::runtime_error("Failed to load OpenGL framework.");
+        }
+
+        CFStringRef str =
+            CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
+        void* symbol = CFBundleGetFunctionPointerForName(framework, str);
+        CFRelease(str);
+
+        return reinterpret_cast<gl::ProcAddress>(symbol);
     }
 
     void activateContext() final {
@@ -105,23 +120,9 @@ private:
     CGLContextObj glContext = nullptr;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    assert(hasContext());
-    static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
-    if (!framework) {
-        throw std::runtime_error("Failed to load OpenGL framework.");
-    }
-
-    CFStringRef str = CFStringCreateWithCString(kCFAllocatorDefault, name, kCFStringEncodingASCII);
-    void* symbol = CFBundleGetFunctionPointerForName(framework, str);
-    CFRelease(str);
-
-    return reinterpret_cast<gl::ProcAddress>(symbol);
-}
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl = std::make_unique<CGLImpl>();
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<CGLBackendImpl>();
 }
 
 } // namespace mbgl

@@ -6031,7 +6031,7 @@ public:
         [nativeView didFinishLoadingStyle];
     }
 
-    mbgl::gl::ProcAddress initializeExtension(const char* name) override {
+    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char* name) override {
         static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengles"));
         if (!framework) {
             throw std::runtime_error("Failed to load OpenGL framework.");

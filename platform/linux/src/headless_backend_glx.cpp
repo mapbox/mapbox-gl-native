@@ -70,8 +70,9 @@ public:
     GLXFBConfig* fbConfigs = nullptr;
 };
 
-struct GLXImpl : public HeadlessBackend::Impl {
-    GLXImpl() {
+class GLXBackendImpl : public HeadlessBackend::Impl {
+public:
+    GLXBackendImpl() {
         // Try to create a legacy context.
         glContext = glXCreateNewContext(glxDisplay->xDisplay, glxDisplay->fbConfigs[0],
                                         GLX_RGBA_TYPE, None, True);
@@ -91,11 +92,15 @@ struct GLXImpl : public HeadlessBackend::Impl {
             glXCreatePbuffer(glxDisplay->xDisplay, glxDisplay->fbConfigs[0], pbufferAttributes);
     }
 
-    ~GLXImpl() final {
+    ~GLXBackendImpl() final {
         if (glxPbuffer) {
             glXDestroyPbuffer(glxDisplay->xDisplay, glxPbuffer);
         }
         glXDestroyContext(glxDisplay->xDisplay, glContext);
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        return glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
     }
 
     void activateContext() final {
@@ -117,13 +122,9 @@ private:
     GLXPbuffer glxPbuffer = 0;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    return glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
-}
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl = std::make_unique<GLXImpl>();
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<GLXBackendImpl>();
 }
 
 } // namespace mbgl

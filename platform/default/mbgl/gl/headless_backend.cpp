@@ -31,19 +31,24 @@ HeadlessBackend::~HeadlessBackend() {
     context.reset();
 }
 
+gl::ProcAddress HeadlessBackend::getExtensionFunctionPointer(const char* name) {
+    assert(impl);
+    return impl->getExtensionFunctionPointer(name);
+}
+
 void HeadlessBackend::activate() {
     active = true;
 
-    if (!hasContext()) {
-        createContext();
+    if (!impl) {
+        createImpl();
     }
 
-    assert(hasContext());
+    assert(impl);
     impl->activateContext();
 }
 
 void HeadlessBackend::deactivate() {
-    assert(hasContext());
+    assert(impl);
     impl->deactivateContext();
     active = false;
 }
