@@ -19,7 +19,6 @@ macro(mbgl_platform_core)
     if(WITH_OSMESA)
         target_sources(mbgl-core
             PRIVATE platform/default/headless_backend_osmesa.cpp
-            PRIVATE platform/default/mbgl/gl/headless_display.cpp
         )
         target_link_libraries(mbgl-core
             PUBLIC -lOSMesa
@@ -27,7 +26,6 @@ macro(mbgl_platform_core)
     elseif(WITH_EGL)
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_egl.cpp
-            PRIVATE platform/linux/src/headless_display_egl.cpp
         )
         target_link_libraries(mbgl-core
             PUBLIC -lGLESv2
@@ -37,7 +35,6 @@ macro(mbgl_platform_core)
     else()
         target_sources(mbgl-core
             PRIVATE platform/linux/src/headless_backend_glx.cpp
-            PRIVATE platform/linux/src/headless_display_glx.cpp
         )
         target_link_libraries(mbgl-core
             PUBLIC -lGL
@@ -66,7 +63,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/headless_frontend.hpp
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-        PRIVATE platform/default/mbgl/gl/headless_display.hpp
 
         # Thread pool
         PRIVATE platform/default/mbgl/util/default_thread_pool.cpp

@@ -12,7 +12,10 @@
 
 namespace mbgl {
 
-struct QtImpl : public HeadlessBackend::Impl {
+class QtImpl : public HeadlessBackend::Impl {
+public:
+    ~QtImpl() final = default;
+
     void activateContext() final {
         widget.makeCurrent();
     }
@@ -21,6 +24,7 @@ struct QtImpl : public HeadlessBackend::Impl {
         widget.doneCurrent();
     }
 
+private:
     QGLWidget widget;
 };
 
@@ -34,13 +38,9 @@ gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
 #endif
 }
 
-bool HeadlessBackend::hasDisplay() {
-    return true;
-};
-
 void HeadlessBackend::createContext() {
     assert(!hasContext());
-    impl.reset(new QtImpl);
+    impl = std::make_unique<QtImpl>();
 }
 
 } // namespace mbgl
