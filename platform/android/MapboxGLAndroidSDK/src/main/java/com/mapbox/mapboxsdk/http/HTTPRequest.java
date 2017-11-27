@@ -22,6 +22,7 @@ import javax.net.ssl.SSLException;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.Dispatcher;
 import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -31,7 +32,7 @@ import timber.log.Timber;
 
 class HTTPRequest implements Callback {
 
-  private static OkHttpClient mClient = new OkHttpClient();
+  private static OkHttpClient mClient = new OkHttpClient.Builder().dispatcher(getDispatcher()).build();
   private String USER_AGENT_STRING = null;
 
   private static final int CONNECTION_ERROR = 0;
@@ -47,6 +48,14 @@ class HTTPRequest implements Callback {
   private Call mCall;
   private Request mRequest;
 
+  private static Dispatcher getDispatcher() {
+    Dispatcher dispatcher = new Dispatcher();
+    // Matches core limit set on
+    // https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/src/http_file_source.cpp#L192
+    dispatcher.setMaxRequestsPerHost(20);
+    return dispatcher;
+  }
+
   private native void nativeOnFailure(int type, String message);
 
   private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires,
@@ -55,7 +64,6 @@ class HTTPRequest implements Callback {
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
     mNativePtr = nativePtr;
 
-    Timber.e("requesting: %s",resourceUrl);
     try {
       HttpUrl httpUrl = HttpUrl.parse(resourceUrl);
       final String host = httpUrl.host().toLowerCase(MapboxConstants.MAPBOX_LOCALE);
