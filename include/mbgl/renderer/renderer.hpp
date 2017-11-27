@@ -25,7 +25,8 @@ class Renderer {
 public:
     Renderer(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&,
              GLContextMode = GLContextMode::Unique,
-             const optional<std::string> programCacheDir = {});
+             const optional<std::string> programCacheDir = {},
+             const optional<std::string> localFontFamily = {});
     ~Renderer();
 
     void markContextLost();

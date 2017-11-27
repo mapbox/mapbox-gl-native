@@ -42,7 +42,8 @@ Renderer::Impl::Impl(RendererBackend& backend_,
                      FileSource& fileSource_,
                      Scheduler& scheduler_,
                      GLContextMode contextMode_,
-                     const optional<std::string> programCacheDir_)
+                     const optional<std::string> programCacheDir_,
+                     const optional<std::string> localFontFamily_)
     : backend(backend_)
     , scheduler(scheduler_)
     , fileSource(fileSource_)
@@ -50,7 +51,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
     , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource))
+    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
     , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
