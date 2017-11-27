@@ -23,10 +23,11 @@ namespace mbgl {
 class DebugBucket;
 class TransformState;
 class TileObserver;
-class PlacementConfig;
 class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
+
+class CollisionIndex;
 
 namespace gl {
 class Context;
@@ -47,7 +48,7 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
-    virtual void setPlacementConfig(const PlacementConfig&) {}
+    virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
     virtual void setMask(TileMask&&) {}
 
@@ -56,7 +57,8 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>&,
-            const RenderedQueryOptions& options);
+            const RenderedQueryOptions& options,
+            const CollisionIndex&);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
@@ -92,6 +94,22 @@ public:
     bool isComplete() const {
         return loaded && !pending;
     }
+    
+    // "holdForFade" is used to keep tiles in the render tree after they're no longer
+    // ideal tiles in order to allow symbols to fade out
+    virtual bool holdForFade() const {
+        return false;
+    }
+    // Set whenever this tile is used as an ideal tile
+    virtual void markRenderedIdeal() {}
+    // Set when the tile is removed from the ideal render set but may still be held for fading
+    virtual void markRenderedPreviously() {}
+    // Placement operation performed while this tile is fading
+    // We hold onto a tile for two placements: fading starts with the first placement
+    // and will have time to finish by the second placement.
+    virtual void performedFadePlacement() {}
+    
+    virtual void resetCrossTileIDs() {};
 
     void dumpDebugLogs() const;
 
@@ -101,8 +119,6 @@ public:
 
     // Contains the tile ID string for painting debug information.
     std::unique_ptr<DebugBucket> debugBucket;
-    
-    virtual float yStretch() const { return 1.0f; }
 
 protected:
     bool triedOptional = false;

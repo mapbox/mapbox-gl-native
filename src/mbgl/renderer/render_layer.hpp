@@ -82,13 +82,16 @@ public:
     friend std::string layoutKey(const RenderLayer&);
 
 protected:
+    // renderTiles are exposed directly to CrossTileSymbolIndex and Placement so they
+    // can update opacities in the symbol buckets immediately before rendering
+    friend class CrossTileSymbolIndex;
+    friend class Placement;
+    // Stores current set of tiles to be rendered for this layer.
+    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
+
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.
     RenderPass passes = RenderPass::None;
-
-    //Stores current set of tiles to be rendered for this layer.
-    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
-
 };
 
 } // namespace mbgl

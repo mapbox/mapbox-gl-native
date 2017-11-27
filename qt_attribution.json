@@ -50,19 +50,6 @@
         "Copyright": "Copyright (c) 2009-2014 libc++ developers"
     },
     {
-        "Id": "mapboxgl-any",
-        "Name": "Any",
-        "QDocModule": "qtlocation",
-        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
-
-        "Path": "deps/any",
-        "Description": "Implementation of N4562 std::experimental::any for C++11 compilers.",
-        "Homepage": "https://github.com/thelink2012/any",
-        "LicenseId": "BSL-1.0",
-        "License": "Boost Software License 1.0",
-        "Copyright": "Copyright (c) 2016 Denilson das Mercês Amorim"
-    },
-    {
         "Id": "mapboxgl-boost",
         "Name": "Boost",
         "QDocModule": "qtlocation",

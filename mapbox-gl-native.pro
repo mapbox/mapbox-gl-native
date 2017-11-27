@@ -68,6 +68,7 @@ SOURCES += \
     platform/qt/src/qmapboxgl_renderer_frontend_p.cpp \
     platform/qt/src/qt_geojson.cpp \
     platform/qt/src/qt_image.cpp \
+    platform/qt/src/qt_logging.cpp \
     platform/qt/src/run_loop.cpp \
     platform/qt/src/sqlite3.cpp \
     platform/qt/src/string_stdlib.cpp \
@@ -129,7 +130,6 @@ SOURCES += \
     src/mbgl/renderer/buckets/raster_bucket.cpp \
     src/mbgl/renderer/buckets/symbol_bucket.cpp \
     src/mbgl/renderer/cross_faded_property_evaluator.cpp \
-    src/mbgl/renderer/frame_history.cpp \
     src/mbgl/renderer/group_by_layout.cpp \
     src/mbgl/renderer/image_atlas.cpp \
     src/mbgl/renderer/image_manager.cpp \
@@ -150,6 +150,7 @@ SOURCES += \
     src/mbgl/renderer/renderer.cpp \
     src/mbgl/renderer/renderer_backend.cpp \
     src/mbgl/renderer/renderer_impl.cpp \
+    src/mbgl/renderer/sources/render_custom_geometry_source.cpp \
     src/mbgl/renderer/sources/render_geojson_source.cpp \
     src/mbgl/renderer/sources/render_image_source.cpp \
     src/mbgl/renderer/sources/render_raster_source.cpp \
@@ -158,6 +159,7 @@ SOURCES += \
     src/mbgl/renderer/tile_pyramid.cpp \
     src/mbgl/shaders/circle.cpp \
     src/mbgl/shaders/collision_box.cpp \
+    src/mbgl/shaders/collision_circle.cpp \
     src/mbgl/shaders/debug.cpp \
     src/mbgl/shaders/extrusion_texture.cpp \
     src/mbgl/shaders/fill.cpp \
@@ -193,6 +195,7 @@ SOURCES += \
     src/mbgl/style/conversion/source.cpp \
     src/mbgl/style/conversion/tileset.cpp \
     src/mbgl/style/conversion/transition_options.cpp \
+    src/mbgl/style/custom_tile_loader.cpp \
     src/mbgl/style/expression/array_assertion.cpp \
     src/mbgl/style/expression/assertion.cpp \
     src/mbgl/style/expression/at.cpp \
@@ -249,6 +252,8 @@ SOURCES += \
     src/mbgl/style/parser.cpp \
     src/mbgl/style/source.cpp \
     src/mbgl/style/source_impl.cpp \
+    src/mbgl/style/sources/custom_geometry_source.cpp \
+    src/mbgl/style/sources/custom_geometry_source_impl.cpp \
     src/mbgl/style/sources/geojson_source.cpp \
     src/mbgl/style/sources/geojson_source_impl.cpp \
     src/mbgl/style/sources/image_source.cpp \
@@ -262,14 +267,17 @@ SOURCES += \
     src/mbgl/style/types.cpp \
     src/mbgl/text/check_max_angle.cpp \
     src/mbgl/text/collision_feature.cpp \
-    src/mbgl/text/collision_tile.cpp \
+    src/mbgl/text/collision_index.cpp \
+    src/mbgl/text/cross_tile_symbol_index.cpp \
     src/mbgl/text/get_anchors.cpp \
     src/mbgl/text/glyph.cpp \
     src/mbgl/text/glyph_atlas.cpp \
     src/mbgl/text/glyph_manager.cpp \
     src/mbgl/text/glyph_pbf.cpp \
+    src/mbgl/text/placement.cpp \
     src/mbgl/text/quads.cpp \
     src/mbgl/text/shaping.cpp \
+    src/mbgl/tile/custom_geometry_tile.cpp \
     src/mbgl/tile/geojson_tile.cpp \
     src/mbgl/tile/geometry_tile.cpp \
     src/mbgl/tile/geometry_tile_data.cpp \
@@ -315,17 +323,16 @@ SOURCES += \
     src/mbgl/util/version.cpp \
     src/mbgl/util/work_request.cpp \
     src/parsedate/parsedate.c \
-	platform/default/asset_file_source.cpp \
-	platform/default/default_file_source.cpp \
-	platform/default/file_source_request.cpp \
-	platform/default/local_file_source.cpp \
-	platform/default/logging_stderr.cpp \
-	platform/default/mbgl/storage/offline.cpp \
-	platform/default/mbgl/storage/offline_database.cpp \
-	platform/default/mbgl/storage/offline_download.cpp \
-	platform/default/mbgl/util/default_thread_pool.cpp \
-	platform/default/mbgl/util/shared_thread_pool.cpp \
-	platform/default/online_file_source.cpp
+    platform/default/asset_file_source.cpp \
+    platform/default/default_file_source.cpp \
+    platform/default/file_source_request.cpp \
+    platform/default/local_file_source.cpp \
+    platform/default/mbgl/storage/offline.cpp \
+    platform/default/mbgl/storage/offline_database.cpp \
+    platform/default/mbgl/storage/offline_download.cpp \
+    platform/default/mbgl/util/default_thread_pool.cpp \
+    platform/default/mbgl/util/shared_thread_pool.cpp \
+    platform/default/online_file_source.cpp
 
 HEADERS += \
     platform/qt/include/qmapbox.hpp \
@@ -341,8 +348,6 @@ HEADERS += \
     platform/qt/src/timer_impl.hpp \
 
 INCLUDEPATH += \
-    deps/any/8fef1e9 \
-    deps/any/8fef1e9/include \
     deps/boost/1.62.0 \
     deps/boost/1.62.0/include \
     deps/cheap-ruler/2.5.3 \
@@ -384,4 +389,4 @@ INCLUDEPATH += \
     src
 
 QMAKE_CXXFLAGS += \
-    -DMBGL_VERSION_REV=\\\"qt-v1.1.1\\\"
+    -DMBGL_VERSION_REV=\\\"qt-v1.2.0\\\"

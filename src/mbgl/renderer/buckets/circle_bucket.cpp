@@ -49,7 +49,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
             // Do not include points that are outside the tile boundaries.
             // Include all points in Still mode. You need to include points from
             // neighbouring tiles so that they are not clipped at tile boundaries.
-            if ((mode != MapMode::Still) &&
+            if ((mode == MapMode::Continuous) &&
                 (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
