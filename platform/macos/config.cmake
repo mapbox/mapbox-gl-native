@@ -14,11 +14,12 @@ macro(mbgl_platform_core)
         # Misc
         PRIVATE platform/darwin/mbgl/storage/reachability.h
         PRIVATE platform/darwin/mbgl/storage/reachability.m
+        PRIVATE platform/darwin/src/CFHandle.hpp
+        PRIVATE platform/darwin/src/local_glyph_rasterizer.mm
         PRIVATE platform/darwin/src/logging_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm
         PRIVATE platform/darwin/src/string_nsstring.mm
         PRIVATE platform/default/bidi.cpp
-        PRIVATE platform/default/local_glyph_rasterizer.cpp
         PRIVATE platform/default/thread_local.cpp
         PRIVATE platform/default/utf.cpp
 
@@ -64,6 +65,7 @@ macro(mbgl_platform_core)
     target_link_libraries(mbgl-core
         PUBLIC "-lz"
         PUBLIC "-framework Foundation"
+        PUBLIC "-framework CoreText"
         PUBLIC "-framework CoreGraphics"
         PUBLIC "-framework OpenGL"
         PUBLIC "-framework ImageIO"
