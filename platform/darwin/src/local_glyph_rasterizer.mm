@@ -2,6 +2,8 @@
 #include <mbgl/util/i18n.hpp>
 
 #import <Foundation/Foundation.h>
+#import <CoreText/CoreText.h>
+#import <ImageIO/ImageIO.h>
 
 namespace {
 
