@@ -321,14 +321,18 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     
     CIContext *ctx = [CIContext contextWithOptions:nil];
     CGImageRef cgimg = [ctx createCGImage:blurredImage fromRect:[backgroundImage extent]];
+    MGLImage *image;
     
 #if TARGET_OS_IPHONE
     
-    return [UIImage imageWithCGImage:cgimg];
+    image = [UIImage imageWithCGImage:cgimg];
 #else
     
-    return [[NSImage alloc] initWithCGImage:cgimg size:[backgroundImage extent].size];
+    image = [[NSImage alloc] initWithCGImage:cgimg size:[backgroundImage extent].size];
 #endif
+
+    CGImageRelease(cgimg);
+    return image;
 }
 
 - (void)cancel
