@@ -5,7 +5,7 @@
 @implementation NSImage (MGLAdditions)
 
 - (nullable instancetype)initWithMGLPremultipliedImage:(mbgl::PremultipliedImage&&)src {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(std::move(src));
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(std::move(src));
     if (!image) {
         return nil;
     }
@@ -16,7 +16,7 @@
 }
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->getImage().clone());
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(styleImage->getImage().clone());
     if (!image) {
         return nil;
     }

@@ -6,7 +6,7 @@
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage
 {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->getImage().clone());
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(styleImage->getImage().clone());
     if (!image) {
         return nil;
     }
@@ -24,7 +24,7 @@
 
 - (nullable instancetype)initWithMGLPremultipliedImage:(const mbgl::PremultipliedImage&&)mbglImage scale:(CGFloat)scale
 {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(mbglImage.clone());
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(mbglImage.clone());
     if (!image) {
         return nil;
     }
