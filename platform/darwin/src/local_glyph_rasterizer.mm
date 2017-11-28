@@ -47,8 +47,8 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph fixedMetrics;
     fixedMetrics.id = glyphID;
 
-    uint32_t width = 40;
-    uint32_t height = 40;
+    uint32_t width = 35;
+    uint32_t height = 35;
     
     fixedMetrics.metrics.width = width;
     fixedMetrics.metrics.height = height;
@@ -136,7 +136,7 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     (void)totalAdvance;
     
     // Set text position and draw the line into the graphics context
-    CGContextSetTextPosition(*context, 0.0, 10.0);
+    CGContextSetTextPosition(*context, 0.0, 5.0);
     CTLineDraw(line, *context);
     
     CFRelease(line);
