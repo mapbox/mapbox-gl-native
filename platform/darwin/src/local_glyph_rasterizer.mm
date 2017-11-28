@@ -22,16 +22,21 @@ namespace mbgl {
 */
 
 using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
-using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
 using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
 class LocalGlyphRasterizer::Impl {
 public:
-    Impl(CTFontRef fontHandle)
-        : font(fontHandle)
+    Impl(CTFontRef font_)
+        : font(font_)
     {}
+    
+    ~Impl() {
+        if (font) {
+            CFRelease(font);
+        }
+    }
 
-    CTFontRefHandle font;
+    CTFontRef font;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
@@ -56,7 +61,7 @@ LocalGlyphRasterizer::~LocalGlyphRasterizer()
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
     // TODO: This is a rough approximation of the set of glyphs that will work with fixed glyph metrics
     // Either narrow this down to be conservative, or actually extract glyph metrics in rasterizeGlyph
-    return *(impl->font) && util::i18n::allowsIdeographicBreaking(glyphID);
+    return impl->font && util::i18n::allowsIdeographicBreaking(glyphID);
 }
 
 // TODO: In theory we should be able to transform user-coordinate bounding box and advance
@@ -137,7 +142,7 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
 
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph fixedMetrics;
-    if (!*(impl->font)) {
+    if (!impl->font) {
         return fixedMetrics;
     }
     
@@ -151,7 +156,7 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     fixedMetrics.metrics.top = -1;
     fixedMetrics.metrics.advance = 24;
 
-    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, *(impl->font), size);
+    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, impl->font, size);
    
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     fixedMetrics.bitmap = AlphaImage(size);

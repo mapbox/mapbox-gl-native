@@ -85,6 +85,7 @@ macro(mbgl_platform_core)
     target_link_libraries(mbgl-core
         PUBLIC "-lz"
         PUBLIC "-framework Foundation"
+        PUBLIC "-framework CoreText"
         PUBLIC "-framework CoreGraphics"
         PUBLIC "-framework OpenGLES"
         PUBLIC "-framework ImageIO"
