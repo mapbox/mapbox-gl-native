@@ -1,5 +1,10 @@
 # Changelog for Mapbox macOS SDK
 
+## v0.6.1
+
+### Annotations
+* Fixed an issue that could cause triggering `-[MGLMapViewDelegate mapView:didSelectAnnotation:]` when taping next to a `MGLAnnotationImage` annotation. ([#10538](https://github.com/mapbox/mapbox-gl-native/pull/10538))
+
 ## v0.6.0
 
 ### Networking and storage

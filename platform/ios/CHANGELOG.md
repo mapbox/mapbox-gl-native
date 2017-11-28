@@ -2,7 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 3.7.0
+## 3.7.1
+
+### Annotations
+* Fixed an issue that could cause triggering `-[MGLMapViewDelegate mapView:didSelectAnnotation:]` when taping next to a `MGLAnnotationImage` annotation. ([#10538](https://github.com/mapbox/mapbox-gl-native/pull/10538))
+
+## 3.7.0 - Novemeber 13, 2017
 
 ### Networking and storage
 
