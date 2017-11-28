@@ -33,7 +33,7 @@ namespace mbgl {
 class LocalGlyphRasterizer {
 public:
     virtual ~LocalGlyphRasterizer();
-    LocalGlyphRasterizer(void* configuration);
+    LocalGlyphRasterizer(void* configuration = nullptr);
 
     // virtual so that test harness can override platform-specific behavior
     virtual bool canRasterizeGlyph(const FontStack&, GlyphID);

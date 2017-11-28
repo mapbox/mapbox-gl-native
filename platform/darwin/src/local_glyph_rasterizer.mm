@@ -34,16 +34,18 @@ public:
     CTFontRefHandle font;
 };
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(void*)
+LocalGlyphRasterizer::LocalGlyphRasterizer(void* configuration)
 {
-    NSDictionary *fontAttributes =
-              [NSDictionary dictionaryWithObjectsAndKeys:
-                      [NSNumber numberWithFloat:24.0], (NSString *)kCTFontSizeAttribute,
-                      nil];
+    if (configuration) {
+        NSMutableDictionary *fontAttributes = CFBridgingRelease((CFDictionaryRef)configuration);
+        fontAttributes[(NSString *)kCTFontSizeAttribute] = [NSNumber numberWithFloat:24.0];
 
-    CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+        CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
 
-    impl = std::make_unique<Impl>(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
+        impl = std::make_unique<Impl>(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
+    } else {
+        impl = std::make_unique<Impl>((CTFontRef)NULL);
+    }
 }
 
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
@@ -52,7 +54,7 @@ LocalGlyphRasterizer::~LocalGlyphRasterizer()
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
     // TODO: This is a rough approximation of the set of glyphs that will work with fixed glyph metrics
     // Either narrow this down to be conservative, or actually extract glyph metrics in rasterizeGlyph
-    return util::i18n::allowsIdeographicBreaking(glyphID);
+    return *(impl->font) && util::i18n::allowsIdeographicBreaking(glyphID);
 }
 
 // TODO: In theory we should be able to transform user-coordinate bounding box and advance
@@ -133,6 +135,10 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
 
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph fixedMetrics;
+    if (!*(impl->font)) {
+        return fixedMetrics;
+    }
+    
     fixedMetrics.id = glyphID;
 
     Size size(35, 35);
