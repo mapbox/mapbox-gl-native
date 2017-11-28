@@ -23,7 +23,7 @@ using CGDataProviderHandle = CFHandle<CGDataProviderRef, CGDataProviderRef, CGDa
 using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
 using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
 
-CGImageRef CGImageFromMGLPremultipliedImage(mbgl::PremultipliedImage&& src) {
+CGImageRef CGImageCreateWithMGLPremultipliedImage(mbgl::PremultipliedImage&& src) {
     // We're converting the PremultipliedImage's backing store to a CGDataProvider, and are taking
     // over ownership of the memory.
     CGDataProviderHandle provider(CGDataProviderCreateWithData(
