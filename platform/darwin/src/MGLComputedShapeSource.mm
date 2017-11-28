@@ -93,32 +93,37 @@
 @implementation MGLComputedShapeSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
-    _requestQueue = [[NSOperationQueue alloc] init];
-    self.requestQueue.name = [NSString stringWithFormat:@"mgl.MGLComputedShapeSource.%@", identifier];
-    self.requestQueue.qualityOfService = NSQualityOfServiceUtility;
-    self.requestQueue.maxConcurrentOperationCount = 4;
+    NSOperationQueue *requestQueue = [[NSOperationQueue alloc] init];
+    requestQueue.name = [NSString stringWithFormat:@"mgl.MGLComputedShapeSource.%@", identifier];
+    requestQueue.qualityOfService = NSQualityOfServiceUtility;
+    requestQueue.maxConcurrentOperationCount = 4;
 
     auto sourceOptions  = MBGLCustomGeometrySourceOptionsFromDictionary(options);
     sourceOptions.fetchTileFunction = ^void(const mbgl::CanonicalTileID& tileID) {
         NSOperation *operation = [[MGLComputedShapeSourceFetchOperation alloc] initForSource:self tile:tileID];
-        [self.requestQueue addOperation:operation];
+        [requestQueue addOperation:operation];
     };
     
     sourceOptions.cancelTileFunction = ^void(const mbgl::CanonicalTileID& tileID) {
-        for(MGLComputedShapeSourceFetchOperation *operation in [self.requestQueue operations]) {
-            if(operation.x == tileID.x && operation.y == tileID.y && operation.z == tileID.z) {
+        for (MGLComputedShapeSourceFetchOperation *operation in requestQueue.operations) {
+            if (operation.x == tileID.x && operation.y == tileID.y && operation.z == tileID.z) {
                 [operation cancel];
             }
         }
     };
 
     auto source = std::make_unique<mbgl::style::CustomGeometrySource>(identifier.UTF8String, sourceOptions);
-    return self = [super initWithPendingSource:std::move(source)];
+
+    if (self = [super initWithPendingSource:std::move(source)]) {
+        _requestQueue = requestQueue;
+    }
+    return self;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
-    self = [self initWithIdentifier:identifier options:options];
-    [self setDataSource:dataSource];
+    if (self = [self initWithIdentifier:identifier options:options]) {
+        [self setDataSource:dataSource];
+    }
     return self;
 }
 
