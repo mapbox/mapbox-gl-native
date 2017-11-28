@@ -34,11 +34,13 @@ public:
     CTFontRefHandle font;
 };
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(void* configuration)
+LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
 {
-    if (configuration) {
-        NSMutableDictionary *fontAttributes = CFBridgingRelease((CFDictionaryRef)configuration);
-        fontAttributes[(NSString *)kCTFontSizeAttribute] = [NSNumber numberWithFloat:24.0];
+    if (fontFamily) {
+        NSDictionary *fontAttributes = @{
+            (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
+            (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
+        };
 
         CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
 
