@@ -47,14 +47,15 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph fixedMetrics;
     fixedMetrics.id = glyphID;
 
-    fixedMetrics.metrics.width = 24;
-    fixedMetrics.metrics.height = 24;
-    fixedMetrics.metrics.left = 0;
-    fixedMetrics.metrics.top = -8;
+    uint32_t width = 40;
+    uint32_t height = 40;
+    
+    fixedMetrics.metrics.width = width;
+    fixedMetrics.metrics.height = height;
+    fixedMetrics.metrics.left = 3;
+    fixedMetrics.metrics.top = -1;
     fixedMetrics.metrics.advance = 24;
 
-    uint32_t width = 30;
-    uint32_t height = 30;
     Size size(width, height);
 
     fixedMetrics.bitmap = AlphaImage(size);
@@ -114,12 +115,32 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
 
     CTLineRef line = CTLineCreateWithAttributedString(attrString); // TODO: Get glyph runs (for metric extraction) and use showGlyphs API instead?
 
+    CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
+    CFIndex runCount = CFArrayGetCount(glyphRuns);
+    assert(runCount == 1);
+    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(glyphRuns, 0);
+    CFIndex glyphCount = CTRunGetGlyphCount(run);
+    assert(glyphCount == 1);
+    const CGGlyph *glyphs = CTRunGetGlyphsPtr(run);
+
+    CGRect boundingRects[1];
+    boundingRects[0] = CGRectMake(0, 0, 0, 0);
+    CGSize advances[1];
+    advances[0] = CGSizeMake(0,0);
+    CGRect totalBoundingRect = CTFontGetBoundingRectsForGlyphs(font, kCTFontOrientationDefault, glyphs, boundingRects, 1);
+    double totalAdvance = CTFontGetAdvancesForGlyphs(font, kCTFontOrientationDefault, glyphs, advances, 1);
+    
+    // Break in the debugger to see these values: translating from "user coordinates" to bitmap pixel coordinates
+    // should be OK, but a lot of glyphs seem to have empty bounding boxes...?
+    (void)totalBoundingRect;
+    (void)totalAdvance;
+    
     // Set text position and draw the line into the graphics context
-    CGContextSetTextPosition(*context, 0.0, 0.0);
+    CGContextSetTextPosition(*context, 0.0, 10.0);
     CTLineDraw(line, *context);
+    
     CFRelease(line);
     CFRelease(font);
-    CFRelease(string); // TODO: Surely leaking something here, wrap these up!
     
     for (uint32_t i = 0; i < width * height; i++) {
         fixedMetrics.bitmap.data[i] = image.data[4 * i + 3]; // alpha value
