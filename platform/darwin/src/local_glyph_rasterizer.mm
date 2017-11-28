@@ -22,6 +22,15 @@ private:
 
 namespace mbgl {
 
+using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
+using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
+using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
+using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
+using CFStringRefHandle = CFHandle<CFStringRef, CFTypeRef, CFRelease>;
+using CFAttributedStringRefHandle = CFHandle<CFAttributedStringRef, CFTypeRef, CFRelease>;
+using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
+using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
+
 /*
     Initial implementation of darwin TinySDF support:
     Draw any CJK glyphs using a default system font
@@ -34,87 +43,41 @@ namespace mbgl {
      - Extract glyph metrics so that this can be used with more than just fixed width glyphs
 */
 
+class LocalGlyphRasterizer::Impl {
+public:
+    Impl(CTFontRef fontHandle)
+        : font(fontHandle)
+    {}
+
+    CTFontRefHandle font;
+};
+
+LocalGlyphRasterizer::LocalGlyphRasterizer(void*)
+{
+    NSDictionary *fontAttributes =
+              [NSDictionary dictionaryWithObjectsAndKeys:
+                      [NSNumber numberWithFloat:24.0], (NSString *)kCTFontSizeAttribute,
+                      nil];
+
+    CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+
+    impl = std::make_unique<Impl>(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
+}
+
+LocalGlyphRasterizer::~LocalGlyphRasterizer()
+{}
+
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
     // TODO: This is a rough approximation of the set of glyphs that will work with fixed glyph metrics
     // Either narrow this down to be conservative, or actually extract glyph metrics in rasterizeGlyph
     return util::i18n::allowsIdeographicBreaking(glyphID);
 }
 
-using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
-using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
-
-Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    Glyph fixedMetrics;
-    fixedMetrics.id = glyphID;
-
-    uint32_t width = 35;
-    uint32_t height = 35;
-    
-    fixedMetrics.metrics.width = width;
-    fixedMetrics.metrics.height = height;
-    fixedMetrics.metrics.left = 3;
-    fixedMetrics.metrics.top = -1;
-    fixedMetrics.metrics.advance = 24;
-
-    Size size(width, height);
-
-    fixedMetrics.bitmap = AlphaImage(size);
-    
-    NSDictionary *fontAttributes =
-              [NSDictionary dictionaryWithObjectsAndKeys:
-                      [NSNumber numberWithFloat:24.0], (NSString *)kCTFontSizeAttribute,
-                      nil];
-    // Create a descriptor.
-    CTFontDescriptorRef descriptor =
-              CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes);
-
-    // Create a font using the descriptor.
-    CTFontRef font = CTFontCreateWithFontDescriptor(descriptor, 0.0, NULL);
-    CFRelease(descriptor);
-
-
-    CFStringRef string = CFStringCreateWithCharacters(NULL, (UniChar*)&glyphID, 1);
-
-    PremultipliedImage image(size);
-
-    CGColorSpaceHandle colorSpace(CGColorSpaceCreateDeviceRGB());
-    // TODO: Is there a way to just draw a single alpha channel instead of copying it out of an RGB image? Doesn't seem like the grayscale colorspace is what I'm looking for...
-    if (!colorSpace) {
-        throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
-    }
-    
-    constexpr const size_t bitsPerComponent = 8;
-    constexpr const size_t bytesPerPixel = 4;
-    const size_t bytesPerRow = bytesPerPixel * width;
-
-    CGContextHandle context(CGBitmapContextCreate(
-        image.data.get(),
-        width,
-        height,
-        bitsPerComponent,
-        bytesPerRow,
-        *colorSpace,
-        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast));
-    if (!context) {
-        throw std::runtime_error("CGBitmapContextCreate failed");
-    }
-
-    CFStringRef keys[] = { kCTFontAttributeName };
-    CFTypeRef values[] = { font };
-
-    CFDictionaryRef attributes =
-        CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
-            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
-            &kCFTypeDictionaryKeyCallBacks,
-            &kCFTypeDictionaryValueCallBacks);
-
-    CFAttributedStringRef attrString =
-        CFAttributedStringCreate(kCFAllocatorDefault, string, attributes);
-    CFRelease(string);
-    CFRelease(attributes);
-
-    CTLineRef line = CTLineCreateWithAttributedString(attrString); // TODO: Get glyph runs (for metric extraction) and use showGlyphs API instead?
-
+// TODO: In theory we should be able to transform user-coordinate bounding box and advance
+// values into pixel glyph metrics. This would remove the need to use fixed glyph metrics
+// (which will be slightly off depending on the font), and allow us to return non CJK glyphs
+// (which will have variable "advance" values).
+void extractGlyphMetrics(CTFontRef font, CTLineRef line) {
     CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
     CFIndex runCount = CFArrayGetCount(glyphRuns);
     assert(runCount == 1);
@@ -134,16 +97,76 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     // should be OK, but a lot of glyphs seem to have empty bounding boxes...?
     (void)totalBoundingRect;
     (void)totalAdvance;
+}
+
+PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
+    PremultipliedImage rgbaBitmap(size);
+    
+    CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(&glyphID), 1));
+
+    CGColorSpaceHandle colorSpace(CGColorSpaceCreateDeviceRGB());
+    // TODO: Is there a way to just draw a single alpha channel instead of copying it out of an RGB image? Doesn't seem like the grayscale colorspace is what I'm looking for...
+    if (!colorSpace) {
+        throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
+    }
+    
+    constexpr const size_t bitsPerComponent = 8;
+    constexpr const size_t bytesPerPixel = 4;
+    const size_t bytesPerRow = bytesPerPixel * size.width;
+
+    CGContextHandle context(CGBitmapContextCreate(
+        rgbaBitmap.data.get(),
+        size.width,
+        size.height,
+        bitsPerComponent,
+        bytesPerRow,
+        *colorSpace,
+        kCGBitmapByteOrderDefault | kCGImageAlphaPremultipliedLast));
+    if (!context) {
+        throw std::runtime_error("CGBitmapContextCreate failed");
+    }
+
+    CFStringRef keys[] = { kCTFontAttributeName };
+    CFTypeRef values[] = { font };
+
+    CFDictionaryRefHandle attributes(
+        CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
+            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
+            &kCFTypeDictionaryKeyCallBacks,
+            &kCFTypeDictionaryValueCallBacks));
+
+    CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, *string, *attributes));
+
+    CTLineRefHandle line(CTLineCreateWithAttributedString(*attrString));
+    
+    // For debugging only, doesn't get useful metrics yet
+    extractGlyphMetrics(font, *line);
     
     // Set text position and draw the line into the graphics context
     CGContextSetTextPosition(*context, 0.0, 5.0);
-    CTLineDraw(line, *context);
+    CTLineDraw(*line, *context);
     
-    CFRelease(line);
-    CFRelease(font);
+    return rgbaBitmap;
+}
+
+Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
+    Glyph fixedMetrics;
+    fixedMetrics.id = glyphID;
+
+    Size size(35, 35);
     
-    for (uint32_t i = 0; i < width * height; i++) {
-        fixedMetrics.bitmap.data[i] = image.data[4 * i + 3]; // alpha value
+    fixedMetrics.metrics.width = size.width;
+    fixedMetrics.metrics.height = size.height;
+    fixedMetrics.metrics.left = 3;
+    fixedMetrics.metrics.top = -1;
+    fixedMetrics.metrics.advance = 24;
+
+    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, *(impl->font), size);
+   
+    // Copy alpha values from RGBA bitmap into the AlphaImage output
+    fixedMetrics.bitmap = AlphaImage(size);
+    for (uint32_t i = 0; i < size.width * size.height; i++) {
+        fixedMetrics.bitmap.data[i] = rgbaBitmap.data[4 * i + 3];
     }
 
     return fixedMetrics;

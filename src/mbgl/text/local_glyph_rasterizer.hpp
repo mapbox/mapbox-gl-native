@@ -32,11 +32,15 @@ namespace mbgl {
 
 class LocalGlyphRasterizer {
 public:
-    virtual ~LocalGlyphRasterizer() = default;
+    virtual ~LocalGlyphRasterizer();
+    LocalGlyphRasterizer(void* configuration);
 
     // virtual so that test harness can override platform-specific behavior
     virtual bool canRasterizeGlyph(const FontStack&, GlyphID);
     virtual Glyph rasterizeGlyph(const FontStack&, GlyphID);
+private:
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 } // namespace mbgl

@@ -25,7 +25,7 @@ public:
 
 class GlyphManager : public util::noncopyable {
 public:
-    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>());
+    GlyphManager(FileSource&, std::unique_ptr<LocalGlyphRasterizer> = std::make_unique<LocalGlyphRasterizer>((void*)NULL));
     ~GlyphManager();
 
     // Workers send a `getGlyphs` message to the main thread once they have determined
