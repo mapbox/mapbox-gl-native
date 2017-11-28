@@ -2,6 +2,15 @@
 
 namespace mbgl {
 
+class LocalGlyphRasterizer::Impl {
+};
+
+LocalGlyphRasterizer::LocalGlyphRasterizer(void*)
+{}
+
+LocalGlyphRasterizer::~LocalGlyphRasterizer()
+{}
+
 bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID) {
     return false;
 }
