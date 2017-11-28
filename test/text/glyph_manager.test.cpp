@@ -19,10 +19,6 @@ static constexpr const size_t stubBitmapLength = 900;
 
 class StubLocalGlyphRasterizer : public LocalGlyphRasterizer {
 public:
-    StubLocalGlyphRasterizer()
-        : LocalGlyphRasterizer(0)
-    {}
-
     bool canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
         return util::i18n::allowsIdeographicBreaking(glyphID);
     }
