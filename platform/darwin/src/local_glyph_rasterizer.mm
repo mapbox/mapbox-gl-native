@@ -5,31 +5,9 @@
 #import <CoreText/CoreText.h>
 #import <ImageIO/ImageIO.h>
 
-namespace {
-
-template <typename T, typename S, void (*Releaser)(S)>
-struct CFHandle {
-    CFHandle(T t_): t(t_) {}
-    ~CFHandle() { Releaser(t); }
-    T operator*() { return t; }
-    operator bool() { return t; }
-private:
-    T t;
-};
-
-} // namespace
-
+#import "CFHandle.hpp"
 
 namespace mbgl {
-
-using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
-using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
-using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
-using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
-using CFStringRefHandle = CFHandle<CFStringRef, CFTypeRef, CFRelease>;
-using CFAttributedStringRefHandle = CFHandle<CFAttributedStringRef, CFTypeRef, CFRelease>;
-using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
-using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
 
 /*
     Initial implementation of darwin TinySDF support:
@@ -42,6 +20,10 @@ using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
        (maybe a globally configurable FontStack -> UIFontDescriptor map would make sense?
      - Extract glyph metrics so that this can be used with more than just fixed width glyphs
 */
+
+using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
+using CTFontRefHandle = CFHandle<CTFontRef, CFTypeRef, CFRelease>;
+using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
 class LocalGlyphRasterizer::Impl {
 public:
