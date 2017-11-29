@@ -62,7 +62,7 @@ public class AttributionMeasure {
       float width = measure.getLogoContainerWidth() + measure.getTextViewShortContainerWidth();
       boolean fitBounds = width <= measure.getMaxSizeShort();
       if (fitBounds) {
-        PointF anchor = calculateAnchor(measure.snapshot, measure.textView, measure.margin);
+        PointF anchor = calculateAnchor(measure.snapshot, measure.textViewShort, measure.margin);
         return new AttributionLayout(measure.logo, anchor, true);
       }
       return null;
