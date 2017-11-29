@@ -41,7 +41,7 @@ protected:
     // Called with the name of an OpenGL extension that should be loaded. RendererBackend implementations
     // must call the API-specific version that obtains the function pointer for this function,
     // or a null pointer if unsupported/unavailable.
-    virtual gl::ProcAddress initializeExtension(const char*) = 0;
+    virtual gl::ProcAddress getExtensionFunctionPointer(const char*) = 0;
 
     // Called when the backend's GL context needs to be made active or inactive. These are called,
     // as a matched pair, exclusively through BackendScope, in two situations:
