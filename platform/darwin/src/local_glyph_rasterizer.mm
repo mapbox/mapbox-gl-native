@@ -1,5 +1,6 @@
 #include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/i18n.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <unordered_map>
 
@@ -62,9 +63,14 @@ public:
         }
         
         if (fontHandles.find(fontStack) == fontHandles.end()) {
+            
+            NSDictionary* fontTraits = @{ (NSString *)kCTFontSymbolicTrait: [NSNumber numberWithFloat:getFontWeight(fontStack)] };
+            
             NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
+                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding],
+                (NSString *)kCTFontTraitsAttribute: fontTraits
+                //(NSString *)kCTFontStyleNameAttribute: (getFontWeight(fontStack) > .3) ? @"Bold" : @"Regular"
             };
 
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
@@ -79,6 +85,30 @@ public:
     }
     
 private:
+    float getFontWeight(const FontStack& fontStack) {
+        // Analog to logic in glyph_manager.js
+        // From NSFontDescriptor.h (macOS 10.11+) NSFontWeight*:
+        constexpr float light = -.4;
+        constexpr float regular = 0.0;
+        constexpr float medium = .23;
+        constexpr float bold = .4;
+        
+        float fontWeight = regular;
+        for (auto font : fontStack) {
+            // Last font in the fontstack "wins"
+            std::string lowercaseFont = mbgl::platform::lowercase(font);
+            if (lowercaseFont.find("bold") != std::string::npos) {
+                fontWeight = bold;
+            } else if (lowercaseFont.find("medium") != std::string::npos) {
+                fontWeight = medium;
+            } else if (lowercaseFont.find("light") != std::string::npos) {
+                fontWeight = light;
+            }
+        }
+
+        return fontWeight;
+    }
+
     std::unordered_map<FontStack, CTFontRef, FontStackHash> fontHandles;
     optional<std::string> fontFamily;
 };
