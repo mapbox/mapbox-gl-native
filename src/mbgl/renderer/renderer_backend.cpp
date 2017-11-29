@@ -16,7 +16,7 @@ gl::Context& RendererBackend::getContext() {
         context = std::make_unique<gl::Context>();
         context->enableDebugging();
         context->initializeExtensions(
-            std::bind(&RendererBackend::initializeExtension, this, std::placeholders::_1));
+            std::bind(&RendererBackend::getExtensionFunctionPointer, this, std::placeholders::_1));
     });
     return *context;
 }

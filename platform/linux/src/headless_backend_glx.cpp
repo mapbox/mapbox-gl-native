@@ -1,5 +1,4 @@
 #include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/headless_display.hpp>
 
 #include <mbgl/util/logging.hpp>
 
@@ -9,79 +8,123 @@
 
 namespace mbgl {
 
-struct GLXImpl : public HeadlessBackend::Impl {
-    GLXImpl(GLXContext glContext_, GLXPbuffer glxPbuffer_, Display* xDisplay_, GLXFBConfig* fbConfigs_)
-            : glContext(glContext_),
-              glxPbuffer(glxPbuffer_),
-              xDisplay(xDisplay_),
-              fbConfigs(fbConfigs_) {
+// This class provides a singleton that contains information about the configuration used for
+// instantiating new headless rendering contexts.
+class GLXDisplayConfig {
+private:
+    // Key for singleton construction.
+    struct Key { explicit Key() = default; };
+
+public:
+    GLXDisplayConfig(Key) {
+        if (!XInitThreads()) {
+            throw std::runtime_error("Failed to XInitThreads.");
+        }
+
+        xDisplay = XOpenDisplay(nullptr);
+        if (xDisplay == nullptr) {
+            throw std::runtime_error("Failed to open X display.");
+        }
+
+        const auto* extensions = reinterpret_cast<const char*>(
+            glXQueryServerString(xDisplay, DefaultScreen(xDisplay), GLX_EXTENSIONS));
+        if (!extensions) {
+            throw std::runtime_error("Cannot read GLX extensions.");
+        }
+        if (!strstr(extensions, "GLX_SGIX_fbconfig")) {
+            throw std::runtime_error("Extension GLX_SGIX_fbconfig was not found.");
+        }
+        if (!strstr(extensions, "GLX_SGIX_pbuffer")) {
+            throw std::runtime_error("Cannot find glXCreateContextAttribsARB.");
+        }
+
+        // We're creating a dummy pbuffer anyway that we're not using.
+        static int pixelFormat[] = { GLX_DRAWABLE_TYPE, GLX_PBUFFER_BIT, None };
+
+        int configs = 0;
+        fbConfigs = glXChooseFBConfig(xDisplay, DefaultScreen(xDisplay), pixelFormat, &configs);
+        if (fbConfigs == nullptr) {
+            throw std::runtime_error("Failed to glXChooseFBConfig.");
+        }
+        if (configs <= 0) {
+            throw std::runtime_error("No Framebuffer configurations.");
+        }
     }
 
-    ~GLXImpl() override {
-        if (glxPbuffer) {
-            glXDestroyPbuffer(xDisplay, glxPbuffer);
+    ~GLXDisplayConfig() {
+        XFree(fbConfigs);
+        XCloseDisplay(xDisplay);
+    }
+
+    static std::shared_ptr<const GLXDisplayConfig> create() {
+        static std::weak_ptr<const GLXDisplayConfig> instance;
+        auto shared = instance.lock();
+        if (!shared) {
+            instance = shared = std::make_shared<GLXDisplayConfig>(Key{});
         }
-        glXDestroyContext(xDisplay, glContext);
+        return shared;
+    }
+
+public:
+    Display* xDisplay = nullptr;
+    GLXFBConfig* fbConfigs = nullptr;
+};
+
+class GLXBackendImpl : public HeadlessBackend::Impl {
+public:
+    GLXBackendImpl() {
+        // Try to create a legacy context.
+        glContext = glXCreateNewContext(glxDisplay->xDisplay, glxDisplay->fbConfigs[0],
+                                        GLX_RGBA_TYPE, None, True);
+        if (glContext && !glXIsDirect(glxDisplay->xDisplay, glContext)) {
+            Log::Error(Event::OpenGL, "failed to create direct OpenGL Legacy context");
+            glXDestroyContext(glxDisplay->xDisplay, glContext);
+            glContext = nullptr;
+        }
+        if (glContext == nullptr) {
+            throw std::runtime_error("Error creating GL context object.");
+        }
+
+        // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
+        // activate the context.
+        int pbufferAttributes[] = { GLX_PBUFFER_WIDTH, 8, GLX_PBUFFER_HEIGHT, 8, None };
+        glxPbuffer =
+            glXCreatePbuffer(glxDisplay->xDisplay, glxDisplay->fbConfigs[0], pbufferAttributes);
+    }
+
+    ~GLXBackendImpl() final {
+        if (glxPbuffer) {
+            glXDestroyPbuffer(glxDisplay->xDisplay, glxPbuffer);
+        }
+        glXDestroyContext(glxDisplay->xDisplay, glContext);
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        return glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
     }
 
     void activateContext() final {
-        if (!glXMakeContextCurrent(xDisplay, glxPbuffer, glxPbuffer, glContext)) {
+        if (!glXMakeContextCurrent(glxDisplay->xDisplay, glxPbuffer, glxPbuffer, glContext)) {
             throw std::runtime_error("Switching OpenGL context failed.\n");
         }
     }
 
     void deactivateContext() final {
-        if (!glXMakeContextCurrent(xDisplay, 0, 0, nullptr)) {
+        if (!glXMakeContextCurrent(glxDisplay->xDisplay, 0, 0, nullptr)) {
             throw std::runtime_error("Removing OpenGL context failed.\n");
         }
     }
 
+private:
+    const std::shared_ptr<const GLXDisplayConfig> glxDisplay = GLXDisplayConfig::create();
+
     GLXContext glContext = nullptr;
     GLXPbuffer glxPbuffer = 0;
-
-    // Needed for ImplDeleter.
-    Display* xDisplay = nullptr;
-    GLXFBConfig* fbConfigs = nullptr;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    return glXGetProcAddress(reinterpret_cast<const GLubyte*>(name));
-}
-
-bool HeadlessBackend::hasDisplay() {
-    if (!display) {
-        display = HeadlessDisplay::create();
-    }
-    return bool(display);
-};
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-
-    auto* xDisplay = display->attribute<Display*>();
-    auto* fbConfigs = display->attribute<GLXFBConfig*>();
-
-    // Try to create a legacy context.
-    GLXContext glContext = glXCreateNewContext(xDisplay, fbConfigs[0], GLX_RGBA_TYPE, None, True);
-    if (glContext && !glXIsDirect(xDisplay, glContext)) {
-        Log::Error(Event::OpenGL, "failed to create direct OpenGL Legacy context");
-        glXDestroyContext(xDisplay, glContext);
-        glContext = nullptr;
-    }
-    if (glContext == nullptr) {
-        throw std::runtime_error("Error creating GL context object.");
-    }
-
-    // Create a dummy pbuffer. We will render to framebuffers anyway, but we need a pbuffer to
-    // activate the context.
-    int pbufferAttributes[] = {
-        GLX_PBUFFER_WIDTH, 8,
-        GLX_PBUFFER_HEIGHT, 8,
-        None
-    };
-    GLXPbuffer glxPbuffer = glXCreatePbuffer(xDisplay, fbConfigs[0], pbufferAttributes);
-
-    impl = std::make_unique<mbgl::GLXImpl>(glContext, glxPbuffer, xDisplay, fbConfigs);
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<GLXBackendImpl>();
 }
 
 } // namespace mbgl

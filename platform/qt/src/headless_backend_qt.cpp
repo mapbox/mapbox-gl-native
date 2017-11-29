@@ -12,7 +12,20 @@
 
 namespace mbgl {
 
-struct QtImpl : public HeadlessBackend::Impl {
+class QtBackendImpl : public HeadlessBackend::Impl {
+public:
+    ~QtBackendImpl() final = default;
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+#if QT_VERSION >= 0x050000
+        QOpenGLContext* thisContext = QOpenGLContext::currentContext();
+        return thisContext->getProcAddress(name);
+#else
+        const QGLContext* thisContext = QGLContext::currentContext();
+        return reinterpret_cast<gl::ProcAddress>(thisContext->getProcAddress(name));
+#endif
+    }
+
     void activateContext() final {
         widget.makeCurrent();
     }
@@ -21,26 +34,13 @@ struct QtImpl : public HeadlessBackend::Impl {
         widget.doneCurrent();
     }
 
+private:
     QGLWidget widget;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-#if QT_VERSION >= 0x050000
-        QOpenGLContext* thisContext = QOpenGLContext::currentContext();
-        return thisContext->getProcAddress(name);
-#else
-        const QGLContext* thisContext = QGLContext::currentContext();
-        return reinterpret_cast<gl::ProcAddress>(thisContext->getProcAddress(name));
-#endif
-}
-
-bool HeadlessBackend::hasDisplay() {
-    return true;
-};
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-    impl.reset(new QtImpl);
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<QtBackendImpl>();
 }
 
 } // namespace mbgl

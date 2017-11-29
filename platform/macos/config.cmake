@@ -32,8 +32,6 @@ macro(mbgl_platform_core)
         PRIVATE platform/default/mbgl/gl/headless_backend.cpp
         PRIVATE platform/default/mbgl/gl/headless_backend.hpp
         PRIVATE platform/darwin/src/headless_backend_cgl.cpp
-        PRIVATE platform/default/mbgl/gl/headless_display.hpp
-        PRIVATE platform/darwin/src/headless_display_cgl.cpp
 
         # Snapshotting
         PRIVATE platform/default/mbgl/map/map_snapshotter.cpp

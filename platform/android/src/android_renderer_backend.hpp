@@ -24,7 +24,7 @@ public:
 
 protected:
     // mbgl::RendererBackend //
-    gl::ProcAddress initializeExtension(const char*) override;
+    gl::ProcAddress getExtensionFunctionPointer(const char*) override;
     void activate() override {};
     void deactivate() override {};
 

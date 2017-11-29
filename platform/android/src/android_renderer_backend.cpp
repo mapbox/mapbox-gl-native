@@ -21,7 +21,7 @@ void AndroidRendererBackend::bind() {
 /**
  * From mbgl::RendererBackend.
  */
-gl::ProcAddress AndroidRendererBackend::initializeExtension(const char* name) {
+gl::ProcAddress AndroidRendererBackend::getExtensionFunctionPointer(const char* name) {
     assert(BackendScope::exists());
     return eglGetProcAddress(name);
 }
