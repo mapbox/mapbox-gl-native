@@ -2930,6 +2930,7 @@ public:
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
+    _mbglMap->setMinZoom(minimumZoomLevel);
 }
 
 - (double)minimumZoomLevel
