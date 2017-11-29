@@ -6,10 +6,6 @@ target_sources(mbgl-offline
     PRIVATE platform/default/mbgl/util/default_styles.hpp
 )
 
-target_compile_options(mbgl-offline
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-offline
     PRIVATE platform/default
 )

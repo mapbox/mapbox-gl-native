@@ -62,10 +62,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC polylabel)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
-    target_compile_options(mbgl-core
-        PRIVATE -fvisibility=hidden
-    )
-
     target_include_directories(mbgl-core
         PUBLIC platform/darwin
         PUBLIC platform/default
@@ -92,10 +88,6 @@ macro(mbgl_filesource)
 
         # Database
         PRIVATE platform/default/sqlite3.cpp
-    )
-
-    target_compile_options(mbgl-filesource
-        PRIVATE -fvisibility=hidden
     )
 
     target_link_libraries(mbgl-filesource

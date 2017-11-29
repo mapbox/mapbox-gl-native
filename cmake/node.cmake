@@ -27,11 +27,6 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/util/async_queue.hpp
 )
 
-target_compile_options(mbgl-node
-    PRIVATE -fPIC
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-node
     PRIVATE platform/default
 )

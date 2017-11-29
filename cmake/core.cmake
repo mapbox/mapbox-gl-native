@@ -2,11 +2,6 @@ add_library(mbgl-core STATIC
     ${MBGL_CORE_FILES}
 )
 
-target_compile_options(mbgl-core
-    PRIVATE -fPIC
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-core
     PUBLIC include
     PRIVATE src
