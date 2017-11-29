@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
+    android:paddingTop="10dp">
+
+    <!--  Region Name  -->
+    <TextView
+        android:id="@+id/name_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:text="REGION NAME:" />
+
+    <EditText
+        android:id="@+id/name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/name_label"
+        android:layout_toEndOf="@id/name_label"
+        android:layout_alignBaseline="@id/name_label"
+        android:hint="Enter Region Name" />
+
+    <!--  Style  -->
+    <TextView
+        android:id="@+id/style_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name_label"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:text="STYLE:" />
+
+    <Spinner
+        android:id="@+id/style"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/name"
+        android:layout_toRightOf="@id/style_label"
+        android:layout_toEndOf="@id/style_label"
+        android:layout_alignBaseline="@id/style_label"/>
+
+    <!--  Min Zoom  -->
+    <TextView
+        android:id="@+id/minzoom_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/style_label"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:text="MIN ZOOM:"/>
+
+    <TextView
+        android:id="@+id/minzoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/style_label"
+        android:layout_alignBaseline="@id/minzoom_label"
+        android:layout_toRightOf="@+id/minzoom_label"
+        android:layout_toEndOf="@+id/minzoom_label"
+        android:text="0"/>
+
+    <SeekBar
+        android:id="@+id/minzoom_slider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/style_label"
+        android:layout_toRightOf="@+id/minzoom"
+        android:layout_toEndOf="@+id/minzoom"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"/>
+
+    <!--  Max Zoom  -->
+    <TextView
+        android:id="@+id/maxzoom_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/minzoom_label"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:text="MAX ZOOM: "/>
+
+    <TextView
+        android:id="@+id/maxzoom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/minzoom_label"
+        android:layout_alignBaseline="@id/maxzoom_label"
+        android:layout_toRightOf="@+id/maxzoom_label"
+        android:layout_toEndOf="@+id/maxzoom_label"
+        android:text="25"/>
+
+    <SeekBar
+        android:id="@+id/maxzoom_slider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/minzoom_label"
+        android:layout_toRightOf="@+id/maxzoom"
+        android:layout_toEndOf="@+id/maxzoom"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"/>
+
+
+    <LinearLayout
+        android:id="@+id/north_east_lat_lon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/maxzoom_label"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/north_east_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="NORTH EAST:" />
+
+        <EditText
+            android:id="@+id/lat_north"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_weight="1"/>
+
+        <EditText
+            android:id="@+id/lon_east"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/south_west_lat_lon"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/north_east_lat_lon"
+        android:layout_marginBottom="10dp"
+        android:layout_marginTop="10dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/south_west_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="SOUTH WEST:" />
+
+        <EditText
+            android:id="@+id/lat_south"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_weight="1"/>
+
+        <EditText
+            android:id="@+id/lon_west"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="numberSigned|numberDecimal"
+            android:layout_weight="1"/>
+    </LinearLayout>
+
+
+    <Button
+        android:id="@+id/action_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/south_west_lat_lon"
+        android:text="Start Download"/>
+
+    <TextView
+        android:id="@+id/download_progress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@id/action_button"
+        android:layout_below="@id/south_west_lat_lon"
+        android:layout_toRightOf="@id/action_button"
+        android:layout_toEndOf="@id/action_button"
+        android:layout_alignBaseline="@id/action_button"
+        android:text="0B, 0%" />
+
+
+
+</RelativeLayout>

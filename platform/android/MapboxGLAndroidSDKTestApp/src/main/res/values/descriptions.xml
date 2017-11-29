@@ -24,6 +24,8 @@
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
     <string name="description_offline_region_delete">Delete region example</string>
+    <string name="description_offline_regions_list">List offline regions example</string>
+    <string name="description_offline_map_form">Form to download offline map</string>
     <string name="description_animated_marker">Animate the position change of a marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
     <string name="description_polygon">Add a polygon to a map</string>

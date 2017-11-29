@@ -144,6 +144,7 @@ public class OfflineManager {
    * Retrieve all regions in the offline database.
    * <p>
    * The query will be executed asynchronously and the results passed to the given
+   * The query will be executed asyncchronously and the results passed to the given
    * callback on the main thread.
    * </p>
    *
@@ -203,6 +204,7 @@ public class OfflineManager {
       return;
     }
 
+    fileSource.activate();
     ConnectivityReceiver.instance(context).activate();
     createOfflineRegion(fileSource, definition, metadata, new CreateOfflineRegionCallback() {
 
@@ -212,6 +214,7 @@ public class OfflineManager {
           @Override
           public void run() {
             ConnectivityReceiver.instance(context).deactivate();
+            fileSource.deactivate();
             callback.onCreate(offlineRegion);
           }
         });
@@ -222,6 +225,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            fileSource.deactivate();
             ConnectivityReceiver.instance(context).deactivate();
             callback.onError(error);
           }

@@ -32,6 +32,8 @@
     <string name="activity_offline">Offline Map</string>
     <string name="activity_update_metadata">Update metadata Map</string>
     <string name="activity_offline_region_delete">Delete region</string>
+    <string name="activity_offline_regions_list">List offline regions</string>
+    <string name="activity_offline_map_form">Download offline map form</string>
     <string name="activity_minmax_zoom">Min/Max Zoom</string>
     <string name="activity_viewpager">ViewPager</string>
     <string name="activity_runtime_style">Runtime Style</string>
