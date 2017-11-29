@@ -50,7 +50,6 @@ macro(mbgl_platform_core)
 
     target_compile_options(mbgl-core
         PRIVATE -fobjc-arc
-        PRIVATE -fvisibility=hidden
     )
 
     target_include_directories(mbgl-core
@@ -81,7 +80,6 @@ macro(mbgl_filesource)
 
     target_compile_options(mbgl-filesource
         PRIVATE -fobjc-arc
-        PRIVATE -fvisibility=hidden
     )
 
     target_link_libraries(mbgl-filesource
@@ -96,11 +94,6 @@ macro(mbgl_platform_glfw)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
-
-    target_compile_options(mbgl-glfw
-        PRIVATE -fvisibility=hidden
-    )
-
 endmacro()
 
 
@@ -109,9 +102,6 @@ macro(mbgl_platform_render)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
     )
-    target_compile_options(mbgl-render
-        PRIVATE -fvisibility=hidden
-    )
 endmacro()
 
 
@@ -119,9 +109,6 @@ macro(mbgl_platform_offline)
     target_link_libraries(mbgl-offline
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
-    )
-    target_compile_options(mbgl-offline
-        PRIVATE -fvisibility=hidden
     )
 endmacro()
 
@@ -141,10 +128,6 @@ macro(mbgl_platform_test)
         COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
 
-    target_compile_options(mbgl-test
-        PRIVATE -fvisibility=hidden
-    )
-
     target_link_libraries(mbgl-test
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-darwin
@@ -152,10 +135,6 @@ macro(mbgl_platform_test)
 endmacro()
 
 macro(mbgl_platform_benchmark)
-    target_compile_options(mbgl-benchmark
-        PRIVATE -fvisibility=hidden
-    )
-
     target_sources(mbgl-benchmark
         PRIVATE benchmark/src/main.cpp
     )
@@ -173,10 +152,6 @@ macro(mbgl_platform_benchmark)
 endmacro()
 
 macro(mbgl_platform_node)
-    target_compile_options(mbgl-node
-        PRIVATE -fvisibility=hidden
-    )
-
     target_link_libraries(mbgl-node
         PRIVATE "-Wl,-bind_at_load"
     )

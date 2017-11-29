@@ -18,7 +18,7 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - node6-clang39-debug:
+      - node6-gcc6-debug:
           filters:
             tags:
               only: /node-.*/
@@ -425,16 +425,16 @@ jobs:
       - *upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node6-clang39-debug:
+  node6-gcc6-debug:
     docker:
-      - image: mbgl/de3c86c2ff:linux-clang-3.9
+      - image: mbgl/de3c86c2ff:linux-gcc-6
+    resource_class: large
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      WITH_CXX11ABI: 0
     steps:
       - checkout
       - *generate-cache-key
@@ -567,7 +567,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_CXX11ABI: 0
@@ -592,7 +592,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
@@ -620,7 +620,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2 # OOM, causing the compiler to crash.
+      JOBS: 4
       BUILDTYPE: Release
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
@@ -648,7 +648,7 @@ jobs:
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
-      JOBS: 2 # OOM, causing the compiler to crash.
+      JOBS: 4
       BUILDTYPE: Release
       WITH_QT_I18N: 1
     steps:
