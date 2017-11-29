@@ -129,7 +129,8 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID));
+        bool isConvertGeometry = options.geometryConversion.value_or(true);
+        result[layerID].push_back(convertFeature(*geometryTileFeature, tileID, isConvertGeometry));
     }
 }
 

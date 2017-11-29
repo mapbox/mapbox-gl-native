@@ -75,8 +75,9 @@ std::vector<GeometryCollection> classifyRings(const GeometryCollection&);
 // Truncate polygon to the largest `maxHoles` inner rings by area.
 void limitHoles(GeometryCollection&, uint32_t maxHoles);
 
-// convert from GeometryTileFeature to Feature (eventually we should eliminate GeometryTileFeature)
-Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&);
+// convert from GeometryTileFeature to Feature with optional geometry conversion
+// (eventually we should eliminate GeometryTileFeature)
+Feature convertFeature(const GeometryTileFeature&, const CanonicalTileID&, const bool = true);
 
 // Fix up possibly-non-V2-compliant polygon geometry using angus clipper.
 // The result is guaranteed to have correctly wound, strictly simple rings.

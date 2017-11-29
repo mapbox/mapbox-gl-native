@@ -14,14 +14,18 @@ namespace mbgl {
 class RenderedQueryOptions {
 public:
     RenderedQueryOptions(optional<std::vector<std::string>> layerIDs_ = {},
-                         optional<style::Filter> filter_ = {})
+                         optional<style::Filter> filter_ = {},
+                         optional<bool> geometryConversion_ = true)
         : layerIDs(std::move(layerIDs_)),
-          filter(std::move(filter_)) {}
+          filter(std::move(filter_)),
+          geometryConversion(std::move(geometryConversion_)) {}
 
     /** layerIDs to include in the query */
     optional<std::vector<std::string>> layerIDs;
 
     optional<style::Filter> filter;
+
+    optional<bool> geometryConversion;
 };
 
 /**

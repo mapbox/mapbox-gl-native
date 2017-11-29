@@ -202,7 +202,8 @@ public:
 
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
                                                                    jni::Array<jni::String>,
-                                                                   jni::Array<jni::Object<>> jfilter);
+                                                                   jni::Array<jni::Object<>> jfilter,
+                                                                   jni::jboolean jwithGeometry);
 
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForBox(JNIEnv&, jni::jfloat, jni::jfloat, jni::jfloat,
                                                                  jni::jfloat, jni::Array<jni::String>,

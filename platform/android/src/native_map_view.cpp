@@ -656,7 +656,8 @@ jni::Array<jlong> NativeMapView::queryShapeAnnotations(JNIEnv &env, jni::Object<
 
 jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForPoint(JNIEnv& env, jni::jfloat x, jni::jfloat y,
                                                                               jni::Array<jni::String> layerIds,
-                                                                              jni::Array<jni::Object<>> jfilter) {
+                                                                              jni::Array<jni::Object<>> jfilter,
+                                                                              jni::jboolean jwithGeometry) {
     using namespace mbgl::android::conversion;
     using namespace mbgl::android::geojson;
 
@@ -666,9 +667,11 @@ jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesFo
     }
     mapbox::geometry::point<double> point = {x, y};
 
+    bool withGeometry = jwithGeometry;
+
     return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(
             env,
-            rendererFrontend->queryRenderedFeatures(point, { layers, toFilter(env, jfilter) }));
+            rendererFrontend->queryRenderedFeatures(point, { layers, toFilter(env, jfilter), withGeometry}));
 }
 
 jni::Array<jni::Object<geojson::Feature>> NativeMapView::queryRenderedFeaturesForBox(JNIEnv& env, jni::jfloat left, jni::jfloat top,

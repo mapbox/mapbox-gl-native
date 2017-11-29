@@ -173,8 +173,47 @@ static Feature::geometry_type convertGeometry(const GeometryTileFeature& geometr
     return Point<double>();
 }
 
-Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID) {
-    Feature feature { convertGeometry(geometryTileFeature, tileID) };
+static Feature::geometry_type convertGeometryType(const GeometryTileFeature& geometryTileFeature) {
+    GeometryCollection geometries = geometryTileFeature.getGeometries();
+
+    switch (geometryTileFeature.getType()) {
+        case FeatureType::Unknown: {
+            assert(false);
+            return Point<double>(NAN, NAN);
+        }
+
+        case FeatureType::Point: {
+            if(geometries.at(0).size() == 1){
+                return Point<double>();
+            } else {
+                return MultiPoint<double>();
+            }
+        }
+
+        case FeatureType::LineString: {
+            if(geometries.size() == 1){
+                return LineString<double>();
+            } else {
+                return MultiLineString<double>();
+            }
+        }
+
+        case FeatureType::Polygon: {
+            if (geometries.size() == 1) {
+                return Polygon<double>();
+            } else {
+                return MultiPolygon<double>();
+            }
+        }
+    }
+
+    // Unreachable, but placate GCC.
+    return Point<double>();
+}
+
+
+Feature convertFeature(const GeometryTileFeature& geometryTileFeature, const CanonicalTileID& tileID, bool isConvertGeometry) {
+    Feature feature { isConvertGeometry ? convertGeometry(geometryTileFeature, tileID) : convertGeometryType(geometryTileFeature)};
     feature.properties = geometryTileFeature.getProperties();
     feature.id = geometryTileFeature.getID();
     return feature;

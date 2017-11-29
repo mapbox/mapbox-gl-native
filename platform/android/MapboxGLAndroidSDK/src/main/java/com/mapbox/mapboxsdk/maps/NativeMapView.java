@@ -801,12 +801,13 @@ final class NativeMapView {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
-                                             @Nullable Filter.Statement filter) {
+                                             @Nullable Filter.Statement filter,
+                                             boolean withGeometry) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
-      coordinates.y / pixelRatio, layerIds, filter != null ? filter.toArray() : null);
+      coordinates.y / pixelRatio, layerIds, filter != null ? filter.toArray() : null, withGeometry);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
 
@@ -1049,7 +1050,8 @@ final class NativeMapView {
 
   private native Feature[] nativeQueryRenderedFeaturesForPoint(float x, float y,
                                                                String[] layerIds,
-                                                               Object[] filter);
+                                                               Object[] filter,
+                                                               boolean withGeometry);
 
   private native Feature[] nativeQueryRenderedFeaturesForBox(float left, float top,
                                                              float right, float bottom,
