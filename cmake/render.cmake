@@ -2,10 +2,6 @@ add_executable(mbgl-render
     bin/render.cpp
 )
 
-target_compile_options(mbgl-render
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-render
     PRIVATE platform/default
 )

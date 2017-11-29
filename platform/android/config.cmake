@@ -7,12 +7,18 @@ set(CMAKE_C_ARCHIVE_CREATE "<CMAKE_AR> cruT <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_CXX_ARCHIVE_APPEND "<CMAKE_AR> ruT <TARGET> <LINK_FLAGS> <OBJECTS>")
 set(CMAKE_C_ARCHIVE_APPEND "<CMAKE_AR> ruT <TARGET> <LINK_FLAGS> <OBJECTS>")
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ffunction-sections -fdata-sections")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -ffunction-sections -fdata-sections")
+
 if ((ANDROID_ABI STREQUAL "armeabi") OR (ANDROID_ABI STREQUAL "armeabi-v7a") OR (ANDROID_ABI STREQUAL "arm64-v8a") OR
     (ANDROID_ABI STREQUAL "x86") OR (ANDROID_ABI STREQUAL "x86_64"))
     # Use Identical Code Folding on platforms that support the gold linker.
     set(CMAKE_EXE_LINKER_FLAGS "-fuse-ld=gold -Wl,--icf=safe ${CMAKE_EXE_LINKER_FLAGS}")
     set(CMAKE_SHARED_LINKER_FLAGS "-fuse-ld=gold -Wl,--icf=safe ${CMAKE_SHARED_LINKER_FLAGS}")
 endif()
+
+set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script")
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--gc-sections -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script")
 
 mason_use(jni.hpp VERSION 3.0.0 HEADER_ONLY)
 mason_use(nunicode VERSION 1.7.1)
@@ -79,12 +85,6 @@ macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC rapidjson)
     target_add_mason_package(mbgl-core PRIVATE icu)
 
-    target_compile_options(mbgl-core
-        PRIVATE -fvisibility=hidden
-        PRIVATE -ffunction-sections
-        PRIVATE -fdata-sections
-    )
-
     target_link_libraries(mbgl-core
         PUBLIC -llog
         PUBLIC -landroid
@@ -112,12 +112,6 @@ macro(mbgl_filesource)
 
     target_add_mason_package(mbgl-filesource PUBLIC sqlite)
     target_add_mason_package(mbgl-filesource PUBLIC jni.hpp)
-
-    target_compile_options(mbgl-filesource
-        PRIVATE -fvisibility=hidden
-        PRIVATE -ffunction-sections
-        PRIVATE -fdata-sections
-    )
 
     target_link_libraries(mbgl-filesource
         PUBLIC -llog
@@ -308,12 +302,6 @@ add_library(mbgl-android STATIC
     platform/android/src/jni.cpp
 )
 
-target_compile_options(mbgl-android
-    PRIVATE -fvisibility=hidden
-    PRIVATE -ffunction-sections
-    PRIVATE -fdata-sections
-)
-
 target_link_libraries(mbgl-android
     PUBLIC mbgl-filesource
     PUBLIC mbgl-core
@@ -327,8 +315,6 @@ add_library(mapbox-gl SHARED
 
 target_link_libraries(mapbox-gl
     PRIVATE mbgl-android
-    PRIVATE -Wl,--gc-sections
-    PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )
 
 ## Test library ##
@@ -346,14 +332,8 @@ macro(mbgl_platform_test)
         PRIVATE platform/android
     )
 
-    target_compile_options(mbgl-test
-        PRIVATE -fvisibility=hidden
-    )
-
     target_link_libraries(mbgl-test
         PRIVATE mbgl-android
-        PRIVATE -Wl,--gc-sections
-        PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
     )
 endmacro()
 
@@ -363,14 +343,6 @@ add_library(example-custom-layer SHARED
     platform/android/src/example_custom_layer.cpp
 )
 
-target_compile_options(example-custom-layer
-    PRIVATE -fvisibility=hidden
-    PRIVATE -ffunction-sections
-    PRIVATE -fdata-sections
-)
-
 target_link_libraries(example-custom-layer
     PRIVATE mbgl-core
-    PRIVATE -Wl,--gc-sections
-    PRIVATE -Wl,--version-script=${CMAKE_SOURCE_DIR}/platform/android/version-script
 )

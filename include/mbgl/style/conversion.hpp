@@ -222,6 +222,15 @@ private:
         optional<GeoJSON> (*toGeoJSON) (const Storage&, Error&);
     };
 
+    // Extracted this function from the table below to work around a GCC bug with differing
+    // visibility settings for capturing lambdas: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80947
+    template <typename T>
+    static auto vtableEachMember(const Storage& s, const std::function<optional<Error>(const std::string&, const Convertible&)>& fn) {
+        return ConversionTraits<T>::eachMember(reinterpret_cast<const T&>(s), [&](const std::string& k, T&& v) {
+            return fn(k, Convertible(std::move(v)));
+        });
+    }
+
     template <typename T>
     static VTable* vtableForType() {
         using Traits = ConversionTraits<T>;
@@ -257,11 +266,7 @@ private:
                     return optional<Convertible>();
                 }
             },
-            [] (const Storage& s, const std::function<optional<Error> (const std::string&, const Convertible&)>& fn) {
-                return Traits::eachMember(reinterpret_cast<const T&>(s), [&](const std::string& k, T&& v) {
-                    return fn(k, Convertible(std::move(v)));
-                });
-            },
+            vtableEachMember<T>,
             [] (const Storage& s) {
                 return Traits::toBool(reinterpret_cast<const T&>(s));
             },

@@ -2,10 +2,6 @@ add_executable(mbgl-benchmark
     ${MBGL_BENCHMARK_FILES}
 )
 
-target_compile_options(mbgl-benchmark
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-benchmark
     PRIVATE src
     PRIVATE benchmark/include

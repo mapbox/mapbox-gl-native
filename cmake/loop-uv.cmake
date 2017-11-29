@@ -4,11 +4,6 @@ add_library(mbgl-loop-uv STATIC
     platform/default/timer.cpp
 )
 
-target_compile_options(mbgl-loop-uv
-    PRIVATE -fPIC
-    PRIVATE -fvisibility-inlines-hidden
-)
-
 target_include_directories(mbgl-loop-uv
     PRIVATE include
     PRIVATE src
