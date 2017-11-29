@@ -21,6 +21,11 @@ namespace mbgl {
      - Extract glyph metrics so that this can be used with more than just fixed width glyphs
 */
 
+using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
+using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
+using CFStringRefHandle = CFHandle<CFStringRef, CFTypeRef, CFRelease>;
+using CFAttributedStringRefHandle = CFHandle<CFAttributedStringRef, CFTypeRef, CFRelease>;
+using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
 using CTFontDescriptorRefHandle = CFHandle<CTFontDescriptorRef, CFTypeRef, CFRelease>;
 using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 

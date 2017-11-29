@@ -1,27 +1,31 @@
+#pragma once
+
+/*
+  CFHandle is a minimal wrapper designed to hold and release CoreFoundation-style handles
+  It is non-transferrable: wrap it in something like a unique_ptr if you need to pass it around,
+  or just use unique_ptr with a custom deleter.
+  CFHandle has no special treatment for null handles -- be careful not to let it hold a null
+  handle if the behavior of the Releaser isn't defined for null.
+ 
+  ex:
+   using CFDataHandle = CFHandle<CFDataRef, CFTypeRef, CFRelease>;
+ 
+   CFDataHandle data(CFDataCreateWithBytesNoCopy(
+        kCFAllocatorDefault, reinterpret_cast<const unsigned char*>(source.data()), source.size(),
+        kCFAllocatorNull));
+*/
 
 namespace {
 
-template <typename T, typename S, void (*Releaser)(S)>
+template <typename HandleType, typename ReleaserArgumentType, void (*Releaser)(ReleaserArgumentType)>
 struct CFHandle {
-    CFHandle(T t_): t(t_) {}
-    ~CFHandle() { Releaser(t); }
-    T operator*() { return t; }
-    operator bool() { return t; }
+    CFHandle(HandleType handle_): handle(handle_) {}
+    ~CFHandle() { Releaser(handle); }
+    HandleType operator*() { return handle; }
+    operator bool() { return handle; }
 private:
-    T t;
+    HandleType handle;
 };
-
-using CGImageHandle = CFHandle<CGImageRef, CGImageRef, CGImageRelease>;
-using CFDataHandle = CFHandle<CFDataRef, CFTypeRef, CFRelease>;
-using CGImageSourceHandle = CFHandle<CGImageSourceRef, CFTypeRef, CFRelease>;
-using CGDataProviderHandle = CFHandle<CGDataProviderRef, CGDataProviderRef, CGDataProviderRelease>;
-using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
-using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
-
-using CFStringRefHandle = CFHandle<CFStringRef, CFTypeRef, CFRelease>;
-using CFAttributedStringRefHandle = CFHandle<CFAttributedStringRef, CFTypeRef, CFRelease>;
-using CFDictionaryRefHandle = CFHandle<CFDictionaryRef, CFTypeRef, CFRelease>;
-
 
 } // namespace
 

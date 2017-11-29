@@ -4,6 +4,13 @@
 
 #import "CFHandle.hpp"
 
+using CGImageHandle = CFHandle<CGImageRef, CGImageRef, CGImageRelease>;
+using CFDataHandle = CFHandle<CFDataRef, CFTypeRef, CFRelease>;
+using CGImageSourceHandle = CFHandle<CGImageSourceRef, CFTypeRef, CFRelease>;
+using CGDataProviderHandle = CFHandle<CGDataProviderRef, CGDataProviderRef, CGDataProviderRelease>;
+using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
+using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
+
 CGImageRef CGImageCreateWithMGLPremultipliedImage(mbgl::PremultipliedImage&& src) {
     // We're converting the PremultipliedImage's backing store to a CGDataProvider, and are taking
     // over ownership of the memory.
