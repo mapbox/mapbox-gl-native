@@ -23,6 +23,10 @@ bool allowsIdeographicBreaking(const std::u16string& string);
     by the given Unicode codepoint due to ideographic breaking. */
 bool allowsIdeographicBreaking(char16_t chr);
 
+/** Conservative set of characters expected to have relatively fixed sizes and
+    advances */
+bool allowsFixedWidthGlyphGeneration(char16_t chr);
+
 /** Returns whether any substring of the given string can be drawn as vertical
     text with upright glyphs. */
 bool allowsVerticalWritingMode(const std::u16string& string);

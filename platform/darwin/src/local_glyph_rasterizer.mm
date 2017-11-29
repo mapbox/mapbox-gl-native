@@ -1,6 +1,8 @@
 #include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/i18n.hpp>
 
+#include <unordered_map>
+
 #import <Foundation/Foundation.h>
 #import <CoreText/CoreText.h>
 #import <ImageIO/ImageIO.h>
@@ -10,15 +12,27 @@
 namespace mbgl {
 
 /*
-    Initial implementation of darwin TinySDF support:
-    Draw any CJK glyphs using a default system font
+    Darwin implementation of LocalGlyphRasterizer:
+     Draws CJK glyphs using locally available fonts.
  
-    Where to take this:
-     - Configure whether to use local fonts, and which fonts to use,
-       based on map or even style layer options
-     - Build heuristics for choosing fonts based on input FontStack
-       (maybe a globally configurable FontStack -> UIFontDescriptor map would make sense?
-     - Extract glyph metrics so that this can be used with more than just fixed width glyphs
+    Mirrors GL JS implementation in that:
+     - Only CJK glyphs are drawn locally (because we can guess their metrics effectively)
+        * Render size/metrics determined experimentally by rendering a few different fonts
+     - Configuration is done at map creation time by setting a "font family"
+        * JS uses a CSS font-family, this uses kCTFontFamilyNameAttribute which has
+          somewhat different behavior.
+     - We use heuristics to extract a font-weight based on the incoming font stack
+ 
+    Further improvements are possible:
+     - If we could reliably extract glyph metrics, we wouldn't be limited to CJK glyphs
+     - We could push the font configuration down to individual style layers, which would
+        allow any current style to be reproducible using local fonts.
+     - Instead of just exposing "font family" as a configuration, we could expose a richer
+        CTFontDescriptor configuration option (although we'd have to override font size to
+        make sure it stayed at 24pt).
+     - Because Apple exposes glyph paths via `CTFontCreatePathForGlyph` we could potentially
+        render directly to SDF instead of going through TinySDF -- although it's not clear
+        how much of an improvement it would be.
 */
 
 using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
@@ -31,44 +45,56 @@ using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
 class LocalGlyphRasterizer::Impl {
 public:
-    Impl(CTFontRef font_)
-        : font(font_)
+    Impl(const optional<std::string> fontFamily_)
+        : fontFamily(fontFamily_)
     {}
     
     ~Impl() {
-        if (font) {
-            CFRelease(font);
+        for (auto& pair : fontHandles) {
+            CFRelease(pair.second);
         }
     }
 
-    CTFontRef font;
+    
+    CTFontRef getFont(const FontStack& fontStack) {
+        if (!fontFamily) {
+            return NULL;
+        }
+        
+        if (fontHandles.find(fontStack) == fontHandles.end()) {
+            NSDictionary *fontAttributes = @{
+                (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
+                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
+            };
+
+            CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
+            CTFontRef font = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
+            if (!font) {
+                throw std::runtime_error("CTFontCreateWithFontDescriptor failed");
+            }
+
+            fontHandles[fontStack] = font;
+        }
+        return fontHandles[fontStack];
+    }
+    
+private:
+    std::unordered_map<FontStack, CTFontRef, FontStackHash> fontHandles;
+    optional<std::string> fontFamily;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
-{
-    if (fontFamily) {
-        NSDictionary *fontAttributes = @{
-            (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-            (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
-        };
-
-        CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
-
-        impl = std::make_unique<Impl>(CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL));
-    } else {
-        impl = std::make_unique<Impl>((CTFontRef)NULL);
-    }
-}
+    : impl(std::make_unique<Impl>(fontFamily))
+{}
 
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
-bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    // TODO: This is a rough approximation of the set of glyphs that will work with fixed glyph metrics
-    // Either narrow this down to be conservative, or actually extract glyph metrics in rasterizeGlyph
-    return impl->font && util::i18n::allowsIdeographicBreaking(glyphID);
+bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
+    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont(fontStack);
 }
 
+/*
 // TODO: In theory we should be able to transform user-coordinate bounding box and advance
 // values into pixel glyph metrics. This would remove the need to use fixed glyph metrics
 // (which will be slightly off depending on the font), and allow us to return non CJK glyphs
@@ -94,6 +120,7 @@ void extractGlyphMetrics(CTFontRef font, CTLineRef line) {
     (void)totalBoundingRect;
     (void)totalAdvance;
 }
+*/
 
 PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     PremultipliedImage rgbaBitmap(size);
@@ -136,18 +163,19 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     CTLineRefHandle line(CTLineCreateWithAttributedString(*attrString));
     
     // For debugging only, doesn't get useful metrics yet
-    extractGlyphMetrics(font, *line);
+    //extractGlyphMetrics(font, *line);
     
-    // Set text position and draw the line into the graphics context
+    // Start drawing a little bit below the top of the bitmap
     CGContextSetTextPosition(*context, 0.0, 5.0);
     CTLineDraw(*line, *context);
     
     return rgbaBitmap;
 }
 
-Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
+Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
     Glyph fixedMetrics;
-    if (!impl->font) {
+    CTFontRef font = impl->getFont(fontStack);
+    if (!font) {
         return fixedMetrics;
     }
     
@@ -161,7 +189,7 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     fixedMetrics.metrics.top = -1;
     fixedMetrics.metrics.advance = 24;
 
-    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, impl->font, size);
+    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, font, size);
    
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     fixedMetrics.bitmap = AlphaImage(size);
