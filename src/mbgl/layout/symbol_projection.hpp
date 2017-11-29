@@ -23,8 +23,16 @@ namespace mbgl {
     };
     
     struct PlacedGlyph {
+        PlacedGlyph() = default;
+
         PlacedGlyph(Point<float> point_, float angle_, optional<TileDistance> tileDistance_)
             : point(point_), angle(angle_), tileDistance(std::move(tileDistance_))
+        {}
+        PlacedGlyph(PlacedGlyph&& other) noexcept
+            : point(std::move(other.point)), angle(other.angle), tileDistance(std::move(other.tileDistance))
+        {}
+        PlacedGlyph(const PlacedGlyph& other)
+            : point(std::move(other.point)), angle(other.angle), tileDistance(std::move(other.tileDistance))
         {}
         Point<float> point;
         float angle;
