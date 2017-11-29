@@ -5,8 +5,15 @@ option(WITH_QT_DECODERS "Use builtin Qt image decoders" OFF)
 option(WITH_QT_I18N     "Use builtin Qt i18n support"   OFF)
 option(WITH_QT_4        "Use Qt4 instead of Qt5"        OFF)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden -D__QT__")
-set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   -fvisibility=hidden -D__QT__")
+if (CMAKE_COMPILER_IS_GNUCC AND NOT
+    ((CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 6.0 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 6.5)
+      OR CMAKE_CXX_COMPILER_VERSION VERSION_EQUAL 7.2))
+  # Don't use hidden default visibility for gcc 6.1-6.4 and 7.2 https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80947
+  set(USE_DEFAULT_VISIBILITY "-fvisibility=hidden")
+endif()
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${USE_DEFAULT_VISIBILITY} -D__QT__")
+set(CMAKE_C_FLAGS   "${CMAKE_C_FLAGS}   ${USE_DEFAULT_VISIBILITY} -D__QT__")
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
