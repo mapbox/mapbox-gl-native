@@ -223,9 +223,9 @@ public:
     return self;
 }
 
-- (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL localIdeographFontFamily:(nullable NSString *)fontFamily {
+- (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL {
     if (self = [super initWithFrame:frame]) {
-        [self commonInit:fontFamily];
+        [self commonInit:nil];
         self.styleURL = styleURL;
     }
     return self;
