@@ -296,7 +296,7 @@ linux: glfw-app render offline
 
 .PHONY: linux-core
 linux-core: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core mbgl-loop-uv
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core mbgl-loop-uv mbgl-filesource
 
 .PHONY: test
 test: $(LINUX_BUILD)
