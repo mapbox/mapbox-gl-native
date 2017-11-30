@@ -1,12 +1,12 @@
-# Contributing to the Mapbox macOS SDK
+# Contributing to the Mapbox Maps SDK for macOS
 
-This document explains how to build the Mapbox macOS SDK from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox iOS SDK.
+This document explains how to build the Mapbox Maps SDK for macOS from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox iOS SDK.
 
 ## Requirements
 
-The Mapbox macOS SDK and the macosapp demo application run on macOS 10.10.0 or above.
+The Mapbox Maps SDK for macOS and the macosapp demo application run on macOS 10.10.0 or above.
 
-The Mapbox macOS SDK requires Xcode 8.0 or above.
+The Mapbox Maps SDK for macOS requires Xcode 7.3 or above.
 
 ## Building the SDK
 
@@ -143,4 +143,4 @@ The demo applications use Mapbox vector tiles, which require a Mapbox account an
 
 Through the macOS SDK, the demo application supports a variety of standard gestures and keyboard shortcuts. For more details, open Mapbox GL Help from the Help menu.
 
-You can also [integrate the Mapbox macOS SDK into your own Cocoa application](INSTALL.md).
+You can also [integrate the Mapbox Maps SDK for macOS into your own Cocoa application](INSTALL.md).

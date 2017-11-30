@@ -1,12 +1,12 @@
-# Contributing to the Mapbox iOS SDK
+# Contributing to the Mapbox Maps SDK for iOS
 
-This document explains how to build the Mapbox iOS SDK from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox iOS SDK.
+This document explains how to build the Mapbox Maps SDK for iOS from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox Maps SDK for iOS.
 
 ## Requirements
 
-The Mapbox iOS SDK and iosapp demo application require iOS 8.0 or above.
+The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above.
 
-The Mapbox iOS SDK requires Xcode 8.0 or above.
+The Mapbox Maps SDK for iOS requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
 
 ## Building the SDK
 
@@ -46,6 +46,7 @@ Build and package the SDK by using one of the following commands:
 * `make iframework` builds a dynamic framework in the Debug configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
 * `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
 * `make ipackage-strip` builds both dynamic and static frameworks in the Debug configuration, stripped of debug symbols, for devices and the iOS Simulator.
+* `make ifabric` builds a special static framework for compatibility with the Fabric Mac application.
 
 You can customize the build output by passing the following arguments into the `make` invocation:
 
@@ -70,7 +71,7 @@ To add any Objective-C type, constant, or member to the iOS SDK’s public inter
 
 1. Ensure that the symbol is pure Objective-C and does not rely on any language features specific to Objective-C++ or the C11 dialect of C – so no namespaced types or classes named with emoji! 🙃 Most projects that depend on this SDK are either written in pure Objective-C (GNU99 dialect) or Swift, which cannot yet bridge C++ types.
 1. Name the symbol according to [Cocoa naming conventions](https://developer.apple.com/library/prerelease/content/documentation/Cocoa/Conceptual/CodingGuidelines/CodingGuidelines.html#//apple_ref/doc/uid/10000146i). Use the `MGL` class prefix to avoid conflicts with client code. If the symbol has an analogue in MapKit, name the symbol according to MapKit.
-1. Provide full documentation comments. We use [jazzy](https://github.com/realm/jazzy/) to produce the documentation found in the SDK distribution and [on the Mapbox iOS SDK website](https://www.mapbox.com/ios-sdk/api/). We also recognize that many developers rely on Xcode’s Quick Help feature. jazzy supports Markdown formatting; however, Quick Help supports only [HeaderDoc](https://developer.apple.com/legacy/library/documentation/DeveloperTools/Conceptual/HeaderDoc/intro/intro.html) syntax and a subset of Doxygen syntax. For hyperlinks, use HTML syntax, which is recognized by both tools.
+1. Provide full documentation comments. We use [jazzy](https://github.com/realm/jazzy/) to produce the documentation found in the SDK distribution and [on the Mapbox Maps SDK for iOS website](https://www.mapbox.com/ios-sdk/api/). We also recognize that many developers rely on Xcode’s Quick Help feature. jazzy supports Markdown formatting; however, Quick Help supports only [HeaderDoc](https://developer.apple.com/legacy/library/documentation/DeveloperTools/Conceptual/HeaderDoc/intro/intro.html) syntax and a subset of Doxygen syntax. For hyperlinks, use HTML syntax, which is recognized by both tools.
 
 ### Making a type or constant public
 
@@ -150,6 +151,13 @@ make darwin-update-examples
 ## Testing
 
 `make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
+
+Before you can run unit tests of the cross-platform code on the command line, install ios-sim version 3.2.0 (not any other version):
+
+```bash
+brew tap mapbox/homebrew-ios-sim-3
+brew install mapbox/homebrew-ios-sim-3/ios-sim
+```
 
 To instead run the cross-platform tests in Xcode instead of on the command line:
 
