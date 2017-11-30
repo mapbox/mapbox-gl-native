@@ -2,25 +2,25 @@
 
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/util/geo.hpp>
 #include <mbgl/util/geojson.hpp>
 #include <mbgl/actor/actor_ref.hpp>
 
 #include <map>
 
 namespace mbgl {
-namespace style {
 
-using SetTileDataFunction = std::function<void(const GeoJSON&)>;
+class CustomGeometryTile;
+
+namespace style {
 
 class CustomTileLoader : private util::noncopyable {
 public:
 
-    using OverscaledIDFunctionTuple = std::tuple<uint8_t, int16_t, ActorRef<SetTileDataFunction>>;
+    using OverscaledIDFunctionTuple = std::tuple<uint8_t, int16_t, ActorRef<CustomGeometryTile>>;
 
     CustomTileLoader(const TileFunction& fetchTileFn, const TileFunction& cancelTileFn);
 
-    void fetchTile(const OverscaledTileID& tileID, ActorRef<SetTileDataFunction> callbackRef);
+    void fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef);
     void cancelTile(const OverscaledTileID& tileID);
 
     void removeTile(const OverscaledTileID& tileID);
