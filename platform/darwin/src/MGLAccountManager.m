@@ -39,7 +39,7 @@
     }
     static dispatch_once_t onceToken;
     static MGLAccountManager *_sharedManager;
-    void (^setupBlock)() = ^{
+    void (^setupBlock)(void) = ^{
         dispatch_once(&onceToken, ^{
             _sharedManager = [[self alloc] init];
         });
