@@ -416,8 +416,12 @@ public class MapView extends FrameLayout {
   public void onDestroy() {
     destroyed = true;
     mapCallback.clearOnMapReadyCallbacks();
-    nativeMapView.destroy();
-    nativeMapView = null;
+
+    if (nativeMapView != null) {
+      // null when destroying an activity programmatically mapbox-navigation-android/issues/503
+      nativeMapView.destroy();
+      nativeMapView = null;
+    }
 
     if (mapRenderer != null) {
       mapRenderer.onDestroy();
