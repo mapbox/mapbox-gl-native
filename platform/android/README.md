@@ -31,7 +31,7 @@ git clone git@github.com:mapbox/mapbox-gl-native.git && cd mapbox-gl-native
 These dependencies are required for all operating systems and all platform targets.
 
 - Latest stable [Android Studio](https://developer.android.com/studio/index.html)
-- Update Android SDK with latest
+- Update the Mapbox Maps SDK for Android with the latest
   - Android SDK Build-Tools
   - Android Platform-Tools
   - Android SDK Tools
