@@ -22,6 +22,7 @@
 		1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454941ECD450D00021D39 /* MGLLight_Private.h */; };
 		1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A61ED08AB400021D39 /* MGLLightTest.mm */; };
 		1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */; };
+		1F9EF4081FBE2C720063FBB0 /* metro-line.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 1F9EF4071FBE2C720063FBB0 /* metro-line.geojson */; };
 		1FB7DAAF1F2A4DBD00410606 /* MGLVectorSource+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */; };
 		1FB7DAB01F2A4DC200410606 /* MGLVectorSource+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */; };
 		1FB7DAB11F2A4DC800410606 /* MGLVectorSource+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FDD9D6E1F26936400252B09 /* MGLVectorSource+MGLAdditions.m */; };
@@ -582,6 +583,7 @@
 		1F7454941ECD450D00021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A61ED08AB400021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLLightTest.mm; path = ../../darwin/test/MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
+		1F9EF4071FBE2C720063FBB0 /* metro-line.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "metro-line.geojson"; sourceTree = "<group>"; };
 		1FDD9D6D1F26936400252B09 /* MGLVectorSource+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLVectorSource+MGLAdditions.h"; sourceTree = "<group>"; };
 		1FDD9D6E1F26936400252B09 /* MGLVectorSource+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLVectorSource+MGLAdditions.m"; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
@@ -1286,6 +1288,7 @@
 				DA1DC99A1CB6E064006E619F /* MBXViewController.m */,
 				632281DD1E6F855900D75A5D /* MBXEmbeddedMapViewController.h */,
 				632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */,
+				1F9EF4071FBE2C720063FBB0 /* metro-line.geojson */,
 				DA821D051CCC6D59007508D4 /* Main.storyboard */,
 				DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */,
 				DA1DC99E1CB6E088006E619F /* Assets.xcassets */,
@@ -2163,6 +2166,7 @@
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
 				DA821D061CCC6D59007508D4 /* LaunchScreen.storyboard in Resources */,
 				96E027231E57C76E004B8E66 /* Localizable.strings in Resources */,
+				1F9EF4081FBE2C720063FBB0 /* metro-line.geojson in Resources */,
 				DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */,
 				DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */,
 			);

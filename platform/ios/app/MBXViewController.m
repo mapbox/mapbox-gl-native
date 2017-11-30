@@ -1877,6 +1877,46 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+    
+}
+- (IBAction)crashMe:(id)sender {
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        NSString *path = [[NSBundle mainBundle] pathForResource:@"metro-line" ofType:@"geojson"];
+        
+        NSData *data = [NSData dataWithContentsOfFile:path];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self drawShapeCollection:data];
+        });
+    });
+}
+
+- (void)drawShapeCollection:(NSData *)data {
+    
+    // Use [MGLShape shapeWithData:encoding:error:] to create a MGLShapeCollectionFeature from GeoJSON data.
+    MGLShape *feature = [MGLShape shapeWithData:data encoding:NSUTF8StringEncoding error:NULL];
+    
+    // Create source and add it to the map style.
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"transit" shape:feature options:nil];
+    [self.mapView.style addSource:source];
+    
+    // Create line style layer.
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"rail-line" source: source];
+    lineLayer.lineJoin = [MGLStyleValue valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinRound]];
+    lineLayer.lineCap = [MGLStyleValue valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapRound]];
+    lineLayer.lineColor = [MGLStyleValue valueWithRawValue:[UIColor redColor]];
+    lineLayer.lineWidth = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval
+                                                                    cameraStops:@{@14: [MGLStyleValue<NSNumber *> valueWithRawValue:@5],
+                                                                                  @18: [MGLStyleValue<NSNumber *> valueWithRawValue:@20]
+                                                                                  }
+                                                                        options:@{MGLStyleFunctionOptionDefaultValue:[MGLConstantStyleValue<NSNumber *> valueWithRawValue:@5]}];
+//    lineLayer.predicate = [NSPredicate predicateWithFormat:@"TYPE = 'Rail line'"];
+    
+    
+    
+    // Add style layers to the map view's style.
+    [self.mapView.style addLayer:lineLayer];
+
 }
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
