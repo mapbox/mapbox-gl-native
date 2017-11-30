@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.text;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.Typeface;
 
 public class LocalGlyphRasterizer {
@@ -12,6 +11,7 @@ public class LocalGlyphRasterizer {
         Bitmap bitmap = Bitmap.createBitmap(35, 35, Bitmap.Config.ARGB_8888);
 
         Paint paint = new Paint();
+        paint.setAntiAlias(true);
         paint.setTextSize(24);
         paint.setTypeface(Typeface.create("Noto Sans", Typeface.NORMAL));
 
