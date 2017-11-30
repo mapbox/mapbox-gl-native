@@ -51,6 +51,7 @@
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
+#include "text/local_glyph_rasterizer_impl.hpp"
 
 namespace mbgl {
 namespace android {
@@ -188,6 +189,9 @@ void registerNatives(JavaVM *vm) {
     // Snapshotter
     MapSnapshotter::registerNative(env);
     MapSnapshot::registerNative(env);
+
+    // text
+    AndroidLocalGlyphRasterizer::registerNative(env);
 }
 
 } // namespace android
