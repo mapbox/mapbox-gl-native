@@ -72,6 +72,87 @@ void HillshadeLayer::setMaxZoom(float maxZoom) {
 
 // Paint properties
 
+PropertyValue<float> HillshadeLayer::getDefaultHillshadeIlluminationDirection() {
+    return { 335 };
+}
+
+PropertyValue<float> HillshadeLayer::getHillshadeIlluminationDirection() const {
+    return impl().paint.template get<HillshadeIlluminationDirection>().value;
+}
+
+void HillshadeLayer::setHillshadeIlluminationDirection(PropertyValue<float> value) {
+    if (value == getHillshadeIlluminationDirection())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeIlluminationDirection>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void HillshadeLayer::setHillshadeIlluminationDirectionTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeIlluminationDirection>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions HillshadeLayer::getHillshadeIlluminationDirectionTransition() const {
+    return impl().paint.template get<HillshadeIlluminationDirection>().options;
+}
+
+PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getDefaultHillshadeIlluminationAnchor() {
+    return { HillshadeIlluminationAnchorType::Viewport };
+}
+
+PropertyValue<HillshadeIlluminationAnchorType> HillshadeLayer::getHillshadeIlluminationAnchor() const {
+    return impl().paint.template get<HillshadeIlluminationAnchor>().value;
+}
+
+void HillshadeLayer::setHillshadeIlluminationAnchor(PropertyValue<HillshadeIlluminationAnchorType> value) {
+    if (value == getHillshadeIlluminationAnchor())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeIlluminationAnchor>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void HillshadeLayer::setHillshadeIlluminationAnchorTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeIlluminationAnchor>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions HillshadeLayer::getHillshadeIlluminationAnchorTransition() const {
+    return impl().paint.template get<HillshadeIlluminationAnchor>().options;
+}
+
+PropertyValue<float> HillshadeLayer::getDefaultHillshadeExaggeration() {
+    return { 0.5 };
+}
+
+PropertyValue<float> HillshadeLayer::getHillshadeExaggeration() const {
+    return impl().paint.template get<HillshadeExaggeration>().value;
+}
+
+void HillshadeLayer::setHillshadeExaggeration(PropertyValue<float> value) {
+    if (value == getHillshadeExaggeration())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeExaggeration>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void HillshadeLayer::setHillshadeExaggerationTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<HillshadeExaggeration>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions HillshadeLayer::getHillshadeExaggerationTransition() const {
+    return impl().paint.template get<HillshadeExaggeration>().options;
+}
+
 PropertyValue<Color> HillshadeLayer::getDefaultHillshadeShadowColor() {
     return { Color::black() };
 }

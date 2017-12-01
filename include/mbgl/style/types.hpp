@@ -38,6 +38,11 @@ enum class LineJoinType : uint8_t {
     FlipBevel
 };
 
+enum HillshadeIlluminationAnchorType : bool {
+    Map,
+    Viewport
+};
+
 enum class TranslateAnchorType : bool {
     Map,
     Viewport

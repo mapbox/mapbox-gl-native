@@ -20,7 +20,7 @@ public:
     RasterTile(const OverscaledTileID&,
                    const TileParameters&,
                    const Tileset&);
-    ~RasterTile() final;
+    ~RasterTile();
 
     void setNecessity(TileNecessity) final;
 
