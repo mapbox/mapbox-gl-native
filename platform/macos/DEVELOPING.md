@@ -6,7 +6,7 @@ This document explains how to build the Mapbox Maps SDK for macOS from source. I
 
 The Mapbox Maps SDK for macOS and the macosapp demo application run on macOS 10.10.0 or above.
 
-The Mapbox Maps SDK for macOS requires Xcode 7.3 or above.
+The Mapbox Maps SDK for macOS requires Xcode 8.0 or above.
 
 ## Building the SDK
 

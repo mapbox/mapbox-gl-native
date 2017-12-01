@@ -6,7 +6,7 @@ This document explains how to build the Mapbox Maps SDK for iOS from source. It 
 
 The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above.
 
-The Mapbox Maps SDK for iOS requires Xcode 7.3 or above. The iosapp demo application requires Xcode 8.0 or above to build.
+The Mapbox Maps SDK for iOS requires Xcode 8.0 or above.
 
 ## Building the SDK
 
@@ -46,7 +46,6 @@ Build and package the SDK by using one of the following commands:
 * `make iframework` builds a dynamic framework in the Debug configuration for devices and the iOS Simulator. The CocoaPods pod downloads the output of this target.
 * `make ipackage-sim` builds a dynamic framework in the Debug configuration for the iOS simulator. This is the fastest target.
 * `make ipackage-strip` builds both dynamic and static frameworks in the Debug configuration, stripped of debug symbols, for devices and the iOS Simulator.
-* `make ifabric` builds a special static framework for compatibility with the Fabric Mac application.
 
 You can customize the build output by passing the following arguments into the `make` invocation:
 
@@ -151,13 +150,6 @@ make darwin-update-examples
 ## Testing
 
 `make ios-test` builds and runs unit tests of cross-platform code as well as the SDK.
-
-Before you can run unit tests of the cross-platform code on the command line, install ios-sim version 3.2.0 (not any other version):
-
-```bash
-brew tap mapbox/homebrew-ios-sim-3
-brew install mapbox/homebrew-ios-sim-3/ios-sim
-```
 
 To instead run the cross-platform tests in Xcode instead of on the command line:
 

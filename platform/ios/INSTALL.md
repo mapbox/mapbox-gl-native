@@ -1,6 +1,6 @@
 # Integrating custom builds of the Mapbox Maps SDK for iOS into your application
 
-This document explains how to build a development version of Mapbox Maps SDK for iOS for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox Maps SDK for iOS homepage](https://mapbox.com/ios-sdk).
+This document explains how to build a development version of Mapbox Maps SDK for iOS for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox Maps SDK for iOS installation page](https://www.mapbox.com/install/ios/).
 
 ### Requirements
 
@@ -10,7 +10,7 @@ The Mapbox Maps SDK for iOS is intended to run on iOS 8.0 and above on the follo
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
 
-The Mapbox Maps SDK for iOS requires Xcode 7.3 or higher.
+The Mapbox Maps SDK for iOS requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
 
 ### Building the SDK
 
@@ -113,7 +113,7 @@ If using the static framework, add `$(inherited)` to your target’s Other Linke
 
 #### Carthage
 
-For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/ios-sdk/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
 
 ##### Testing pre-releases with Carthage
 

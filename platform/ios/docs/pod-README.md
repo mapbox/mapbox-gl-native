@@ -10,7 +10,7 @@ For more information, check out the [Mapbox Maps SDK for iOS homepage](https://w
 
 The Mapbox Maps SDK for iOS may be installed as either a dynamic framework or a static framework. (To reduce the download size, the static framework is omitted from some distributions; you may need to download the full package from the [release page](https://github.com/mapbox/mapbox-gl-native/releases/).)
 
-Integrating the Mapbox Maps SDK for iOS requires Xcode 7.3 or higher.
+Integrating the Mapbox Maps SDK for iOS requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
 
 {{DYNAMIC}}
 
@@ -96,4 +96,4 @@ class ViewController: UIViewController {
 
 Full API documentation is included in this package, within the `documentation` folder. For more details, read “[First steps with the Mapbox Maps SDK for iOS](https://www.mapbox.com/help/first-steps-ios-sdk/)” and consult the [online examples](https://www.mapbox.com/ios-sdk/examples/).
 
-If you have any questions, please [contact our support team](https://www.mapbox.com/contact/). We welcome your [bug reports and feature requests](https://github.com/mapbox/mapbox-gl-native/issues/).
+If you have any questions, please see [our help page](https://www.mapbox.com/help/). We welcome your [bug reports, feature requests, and contributions](https://github.com/mapbox/mapbox-gl-native/issues/).
