@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
+### Packaging
+
+* Renamed this SDK from Mapbox iOS SDK to Mapbox Maps SDK for iOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
+
 ### Annotations and user interaction
 
 * Increased the default maximum zoom level from 20 to 22. ([#9835](https://github.com/mapbox/mapbox-gl-native/pull/9835))
@@ -154,7 +158,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## 3.5.2 - April 7, 2017
 
 * Fixed an issue that caused a crash when the user location annotation was presenting a callout view and the map was moved. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
-* This release was built with Xcode 8.3.1, which fixed [a significant bitcode issue](http://www.openradar.me/31302382) introduced in Xcode 8.3 that caused Mapbox Maps SDK for iOS 3.5.1 to be 2× larger than 3.5.0.
+* This release was built with Xcode 8.3.1, which fixed [a significant bitcode issue](http://www.openradar.me/31302382) introduced in Xcode 8.3 that caused Mapbox iOS SDK 3.5.1 to be 2× larger than 3.5.0.
 
 ## 3.5.1 - April 5, 2017
 
@@ -232,7 +236,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.4.2 - February 21, 2017
 
-This is the final scheduled version of the Mapbox Maps SDK for iOS that supports iOS 7. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
+This is the final scheduled version of the Mapbox iOS SDK that supports iOS 7. ([#8129](https://github.com/mapbox/mapbox-gl-native/pull/8129))
 
 * A programmatic change to an MGLMapView’s camera no longer resets the user tracking mode. ([#7856](https://github.com/mapbox/mapbox-gl-native/pull/7856))
 * Improved the performance of trivial camera animations. ([#7125](https://github.com/mapbox/mapbox-gl-native/pull/7125))
@@ -571,7 +575,7 @@ Repackaging 2.0.0-pre.1 as it contained no issues.
 
 ## 2.0.0-pre.1 - August 21, 2015
 
-Repackaging 0.5.1 as the Mapbox Maps SDK for iOS 2.0.0 series.
+Repackaging 0.5.1 as the Mapbox iOS SDK 2.0.0 series.
 
 ## 0.5.1 - July 13, 2015
 

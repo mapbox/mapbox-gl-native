@@ -1,6 +1,8 @@
-# Changelog for Mapbox Maps SDK for macOS
+# Changelog for Mapbox macOS SDK
 
 ## master
+
+* Renamed this SDK from Mapbox macOS SDK to Mapbox Maps SDK for macOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
 
 ### Annotations and user interaction
 
@@ -49,7 +51,7 @@
 
 ## 0.5.1
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.6.4 of the Mapbox Maps SDK for iOS.
+This version of the Mapbox macOS SDK corresponds to version 3.6.4 of the Mapbox iOS SDK.
 
 * Added an `MGLStyle.localizesLabels` property, off by default, that localizes any Mapbox Streets–sourced symbol layer into the user’s preferred language. ([#9582](https://github.com/mapbox/mapbox-gl-native/pull/9582))
 * Fixed an issue that caused `-[MGLShapeSource featuresMatchingPredicate:]` and `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` to always return an empty array. ([#9784](https://github.com/mapbox/mapbox-gl-native/pull/9784))
@@ -60,7 +62,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.6.4 of th
 
 ## 0.5.0
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.6.0 of the Mapbox Maps SDK for iOS.
+This version of the Mapbox macOS SDK corresponds to version 3.6.0 of the Mapbox iOS SDK.
 
 ### Packaging
 
@@ -85,7 +87,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.6.0 of th
 
 ### Annotations
 
-* The default marker image has been made slightly larger and now matches the version in the Mapbox Maps SDK for iOS. ([#9370](https://github.com/mapbox/mapbox-gl-native/pull/9370))
+* The default marker image has been made slightly larger and now matches the version in the Mapbox iOS SDK. ([#9370](https://github.com/mapbox/mapbox-gl-native/pull/9370))
 * The `MGLPolyline.coordinate` and `MGLPolygon.coordinate` properties now return the midpoint and centroid, respectively, instead of the first coordinate. ([#8713](https://github.com/mapbox/mapbox-gl-native/pull/8713))
 
 ### User interaction
@@ -106,7 +108,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.6.0 of th
 
 ## 0.4.1 - April 8, 2017
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.5.2 of the Mapbox Maps SDK for iOS.
+This version of the Mapbox macOS SDK corresponds to version 3.5.2 of the Mapbox iOS SDK.
 
 * Fixed an issue causing code signing failures and bloating the framework. ([#8640](https://github.com/mapbox/mapbox-gl-native/pull/8640))
 * Fixed an issue that could cause a crash if annotations unknown to the map view were interacted with. ([#8686](https://github.com/mapbox/mapbox-gl-native/pull/8686))
@@ -114,7 +116,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.5.2 of th
 
 ## 0.4.0 - April 2, 2017
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.5.1 of the Mapbox Maps SDK for iOS.
+This version of the Mapbox macOS SDK corresponds to version 3.5.1 of the Mapbox iOS SDK.
 
 ### Internationalization
 
@@ -173,7 +175,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.5.1 of th
 
 ## 0.3.1 - February 21, 2017
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.4.2 of the Mapbox Maps SDK for iOS.
+This version of the Mapbox macOS SDK corresponds to version 3.4.2 of the Mapbox iOS SDK.
 
 * Fixed an issue causing MGLMapView’s `camera`’s `heading` to be set to a negative value, indicating an undefined heading, when the map view faces northwest. The heading is now wrapped to between zero and 360 degrees, for consistency with MGLMapView’s `direction` property. ([#7724](https://github.com/mapbox/mapbox-gl-native/pull/7724))
 * Fixed a crash that occurred when moving a window containing an MGLMapView from one screen to another. ([#8004](https://github.com/mapbox/mapbox-gl-native/pull/8004))
@@ -184,7 +186,7 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.4.2 of th
 
 ## 0.3.0 - January 21, 2016
 
-This version of the Mapbox Maps SDK for macOS corresponds to version 3.4.0 of the Mapbox Maps SDK for iOS. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
+This version of the Mapbox macOS SDK corresponds to version 3.4.0 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
 
 ### Packaging
 
@@ -269,8 +271,8 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.4.0 of th
 
 ## 0.2.0 - June 14, 2016
 
-* This version of the Mapbox Maps SDK for macOS roughly corresponds to version 3.3.0-beta.1 of the Mapbox Maps SDK for iOS. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
-* Renamed the SDK to the Mapbox Maps SDK for macOS.
+* This version of the Mapbox macOS SDK roughly corresponds to version 3.3.0-beta.1 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main differences are the lack of user location tracking and annotation views. Some APIs have been adapted to macOS conventions, particularly the use of NSPopover for callout views.
+* Renamed the SDK to the Mapbox macOS SDK.
 * Fixed an issue in which Mapbox.framework was nested inside another folder named Mapbox.framework. ([#4998](https://github.com/mapbox/mapbox-gl-native/pull/4998))
 * Added methods to MGLMapView for obtaining the underlying map data rendered by the current style, along with additional classes to represent complex geometry in that data. ([#5110](https://github.com/mapbox/mapbox-gl-native/pull/5110))
 * An MGLPolygon can now have interior polygons, representing holes knocked out of the overall shape. ([#5110](https://github.com/mapbox/mapbox-gl-native/pull/5110))
@@ -286,4 +288,4 @@ This version of the Mapbox Maps SDK for macOS corresponds to version 3.4.0 of th
 
 ## 0.1.0 - May 10, 2016
 
-* This version of the Mapbox OS X SDK roughly corresponds to version 3.3.0-alpha.2 of the Mapbox Maps SDK for iOS. The two SDKs have very similar feature sets. The main difference is the lack of user location tracking. Some APIs have been adapted to OS X conventions, particularly the use of NSPopover for callout views.
+* This version of the Mapbox OS X SDK roughly corresponds to version 3.3.0-alpha.2 of the Mapbox iOS SDK. The two SDKs have very similar feature sets. The main difference is the lack of user location tracking. Some APIs have been adapted to OS X conventions, particularly the use of NSPopover for callout views.

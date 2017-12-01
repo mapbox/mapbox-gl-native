@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Visa mer information";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Kartan kunde inte laddas på grund av att stilen är skadad.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK version %@ är nu tillgängligt:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS version %@ är nu tillgängligt:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Kartan kunde inte laddas på grund av ett okänt fel.";

@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Mehr Infos anzeigen";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Die Karte konnte nicht geladen werden, da diese Form beschädigt ist.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK Version %@ ist ab sofort verfügbar.";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS Version %@ ist ab sofort verfügbar.";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Die Karte konnte nicht geladen werden, da diese Form nicht gefunden werden kann oder nicht kompatibel ist.";

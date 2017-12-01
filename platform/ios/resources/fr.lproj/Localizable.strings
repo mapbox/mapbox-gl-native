@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Voir plus d’informations";
 
 /* No comment provided by engineer. */
@@ -53,7 +53,7 @@
 "PARSE_STYLE_FAILED_DESC" = "La carte n’a pas pu être chargée car le style est corrompu.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
 "SDK_UPDATE_AVAILABLE" = "La version %@ du SDK Mapbox pour iOS est maintenant disponible :";

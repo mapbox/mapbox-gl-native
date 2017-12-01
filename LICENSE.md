@@ -528,7 +528,7 @@ limitations under the License.
 
 ===========================================================================
 
-Mapbox GL uses portions of the Mapbox Maps SDK for iOS, which was derived from the
+Mapbox GL uses portions of the Mapbox iOS SDK, which was derived from the
 Route-Me open source project, including the Alpstein fork of it.
 
 The Route-Me license appears below.
