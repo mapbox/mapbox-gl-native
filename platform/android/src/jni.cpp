@@ -191,7 +191,7 @@ void registerNatives(JavaVM *vm) {
     MapSnapshot::registerNative(env);
 
     // text
-    AndroidLocalGlyphRasterizer::registerNative(env);
+    LocalGlyphRasterizer::registerNative(env);
 }
 
 } // namespace android

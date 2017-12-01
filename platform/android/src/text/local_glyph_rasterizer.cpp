@@ -1,62 +1,102 @@
 #include <mbgl/text/local_glyph_rasterizer.hpp>
 #include <mbgl/util/i18n.hpp>
+#include <mbgl/util/platform.hpp>
 
 #include <jni/jni.hpp>
 
 #include "../attach_env.hpp"
 #include "../bitmap.hpp"
 
-#include "local_glyph_rasterizer_impl.hpp" // Actually AndroidLocalGlyphRasterizer
+#include "local_glyph_rasterizer_impl.hpp"
+
+/*
+    Android implementation of LocalGlyphRasterizer:
+     Draws CJK glyphs using locally available fonts.
+
+    Follows pattern of GL JS implementation in that:
+     - Only CJK glyphs are drawn locally (because we can guess their metrics effectively)
+        * Render size/metrics determined experimentally using Noto Sans
+     - Configuration is done at map creation time by setting a "font family"
+        * JS uses a CSS font-family, this uses android.graphics.Typeface
+          https://developer.android.com/reference/android/graphics/Typeface.html
+     - We use heuristics to extract a font-weight based on the incoming font stack
+        * JS tries to extract multiple weights, this implementation only looks for
+          "bold"
+
+     mbgl::LocalGlyphRasterizer is the portable interface
+     mbgl::LocalGlyphRasterizer::Impl stores platform-specific configuration data
+     mbgl::android::LocalGlyphRasterizer is the JNI wrapper
+     com.mapbox.mapboxsdk.text.LocalGlyphRasterizer is the Java implementation that
+      actually does the drawing
+ */
 
 namespace mbgl {
-
 namespace android {
 
-PremultipliedImage AndroidLocalGlyphRasterizer::drawGlyphBitmap(const FontStack&, unsigned short glyphID, Size) {
-    UniqueEnv env { AttachEnv() }; // TODO: How should this be hooked up?
+PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& fontFamily, const bool bold, const GlyphID glyphID) {
+    UniqueEnv env { AttachEnv() };
 
-    // TODO: Pass in font stack and size (and configuration)
-    // For now, just try to hard-wire any rendering at all
-    using Signature = jni::Object<Bitmap>(jni::jchar);
+    using Signature = jni::Object<Bitmap>(jni::String, jni::jboolean, jni::jchar);
     auto method = javaClass.GetStaticMethod<Signature>(*env, "drawGlyphBitmap");
-    auto result = javaClass.Call(*env, method, glyphID);
+
+    jni::String jniFontFamily = jni::Make<jni::String>(*env, fontFamily);
+
+    auto result = javaClass.Call(*env,
+                                 method,
+                                 jniFontFamily,
+                                 static_cast<jni::jboolean>(bold),
+                                 static_cast<jni::jchar>(glyphID));
 
     return Bitmap::GetImage(*env, result);
 }
 
-void AndroidLocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
-    javaClass = *jni::Class<AndroidLocalGlyphRasterizer>::Find(env).NewGlobalRef(env).release();
+void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
+    javaClass = *jni::Class<LocalGlyphRasterizer>::Find(env).NewGlobalRef(env).release();
 }
 
-jni::Class<AndroidLocalGlyphRasterizer> AndroidLocalGlyphRasterizer::javaClass;
+jni::Class<LocalGlyphRasterizer> LocalGlyphRasterizer::javaClass;
 
 } // namespace android
 
 class LocalGlyphRasterizer::Impl {
 public:
-    bool hasFont(const FontStack&) const {
-        return true;
+    Impl(const optional<std::string> fontFamily_)
+        : fontFamily(fontFamily_)
+    {}
+
+    bool isConfigured() const {
+        return bool(fontFamily);
     }
 
-    PremultipliedImage drawGlyphBitmap(const FontStack& fontStack, GlyphID glyphID, Size size) {
-        return android::AndroidLocalGlyphRasterizer::drawGlyphBitmap(fontStack, (unsigned short)glyphID, size);
+    PremultipliedImage drawGlyphBitmap(const FontStack& fontStack, GlyphID glyphID) {
+        bool bold = false;
+        for (auto font : fontStack) {
+            std::string lowercaseFont = platform::lowercase(font);
+            if (lowercaseFont.find("bold") != std::string::npos) {
+                bold = true;
+            }
+        }
+        return android::LocalGlyphRasterizer::drawGlyphBitmap(*fontFamily, bold, glyphID);
     }
+
+private:
+    optional<std::string> fontFamily;
 };
 
-LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string>)
-    : impl(std::make_unique<Impl>())
+LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
+    : impl(std::make_unique<Impl>(fontFamily))
 {}
 
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
-bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
-     return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->hasFont(fontStack);
+bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
+     return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->isConfigured();
 }
 
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
     Glyph fixedMetrics;
-    if (!impl->hasFont(fontStack)) {
+    if (!impl->isConfigured()) {
         return fixedMetrics;
     }
 
@@ -70,7 +110,7 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID g
     fixedMetrics.metrics.top = -10;
     fixedMetrics.metrics.advance = 24;
 
-    PremultipliedImage rgbaBitmap = impl->drawGlyphBitmap(fontStack, glyphID, size);
+    PremultipliedImage rgbaBitmap = impl->drawGlyphBitmap(fontStack, glyphID);
 
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     fixedMetrics.bitmap = AlphaImage(size);
