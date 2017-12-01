@@ -1,6 +1,6 @@
 # Contributing to the Mapbox Maps SDK for macOS
 
-This document explains how to build the Mapbox Maps SDK for macOS from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox iOS SDK.
+This document explains how to build the Mapbox Maps SDK for macOS from source. It is intended for advanced developers who wish to contribute to Mapbox GL and the Mapbox Maps SDK for iOS.
 
 ## Requirements
 

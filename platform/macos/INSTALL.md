@@ -71,4 +71,4 @@ script AppDelegate
 end script
 ```
 
-For further instructions, consult the [macOS SDK documentation](https://mapbox.github.io/mapbox-gl-native/macos/) or run `make xdocument` to generate the documentation. The [Mapbox iOS SDK](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox Maps SDK for macOS with few differences, mostly around unimplemented features like user location tracking.
+For further instructions, consult the [macOS SDK documentation](https://mapbox.github.io/mapbox-gl-native/macos/) or run `make xdocument` to generate the documentation. The [Mapbox Maps SDK for iOS](https://www.mapbox.com/ios-sdk/)’s [API documentation](https://www.mapbox.com/ios-sdk/) and [online examples](https://www.mapbox.com/ios-sdk/examples/) apply to the Mapbox Maps SDK for macOS with few differences, mostly around unimplemented features like user location tracking.

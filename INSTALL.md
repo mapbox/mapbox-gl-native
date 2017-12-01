@@ -57,8 +57,8 @@ dependencies:
 See the relevant SDK documentation for next steps:
 
 * [Mapbox Android SDK](platform/android/)
-* [Mapbox iOS SDK](platform/ios/)
-* [Mapbox macOS SDK](platform/macos/)
+* [Mapbox Maps SDK for iOS](platform/ios/)
+* [Mapbox Maps SDK for macOS](platform/macos/)
 * [Mapbox Qt SDK](platform/qt/)
 * [Mapbox GL Native on Linux](platform/linux/)
 * [node-mapbox-gl-native](platform/node/)
