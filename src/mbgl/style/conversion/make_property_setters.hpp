@@ -196,6 +196,12 @@ inline auto makePaintPropertySetters() {
     result["raster-fade-duration"] = &setProperty<RasterLayer, PropertyValue<float>, &RasterLayer::setRasterFadeDuration>;
     result["raster-fade-duration-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterFadeDurationTransition>;
 
+    result["hillshade-illumination-direction"] = &setProperty<HillshadeLayer, PropertyValue<float>, &HillshadeLayer::setHillshadeIlluminationDirection>;
+    result["hillshade-illumination-direction-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeIlluminationDirectionTransition>;
+    result["hillshade-illumination-anchor"] = &setProperty<HillshadeLayer, PropertyValue<HillshadeIlluminationAnchorType>, &HillshadeLayer::setHillshadeIlluminationAnchor>;
+    result["hillshade-illumination-anchor-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeIlluminationAnchorTransition>;
+    result["hillshade-exaggeration"] = &setProperty<HillshadeLayer, PropertyValue<float>, &HillshadeLayer::setHillshadeExaggeration>;
+    result["hillshade-exaggeration-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeExaggerationTransition>;
     result["hillshade-shadow-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeShadowColor>;
     result["hillshade-shadow-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeShadowColorTransition>;
     result["hillshade-highlight-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeHighlightColor>;

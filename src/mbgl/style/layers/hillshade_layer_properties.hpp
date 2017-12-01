@@ -12,6 +12,18 @@
 namespace mbgl {
 namespace style {
 
+struct HillshadeIlluminationDirection : PaintProperty<float> {
+    static float defaultValue() { return 335; }
+};
+
+struct HillshadeIlluminationAnchor : PaintProperty<HillshadeIlluminationAnchorType> {
+    static HillshadeIlluminationAnchorType defaultValue() { return HillshadeIlluminationAnchorType::Viewport; }
+};
+
+struct HillshadeExaggeration : PaintProperty<float> {
+    static float defaultValue() { return 0.5; }
+};
+
 struct HillshadeShadowColor : PaintProperty<Color> {
     static Color defaultValue() { return Color::black(); }
 };
@@ -25,6 +37,9 @@ struct HillshadeAccentColor : PaintProperty<Color> {
 };
 
 class HillshadePaintProperties : public Properties<
+    HillshadeIlluminationDirection,
+    HillshadeIlluminationAnchor,
+    HillshadeExaggeration,
     HillshadeShadowColor,
     HillshadeHighlightColor,
     HillshadeAccentColor

@@ -27,6 +27,7 @@ public:
     const style::HillshadeLayer::Impl& impl() const;
 private:
     const std::array<float, 2> getLatRange(const UnwrappedTileID& id);
+    const std::array<float, 3> getLight(const PaintParameters& parameters);
 };
 
 template <>

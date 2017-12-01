@@ -31,6 +31,24 @@ public:
 
     // Paint properties
 
+    static PropertyValue<float> getDefaultHillshadeIlluminationDirection();
+    PropertyValue<float> getHillshadeIlluminationDirection() const;
+    void setHillshadeIlluminationDirection(PropertyValue<float>);
+    void setHillshadeIlluminationDirectionTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeIlluminationDirectionTransition() const;
+
+    static PropertyValue<HillshadeIlluminationAnchorType> getDefaultHillshadeIlluminationAnchor();
+    PropertyValue<HillshadeIlluminationAnchorType> getHillshadeIlluminationAnchor() const;
+    void setHillshadeIlluminationAnchor(PropertyValue<HillshadeIlluminationAnchorType>);
+    void setHillshadeIlluminationAnchorTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeIlluminationAnchorTransition() const;
+
+    static PropertyValue<float> getDefaultHillshadeExaggeration();
+    PropertyValue<float> getHillshadeExaggeration() const;
+    void setHillshadeExaggeration(PropertyValue<float>);
+    void setHillshadeExaggerationTransition(const TransitionOptions&);
+    TransitionOptions getHillshadeExaggerationTransition() const;
+
     static PropertyValue<Color> getDefaultHillshadeShadowColor();
     PropertyValue<Color> getHillshadeShadowColor() const;
     void setHillshadeShadowColor(PropertyValue<Color>);

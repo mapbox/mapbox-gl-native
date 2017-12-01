@@ -44,8 +44,8 @@ set(MBGL_CORE_FILES
     # geometry
     src/mbgl/geometry/anchor.hpp
     src/mbgl/geometry/debug_font_data.hpp
-    src/mbgl/geometry/dem_pyramid.hpp
     src/mbgl/geometry/dem_pyramid.cpp
+    src/mbgl/geometry/dem_pyramid.hpp
     src/mbgl/geometry/feature_index.cpp
     src/mbgl/geometry/feature_index.hpp
     src/mbgl/geometry/line_atlas.cpp
@@ -146,10 +146,10 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/fill_extrusion_program.hpp
     src/mbgl/programs/fill_program.cpp
     src/mbgl/programs/fill_program.hpp
-    src/mbgl/programs/hillshade_program.cpp
-    src/mbgl/programs/hillshade_program.hpp
     src/mbgl/programs/hillshade_prepare_program.cpp
     src/mbgl/programs/hillshade_prepare_program.hpp
+    src/mbgl/programs/hillshade_program.cpp
+    src/mbgl/programs/hillshade_program.hpp
     src/mbgl/programs/line_program.cpp
     src/mbgl/programs/line_program.hpp
     src/mbgl/programs/program.hpp
@@ -547,8 +547,8 @@ set(MBGL_CORE_FILES
     include/mbgl/style/sources/custom_geometry_source.hpp
     include/mbgl/style/sources/geojson_source.hpp
     include/mbgl/style/sources/image_source.hpp
-    include/mbgl/style/sources/raster_source.hpp
     include/mbgl/style/sources/raster_dem_source.hpp
+    include/mbgl/style/sources/raster_source.hpp
     include/mbgl/style/sources/vector_source.hpp
     src/mbgl/style/sources/custom_geometry_source.cpp
     src/mbgl/style/sources/custom_geometry_source_impl.cpp
@@ -613,6 +613,10 @@ set(MBGL_CORE_FILES
     src/mbgl/tile/geometry_tile_data.hpp
     src/mbgl/tile/geometry_tile_worker.cpp
     src/mbgl/tile/geometry_tile_worker.hpp
+    src/mbgl/tile/raster_dem_tile.cpp
+    src/mbgl/tile/raster_dem_tile.hpp
+    src/mbgl/tile/raster_dem_tile_worker.cpp
+    src/mbgl/tile/raster_dem_tile_worker.hpp
     src/mbgl/tile/raster_tile.cpp
     src/mbgl/tile/raster_tile.hpp
     src/mbgl/tile/raster_tile_worker.cpp
