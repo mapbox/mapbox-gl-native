@@ -143,6 +143,8 @@ public:
 @property (nonatomic, readwrite) NSView *attributionView;
 
 @property (nonatomic, readwrite) MGLStyle *style;
+@property (nonatomic, readonly) NSString *ideographicFontFamilyName;
+
 
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
@@ -217,7 +219,7 @@ public:
 
 - (instancetype)initWithFrame:(NSRect)frameRect {
     if (self = [super initWithFrame:frameRect]) {
-        [self commonInit:nil];
+        [self commonInit];
         self.styleURL = nil;
     }
     return self;
@@ -225,7 +227,7 @@ public:
 
 - (instancetype)initWithFrame:(NSRect)frame styleURL:(nullable NSURL *)styleURL {
     if (self = [super initWithFrame:frame]) {
-        [self commonInit:nil];
+        [self commonInit];
         self.styleURL = styleURL;
     }
     return self;
@@ -233,7 +235,7 @@ public:
 
 - (instancetype)initWithCoder:(nonnull NSCoder *)decoder {
     if (self = [super initWithCoder:decoder]) {
-        [self commonInit:nil];
+        [self commonInit];
     }
     return self;
 }
@@ -252,7 +254,7 @@ public:
     return @[@"camera", @"debugMask"];
 }
 
-- (void)commonInit:(nullable NSString*)fontFamily {
+- (void)commonInit {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
 
     // Set up cross-platform controllers and resources.
@@ -271,10 +273,10 @@ public:
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
     mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-
     _mbglThreadPool = mbgl::sharedThreadPool();
+    NSString *fontFamilyName = self.ideographicFontFamilyName;
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique, mbgl::optional<std::string>(), fontFamily ? std::string([fontFamily UTF8String]) : mbgl::optional<std::string>());
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique, mbgl::optional<std::string>(), fontFamilyName ? std::string([fontFamilyName UTF8String]) : mbgl::optional<std::string>());
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
@@ -650,6 +652,12 @@ public:
 
 - (mbgl::Renderer *)renderer {
     return _rendererFrontend->getRenderer();
+}
+
+#pragma mark Ideographic Font Info
+
+- (NSString *)ideographicFontFamilyName {
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 }
 
 #pragma mark View hierarchy and drawing

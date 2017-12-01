@@ -187,6 +187,7 @@ public:
 @property (nonatomic) EAGLContext *context;
 @property (nonatomic) GLKView *glView;
 @property (nonatomic) UIImageView *glSnapshotView;
+
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *scaleBarConstraints;
 @property (nonatomic, readwrite) MGLScaleBar *scaleBar;
 @property (nonatomic, readwrite) UIImageView *compassView;
@@ -195,7 +196,10 @@ public:
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *logoViewConstraints;
 @property (nonatomic, readwrite) UIButton *attributionButton;
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
+
 @property (nonatomic, readwrite) MGLStyle *style;
+@property (nonatomic, readonly) NSString *ideographicFontFamilyName;
+
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UITapGestureRecognizer *doubleTap;
 @property (nonatomic) UITapGestureRecognizer *twoFingerTap;
@@ -204,11 +208,14 @@ public:
 @property (nonatomic) UIRotationGestureRecognizer *rotate;
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
+
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
+
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) UIView<MGLCalloutView> *calloutViewForSelectedAnnotation;
 @property (nonatomic) MGLUserLocationAnnotationView *userLocationAnnotationView;
+
 /// Indicates how thoroughly the map view is tracking the user location.
 @property (nonatomic) MGLUserTrackingState userTrackingState;
 @property (nonatomic) CLLocationManager *locationManager;
@@ -402,8 +409,9 @@ public:
     mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
     const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
     _mbglThreadPool = mbgl::sharedThreadPool();
-    
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique);
+    NSString *fontFamilyName = self.ideographicFontFamilyName;
+
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique, mbgl::optional<std::string>(), fontFamilyName ? std::string([fontFamilyName UTF8String]) : mbgl::optional<std::string>());
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
     _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
@@ -3458,6 +3466,12 @@ public:
 - (void)removeStyleClass:(NSString *)styleClass
 {
     [self.style removeStyleClass:styleClass];
+}
+
+#pragma mark Ideographic Font Info
+
+- (NSString *)ideographicFontFamilyName {
+    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 }
 
 #pragma mark - Annotations -
