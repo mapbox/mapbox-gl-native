@@ -142,6 +142,10 @@ node: $(MACOS_PROJ_PATH)
 macos-test: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
 
+.PHONY: macos-lint
+macos-lint:
+	find platform/macos -type f -name '*.plist' | xargs plutil -lint
+
 .PHONY: xpackage
 xpackage: $(MACOS_PROJ_PATH)
 	SYMBOLS=$(SYMBOLS) ./platform/macos/scripts/package.sh
@@ -217,6 +221,11 @@ ios: $(IOS_PROJ_PATH)
 .PHONY: iproj
 iproj: $(IOS_PROJ_PATH)
 	open $(IOS_WORK_PATH)
+
+.PHONY: ios-lint
+ios-lint:
+	find platform/ios/framework -type f -name '*.plist' | xargs plutil -lint
+	find platform/ios/app -type f -name '*.plist' | xargs plutil -lint
 
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)
