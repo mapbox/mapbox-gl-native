@@ -686,6 +686,9 @@ jobs:
       - *reset-ccache-stats
       - *build-ios-test
       - *check-public-symbols
+      - run:
+          name: Lint plist files
+          command: make ios-lint
       - *show-ccache-stats
       - *save-cache
 
@@ -742,6 +745,9 @@ jobs:
       - *reset-ccache-stats
       - *build-macos-test
       - *check-public-symbols
+      - run:
+          name: Lint plist files
+          command: make macos-lint
       - *show-ccache-stats
       - *save-cache
       - store_artifacts:
