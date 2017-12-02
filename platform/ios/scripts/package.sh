@@ -11,6 +11,7 @@ PRODUCTS=${DERIVED_DATA}
 LOG_PATH=build/xcodebuild-$(date +"%Y-%m-%d_%H%M%S").log
 
 BUILD_FOR_DEVICE=${BUILD_DEVICE:-true}
+BUILD_FOR_TV=${BUILD_TV:-true}
 BUILD_DOCS=${BUILD_DOCS:-true}
 SYMBOLS=${SYMBOLS:-YES}
 
@@ -36,6 +37,15 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
 fi
 IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
+TVOS_SDK=
+if [[ ${BUILD_FOR_TV} == true ]]; then
+    TVOS_SDK=appletvsimulator
+    if [[ ${BUILD_FOR_DEVICE} == true ]]; then
+        TVOS_SDK=appletvos
+    fi
+fi
+TVOS_SDK_VERSION=`xcrun --sdk ${TVOS_SDK} --show-sdk-version`
+
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
@@ -50,6 +60,9 @@ if [[ ${BUILD_STATIC} == true ]]; then
 fi
 if [[ ${BUILD_DYNAMIC} == true ]]; then
     mkdir -p "${OUTPUT}"/dynamic
+fi
+if [[ ${BUILD_FOR_TV} == true ]]; then
+    mkdir -p "${OUTPUT}"/tv
 fi
 
 step "Recording library version…"
@@ -110,6 +123,38 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
         -jobs ${JOBS} | tee ${LOG_PATH} | xcpretty
 fi
 
+if [[ ${BUILD_FOR_TV} == true ]]; then
+    step "Building for tvOS Simulator using scheme tv"
+    xcodebuild \
+        CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+        CURRENT_SHORT_VERSION=${SHORT_VERSION} \
+        CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
+        CURRENT_COMMIT_HASH=${HASH} \
+        ONLY_ACTIVE_ARCH=NO \
+        -derivedDataPath ${DERIVED_DATA} \
+        -workspace ./platform/ios/ios.xcworkspace \
+        -scheme tv \
+        -configuration ${BUILDTYPE} \
+        -sdk appletvsimulator \
+        -jobs ${JOBS} | xcpretty
+    
+    if [[ ${BUILD_FOR_DEVICE} == true ]]; then
+        step "Building for tvOS devices using scheme tv"
+        xcodebuild \
+            CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+            CURRENT_SHORT_VERSION=${SHORT_VERSION} \
+            CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
+            CURRENT_COMMIT_HASH=${HASH} \
+            ONLY_ACTIVE_ARCH=NO \
+            -derivedDataPath ${DERIVED_DATA} \
+            -workspace ./platform/ios/ios.xcworkspace \
+            -scheme tv \
+            -configuration ${BUILDTYPE} \
+            -sdk appletvos \
+            -jobs ${JOBS} | xcpretty
+    fi
+fi
+
 LIBS=(Mapbox.a)
 
 # https://medium.com/@syshen/create-an-ios-universal-framework-148eb130a46c
@@ -146,14 +191,41 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
             fi
         fi
 
-        step "Merging simulator dynamic library into device dynamic library…"
+        step "Merging iOS simulator dynamic library into device dynamic library…"
         lipo \
             ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.framework/${NAME} \
             ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.framework/${NAME} \
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
-    
+
     cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
+
+    if [[ ${BUILD_FOR_TV} == true ]]; then
+        step "Copying dynamic framework into place for tvOS devices"
+        cp -r \
+            ${PRODUCTS}/${BUILDTYPE}-appletvos/${NAME}.framework \
+            ${OUTPUT}/tv/
+
+        if [[ -e ${PRODUCTS}/${BUILDTYPE}-appletvos/${NAME}.framework.dSYM ]]; then
+            step "Copying dSYM"
+            cp -r ${PRODUCTS}/${BUILDTYPE}-appletvos/${NAME}.framework.dSYM \
+                  ${OUTPUT}/tv/
+            if [[ -e ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework.dSYM ]]; then
+                step "Merging device and simulator dSYMs…"
+                lipo \
+                    ${PRODUCTS}/${BUILDTYPE}-appletvos/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME} \
+                    ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME} \
+                    -create -output ${OUTPUT}/tv/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}
+                lipo -info ${OUTPUT}/tv/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}
+            fi
+        fi
+
+        step "Merging tvOS simulator dynamic library into device dynamic library…"
+        lipo \
+            ${PRODUCTS}/${BUILDTYPE}-appletvos/${NAME}.framework/${NAME} \
+            ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework/${NAME} \
+            -create -output ${OUTPUT}/tv/${NAME}.framework/${NAME} | echo
+    fi
 else
     if [[ ${BUILD_STATIC} == true ]]; then
         step "Assembling static library for iOS Simulator…"
@@ -177,8 +249,20 @@ else
                 ${OUTPUT}/dynamic/
         fi
     fi
-    
+
     cp -rv platform/ios/app/Settings.bundle ${OUTPUT}
+
+    if [[ ${BUILD_FOR_TV} == true ]]; then
+        step "Copying dynamic framework into place for tvOS Simulator…"
+        cp -r \
+            ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework \
+            ${OUTPUT}/tv/${NAME}.framework
+        if [[ -e ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework.dSYM ]]; then
+            step "Copying dSYM"
+            cp -r ${PRODUCTS}/${BUILDTYPE}-appletvsimulator/${NAME}.framework.dSYM \
+                ${OUTPUT}/tv/
+        fi
+    fi
 fi
 
 function get_comparable_uuid {
@@ -206,6 +290,12 @@ if [[ ${BUILD_DYNAMIC} == true && ${BUILDTYPE} == Release ]]; then
         lipo -info "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}"
 fi
 
+if [[ ${BUILD_FOR_TV} == true && ${BUILDTYPE} == Release ]]; then
+    validate_dsym \
+        "${OUTPUT}/tv/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
+        "${OUTPUT}/tv/${NAME}.framework/${NAME}"
+fi
+
 if [[ ${BUILD_STATIC} == true ]]; then
     step "Copying static library headers…"
     cp -rv "${PRODUCTS}/${BUILDTYPE}-iphoneos/Headers" "${OUTPUT}/static/${NAME}.framework/Headers"
@@ -222,8 +312,12 @@ if [[ ${BUILD_STATIC} == true ]]; then
     cp -pv platform/ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
 fi
 if [[ ${BUILD_DYNAMIC} == true && ${BUILD_FOR_DEVICE} == true ]]; then
-    step "Copying bitcode symbol maps…"
+    step "Copying iOS Bitcode symbol maps…"
     find "${PRODUCTS}/${BUILDTYPE}-iphoneos" -name '*.bcsymbolmap' -type f -exec cp -pv {} "${OUTPUT}/dynamic/" \;
+fi
+if [[ ${BUILD_FOR_TV} == true && ${BUILD_FOR_DEVICE} == true ]]; then
+    step "Copying tvOS Bitcode symbol maps…"
+    find "${PRODUCTS}/${BUILDTYPE}-appletvos" -name '*.bcsymbolmap' -type f -exec cp -pv {} "${OUTPUT}/tv/" \;
 fi
 sed -n -e '/^## /,$p' platform/ios/CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 
