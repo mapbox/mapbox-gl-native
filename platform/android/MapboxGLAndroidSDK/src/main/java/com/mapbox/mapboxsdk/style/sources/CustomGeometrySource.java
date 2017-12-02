@@ -191,7 +191,7 @@ public class CustomGeometrySource extends Source {
 
       FeatureCollection data = provider.getFeaturesForBounds(LatLngBounds.from(id.z, id.x, id.y), id.z);
       CustomGeometrySource source = sourceRef.get();
-      if (!isCancelled() && source != null && !data.getFeatures().isEmpty())  {
+      if (!isCancelled() && source != null && data != null)  {
         source.setTileData(id, data);
       }
     }
