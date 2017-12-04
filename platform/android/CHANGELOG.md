@@ -1,4 +1,4 @@
-# Changelog for Mapbox Android SDK
+# Changelog for the Mapbox Maps SDK for Android
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 

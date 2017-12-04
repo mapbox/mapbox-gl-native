@@ -1,8 +1,8 @@
 # Building & Developing Mapbox GL Native from Source
 
 **Just trying to use Mapbox GL Native? You don't need to read this stuff! We
-provide [easy-to-install, prebuilt versions of the Mapbox SDKs for iOS and Android
-that you can download instantly and get started with fast](https://www.mapbox.com/mobile/).**
+provide [easy-to-install, prebuilt versions of the Mapbox Maps SDKs for iOS and Android
+that you can download instantly and get started with fast](https://www.mapbox.com/install/).**
 
 Still with us? These are the instructions you'll need to build Mapbox GL Native
 from source on a variety of platforms and set up a development environment.

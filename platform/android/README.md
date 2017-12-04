@@ -1,4 +1,4 @@
-# [Mapbox Android SDK](https://www.mapbox.com/android-sdk/)
+# [Mapbox Maps SDK for Android](https://www.mapbox.com/android-sdk/)
 
 [![Circle CI build status](https://circleci.com/gh/mapbox/mapbox-gl-native.svg?style=shield)](https://circleci.com/gh/mapbox/workflows/mapbox-gl-native/tree/master)
 
@@ -10,7 +10,7 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 **To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-sdk/api).**
 
-**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android SDK website](https://www.mapbox.com/android-sdk/).**
+**To install and use the Mapbox Maps SDK for Android in an application, see the [Mapbox Maps SDK for Android website](https://www.mapbox.com/install/android/).**
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
