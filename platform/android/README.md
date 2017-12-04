@@ -1,4 +1,4 @@
-# [Mapbox Android SDK](https://www.mapbox.com/android-sdk/)
+# [Mapbox Maps SDK for Android](https://www.mapbox.com/android-sdk/)
 
 [![Circle CI build status](https://circleci.com/gh/mapbox/mapbox-gl-native.svg?style=shield)](https://circleci.com/gh/mapbox/workflows/mapbox-gl-native/tree/master)
 
@@ -10,7 +10,7 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 **To view our current API documentation, see our [JavaDoc](https://www.mapbox.com/android-sdk/api).**
 
-**To install and use the Mapbox Android SDK in an application, see the [Mapbox Android SDK website](https://www.mapbox.com/install/android/).**
+**To install and use the Mapbox Maps SDK for Android in an application, see the [Mapbox Maps SDK for Android website](https://www.mapbox.com/install/android/).**
 
 [![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
 
@@ -31,7 +31,7 @@ git clone git@github.com:mapbox/mapbox-gl-native.git && cd mapbox-gl-native
 These dependencies are required for all operating systems and all platform targets.
 
 - Latest stable [Android Studio](https://developer.android.com/studio/index.html)
-- Update Android SDK with latest
+- Update the Mapbox Maps SDK for Android with the latest
   - Android SDK Build-Tools
   - Android Platform-Tools
   - Android SDK Tools
@@ -86,7 +86,7 @@ More information about building and distributing this project in [DISTRIBUTE.md]
 
 #### Using the SDK snapshot
 
-Instead of using the latest stable release of the Mapbox Android SDK, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
+Instead of using the latest stable release of the Maps SDK for Android, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example `5.2.0-SNAPSHOT` or:
 
 ```java
 // Mapbox SDK dependency
