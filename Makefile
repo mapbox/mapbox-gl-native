@@ -613,7 +613,12 @@ apackage: platform/android/configuration.gradle
 # Uploads the compiled Android SDK to Maven
 .PHONY: run-android-upload-archives
 run-android-upload-archives: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
+	cd platform/android && export IS_LOCAL_DEVELOPMENT=false && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
+
+# Uploads the compiled Android SDK to ~/.m2/repository/com/mapbox/mapboxsdk
+.PHONY: run-android-upload-archives-local
+run-android-upload-archives-local: platform/android/configuration.gradle
+	cd platform/android && export IS_LOCAL_DEVELOPMENT=true && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
 
 # Dump system graphics information for the test app
 .PHONY: android-gfxinfo
