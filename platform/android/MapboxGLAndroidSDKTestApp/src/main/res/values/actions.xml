@@ -11,6 +11,7 @@
     <string name="menuitem_title_change_location_source_mock">Change to mock location source</string>
     <string name="menuitem_title_change_location_source_null">Reset location source to null</string>
     <string name="menuitem_change_icon_overlap">Toggle icon overlap</string>
+    <string name="menuitem_filter">Filter layer</string>
     <string name="menuitem_change_location">Change location</string>
     <string name="menuitem_title_accelerate_decelerate">Accelerate/Decelerate interpolator</string>
     <string name="menuitem_title_bounce">Bounce interpolator</string>
