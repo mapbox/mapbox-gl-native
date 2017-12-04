@@ -42,6 +42,7 @@
 #import "MGLOfflineStorage_Private.h"
 #import "MGLFoundation_Private.h"
 #import "MGLRendererFrontend.h"
+#import "MGLRendererConfiguration.h"
 
 #import "MGLVectorSource+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
@@ -198,7 +199,6 @@ public:
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 
 @property (nonatomic, readwrite) MGLStyle *style;
-@property (nonatomic, readonly) NSString *ideographicFontFamilyName;
 
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UITapGestureRecognizer *doubleTap;
@@ -323,7 +323,7 @@ public:
 
 + (void)initialize
 {
-    if (self == [MGLMapView self])
+    if (self == [MGLMapView class])
     {
         [MGLSDKUpdateChecker checkForUpdates];
     }
@@ -406,14 +406,12 @@ public:
     [[NSFileManager defaultManager] removeItemAtPath:fileCachePath error:NULL];
 
     // setup mbgl map
-    mbgl::DefaultFileSource *mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-    const float scaleFactor = [UIScreen instancesRespondToSelector:@selector(nativeScale)] ? [[UIScreen mainScreen] nativeScale] : [[UIScreen mainScreen] scale];
+    MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
     _mbglThreadPool = mbgl::sharedThreadPool();
-    NSString *fontFamilyName = self.ideographicFontFamilyName;
 
-    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::GLContextMode::Unique, mbgl::optional<std::string>(), fontFamilyName ? std::string([fontFamilyName UTF8String]) : mbgl::optional<std::string>());
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
     _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView);
-    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, scaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *[config fileSource], *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // start paused if in IB
     if (_isTargetingInterfaceBuilder || background) {
@@ -3466,12 +3464,6 @@ public:
 - (void)removeStyleClass:(NSString *)styleClass
 {
     [self.style removeStyleClass:styleClass];
-}
-
-#pragma mark Ideographic Font Info
-
-- (NSString *)ideographicFontFamilyName {
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 }
 
 #pragma mark - Annotations -
