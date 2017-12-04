@@ -74,7 +74,7 @@ To add any Objective-C type, constant, or member to the iOS SDK’s public inter
 
 ### Making a type or constant public
 
-To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to the iOS SDK’s public interface:
+To add an Objective-C class, protocol, category, typedef, enumeration, or global constant to this SDK’s public interface:
 
 1. _(Optional.)_ Add the macro `MGL_EXPORT` prior to the declaration for classes and global constants when adding them in shared headers located in `platform/darwin`. To use this macro, include `MGLFoundation.h`. You can check whether all public symbols are exported correctly by running `make check-public-symbols`.
 1. _(Optional.)_ Add the type or constant’s name to the relevant category in the `custom_categories` section of [the jazzy configuration file](./jazzy.yml). This is required for classes and protocols and also recommended for any other type that is strongly associated with a particular class or protocol. If you leave out this step, the symbol will appear in an “Other” section in the generated HTML documentation’s table of contents.
@@ -82,32 +82,32 @@ To add an Objective-C class, protocol, category, typedef, enumeration, or global
 
 ### Adding a source code file
 
-To add an Objective-C header or implementation file to the iOS SDK:
+To add an Objective-C header or implementation file to the iOS maps SDK:
 
 1. Add the file to the Headers or Compile Sources build phase, as appropriate, of both the “dynamic” and “static” targets. You can either use the Build Phases tab of the project editor or the Target Membership section of the File inspector.
 1. Audit new headers for nullability. Typically, you will wrap a header with `NS_ASSUME_NONNULL_BEGIN` and `NS_ASSUME_NONNULL_END`.
 1. _(Optional.)_ If it’s a public header, change its visibility from Project to Public and import it in [the iOS SDK’s umbrella header](./src/Mapbox.h).
-1. _(Optional.)_ If the file would also be used by the macOS SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
+1. _(Optional.)_ If the file would also be used by the macOS maps SDK, make sure it’s in [platform/darwin/src/](../darwin/src/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-source-code-file) for further instructions.
 
 ### Adding a resource
 
-To add a resource (such as an image, SSL certificate, property list, or strings table) to the iOS SDK:
+To add a resource (such as an image, SSL certificate, property list, or strings table) to the iOS maps SDK:
 
 1. Add the header to the Copy Bundle Resources build phase of both the “dynamic” and “bundle” targets. You can either use the Build Phases tab of the project editor or the Target Membership section of the File inspector.
-1. _(Optional.)_ If the resource would also be used by the macOS SDK, make sure it’s in [platform/darwin/resources/](../darwin/resources/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-resource) for further instructions.
+1. _(Optional.)_ If the resource would also be used by the macOS maps SDK, make sure it’s in [platform/darwin/resources/](../darwin/resources/), then consult [the companion macOS document](../macos/DEVELOPING.md#adding-a-resource) for further instructions.
 
 ### Adding user-facing text
 
-To add or update text that the user may see in the iOS SDK:
+To add or update text that the user may see in the iOS maps SDK:
 
 1. Make sure the implementation file imports [NSBundle+MGLAdditions.h](../darwin/src/NSBundle+MGLAdditions.h).
 1. Use the `NSLocalizedStringWithDefaultValue()` macro:
   * `key` is a unique identifier that won’t change if the user-facing text ever needs to change.
-  * `tbl` is `Foundation` in code shared between the iOS and macOS SDKs, or `nil` otherwise.
+  * `tbl` is `Foundation` in code shared between the iOS and macOS maps SDKs, or `nil` otherwise.
   * `bundle` is `nil`; the redefined macro looks for the SDK bundle at runtime and ignores this argument.
   * `val` is the English string.
 1. _(Optional.)_ When dealing with a number followed by a pluralized word, do not split the string. Instead, use a format string and make `val` ambiguous, like `%d file(s)`. Then pluralize for English in the appropriate [.stringsdict file](https://developer.apple.com/library/ios/documentation/MacOSX/Conceptual/BPInternational/StringsdictFileFormat/StringsdictFileFormat.html). See [platform/darwin/resources/en.lproj/Foundation.stringsdict](../darwin/resources/en.lproj/Foundation.stringsdict) for an example. Localizers should do likewise for their languages.
-1. Run `make genstrings` and commit any changes it makes to .strings files. The make rule also updates the macOS SDK’s strings tables.
+1. Run `make genstrings` and commit any changes it makes to .strings files. The make rule also updates the macOS maps SDK’s strings tables.
 
 ### Adding a localization
 
