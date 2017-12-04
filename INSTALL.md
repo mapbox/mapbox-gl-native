@@ -1,7 +1,7 @@
 # Building & Developing Mapbox GL Native from Source
 
 **Just trying to use Mapbox GL Native? You don't need to read this stuff! We
-provide [easy-to-install, prebuilt versions of the Mapbox SDKs for iOS and Android
+provide [easy-to-install, prebuilt versions of the Mapbox Maps SDKs for iOS and Android
 that you can download instantly and get started with fast](https://www.mapbox.com/install/).**
 
 Still with us? These are the instructions you'll need to build Mapbox GL Native
@@ -56,9 +56,9 @@ dependencies:
 
 See the relevant SDK documentation for next steps:
 
-* [Mapbox Android SDK](platform/android/)
-* [Mapbox Maps SDK for iOS](platform/ios/)
-* [Mapbox Maps SDK for macOS](platform/macos/)
+* [Maps SDK for Android](platform/android/)
+* [Maps SDK for iOS](platform/ios/)
+* [Maps SDK for iOS](platform/macos/)
 * [Mapbox Qt SDK](platform/qt/)
 * [Mapbox GL Native on Linux](platform/linux/)
 * [node-mapbox-gl-native](platform/node/)
