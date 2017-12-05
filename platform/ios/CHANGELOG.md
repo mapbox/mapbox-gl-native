@@ -1,4 +1,4 @@
-# Changelog for Mapbox iOS SDK
+# Changelog for Mapbox Maps SDK for iOS
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
@@ -6,6 +6,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Annotations
 * Fixed an issue that could cause triggering `-[MGLMapViewDelegate mapView:didSelectAnnotation:]` when taping next to a `MGLAnnotationImage` annotation. ([#10538](https://github.com/mapbox/mapbox-gl-native/pull/10538))
+
+### Packaging
+
+* Renamed this SDK from Mapbox iOS SDK to Mapbox Maps SDK for iOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
 
 ## 3.7.0 - Novemeber 13, 2017
 

@@ -1,6 +1,6 @@
 # User Interactions
 
-The Mapbox iOS SDK provides a set of built-in gesture recognizers. You can customize or supplement these gestures according to your use case. You see what gesture recognizers are on your `MGLMapView` by accessing the `gestureRecognizers` property on your map.
+The Mapbox Maps SDK for iOS provides a set of built-in gesture recognizers. You can customize or supplement these gestures according to your use case. You see what gesture recognizers are on your `MGLMapView` by accessing the `gestureRecognizers` property on your map.
 
 ## Configuring user interaction
 

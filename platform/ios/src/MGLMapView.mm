@@ -1973,7 +1973,7 @@ public:
 
 - (void)showAttribution:(__unused id)sender
 {
-    NSString *title = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox iOS SDK", @"Action sheet title");
+    NSString *title = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox Maps SDK for iOS", @"Action sheet title");
     UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:title
                                                                                    message:nil
                                                                             preferredStyle:UIAlertControllerStyleActionSheet];

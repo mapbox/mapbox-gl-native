@@ -10,8 +10,8 @@ If you want to contribute code:
 
 1. Pull requests are gladly accepted. If there are any changes that developers using one of the GL SDKs should be aware of, please update the **master** section of the relevant changelog(s):
   * [Mapbox Android SDK](platform/android/CHANGELOG.md)
-  * [Mapbox iOS SDK](platform/ios/CHANGELOG.md)
-  * [Mapbox macOS SDK](platform/macos/CHANGELOG.md)
+  * [Mapbox Maps SDK for iOS](platform/ios/CHANGELOG.md)
+  * [Mapbox Maps SDK for macOS](platform/macos/CHANGELOG.md)
   * [node-mapbox-gl-native](platform/node/CHANGELOG.md)
 
 1. Prefix your commit messages with the platform(s) your changes affect: `[core]`, `[android]`, `[ios]`, `[macos]`, `[node]`, or `[qt]`.
