@@ -221,8 +221,127 @@ TEST(LatLngBounds, FromTileID) {
     }
 }
 
-TEST(LatLngBounds, Contains) {
-    const LatLngBounds bounds( CanonicalTileID(4,2,6));
-    const LatLngBounds innerBounds( CanonicalTileID(9,82,197));
+TEST(LatLngBounds, ContainsPoint) {
+    auto bounds = LatLngBounds::hull({50.0, -100.0},{-50.0, 100.0});
+
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 170.0}));
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, -170.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, -100.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{-50.0, 100.0}));
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 365.0}));
+}
+
+TEST(LatLngBounds, ContainsPoint_Wrapped) {
+    auto bounds = LatLngBounds::hull({50.0, -160.0}, {-50.0, 160.0});
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 170.0}));
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, -170.0}));
+
+    bounds = LatLngBounds::hull({50.0, -200}, {-50.0, -160.0});
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 170.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, 170.0}, LatLng::Wrapped));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, -170.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, -170.0}, LatLng::Wrapped));
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 190.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, 190.0}, LatLng::Wrapped));
+    EXPECT_FALSE(bounds.contains(LatLng{0.0, 541.0}));
+    EXPECT_TRUE(bounds.contains(LatLng{0.0, 541.0}, LatLng::Wrapped));
+}
+
+TEST(LatLngBounds, ContainsBounds) {
+    auto bounds = LatLngBounds::hull({ 50.0, -160.0 }, {-50.0, 160.0});
+    EXPECT_TRUE(bounds.contains(bounds));
+
+    auto innerBounds = LatLngBounds::hull({10.0, -180.0}, {-10.0, -170.0});
+    EXPECT_FALSE(bounds.contains(innerBounds));
+    EXPECT_FALSE(innerBounds.contains(bounds));
+
+    innerBounds = LatLngBounds::hull({10, 120.0}, {-60, 125.0});
+    EXPECT_FALSE(bounds.contains(innerBounds));
+    EXPECT_FALSE(innerBounds.contains(bounds));
+
+    innerBounds = LatLngBounds::hull({10, 120.0}, {-10, 125.0});
     EXPECT_TRUE(bounds.contains(innerBounds));
+    EXPECT_FALSE(innerBounds.contains(bounds));
+
+}
+
+TEST(LatLngBounds, ContainsBounds_Wrapped) {
+    auto bounds = LatLngBounds::hull({50.0, -200}, {-50.0, -160.0});
+
+    auto inner = LatLngBounds::hull({10.0, -180.0}, {-10.0, -170.0});
+    EXPECT_TRUE(bounds.contains(inner));
+    EXPECT_TRUE(bounds.contains(inner, LatLng::Wrapped));
+
+    inner = LatLngBounds::hull({10.0, 180.0}, {-10.0, 190.0});
+    EXPECT_FALSE(bounds.contains(inner));
+    EXPECT_TRUE(bounds.contains(inner, LatLng::Wrapped));
+
+    inner = LatLngBounds::hull({10.0, 190.0}, {-10.0, 220.0});
+    EXPECT_FALSE(bounds.contains(inner));
+    EXPECT_FALSE(bounds.contains(inner, LatLng::Wrapped));
+
+    auto unwrapped = LatLngBounds::hull({10.0, 170.0}, { -10.0, -175.0});
+    EXPECT_FALSE(bounds.contains(unwrapped));
+    EXPECT_FALSE(bounds.contains(unwrapped, LatLng::Wrapped));
+    
+    unwrapped = LatLngBounds::hull({10.0, 0.0} , {-10.0, -10.0});
+    EXPECT_FALSE(bounds.contains(unwrapped));
+    EXPECT_FALSE(bounds.contains(unwrapped, LatLng::Wrapped));
+    
+    unwrapped = LatLngBounds::hull({10.0, -165.0}, {-10.0, -180.0});
+    EXPECT_TRUE(bounds.contains(unwrapped));
+    EXPECT_TRUE(bounds.contains(unwrapped, LatLng::Wrapped));
+
+    unwrapped = LatLngBounds::hull({10.0, 180.0}, {-10.0, 160.0});
+    EXPECT_FALSE(bounds.contains(unwrapped));
+    EXPECT_TRUE(bounds.contains(unwrapped, LatLng::Wrapped));
+
+    unwrapped = LatLngBounds::hull({10.0, 540.0}, {-10.0, 560.0});
+    EXPECT_FALSE(bounds.contains(unwrapped));
+    EXPECT_TRUE(bounds.contains(unwrapped, LatLng::Wrapped));
+}
+
+TEST(LatLngBounds, ContainsTileIDs) {
+    LatLngBounds bounds(CanonicalTileID(4,2,6));
+    LatLngBounds innerBounds(CanonicalTileID(9,82,197));
+    EXPECT_TRUE(bounds.contains(innerBounds));
+    EXPECT_FALSE(bounds.contains(LatLngBounds{ CanonicalTileID(3, 1, 0) }));
+}
+
+TEST(LatLngBounds, Intersects) {
+    auto bounds = LatLngBounds::hull({ 50.0, -160.0 }, { -50.0, 160.0 });
+    EXPECT_TRUE(bounds.intersects(bounds));
+
+    auto other = LatLngBounds::hull({50.0, -160.0}, {10, 160.0});
+    EXPECT_TRUE(bounds.intersects(other));
+    EXPECT_TRUE(other.intersects(bounds));
+}
+
+TEST(LatLngBounds, Intersects_Wrapped) {
+    auto bounds = LatLngBounds::hull({50.0, -200.0}, {-50.0, -160.0});
+    EXPECT_TRUE(bounds.intersects(bounds));
+
+    auto other = LatLngBounds::hull({50.0, -150.0}, {10, 160.0});
+    EXPECT_FALSE(bounds.intersects(other));
+    EXPECT_FALSE(other.intersects(bounds));
+    EXPECT_FALSE(bounds.intersects(other, LatLng::Wrapped));
+    EXPECT_FALSE(other.intersects(bounds, LatLng::Wrapped));
+
+    other = LatLngBounds::hull({10.0, -150.0}, {-10.0, -210.0});
+    EXPECT_TRUE(bounds.intersects(other));
+    EXPECT_TRUE(bounds.intersects(other, LatLng::Wrapped));
+    EXPECT_TRUE(other.intersects(bounds));
+    EXPECT_TRUE(other.intersects(bounds, LatLng::Wrapped));
+
+    other = LatLngBounds::hull({10.0, 150.0}, {-10.0, 210.0});
+    EXPECT_FALSE(bounds.intersects(other));
+    EXPECT_FALSE(other.intersects(bounds));
+    EXPECT_TRUE(bounds.intersects(other, LatLng::Wrapped));
+    EXPECT_TRUE(other.intersects(bounds, LatLng::Wrapped));
+
+    other = LatLngBounds::hull({10.0, 195.0}, {-10.0, 300.0});
+    EXPECT_FALSE(bounds.intersects(other));
+    EXPECT_FALSE(other.intersects(bounds));
+    EXPECT_TRUE(bounds.intersects(other, LatLng::Wrapped));
+    EXPECT_TRUE(other.intersects(bounds, LatLng::Wrapped));
 }
