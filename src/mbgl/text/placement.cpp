@@ -2,7 +2,7 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/tile/geometry_tile.cpp>
+#include <mbgl/tile/geometry_tile.hpp>
 #include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/renderer/bucket.hpp>
 
@@ -66,14 +66,14 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         matrix::multiply(posMatrix, projMatrix, posMatrix);
 
         mat4 textLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<TextRotationAlignment>() == style::AlignmentType::Map,
+                layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
+                layout.get<style::TextRotationAlignment>() == style::AlignmentType::Map,
                 state,
                 pixelsToTileUnits);
 
         mat4 iconLabelPlaneMatrix = getLabelPlaneMatrix(posMatrix,
-                layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
-                layout.get<IconRotationAlignment>() == style::AlignmentType::Map,
+                layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
+                layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
                 state,
                 pixelsToTileUnits);
 
@@ -95,8 +95,8 @@ void Placement::placeLayerBucket(
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
-    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<TextOptional>();
-    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<IconOptional>();
+    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<style::TextOptional>();
+    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<style::IconOptional>();
 
     for (auto& symbolInstance : bucket.symbolInstances) {
 
@@ -119,8 +119,8 @@ void Placement::placeLayerBucket(
                 auto placed = collisionIndex.placeFeature(symbolInstance.textCollisionFeature,
                         posMatrix, textLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
-                        bucket.layout.get<TextAllowOverlap>(),
-                        bucket.layout.get<TextPitchAlignment>() == style::AlignmentType::Map,
+                        bucket.layout.get<style::TextAllowOverlap>(),
+                        bucket.layout.get<style::TextPitchAlignment>() == style::AlignmentType::Map,
                         showCollisionBoxes);
                 placeText = placed.first;
                 offscreen &= placed.second;
@@ -133,8 +133,8 @@ void Placement::placeLayerBucket(
                 auto placed = collisionIndex.placeFeature(symbolInstance.iconCollisionFeature,
                         posMatrix, iconLabelPlaneMatrix, textPixelRatio,
                         placedSymbol, scale, fontSize,
-                        bucket.layout.get<IconAllowOverlap>(),
-                        bucket.layout.get<IconPitchAlignment>() == style::AlignmentType::Map,
+                        bucket.layout.get<style::IconAllowOverlap>(),
+                        bucket.layout.get<style::IconPitchAlignment>() == style::AlignmentType::Map,
                         showCollisionBoxes);
                 placeIcon = placed.first;
                 offscreen &= placed.second;
@@ -150,11 +150,11 @@ void Placement::placeLayerBucket(
             }
 
             if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<TextIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>());
             }
 
             if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<IconIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>());
             }
 
             assert(symbolInstance.crossTileID != 0);
