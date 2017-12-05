@@ -41,13 +41,15 @@ PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& font
 
     jni::String jniFontFamily = jni::Make<jni::String>(*env, fontFamily);
 
-    auto result = javaClass.Call(*env,
-                                 method,
-                                 jniFontFamily,
-                                 static_cast<jni::jboolean>(bold),
-                                 static_cast<jni::jchar>(glyphID));
+    auto javaBitmap = javaClass.Call(*env,
+                                     method,
+                                     jniFontFamily,
+                                     static_cast<jni::jboolean>(bold),
+                                     static_cast<jni::jchar>(glyphID));
 
-    return Bitmap::GetImage(*env, result);
+    PremultipliedImage result = Bitmap::GetImage(*env, javaBitmap);
+    jni::DeleteLocalRef(*env, javaBitmap);
+    return result;
 }
 
 void LocalGlyphRasterizer::registerNative(jni::JNIEnv& env) {
