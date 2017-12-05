@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "No se pudo cargar el mapa debido a que el estilo está dañado.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "La versión %@ de Mapbox iOS SDK está disponible:";
+"SDK_UPDATE_AVAILABLE" = "La versión %@ de Mapbox Maps SDK for iOS está disponible:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "No se pudo cargar el mapa debido a que no se encuentra el estilo o está incompleto.";

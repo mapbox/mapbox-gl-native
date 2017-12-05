@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "顯示信息";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "樣式表有毀損，無法載入地圖。";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK %@版現已開放下載：";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS %@版現已開放下載：";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "找不到樣式表或樣式表不兼容，無法載入地圖。";

@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Több infót mutat";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílus sérült.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK %@ mostantól elérhető:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS %@ mostantól elérhető:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Nem sikerült betölteni a térképet, mert a stílus nem található vagy inkompatibilis.";
