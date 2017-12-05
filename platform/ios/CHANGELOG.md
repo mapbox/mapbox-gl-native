@@ -1,8 +1,12 @@
-# Changelog for Mapbox iOS SDK
+# Changelog for Mapbox Maps SDK for iOS
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
 ## master
+
+### Packaging
+
+* Renamed this SDK from Mapbox iOS SDK to Mapbox Maps SDK for iOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
 
 ### Annotations and user interaction
 

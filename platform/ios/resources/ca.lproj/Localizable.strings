@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Mostra més informació";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "El mapa no s’ha carregat perquè s’ha corromput l’estil.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "La versió %@ del Mapbox iOS SDK està disponible:";
+"SDK_UPDATE_AVAILABLE" = "La versió %@ del Mapbox Maps SDK for iOS està disponible:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "El mapa no s’ha carregat perquè no es troba l’estil o bé és incompatible.";
