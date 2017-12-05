@@ -7,7 +7,7 @@
 #include "../attach_env.hpp"
 #include "../bitmap.hpp"
 
-#include "local_glyph_rasterizer_impl.hpp"
+#include "local_glyph_rasterizer_jni.hpp"
 
 /*
     Android implementation of LocalGlyphRasterizer:

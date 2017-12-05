@@ -51,7 +51,7 @@
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
-#include "text/local_glyph_rasterizer_impl.hpp"
+#include "text/local_glyph_rasterizer_jni.hpp"
 
 namespace mbgl {
 namespace android {
