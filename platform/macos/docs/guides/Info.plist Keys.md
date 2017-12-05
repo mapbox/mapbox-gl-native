@@ -1,6 +1,6 @@
 # Info.plist Keys
 
-The Mapbox macOS SDK supports custom `Info.plist` keys in your application in order to configure various settings.
+The Mapbox Maps SDK for macOS supports custom `Info.plist` keys in your application in order to configure various settings.
 
 ## MGLMapboxAccessToken
 

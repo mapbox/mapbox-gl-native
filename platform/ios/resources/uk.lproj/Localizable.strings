@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Показує більше інформації";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Неможливо завантажити мапу, через помилки в стилі.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Доступна версія %@ Mapbox iOS SDK:";
+"SDK_UPDATE_AVAILABLE" = "Доступна версія %@ Mapbox Maps SDK for iOS:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Неможливо завантажити мапу, бо неможливо знайти стиль або він несумісний.";

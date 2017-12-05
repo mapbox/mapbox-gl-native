@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "詳細を伝える";
 
 /* No comment provided by engineer. */
@@ -41,10 +41,10 @@
 "MAP_A11Y_VALUE" = "ズーム %1$d倍\n%2$ld ピン現れる";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "現在Mapbox iOS SDK %1$@が入手できる：";
+"SDK_UPDATE_AVAILABLE" = "現在Mapbox Maps SDK for iOS %1$@が入手できる：";
 
 /* Telemetry prompt message */
 "TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
