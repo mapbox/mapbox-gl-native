@@ -6,6 +6,20 @@ Mapbox welcomes participation and contributions from everyone.  If you'd like to
 
 * TBA
 
+## 5.2.1 - December 6, 2017
+ - Close race condition in RunLoop [#10537](https://github.com/mapbox/mapbox-gl-native/pull/10537)
+ - OkHttp 3.9.1 [#10515](https://github.com/mapbox/mapbox-gl-native/pull/10515)
+ - Attribution anchor point fix [#10558](https://github.com/mapbox/mapbox-gl-native/pull/10558)
+ - Pre API 19 VerifyError [#10579](https://github.com/mapbox/mapbox-gl-native/pull/10579)
+ - Set larger Http request limit [#10567](https://github.com/mapbox/mapbox-gl-native/pull/10567)
+ - Remove jar generation from maven publish [#10625](https://github.com/mapbox/mapbox-gl-native/pull/10625)
+ - Enable Map Rendering when paused for multiple window support [#10509](https://github.com/mapbox/mapbox-gl-native/pull/10509)
+ - Activate FileSource when listing offline regions [#10531](https://github.com/mapbox/mapbox-gl-native/pull/10531)
+ - Harden MarkerView integration by checking for null bitmap [#10532](https://github.com/mapbox/mapbox-gl-native/pull/10532)
+ - Use concurrent lists for camera change listeners [#10542](https://github.com/mapbox/mapbox-gl-native/pull/10542)
+ - Handle destroy activity as part of theme switching [#10589](https://github.com/mapbox/mapbox-gl-native/pull/10589)
+ - add FileSource activation/deactivation to MapSnapshotter [#10556](https://github.com/mapbox/mapbox-gl-native/pull/10556)
+
 ## 5.2.0 - November 17, 2017
 
 - Monkey crashes [#10472](https://github.com/mapbox/mapbox-gl-native/pull/10472)
