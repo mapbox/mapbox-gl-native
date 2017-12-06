@@ -455,6 +455,9 @@ public:
     _attributionButtonConstraints = [NSMutableArray array];
     [_attributionButton addObserver:self forKeyPath:@"hidden" options:NSKeyValueObservingOptionNew context:NULL];
 
+    UILongPressGestureRecognizer *attributionLongPress = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(showAttribution:)];
+    [_attributionButton addGestureRecognizer:attributionLongPress];
+
     // setup compass
     //
     _compassView = [[UIImageView alloc] initWithImage:self.compassImage];
@@ -1973,13 +1976,28 @@ public:
 
 #pragma mark - Attribution -
 
-- (void)showAttribution:(__unused id)sender
+- (void)showAttribution:(id)sender
 {
+    BOOL shouldShowVersion = [sender isKindOfClass:[UILongPressGestureRecognizer class]];
+    if (shouldShowVersion)
+    {
+        UILongPressGestureRecognizer *longPress = (UILongPressGestureRecognizer *)sender;
+        if (longPress.state != UIGestureRecognizerStateBegan)
+        {
+            return;
+        }
+    }
+
     NSString *title = NSLocalizedStringWithDefaultValue(@"SDK_NAME", nil, nil, @"Mapbox Maps SDK for iOS", @"Action sheet title");
     UIAlertController *attributionController = [UIAlertController alertControllerWithTitle:title
                                                                                    message:nil
                                                                             preferredStyle:UIAlertControllerStyleActionSheet];
-    
+
+    if (shouldShowVersion)
+    {
+        attributionController.title = [title stringByAppendingFormat:@" %@", [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]];
+    }
+
     NSArray *attributionInfos = [self.style attributionInfosWithFontSize:[UIFont buttonFontSize]
                                                                linkColor:nil];
     for (MGLAttributionInfo *info in attributionInfos)
