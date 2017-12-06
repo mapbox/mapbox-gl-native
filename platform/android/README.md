@@ -42,6 +42,7 @@ These dependencies are required for all operating systems and all platform targe
   - clang++ 3.5 or later or
   - g++-4.9 or later
 - [Node.js](https://nodejs.org/)
+  - make sure [npm](https://www.npmjs.com) is installed as well
 - [ccache](https://ccache.samba.org/) (optional)
 
 **Note**: We partially support C++14 because GCC 4.9 does not fully implement the
@@ -62,6 +63,8 @@ make aproj
 #### linux
 
 run `make android-configuration` in the root folder of the project and open the Android Studio project in `/platform/android`.
+
+If you are using Arch Linux, install [ncurses5-compat-libs](https://aur.archlinux.org/packages/ncurses5-compat-libs).
 
 ### Project configuration
 
