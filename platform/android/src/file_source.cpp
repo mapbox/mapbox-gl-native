@@ -63,11 +63,22 @@ void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::
 }
 
 void FileSource::resume(jni::JNIEnv&) {
-    fileSource->resume();
+    if (!activationCounter) {
+        activationCounter = optional<int>(1) ;
+        return;
+    }
+
+    activationCounter.value()++;
+    if (activationCounter == 1) {
+       fileSource->resume();
+    }
 }
 
 void FileSource::pause(jni::JNIEnv&) {
-    fileSource->pause();
+    activationCounter.value()--;
+    if (activationCounter == 0) {
+        fileSource->pause();
+    }
 }
 
 jni::Class<FileSource> FileSource::javaClass;
@@ -100,8 +111,8 @@ void FileSource::registerNative(jni::JNIEnv& env) {
         METHOD(&FileSource::setAccessToken, "setAccessToken"),
         METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
         METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
-        METHOD(&FileSource::resume, "resume"),
-        METHOD(&FileSource::pause, "pause")
+        METHOD(&FileSource::resume, "activate"),
+        METHOD(&FileSource::pause, "deactivate")
     );
 }
 

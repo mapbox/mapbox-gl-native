@@ -54,6 +54,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
 private:
+    optional<int> activationCounter;
     std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
 };
