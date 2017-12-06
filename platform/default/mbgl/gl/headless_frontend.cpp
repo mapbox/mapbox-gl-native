@@ -7,11 +7,11 @@
 
 namespace mbgl {
 
-HeadlessFrontend::HeadlessFrontend(float pixelRatio_, FileSource& fileSource, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode)
-    : HeadlessFrontend({ 256, 256 }, pixelRatio_, fileSource, scheduler, programCacheDir, mode) {
+HeadlessFrontend::HeadlessFrontend(float pixelRatio_, FileSource& fileSource, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode, const optional<std::string> localFontFamily)
+    : HeadlessFrontend({ 256, 256 }, pixelRatio_, fileSource, scheduler, programCacheDir, mode, localFontFamily) {
 }
 
-HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, FileSource& fileSource, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode)
+HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, FileSource& fileSource, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode, const optional<std::string> localFontFamily)
     : size(size_),
     pixelRatio(pixelRatio_),
     backend({ static_cast<uint32_t>(size.width * pixelRatio),
@@ -22,7 +22,7 @@ HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, FileSource& fi
             renderer->render(*updateParameters);
         }
     }),
-    renderer(std::make_unique<Renderer>(backend, pixelRatio, fileSource, scheduler, mode, programCacheDir)) {
+    renderer(std::make_unique<Renderer>(backend, pixelRatio, fileSource, scheduler, mode, programCacheDir, localFontFamily)) {
 }
 
 HeadlessFrontend::~HeadlessFrontend() = default;
