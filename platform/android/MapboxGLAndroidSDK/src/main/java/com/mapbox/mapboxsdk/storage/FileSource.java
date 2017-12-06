@@ -6,10 +6,8 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.support.annotation.NonNull;
-
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-
 import timber.log.Timber;
 
 /**
@@ -119,38 +117,20 @@ public class FileSource {
   }
 
   private long nativePtr;
-  private long activeCounter;
-  private boolean wasPaused;
 
   private FileSource(String cachePath, AssetManager assetManager) {
     initialize(Mapbox.getAccessToken(), cachePath, assetManager);
   }
 
-  public void activate() {
-    activeCounter++;
-    if (activeCounter == 1 && wasPaused) {
-      wasPaused = false;
-      resume();
-    }
-  }
+  public native void activate();
 
-  public void deactivate() {
-    activeCounter--;
-    if (activeCounter == 0) {
-      wasPaused = true;
-      pause();
-    }
-  }
+  public native void deactivate();
 
   public native void setAccessToken(@NonNull String accessToken);
 
   public native String getAccessToken();
 
   public native void setApiBaseUrl(String baseUrl);
-
-  private native void resume();
-
-  private native void pause();
 
   /**
    * Sets a callback for transforming URLs requested from the internet
