@@ -30,7 +30,7 @@ public:
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), 0.0002, 0.1);
+                         frontend.render(map), 0.05, 0.1);
     }
 };
 
