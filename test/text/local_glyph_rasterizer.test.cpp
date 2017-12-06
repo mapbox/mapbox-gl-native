@@ -9,6 +9,22 @@
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/style/style.hpp>
 
+/*
+    LoadLocalCJKGlyph in glyph_manager.test.cpp exercises the platform-independent
+    part of LocalGlyphRasterizer. This test actually exercises platform-dependent
+    font loading code for whatever platform it runs on. Different platforms have
+    different default fonts, so adding a new platform requires new "expected"
+    fixtures.
+ 
+    At the time of writing, we don't run `mbgl-test` on iOS or Android, so the only
+    supported test platform is macOS. Supporting Android would require adding a new
+    test case (probably using the "Droid" font family). iOS should theoretically
+    work -- the "PingFang" font family used below is expected to be available on
+    all iOS devices, and we use a relatively high image diff tolerance (0.05) to
+    account for small changes between the many possible variants of the PingFang
+    family.
+*/
+
 using namespace mbgl;
 
 namespace {
@@ -30,7 +46,7 @@ public:
 
     void checkRendering(const char * name) {
         test::checkImage(std::string("test/fixtures/local_glyphs/") + name,
-                         frontend.render(map), 0.0002, 0.1);
+                         frontend.render(map), 0.05, 0.1);
     }
 };
 
@@ -68,19 +84,3 @@ TEST(LocalGlyphRasterizer, NoLocal) {
     test.checkRendering("no_local");
 }
 
-#if ANDROID
-
-TEST(LocalGlyphRasterizer, Droid) {
-    LocalGlyphRasterizerTest test(std::string("Droid"));
-
-    test.fileSource.glyphsResponse = [&] (const Resource& resource) {
-        EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
-        Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
-        return response;
-    };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
-    test.checkRendering("droid");
-}
-
-#endif
