@@ -11,6 +11,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Renamed this SDK from Mapbox iOS SDK to Mapbox Maps SDK for iOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
 
+### Other changes
+
+* Fixed an issue that caused  `MGLMapView.minimumZoomLevel` not getting set. ([#10596](https://github.com/mapbox/mapbox-gl-native/pull/10596))
+
 ## 3.7.0 - Novemeber 13, 2017
 
 ### Networking and storage
