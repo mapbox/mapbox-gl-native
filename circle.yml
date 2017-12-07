@@ -200,8 +200,20 @@ step-library:
       run:
         name: Publish node package
         when: on_success
-        command: platform/node/scripts/after_success.sh
-
+        environment:
+          PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
+        command: |
+          echo "Node package version: ${PACKAGE_JSON_VERSION}"
+          if [[ "${CIRCLE_TAG}" == "node-v${PACKAGE_JSON_VERSION}" ]]; then
+            if [[ "${BUILDTYPE}" == "RelWithDebInfo" ]]; then
+              ./node_modules/.bin/node-pre-gyp package publish info
+            elif [[ "${BUILDTYPE}" == "Debug" ]]; then
+              ./node_modules/.bin/node-pre-gyp package publish info --debug
+            else
+              echo "error: must provide either Debug or RelWithDebInfo for BUILDTYPE"
+              exit 1
+            fi
+          fi
 
   - &upload-render-tests
       store_artifacts:
@@ -665,8 +677,6 @@ jobs:
       - *save-cache
       - run:
           name: Run valgrind-backed tests
-          environment:
-            JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
           command: |
             xvfb-run --server-args="-screen 0 1024x768x24" \
               build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
