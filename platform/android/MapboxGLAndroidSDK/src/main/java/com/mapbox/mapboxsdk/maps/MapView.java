@@ -293,7 +293,7 @@ public class MapView extends FrameLayout {
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     if (options.getTextureMode()) {
       TextureView textureView = new TextureView(getContext());
-      mapRenderer = new TextureViewMapRenderer(getContext(), textureView) {
+      mapRenderer = new TextureViewMapRenderer(getContext(), textureView, options.getLocalIdeographFontFamily()) {
         @Override
         protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.post(new Runnable() {
@@ -315,7 +315,7 @@ public class MapView extends FrameLayout {
       GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
       glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
 
-      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView) {
+      mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, options.getLocalIdeographFontFamily()) {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.post(new Runnable() {
