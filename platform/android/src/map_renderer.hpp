@@ -48,7 +48,8 @@ public:
                 jni::Object<MapRenderer>,
                 jni::Object<FileSource>,
                 jni::jfloat pixelRatio,
-                jni::String programCacheDir);
+                jni::String programCacheDir,
+                jni::String localIdeographFontFamily);
 
     ~MapRenderer() override;
 
@@ -103,6 +104,7 @@ private:
     float pixelRatio;
     DefaultFileSource& fileSource;
     std::string programCacheDir;
+    optional<std::string> localIdeographFontFamily;
 
     std::shared_ptr<ThreadPool> threadPool;
     std::shared_ptr<Mailbox> mailbox;
