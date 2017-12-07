@@ -305,6 +305,10 @@ template type::Type valueTypeToExpressionType<TranslateAnchorType>();
 template optional<TranslateAnchorType> fromExpressionValue<TranslateAnchorType>(const Value&);
 template Value toExpressionValue(const TranslateAnchorType&);
 
+template type::Type valueTypeToExpressionType<HillshadeIlluminationAnchorType>();
+template optional<HillshadeIlluminationAnchorType> fromExpressionValue<HillshadeIlluminationAnchorType>(const Value&);
+template Value toExpressionValue(const HillshadeIlluminationAnchorType&);
+
 template type::Type valueTypeToExpressionType<LightAnchorType>();
 template optional<LightAnchorType> fromExpressionValue<LightAnchorType>(const Value&);
 template Value toExpressionValue(const LightAnchorType&);

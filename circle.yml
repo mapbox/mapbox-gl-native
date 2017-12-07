@@ -8,8 +8,8 @@ workflows:
           filters:
             branches:
               ignore: master
-      - android-debug-arm-v7
-      - android-release-all
+      #- android-debug-arm-v7
+      #- android-release-all
       - node4-clang39-release:
           filters:
             tags:
@@ -32,17 +32,17 @@ workflows:
       - linux-gcc5-release-qt5
       - ios-debug
       #- ios-sanitize-address
-      - ios-sanitize-thread
-      - macos-debug
-      - macos-debug-qt5
-      - macos-release-node4:
-          filters:
-            tags:
-              only: /node-.*/
-      - macos-release-node6:
-          filters:
-            tags:
-              only: /node-.*/
+      #- ios-sanitize-thread
+      #- macos-debug
+      #- macos-debug-qt5
+      #- macos-release-node4:
+      #    filters:
+      #      tags:
+      #        only: /node-.*/
+      #- macos-release-node6:
+      #    filters:
+      #      tags:
+      #        only: /node-.*/
 
 step-library:
   - &generate-cache-key
