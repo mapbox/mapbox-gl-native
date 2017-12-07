@@ -5,6 +5,8 @@
 #include <mbgl/actor/scheduler.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/tile/tile_observer.hpp>
+#include <mbgl/style/custom_tile_loader.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 
@@ -19,7 +21,8 @@ CustomGeometryTile::CustomGeometryTile(const OverscaledTileID& overscaledTileID,
     necessity(TileNecessity::Optional),
     options(options_),
     loader(loader_),
-    actor(*Scheduler::GetCurrent(), std::bind(&CustomGeometryTile::setTileData, this, std::placeholders::_1)) {
+    mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
+    actorRef(*this, mailbox) {
 }
 
 CustomGeometryTile::~CustomGeometryTile() {
@@ -43,14 +46,20 @@ void CustomGeometryTile::setTileData(const GeoJSON& geoJSON) {
     setData(std::make_unique<GeoJSONTileData>(std::move(featureData)));
 }
 
+void CustomGeometryTile::invalidateTileData() {
+    stale = true;
+    observer->onTileChanged(*this);
+}
+
 //Fetching tile data for custom sources is assumed to be an expensive operation.
 // Only required tiles make fetchTile requests. Attempt to cancel a tile
 // that is no longer required.
 void CustomGeometryTile::setNecessity(TileNecessity newNecessity) {
-   if (newNecessity != necessity) {
+   if (newNecessity != necessity || stale ) {
         necessity = newNecessity;
         if (necessity == TileNecessity::Required) {
-            loader.invoke(&style::CustomTileLoader::fetchTile, id, actor.self());
+            loader.invoke(&style::CustomTileLoader::fetchTile, id, actorRef);
+            stale = false;
         } else if (!isRenderable()) {
             loader.invoke(&style::CustomTileLoader::cancelTile, id);
         }

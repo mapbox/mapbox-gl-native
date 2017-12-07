@@ -40,6 +40,6 @@ void CustomGeometrySource::invalidateTile(const CanonicalTileID& tileID) {
 void CustomGeometrySource::invalidateRegion(const LatLngBounds& bounds) {
     loader->invoke(&CustomTileLoader::invalidateRegion, bounds, impl().getZoomRange());
 }
-    
+
 } // namespace style
 } // namespace mbgl
