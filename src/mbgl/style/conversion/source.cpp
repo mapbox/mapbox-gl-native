@@ -5,6 +5,7 @@
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/util/geo.hpp>
@@ -53,6 +54,28 @@ static optional<std::unique_ptr<Source>> convertRasterSource(const std::string& 
     }
 
     return { std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize) };
+}
+
+static optional<std::unique_ptr<Source>> convertRasterDEMSource(const std::string& id,
+                                                             const Convertible& value,
+                                                             Error& error) {
+    optional<variant<std::string, Tileset>> urlOrTileset = convertURLOrTileset(value, error);
+    if (!urlOrTileset) {
+        return {};
+    }
+
+    uint16_t tileSize = util::tileSize;
+    auto tileSizeValue = objectMember(value, "tileSize");
+    if (tileSizeValue) {
+        optional<float> size = toNumber(*tileSizeValue);
+        if (!size || *size < 0 || *size > std::numeric_limits<uint16_t>::max()) {
+            error = { "invalid tileSize" };
+            return {};
+        }
+        tileSize = *size;
+    }
+
+    return { std::make_unique<RasterDEMSource>(id, std::move(*urlOrTileset), tileSize) };
 }
 
 static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
@@ -155,9 +178,11 @@ optional<std::unique_ptr<Source>> Converter<std::unique_ptr<Source>>::operator()
         error = { "source type must be a string" };
         return {};
     }
-
+    const std::string tname = *type;
     if (*type == "raster") {
         return convertRasterSource(id, value, error);
+    } else if (*type == "raster-dem") {
+        return convertRasterDEMSource(id, value, error);
     } else if (*type == "vector") {
         return convertVectorSource(id, value, error);
     } else if (*type == "geojson") {

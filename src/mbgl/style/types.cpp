@@ -25,6 +25,11 @@ MBGL_DEFINE_ENUM(TranslateAnchorType, {
     { TranslateAnchorType::Viewport, "viewport" },
 });
 
+MBGL_DEFINE_ENUM(HillshadeIlluminationAnchorType, {
+    { HillshadeIlluminationAnchorType::Map, "map" },
+    { HillshadeIlluminationAnchorType::Viewport, "viewport" },
+});
+
 MBGL_DEFINE_ENUM(RotateAnchorType, {
     { RotateAnchorType::Map, "map" },
     { RotateAnchorType::Viewport, "viewport" },
