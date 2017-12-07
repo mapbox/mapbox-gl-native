@@ -154,25 +154,84 @@ public:
                sw.longitude() > ne.longitude();
     }
 
-    bool contains(const LatLng& point) const {
-        return (point.latitude()  >= sw.latitude()  &&
-                point.latitude()  <= ne.latitude()  &&
-                point.longitude() >= sw.longitude() &&
-                point.longitude() <= ne.longitude());
+    bool crossesAntimeridian() const {
+        return (sw.wrapped().longitude() > ne.wrapped().longitude());
     }
 
-    bool contains(const LatLngBounds& area) const {
-        return (area.ne.latitude()  <= ne.latitude()  &&
-                area.sw.latitude()  >= sw.latitude()  &&
-                area.ne.longitude() <= ne.longitude() &&
-                area.sw.longitude() >= sw.longitude());
+    bool contains(const LatLng& point, LatLng::WrapMode wrap = LatLng::Unwrapped) const {
+        bool containsLatitude = point.latitude() >= sw.latitude() &&
+                                point.latitude() <= ne.latitude();
+        if (!containsLatitude) {
+            return false;
+        }
+
+        bool containsUnwrappedLongitude = point.longitude() >= sw.longitude() &&
+                                          point.longitude() <= ne.longitude();
+        if (containsUnwrappedLongitude) {
+            return true;
+        } else if (wrap == LatLng::Wrapped) {
+            LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
+            auto ptLon = point.wrapped().longitude();
+            if (crossesAntimeridian()) {
+                return (ptLon >= wrapped.sw.longitude() &&
+                        ptLon <= util::LONGITUDE_MAX) ||
+                       (ptLon <= wrapped.ne.longitude() &&
+                        ptLon >= -util::LONGITUDE_MAX);
+            } else {
+                return (ptLon >= wrapped.sw.longitude() &&
+                        ptLon <= wrapped.ne.longitude());
+            }
+        }
+        return false;
     }
 
-    bool intersects(const LatLngBounds area) const {
-        return (area.ne.latitude()  > sw.latitude()  &&
-                area.sw.latitude()  < ne.latitude()  &&
-                area.ne.longitude() > sw.longitude() &&
-                area.sw.longitude() < ne.longitude());
+    bool contains(const LatLngBounds& area, LatLng::WrapMode wrap = LatLng::Unwrapped) const {
+        bool containsLatitude = area.north() <= north() && area.south() >= south();
+        if (!containsLatitude) {
+            return false;
+        }
+
+        bool containsUnwrapped = area.east() <= east() && area.west() >= west();
+        if(containsUnwrapped) {
+            return true;
+        } else if (wrap == LatLng::Wrapped) {
+            LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
+            LatLngBounds other(area.sw.wrapped(), area.ne.wrapped());
+            if (crossesAntimeridian() & !area.crossesAntimeridian()) {
+                return (other.east() <= util::LONGITUDE_MAX && other.west() >= wrapped.west()) ||
+                       (other.east() <= wrapped.east() && other.west() >= -util::LONGITUDE_MAX);
+            } else {
+                return other.east() <= wrapped.east() && other.west() >= wrapped.west();
+            }
+        }
+        return false;
+    }
+
+    bool intersects(const LatLngBounds area, LatLng::WrapMode wrap = LatLng::Unwrapped) const {
+        bool latitudeIntersects = area.north() > south() && area.south() < north();
+        if (!latitudeIntersects) {
+            return false;
+        }
+
+        bool longitudeIntersects = area.east() > west() && area.west() < east();
+        if (longitudeIntersects) {
+            return true;
+        } else if (wrap == LatLng::Wrapped) {
+            LatLngBounds wrapped(sw.wrapped(), ne.wrapped());
+            LatLngBounds other(area.sw.wrapped(), area.ne.wrapped());
+            if (crossesAntimeridian()) {
+                return area.crossesAntimeridian() ||
+                       other.east() > wrapped.west() ||
+                       other.west() < wrapped.east();
+            } else if (other.crossesAntimeridian()){
+                return other.east() > wrapped.west() ||
+                       other.west() < wrapped.east();
+            } else {
+                return other.east() > wrapped.west() &&
+                       other.west() < wrapped.east();
+            }
+        }
+        return false;
     }
 
 private:

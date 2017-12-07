@@ -81,7 +81,7 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
     for (auto idtuple= tileCallbackMap.begin(); idtuple != tileCallbackMap.end(); idtuple++) {
         const LatLngBounds tileBounds(idtuple->first);
-        if (tileBounds.intersects(bounds) || bounds.contains(tileBounds) || tileBounds.contains(bounds)) {
+        if (tileBounds.intersects(bounds, LatLng::Wrapped) || bounds.contains(tileBounds, LatLng::Wrapped) || tileBounds.contains(bounds, LatLng::Wrapped)) {
             for (auto iter = idtuple->second.begin(); iter != idtuple->second.end(); iter++) {
                 auto actor = std::get<2>(*iter);
                 actor.invoke(&CustomGeometryTile::invalidateTileData);
