@@ -49,7 +49,7 @@ public:
     struct Replace {
         static constexpr BlendEquation equation = BlendEquation::Add;
         static constexpr BlendFactor srcFactor = One;
-        static constexpr BlendFactor dstFactor = One;
+        static constexpr BlendFactor dstFactor = Zero;
     };
 
     using Add              = LinearBlend<BlendEquation::Add>;
