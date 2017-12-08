@@ -306,7 +306,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
-      mapboxMapOptions.localIdeographFontFamily(typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
+      mapboxMapOptions.localIdeographFontFamily(
+        typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
     } finally {
       typedArray.recycle();
     }
@@ -741,7 +742,7 @@ public class MapboxMapOptions implements Parcelable {
    * and ‘Hangul Syllables’ ranges.
    *
    * @param fontFamily font family for local ideograph generation.
-   * @return
+   * @return This
    */
   public MapboxMapOptions localIdeographFontFamily(String fontFamily) {
     this.localIdeographFontFamily = fontFamily;
@@ -1100,7 +1101,9 @@ public class MapboxMapOptions implements Parcelable {
    *
    * @return Local ideograph font family name.
    */
-  public String getLocalIdeographFontFamily() { return localIdeographFontFamily; }
+  public String getLocalIdeographFontFamily() {
+    return localIdeographFontFamily;
+  }
 
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
