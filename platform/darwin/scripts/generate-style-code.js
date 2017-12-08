@@ -365,6 +365,7 @@ global.describeValue = function (value, property, layerType) {
             }
             return `an \`NSValue\` object containing ${displayValue}`;
         case 'color':
+            if (property.name === 'heatmap-color') value = 'red';
             let color = parseColor(value);
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);

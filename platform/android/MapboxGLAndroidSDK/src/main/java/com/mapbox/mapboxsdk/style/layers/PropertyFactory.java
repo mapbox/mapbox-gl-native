@@ -167,7 +167,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#fillTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -178,7 +178,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#fillTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -287,7 +287,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#lineTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -298,7 +298,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#lineTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -593,7 +593,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#iconTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -604,7 +604,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#iconTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -767,7 +767,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#textTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -778,7 +778,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#textTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -909,7 +909,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#circleTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -920,7 +920,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#circleTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -1051,6 +1051,114 @@ public class PropertyFactory {
   }
 
   /**
+   * Radius of influence of one heatmap point in density-independent pixels. Increasing the value makes the heatmap smoother, but less detailed.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapRadius(Float value) {
+    return new PaintPropertyValue<>("heatmap-radius", value);
+  }
+
+
+  /**
+   * Radius of influence of one heatmap point in density-independent pixels. Increasing the value makes the heatmap smoother, but less detailed.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> heatmapRadius(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("heatmap-radius", function);
+  }
+
+  /**
+   * A measure of how much an individual point contributes to the heatmap. A value of 10 would be equivalent to having 10 points of weight 1 in the same spot. Especially useful when combined with clustering.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapWeight(Float value) {
+    return new PaintPropertyValue<>("heatmap-weight", value);
+  }
+
+
+  /**
+   * A measure of how much an individual point contributes to the heatmap. A value of 10 would be equivalent to having 10 points of weight 1 in the same spot. Especially useful when combined with clustering.
+   *
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
+   * @return property wrapper around a Float function
+   */
+  public static <T> PropertyValue<Function<T, Float>> heatmapWeight(Function<T, Float> function) {
+    return new PaintPropertyValue<>("heatmap-weight", function);
+  }
+
+  /**
+   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapIntensity(Float value) {
+    return new PaintPropertyValue<>("heatmap-intensity", value);
+  }
+
+
+  /**
+   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> heatmapIntensity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("heatmap-intensity", function);
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> heatmapColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("heatmap-color", colorToRgbaString(value));
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> heatmapColor(String value) {
+    return new PaintPropertyValue<>("heatmap-color", value);
+  }
+
+  /**
+   * The global opacity at which the heatmap layer will be drawn.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapOpacity(Float value) {
+    return new PaintPropertyValue<>("heatmap-opacity", value);
+  }
+
+
+  /**
+   * The global opacity at which the heatmap layer will be drawn.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> heatmapOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("heatmap-opacity", function);
+  }
+
+  /**
    * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
    *
    * @param value a Float value
@@ -1127,7 +1235,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#fillExtrusionTranslate}.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1138,7 +1246,7 @@ public class PropertyFactory {
 
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for {@link PropertyFactory#fillExtrusionTranslate}.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -1767,7 +1875,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. A string with {tokens} replaced, referencing the data property to pull from.
+   * Name of image in sprite to use for drawing an image background. A string with `{tokens}` replaced, referencing the data property to pull from. (`{token}` replacement is only supported for literal {@link PropertyFactory#iconImage} values; not for property functions.)
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1779,7 +1887,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing an image background. A string with {tokens} replaced, referencing the data property to pull from.
+   * Name of image in sprite to use for drawing an image background. A string with `{tokens}` replaced, referencing the data property to pull from. (`{token}` replacement is only supported for literal {@link PropertyFactory#iconImage} values; not for property functions.)
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
@@ -1974,7 +2082,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal {@link PropertyFactory#textField} values--not for property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like `{field_name}`. (`{token}` replacement is only supported for literal {@link PropertyFactory#textField} values; not for property functions.)
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1986,7 +2094,7 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like {field_name}.  (Token replacement is only supported for literal {@link PropertyFactory#textField} values--not for property functions.)
+   * Value to use for a text label. Feature properties are specified using tokens like `{field_name}`. (`{token}` replacement is only supported for literal {@link PropertyFactory#textField} values; not for property functions.)
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
