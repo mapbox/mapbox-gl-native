@@ -22,9 +22,14 @@ namespace mbgl {
      - Configuration is done at map creation time by setting a "font family"
         * JS uses a CSS font-family, this uses kCTFontFamilyNameAttribute which has
           somewhat different behavior.
-     - We use heuristics to extract a font-weight based on the incoming font stack
  
     Further improvements are possible:
+     - GL JS heuristically determines a font weight based on the strings included in
+        the FontStack. Android follows a simpler heuristic that just picks up the
+        "Bold" property from the FontStack. Although both should be possible with CoreText,
+        our initial implementation couldn't reliably control the font-weight, so we're
+        skipping that functionality on darwin.
+        (See commit history for attempted implementation)
      - If we could reliably extract glyph metrics, we wouldn't be limited to CJK glyphs
      - We could push the font configuration down to individual style layers, which would
         allow any current style to be reproducible using local fonts.
@@ -48,69 +53,39 @@ class LocalGlyphRasterizer::Impl {
 public:
     Impl(const optional<std::string> fontFamily_)
         : fontFamily(fontFamily_)
+        , fontHandle(NULL)
     {}
     
     ~Impl() {
-        for (auto& pair : fontHandles) {
-            CFRelease(pair.second);
+        if (fontHandle) {
+            CFRelease(fontHandle);
         }
     }
 
     
-    CTFontRef getFont(const FontStack& fontStack) {
+    CTFontRef getFont() {
         if (!fontFamily) {
             return NULL;
         }
         
-        if (fontHandles.find(fontStack) == fontHandles.end()) {
-            
-            NSDictionary* fontTraits = @{ (NSString *)kCTFontWeightTrait: [NSNumber numberWithFloat:getFontWeight(fontStack)] };
-            
-            NSDictionary *fontAttributes = @{
+        if (!fontHandle) {
+          NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding],
-                (NSString *)kCTFontTraitsAttribute: fontTraits
-                //(NSString *)kCTFontStyleNameAttribute: (getFontWeight(fontStack) > .3) ? @"Bold" : @"Regular"
+                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
             };
 
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
-            CTFontRef font = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
-            if (!font) {
+            fontHandle = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
+            if (!fontHandle) {
                 throw std::runtime_error("CTFontCreateWithFontDescriptor failed");
             }
-
-            fontHandles[fontStack] = font;
         }
-        return fontHandles[fontStack];
+        return fontHandle;
     }
     
 private:
-    float getFontWeight(const FontStack& fontStack) {
-        // Analog to logic in glyph_manager.js
-        // From NSFontDescriptor.h (macOS 10.11+) NSFontWeight*:
-        constexpr float light = -.4;
-        constexpr float regular = 0.0;
-        constexpr float medium = .23;
-        constexpr float bold = .4;
-        
-        float fontWeight = regular;
-        for (auto font : fontStack) {
-            // Last font in the fontstack "wins"
-            std::string lowercaseFont = mbgl::platform::lowercase(font);
-            if (lowercaseFont.find("bold") != std::string::npos) {
-                fontWeight = bold;
-            } else if (lowercaseFont.find("medium") != std::string::npos) {
-                fontWeight = medium;
-            } else if (lowercaseFont.find("light") != std::string::npos) {
-                fontWeight = light;
-            }
-        }
-
-        return fontWeight;
-    }
-
-    std::unordered_map<FontStack, CTFontRef, FontStackHash> fontHandles;
     optional<std::string> fontFamily;
+    CTFontRef fontHandle;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
@@ -120,37 +95,9 @@ LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamil
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
-bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
-    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont(fontStack);
+bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
+    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont();
 }
-
-/*
-// TODO: In theory we should be able to transform user-coordinate bounding box and advance
-// values into pixel glyph metrics. This would remove the need to use fixed glyph metrics
-// (which will be slightly off depending on the font), and allow us to return non CJK glyphs
-// (which will have variable "advance" values).
-void extractGlyphMetrics(CTFontRef font, CTLineRef line) {
-    CFArrayRef glyphRuns = CTLineGetGlyphRuns(line);
-    CFIndex runCount = CFArrayGetCount(glyphRuns);
-    assert(runCount == 1);
-    CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(glyphRuns, 0);
-    CFIndex glyphCount = CTRunGetGlyphCount(run);
-    assert(glyphCount == 1);
-    const CGGlyph *glyphs = CTRunGetGlyphsPtr(run);
-
-    CGRect boundingRects[1];
-    boundingRects[0] = CGRectMake(0, 0, 0, 0);
-    CGSize advances[1];
-    advances[0] = CGSizeMake(0,0);
-    CGRect totalBoundingRect = CTFontGetBoundingRectsForGlyphs(font, kCTFontOrientationDefault, glyphs, boundingRects, 1);
-    double totalAdvance = CTFontGetAdvancesForGlyphs(font, kCTFontOrientationDefault, glyphs, advances, 1);
-    
-    // Break in the debugger to see these values: translating from "user coordinates" to bitmap pixel coordinates
-    // should be OK, but a lot of glyphs seem to have empty bounding boxes...?
-    (void)totalBoundingRect;
-    (void)totalAdvance;
-}
-*/
 
 PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     PremultipliedImage rgbaBitmap(size);
@@ -158,7 +105,6 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(&glyphID), 1));
 
     CGColorSpaceHandle colorSpace(CGColorSpaceCreateDeviceRGB());
-    // TODO: Is there a way to just draw a single alpha channel instead of copying it out of an RGB image? Doesn't seem like the grayscale colorspace is what I'm looking for...
     if (!colorSpace) {
         throw std::runtime_error("CGColorSpaceCreateDeviceRGB failed");
     }
@@ -189,11 +135,7 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
             &kCFTypeDictionaryValueCallBacks));
 
     CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, *string, *attributes));
-
     CTLineRefHandle line(CTLineCreateWithAttributedString(*attrString));
-    
-    // For debugging only, doesn't get useful metrics yet
-    //extractGlyphMetrics(font, *line);
     
     // Start drawing a little bit below the top of the bitmap
     CGContextSetTextPosition(*context, 0.0, 5.0);
@@ -202,9 +144,9 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     return rgbaBitmap;
 }
 
-Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack& fontStack, GlyphID glyphID) {
+Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph fixedMetrics;
-    CTFontRef font = impl->getFont(fontStack);
+    CTFontRef font = impl->getFont();
     if (!font) {
         return fixedMetrics;
     }
