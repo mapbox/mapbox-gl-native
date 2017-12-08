@@ -97,6 +97,8 @@ global.paintPropertyType = function (property, type) {
 global.propertyValueType = function (property) {
   if (isDataDriven(property)) {
     return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
+  } else if (property.name === 'heatmap-color') {
+    return `HeatmapColorPropertyValue`;
   } else {
     return `PropertyValue<${evaluatedType(property)}>`;
   }

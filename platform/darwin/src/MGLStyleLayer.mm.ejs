@@ -157,7 +157,9 @@ namespace mbgl {
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
-<% if (property["property-function"]) { -%>
+<% if (property.name === 'heatmap-color') { -%>
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
+<% } else if (property["property-function"]) { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
 <% } else { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::PropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);

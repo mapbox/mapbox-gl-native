@@ -1516,6 +1516,138 @@ public class PropertyFactory {
   }
 
   /**
+   * Radius of influence of one heatmap point in density-independent pixels. Increasing the value makes the heatmap smoother, but less detailed.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapRadius(Float value) {
+    return new PaintPropertyValue<>("heatmap-radius", value);
+  }
+
+  /**
+   * Radius of influence of one heatmap point in density-independent pixels. Increasing the value makes the heatmap smoother, but less detailed.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> heatmapRadius(Expression expression) {
+    return new PaintPropertyValue<>("heatmap-radius", expression);
+  }
+
+
+  /**
+   * Radius of influence of one heatmap point in density-independent pixels. Increasing the value makes the heatmap smoother, but less detailed.
+   *
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <T> PropertyValue<Function<T, Float>> heatmapRadius(Function<T, Float> function) {
+    return new PaintPropertyValue<>("heatmap-radius", function);
+  }
+
+  /**
+   * A measure of how much an individual point contributes to the heatmap. A value of 10 would be equivalent to having 10 points of weight 1 in the same spot. Especially useful when combined with clustering.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapWeight(Float value) {
+    return new PaintPropertyValue<>("heatmap-weight", value);
+  }
+
+  /**
+   * A measure of how much an individual point contributes to the heatmap. A value of 10 would be equivalent to having 10 points of weight 1 in the same spot. Especially useful when combined with clustering.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> heatmapWeight(Expression expression) {
+    return new PaintPropertyValue<>("heatmap-weight", expression);
+  }
+
+
+  /**
+   * A measure of how much an individual point contributes to the heatmap. A value of 10 would be equivalent to having 10 points of weight 1 in the same spot. Especially useful when combined with clustering.
+   *
+   * @param <T> the function input type
+   * @param function a wrapper function for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <T> PropertyValue<Function<T, Float>> heatmapWeight(Function<T, Float> function) {
+    return new PaintPropertyValue<>("heatmap-weight", function);
+  }
+
+  /**
+   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapIntensity(Float value) {
+    return new PaintPropertyValue<>("heatmap-intensity", value);
+  }
+
+  /**
+   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> heatmapIntensity(Expression expression) {
+    return new PaintPropertyValue<>("heatmap-intensity", expression);
+  }
+
+
+  /**
+   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> heatmapIntensity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("heatmap-intensity", function);
+  }
+
+  /**
+   * The global opacity at which the heatmap layer will be drawn.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> heatmapOpacity(Float value) {
+    return new PaintPropertyValue<>("heatmap-opacity", value);
+  }
+
+  /**
+   * The global opacity at which the heatmap layer will be drawn.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> heatmapOpacity(Expression expression) {
+    return new PaintPropertyValue<>("heatmap-opacity", expression);
+  }
+
+
+  /**
+   * The global opacity at which the heatmap layer will be drawn.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> heatmapOpacity(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("heatmap-opacity", function);
+  }
+
+  /**
    * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
    *
    * @param value a Float value

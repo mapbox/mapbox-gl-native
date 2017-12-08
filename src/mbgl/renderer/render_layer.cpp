@@ -8,6 +8,7 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 
@@ -35,6 +36,8 @@ std::unique_ptr<RenderLayer> RenderLayer::create(Immutable<Layer::Impl> impl) {
         return std::make_unique<RenderCustomLayer>(staticImmutableCast<CustomLayer::Impl>(impl));
     case LayerType::FillExtrusion:
         return std::make_unique<RenderFillExtrusionLayer>(staticImmutableCast<FillExtrusionLayer::Impl>(impl));
+    case LayerType::Heatmap:
+        return std::make_unique<RenderHeatmapLayer>(staticImmutableCast<HeatmapLayer::Impl>(impl));
     }
 
     // Not reachable, but placate GCC.

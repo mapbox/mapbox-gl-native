@@ -25,6 +25,7 @@ struct <%- camelize(property.name) %> : <%- layoutPropertyType(property, type) %
 
 <% } -%>
 <% for (const property of paintProperties) { -%>
+<%   if (property.name === 'heatmap-color') continue; -%>
 struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %> {
     static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };

@@ -95,6 +95,7 @@ custom_categories:
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
       - MGLFillExtrusionStyleLayer
+      - MGLHeatmapStyleLayer
       - MGLHillshadeStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
