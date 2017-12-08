@@ -18,7 +18,7 @@ public class LocalGlyphActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_map_simple);
+    setContentView(R.layout.activity_local_glyph);
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
