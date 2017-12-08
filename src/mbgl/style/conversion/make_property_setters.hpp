@@ -8,6 +8,7 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
@@ -66,6 +67,7 @@ inline auto makeLayoutPropertySetters() {
     result["text-allow-overlap"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextAllowOverlap>;
     result["text-ignore-placement"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextIgnorePlacement>;
     result["text-optional"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextOptional>;
+
 
 
 
@@ -165,6 +167,17 @@ inline auto makePaintPropertySetters() {
     result["circle-stroke-color-transition"] = &setTransition<CircleLayer, &CircleLayer::setCircleStrokeColorTransition>;
     result["circle-stroke-opacity"] = &setProperty<CircleLayer, DataDrivenPropertyValue<float>, &CircleLayer::setCircleStrokeOpacity>;
     result["circle-stroke-opacity-transition"] = &setTransition<CircleLayer, &CircleLayer::setCircleStrokeOpacityTransition>;
+
+    result["heatmap-radius"] = &setProperty<HeatmapLayer, DataDrivenPropertyValue<float>, &HeatmapLayer::setHeatmapRadius>;
+    result["heatmap-radius-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapRadiusTransition>;
+    result["heatmap-weight"] = &setProperty<HeatmapLayer, DataDrivenPropertyValue<float>, &HeatmapLayer::setHeatmapWeight>;
+    result["heatmap-weight-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapWeightTransition>;
+    result["heatmap-intensity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapIntensity>;
+    result["heatmap-intensity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapIntensityTransition>;
+    result["heatmap-color"] = &setProperty<HeatmapLayer, HeatmapColorPropertyValue, &HeatmapLayer::setHeatmapColor>;
+    result["heatmap-color-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapColorTransition>;
+    result["heatmap-opacity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapOpacity>;
+    result["heatmap-opacity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapOpacityTransition>;
 
     result["fill-extrusion-opacity"] = &setProperty<FillExtrusionLayer, PropertyValue<float>, &FillExtrusionLayer::setFillExtrusionOpacity>;
     result["fill-extrusion-opacity-transition"] = &setTransition<FillExtrusionLayer, &FillExtrusionLayer::setFillExtrusionOpacityTransition>;

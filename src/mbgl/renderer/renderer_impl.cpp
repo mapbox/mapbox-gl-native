@@ -15,6 +15,7 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -92,9 +93,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
-    
+
     assert(BackendScope::exists());
-    
+
     updateParameters.annotationManager.updateData();
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
@@ -185,7 +186,12 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (layerAdded || layerChanged) {
             layer.transition(transitionParameters);
+
+            if (layer.is<RenderHeatmapLayer>()) {
+                layer.as<RenderHeatmapLayer>()->updateColorRamp();
+            }
         }
+
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
             layer.evaluate(evaluationParameters);
@@ -290,7 +296,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && (layer->is<RenderFillExtrusionLayer>() || layer->is<RenderHillshadeLayer>())) {
+        if (!parameters.staticData.has3D && (
+                layer->is<RenderFillExtrusionLayer>() ||
+                layer->is<RenderHillshadeLayer>() ||
+                layer->is<RenderHeatmapLayer>())) {
+
             parameters.staticData.has3D = true;
         }
 
@@ -402,7 +412,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         placement->setRecent(parameters.timePoint);
-        
+
         updateFadingTiles();
     } else {
         placement->setStale();
@@ -425,7 +435,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
-        
+
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
@@ -768,7 +778,7 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     if (placement->hasTransitions(timePoint)) {
         return true;
     }
-    
+
     if (fadingTiles) {
         return true;
     }
