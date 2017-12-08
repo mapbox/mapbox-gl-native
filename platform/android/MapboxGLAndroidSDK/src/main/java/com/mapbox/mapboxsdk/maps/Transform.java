@@ -172,11 +172,16 @@ final class Transform implements MapView.OnMapChangedListener {
     // notify user about cancel
     cameraChangeDispatcher.onCameraMoveCanceled();
 
-    // notify animateCamera and easeCamera about cancelling
-    if (cameraCancelableCallback != null) {
-      cameraChangeDispatcher.onCameraIdle();
-      cameraCancelableCallback.onCancel();
-      cameraCancelableCallback = null;
+    try {
+      // notify animateCamera and easeCamera about cancelling
+      if (cameraCancelableCallback != null) {
+        cameraChangeDispatcher.onCameraIdle();
+        cameraCancelableCallback.onCancel();
+        cameraCancelableCallback = null;
+      }
+    } catch (NullPointerException exception) {
+      // see #10643
+      Timber.e("Couldn't invoke cameraCancelCallback#onCancel");
     }
 
     // cancel ongoing transitions
