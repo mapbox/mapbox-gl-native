@@ -22,4 +22,4 @@ If you have implemented custom opt-out of Mapbox Telemetry within the user inter
 
 ## MGLIdeographFontFamilyName
 
-The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, i.e. `Arial Unicode MS`.
+The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, e.g. `PingFang`.
