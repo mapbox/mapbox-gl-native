@@ -81,7 +81,7 @@ public:
             createIndexBuffer(v.data(), v.byteSize(), usage)
         };
     }
-    
+
     template <class DrawMode>
     void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, IndexVector<DrawMode>&& v) {
         assert(v.indexSize() == buffer.indexCount);
@@ -143,6 +143,8 @@ public:
                           TextureUnit unit = 0) {
         return { size, createTexture(size, nullptr, format, unit) };
     }
+
+    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
 
     void bindTexture(Texture&,
                      TextureUnit = 0,
@@ -259,7 +261,6 @@ private:
     void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
-    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);

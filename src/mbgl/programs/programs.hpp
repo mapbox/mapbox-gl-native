@@ -4,6 +4,8 @@
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
+#include <mbgl/programs/heatmap_program.hpp>
+#include <mbgl/programs/heatmap_texture_program.hpp>
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/programs/raster_program.hpp>
 #include <mbgl/programs/symbol_program.hpp>
@@ -21,6 +23,8 @@ public:
           fill(context, programParameters),
           fillExtrusion(context, programParameters),
           fillExtrusionPattern(context, programParameters),
+          heatmap(context, programParameters),
+          heatmapTexture(context, programParameters),
           fillPattern(context, programParameters),
           fillOutline(context, programParameters),
           fillOutlinePattern(context, programParameters),
@@ -41,6 +45,8 @@ public:
     ProgramMap<FillProgram> fill;
     ProgramMap<FillExtrusionProgram> fillExtrusion;
     ProgramMap<FillExtrusionPatternProgram> fillExtrusionPattern;
+    ProgramMap<HeatmapProgram> heatmap;
+    HeatmapTextureProgram heatmapTexture;
     ProgramMap<FillPatternProgram> fillPattern;
     ProgramMap<FillOutlineProgram> fillOutline;
     ProgramMap<FillOutlinePatternProgram> fillOutlinePattern;

@@ -5,6 +5,7 @@
 #import "MGLStyleLayer_Private.h"
 #import "MGLFillStyleLayer.h"
 #import "MGLFillExtrusionStyleLayer.h"
+#import "MGLHeatmapStyleLayer.h"
 #import "MGLLineStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
@@ -32,6 +33,7 @@
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -216,7 +218,7 @@ static NSURL *MGLStyleURL_trafficNight;
 - (MGLSource *)sourceWithIdentifier:(NSString *)identifier
 {
     auto rawSource = self.rawStyle->getSource(identifier.UTF8String);
-    
+
     return rawSource ? [self sourceFromMBGLSource:rawSource] : nil;
 }
 
@@ -391,6 +393,8 @@ static NSURL *MGLStyleURL_trafficNight;
         return [[MGLFillStyleLayer alloc] initWithRawLayer:fillLayer];
     } else if (auto fillExtrusionLayer = rawLayer->as<mbgl::style::FillExtrusionLayer>()) {
         return [[MGLFillExtrusionStyleLayer alloc] initWithRawLayer:fillExtrusionLayer];
+    } else if (auto heatmapLayer = rawLayer->as<mbgl::style::HeatmapLayer>()) {
+        return [[MGLHeatmapStyleLayer alloc] initWithRawLayer:heatmapLayer];
     } else if (auto lineLayer = rawLayer->as<mbgl::style::LineLayer>()) {
         return [[MGLLineStyleLayer alloc] initWithRawLayer:lineLayer];
     } else if (auto symbolLayer = rawLayer->as<mbgl::style::SymbolLayer>()) {
@@ -600,7 +604,7 @@ static NSURL *MGLStyleURL_trafficNight;
     auto transitionOptions = self.rawStyle->getTransitionOptions();
     transitionOptions.duration = MGLDurationFromTimeInterval(transition.duration);
     transitionOptions.delay = MGLDurationFromTimeInterval(transition.delay);
-    
+
     self.rawStyle->setTransitionOptions(transitionOptions);
 }
 
@@ -611,7 +615,7 @@ static NSURL *MGLStyleURL_trafficNight;
 
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
     transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    
+
     return transition;
 }
 
@@ -647,7 +651,7 @@ static NSURL *MGLStyleURL_trafficNight;
     } else {
         return;
     }
-    
+
     if (_localizesLabels) {
         NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
         NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
@@ -655,17 +659,17 @@ static NSURL *MGLStyleURL_trafficNight;
             if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
                 continue;
             }
-            
+
             MGLVectorSource *source = (MGLVectorSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
             if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
                 continue;
             }
-            
+
             NSDictionary *localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier];
             if (!localizedKeysByKey) {
                 localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier] = [source localizedKeysByKeyForPreferredLanguage:preferredLanguage];
             }
-            
+
             NSString *(^stringByLocalizingString)(NSString *) = ^ NSString * (NSString *string) {
                 NSMutableString *localizedString = string.mutableCopy;
                 [localizedKeysByKey enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull localizedKey, BOOL * _Nonnull stop) {
@@ -678,7 +682,7 @@ static NSURL *MGLStyleURL_trafficNight;
                 }];
                 return localizedString;
             };
-            
+
             if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
                 NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
                 NSString *localizingString = stringByLocalizingString(textField);
@@ -702,7 +706,7 @@ static NSURL *MGLStyleURL_trafficNight;
                         [cameraStops setObject:textLanguage forKey:zoomLevel];
                         stops[zoomLevel] = [MGLStyleValue<NSString *> valueWithRawValue:localizingString];
                     }
-                    
+
                 }];
                 if (cameraStops.count > 0) {
                     [self.localizedLayersByIdentifier setObject:cameraStops forKey:layer.identifier];
@@ -712,10 +716,10 @@ static NSURL *MGLStyleURL_trafficNight;
             }
         }
     } else {
-        
+
         [self.localizedLayersByIdentifier enumerateKeysAndObjectsUsingBlock:^(NSString *identifier, NSDictionary<NSObject *, MGLTextLanguage *> *textFields, BOOL *done) {
             MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:identifier];
-            
+
             if ([layer.text isKindOfClass:[MGLConstantStyleValue class]]) {
                 NSString *textField = [(MGLConstantStyleValue<NSString *> *)layer.text rawValue];
                 [textFields enumerateKeysAndObjectsUsingBlock:^(NSObject *originalLanguage, MGLTextLanguage *textLanguage, BOOL *done) {
@@ -757,7 +761,7 @@ static NSURL *MGLStyleURL_trafficNight;
 
 - (NS_ARRAY_OF(MGLStyleLayer *) *)placeStyleLayers {
     NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
-    
+
     NSSet *placeSourceLayerIdentifiers = [NSSet setWithObjects:@"marine_label", @"country_label", @"state_label", @"place_label", @"water_label", @"poi_label", @"rail_station_label", @"mountain_peak_label", nil];
     NSPredicate *isPlacePredicate = [NSPredicate predicateWithBlock:^BOOL (MGLVectorStyleLayer * _Nullable layer, NSDictionary<NSString *, id> * _Nullable bindings) {
         return [layer isKindOfClass:[MGLVectorStyleLayer class]] && [streetsSourceIdentifiers containsObject:layer.sourceIdentifier] && [placeSourceLayerIdentifiers containsObject:layer.sourceLayerIdentifier];
@@ -767,7 +771,7 @@ static NSURL *MGLStyleURL_trafficNight;
 
 - (NS_ARRAY_OF(MGLStyleLayer *) *)roadStyleLayers {
     NSSet *streetsSourceIdentifiers = [self.mapboxStreetsSources valueForKey:@"identifier"];
-    
+
     NSPredicate *isPlacePredicate = [NSPredicate predicateWithBlock:^BOOL (MGLVectorStyleLayer * _Nullable layer, NSDictionary<NSString *, id> * _Nullable bindings) {
         return [layer isKindOfClass:[MGLVectorStyleLayer class]] && [streetsSourceIdentifiers containsObject:layer.sourceIdentifier] && [layer.sourceLayerIdentifier isEqualToString:@"road_label"];
     }];

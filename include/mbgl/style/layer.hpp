@@ -22,6 +22,7 @@ class RasterLayer;
 class BackgroundLayer;
 class CustomLayer;
 class FillExtrusionLayer;
+class HeatmapLayer;
 class LayerObserver;
 
 /**
@@ -90,6 +91,8 @@ public:
             return std::forward<V>(visitor)(*as<CustomLayer>());
         case LayerType::FillExtrusion:
             return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
+        case LayerType::Heatmap:
+            return std::forward<V>(visitor)(*as<HeatmapLayer>());
         }
 
 

@@ -402,7 +402,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface TEXT_TRANSFORM {}
 
-  // FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // FILL_TRANSLATE_ANCHOR: Controls the frame of reference for `fill-translate`.
 
   /**
    * The fill is translated relative to the map.
@@ -414,7 +414,7 @@ public final class Property {
   public static final String FILL_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `fill-translate`.
    */
   @StringDef({
       FILL_TRANSLATE_ANCHOR_MAP,
@@ -423,7 +423,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface FILL_TRANSLATE_ANCHOR {}
 
-  // LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // LINE_TRANSLATE_ANCHOR: Controls the frame of reference for `line-translate`.
 
   /**
    * The line is translated relative to the map.
@@ -435,7 +435,7 @@ public final class Property {
   public static final String LINE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `line-translate`.
    */
   @StringDef({
       LINE_TRANSLATE_ANCHOR_MAP,
@@ -444,7 +444,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface LINE_TRANSLATE_ANCHOR {}
 
-  // ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // ICON_TRANSLATE_ANCHOR: Controls the frame of reference for `icon-translate`.
 
   /**
    * Icons are translated relative to the map.
@@ -456,7 +456,7 @@ public final class Property {
   public static final String ICON_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `icon-translate`.
    */
   @StringDef({
       ICON_TRANSLATE_ANCHOR_MAP,
@@ -465,7 +465,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface ICON_TRANSLATE_ANCHOR {}
 
-  // TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // TEXT_TRANSLATE_ANCHOR: Controls the frame of reference for `text-translate`.
 
   /**
    * The text is translated relative to the map.
@@ -477,7 +477,7 @@ public final class Property {
   public static final String TEXT_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `text-translate`.
    */
   @StringDef({
       TEXT_TRANSLATE_ANCHOR_MAP,
@@ -486,7 +486,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface TEXT_TRANSLATE_ANCHOR {}
 
-  // CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // CIRCLE_TRANSLATE_ANCHOR: Controls the frame of reference for `circle-translate`.
 
   /**
    * The circle is translated relative to the map.
@@ -498,7 +498,7 @@ public final class Property {
   public static final String CIRCLE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `circle-translate`.
    */
   @StringDef({
       CIRCLE_TRANSLATE_ANCHOR_MAP,
@@ -549,7 +549,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface CIRCLE_PITCH_ALIGNMENT {}
 
-  // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the frame of reference for `fill-extrusion-translate`.
 
   /**
    * The fill extrusion is translated relative to the map.
@@ -561,7 +561,7 @@ public final class Property {
   public static final String FILL_EXTRUSION_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `fill-extrusion-translate`.
    */
   @StringDef({
       FILL_EXTRUSION_TRANSLATE_ANCHOR_MAP,

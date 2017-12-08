@@ -14,6 +14,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -514,7 +515,7 @@ void NodeMap::release() {
     uv_close(reinterpret_cast<uv_handle_t *>(async), [] (uv_handle_t *h) {
         delete reinterpret_cast<uv_async_t *>(h);
     });
-    
+
     map.reset();
     frontend.reset();
 }
@@ -542,7 +543,7 @@ void NodeMap::Cancel(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
 void NodeMap::cancel() {
     auto style = map->getStyle().getJSON();
-    
+
     // Reset map explicitly as it resets the renderer frontend
     map.reset();
 
@@ -691,7 +692,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     float pixelRatio = Nan::Get(optionObject, Nan::New("pixelRatio").ToLocalChecked()).ToLocalChecked()->NumberValue();
     auto imageBuffer = Nan::To<v8::Object>(info[1]).ToLocalChecked()->ToObject();
-    
+
     char * imageDataBuffer = node::Buffer::Data(imageBuffer);
     size_t imageLength = node::Buffer::Length(imageBuffer);
 
@@ -701,7 +702,7 @@ void NodeMap::AddImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
     std::unique_ptr<uint8_t[]> data = std::make_unique<uint8_t[]>(imageLength);
     std::copy(imageDataBuffer, imageDataBuffer + imageLength, data.get());
-    
+
     mbgl::UnassociatedImage cImage({ imageWidth, imageHeight}, std::move(data));
     mbgl::PremultipliedImage cPremultipliedImage = mbgl::util::premultiply(std::move(cImage));
     nodeMap->map->getStyle().addImage(std::make_unique<mbgl::style::Image>(*Nan::Utf8String(info[0]), std::move(cPremultipliedImage), pixelRatio));
@@ -1001,9 +1002,9 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
         if (!info[1]->IsObject()) {
             return Nan::ThrowTypeError("options argument must be an object");
         }
-        
+
         auto options = Nan::To<v8::Object>(info[1]).ToLocalChecked();
-        
+
         //Check if layers is set. If provided, it must be an array of strings
         if (Nan::Has(options, Nan::New("layers").ToLocalChecked()).FromJust()) {
             auto layersOption = Nan::Get(options, Nan::New("layers").ToLocalChecked()).ToLocalChecked();
@@ -1017,7 +1018,7 @@ void NodeMap::QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>& 
             }
             queryOptions.layerIDs = layersVec;
         }
-        
+
         //Check if filter is provided. If set it must be a valid Filter object
         if (Nan::Has(options, Nan::New("filter").ToLocalChecked()).FromJust()) {
             auto filterOption = Nan::Get(options, Nan::New("filter").ToLocalChecked()).ToLocalChecked();
