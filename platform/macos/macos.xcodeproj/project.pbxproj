@@ -85,6 +85,9 @@
 		55D120A31F7906E6004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
+		89462399200D199100DA8EF2 /* heatmap.json in Resources */ = {isa = PBXBuildFile; fileRef = 89462398200D199100DA8EF2 /* heatmap.json */; };
+		8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */; };
+		894623A0200E748000DA8EF2 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */; };
 		92092EF01F5EB10E00AF5130 /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		92092EF11F5EB10E00AF5130 /* MGLMapSnapshotter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */; };
 		920A3E591E6F859D00C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */; };
@@ -369,6 +372,9 @@
 		55D9B4B01D005D3900C1CCE2 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLOfflineStorageTests.mm; path = ../../darwin/test/MGLOfflineStorageTests.mm; sourceTree = "<group>"; };
 		55FE0E8D1D100A0900FD240B /* config.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = config.xcconfig; path = ../../build/macos/config.xcconfig; sourceTree = "<group>"; };
+		89462398200D199100DA8EF2 /* heatmap.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = heatmap.json; sourceTree = "<group>"; };
+		8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
+		8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
 		92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
 		92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; };
 		920A3E581E6F859D00C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLSourceQueryTests.m; sourceTree = "<group>"; };
@@ -662,6 +668,8 @@
 		35136D471D42295400C20EFD /* Layers */ = {
 			isa = PBXGroup;
 			children = (
+				8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */,
+				8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */,
 				DA8F25851D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h */,
 				DA8F25861D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm */,
 				3527428B1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h */,
@@ -825,6 +833,7 @@
 				DA839EA61CC2E3400062CAFB /* Info.plist */,
 				96E027331E57C9A7004B8E66 /* Localizable.strings */,
 				DA839E981CC2E3400062CAFB /* Supporting Files */,
+				89462398200D199100DA8EF2 /* heatmap.json */,
 			);
 			name = "Demo App";
 			path = app;
@@ -1232,6 +1241,7 @@
 				359819591E02F611008FC139 /* NSCoder+MGLAdditions.h in Headers */,
 				DAE6C38E1CC31E2A00DB3429 /* MGLOfflineStorage_Private.h in Headers */,
 				DA87A9A01DC9DC6200810D09 /* MGLValueEvaluator.h in Headers */,
+				8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */,
 				DAE6C3601CC31E0400DB3429 /* MGLOfflineRegion.h in Headers */,
 				DAE6C3681CC31E0400DB3429 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA35A2CF1CCAAED300E826B2 /* NSValue+MGLAdditions.h in Headers */,
@@ -1422,6 +1432,7 @@
 				DA839EA01CC2E3400062CAFB /* MapDocument.xib in Resources */,
 				353BAEF81D6463B8009A8DA9 /* amsterdam.geojson in Resources */,
 				96E027311E57C9A7004B8E66 /* Localizable.strings in Resources */,
+				89462399200D199100DA8EF2 /* heatmap.json in Resources */,
 				DA839EA51CC2E3400062CAFB /* MainMenu.xib in Resources */,
 				DA5589771D320C41006B7F64 /* wms.json in Resources */,
 				DAE6C2E21CC304F900DB3429 /* Credits.rtf in Resources */,
@@ -1503,6 +1514,7 @@
 				07D9474B1F6743F000E37934 /* MGLAbstractShapeSource.mm in Sources */,
 				DAE6C3941CC31E2A00DB3429 /* MGLStyle.mm in Sources */,
 				DAE6C3871CC31E2A00DB3429 /* MGLGeometry.mm in Sources */,
+				894623A0200E748000DA8EF2 /* MGLHeatmapStyleLayer.mm in Sources */,
 				3527428E1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.mm in Sources */,
 				35602C011D3EA9B40050646F /* MGLForegroundStyleLayer.mm in Sources */,
 				408AA86A1DAEEE5D00022900 /* NSDictionary+MGLAdditions.mm in Sources */,

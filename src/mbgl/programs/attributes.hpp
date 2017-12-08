@@ -30,7 +30,7 @@ MBGL_DEFINE_ATTRIBUTE(int16_t, 2, a_anchor_pos);
 MBGL_DEFINE_ATTRIBUTE(uint16_t, 2, a_texture_pos);
 MBGL_DEFINE_ATTRIBUTE(int16_t,  4, a_normal_ed);
 MBGL_DEFINE_ATTRIBUTE(uint8_t, 1, a_fade_opacity);
-MBGL_DEFINE_ATTRIBUTE(uint8_t, 2, a_placed);                                        
+MBGL_DEFINE_ATTRIBUTE(uint8_t, 2, a_placed);
 
 template <typename T, std::size_t N>
 struct a_data {
@@ -139,6 +139,11 @@ struct a_halo_width {
 
 struct a_halo_blur {
     static auto name() { return "a_halo_blur"; }
+    using Type = gl::Attribute<float, 1>;
+};
+
+struct a_weight {
+    static auto name() { return "a_weight"; }
     using Type = gl::Attribute<float, 1>;
 };
 

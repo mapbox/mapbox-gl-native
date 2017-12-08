@@ -150,6 +150,8 @@ set(MBGL_CORE_FILES
     src/mbgl/programs/hillshade_prepare_program.hpp
     src/mbgl/programs/hillshade_program.cpp
     src/mbgl/programs/hillshade_program.hpp
+    src/mbgl/programs/heatmap_program.cpp
+    src/mbgl/programs/heatmap_program.hpp
     src/mbgl/programs/line_program.cpp
     src/mbgl/programs/line_program.hpp
     src/mbgl/programs/program.hpp
@@ -227,6 +229,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/buckets/fill_extrusion_bucket.hpp
     src/mbgl/renderer/buckets/hillshade_bucket.cpp
     src/mbgl/renderer/buckets/hillshade_bucket.hpp
+    src/mbgl/renderer/buckets/heatmap_bucket.cpp
+    src/mbgl/renderer/buckets/heatmap_bucket.hpp
     src/mbgl/renderer/buckets/line_bucket.cpp
     src/mbgl/renderer/buckets/line_bucket.hpp
     src/mbgl/renderer/buckets/raster_bucket.cpp
@@ -247,6 +251,8 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/layers/render_fill_layer.hpp
     src/mbgl/renderer/layers/render_hillshade_layer.cpp
     src/mbgl/renderer/layers/render_hillshade_layer.hpp
+    src/mbgl/renderer/layers/render_heatmap_layer.cpp
+    src/mbgl/renderer/layers/render_heatmap_layer.hpp
     src/mbgl/renderer/layers/render_line_layer.cpp
     src/mbgl/renderer/layers/render_line_layer.hpp
     src/mbgl/renderer/layers/render_raster_layer.cpp
@@ -301,6 +307,10 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/hillshade.hpp
     src/mbgl/shaders/hillshade_prepare.cpp
     src/mbgl/shaders/hillshade_prepare.hpp
+    src/mbgl/shaders/heatmap.cpp
+    src/mbgl/shaders/heatmap.hpp
+    src/mbgl/shaders/heatmap_texture.cpp
+    src/mbgl/shaders/heatmap_texture.hpp
     src/mbgl/shaders/line.cpp
     src/mbgl/shaders/line.hpp
     src/mbgl/shaders/line_pattern.cpp
@@ -349,6 +359,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
     include/mbgl/style/filter_evaluator.hpp
+    include/mbgl/style/heatmap_color_property_value.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
     include/mbgl/style/layer_type.hpp
@@ -401,6 +412,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/geojson.hpp
     include/mbgl/style/conversion/geojson_options.hpp
     include/mbgl/style/conversion/get_json_type.hpp
+    include/mbgl/style/conversion/heatmap_color_property_value.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
     include/mbgl/style/conversion/position.hpp
@@ -496,6 +508,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/layers/fill_extrusion_layer.hpp
     include/mbgl/style/layers/fill_layer.hpp
     include/mbgl/style/layers/hillshade_layer.hpp
+    include/mbgl/style/layers/heatmap_layer.hpp
     include/mbgl/style/layers/line_layer.hpp
     include/mbgl/style/layers/raster_layer.hpp
     include/mbgl/style/layers/symbol_layer.hpp
@@ -527,6 +540,11 @@ set(MBGL_CORE_FILES
     src/mbgl/style/layers/hillshade_layer_impl.hpp
     src/mbgl/style/layers/hillshade_layer_properties.cpp
     src/mbgl/style/layers/hillshade_layer_properties.hpp
+    src/mbgl/style/layers/heatmap_layer.cpp
+    src/mbgl/style/layers/heatmap_layer_impl.cpp
+    src/mbgl/style/layers/heatmap_layer_impl.hpp
+    src/mbgl/style/layers/heatmap_layer_properties.cpp
+    src/mbgl/style/layers/heatmap_layer_properties.hpp
     src/mbgl/style/layers/line_layer.cpp
     src/mbgl/style/layers/line_layer_impl.cpp
     src/mbgl/style/layers/line_layer_impl.hpp
