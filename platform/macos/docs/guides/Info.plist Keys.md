@@ -16,6 +16,6 @@ Use this key if you need to customize the API base URL used throughout the SDK. 
 
 The default value is `https://api.mapbox.com`.
 
-## MGLIdeographFontFamilyName                                                                                                                                                          
-                                                                                                                                                                                       
+## MGLIdeographicFontFamilyName                                                                                                                                                          
+
 The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, e.g. `PingFang`.
