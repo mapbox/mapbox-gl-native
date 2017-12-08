@@ -31,8 +31,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  Currently only used for CJK glyphs. Changing this at run time is not currently
  supported. Enable client-side rendering of CJK glyphs by setting
- `MGLIdeographicFontFamilyName` in your containing app's Info.plist to a value
- which will be available at runtime, i.e. "Arial Unicode MS". */
+ `MGLIdeographFontFamilyName` in your containing app's Info.plist to a value
+ which will be available at run time, i.e. "Arial Unicode MS". */
 @property (nonatomic, readonly) mbgl::optional<std::string> localFontFamilyName;
 
 @end
