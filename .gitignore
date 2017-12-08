@@ -34,3 +34,6 @@ xcuserdata
 test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
 /.circle-week
+package-lock.json
+.idea
+cmake-build-debug
