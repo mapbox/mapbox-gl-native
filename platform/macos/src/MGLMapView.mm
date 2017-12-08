@@ -144,8 +144,6 @@ public:
 @property (nonatomic, readwrite) NSView *attributionView;
 
 @property (nonatomic, readwrite) MGLStyle *style;
-@property (nonatomic, readonly) NSString *ideographicFontFamilyName;
-
 
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
@@ -652,12 +650,6 @@ public:
 
 - (mbgl::Renderer *)renderer {
     return _rendererFrontend->getRenderer();
-}
-
-#pragma mark Ideographic Font Info
-
-- (NSString *)ideographicFontFamilyName {
-    return [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 }
 
 #pragma mark View hierarchy and drawing
