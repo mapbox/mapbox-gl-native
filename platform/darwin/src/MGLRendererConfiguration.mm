@@ -35,7 +35,7 @@
 }
 
 - (mbgl::optional<std::string>)localFontFamilyName {
-    NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographFontFamilyName"];
+    NSString *fontFamilyName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLIdeographicFontFamilyName"];
 
     return fontFamilyName ? std::string([fontFamilyName UTF8String]) : mbgl::optional<std::string>();
 }
