@@ -151,6 +151,7 @@
                 [NSURLQueryItem queryItemWithName:@"owner" value:stylePathComponents[1]],
                 [NSURLQueryItem queryItemWithName:@"id" value:stylePathComponents[2]],
                 [NSURLQueryItem queryItemWithName:@"access_token" value:[MGLAccountManager accessToken]],
+                [NSURLQueryItem queryItemWithName:@"map_sdk_version" value:[NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"]],
             ]];
         }
     }

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(CURRENT_SHORT_VERSION)</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -20,5 +20,9 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>MGLCommitHash</key>
+	<string>$(CURRENT_COMMIT_HASH)</string>
+	<key>MGLSemanticVersionString</key>
+	<string>$(CURRENT_SEMANTIC_VERSION)</string>
 </dict>
 </plist>
