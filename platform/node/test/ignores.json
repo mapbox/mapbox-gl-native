@@ -9,7 +9,6 @@
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
   "query-tests/geometry/polygon": "needs investigation",
-  "query-tests/regressions/mapbox-gl-js#5172": "https://github.com/mapbox/mapbox-gl-native/issues/10616",
   "query-tests/symbol/panned-after-insert": "https://github.com/mapbox/mapbox-gl-native/issues/10408",
   "query-tests/symbol/rotated-after-insert": "https://github.com/mapbox/mapbox-gl-native/issues/10408",
   "query-tests/world-wrapping/box": "skip - needs issue",
