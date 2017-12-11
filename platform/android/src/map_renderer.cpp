@@ -16,10 +16,12 @@ namespace android {
 
 MapRenderer::MapRenderer(jni::JNIEnv& _env, jni::Object<MapRenderer> obj,
                          jni::Object<FileSource> _fileSource, jni::jfloat pixelRatio_,
-                         jni::String programCacheDir_)
+                         jni::String programCacheDir_,
+                         jni::String localIdeographFontFamily_)
         : javaPeer(SeizeGenericWeakRef(_env, jni::Object<MapRenderer>(jni::NewWeakGlobalRef(_env, obj.Get()).release()))), pixelRatio(pixelRatio_)
         , fileSource(FileSource::getDefaultFileSource(_env, _fileSource))
         , programCacheDir(jni::Make<std::string>(_env, programCacheDir_))
+        , localIdeographFontFamily(localIdeographFontFamily_ == nullptr ? optional<std::string>{} : jni::Make<std::string>(_env, localIdeographFontFamily_ ))
         , threadPool(sharedThreadPool())
         , mailbox(std::make_shared<Mailbox>(*this)) {
 }
@@ -145,7 +147,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
     std::lock_guard<std::mutex> lock(initialisationMutex);
 
     // The android system will have already destroyed the underlying
-    // GL resources if this is not the first intialization and an
+    // GL resources if this is not the first initialization and an
     // attempt to clean them up will fail
     if (backend) backend->markContextLost();
     if (renderer) renderer->markContextLost();
@@ -157,7 +159,7 @@ void MapRenderer::onSurfaceCreated(JNIEnv&) {
     // Create the new backend and renderer
     backend = std::make_unique<AndroidRendererBackend>();
     renderer = std::make_unique<Renderer>(*backend, pixelRatio, fileSource, *threadPool,
-                                          GLContextMode::Unique, programCacheDir);
+                                          GLContextMode::Unique, programCacheDir, localIdeographFontFamily);
     rendererRef = std::make_unique<ActorRef<Renderer>>(*renderer, mailbox);
 
     // Set the observer on the new Renderer implementation
@@ -184,7 +186,7 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
 
     // Register the peer
     jni::RegisterNativePeer<MapRenderer>(env, MapRenderer::javaClass, "nativePtr",
-                                         std::make_unique<MapRenderer, JNIEnv&, jni::Object<MapRenderer>, jni::Object<FileSource>, jni::jfloat, jni::String>,
+                                         std::make_unique<MapRenderer, JNIEnv&, jni::Object<MapRenderer>, jni::Object<FileSource>, jni::jfloat, jni::String, jni::String>,
                                          "nativeInitialize", "finalize",
                                          METHOD(&MapRenderer::render, "nativeRender"),
                                          METHOD(&MapRenderer::onSurfaceCreated,

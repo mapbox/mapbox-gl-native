@@ -113,7 +113,8 @@ set(MBGL_TEST_FILES
 
     # text
     test/text/cross_tile_symbol_index.test.cpp
-    test/text/glyph_loader.test.cpp
+    test/text/local_glyph_rasterizer.test.cpp
+    test/text/glyph_manager.test.cpp
     test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
 

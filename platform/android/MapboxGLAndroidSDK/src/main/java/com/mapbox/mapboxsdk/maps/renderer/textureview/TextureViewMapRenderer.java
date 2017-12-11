@@ -24,8 +24,10 @@ public class TextureViewMapRenderer extends MapRenderer {
    * @param context     the current Context
    * @param textureView the TextureView
    */
-  public TextureViewMapRenderer(@NonNull Context context, @NonNull TextureView textureView) {
-    super(context);
+  public TextureViewMapRenderer(@NonNull Context context,
+                                @NonNull TextureView textureView,
+                                String localIdeographFontFamily) {
+    super(context, localIdeographFontFamily);
     renderThread = new TextureViewRenderThread(textureView, this);
     renderThread.start();
   }

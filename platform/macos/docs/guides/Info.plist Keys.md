@@ -15,3 +15,7 @@ As an alternative, you can use `+[MGLAccountManager setAccessToken:]` to set a t
 Use this key if you need to customize the API base URL used throughout the SDK. If unset, the default Mapbox API is used.
 
 The default value is `https://api.mapbox.com`.
+
+## MGLIdeographicFontFamilyName                                                                                                                                                          
+
+The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, e.g. `PingFang`.

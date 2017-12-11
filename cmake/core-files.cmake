@@ -554,6 +554,7 @@ set(MBGL_CORE_FILES
     src/mbgl/text/glyph_pbf.cpp
     src/mbgl/text/glyph_pbf.hpp
     src/mbgl/text/glyph_range.hpp
+    src/mbgl/text/local_glyph_rasterizer.hpp
     src/mbgl/text/placement.cpp
     src/mbgl/text/placement.hpp
     src/mbgl/text/quads.cpp
@@ -689,6 +690,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/tile_coordinate.hpp
     src/mbgl/util/tile_cover.cpp
     src/mbgl/util/tile_cover.hpp
+    src/mbgl/util/tiny_sdf.cpp
+    src/mbgl/util/tiny_sdf.hpp
     src/mbgl/util/token.hpp
     src/mbgl/util/url.cpp
     src/mbgl/util/url.hpp

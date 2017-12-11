@@ -49,6 +49,8 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()
 
+    target_sources(mbgl-core PRIVATE platform/default/local_glyph_rasterizer.cpp)
+
 endmacro()
 
 

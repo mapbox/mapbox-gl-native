@@ -4,14 +4,16 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/tiny_sdf.hpp>
 
 namespace mbgl {
 
 static GlyphManagerObserver nullObserver;
 
-GlyphManager::GlyphManager(FileSource& fileSource_)
+GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
     : fileSource(fileSource_),
-      observer(&nullObserver) {
+      observer(&nullObserver),
+      localGlyphRasterizer(std::move(localGlyphRasterizer_)) {
 }
 
 GlyphManager::~GlyphManager() = default;
@@ -30,7 +32,13 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         const GlyphIDs& glyphIDs = dependency.second;
         GlyphRangeSet ranges;
         for (const auto& glyphID : glyphIDs) {
-            ranges.insert(getGlyphRange(glyphID));
+            if (localGlyphRasterizer->canRasterizeGlyph(fontStack, glyphID)) {
+                if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
+                    entry.glyphs.emplace(glyphID, makeMutable<Glyph>(generateLocalSDF(fontStack, glyphID)));
+                }
+            } else {
+                ranges.insert(getGlyphRange(glyphID));
+            }
         }
 
         for (const auto& range : ranges) {
@@ -48,6 +56,12 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
     if (dependencies.unique()) {
         notify(requestor, *dependencies);
     }
+}
+
+Glyph GlyphManager::generateLocalSDF(const FontStack& fontStack, GlyphID glyphID) {
+    Glyph local = localGlyphRasterizer->rasterizeGlyph(fontStack, glyphID);
+    local.bitmap = util::transformRasterToSDF(local.bitmap, 8, .25);
+    return local;
 }
 
 void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range) {
