@@ -303,13 +303,13 @@ std::vector<IndexedSubfeature> CollisionIndex::queryRenderedSymbols(const Geomet
         }
     }
 
-    std::unordered_map<std::string, std::unordered_set<std::size_t>> sourceLayerFeatures;
+    std::unordered_map<std::string, std::unordered_map<std::string, std::unordered_set<std::size_t>>> sourceLayerFeatures;
     for (auto& queryResult : thisTileFeatures) {
         auto& feature = queryResult.first;
         auto& bbox = queryResult.second;
 
         // Skip already seen features.
-        auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName];
+        auto& seenFeatures = sourceLayerFeatures[feature.sourceLayerName][feature.bucketName];
         if (seenFeatures.find(feature.index) != seenFeatures.end())
             continue;
 
