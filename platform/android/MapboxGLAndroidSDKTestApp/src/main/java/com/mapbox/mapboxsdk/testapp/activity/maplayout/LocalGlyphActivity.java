@@ -12,6 +12,10 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity that displays the city of Suzhou with a mixture of server-generated
+ * latin glyphs and CJK glyphs generated locally using "Droid Sans" as a font family.
+ */
 public class LocalGlyphActivity extends AppCompatActivity {
   private MapView mapView;
 
