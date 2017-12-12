@@ -135,10 +135,10 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     // Only enable if the long side of the image is > 2 pixels. Resulting in a
     // display of at least 2 x 1 px image
-    // dMax is in tile coordinate units at z0, so scale by util::EXTENT and then
-    // by 2^z to get geometry coordinates at the current zoom.
-    // 1 gc unit  = tileSize / extent pixels.
-    enabled = dMax * std::pow( 2.0, transformState.getZoom()) * util::tileSize > 2.0;
+    // A tile coordinate unit represents the length of one tile (tileSize) at a given zoom.
+    // To convert a tile coordinate to pixels, multiply by tileSize.
+    // Here dMax is in z0 tile units, so we also scale by 2^z to match current zoom.
+    enabled = dMax * std::pow(2.0, transformState.getZoom()) * util::tileSize > 2.0;
     if (!enabled) {
         return;
     }
