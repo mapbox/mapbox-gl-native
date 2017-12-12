@@ -133,8 +133,12 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
     auto dMax = std::max(dx, dy);
     double zoom = std::max(0.0, std::floor(-util::log2(dMax)));
 
-    // Don't bother drawing the ImageSource unless it occupies >4 screen pixels
-    enabled = dMax * std::pow(2.0, transformState.getZoom()) > 2.0 / util::tileSize;
+    // Only enable if the long side of the image is > 2 pixels. Resulting in a
+    // display of at least 2 x 1 px image
+    // dMax is in tile coordinate units at z0, so scale by util::EXTENT and then
+    // by 2^z to get geometry coordinates at the current zoom.
+    // 1 gc unit  = tileSize / extent pixels.
+    enabled = dMax * std::pow( 2.0, transformState.getZoom()) * util::tileSize > 2.0;
     if (!enabled) {
         return;
     }
