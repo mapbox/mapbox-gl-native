@@ -114,44 +114,39 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         return;
     }
 
-    auto size = transformState.getSize();
-    const double viewportHeight = size.height;
-
-    // Compute the screen coordinates at wrap=0 for the given LatLng
-    ScreenCoordinate nePixel = { -INFINITY, -INFINITY };
-    ScreenCoordinate swPixel = { INFINITY, INFINITY };
-
+    // Compute the z0 tile coordinates for the given LatLngs
+    TileCoordinatePoint nePoint = { -INFINITY, -INFINITY };
+    TileCoordinatePoint swPoint = { INFINITY, INFINITY };
+    std::vector<TileCoordinatePoint> tileCoordinates;
     for (LatLng latLng : coords) {
-        ScreenCoordinate pixel = transformState.latLngToScreenCoordinate(latLng);
-        swPixel.x = std::min(swPixel.x, pixel.x);
-        nePixel.x = std::max(nePixel.x, pixel.x);
-        swPixel.y = std::min(swPixel.y, viewportHeight - pixel.y);
-        nePixel.y = std::max(nePixel.y, viewportHeight - pixel.y);
-    }
-    const double width = nePixel.x - swPixel.x;
-    const double height = nePixel.y - swPixel.y;
+        auto point = TileCoordinate::fromLatLng(0, latLng).p;
+        tileCoordinates.push_back(point);
+        swPoint.x = std::min(swPoint.x, point.x);
+        nePoint.x = std::max(nePoint.x, point.x);
+        swPoint.y = std::min(swPoint.y, point.y);
+        nePoint.y = std::max(nePoint.y, point.y);
+   }
+
+    // Calculate the optimum zoom level to determine the tile ids to use for transforms
+    auto dx = nePoint.x - swPoint.x;
+    auto dy = nePoint.y - swPoint.y;
+    auto dMax = std::max(dx, dy);
+    double zoom = std::max(0.0, std::floor(-util::log2(dMax)));
 
     // Don't bother drawing the ImageSource unless it occupies >4 screen pixels
-    enabled = (width * height > 4);
+    enabled = dMax * std::pow(2.0, transformState.getZoom()) > 2.0 / util::tileSize;
     if (!enabled) {
         return;
     }
 
-    // Calculate the optimum zoom level to determine the tile ids to use for transforms
-    double minScale = INFINITY;
-    double scaleX = double(size.width) / width;
-    double scaleY = double(size.height) / height;
-    minScale = util::min(scaleX, scaleY);
-    double zoom = transformState.getZoom() + util::log2(minScale);
-    zoom = std::floor(util::clamp(zoom, transformState.getMinZoom(), transformState.getMaxZoom()));
     auto imageBounds = LatLngBounds::hull(coords[0], coords[1]);
     imageBounds.extend(coords[2]);
     imageBounds.extend(coords[3]);
     auto tileCover = util::tileCover(imageBounds, zoom);
     tileIds.clear();
     tileIds.push_back(tileCover[0]);
-    bool hasVisibleTile = false;
 
+    bool hasVisibleTile = false;
     // Add additional wrapped tile ids if neccessary
     auto idealTiles = util::tileCover(transformState, transformState.getZoom());
     for (auto tile : idealTiles) {
@@ -177,9 +172,8 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     // Calculate Geometry Coordinates based on tile cover at ideal zoom
     GeometryCoordinates geomCoords;
-    for (auto latLng : coords) {
-        auto tc = TileCoordinate::fromLatLng(0, latLng);
-        auto gc = TileCoordinate::toGeometryCoordinate(tileIds[0], tc.p);
+    for (auto tileCoords : tileCoordinates) {
+        auto gc = TileCoordinate::toGeometryCoordinate(tileIds[0], tileCoords);
         geomCoords.push_back(gc);
     }
     if (!bucket) {
