@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.http.HttpRequestUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -56,6 +57,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    HttpRequestUtil.setLogEnabled(false);
     setContentView(R.layout.activity_debug_mode);
     setupToolbar();
     setupMapView(savedInstanceState);
@@ -113,7 +115,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
     mapboxMap.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
       @Override
       public void onFpsChanged(double fps) {
-        fpsView.setText(String.format(Locale.US,"FPS: %4.2f", fps));
+        fpsView.setText(String.format(Locale.US, "FPS: %4.2f", fps));
       }
     });
   }
@@ -229,6 +231,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
+    HttpRequestUtil.setLogEnabled(true);
   }
 
   @Override
