@@ -908,23 +908,63 @@ public class MapView extends FrameLayout {
   private class RegisterTouchListener implements MapboxMap.OnRegisterTouchListener {
 
     @Override
-    public void onRegisterMapClickListener(MapboxMap.OnMapClickListener listener) {
+    public void onSetMapClickListener(MapboxMap.OnMapClickListener listener) {
       mapGestureDetector.setOnMapClickListener(listener);
     }
 
     @Override
-    public void onRegisterMapLongClickListener(MapboxMap.OnMapLongClickListener listener) {
+    public void onAddMapClickListener(MapboxMap.OnMapClickListener listener) {
+      mapGestureDetector.addOnMapClickListener(listener);
+    }
+
+    @Override
+    public void onRemoveMapClickListener(MapboxMap.OnMapClickListener listener) {
+      mapGestureDetector.removeOnMapClickListener(listener);
+    }
+
+    @Override
+    public void onSetMapLongClickListener(MapboxMap.OnMapLongClickListener listener) {
       mapGestureDetector.setOnMapLongClickListener(listener);
     }
 
     @Override
-    public void onRegisterScrollListener(MapboxMap.OnScrollListener listener) {
+    public void onAddMapLongClickListener(MapboxMap.OnMapLongClickListener listener) {
+      mapGestureDetector.addOnMapLongClickListener(listener);
+    }
+
+    @Override
+    public void onRemoveMapLongClickListener(MapboxMap.OnMapLongClickListener listener) {
+      mapGestureDetector.removeOnMapLongClickListener(listener);
+    }
+
+    @Override
+    public void onSetScrollListener(MapboxMap.OnScrollListener listener) {
       mapGestureDetector.setOnScrollListener(listener);
     }
 
     @Override
-    public void onRegisterFlingListener(MapboxMap.OnFlingListener listener) {
+    public void onAddScrollListener(MapboxMap.OnScrollListener listener) {
+      mapGestureDetector.addOnScrollListener(listener);
+    }
+
+    @Override
+    public void onRemoveScrollListener(MapboxMap.OnScrollListener listener) {
+      mapGestureDetector.removeOnScrollListener(listener);
+    }
+
+    @Override
+    public void onSetFlingListener(MapboxMap.OnFlingListener listener) {
       mapGestureDetector.setOnFlingListener(listener);
+    }
+
+    @Override
+    public void onAddFlingListener(MapboxMap.OnFlingListener listener) {
+      mapGestureDetector.addOnFlingListener(listener);
+    }
+
+    @Override
+    public void onRemoveFlingListener(MapboxMap.OnFlingListener listener) {
+      mapGestureDetector.removeOnFlingListener(listener);
     }
   }
 

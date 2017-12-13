@@ -26,6 +26,8 @@ import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.utils.MathUtils;
 import com.mapbox.services.android.telemetry.utils.TelemetryUtils;
 
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
 /**
@@ -52,6 +54,11 @@ final class MapGestureDetector {
   private MapboxMap.OnMapLongClickListener onMapLongClickListener;
   private MapboxMap.OnFlingListener onFlingListener;
   private MapboxMap.OnScrollListener onScrollListener;
+
+  private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<MapboxMap.OnMapLongClickListener> onMapLongClickListenerList = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<MapboxMap.OnFlingListener> onFlingListenerList = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<MapboxMap.OnScrollListener> onScrollListenerList = new CopyOnWriteArrayList<>();
 
   private PointF focalPoint;
 
@@ -359,6 +366,10 @@ final class MapGestureDetector {
         if (onMapClickListener != null) {
           onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
         }
+
+        for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
+          listener.onMapClick(projection.fromScreenLocation(tapPoint));
+        }
       }
 
       MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
@@ -373,6 +384,13 @@ final class MapGestureDetector {
       if (onMapLongClickListener != null && !quickZoom) {
         onMapLongClickListener.onMapLongClick(
           projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY())));
+      }
+
+      if (!quickZoom) {
+        for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
+          listener.onMapLongClick(
+            projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY())));
+        }
       }
     }
 
@@ -415,6 +433,10 @@ final class MapGestureDetector {
       if (onFlingListener != null) {
         onFlingListener.onFling();
       }
+
+      for (MapboxMap.OnFlingListener listener : onFlingListenerList) {
+        listener.onFling();
+      }
       return true;
     }
 
@@ -451,6 +473,10 @@ final class MapGestureDetector {
 
       if (onScrollListener != null) {
         onScrollListener.onScroll();
+      }
+
+      for (MapboxMap.OnScrollListener listener : onScrollListenerList) {
+        listener.onScroll();
       }
       return true;
     }
@@ -843,5 +869,37 @@ final class MapGestureDetector {
 
   void setOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
     this.onScrollListener = onScrollListener;
+  }
+
+  void addOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
+    onMapClickListenerList.add(onMapClickListener);
+  }
+
+  void removeOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
+    onMapClickListenerList.remove(onMapClickListener);
+  }
+
+  void addOnMapLongClickListener(MapboxMap.OnMapLongClickListener onMapLongClickListener) {
+    onMapLongClickListenerList.add(onMapLongClickListener);
+  }
+
+  void removeOnMapLongClickListener(MapboxMap.OnMapLongClickListener onMapLongClickListener) {
+    onMapLongClickListenerList.remove(onMapLongClickListener);
+  }
+
+  void addOnFlingListener(MapboxMap.OnFlingListener onFlingListener) {
+    onFlingListenerList.add(onFlingListener);
+  }
+
+  void removeOnFlingListener(MapboxMap.OnFlingListener onFlingListener) {
+    onFlingListenerList.remove(onFlingListener);
+  }
+
+  void addOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
+    onScrollListenerList.add(onScrollListener);
+  }
+
+  void removeOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
+    onScrollListenerList.remove(onScrollListener);
   }
 }
