@@ -88,6 +88,7 @@ set(MBGL_TEST_FILES
     test/style/conversion/layer.test.cpp
     test/style/conversion/light.test.cpp
     test/style/conversion/stringify.test.cpp
+    test/style/conversion/tileset.test.cpp
 
     # style/expression
     test/style/expression/expression.test.cpp
@@ -113,9 +114,9 @@ set(MBGL_TEST_FILES
 
     # text
     test/text/cross_tile_symbol_index.test.cpp
-    test/text/local_glyph_rasterizer.test.cpp
     test/text/glyph_manager.test.cpp
     test/text/glyph_pbf.test.cpp
+    test/text/local_glyph_rasterizer.test.cpp
     test/text/quads.test.cpp
 
     # tile
