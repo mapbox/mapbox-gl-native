@@ -71,3 +71,31 @@
 }
 
 @end
+
+@implementation NSCompoundPredicate (MGLExpressionAdditions)
+
+- (id)mgl_jsonExpressionObject {
+    switch (self.compoundPredicateType) {
+        case NSNotPredicateType: {
+            NSAssert(self.subpredicates.count <= 1, @"NOT predicate cannot have multiple subpredicates.");
+            NSPredicate *subpredicate = self.subpredicates.firstObject;
+            return @[@"!", subpredicate.mgl_jsonExpressionObject];
+        }
+            
+        case NSAndPredicateType: {
+            NSArray *subarrays = [self.subpredicates valueForKeyPath:@"mgl_jsonExpressionObject"];
+            return [@[@"all"] arrayByAddingObjectsFromArray:subarrays];
+        }
+            
+        case NSOrPredicateType: {
+            NSArray *subarrays = [self.subpredicates valueForKeyPath:@"mgl_jsonExpressionObject"];
+            return [@[@"any"] arrayByAddingObjectsFromArray:subarrays];
+        }
+    }
+    
+    [NSException raise:@"Compound predicate type not handled"
+                format:@""];
+    return nil;
+}
+
+@end

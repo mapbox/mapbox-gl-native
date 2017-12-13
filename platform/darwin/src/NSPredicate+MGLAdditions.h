@@ -11,3 +11,10 @@
 
 @end
 
+@interface NSPredicate (MGLExpressionAdditions)
+
++ (instancetype)mgl_predicateWithJSONObject:(id)object;
+
+@property (nonatomic, readonly) id mgl_jsonExpressionObject;
+
+@end

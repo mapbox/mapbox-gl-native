@@ -8,8 +8,11 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLSymbolStyleLayer.h"
 
+#import "NSExpression+MGLAdditions.h"
+
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 
 namespace mbgl {
 
@@ -564,27 +567,33 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setText:(MGLStyleValue<NSString *> *)text {
-    MGLAssertStyleLayerIsValid();
+- (void)setText:(NSExpression *)text {
+    NSArray *jsonExpression = text.mgl_jsonExpressionObject;
+    
+    using namespace mbgl::style;
+    conversion::Error valueError;
+    auto value = conversion::convert<DataDrivenPropertyValue<std::string>>(
+        conversion::makeConvertible(jsonExpression), valueError);
+    NSAssert(value, @(valueError.message.c_str()));
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenPropertyValue(text);
-    self.rawLayer->setTextField(mbglValue);
+    self.rawLayer->setTextField(*value);
 }
 
-- (MGLStyleValue<NSString *> *)text {
+- (NSExpression *)text {
+#warning Convert to NSExpression.
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextField();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextField());
+        propertyValue = self.rawLayer->getDefaultTextField();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
-- (void)setTextField:(MGLStyleValue<NSString *> *)textField {
+- (void)setTextField:(NSExpression *)textField {
 }
 
-- (MGLStyleValue<NSString *> *)textField {
+- (NSExpression *)textField {
     return self.text;
 }
 

@@ -968,10 +968,10 @@ MGL_EXPORT
    * `MGLInterpolationModeInterval`
    * `MGLInterpolationModeCategorical`
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *text;
+@property (nonatomic, null_resettable) NSExpression *text;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *textField __attribute__((unavailable("Use text instead.")));
+@property (nonatomic, null_resettable) NSExpression *textField __attribute__((unavailable("Use text instead.")));
 
 /**
  If true, the text will be visible even if it collides with other previously

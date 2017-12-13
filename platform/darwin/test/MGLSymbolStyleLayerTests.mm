@@ -906,26 +906,27 @@
     {
         XCTAssertTrue(rawLayer->getTextField().isUndefined(),
                       @"text-field should be unset initially.");
-        MGLStyleValue<NSString *> *defaultStyleValue = layer.text;
+        NSExpression *defaultStyleValue = layer.text;
 
-        MGLStyleValue<NSString *> *constantStyleValue = [MGLStyleValue<NSString *> valueWithRawValue:@"Text Field"];
-        layer.text = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionForConstantValue:@"Text Field"];
+        layer.text = constantExpression;
         mbgl::style::DataDrivenPropertyValue<std::string> propertyValue = { "Text Field" };
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a constant value should update text-field.");
-        XCTAssertEqualObjects(layer.text, constantStyleValue,
+        XCTAssertEqualObjects(layer.text, constantExpression,
                               @"text should round-trip constant values.");
 
-        MGLStyleValue<NSString *> * functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.text = functionStyleValue;
-
-        mbgl::style::IntervalStops<std::string> intervalStops = { {{18, "Text Field"}} };
-        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
-        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
-                       @"Setting text to a camera function should update text-field.");
-        XCTAssertEqualObjects(layer.text, functionStyleValue,
-                              @"text should round-trip camera functions.");
+#warning Test setting interpolation expression.
+//        MGLStyleValue<NSString *> * functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
+//        layer.text = functionStyleValue;
+//
+//        mbgl::style::IntervalStops<std::string> intervalStops = { {{18, "Text Field"}} };
+//        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
+//
+//        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
+//                       @"Setting text to a camera function should update text-field.");
+//        XCTAssertEqualObjects(layer.text, functionStyleValue,
+//                              @"text should round-trip camera functions.");
 
                               
 

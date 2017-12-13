@@ -716,7 +716,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style addLayer:lineLayer];
     MGLSymbolStyleLayer *labelLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"graticule.labels"
                                                                                source:source];
-    labelLayer.text = [MGLStyleValue valueWithRawValue:@"{value}"];
+    labelLayer.text = [NSExpression expressionWithFormat:@"value"];
     [self.mapView.style addLayer:labelLayer];
 }
 

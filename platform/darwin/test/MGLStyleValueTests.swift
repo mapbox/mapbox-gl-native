@@ -116,8 +116,8 @@ extension MGLStyleValueTests {
         XCTAssertEqual((symbolStyleLayer.iconHaloWidth as! MGLConstantStyleValue<NSNumber>).rawValue, 3)
         
         // String
-        symbolStyleLayer.text = MGLConstantStyleValue(rawValue: "{name}")
-        XCTAssertEqual((symbolStyleLayer.text as! MGLConstantStyleValue<NSString>).rawValue, "{name}")
+        symbolStyleLayer.text = NSExpression(forKeyPath: "name")
+        XCTAssertEqual(symbolStyleLayer.text, NSExpression(forKeyPath: "name"))
 
         var circleTranslationOne = CGVector(dx: 100, dy: 0)
         let circleTranslationValueOne = NSValue(bytes: &circleTranslationOne, objCType: "{CGVector=dd}")

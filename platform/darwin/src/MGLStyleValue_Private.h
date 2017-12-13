@@ -38,6 +38,12 @@ public:
         PropertyValueEvaluator evaluator;
         return mbglValue.evaluate(evaluator);
     }
+    
+    // Convert an mbgl data driven property value into an mgl style value
+    NSExpression *toExpression(const mbgl::style::DataDrivenPropertyValue<MBGLType> &mbglValue) {
+        PropertyExpressionEvaluator evaluator;
+        return mbglValue.evaluate(evaluator);
+    }
 
     // Convert an mbgl property value containing an enum into an mgl style value
     template <typename MBGLEnum = MBGLType,
@@ -702,6 +708,35 @@ private: // Private utilities for converting from mbgl to mgl values
         MGLCompositeStyleFunction<ObjCType> * operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
             CompositeFunctionStopsVisitor visitor { mbglValue };
             return apply_visitor(visitor, mbglValue.stops);
+        }
+    };
+
+
+    // Converts all types of mbgl property values into an equivalent NSExpression.
+    class PropertyExpressionEvaluator {
+    public:
+        NSExpression *operator()(const mbgl::style::Undefined) const {
+            return nil;
+        }
+
+        NSExpression *operator()(const MBGLType &value) const {
+            auto rawValue = toMGLRawStyleValue(value);
+            return [NSExpression expressionForConstantValue:rawValue];
+        }
+
+        NSExpression *operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
+#warning Convert camera functions to NSExpression.
+            return nil;
+        }
+
+        NSExpression *operator()(const mbgl::style::SourceFunction<MBGLType> &mbglValue) const {
+#warning Convert source functions to NSExpression.
+            return nil;
+        }
+
+        NSExpression *operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
+#warning Convert composite functions to NSExpression.
+            return nil;
         }
     };
 };
