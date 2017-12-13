@@ -115,7 +115,7 @@ macro(mbgl_platform_glfw)
     add_custom_command(
         TARGET mbgl-glfw POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
-                ${CMAKE_SOURCE_DIR}/common/ca-bundle.crt
+                ${CMAKE_SOURCE_DIR}/misc/ca-bundle.crt
                 ${CMAKE_CURRENT_BINARY_DIR}/ca-bundle.crt
     )
 endmacro()
