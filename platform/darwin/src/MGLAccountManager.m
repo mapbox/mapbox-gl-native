@@ -5,8 +5,6 @@
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
 #import "MGLMapboxEvents.h"
 
-#import "MMEEventsManager.h"
-
 #import "FABKitProtocol.h"
 #import "Fabric+FABKits.h"
 
@@ -66,14 +64,7 @@
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    // Update MGLMapboxEvents
-    // NOTE: This is (likely) the initial setup of MGLMapboxEvents
-    [MGLMapboxEvents sharedManager];        
-    
-    [MMEEventsManager sharedManager].debugLoggingEnabled = YES;
-    [[MMEEventsManager sharedManager] initializeWithAccessToken:accessToken userAgentBase:@"iOSIntegrationTest" hostSDKVersion:@"1"];    
-    [[MMEEventsManager sharedManager] sendTurnstileEvent];
-    
+    [MGLMapboxEvents setupWithAccessToken:accessToken];
 #endif
 }
 
