@@ -1902,9 +1902,34 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
+   *
+   * @deprecated Use {@link #addOnScrollListener(OnScrollListener)} instead.
    */
+  @Deprecated
   public void setOnScrollListener(@Nullable OnScrollListener listener) {
-    onRegisterTouchListener.onRegisterScrollListener(listener);
+    onRegisterTouchListener.onSetScrollListener(listener);
+  }
+
+  /**
+   * Adds a callback that's invoked when the map is scrolled.
+   *
+   * @param listener The callback that's invoked when the map is scrolled.
+   *                 To unset the callback, use null.
+   *
+   */
+  public void addOnScrollListener(@Nullable OnScrollListener listener) {
+    onRegisterTouchListener.onAddScrollListener(listener);
+  }
+
+  /**
+   * Removes a callback that's invoked when the map is scrolled.
+   *
+   * @param listener The callback that's invoked when the map is scrolled.
+   *                 To unset the callback, use null.
+   *
+   */
+  public void removeOnScrollListener(@Nullable OnScrollListener listener) {
+    onRegisterTouchListener.onRemoveScrollListener(listener);
   }
 
   /**
@@ -1912,9 +1937,32 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is flinged.
    *                 To unset the callback, use null.
+   *
+   * @deprecated Use {@link #addOnFlingListener(OnFlingListener)} instead.
    */
+  @Deprecated
   public void setOnFlingListener(@Nullable OnFlingListener listener) {
-    onRegisterTouchListener.onRegisterFlingListener(listener);
+    onRegisterTouchListener.onSetFlingListener(listener);
+  }
+
+  /**
+   * Adds a callback that's invoked when the map is flinged.
+   *
+   * @param listener The callback that's invoked when the map is flinged.
+   *                 To unset the callback, use null.
+   */
+  public void addOnFlingListener(@Nullable OnFlingListener listener) {
+    onRegisterTouchListener.onAddFlingListener(listener);
+  }
+
+  /**
+   * Removes a callback that's invoked when the map is flinged.
+   *
+   * @param listener The callback that's invoked when the map is flinged.
+   *                 To unset the callback, use null.
+   */
+  public void removeOnFlingListener(@Nullable OnFlingListener listener) {
+    onRegisterTouchListener.onRemoveFlingListener(listener);
   }
 
   /**
@@ -1922,9 +1970,32 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
    *                 To unset the callback, use null.
+   *
+   * @deprecated Use {@link #addOnMapClickListener(OnMapClickListener)} instead.
    */
+  @Deprecated
   public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
-    onRegisterTouchListener.onRegisterMapClickListener(listener);
+    onRegisterTouchListener.onSetMapClickListener(listener);
+  }
+
+  /**
+   * Adds a callback that's invoked when the user clicks on the map view.
+   *
+   * @param listener The callback that's invoked when the user clicks on the map view.
+   *                 To unset the callback, use null.
+   */
+  public void addOnMapClickListener(@Nullable OnMapClickListener listener) {
+    onRegisterTouchListener.onAddMapClickListener(listener);
+  }
+
+  /**
+   * Removes a callback that's invoked when the user clicks on the map view.
+   *
+   * @param listener The callback that's invoked when the user clicks on the map view.
+   *                 To unset the callback, use null.
+   */
+  public void removeOnMapClickListener(@Nullable OnMapClickListener listener) {
+    onRegisterTouchListener.onRemoveMapClickListener(listener);
   }
 
   /**
@@ -1932,9 +2003,32 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
    *                 To unset the callback, use null.
+   *
+   * @deprecated Use {@link #addOnMapLongClickListener(OnMapLongClickListener)} instead.
    */
+  @Deprecated
   public void setOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-    onRegisterTouchListener.onRegisterMapLongClickListener(listener);
+    onRegisterTouchListener.onSetMapLongClickListener(listener);
+  }
+
+  /**
+   * Adds a callback that's invoked when the user long clicks on the map view.
+   *
+   * @param listener The callback that's invoked when the user long clicks on the map view.
+   *                 To unset the callback, use null.
+   */
+  public void addOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
+    onRegisterTouchListener.onAddMapLongClickListener(listener);
+  }
+
+  /**
+   * Removes a callback that's invoked when the user long clicks on the map view.
+   *
+   * @param listener The callback that's invoked when the user long clicks on the map view.
+   *                 To unset the callback, use null.
+   */
+  public void removeOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
+    onRegisterTouchListener.onRemoveMapLongClickListener(listener);
   }
 
   /**
@@ -2304,13 +2398,29 @@ public final class MapboxMap {
    * related to touch and click events.
    */
   interface OnRegisterTouchListener {
-    void onRegisterMapClickListener(OnMapClickListener listener);
+    void onSetMapClickListener(OnMapClickListener listener);
 
-    void onRegisterMapLongClickListener(OnMapLongClickListener listener);
+    void onAddMapClickListener(OnMapClickListener listener);
 
-    void onRegisterScrollListener(OnScrollListener listener);
+    void onRemoveMapClickListener(OnMapClickListener listener);
 
-    void onRegisterFlingListener(OnFlingListener listener);
+    void onSetMapLongClickListener(OnMapLongClickListener listener);
+
+    void onAddMapLongClickListener(OnMapLongClickListener listener);
+
+    void onRemoveMapLongClickListener(OnMapLongClickListener listener);
+
+    void onSetScrollListener(OnScrollListener listener);
+
+    void onAddScrollListener(OnScrollListener listener);
+
+    void onRemoveScrollListener(OnScrollListener listener);
+
+    void onSetFlingListener(OnFlingListener listener);
+
+    void onAddFlingListener(OnFlingListener listener);
+
+    void onRemoveFlingListener(OnFlingListener listener);
   }
 
   /**
