@@ -62,6 +62,7 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        SourceType::GeoJSON,
                        util::tileSize,
                        impl().getZoomRange(),
+                       {},
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data->getTile(tileID.canonical));
                        });
