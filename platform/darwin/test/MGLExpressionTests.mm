@@ -7,6 +7,11 @@
 #import "MGLTypes.h"
 #import "NSExpression+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
+#if TARGET_OS_IPHONE
+#import "UIColor+MGLAdditions.h"
+#else
+#import "NSColor+MGLAdditions.h"
+#endif
 
 #define MGLAssertEqualValues(actual, expected, ...) \
     XCTAssertTrue(actual.is<__typeof__(expected)>()); \
@@ -195,6 +200,20 @@ using namespace std::string_literals;
         // No way to distinguish offsets from ordinary arrays in expressions.
         XCTAssertEqualObjects([[NSExpression mgl_expressionWithJSONObject:jsonExpression].collection valueForKeyPath:@"constantValue"], jsonExpression.lastObject);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], value);
+    }
+    {
+        MGLColor *color = [MGLColor mgl_colorWithColor:{ 255.0/255, 239.0/255, 213.0/255, 1 }]; // papayawhip
+        NSExpression *expression = [NSExpression expressionForConstantValue:color];
+        NSArray *jsonExpression = @[@"rgb", @255, @239, @213];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], color);
+    }
+    {
+        MGLColor *color = [MGLColor mgl_colorWithColor:{ 255.0/255, 239.0/255, 213.0/255, 0.5 }]; // papayawhip
+        NSExpression *expression = [NSExpression expressionForConstantValue:color];
+        NSArray *jsonExpression = @[@"rgba", @255, @239, @213, @0.5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], color);
     }
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"noindex(513)"];

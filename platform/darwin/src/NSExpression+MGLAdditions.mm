@@ -320,11 +320,18 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     
     switch (self.expressionType) {
         case NSConstantValueExpressionType: {
-#warning Convert non-JSON types to JSON types.
             if ([self.constantValue isEqual:@(M_E)]) {
                 return @[@"e"];
-            } else if ([self.constantValue isEqual:@(M_PI)]) {
+            }
+            if ([self.constantValue isEqual:@(M_PI)]) {
                 return @[@"pi"];
+            }
+            if ([self.constantValue isKindOfClass:[MGLColor class]]) {
+                auto color = [self.constantValue mgl_color];
+                if (color.a == 1) {
+                    return @[@"rgb", @(color.r * 255), @(color.g * 255), @(color.b * 255)];
+                }
+                return @[@"rgba", @(color.r * 255), @(color.g * 255), @(color.b * 255), @(color.a)];
             }
             return self.constantValue;
         }
