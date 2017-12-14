@@ -38,7 +38,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
         }
         
         bool isValidName = std::all_of(name->begin(), name->end(), [](unsigned char c) {
-            return std::isalnum(c) || c == '_';
+            return ::isalnum(c) || c == '_';
         });
         if (!isValidName) {
             ctx.error("Variable names must contain only alphanumeric characters or '_'.", 1);

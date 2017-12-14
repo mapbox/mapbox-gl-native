@@ -354,7 +354,7 @@ template <> mbgl::Timestamp Statement::get(int offset) {
     QVariant value = impl->query.value(offset);
     checkQueryError(impl->query);
     return std::chrono::time_point_cast<std::chrono::seconds>(
-        std::chrono::system_clock::from_time_t(value.value<std::time_t>()));
+        std::chrono::system_clock::from_time_t(value.value<::time_t>()));
 }
 
 template <> optional<int64_t> Statement::get(int offset) {
@@ -398,7 +398,7 @@ template <> optional<mbgl::Timestamp> Statement::get(int offset) {
     if (value.isNull())
         return {};
     return { std::chrono::time_point_cast<mbgl::Seconds>(
-        std::chrono::system_clock::from_time_t(value.value<std::time_t>())) };
+        std::chrono::system_clock::from_time_t(value.value<::time_t>())) };
 }
 
 void Statement::reset() {
