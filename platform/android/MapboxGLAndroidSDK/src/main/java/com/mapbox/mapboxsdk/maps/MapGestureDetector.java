@@ -45,10 +45,10 @@ final class MapGestureDetector {
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
-  private final GestureDetectorCompat gestureDetector;
-  private final ScaleGestureDetector scaleGestureDetector;
-  private final RotateGestureDetector rotateGestureDetector;
-  private final ShoveGestureDetector shoveGestureDetector;
+  private GestureDetectorCompat gestureDetector;
+  private ScaleGestureDetector scaleGestureDetector;
+  private RotateGestureDetector rotateGestureDetector;
+  private ShoveGestureDetector shoveGestureDetector;
 
   private MapboxMap.OnMapClickListener onMapClickListener;
   private MapboxMap.OnMapLongClickListener onMapLongClickListener;
@@ -88,12 +88,14 @@ final class MapGestureDetector {
     this.cameraChangeDispatcher = cameraChangeDispatcher;
 
     // Touch gesture detectors
-    gestureDetector = new GestureDetectorCompat(context, new GestureListener());
-    gestureDetector.setIsLongpressEnabled(true);
-    scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
-    ScaleGestureDetectorCompat.setQuickScaleEnabled(scaleGestureDetector, true);
-    rotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
-    shoveGestureDetector = new ShoveGestureDetector(context, new ShoveGestureListener());
+    if (context != null) {
+      gestureDetector = new GestureDetectorCompat(context, new GestureListener());
+      gestureDetector.setIsLongpressEnabled(true);
+      scaleGestureDetector = new ScaleGestureDetector(context, new ScaleGestureListener());
+      ScaleGestureDetectorCompat.setQuickScaleEnabled(scaleGestureDetector, true);
+      rotateGestureDetector = new RotateGestureDetector(context, new RotateGestureListener());
+      shoveGestureDetector = new ShoveGestureDetector(context, new ShoveGestureListener());
+    }
   }
 
   /**
@@ -294,7 +296,6 @@ final class MapGestureDetector {
     return false;
   }
 
-
   /**
    * Responsible for handling one finger gestures.
    */
@@ -362,14 +363,7 @@ final class MapGestureDetector {
           annotationManager.deselectMarkers();
         }
 
-        // notify app of map click
-        if (onMapClickListener != null) {
-          onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
-        }
-
-        for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
-          listener.onMapClick(projection.fromScreenLocation(tapPoint));
-        }
+        notifyOnMapClickListeners(tapPoint);
       }
 
       MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
@@ -381,17 +375,8 @@ final class MapGestureDetector {
 
     @Override
     public void onLongPress(MotionEvent motionEvent) {
-      if (onMapLongClickListener != null && !quickZoom) {
-        onMapLongClickListener.onMapLongClick(
-          projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY())));
-      }
-
-      if (!quickZoom) {
-        for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
-          listener.onMapLongClick(
-            projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY())));
-        }
-      }
+      PointF longClickPoint = new PointF(motionEvent.getX(), motionEvent.getY());
+      notifyOnMapLongClickListeners(longClickPoint);
     }
 
     @Override
@@ -430,13 +415,7 @@ final class MapGestureDetector {
       // update transformation
       transform.moveBy(offsetX, offsetY, animationTime);
 
-      if (onFlingListener != null) {
-        onFlingListener.onFling();
-      }
-
-      for (MapboxMap.OnFlingListener listener : onFlingListenerList) {
-        listener.onFling();
-      }
+      notifyOnFlingListeners();
       return true;
     }
 
@@ -471,14 +450,51 @@ final class MapGestureDetector {
       // Scroll the map
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
-      if (onScrollListener != null) {
-        onScrollListener.onScroll();
+      notifyOnScrollListeners();
+      return true;
+    }
+  }
+
+  void notifyOnMapClickListeners(PointF tapPoint) {
+    // notify app of map click
+    if (onMapClickListener != null) {
+      onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
+    }
+
+    for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
+      listener.onMapClick(projection.fromScreenLocation(tapPoint));
+    }
+  }
+
+  void notifyOnMapLongClickListeners(PointF longClickPoint) {
+    if (!quickZoom) {
+      if (onMapLongClickListener != null) {
+        onMapLongClickListener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
       }
 
-      for (MapboxMap.OnScrollListener listener : onScrollListenerList) {
-        listener.onScroll();
+      for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
+        listener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
       }
-      return true;
+    }
+  }
+
+  void notifyOnFlingListeners() {
+    if (onFlingListener != null) {
+      onFlingListener.onFling();
+    }
+
+    for (MapboxMap.OnFlingListener listener : onFlingListenerList) {
+      listener.onFling();
+    }
+  }
+
+  void notifyOnScrollListeners() {
+    if (onScrollListener != null) {
+      onScrollListener.onScroll();
+    }
+
+    for (MapboxMap.OnScrollListener listener : onScrollListenerList) {
+      listener.onScroll();
     }
   }
 
