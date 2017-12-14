@@ -55,10 +55,17 @@ final class MapGestureDetector {
   private MapboxMap.OnFlingListener onFlingListener;
   private MapboxMap.OnScrollListener onScrollListener;
 
-  private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList = new CopyOnWriteArrayList<>();
-  private final CopyOnWriteArrayList<MapboxMap.OnMapLongClickListener> onMapLongClickListenerList = new CopyOnWriteArrayList<>();
-  private final CopyOnWriteArrayList<MapboxMap.OnFlingListener> onFlingListenerList = new CopyOnWriteArrayList<>();
-  private final CopyOnWriteArrayList<MapboxMap.OnScrollListener> onScrollListenerList = new CopyOnWriteArrayList<>();
+  private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnMapLongClickListener> onMapLongClickListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnFlingListener> onFlingListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnScrollListener> onScrollListenerList
+    = new CopyOnWriteArrayList<>();
 
   private PointF focalPoint;
 
