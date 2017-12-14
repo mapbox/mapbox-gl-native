@@ -147,6 +147,7 @@ set(MBGL_TEST_FILES
     test/util/thread.test.cpp
     test/util/thread_local.test.cpp
     test/util/tile_cover.test.cpp
+    test/util/tile_range.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
     test/util/unique_any.test.cpp
