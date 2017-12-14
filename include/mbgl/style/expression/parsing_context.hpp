@@ -5,6 +5,7 @@
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/conversion.hpp>
 
+#include <iterator>
 #include <map>
 #include <string>
 #include <vector>
