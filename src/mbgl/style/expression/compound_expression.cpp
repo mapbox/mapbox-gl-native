@@ -5,6 +5,7 @@
 #include <mbgl/math/log2.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/platform.hpp>
 
 namespace mbgl {
 namespace style {
@@ -397,16 +398,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("!", [](bool e) -> Result<bool> { return !e; });
     
     define("upcase", [](const std::string& input) -> Result<std::string> {
-        std::string s = input;
-        std::transform(s.begin(), s.end(), s.begin(),
-                       [](unsigned char c){ return std::toupper(c); });
-        return s;
+        return platform::uppercase(input);
     });
     define("downcase", [](const std::string& input) -> Result<std::string> {
-        std::string s = input;
-        std::transform(s.begin(), s.end(), s.begin(),
-                       [](unsigned char c){ return std::tolower(c); });
-        return s;
+        return platform::lowercase(input);
     });
     define("concat", [](const Varargs<std::string>& args) -> Result<std::string> {
         std::string s;
