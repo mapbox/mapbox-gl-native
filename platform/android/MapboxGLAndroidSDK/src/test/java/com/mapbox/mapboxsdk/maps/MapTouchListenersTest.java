@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 public class MapTouchListenersTest {
 
   @Test
-  public void OnMapClickListenerTest() throws Exception {
+  public void onMapClickListenerTest() throws Exception {
     LatLng latLng = new LatLng();
     PointF pointF = new PointF();
 
@@ -34,7 +34,7 @@ public class MapTouchListenersTest {
   }
 
   @Test
-  public void OnMapLongClickListenerTest() throws Exception {
+  public void onMapLongClickListenerTest() throws Exception {
     LatLng latLng = new LatLng();
     PointF pointF = new PointF();
 
@@ -54,7 +54,7 @@ public class MapTouchListenersTest {
   }
 
   @Test
-  public void OnFlingListenerTest() throws Exception {
+  public void onFlingListenerTest() throws Exception {
     LatLng latLng = new LatLng();
     PointF pointF = new PointF();
 
@@ -74,7 +74,7 @@ public class MapTouchListenersTest {
   }
 
   @Test
-  public void OnScrollListenerTest() throws Exception {
+  public void onScrollListenerTest() throws Exception {
     LatLng latLng = new LatLng();
     PointF pointF = new PointF();
 
