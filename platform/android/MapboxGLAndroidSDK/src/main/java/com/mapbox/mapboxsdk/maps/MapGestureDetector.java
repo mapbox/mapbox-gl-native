@@ -50,11 +50,13 @@ final class MapGestureDetector {
   private RotateGestureDetector rotateGestureDetector;
   private ShoveGestureDetector shoveGestureDetector;
 
+  // deprecated map touch API
   private MapboxMap.OnMapClickListener onMapClickListener;
   private MapboxMap.OnMapLongClickListener onMapLongClickListener;
   private MapboxMap.OnFlingListener onFlingListener;
   private MapboxMap.OnScrollListener onScrollListener;
 
+  // new map touch API
   private final CopyOnWriteArrayList<MapboxMap.OnMapClickListener> onMapClickListenerList
     = new CopyOnWriteArrayList<>();
 
@@ -383,7 +385,10 @@ final class MapGestureDetector {
     @Override
     public void onLongPress(MotionEvent motionEvent) {
       PointF longClickPoint = new PointF(motionEvent.getX(), motionEvent.getY());
-      notifyOnMapLongClickListeners(longClickPoint);
+
+      if (!quickZoom) {
+        notifyOnMapLongClickListeners(longClickPoint);
+      }
     }
 
     @Override
@@ -463,43 +468,48 @@ final class MapGestureDetector {
   }
 
   void notifyOnMapClickListeners(PointF tapPoint) {
-    // notify app of map click
+    // deprecated API
     if (onMapClickListener != null) {
       onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
     }
 
+    // new API
     for (MapboxMap.OnMapClickListener listener : onMapClickListenerList) {
       listener.onMapClick(projection.fromScreenLocation(tapPoint));
     }
   }
 
   void notifyOnMapLongClickListeners(PointF longClickPoint) {
-    if (!quickZoom) {
-      if (onMapLongClickListener != null) {
-        onMapLongClickListener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
-      }
+    // deprecated API
+    if (onMapLongClickListener != null) {
+      onMapLongClickListener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
+    }
 
-      for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
-        listener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
-      }
+    // new API
+    for (MapboxMap.OnMapLongClickListener listener : onMapLongClickListenerList) {
+      listener.onMapLongClick(projection.fromScreenLocation(longClickPoint));
     }
   }
 
   void notifyOnFlingListeners() {
+    // deprecated API
     if (onFlingListener != null) {
       onFlingListener.onFling();
     }
 
+    // new API
     for (MapboxMap.OnFlingListener listener : onFlingListenerList) {
       listener.onFling();
     }
   }
 
   void notifyOnScrollListeners() {
+    //deprecated API
     if (onScrollListener != null) {
       onScrollListener.onScroll();
     }
 
+    // new API
     for (MapboxMap.OnScrollListener listener : onScrollListenerList) {
       listener.onScroll();
     }
