@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.os.Handler;
 import android.support.annotation.NonNull;
 
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -9,10 +10,16 @@ import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveCanceledListener;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveListener;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener;
 
+/**
+ * Class responsible for dispatching camera change events to registered listeners.
+ */
 class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, MapboxMap.OnCameraMoveListener,
   MapboxMap.OnCameraMoveCanceledListener, OnCameraIdleListener {
 
+  private final Handler handler = new Handler();
+
   private boolean idle = true;
+  private int moveStartedReason;
 
   private final CopyOnWriteArrayList<OnCameraMoveStartedListener> onCameraMoveStarted = new CopyOnWriteArrayList<>();
   private final CopyOnWriteArrayList<OnCameraMoveCanceledListener> onCameraMoveCanceled = new CopyOnWriteArrayList<>();
@@ -23,6 +30,74 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   private OnCameraMoveCanceledListener onCameraMoveCanceledListener;
   private OnCameraMoveListener onCameraMoveListener;
   private OnCameraIdleListener onCameraIdleListener;
+
+  private final Runnable onCameraMoveStartedRunnable = new Runnable() {
+    @Override
+    public void run() {
+      // deprecated API
+      if (onCameraMoveStartedListener != null) {
+        onCameraMoveStartedListener.onCameraMoveStarted(moveStartedReason);
+      }
+
+      // new API
+      if (!onCameraMoveStarted.isEmpty()) {
+        for (OnCameraMoveStartedListener cameraMoveStartedListener : onCameraMoveStarted) {
+          cameraMoveStartedListener.onCameraMoveStarted(moveStartedReason);
+        }
+      }
+    }
+  };
+
+  private final Runnable onCameraMoveRunnable = new Runnable() {
+    @Override
+    public void run() {
+      // deprecated API
+      if (onCameraMoveListener != null && !idle) {
+        onCameraMoveListener.onCameraMove();
+      }
+
+      // new API
+      if (!onCameraMove.isEmpty() && !idle) {
+        for (OnCameraMoveListener cameraMoveListener : onCameraMove) {
+          cameraMoveListener.onCameraMove();
+        }
+      }
+    }
+  };
+
+  private final Runnable onCameraMoveCancelRunnable = new Runnable() {
+    @Override
+    public void run() {
+      // deprecated API
+      if (onCameraMoveCanceledListener != null && !idle) {
+        onCameraMoveCanceledListener.onCameraMoveCanceled();
+      }
+
+      // new API
+      if (!onCameraMoveCanceled.isEmpty() && !idle) {
+        for (OnCameraMoveCanceledListener cameraMoveCanceledListener : onCameraMoveCanceled) {
+          cameraMoveCanceledListener.onCameraMoveCanceled();
+        }
+      }
+    }
+  };
+
+  private final Runnable onCameraIdleRunnable = new Runnable() {
+    @Override
+    public void run() {
+      // deprecated API
+      if (onCameraIdleListener != null) {
+        onCameraIdleListener.onCameraIdle();
+      }
+
+      // new API
+      if (!onCameraIdle.isEmpty()) {
+        for (OnCameraIdleListener cameraIdleListener : onCameraIdle) {
+          cameraIdleListener.onCameraIdle();
+        }
+      }
+    }
+  };
 
   @Deprecated
   void setOnCameraMoveStartedListener(OnCameraMoveStartedListener onCameraMoveStartedListener) {
@@ -45,70 +120,30 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   }
 
   @Override
-  public void onCameraMoveStarted(int reason) {
+  public void onCameraMoveStarted(final int reason) {
     if (!idle) {
       return;
     }
     idle = false;
-
-    // deprecated API
-    if (onCameraMoveStartedListener != null) {
-      onCameraMoveStartedListener.onCameraMoveStarted(reason);
-    }
-
-    // new API
-    if (!onCameraMoveStarted.isEmpty()) {
-      for (OnCameraMoveStartedListener cameraMoveStartedListener : onCameraMoveStarted) {
-        cameraMoveStartedListener.onCameraMoveStarted(reason);
-      }
-    }
+    moveStartedReason = reason;
+    handler.post(onCameraMoveStartedRunnable);
   }
 
   @Override
   public void onCameraMove() {
-    // deprecated API
-    if (onCameraMoveListener != null && !idle) {
-      onCameraMoveListener.onCameraMove();
-    }
-
-    // new API
-    if (!onCameraMove.isEmpty() && !idle) {
-      for (OnCameraMoveListener cameraMoveListener : onCameraMove) {
-        cameraMoveListener.onCameraMove();
-      }
-    }
+    handler.post(onCameraMoveRunnable);
   }
 
   @Override
   public void onCameraMoveCanceled() {
-    // deprecated API
-    if (onCameraMoveCanceledListener != null && !idle) {
-      onCameraMoveCanceledListener.onCameraMoveCanceled();
-    }
-
-    // new API
-    if (!onCameraMoveCanceled.isEmpty() && !idle) {
-      for (OnCameraMoveCanceledListener cameraMoveCanceledListener : onCameraMoveCanceled) {
-        cameraMoveCanceledListener.onCameraMoveCanceled();
-      }
-    }
+    handler.post(onCameraMoveCancelRunnable);
   }
 
   @Override
   public void onCameraIdle() {
     if (!idle) {
       idle = true;
-      // deprecated API
-      if (onCameraIdleListener != null) {
-        onCameraIdleListener.onCameraIdle();
-      }
-
-      // new API
-      if (!onCameraIdle.isEmpty()) {
-        for (OnCameraIdleListener cameraIdleListener : onCameraIdle) {
-          cameraIdleListener.onCameraIdle();
-        }
-      }
+      handler.post(onCameraIdleRunnable);
     }
   }
 
