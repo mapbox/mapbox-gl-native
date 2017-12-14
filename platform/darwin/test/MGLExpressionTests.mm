@@ -434,6 +434,16 @@ using namespace std::string_literals;
     }
 }
 
+- (void)testTypeConversionExpressionObject {
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(number, 'stringValue')"];
+        NSArray *jsonExpression = @[@"to-string", @[@"get", @"number"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:@{@"number": @1.5} context:nil], @"1.5");
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+}
+
 - (void)testConditionalExpressionObject {
     {
         NSPredicate *conditional = [NSPredicate predicateWithFormat:@"1 = 2"];

@@ -251,6 +251,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"literal"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             return [NSExpression expressionForAggregate:subexpressions];
+        } else if ([op isEqualToString:@"to-string"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            return [NSExpression expressionForFunction:operand selectorName:@"stringValue" arguments:@[]];
         } else if ([op isEqualToString:@"get"]) {
             return [NSExpression expressionForKeyPath:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"length"]) {
@@ -368,6 +371,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = [self.arguments valueForKeyPath:@"mgl_jsonExpressionObject"];
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
+            } else if ([function isEqualToString:@"stringValue"]) {
+                return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"median:"] ||
