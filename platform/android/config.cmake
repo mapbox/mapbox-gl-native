@@ -36,6 +36,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/android/src/thread.cpp
         PRIVATE platform/default/string_stdlib.cpp
         PRIVATE platform/default/bidi.cpp
+        PRIVATE platform/default/local_glyph_rasterizer.cpp
         PRIVATE platform/default/thread_local.cpp
         PRIVATE platform/default/utf.cpp
 
