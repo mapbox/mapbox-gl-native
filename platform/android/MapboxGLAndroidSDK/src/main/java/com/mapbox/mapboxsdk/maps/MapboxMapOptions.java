@@ -82,6 +82,7 @@ public class MapboxMapOptions implements Parcelable {
   private float myLocationAccuracyThreshold;
   private boolean prefetchesTiles = true;
   private boolean zMediaOverlay = false;
+  private String localIdeographFontFamily;
 
   private String apiBaseUrl;
 
@@ -157,6 +158,7 @@ public class MapboxMapOptions implements Parcelable {
     textureMode = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
+    localIdeographFontFamily = in.readString();
   }
 
   static Bitmap getBitmapFromDrawable(Drawable drawable) {
@@ -304,6 +306,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableZMediaOverlay, false));
+      mapboxMapOptions.localIdeographFontFamily(
+        typedArray.getString(R.styleable.mapbox_MapView_mapbox_localIdeographFontFamily));
     } finally {
       typedArray.recycle();
     }
@@ -734,6 +738,18 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
+   * Set the font-family for generating glyphs locally for ideographs in the ‘CJK Unified Ideographs’
+   * and ‘Hangul Syllables’ ranges.
+   *
+   * @param fontFamily font family for local ideograph generation.
+   * @return This
+   */
+  public MapboxMapOptions localIdeographFontFamily(String fontFamily) {
+    this.localIdeographFontFamily = fontFamily;
+    return this;
+  }
+
+  /**
    * Check whether tile pre-fetching is enabled.
    *
    * @return true if enabled
@@ -1079,6 +1095,16 @@ public class MapboxMapOptions implements Parcelable {
     return textureMode;
   }
 
+  /**
+   * Returns the font-family for locally overriding generation of glyphs in the
+   * ‘CJK Unified Ideographs’ and ‘Hangul Syllables’ ranges.
+   *
+   * @return Local ideograph font family name.
+   */
+  public String getLocalIdeographFontFamily() {
+    return localIdeographFontFamily;
+  }
+
   public static final Parcelable.Creator<MapboxMapOptions> CREATOR = new Parcelable.Creator<MapboxMapOptions>() {
     public MapboxMapOptions createFromParcel(Parcel in) {
       return new MapboxMapOptions(in);
@@ -1145,6 +1171,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (textureMode ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
+    dest.writeString(localIdeographFontFamily);
   }
 
   @Override
@@ -1274,6 +1301,9 @@ public class MapboxMapOptions implements Parcelable {
     if (zMediaOverlay != options.zMediaOverlay) {
       return false;
     }
+    if (localIdeographFontFamily != options.localIdeographFontFamily) {
+      return false;
+    }
 
     return false;
   }
@@ -1323,6 +1353,7 @@ public class MapboxMapOptions implements Parcelable {
     result = 31 * result + (style != null ? style.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);
+    result = 31 * result + (localIdeographFontFamily != null ? localIdeographFontFamily.hashCode() : 0);
     return result;
   }
 }

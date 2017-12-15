@@ -367,9 +367,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-        <activity android:name=".activity.snapshot.MapSnapshotterActivity"
-                  android:description="@string/description_map_snapshotter"
-                  android:label="@string/activity_map_snapshotter">
+        <activity
+            android:name=".activity.snapshot.MapSnapshotterActivity"
+            android:description="@string/description_map_snapshotter"
+            android:label="@string/activity_map_snapshotter">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator"/>
@@ -377,9 +378,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-        <activity android:name=".activity.snapshot.MapSnapshotterReuseActivity"
-                  android:description="@string/description_map_snapshotter_reuse"
-                  android:label="@string/activity_map_snapshotter_reuse">
+        <activity
+            android:name=".activity.snapshot.MapSnapshotterReuseActivity"
+            android:description="@string/description_map_snapshotter_reuse"
+            android:label="@string/activity_map_snapshotter_reuse">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator"/>
@@ -387,9 +389,10 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-        <activity android:name=".activity.snapshot.MapSnapshotterMarkerActivity"
-                  android:description="@string/description_map_snapshotter_marker"
-                  android:label="@string/activity_map_snapshotter_marker">
+        <activity
+            android:name=".activity.snapshot.MapSnapshotterMarkerActivity"
+            android:description="@string/description_map_snapshotter_marker"
+            android:label="@string/activity_map_snapshotter_marker">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_imagegenerator"/>
@@ -586,8 +589,8 @@
         </activity>
         <activity
             android:name=".activity.style.AnimatedImageSourceActivity"
-            android:label="@string/activity_animated_image_source"
-            android:description="@string/description_animated_image_source">
+            android:description="@string/description_animated_image_source"
+            android:label="@string/activity_animated_image_source">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_style"/>
@@ -720,35 +723,50 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-        <activity android:name=".activity.maplayout.BottomSheetActivity"
-                  android:description="@string/description_bottom_sheet"
-                  android:label="@string/activity_bottom_sheet">
+        <activity
+            android:name=".activity.maplayout.BottomSheetActivity"
+            android:description="@string/description_bottom_sheet"
+            android:label="@string/activity_bottom_sheet">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_maplayout"/>
         </activity>
 
         <!-- TextureView -->
-        <activity android:name=".activity.textureview.TextureViewDebugModeActivity"
-                  android:description="@string/description_textureview_debug"
-                  android:label="@string/activity_textureview_debug">
+        <activity
+            android:name=".activity.textureview.TextureViewDebugModeActivity"
+            android:description="@string/description_textureview_debug"
+            android:label="@string/activity_textureview_debug">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_textureview"/>
         </activity>
-        <activity android:name=".activity.textureview.TextureViewResizeActivity"
-                  android:description="@string/description_textureview_resize"
-                  android:label="@string/activity_textureview_resize">
+        <activity
+            android:name=".activity.textureview.TextureViewResizeActivity"
+            android:description="@string/description_textureview_resize"
+            android:label="@string/activity_textureview_resize">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_textureview"/>
         </activity>
-        <activity android:name=".activity.textureview.TextureViewAnimationActivity"
-                  android:description="@string/description_textureview_animate"
-                  android:label="@string/activity_textureview_animate">
+        <activity
+            android:name=".activity.textureview.TextureViewAnimationActivity"
+            android:description="@string/description_textureview_animate"
+            android:label="@string/activity_textureview_animate">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_textureview"/>
+        </activity>
+        <activity
+            android:name=".activity.maplayout.LocalGlyphActivity"
+            android:description="@string/description_local_glyph"
+            android:label="@string/activity_local_glyph">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
         </activity>
 
         <!-- For Instrumentation tests -->
