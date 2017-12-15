@@ -67,4 +67,5 @@
     <string name="description_textureview_debug">Use TextureView to render the map</string>
     <string name="description_textureview_resize">Resize a map rendered on a TextureView</string>
     <string name="description_textureview_animate">Animate a map rendered on a TextureView</string>
+    <string name="description_local_glyph">Suzhou using Droid Sans for Chinese glyphs</string>
 </resources>
