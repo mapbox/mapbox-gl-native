@@ -47,7 +47,9 @@ void RenderHillshadeLayer::transition(const TransitionParameters& parameters) {
 
 void RenderHillshadeLayer::evaluate(const PropertyEvaluationParameters& parameters) {
     evaluated = unevaluated.evaluate(parameters);
-    passes = RenderPass::Translucent;
+    passes = (evaluated.get<style::HillshadeExaggeration >() > 0)
+                 ? (RenderPass::Translucent | RenderPass::Pass3D)
+                 : RenderPass::None;
 }
 
 bool RenderHillshadeLayer::hasTransition() const {
@@ -55,7 +57,7 @@ bool RenderHillshadeLayer::hasTransition() const {
 }
 
 void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
-    if (parameters.pass != RenderPass::Translucent)
+    if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
     
     auto draw = [&] (const mat4& matrix,
@@ -92,11 +94,11 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
     for (const RenderTile& tile : renderTiles) {
         assert(dynamic_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl)));
         HillshadeBucket& bucket = *reinterpret_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl));
-        
+
 
         if (!bucket.hasData())
             continue;
-        if (!bucket.prepared) {
+        if (!bucket.prepared && parameters.pass == RenderPass::Pass3D) {
             OffscreenTexture view(parameters.context, { 256, 256 });
             view.bind();
             
