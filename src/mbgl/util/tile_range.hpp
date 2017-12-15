@@ -28,8 +28,9 @@ public:
 
     bool contains(const CanonicalTileID& tileID) {
         return z == tileID.z &&
-        tileID.x < range.max.x &&
-        tileID.x >= range.min.x &&
+        (range.min.x >= range.max.x ? //For wrapped bounds
+            tileID.x >= range.min.x || tileID.x < range.max.x :
+            tileID.x < range.max.x && tileID.x >= range.min.x) &&
         tileID.y < range.max.y &&
         tileID.y >= range.min.y;
     }
