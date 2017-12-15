@@ -104,7 +104,7 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 }
 
 bool HillshadeBucket::hasData() const {
-    return !!pyramid.levels.empty();
+    return !pyramid.levels.empty();
 }
 
 } // namespace mbgl

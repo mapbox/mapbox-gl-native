@@ -14,6 +14,7 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -289,7 +290,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) {
+        if ((!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) || (!parameters.staticData.has3D && layer->is<RenderHillshadeLayer>())) {
             parameters.staticData.has3D = true;
         }
 
