@@ -54,6 +54,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSDictionary (MGLExpressionAdditions)
+
+@property (nonatomic, readonly) id mgl_jsonExpressionObject;
+
+@end
+
 @interface MGLColor (MGLExpressionAdditions)
 
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
