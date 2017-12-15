@@ -44,6 +44,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSNumber (MGLExpressionAdditions)
 
+- (id)mgl_interpolateWithCurveType:(NSString *)curveType parameters:(NSArray *)parameters stops:(NSDictionary<NSNumber *, id> *)stops;
+- (id)mgl_stepWithMinimum:(id)minimum stops:(NSDictionary<NSNumber *, id> *)stops;
+
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
 @end

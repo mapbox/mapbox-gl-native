@@ -179,6 +179,20 @@
 
 @implementation NSNumber (MGLExpressionAdditions)
 
+- (id)mgl_interpolateWithCurveType:(NSString *)curveType
+                        parameters:(NSArray *)parameters
+                             stops:(NSDictionary<NSNumber *, id> *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Interpolation expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+- (id)mgl_stepWithMinimum:(id)minimum stops:(NSDictionary<NSNumber *, id> *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Interpolation expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 - (id)mgl_jsonExpressionObject {
     if ([self isEqualToNumber:@(M_E)]) {
         return @[@"e"];
@@ -317,6 +331,52 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSExpression *operand = subexpressions.firstObject;
             subexpressions = [subexpressions subarrayWithRange:NSMakeRange(1, subexpressions.count - 1)];
             return [NSExpression expressionForFunction:operand selectorName:@"stringByAppendingString:" arguments:subexpressions];
+        } else if ([op isEqualToString:@"interpolate"]) {
+            NSArray *interpolationOptions = argumentObjects.firstObject;
+            NSString *curveType = interpolationOptions.firstObject;
+            NSExpression *curveTypeExpression = [NSExpression mgl_expressionWithJSONObject:curveType];
+            id curveParameters;
+            if ([curveType isEqual:@"exponential"]) {
+                curveParameters = interpolationOptions[1];
+            } else if ([curveType isEqualToString:@"cubic-bezier"]) {
+                curveParameters = @[@"literal", [interpolationOptions subarrayWithRange:NSMakeRange(1, 4)]];
+            }
+            NSExpression *curveParameterExpression = [NSExpression mgl_expressionWithJSONObject:curveParameters];
+            argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
+            NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
+            while (NSNumber *key = stopEnumerator.nextObject) {
+                NSExpression *valueExpression = stopEnumerator.nextObject;
+                stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+            }
+            NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
+            return [NSExpression expressionForFunction:operand
+                                          selectorName:@"mgl_interpolateWithCurveType:parameters:stops:"
+                                             arguments:@[curveTypeExpression, curveParameterExpression, stopExpression]];
+        } else if ([op isEqualToString:@"step"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSExpression *minimum;
+            if (stopExpressions.count % 2) {
+                minimum = [NSExpression mgl_expressionWithJSONObject:stopExpressions.firstObject];
+                stopExpressions = [stopExpressions subarrayWithRange:NSMakeRange(1, stopExpressions.count - 1)];
+            }
+            NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
+            NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
+            while (NSNumber *key = stopEnumerator.nextObject) {
+                NSExpression *valueExpression = stopEnumerator.nextObject;
+                if (minimum) {
+                    stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                } else {
+                    minimum = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                }
+            }
+            NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
+            return [NSExpression expressionForFunction:operand
+                                          selectorName:@"mgl_stepWithMinimum:stops:"
+                                             arguments:@[minimum, stopExpression]];
         } else if ([op isEqualToString:@"case"]) {
             NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
             NSExpression *trueExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[1]];
@@ -445,6 +505,40 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
+            } else if ([function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
+                if (self.arguments.count < 3) {
+                    [NSException raise:NSInvalidArgumentException format:
+                     @"Too few arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments."];
+                } else if (self.arguments.count > 3) {
+                    [NSException raise:NSInvalidArgumentException format:
+                     @"%lu unexpected arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments.",
+                     self.arguments.count - 3];
+                }
+                NSString *curveType = self.arguments.firstObject.constantValue;
+                NSMutableArray *interpolationArray = [NSMutableArray arrayWithObject:curveType];
+                if ([curveType isEqualToString:@"exponential"]) {
+                    id base = [self.arguments[1] mgl_jsonExpressionObject];
+                    [interpolationArray addObject:base];
+                } else if ([curveType isEqualToString:@"cubic-bezier"]) {
+                    NSArray *controlPoints = [self.arguments[1].collection mgl_jsonExpressionObject];
+                    [interpolationArray addObjectsFromArray:controlPoints];
+                }
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, self.operand.mgl_jsonExpressionObject, nil];
+                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[2].constantValue;
+                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+                    [expressionObject addObject:key];
+                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+                }
+                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_stepWithMinimum:stops:"]) {
+                id minimum = self.arguments.firstObject.mgl_jsonExpressionObject;
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", self.operand.mgl_jsonExpressionObject, minimum, nil];
+                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[1].constantValue;
+                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+                    [expressionObject addObject:key];
+                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+                }
+                return expressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||
