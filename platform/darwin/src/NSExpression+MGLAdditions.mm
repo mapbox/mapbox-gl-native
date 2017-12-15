@@ -161,6 +161,14 @@
 
 @end
 
+@implementation NSNull (MGLExpressionAdditions)
+
+- (id)mgl_jsonExpressionObject {
+    return self;
+}
+
+@end
+
 @implementation NSString (MGLExpressionAdditions)
 
 - (id)mgl_jsonExpressionObject {
@@ -234,6 +242,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"downcase": @"lowercase:",
         };
     });
+    
+    if (!object || object == [NSNull null]) {
+        return [NSExpression expressionForConstantValue:nil];
+    }
     
     if ([object isKindOfClass:[NSString class]] ||
         [object isKindOfClass:[NSNumber class]] ||
@@ -338,6 +350,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     switch (self.expressionType) {
         case NSConstantValueExpressionType: {
             id constantValue = self.constantValue;
+            if (!constantValue || constantValue == [NSNull null]) {
+                return [NSNull null];
+            }
             if ([constantValue isEqual:@(M_E)]) {
                 return @[@"e"];
             }

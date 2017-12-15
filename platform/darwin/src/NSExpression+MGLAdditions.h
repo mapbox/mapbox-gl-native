@@ -30,6 +30,12 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSNull (MGLExpressionAdditions)
+
+@property (nonatomic, readonly) id mgl_jsonExpressionObject;
+
+@end
+
 @interface NSString (MGLExpressionAdditions)
 
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;

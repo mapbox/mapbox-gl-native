@@ -166,12 +166,21 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @1);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"1"].mgl_jsonExpressionObject, @1);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@1], expression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
     }
     {
         NSExpression *expression = [NSExpression expressionForConstantValue:@YES];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @YES);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"TRUE"].mgl_jsonExpressionObject, @YES);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@YES], expression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @YES);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForConstantValue:nil];
+        XCTAssert(expression.mgl_jsonExpressionObject == [NSNull null]);
+        XCTAssert([NSExpression expressionWithFormat:@"nil"].mgl_jsonExpressionObject == [NSNull null]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:[NSNull null]], expression);
+        XCTAssertNil([expression expressionValueWithObject:nil context:nil]);
     }
     {
         CGVector vector = CGVectorMake(1, 2);
