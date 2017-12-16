@@ -25,14 +25,14 @@
         XCTAssertEqualWithAccuracy(actual.get<__typeof__(expected)>(), expected, accuracy, __VA_ARGS__); \
     }
 
-#define MGLAssertConstantEqualsValue(constant, value, ...) \
-    MGLAssertEqualValues([NSExpression expressionForConstantValue:constant].mgl_constantMBGLValue, value, __VA_ARGS__);
-
-#define MGLAssertConstantEqualsValueWithAccuracy(constant, value, accuracy, ...) \
-    MGLAssertEqualValuesWithAccuracy([NSExpression expressionForConstantValue:constant].mgl_constantMBGLValue, value, accuracy, __VA_ARGS__);
-
 #define MGLConstantExpression(constant) \
     [NSExpression expressionForConstantValue:constant]
+
+#define MGLAssertConstantEqualsValue(constant, value, ...) \
+    MGLAssertEqualValues(MGLConstantExpression(constant).mgl_constantMBGLValue, value, __VA_ARGS__);
+
+#define MGLAssertConstantEqualsValueWithAccuracy(constant, value, accuracy, ...) \
+    MGLAssertEqualValuesWithAccuracy(MGLConstantExpression(constant).mgl_constantMBGLValue, value, accuracy, __VA_ARGS__);
 
 using namespace std::string_literals;
 
@@ -232,11 +232,25 @@ using namespace std::string_literals;
 }
 
 - (void)testKeyPathExpressionObject {
-    NSExpression *expression = [NSExpression expressionForKeyPath:@"highway"];
-    NSArray *jsonExpression = @[@"get", @"highway"];
-    XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-    XCTAssertEqualObjects([NSExpression expressionWithFormat:@"highway"].mgl_jsonExpressionObject, jsonExpression);
-    XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    {
+        NSExpression *expression = [NSExpression expressionForKeyPath:@"highway"];
+        NSArray *jsonExpression = @[@"get", @"highway"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"highway"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"%@.population", @{@"population": MGLConstantExpression(@12000)}];
+        NSArray *jsonExpression = @[@"get", @"population", @[@"literal", @{@"population": @12000}]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"%@.uppercase('population')", @{@"POPULATION": MGLConstantExpression(@12000)}];
+        NSArray *jsonExpression = @[@"get", @[@"upcase", @"population"], @[@"literal", @{@"POPULATION": @12000}]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testStatisticalExpressionObject {
@@ -463,6 +477,26 @@ using namespace std::string_literals;
 }
 
 - (void)testTypeConversionExpressionObject {
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(number, 'boolValue')"];
+        NSArray *jsonExpression = @[@"to-boolean", @[@"get", @"number"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        // NSExpression is unable to evaluate -[NSNumber boolValue] by itself
+        // because it returns a primitive instead of an object.
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'mgl_numberWithFallbackValues:', zipCode)"];
+        NSArray *jsonExpression = @[@"to-number", @[@"get", @"postalCode"], @[@"get", @"zipCode"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'doubleValue', zipCode)"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'floatValue', zipCode)"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'decimalValue', zipCode)"].mgl_jsonExpressionObject, jsonExpression);
+        // NSExpression is unable to evaluate NSNumber’s -floatValue,
+        // -doubleValue, or -decimalValue by themselves because they each return
+        // a primitive instead of an object.
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(number, 'stringValue')"];
         NSArray *jsonExpression = @[@"to-string", @[@"get", @"number"]];

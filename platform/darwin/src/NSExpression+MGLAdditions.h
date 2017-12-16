@@ -22,6 +22,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @end
 
+@interface NSObject (MGLExpressionAdditions)
+
+- (NSNumber *)mgl_number;
+- (NSNumber *)mgl_numberWithFallbackValues:(id)fallbackValue, ... NS_REQUIRES_NIL_TERMINATION;
+
+@end
+
 @interface NSExpression (MGLExpressionAdditions)
 
 + (instancetype)mgl_expressionWithJSONObject:(id)object;

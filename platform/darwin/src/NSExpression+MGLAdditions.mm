@@ -161,6 +161,30 @@
 
 @end
 
+@implementation NSObject (MGLExpressionAdditions)
+
+- (NSNumber *)mgl_number {
+    return nil;
+}
+
+- (NSNumber *)mgl_numberWithFallbackValues:(id)fallbackValue, ... {
+    if (self.mgl_number) {
+        return self.mgl_number;
+    }
+    
+    va_list fallbackValues;
+    va_start(fallbackValues, fallbackValue);
+    for (id value = fallbackValue; value; value = va_arg(fallbackValues, id)) {
+        if ([value mgl_number]) {
+            return [value mgl_number];
+        }
+    }
+    
+    return nil;
+}
+
+@end
+
 @implementation NSNull (MGLExpressionAdditions)
 
 - (id)mgl_jsonExpressionObject {
@@ -173,6 +197,14 @@
 
 - (id)mgl_jsonExpressionObject {
     return self;
+}
+
+- (NSNumber *)mgl_number {
+    if (self.doubleValue || ![[NSDecimalNumber decimalNumberWithString:self] isEqual:[NSDecimalNumber notANumber]]) {
+        return @(self.doubleValue);
+    }
+    
+    return nil;
 }
 
 @end
@@ -191,6 +223,10 @@
     [NSException raise:NSInvalidArgumentException
                 format:@"Interpolation expressions lack underlying Objective-C implementations."];
     return nil;
+}
+
+- (NSNumber *)mgl_number {
+    return self;
 }
 
 - (id)mgl_jsonExpressionObject {
@@ -280,14 +316,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         return [NSExpression expressionForConstantValue:object];
     }
     
+    if ([object isKindOfClass:[NSDictionary class]]) {
+        NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:[object count]];
+        [object enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull obj, BOOL * _Nonnull stop) {
+            dictionary[key] = [NSExpression mgl_expressionWithJSONObject:obj];
+        }];
+        return [NSExpression expressionForConstantValue:dictionary];
+    }
+    
     if ([object isKindOfClass:[NSArray class]]) {
         NSArray *array = (NSArray *)object;
         NSString *op = array.firstObject;
         
         NSArray *argumentObjects = [array subarrayWithRange:NSMakeRange(1, array.count - 1)];
-        if ([op isEqualToString:@"literal"]) {
-            argumentObjects = argumentObjects.firstObject;
-        }
         
         NSString *functionName = MGLFunctionNamesByExpressionOperator[op];
         if (functionName) {
@@ -304,12 +345,30 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:functionName
                                              arguments:subexpressions];
         } else if ([op isEqualToString:@"literal"]) {
+            if ([argumentObjects.firstObject isKindOfClass:[NSArray class]]) {
+                return [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects.firstObject)];
+            }
+            return [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+        } else if ([op isEqualToString:@"to-boolean"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
+        } else if ([op isEqualToString:@"to-number"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            return [NSExpression expressionForAggregate:subexpressions];
+            return [NSExpression expressionForFunction:operand selectorName:@"mgl_numberWithFallbackValues:" arguments:subexpressions];
         } else if ([op isEqualToString:@"to-string"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionForFunction:operand selectorName:@"stringValue" arguments:@[]];
         } else if ([op isEqualToString:@"get"]) {
+            if (argumentObjects.count == 2) {
+                NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
+                if ([argumentObjects.firstObject isKindOfClass:[NSString class]]) {
+                    return [NSExpression expressionWithFormat:@"%@.%K", operand, argumentObjects.firstObject];
+                }
+                NSExpression *key = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+                return [NSExpression expressionWithFormat:@"%@.%@", operand, key];
+            }
             return [NSExpression expressionForKeyPath:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"length"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
@@ -459,8 +518,17 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return self.constantValue;
         }
             
-        case NSKeyPathExpressionType:
-            return [@[@"get"] arrayByAddingObjectsFromArray:self.keyPath.pathComponents];
+        case NSKeyPathExpressionType: {
+            NSArray *expressionObject;
+            for (NSString *pathComponent in self.keyPath.pathComponents.reverseObjectEnumerator) {
+                if (expressionObject) {
+                    expressionObject = @[@"get", pathComponent, expressionObject];
+                } else {
+                    expressionObject = @[@"get", pathComponent];
+                }
+            }
+            return expressionObject;
+        }
             
         case NSFunctionExpressionType: {
             NSString *function = self.function;
@@ -468,6 +536,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if (op) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[op] arrayByAddingObjectsFromArray:arguments];
+            } else if ([function isEqualToString:@"valueForKeyPath:"]) {
+                return @[@"get", self.arguments.firstObject.mgl_jsonExpressionObject, self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"average:"]) {
                 NSExpression *sum = [NSExpression expressionForFunction:@"sum:" arguments:self.arguments];
                 NSExpression *count = [NSExpression expressionForFunction:@"count:" arguments:self.arguments];
@@ -501,6 +571,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
+            } else if ([function isEqualToString:@"boolValue"]) {
+                return @[@"to-boolean", self.operand.mgl_jsonExpressionObject];
+            } else if ([function isEqualToString:@"mgl_numberWithFallbackValues:"] ||
+                       [function isEqualToString:@"decimalValue"] ||
+                       [function isEqualToString:@"floatValue"] ||
+                       [function isEqualToString:@"doubleValue"]) {
+                NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
+                return [@[@"to-number", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"stringValue"]) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
@@ -594,6 +672,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                         format:@"Expression type %lu not yet implemented.", self.expressionType];
     }
     
+    // NSKeyPathSpecifierExpression
+    if (self.expressionType == 10) {
+        return self.description;
+    }
     // An assignment expression type is present in the BNF grammar, but the
     // corresponding NSExpressionType value and property getters are missing.
     if (self.expressionType == 12) {
