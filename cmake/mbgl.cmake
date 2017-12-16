@@ -143,11 +143,14 @@ macro(initialize_xcode_cxx_build_settings target)
     # -Wshadow
     set_xcode_property(${target} GCC_WARN_SHADOW YES)
 
-    # -Wno-unknown-pragmas
-    set_xcode_property(${target} GCC_WARN_UNKNOWN_PRAGMAS YES)
-
     # -Wnon-virtual-dtor
     set_xcode_property(${target} GCC_WARN_NON_VIRTUAL_DESTRUCTOR YES)
+
+    # -Wnon-literal-conversion
+    set_xcode_property(${target} CLANG_WARN_NON_LITERAL_NULL_CONVERSION YES)
+
+    # -Wrange-loop-analysis
+    set_xcode_property(${target} CLANG_WARN_RANGE_LOOP_ANALYSIS YES)
 endmacro(initialize_xcode_cxx_build_settings)
 
 # CMake 3.1 does not have this yet.
