@@ -174,7 +174,7 @@ struct Convert {
     template <typename T>
     static std::map<double, std::unique_ptr<Expression>> convertStops(const std::map<float, T>& stops) {
         std::map<double, std::unique_ptr<Expression>> convertedStops;
-        for(const std::pair<float, T>& stop : stops) {
+        for(const auto& stop : stops) {
             convertedStops.emplace(
                 stop.first,
                 makeLiteral(stop.second)

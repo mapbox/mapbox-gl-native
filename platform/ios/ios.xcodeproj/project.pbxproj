@@ -687,7 +687,7 @@
 		4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView_Private.h; sourceTree = "<group>"; };
 		4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAnnotationView.mm; sourceTree = "<group>"; };
 		4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView.h; sourceTree = "<group>"; };
-		402E9DE01CD2C76200FD4519 /* Mapbox.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Mapbox.playground; sourceTree = "<group>"; };
+		402E9DE01CD2C76200FD4519 /* Mapbox.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Mapbox.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		4031ACFE1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLSDKTestHelpers.swift; path = ../../darwin/test/MGLSDKTestHelpers.swift; sourceTree = "<group>"; };
 		404326881D5B9B1A007111BD /* MGLAnnotationContainerView_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView_Private.h; sourceTree = "<group>"; };
 		4049C29B1DB6CD6C00B3F799 /* MGLPointCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPointCollection.h; sourceTree = "<group>"; };
@@ -2110,7 +2110,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = MBX;
-				LastUpgradeCheck = 0800;
+				LastUpgradeCheck = 0910;
 				ORGANIZATIONNAME = Mapbox;
 				TargetAttributes = {
 					DA1DC9491CB6C1C2006E619F = {
@@ -2721,7 +2721,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -2729,7 +2731,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -2774,7 +2780,9 @@
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
 				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
@@ -2782,7 +2790,11 @@
 				CLANG_WARN_ENUM_CONVERSION = YES;
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
@@ -2805,6 +2817,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SYMROOT = ../../build/ios;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
@@ -2913,6 +2926,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
@@ -2954,6 +2968,7 @@
 			baseConfigurationReference = 55D8C9941D0F133500F42F10 /* config.xcconfig */;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
 				CURRENT_PROJECT_VERSION = 1;
 				DEFINES_MODULE = YES;
 				DYLIB_COMPATIBILITY_VERSION = 1;
