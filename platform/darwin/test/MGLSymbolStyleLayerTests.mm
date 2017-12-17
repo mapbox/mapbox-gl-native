@@ -916,17 +916,19 @@
         XCTAssertEqualObjects(layer.text, constantExpression,
                               @"text should round-trip constant values.");
 
-#warning Test setting interpolation expression.
-//        MGLStyleValue<NSString *> * functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-//        layer.text = functionStyleValue;
-//
-//        mbgl::style::IntervalStops<std::string> intervalStops = { {{18, "Text Field"}} };
-//        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-//
-//        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
-//                       @"Setting text to a camera function should update text-field.");
-//        XCTAssertEqualObjects(layer.text, functionStyleValue,
-//                              @"text should round-trip camera functions.");
+        NSExpression *interpolationExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.text = interpolationExpression;
+        
+        mbgl::style::IntervalStops<std::string> intervalStops = {{
+            { -INFINITY, "Text Field" },
+            { 18, "Text Field" },
+        }};
+        propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
+        
+        XCTAssertEqual(rawLayer->getTextField(), propertyValue,
+                       @"Setting text to a camera function should update text-field.");
+        XCTAssertEqualObjects(layer.text, interpolationExpression,
+                              @"text should round-trip camera functions.");
 
                               
 

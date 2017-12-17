@@ -580,7 +580,6 @@ namespace mbgl {
 }
 
 - (NSExpression *)text {
-#warning Convert to NSExpression.
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getTextField();

@@ -4,6 +4,7 @@
 
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "NSValue+MGLAdditions.h"
+#import "NSExpression+MGLAdditions.h"
 #import "MGLTypes.h"
 
 #import "MGLConversion.h"
@@ -22,6 +23,16 @@
 #else
     #import "NSColor+MGLAdditions.h"
 #endif
+
+namespace mbgl {
+    namespace style {
+        namespace expression {
+            class Expression;
+        }
+    }
+}
+
+id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression);
 
 template <typename MBGLType, typename ObjCType, typename MBGLElement = MBGLType, typename ObjCEnum = ObjCType>
 class MGLStyleValueTransformer {
@@ -711,7 +722,6 @@ private: // Private utilities for converting from mbgl to mgl values
         }
     };
 
-
     // Converts all types of mbgl property values into an equivalent NSExpression.
     class PropertyExpressionEvaluator {
     public:
@@ -725,18 +735,15 @@ private: // Private utilities for converting from mbgl to mgl values
         }
 
         NSExpression *operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
-#warning Convert camera functions to NSExpression.
-            return nil;
+            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
 
         NSExpression *operator()(const mbgl::style::SourceFunction<MBGLType> &mbglValue) const {
-#warning Convert source functions to NSExpression.
-            return nil;
+            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
 
         NSExpression *operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
-#warning Convert composite functions to NSExpression.
-            return nil;
+            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
     };
 };
