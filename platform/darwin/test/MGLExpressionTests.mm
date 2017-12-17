@@ -153,6 +153,41 @@ using namespace std::string_literals;
 
 #pragma mark - JSON expression object tests
 
+- (void)testVariableExpressionObject {
+    {
+        NSExpression *expression = [NSExpression expressionForVariable:@"zoomLevel"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"zoom"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$zoomLevel"].mgl_jsonExpressionObject, @[@"zoom"]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"zoom"]], expression);
+        NSMutableDictionary *context = [@{@"zoomLevel": @16} mutableCopy];
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @16);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForVariable:@"heatmapDensity"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"heatmap-density"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$heatmapDensity"].mgl_jsonExpressionObject, @[@"heatmap-density"]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"heatmap-density"]], expression);
+        NSMutableDictionary *context = [@{@"heatmapDensity": @1} mutableCopy];
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForVariable:@"loremIpsum"];
+        NSArray *jsonExpression = @[@"var", @"loremIpsum"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$loremIpsum"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        NSMutableDictionary *context = [@{@"loremIpsum": @"Lorem ipsum dolor sit amet"} mutableCopy];
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @"Lorem ipsum dolor sit amet");
+    }
+    {
+        NSDictionary *context = @{@"loremIpsum": MGLConstantExpression(@"Lorem ipsum dolor sit amet")};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(uppercase($loremIpsum), 'mgl_expressionWithContext:', %@)", context];
+        NSArray *jsonExpression = @[@"let", @"loremIpsum", @"Lorem ipsum dolor sit amet", @[@"upcase", @[@"var", @"loremIpsum"]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+}
+
 - (void)testConstantValueExpressionObject {
     {
         NSExpression *expression = [NSExpression expressionForConstantValue:nil];
