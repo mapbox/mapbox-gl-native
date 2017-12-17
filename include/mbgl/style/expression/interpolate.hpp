@@ -70,11 +70,18 @@ public:
     {}
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
+    const Interpolator& getInterpolator() const { return interpolator; }
 
     void eachChild(const std::function<void(const Expression&)>& visit) const override {
         visit(*input);
         for (const auto& stop : stops) {
             visit(*stop.second);
+        }
+    }
+
+    void eachStop(const std::function<void(double, const Expression&)>& visit) const {
+        for (const auto& stop : stops) {
+            visit(stop.first, *stop.second);
         }
     }
     
