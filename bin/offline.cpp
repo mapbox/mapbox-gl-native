@@ -4,52 +4,62 @@
 
 #include <mbgl/storage/default_file_source.hpp>
 
+#include <args/args.hxx>
+
 #include <cstdlib>
 #include <iostream>
 #include <csignal>
 #include <atomic>
+#include <sstream>
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunknown-pragmas"
-#pragma GCC diagnostic ignored "-Wunused-local-typedefs"
-#pragma GCC diagnostic ignored "-Wshadow"
-#include <boost/program_options.hpp>
-#pragma GCC diagnostic pop
-
-namespace po = boost::program_options;
 using namespace std::literals::chrono_literals;
 
 int main(int argc, char *argv[]) {
-    std::string style = mbgl::util::default_styles::streets.url;
-    double north = 37.2, west = -122.8, south = 38.1, east = -121.7; // Bay area
-    double minZoom = 0.0, maxZoom = 15.0, pixelRatio = 1.0;
-    std::string output = "offline.db";
+    args::ArgumentParser argumentParser("Mapbox GL offline tool");
+    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
 
-    const char* tokenEnv = getenv("MAPBOX_ACCESS_TOKEN");
-    std::string token = tokenEnv ? tokenEnv : std::string();
+    args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token", {'t', "token"});
+    args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
+    args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output database file name", {'o', "output"});
 
-    po::options_description desc("Allowed options");
-    desc.add_options()
-        ("style,s", po::value(&style)->value_name("URL"), "Map stylesheet")
-        ("north", po::value(&north)->value_name("degrees")->default_value(north), "North latitude")
-        ("west", po::value(&west)->value_name("degrees")->default_value(west), "West longitude")
-        ("south", po::value(&south)->value_name("degrees")->default_value(south), "South latitude")
-        ("east", po::value(&east)->value_name("degrees")->default_value(east), "East longitude")
-        ("minZoom", po::value(&minZoom)->value_name("number")->default_value(minZoom), "Min zoom level")
-        ("maxZoom", po::value(&maxZoom)->value_name("number")->default_value(maxZoom), "Max zoom level")
-        ("pixelRatio", po::value(&pixelRatio)->value_name("number")->default_value(pixelRatio), "Pixel ratio")
-        ("token,t", po::value(&token)->value_name("key")->default_value(token), "Mapbox access token")
-        ("output,o", po::value(&output)->value_name("file")->default_value(output), "Output database file name")
-    ;
+    args::ValueFlag<double> northValue(argumentParser, "degrees", "North latitude", {"north"});
+    args::ValueFlag<double> westValue(argumentParser, "degrees", "West longitude", {"west"});
+    args::ValueFlag<double> southValue(argumentParser, "degrees", "South latitude", {"south"});
+    args::ValueFlag<double> eastValue(argumentParser, "degrees", "East longitude", {"east"});
+    args::ValueFlag<double> minZoomValue(argumentParser, "number", "Min zoom level", {"minZoom"});
+    args::ValueFlag<double> maxZoomValue(argumentParser, "number", "Max zoom level", {"maxZoom"});
+    args::ValueFlag<double> pixelRatioValue(argumentParser, "number", "Pixel ratio", {"pixelRatio"});
 
     try {
-        po::variables_map vm;
-        po::store(po::parse_command_line(argc, argv, desc), vm);
-        po::notify(vm);
-    } catch(std::exception& e) {
-        std::cout << "Error: " << e.what() << std::endl << desc;
+        argumentParser.ParseCLI(argc, argv);
+    } catch (args::Help) {
+        std::cout << argumentParser;
+        exit(0);
+    } catch (args::ParseError e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << argumentParser;
         exit(1);
+    } catch (args::ValidationError e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << argumentParser;
+        exit(2);
     }
+
+    std::string style = styleValue ? args::get(styleValue) : mbgl::util::default_styles::streets.url;
+
+    // Bay area
+    const double north = northValue ? args::get(northValue) : 37.2;
+    const double west = westValue ? args::get(westValue) : -122.8;
+    const double south = southValue ? args::get(southValue) : 38.1;
+    const double east = eastValue ? args::get(eastValue) : -121.7;
+
+    const double minZoom = minZoomValue ? args::get(minZoomValue) : 0.0;
+    const double maxZoom = maxZoomValue ? args::get(maxZoomValue) : 15.0;
+    const double pixelRatio = pixelRatioValue ? args::get(pixelRatioValue) : 1.0;
+    const std::string output = outputValue ? args::get(outputValue) : "offline.db";
+
+    const char* tokenEnv = getenv("MAPBOX_ACCESS_TOKEN");
+    const std::string token = tokenValue ? args::get(tokenValue) : (tokenEnv ? tokenEnv : std::string());
 
     using namespace mbgl;
 

@@ -1,10 +1,10 @@
 set(CMAKE_OSX_DEPLOYMENT_TARGET 10.10)
 
 mason_use(glfw VERSION 2017-07-13-67c9155)
-mason_use(boost_libprogram_options VERSION 1.62.0)
 mason_use(gtest VERSION 1.8.0)
 mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
+mason_use(args VERSION 6.2.0 HEADER_ONLY)
 
 include(cmake/loop-uv.cmake)
 include(cmake/loop-darwin.cmake)
