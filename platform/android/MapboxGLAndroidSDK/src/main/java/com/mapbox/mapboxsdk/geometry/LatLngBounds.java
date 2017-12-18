@@ -324,17 +324,17 @@ public class LatLngBounds implements Parcelable {
    * Returns a new LatLngBounds that stretches to include another LatLngBounds,
    * given by corner points.
    *
-   * @param lonNorth Northern Longitude
-   * @param latEast  Eastern Latitude
-   * @param lonSouth Southern Longitude
-   * @param latWest  Western Longitude
+   * @param latNorth Northern Latitude
+   * @param lonEast  Eastern Longitude
+   * @param latSouth Southern Latitude
+   * @param lonWest  Western Longitude
    * @return BoundingBox
    */
-  public LatLngBounds union(final double lonNorth, final double latEast, final double lonSouth, final double latWest) {
-    return new LatLngBounds((this.latitudeNorth < lonNorth) ? lonNorth : this.latitudeNorth,
-      (this.longitudeEast < latEast) ? latEast : this.longitudeEast,
-      (this.latitudeSouth > lonSouth) ? lonSouth : this.latitudeSouth,
-      (this.longitudeWest > latWest) ? latWest : this.longitudeWest);
+  public LatLngBounds union(final double latNorth, final double lonEast, final double latSouth, final double lonWest) {
+    return new LatLngBounds((this.latitudeNorth < latNorth) ? latNorth : this.latitudeNorth,
+      (this.longitudeEast < lonEast) ? lonEast : this.longitudeEast,
+      (this.latitudeSouth > latSouth) ? latSouth : this.latitudeSouth,
+      (this.longitudeWest > lonWest) ? lonWest : this.longitudeWest);
   }
 
   /**
@@ -345,13 +345,13 @@ public class LatLngBounds implements Parcelable {
    */
   @Nullable
   public LatLngBounds intersect(LatLngBounds box) {
-    double minLatWest = Math.max(getLonWest(), box.getLonWest());
-    double maxLatEast = Math.min(getLonEast(), box.getLonEast());
-    if (maxLatEast > minLatWest) {
-      double minLonSouth = Math.max(getLatSouth(), box.getLatSouth());
-      double maxLonNorth = Math.min(getLatNorth(), box.getLatNorth());
-      if (maxLonNorth > minLonSouth) {
-        return new LatLngBounds(maxLonNorth, maxLatEast, minLonSouth, minLatWest);
+    double minLonWest = Math.max(getLonWest(), box.getLonWest());
+    double maxLonEast = Math.min(getLonEast(), box.getLonEast());
+    if (maxLonEast > minLonWest) {
+      double minLatSouth = Math.max(getLatSouth(), box.getLatSouth());
+      double maxLatNorth = Math.min(getLatNorth(), box.getLatNorth());
+      if (maxLatNorth > minLatSouth) {
+        return new LatLngBounds(maxLatNorth, maxLonEast, minLatSouth, minLonWest);
       }
     }
     return null;
