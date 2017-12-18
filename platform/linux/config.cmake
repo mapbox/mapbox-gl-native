@@ -1,6 +1,5 @@
 mason_use(glfw VERSION 2017-07-13-67c9155)
 mason_use(mesa VERSION 13.0.4)
-mason_use(boost_libprogram_options VERSION 1.62.0${MASON_CXXABI_SUFFIX})
 mason_use(sqlite VERSION 3.14.2)
 mason_use(libuv VERSION 1.9.1)
 mason_use(nunicode VERSION 1.7.1)
@@ -10,6 +9,7 @@ mason_use(webp VERSION 0.5.1)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
+mason_use(args VERSION 6.2.0 HEADER_ONLY)
 
 include(cmake/loop-uv.cmake)
 
