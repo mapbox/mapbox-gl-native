@@ -22,6 +22,7 @@ custom_categories:
       - Using Style Functions at Runtime
       - Working with Mapbox Studio
       - Working with GeoJSON Data
+      - Predicates and Expressions
       - For Style Authors
       - Tile URL Templates
       - Info.plist Keys

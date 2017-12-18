@@ -18,6 +18,7 @@ custom_categories:
   - name: Guides
     children:
       - Working with GeoJSON Data
+      - Predicates and Expressions
       - For Style Authors
       - Using Style Functions at Runtime
       - Tile URL Templates
