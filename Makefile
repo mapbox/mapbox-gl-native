@@ -599,16 +599,16 @@ run-android-unit-test: platform/android/configuration.gradle
 run-android-unit-test-%: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
 
-# Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
-.PHONY: run-android-ui-test-aws
-run-android-ui-test-aws: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all devicefarmUpload
-
 # Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/configuration.gradle
 	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
+
+# Build test app instrumentation tests apk and test app apk for all abi's
+.PHONY: android-ui-test
+android-ui-test: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
 # Uploads the compiled Android SDK to Maven
 .PHONY: run-android-upload-archives
@@ -624,11 +624,6 @@ run-android-upload-archives-local: platform/android/configuration.gradle
 .PHONY: android-gfxinfo
 android-gfxinfo:
 	adb shell dumpsys gfxinfo com.mapbox.mapboxsdk.testapp reset
-
-# Runs Android UI tests on all connected devices using Spoon
-.PHONY: run-android-ui-test-spoon
-run-android-ui-test-spoon: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis="$(MBGL_ANDROID_ACTIVE_ARCHS)" spoon
 
 # Generates Activity sanity tests
 .PHONY: test-code-android

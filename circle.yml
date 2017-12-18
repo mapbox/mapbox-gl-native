@@ -248,6 +248,9 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - run:
+          name: Check code style
+          command: make android-check
+      - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
       - run:
@@ -259,17 +262,6 @@ jobs:
       - run:
           name: Generate Espresso sanity tests
           command: make test-code-android
-      - run:
-          name: Check Java code style
-          command: make android-checkstyle
-      - run:
-          name: Check Android modules for potential bugs (Lint SDK)
-          command: |
-            make android-lint-sdk
-      - run:
-          name: Check Android modules for potential bugs (Lint Test App)
-          command: |
-            make android-lint-test-app
       - run:
           name: Build Test APK
           command: |
