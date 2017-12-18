@@ -2,11 +2,42 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>MAP_A11Y_VALUE</key>
+	<key>MAP_A11Y_VALUE_ANNOTATIONS</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@level@
-%#@count@</string>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%d видими анотации</string>
+			<key>other</key>
+			<string>%d видими анотации</string>
+		</dict>
+	</dict>
+	<key>MAP_A11Y_VALUE_ROADS</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>one</key>
+			<string>%d път видимост</string>
+			<key>other</key>
+			<string>%d пътища видимост</string>
+		</dict>
+	</dict>
+	<key>MAP_A11Y_VALUE_ZOOM</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@level@</string>
 		<key>level</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -17,17 +48,6 @@
 			<string>Мащаб %dx</string>
 			<key>other</key>
 			<string>Мащаб %dx</string>
-		</dict>
-		<key>count</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>ld</string>
-			<key>one</key>
-			<string>%d видима анотация</string>
-			<key>other</key>
-			<string>%d видими анотации</string>
 		</dict>
 	</dict>
 </dict>
