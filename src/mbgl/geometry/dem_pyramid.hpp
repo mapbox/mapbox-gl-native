@@ -14,7 +14,7 @@ class DEMPyramid {
 public:
     class Level {
     public:
-        Level(int32_t dim, size_t border);
+        Level(int32_t dim, int32_t border);
 
         void set(const int32_t x, const int32_t y, const int32_t value) {
             reinterpret_cast<int32_t*>(image.data.get())[idx(x, y)] = value + 65536;
