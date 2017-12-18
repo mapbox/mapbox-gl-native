@@ -52,39 +52,44 @@
     {
         XCTAssertTrue(rawLayer->getHillshadeAccentColor().isUndefined(),
                       @"hillshade-accent-color should be unset initially.");
-        MGLStyleValue<MGLColor *> *defaultStyleValue = layer.hillshadeAccentColor;
+        NSExpression *defaultExpression = layer.hillshadeAccentColor;
 
-        MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
-        layer.hillshadeAccentColor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        layer.hillshadeAccentColor = constantExpression;
         mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getHillshadeAccentColor(), propertyValue,
-                       @"Setting hillshadeAccentColor to a constant value should update hillshade-accent-color.");
-        XCTAssertEqualObjects(layer.hillshadeAccentColor, constantStyleValue,
-                              @"hillshadeAccentColor should round-trip constant values.");
+                       @"Setting hillshadeAccentColor to a constant value expression should update hillshade-accent-color.");
+        XCTAssertEqualObjects(layer.hillshadeAccentColor, constantExpression,
+                              @"hillshadeAccentColor should round-trip constant value expressions.");
 
-        MGLStyleValue<MGLColor *> * functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeAccentColor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeAccentColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = { {{18, { 1, 0, 0, 1 }}} };
+        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
+            { -INFINITY, { 1, 0, 0, 1 } },
+            { 18, { 1, 0, 0, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeAccentColor(), propertyValue,
-                       @"Setting hillshadeAccentColor to a camera function should update hillshade-accent-color.");
-        XCTAssertEqualObjects(layer.hillshadeAccentColor, functionStyleValue,
-                              @"hillshadeAccentColor should round-trip camera functions.");
+                       @"Setting hillshadeAccentColor to a camera expression should update hillshade-accent-color.");
+        XCTAssertEqualObjects(layer.hillshadeAccentColor, functionExpression,
+                              @"hillshadeAccentColor should round-trip camera expressions.");
 
                               
 
         layer.hillshadeAccentColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeAccentColor().isUndefined(),
                       @"Unsetting hillshadeAccentColor should return hillshade-accent-color to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeAccentColor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeAccentColor, defaultExpression,
                               @"hillshadeAccentColor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeAccentColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeAccentColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeAccentColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeAccentColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.hillshadeAccentColorTransition = transitionTest;
         auto toptions = rawLayer->getHillshadeAccentColorTransition();
@@ -100,39 +105,44 @@
     {
         XCTAssertTrue(rawLayer->getHillshadeExaggeration().isUndefined(),
                       @"hillshade-exaggeration should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.hillshadeExaggeration;
+        NSExpression *defaultExpression = layer.hillshadeExaggeration;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.hillshadeExaggeration = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.hillshadeExaggeration = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getHillshadeExaggeration(), propertyValue,
-                       @"Setting hillshadeExaggeration to a constant value should update hillshade-exaggeration.");
-        XCTAssertEqualObjects(layer.hillshadeExaggeration, constantStyleValue,
-                              @"hillshadeExaggeration should round-trip constant values.");
+                       @"Setting hillshadeExaggeration to a constant value expression should update hillshade-exaggeration.");
+        XCTAssertEqualObjects(layer.hillshadeExaggeration, constantExpression,
+                              @"hillshadeExaggeration should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeExaggeration = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeExaggeration = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeExaggeration(), propertyValue,
-                       @"Setting hillshadeExaggeration to a camera function should update hillshade-exaggeration.");
-        XCTAssertEqualObjects(layer.hillshadeExaggeration, functionStyleValue,
-                              @"hillshadeExaggeration should round-trip camera functions.");
+                       @"Setting hillshadeExaggeration to a camera expression should update hillshade-exaggeration.");
+        XCTAssertEqualObjects(layer.hillshadeExaggeration, functionExpression,
+                              @"hillshadeExaggeration should round-trip camera expressions.");
 
                               
 
         layer.hillshadeExaggeration = nil;
         XCTAssertTrue(rawLayer->getHillshadeExaggeration().isUndefined(),
                       @"Unsetting hillshadeExaggeration should return hillshade-exaggeration to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeExaggeration, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeExaggeration, defaultExpression,
                               @"hillshadeExaggeration should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeExaggeration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeExaggeration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeExaggeration = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeExaggeration = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.hillshadeExaggerationTransition = transitionTest;
         auto toptions = rawLayer->getHillshadeExaggerationTransition();
@@ -148,39 +158,44 @@
     {
         XCTAssertTrue(rawLayer->getHillshadeHighlightColor().isUndefined(),
                       @"hillshade-highlight-color should be unset initially.");
-        MGLStyleValue<MGLColor *> *defaultStyleValue = layer.hillshadeHighlightColor;
+        NSExpression *defaultExpression = layer.hillshadeHighlightColor;
 
-        MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
-        layer.hillshadeHighlightColor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        layer.hillshadeHighlightColor = constantExpression;
         mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getHillshadeHighlightColor(), propertyValue,
-                       @"Setting hillshadeHighlightColor to a constant value should update hillshade-highlight-color.");
-        XCTAssertEqualObjects(layer.hillshadeHighlightColor, constantStyleValue,
-                              @"hillshadeHighlightColor should round-trip constant values.");
+                       @"Setting hillshadeHighlightColor to a constant value expression should update hillshade-highlight-color.");
+        XCTAssertEqualObjects(layer.hillshadeHighlightColor, constantExpression,
+                              @"hillshadeHighlightColor should round-trip constant value expressions.");
 
-        MGLStyleValue<MGLColor *> * functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeHighlightColor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeHighlightColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = { {{18, { 1, 0, 0, 1 }}} };
+        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
+            { -INFINITY, { 1, 0, 0, 1 } },
+            { 18, { 1, 0, 0, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeHighlightColor(), propertyValue,
-                       @"Setting hillshadeHighlightColor to a camera function should update hillshade-highlight-color.");
-        XCTAssertEqualObjects(layer.hillshadeHighlightColor, functionStyleValue,
-                              @"hillshadeHighlightColor should round-trip camera functions.");
+                       @"Setting hillshadeHighlightColor to a camera expression should update hillshade-highlight-color.");
+        XCTAssertEqualObjects(layer.hillshadeHighlightColor, functionExpression,
+                              @"hillshadeHighlightColor should round-trip camera expressions.");
 
                               
 
         layer.hillshadeHighlightColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeHighlightColor().isUndefined(),
                       @"Unsetting hillshadeHighlightColor should return hillshade-highlight-color to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeHighlightColor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeHighlightColor, defaultExpression,
                               @"hillshadeHighlightColor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeHighlightColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeHighlightColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeHighlightColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeHighlightColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.hillshadeHighlightColorTransition = transitionTest;
         auto toptions = rawLayer->getHillshadeHighlightColorTransition();
@@ -196,78 +211,88 @@
     {
         XCTAssertTrue(rawLayer->getHillshadeIlluminationAnchor().isUndefined(),
                       @"hillshade-illumination-anchor should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.hillshadeIlluminationAnchor;
+        NSExpression *defaultExpression = layer.hillshadeIlluminationAnchor;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLHillshadeIlluminationAnchor:MGLHillshadeIlluminationAnchorViewport]];
-        layer.hillshadeIlluminationAnchor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        layer.hillshadeIlluminationAnchor = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::HillshadeIlluminationAnchorType> propertyValue = { mbgl::style::HillshadeIlluminationAnchorType::Viewport };
         XCTAssertEqual(rawLayer->getHillshadeIlluminationAnchor(), propertyValue,
-                       @"Setting hillshadeIlluminationAnchor to a constant value should update hillshade-illumination-anchor.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, constantStyleValue,
-                              @"hillshadeIlluminationAnchor should round-trip constant values.");
+                       @"Setting hillshadeIlluminationAnchor to a constant value expression should update hillshade-illumination-anchor.");
+        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, constantExpression,
+                              @"hillshadeIlluminationAnchor should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeIlluminationAnchor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeIlluminationAnchor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::HillshadeIlluminationAnchorType> intervalStops = { {{18, mbgl::style::HillshadeIlluminationAnchorType::Viewport}} };
+        mbgl::style::IntervalStops<mbgl::style::HillshadeIlluminationAnchorType> intervalStops = {{
+            { -INFINITY, mbgl::style::HillshadeIlluminationAnchorType::Viewport },
+            { 18, mbgl::style::HillshadeIlluminationAnchorType::Viewport },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::HillshadeIlluminationAnchorType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeIlluminationAnchor(), propertyValue,
-                       @"Setting hillshadeIlluminationAnchor to a camera function should update hillshade-illumination-anchor.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, functionStyleValue,
-                              @"hillshadeIlluminationAnchor should round-trip camera functions.");
+                       @"Setting hillshadeIlluminationAnchor to a camera expression should update hillshade-illumination-anchor.");
+        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, functionExpression,
+                              @"hillshadeIlluminationAnchor should round-trip camera expressions.");
 
                               
 
         layer.hillshadeIlluminationAnchor = nil;
         XCTAssertTrue(rawLayer->getHillshadeIlluminationAnchor().isUndefined(),
                       @"Unsetting hillshadeIlluminationAnchor should return hillshade-illumination-anchor to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, defaultExpression,
                               @"hillshadeIlluminationAnchor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // hillshade-illumination-direction
     {
         XCTAssertTrue(rawLayer->getHillshadeIlluminationDirection().isUndefined(),
                       @"hillshade-illumination-direction should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.hillshadeIlluminationDirection;
+        NSExpression *defaultExpression = layer.hillshadeIlluminationDirection;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.hillshadeIlluminationDirection = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.hillshadeIlluminationDirection = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getHillshadeIlluminationDirection(), propertyValue,
-                       @"Setting hillshadeIlluminationDirection to a constant value should update hillshade-illumination-direction.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, constantStyleValue,
-                              @"hillshadeIlluminationDirection should round-trip constant values.");
+                       @"Setting hillshadeIlluminationDirection to a constant value expression should update hillshade-illumination-direction.");
+        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, constantExpression,
+                              @"hillshadeIlluminationDirection should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeIlluminationDirection = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeIlluminationDirection = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeIlluminationDirection(), propertyValue,
-                       @"Setting hillshadeIlluminationDirection to a camera function should update hillshade-illumination-direction.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, functionStyleValue,
-                              @"hillshadeIlluminationDirection should round-trip camera functions.");
+                       @"Setting hillshadeIlluminationDirection to a camera expression should update hillshade-illumination-direction.");
+        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, functionExpression,
+                              @"hillshadeIlluminationDirection should round-trip camera expressions.");
 
                               
 
         layer.hillshadeIlluminationDirection = nil;
         XCTAssertTrue(rawLayer->getHillshadeIlluminationDirection().isUndefined(),
                       @"Unsetting hillshadeIlluminationDirection should return hillshade-illumination-direction to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, defaultExpression,
                               @"hillshadeIlluminationDirection should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationDirection = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationDirection = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationDirection = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationDirection = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.hillshadeIlluminationDirectionTransition = transitionTest;
         auto toptions = rawLayer->getHillshadeIlluminationDirectionTransition();
@@ -283,39 +308,44 @@
     {
         XCTAssertTrue(rawLayer->getHillshadeShadowColor().isUndefined(),
                       @"hillshade-shadow-color should be unset initially.");
-        MGLStyleValue<MGLColor *> *defaultStyleValue = layer.hillshadeShadowColor;
+        NSExpression *defaultExpression = layer.hillshadeShadowColor;
 
-        MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
-        layer.hillshadeShadowColor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        layer.hillshadeShadowColor = constantExpression;
         mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getHillshadeShadowColor(), propertyValue,
-                       @"Setting hillshadeShadowColor to a constant value should update hillshade-shadow-color.");
-        XCTAssertEqualObjects(layer.hillshadeShadowColor, constantStyleValue,
-                              @"hillshadeShadowColor should round-trip constant values.");
+                       @"Setting hillshadeShadowColor to a constant value expression should update hillshade-shadow-color.");
+        XCTAssertEqualObjects(layer.hillshadeShadowColor, constantExpression,
+                              @"hillshadeShadowColor should round-trip constant value expressions.");
 
-        MGLStyleValue<MGLColor *> * functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.hillshadeShadowColor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.hillshadeShadowColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = { {{18, { 1, 0, 0, 1 }}} };
+        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
+            { -INFINITY, { 1, 0, 0, 1 } },
+            { 18, { 1, 0, 0, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
         
         XCTAssertEqual(rawLayer->getHillshadeShadowColor(), propertyValue,
-                       @"Setting hillshadeShadowColor to a camera function should update hillshade-shadow-color.");
-        XCTAssertEqualObjects(layer.hillshadeShadowColor, functionStyleValue,
-                              @"hillshadeShadowColor should round-trip camera functions.");
+                       @"Setting hillshadeShadowColor to a camera expression should update hillshade-shadow-color.");
+        XCTAssertEqualObjects(layer.hillshadeShadowColor, functionExpression,
+                              @"hillshadeShadowColor should round-trip camera expressions.");
 
                               
 
         layer.hillshadeShadowColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeShadowColor().isUndefined(),
                       @"Unsetting hillshadeShadowColor should return hillshade-shadow-color to the default value.");
-        XCTAssertEqualObjects(layer.hillshadeShadowColor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.hillshadeShadowColor, defaultExpression,
                               @"hillshadeShadowColor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeShadowColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.hillshadeShadowColor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeShadowColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.hillshadeShadowColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.hillshadeShadowColorTransition = transitionTest;
         auto toptions = rawLayer->getHillshadeShadowColorTransition();

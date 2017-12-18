@@ -39,21 +39,21 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setMaximumRasterBrightness:(MGLStyleValue<NSNumber *> *)maximumRasterBrightness {
+- (void)setMaximumRasterBrightness:(NSExpression *)maximumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(maximumRasterBrightness);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(maximumRasterBrightness);
     self.rawLayer->setRasterBrightnessMax(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)maximumRasterBrightness {
+- (NSExpression *)maximumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterBrightnessMax();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterBrightnessMax());
+        propertyValue = self.rawLayer->getDefaultRasterBrightnessMax();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setMaximumRasterBrightnessTransition:(MGLTransition )transition {
@@ -74,28 +74,28 @@
     return transition;
 }
 
-- (void)setRasterBrightnessMax:(MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+- (void)setRasterBrightnessMax:(NSExpression *)rasterBrightnessMax {
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterBrightnessMax {
+- (NSExpression *)rasterBrightnessMax {
     return self.maximumRasterBrightness;
 }
 
-- (void)setMinimumRasterBrightness:(MGLStyleValue<NSNumber *> *)minimumRasterBrightness {
+- (void)setMinimumRasterBrightness:(NSExpression *)minimumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(minimumRasterBrightness);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(minimumRasterBrightness);
     self.rawLayer->setRasterBrightnessMin(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)minimumRasterBrightness {
+- (NSExpression *)minimumRasterBrightness {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterBrightnessMin();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterBrightnessMin());
+        propertyValue = self.rawLayer->getDefaultRasterBrightnessMin();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setMinimumRasterBrightnessTransition:(MGLTransition )transition {
@@ -116,28 +116,28 @@
     return transition;
 }
 
-- (void)setRasterBrightnessMin:(MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+- (void)setRasterBrightnessMin:(NSExpression *)rasterBrightnessMin {
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterBrightnessMin {
+- (NSExpression *)rasterBrightnessMin {
     return self.minimumRasterBrightness;
 }
 
-- (void)setRasterContrast:(MGLStyleValue<NSNumber *> *)rasterContrast {
+- (void)setRasterContrast:(NSExpression *)rasterContrast {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(rasterContrast);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(rasterContrast);
     self.rawLayer->setRasterContrast(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterContrast {
+- (NSExpression *)rasterContrast {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterContrast();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterContrast());
+        propertyValue = self.rawLayer->getDefaultRasterContrast();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setRasterContrastTransition:(MGLTransition )transition {
@@ -158,38 +158,38 @@
     return transition;
 }
 
-- (void)setRasterFadeDuration:(MGLStyleValue<NSNumber *> *)rasterFadeDuration {
+- (void)setRasterFadeDuration:(NSExpression *)rasterFadeDuration {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(rasterFadeDuration);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(rasterFadeDuration);
     self.rawLayer->setRasterFadeDuration(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterFadeDuration {
+- (NSExpression *)rasterFadeDuration {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterFadeDuration();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterFadeDuration());
+        propertyValue = self.rawLayer->getDefaultRasterFadeDuration();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
-- (void)setRasterHueRotation:(MGLStyleValue<NSNumber *> *)rasterHueRotation {
+- (void)setRasterHueRotation:(NSExpression *)rasterHueRotation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(rasterHueRotation);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(rasterHueRotation);
     self.rawLayer->setRasterHueRotate(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterHueRotation {
+- (NSExpression *)rasterHueRotation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterHueRotate();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterHueRotate());
+        propertyValue = self.rawLayer->getDefaultRasterHueRotate();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setRasterHueRotationTransition:(MGLTransition )transition {
@@ -210,28 +210,28 @@
     return transition;
 }
 
-- (void)setRasterHueRotate:(MGLStyleValue<NSNumber *> *)rasterHueRotate {
+- (void)setRasterHueRotate:(NSExpression *)rasterHueRotate {
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterHueRotate {
+- (NSExpression *)rasterHueRotate {
     return self.rasterHueRotation;
 }
 
-- (void)setRasterOpacity:(MGLStyleValue<NSNumber *> *)rasterOpacity {
+- (void)setRasterOpacity:(NSExpression *)rasterOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(rasterOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(rasterOpacity);
     self.rawLayer->setRasterOpacity(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterOpacity {
+- (NSExpression *)rasterOpacity {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterOpacity());
+        propertyValue = self.rawLayer->getDefaultRasterOpacity();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setRasterOpacityTransition:(MGLTransition )transition {
@@ -252,21 +252,21 @@
     return transition;
 }
 
-- (void)setRasterSaturation:(MGLStyleValue<NSNumber *> *)rasterSaturation {
+- (void)setRasterSaturation:(NSExpression *)rasterSaturation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(rasterSaturation);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(rasterSaturation);
     self.rawLayer->setRasterSaturation(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)rasterSaturation {
+- (NSExpression *)rasterSaturation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getRasterSaturation();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultRasterSaturation());
+        propertyValue = self.rawLayer->getDefaultRasterSaturation();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setRasterSaturationTransition:(MGLTransition )transition {

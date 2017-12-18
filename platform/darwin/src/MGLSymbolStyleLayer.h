@@ -2,7 +2,6 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLStyleValue.h"
 #import "MGLVectorStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -335,12 +334,12 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  ```swift
  let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
  layer.sourceLayerIdentifier = "pois"
- layer.iconImageName = MGLStyleValue(rawValue: "coffee")
- layer.iconScale = MGLStyleValue(rawValue: 0.5)
- layer.text = MGLStyleValue(rawValue: "{name}")
- layer.textTranslation = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
- layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
- layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
+ layer.iconImageName = NSExpression(forConstantValue: "coffee")
+ layer.iconScale = NSExpression(forConstantValue: 0.5)
+ layer.text = NSExpression(forKeyPath: "name")
+ layer.textTranslation = NSExpression(forConstantValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+ layer.textJustification = NSExpression(forConstantValue: "left")
+ layer.textAnchor = NSExpression(forConstantValue: "left")
  layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
  mapView.style?.addLayer(layer)
  ```
@@ -369,9 +368,8 @@ MGL_EXPORT
  If true, the icon will be visible even if it collides with other previously
  drawn symbols.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -380,51 +378,62 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-allow-overlap"><code>icon-allow-overlap</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowsOverlap;
+@property (nonatomic, null_resettable) NSExpression *iconAllowsOverlap;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap __attribute__((unavailable("Use iconAllowsOverlap instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconAllowOverlap __attribute__((unavailable("Use iconAllowsOverlap instead.")));
 
 /**
  Part of the icon placed closest to the anchor.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconAnchorCenter`. Set this property to `nil`
- to reset it to the default value.
+ The default value of this property is an expression that evaluates to `center`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `MGLIconAnchor` values
+ * Any of the following constant string values:
+   * `center`: The center of the icon is placed closest to the anchor.
+   * `left`: The left side of the icon is placed closest to the anchor.
+   * `right`: The right side of the icon is placed closest to the anchor.
+   * `top`: The top of the icon is placed closest to the anchor.
+   * `bottom`: The bottom of the icon is placed closest to the anchor.
+   * `top-left`: The top left corner of the icon is placed closest to the
+ anchor.
+   * `top-right`: The top right corner of the icon is placed closest to the
+ anchor.
+   * `bottom-left`: The bottom left corner of the icon is placed closest to the
+ anchor.
+   * `bottom-right`: The bottom right corner of the icon is placed closest to
+ the anchor.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconAnchor;
+@property (nonatomic, null_resettable) NSExpression *iconAnchor;
 
 /**
  If true, other symbols can be visible even if they collide with the icon.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -433,16 +442,22 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-ignore-placement"><code>icon-ignore-placement</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnoresPlacement;
+@property (nonatomic, null_resettable) NSExpression *iconIgnoresPlacement;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
  Name of image in sprite to use for drawing an image background. Within literal
@@ -455,103 +470,87 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant string values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImageName;
+@property (nonatomic, null_resettable) NSExpression *iconImageName;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *iconImage __attribute__((unavailable("Use iconImageName instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconImage __attribute__((unavailable("Use iconImageName instead.")));
 
 #if TARGET_OS_IPHONE
 /**
  Offset distance of icon from its anchor.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 rightward and 0
  downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
+@property (nonatomic, null_resettable) NSExpression *iconOffset;
 #else
 /**
  Offset distance of icon from its anchor.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 rightward and 0
  upward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconOffset;
+@property (nonatomic, null_resettable) NSExpression *iconOffset;
 #endif
 
 /**
  If true, text will display without their corresponding icons when the icon
  collides with other symbols and the text does not.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `text` is non-`nil`. Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable, getter=isIconOptional) MGLStyleValue<NSNumber *> *iconOptional;
+@property (nonatomic, null_resettable, getter=isIconOptional) NSExpression *iconOptional;
 
 /**
  Size of the additional area around the icon bounding box used for detecting
@@ -559,48 +558,59 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `2`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
+@property (nonatomic, null_resettable) NSExpression *iconPadding;
 
 /**
  Orientation of icon when map is pitched.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconPitchAlignmentAuto`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLIconPitchAlignment` values
+ * Any of the following constant string values:
+   * `map`: The icon is aligned to the plane of the map.
+   * `viewport`: The icon is aligned to the plane of the viewport.
+   * `auto`: Automatically matches the value of `icon-rotation-alignment`.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconPitchAlignment;
+@property (nonatomic, null_resettable) NSExpression *iconPitchAlignment;
 
 /**
  Rotates the icon clockwise.
  
  This property is measured in degrees.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -609,45 +619,51 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-rotate"><code>icon-rotate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotation;
+@property (nonatomic, null_resettable) NSExpression *iconRotation;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconRotate __attribute__((unavailable("Use iconRotation instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconRotate __attribute__((unavailable("Use iconRotation instead.")));
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of
  icons.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconRotationAlignmentAuto`. Set this property
- to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLIconRotationAlignment` values
+ * Any of the following constant string values:
+   * `map`: When `symbol-placement` is set to `point`, aligns icons east-west.
+ When `symbol-placement` is set to `line`, aligns icon x-axes with the line.
+   * `viewport`: Produces icons whose x-axes are aligned with the x-axis of the
+ viewport, regardless of the value of `symbol-placement`.
+   * `auto`: When `symbol-placement` is set to `point`, this is equivalent to
+ `viewport`. When `symbol-placement` is set to `line`, this is equivalent to
+ `map`.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconRotationAlignment;
+@property (nonatomic, null_resettable) NSExpression *iconRotationAlignment;
 
 /**
  Scales the original size of the icon by the provided factor. The new point size
@@ -656,9 +672,8 @@ MGL_EXPORT
  
  This property is measured in factor of the original icon sizes.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -667,44 +682,49 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-size"><code>icon-size</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconScale;
+@property (nonatomic, null_resettable) NSExpression *iconScale;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconSize __attribute__((unavailable("Use iconScale instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconSize __attribute__((unavailable("Use iconScale instead.")));
 
 /**
  Scales the icon to fit around the associated text.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconTextFitNone`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to `none`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `text` is non-`nil`. Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLIconTextFit` values
+ * Any of the following constant string values:
+   * `none`: The icon is displayed at its intrinsic aspect ratio.
+   * `width`: The icon is scaled in the x-dimension to fit the width of the
+ text.
+   * `height`: The icon is scaled in the y-dimension to fit the height of the
+ text.
+   * `both`: The icon is scaled in both x- and y-dimensions.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFit;
+@property (nonatomic, null_resettable) NSExpression *iconTextFit;
 
 #if TARGET_OS_IPHONE
 /**
@@ -712,142 +732,160 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing `UIEdgeInsetsZero`. Set this property to `nil` to
  reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
- containing an `NSValue` object containing `MGLIconTextFitBoth`,
- `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ `text` is non-`nil`, and `iconTextFit` is set to an expression that evaluates
+ to `MGLIconTextFitBoth`, `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`.
+ Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `UIEdgeInsets` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
+@property (nonatomic, null_resettable) NSExpression *iconTextFitPadding;
 #else
 /**
  Size of the additional area added to dimensions determined by `iconTextFit`.
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing `NSEdgeInsetsZero`. Set this property to `nil` to
  reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `text` is non-`nil`, and `iconTextFit` is set to an `MGLStyleValue` object
- containing an `NSValue` object containing `MGLIconTextFitBoth`,
- `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`. Otherwise, it is ignored.
+ `text` is non-`nil`, and `iconTextFit` is set to an expression that evaluates
+ to `MGLIconTextFitBoth`, `MGLIconTextFitWidth`, or `MGLIconTextFitHeight`.
+ Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `NSEdgeInsets` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTextFitPadding;
+@property (nonatomic, null_resettable) NSExpression *iconTextFitPadding;
 #endif
 
 /**
  If true, the icon may be flipped to prevent it from being rendered upside-down.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
- `iconRotationAlignment` is set to an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconRotationAlignmentMap`, and
- `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue`
- object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ `iconRotationAlignment` is set to an expression that evaluates to `map`, and
+ `symbolPlacement` is set to an expression that evaluates to `line`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-keep-upright"><code>icon-keep-upright</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsIconUpright;
+@property (nonatomic, null_resettable) NSExpression *keepsIconUpright;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconKeepUpright __attribute__((unavailable("Use keepsIconUpright instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconKeepUpright __attribute__((unavailable("Use keepsIconUpright instead.")));
 
 /**
  If true, the text may be flipped vertically to prevent it from being rendered
  upside-down.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `YES`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `YES`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `textRotationAlignment` is set to an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextRotationAlignmentMap`, and
- `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue`
- object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ `textRotationAlignment` is set to an expression that evaluates to `map`, and
+ `symbolPlacement` is set to an expression that evaluates to `line`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-keep-upright"><code>text-keep-upright</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *keepsTextUpright;
+@property (nonatomic, null_resettable) NSExpression *keepsTextUpright;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textKeepUpright __attribute__((unavailable("Use keepsTextUpright instead.")));
+@property (nonatomic, null_resettable) NSExpression *textKeepUpright __attribute__((unavailable("Use keepsTextUpright instead.")));
 
 /**
  Maximum angle change between adjacent characters.
  
  This property is measured in degrees.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `45`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `45`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
- `symbolPlacement` is set to an `MGLStyleValue` object containing an `NSValue`
- object containing `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ `symbolPlacement` is set to an expression that evaluates to `line`. Otherwise,
+ it is ignored.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-angle"><code>text-max-angle</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextAngle;
+@property (nonatomic, null_resettable) NSExpression *maximumTextAngle;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxAngle __attribute__((unavailable("Use maximumTextAngle instead.")));
+@property (nonatomic, null_resettable) NSExpression *textMaxAngle __attribute__((unavailable("Use maximumTextAngle instead.")));
 
 /**
  The maximum line width for text wrapping.
  
  This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `10`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `10`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -856,26 +894,19 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-max-width"><code>text-max-width</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextWidth;
+@property (nonatomic, null_resettable) NSExpression *maximumTextWidth;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textMaxWidth __attribute__((unavailable("Use maximumTextWidth instead.")));
+@property (nonatomic, null_resettable) NSExpression *textMaxWidth __attribute__((unavailable("Use maximumTextWidth instead.")));
 
 /**
  If true, the symbols will not cross tile edges to avoid mutual collisions.
@@ -883,61 +914,77 @@ MGL_EXPORT
  prevent collisions, or if it is a point symbol layer placed after a line symbol
  layer.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-symbol-avoid-edges"><code>symbol-avoid-edges</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidsEdges;
+@property (nonatomic, null_resettable) NSExpression *symbolAvoidsEdges;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolAvoidEdges __attribute__((unavailable("Use symbolAvoidsEdges instead.")));
+@property (nonatomic, null_resettable) NSExpression *symbolAvoidEdges __attribute__((unavailable("Use symbolAvoidsEdges instead.")));
 
 /**
  Label placement relative to its geometry.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLSymbolPlacementPoint`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `point`.
+ Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLSymbolPlacement` values
+ * Any of the following constant string values:
+   * `point`: The label is placed at the point where the geometry is located.
+   * `line`: The label is placed along the line of the geometry. Can only be
+ used on `LineString` and `Polygon` geometries.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *symbolPlacement;
+@property (nonatomic, null_resettable) NSExpression *symbolPlacement;
 
 /**
  Distance between two symbol anchors.
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `250`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `250`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `symbolPlacement` is set to an
- `MGLStyleValue` object containing an `NSValue` object containing
- `MGLSymbolPlacementLine`. Otherwise, it is ignored.
+ expression that evaluates to `line`. Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
+@property (nonatomic, null_resettable) NSExpression *symbolSpacing;
 
 /**
  Value to use for a text label. Within literal values, attribute names enclosed
@@ -945,28 +992,21 @@ MGL_EXPORT
  attribute. Expressions do not support this syntax; for equivalent functionality
  in expressions, use `stringByAppendingString:` and key path expressions.
  
- The default value of this property is an `MGLStyleValue` object containing the
- empty string. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the empty
+ string. Set this property to `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-field"><code>text-field</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant string values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *text;
 
@@ -977,9 +1017,8 @@ MGL_EXPORT
  If true, the text will be visible even if it collides with other previously
  drawn symbols.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -988,44 +1027,56 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-allow-overlap"><code>text-allow-overlap</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowsOverlap;
+@property (nonatomic, null_resettable) NSExpression *textAllowsOverlap;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textAllowOverlap __attribute__((unavailable("Use textAllowsOverlap instead.")));
+@property (nonatomic, null_resettable) NSExpression *textAllowOverlap __attribute__((unavailable("Use textAllowsOverlap instead.")));
 
 /**
  Part of the text placed closest to the anchor.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextAnchorCenter`. Set this property to `nil`
- to reset it to the default value.
+ The default value of this property is an expression that evaluates to `center`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `MGLTextAnchor` values
+ * Any of the following constant string values:
+   * `center`: The center of the text is placed closest to the anchor.
+   * `left`: The left side of the text is placed closest to the anchor.
+   * `right`: The right side of the text is placed closest to the anchor.
+   * `top`: The top of the text is placed closest to the anchor.
+   * `bottom`: The bottom of the text is placed closest to the anchor.
+   * `top-left`: The top left corner of the text is placed closest to the
+ anchor.
+   * `top-right`: The top right corner of the text is placed closest to the
+ anchor.
+   * `bottom-left`: The bottom left corner of the text is placed closest to the
+ anchor.
+   * `bottom-right`: The bottom right corner of the text is placed closest to
+ the anchor.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
+@property (nonatomic, null_resettable) NSExpression *textAnchor;
 
 /**
  An array of font face names used to display the text.
@@ -1040,9 +1091,9 @@ MGL_EXPORT
  the text, if the first font lacks a glyph for the character, the next font is
  applied as a fallback, and so on.
  
- The default value of this property is an `MGLStyleValue` object containing the
- array `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the array
+ `Open Sans Regular`, `Arial Unicode MS Regular`. Set this property to `nil` to
+ reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1051,35 +1102,27 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-font"><code>text-font</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant array values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFontNames;
+@property (nonatomic, null_resettable) NSExpression *textFontNames;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSArray<NSString *> *> *textFont __attribute__((unavailable("Use textFontNames instead.")));
+@property (nonatomic, null_resettable) NSExpression *textFont __attribute__((unavailable("Use textFontNames instead.")));
 
 /**
  Font size.
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `16`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `16`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1088,33 +1131,25 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-size"><code>text-size</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textFontSize;
+@property (nonatomic, null_resettable) NSExpression *textFontSize;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textSize __attribute__((unavailable("Use textFontSize instead.")));
+@property (nonatomic, null_resettable) NSExpression *textSize __attribute__((unavailable("Use textFontSize instead.")));
 
 /**
  If true, other symbols can be visible even if they collide with the text.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1123,23 +1158,28 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-ignore-placement"><code>text-ignore-placement</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnoresPlacement;
+@property (nonatomic, null_resettable) NSExpression *textIgnoresPlacement;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textIgnorePlacement __attribute__((unavailable("Use textIgnoresPlacement instead.")));
+@property (nonatomic, null_resettable) NSExpression *textIgnorePlacement __attribute__((unavailable("Use textIgnoresPlacement instead.")));
 
 /**
  Text justification options.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextJustificationCenter`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `center`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1148,77 +1188,69 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-justify"><code>text-justify</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `MGLTextJustification` values
+ * Any of the following constant string values:
+   * `left`: The text is aligned to the left.
+   * `center`: The text is centered.
+   * `right`: The text is aligned to the right.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustification;
+@property (nonatomic, null_resettable) NSExpression *textJustification;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustify __attribute__((unavailable("Use textJustification instead.")));
+@property (nonatomic, null_resettable) NSExpression *textJustify __attribute__((unavailable("Use textJustification instead.")));
 
 /**
  Text tracking amount.
  
  This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLetterSpacing;
+@property (nonatomic, null_resettable) NSExpression *textLetterSpacing;
 
 /**
  Text leading value for multi-line text.
  
  This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1.2`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1.2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLineHeight;
+@property (nonatomic, null_resettable) NSExpression *textLineHeight;
 
 #if TARGET_OS_IPHONE
 /**
@@ -1226,80 +1258,71 @@ MGL_EXPORT
  
  This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems downward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
+@property (nonatomic, null_resettable) NSExpression *textOffset;
 #else
 /**
  Offset distance of text from its anchor.
  
  This property is measured in ems.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 ems rightward and 0
  ems upward. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textOffset;
+@property (nonatomic, null_resettable) NSExpression *textOffset;
 #endif
 
 /**
  If true, icons will display without their corresponding text when the text
  collides with other symbols and the icon does not.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing `NO`. Set this property to `nil` to reset it to
- the default value.
+ The default value of this property is an expression that evaluates to `NO`. Set
+ this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `iconImageName` is non-`nil`. Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant Boolean values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable, getter=isTextOptional) MGLStyleValue<NSNumber *> *textOptional;
+@property (nonatomic, null_resettable, getter=isTextOptional) NSExpression *textOptional;
 
 /**
  Size of the additional area around the text bounding box used for detecting
@@ -1307,48 +1330,59 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `2`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `2`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textPadding;
+@property (nonatomic, null_resettable) NSExpression *textPadding;
 
 /**
  Orientation of text when map is pitched.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextPitchAlignmentAuto`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLTextPitchAlignment` values
+ * Any of the following constant string values:
+   * `map`: The text is aligned to the plane of the map.
+   * `viewport`: The text is aligned to the plane of the viewport.
+   * `auto`: Automatically matches the value of `text-rotation-alignment`.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textPitchAlignment;
+@property (nonatomic, null_resettable) NSExpression *textPitchAlignment;
 
 /**
  Rotates the text clockwise.
  
  This property is measured in degrees.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1357,135 +1391,99 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-text-rotate"><code>text-rotate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotation;
+@property (nonatomic, null_resettable) NSExpression *textRotation;
 
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textRotate __attribute__((unavailable("Use textRotation instead.")));
+@property (nonatomic, null_resettable) NSExpression *textRotate __attribute__((unavailable("Use textRotation instead.")));
 
 /**
  In combination with `symbolPlacement`, determines the rotation behavior of the
  individual glyphs forming the text.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextRotationAlignmentAuto`. Set this property
- to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `auto`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLTextRotationAlignment` values
+ * Any of the following constant string values:
+   * `map`: When `symbol-placement` is set to `point`, aligns text east-west.
+ When `symbol-placement` is set to `line`, aligns text x-axes with the line.
+   * `viewport`: Produces glyphs whose x-axes are aligned with the x-axis of the
+ viewport, regardless of the value of `symbol-placement`.
+   * `auto`: When `symbol-placement` is set to `point`, this is equivalent to
+ `viewport`. When `symbol-placement` is set to `line`, this is equivalent to
+ `map`.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textRotationAlignment;
+@property (nonatomic, null_resettable) NSExpression *textRotationAlignment;
 
 /**
  Specifies how to capitalize text.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextTransformNone`. Set this property to `nil`
- to reset it to the default value.
+ The default value of this property is an expression that evaluates to `none`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `MGLTextTransform` values
+ * Any of the following constant string values:
+   * `none`: The text is not altered.
+   * `uppercase`: Forces all letters to be displayed in uppercase.
+   * `lowercase`: Forces all letters to be displayed in lowercase.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTransform;
+@property (nonatomic, null_resettable) NSExpression *textTransform;
 
 #pragma mark - Accessing the Paint Attributes
 
-#if TARGET_OS_IPHONE
 /**
  The tint color to apply to the icon. The `iconImageName` property must be set
  to a template image.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconColor;
-#else
-/**
- The tint color to apply to the icon. The `iconImageName` property must be set
- to a template image.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
- value.
- 
- This property is only applied to the style if `iconImageName` is non-`nil`.
- Otherwise, it is ignored.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *iconColor;
 
 /**
  The transition affecting any changes to this layer’s `iconColor` property.
@@ -1499,30 +1497,22 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloBlur;
+@property (nonatomic, null_resettable) NSExpression *iconHaloBlur;
 
 /**
  The transition affecting any changes to this layer’s `iconHaloBlur` property.
@@ -1531,65 +1521,27 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition iconHaloBlurTransition;
 
-#if TARGET_OS_IPHONE
 /**
  The color of the icon’s halo. The `iconImageName` property must be set to a
  template image.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.clearColor`. Set this property to `nil` to reset it to the default
  value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *iconHaloColor;
-#else
-/**
- The color of the icon’s halo. The `iconImageName` property must be set to a
- template image.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.clearColor`. Set this property to `nil` to reset it to the default
- value.
- 
- This property is only applied to the style if `iconImageName` is non-`nil`.
- Otherwise, it is ignored.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *iconHaloColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *iconHaloColor;
 
 /**
  The transition affecting any changes to this layer’s `iconHaloColor` property.
@@ -1603,30 +1555,22 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconHaloWidth;
+@property (nonatomic, null_resettable) NSExpression *iconHaloWidth;
 
 /**
  The transition affecting any changes to this layer’s `iconHaloWidth` property.
@@ -1638,30 +1582,22 @@ MGL_EXPORT
 /**
  The opacity at which the icon will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconOpacity;
+@property (nonatomic, null_resettable) NSExpression *iconOpacity;
 
 /**
  The transition affecting any changes to this layer’s `iconOpacity` property.
@@ -1676,7 +1612,7 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points downward. Set this property to `nil` to reset it to the default value.
  
@@ -1687,21 +1623,25 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
+@property (nonatomic, null_resettable) NSExpression *iconTranslation;
 #else
 /**
  Distance that the icon's anchor is moved from its original placement.
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points upward. Set this property to `nil` to reset it to the default value.
  
@@ -1712,14 +1652,18 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate"><code>icon-translate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslation;
+@property (nonatomic, null_resettable) NSExpression *iconTranslation;
 #endif
 
 /**
@@ -1729,14 +1673,13 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition iconTranslationTransition;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
 /**
  Controls the frame of reference for `iconTranslation`.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLIconTranslationAnchorMap`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `map`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`, and
  `iconTranslation` is non-`nil`. Otherwise, it is ignored.
@@ -1745,73 +1688,45 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-icon-translate-anchor"><code>icon-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLIconTranslationAnchor` values
+ * Any of the following constant string values:
+   * `map`: Icons are translated relative to the map.
+   * `viewport`: Icons are translated relative to the viewport.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslationAnchor;
+@property (nonatomic, null_resettable) NSExpression *iconTranslationAnchor;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
+@property (nonatomic, null_resettable) NSExpression *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
-#if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textColor;
-#else
-/**
- The color with which the text will be drawn.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
- value.
- 
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *textColor;
 
 /**
  The transition affecting any changes to this layer’s `textColor` property.
@@ -1825,30 +1740,22 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloBlur;
+@property (nonatomic, null_resettable) NSExpression *textHaloBlur;
 
 /**
  The transition affecting any changes to this layer’s `textHaloBlur` property.
@@ -1857,63 +1764,26 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition textHaloBlurTransition;
 
-#if TARGET_OS_IPHONE
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.clearColor`. Set this property to `nil` to reset it to the default
  value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *textHaloColor;
-#else
-/**
- The color of the text's halo, which helps it stand out from backgrounds.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.clearColor`. Set this property to `nil` to reset it to the default
- value.
- 
- This property is only applied to the style if `text` is non-`nil`. Otherwise,
- it is ignored.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *textHaloColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *textHaloColor;
 
 /**
  The transition affecting any changes to this layer’s `textHaloColor` property.
@@ -1928,30 +1798,22 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textHaloWidth;
+@property (nonatomic, null_resettable) NSExpression *textHaloWidth;
 
 /**
  The transition affecting any changes to this layer’s `textHaloWidth` property.
@@ -1963,30 +1825,22 @@ MGL_EXPORT
 /**
  The opacity at which the text will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- * `MGLSourceStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
-   * `MGLInterpolationModeIdentity`
- * `MGLCompositeStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
-   * `MGLInterpolationModeCategorical`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textOpacity;
+@property (nonatomic, null_resettable) NSExpression *textOpacity;
 
 /**
  The transition affecting any changes to this layer’s `textOpacity` property.
@@ -2001,7 +1855,7 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points downward. Set this property to `nil` to reset it to the default value.
  
@@ -2012,21 +1866,25 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
+@property (nonatomic, null_resettable) NSExpression *textTranslation;
 #else
 /**
  Distance that the text's anchor is moved from its original placement.
  
  This property is measured in points.
  
- The default value of this property is an `MGLStyleValue` object containing an
+ The default value of this property is an expression that evaluates to an
  `NSValue` object containing a `CGVector` struct set to 0 points rightward and 0
  points upward. Set this property to `nil` to reset it to the default value.
  
@@ -2037,14 +1895,18 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate"><code>text-translate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `CGVector` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslation;
+@property (nonatomic, null_resettable) NSExpression *textTranslation;
 #endif
 
 /**
@@ -2054,14 +1916,13 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition textTranslationTransition;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
+@property (nonatomic, null_resettable) NSExpression *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 
 /**
  Controls the frame of reference for `textTranslation`.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLTextTranslationAnchorMap`. Set this property to
- `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to `map`.
+ Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `textTranslation` is non-`nil`. Otherwise, it is ignored.
@@ -2070,15 +1931,24 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-text-translate-anchor"><code>text-translate-anchor</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLTextTranslationAnchor` values
+ * Any of the following constant string values:
+   * `map`: The text is translated relative to the map.
+   * `viewport`: The text is translated relative to the viewport.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslationAnchor;
+@property (nonatomic, null_resettable) NSExpression *textTranslationAnchor;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslateAnchor __attribute__((unavailable("Use textTranslationAnchor instead.")));
+@property (nonatomic, null_resettable) NSExpression *textTranslateAnchor __attribute__((unavailable("Use textTranslationAnchor instead.")));
 
 @end
 
