@@ -32,19 +32,18 @@
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        auto lightFromMGLlight = [mglLight mbglLight];
+        auto lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getDefault<%- camelize(property.name) -%>(), lightFromMGLlight.get<%- camelize(property.name) -%>());
+        XCTAssertEqual(light.getDefault<%- camelize(property.name) -%>(), lightFromMGLLight.get<%- camelize(property.name) -%>());
 <% if (property.transition) { -%>
-        auto <%- camelizeWithLeadingLowercase(property.name) -%>Transition = lightFromMGLlight.get<%- camelize(property.name) -%>Transition();
+        auto <%- camelizeWithLeadingLowercase(property.name) -%>Transition = lightFromMGLLight.get<%- camelize(property.name) -%>Transition();
         XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay && MGLTimeIntervalFromDuration(*<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay) == defaultTransition.delay);
         XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration && MGLTimeIntervalFromDuration(*<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration) == defaultTransition.duration);
 
 <% } -%>
 <% if (property.type == "enum" && property.default) { -%>
-        XCTAssert([mglLight.<%- camelizeWithLeadingLowercase(property.name) -%> isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.<%- camelizeWithLeadingLowercase(property.name) -%> isn’t a MGLConstantStyleValue.");
-        NSValue *<%- camelizeWithLeadingLowercase(property.name) -%>Value = ((MGLConstantStyleValue *)mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>).rawValue;
-        XCTAssertEqual(<%- camelizeWithLeadingLowercase(property.name) -%>Value.MGLLight<%- camelize(property.name) -%>Value, MGLLight<%- camelize(property.name) -%><%- camelize(property.default) -%>);
+        XCTAssertEqual(mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>.expressionType, NSConstantValueExpressionType, @"mglLight.<%- camelizeWithLeadingLowercase(property.name) -%> isn’t a constant value expression.");
+        XCTAssertEqualObjects(mglLight.<%- camelizeWithLeadingLowercase(property.name) -%>.constantValue, @"<%- property.default -%>");
 
 <% } -%>
 <% if (property.type == "array") { -%>
@@ -60,11 +59,11 @@
 
 <% } -%>
         mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        lightFromMGLlight = [mglLight mbglLight];
+        lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.get<%- camelize(property.name) -%>(), lightFromMGLlight.get<%- camelize(property.name) -%>());
+        XCTAssertEqual(light.get<%- camelize(property.name) -%>(), lightFromMGLLight.get<%- camelize(property.name) -%>());
 <% if (property.transition) { -%>
-        <%- camelizeWithLeadingLowercase(property.name) -%>Transition = lightFromMGLlight.get<%- camelize(property.name) -%>Transition();
+        <%- camelizeWithLeadingLowercase(property.name) -%>Transition = lightFromMGLLight.get<%- camelize(property.name) -%>Transition();
         XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay && MGLTimeIntervalFromDuration(*<%- camelizeWithLeadingLowercase(property.name) -%>Transition.delay) == transition.delay);
         XCTAssert(<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration && MGLTimeIntervalFromDuration(*<%- camelizeWithLeadingLowercase(property.name) -%>Transition.duration) == transition.duration);
 

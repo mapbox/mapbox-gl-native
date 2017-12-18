@@ -137,12 +137,15 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLCircleStyleLayer(identifier: "circles", source: population)
         layer.sourceLayerIdentifier = "population"
-        layer.circleColor = MGLStyleValue(rawValue: .green)
-        layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
-                                           cameraStops: [12: MGLStyleValue(rawValue: 2),
-                                                         22: MGLStyleValue(rawValue: 180)],
-                                           options: [.interpolationBase: 1.75])
-        layer.circleOpacity = MGLStyleValue(rawValue: 0.7)
+        #if os(macOS)
+            layer.circleColor = NSExpression(forConstantValue: NSColor.green)
+        #else
+            layer.circleColor = NSExpression(forConstantValue: UIColor.green)
+        #endif
+        layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.75, %@)",
+                                          [12: 2,
+                                           22: 180])
+        layer.circleOpacity = NSExpression(forConstantValue: 0.7)
         layer.predicate = NSPredicate(format: "%K == %@", "marital-status", "married")
         mapView.style?.addLayer(layer)
         //#-end-example-code
@@ -157,12 +160,15 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
         layer.sourceLayerIdentifier = "trails"
-        layer.lineWidth = MGLStyleValue(interpolationMode: .exponential,
-                                        cameraStops: [14: MGLStyleValue(rawValue: 2),
-                                                      18: MGLStyleValue(rawValue: 20)],
-                                        options: [.interpolationBase: 1.5])
-        layer.lineColor = MGLStyleValue(rawValue: .brown)
-        layer.lineCap = MGLStyleValue(rawValue: NSValue(mglLineCap: .round))
+        layer.lineWidth = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+                                       [14: 2,
+                                        18: 20])
+        #if os(macOS)
+            layer.lineColor = NSExpression(forConstantValue: NSColor.brown)
+        #else
+            layer.lineColor = NSExpression(forConstantValue: UIColor.brown)
+        #endif
+        layer.lineCap = NSExpression(forConstantValue: "round")
         layer.predicate = NSPredicate(format: "%K == %@", "trail-type", "mountain-biking")
         mapView.style?.addLayer(layer)
         //#-end-example-code
@@ -177,7 +183,11 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLFillStyleLayer(identifier: "parks", source: parks)
         layer.sourceLayerIdentifier = "parks"
-        layer.fillColor = MGLStyleValue(rawValue: .green)
+        #if os(macOS)
+            layer.fillColor = NSExpression(forConstantValue: NSColor.green)
+        #else
+            layer.fillColor = NSExpression(forConstantValue: UIColor.green)
+        #endif
         layer.predicate = NSPredicate(format: "type == %@", "national-park")
         mapView.style?.addLayer(layer)
         //#-end-example-code
@@ -192,8 +202,8 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLFillExtrusionStyleLayer(identifier: "buildings", source: buildings)
         layer.sourceLayerIdentifier = "building"
-        layer.fillExtrusionHeight = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "height", options: nil)
-        layer.fillExtrusionBase = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "min_height", options: nil)
+        layer.fillExtrusionHeight = NSExpression(forKeyPath: "height")
+        layer.fillExtrusionBase = NSExpression(forKeyPath: "min_height")
         layer.predicate = NSPredicate(format: "extrude == 'true'")
         mapView.style?.addLayer(layer)
         //#-end-example-code
@@ -208,17 +218,17 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLSymbolStyleLayer(identifier: "coffeeshops", source: pois)
         layer.sourceLayerIdentifier = "pois"
-        layer.iconImageName = MGLStyleValue(rawValue: "coffee")
-        layer.iconScale = MGLStyleValue(rawValue: 0.5)
+        layer.iconImageName = NSExpression(forConstantValue: "coffee")
+        layer.iconScale = NSExpression(forConstantValue: 0.5)
         layer.text = NSExpression(forKeyPath: "name")
         #if os(macOS)
             var vector = CGVector(dx: 10, dy: 0)
-            layer.textTranslation = MGLStyleValue(rawValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))
+            layer.textTranslation = NSExpression(forConstantValue: NSValue(bytes: &vector, objCType: "{CGVector=dd}"))
         #else
-            layer.textTranslation = MGLStyleValue(rawValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
+            layer.textTranslation = NSExpression(forConstantValue: NSValue(cgVector: CGVector(dx: 10, dy: 0)))
         #endif
-        layer.textJustification = MGLStyleValue(rawValue: NSValue(mglTextJustification: .left))
-        layer.textAnchor = MGLStyleValue(rawValue: NSValue(mglTextAnchor: .left))
+        layer.textJustification = NSExpression(forConstantValue: "left")
+        layer.textAnchor = NSExpression(forConstantValue: "left")
         layer.predicate = NSPredicate(format: "%K == %@", "venue-type", "coffee")
         mapView.style?.addLayer(layer)
         //#-end-example-code
@@ -239,7 +249,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         //#-example-code
         let layer = MGLRasterStyleLayer(identifier: "clouds", source: source)
-        layer.rasterOpacity = MGLStyleValue(rawValue: 0.5)
+        layer.rasterOpacity = NSExpression(forConstantValue: 0.5)
         mapView.style?.addLayer(layer)
         //#-end-example-code
 
