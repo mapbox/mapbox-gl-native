@@ -170,8 +170,8 @@
 
 - (NSAttributedString *)titleWithStyle:(MGLAttributionInfoStyle)style
 {
-    NSString *openStreetMap = NSLocalizedStringWithDefaultValue(@"OSM_FULL_NAME", nil, nil, @"OpenStreetMap", @"OpenStreetMap full name attribution");
-    NSString *OSM = NSLocalizedStringWithDefaultValue(@"OSM_SHORT_NAME", nil, nil, @"OSM", @"OpenStreetMap short name attribution");
+    NSString *openStreetMap = NSLocalizedStringWithDefaultValue(@"OSM_FULL_NAME", @"Foundation", nil, @"OpenStreetMap", @"OpenStreetMap full name attribution");
+    NSString *OSM = NSLocalizedStringWithDefaultValue(@"OSM_SHORT_NAME", @"Foundation", nil, @"OSM", @"OpenStreetMap short name attribution");
     
     NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithAttributedString:self.title];
     [title removeAttribute:NSUnderlineStyleAttributeName range:NSMakeRange(0, [title.string length])];

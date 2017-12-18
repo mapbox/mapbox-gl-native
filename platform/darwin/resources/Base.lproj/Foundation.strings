@@ -289,3 +289,9 @@
 /* West longitude format, short: {longitude} */
 "COORD_W_SHORT" = "%@W";
 
+/* OpenStreetMap full name attribution */
+"OSM_FULL_NAME" = "OpenStreetMap";
+
+/* OpenStreetMap short name attribution */
+"OSM_SHORT_NAME" = "OSM";
+
