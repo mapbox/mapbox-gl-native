@@ -562,7 +562,7 @@ public final class MapboxMap {
    *
    * @return the TrackingSettings asssociated with this map
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public TrackingSettings getTrackingSettings() {
@@ -578,7 +578,7 @@ public final class MapboxMap {
    *
    * @return the MyLocationViewSettings associated with this map
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public MyLocationViewSettings getMyLocationViewSettings() {
@@ -2097,7 +2097,7 @@ public final class MapboxMap {
    *
    * @return True if the my-location layer is enabled, false otherwise.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public boolean isMyLocationEnabled() {
@@ -2115,7 +2115,7 @@ public final class MapboxMap {
    *
    * @param enabled True to enable; false to disable.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public void setMyLocationEnabled(boolean enabled) {
@@ -2127,7 +2127,7 @@ public final class MapboxMap {
    *
    * @return The currently displayed user location.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Nullable
   @Deprecated
@@ -2142,7 +2142,7 @@ public final class MapboxMap {
    * @param listener The callback that's invoked when the user clicks on a marker.
    *                 To unset the callback, use null.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener
@@ -2155,7 +2155,7 @@ public final class MapboxMap {
    *
    * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public void setLocationSource(@Nullable LocationEngine locationSource) {
@@ -2168,7 +2168,7 @@ public final class MapboxMap {
    * @param listener The callback that's invoked when the location tracking mode changes.
    *                 To unset the callback, use null.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public void setOnMyLocationTrackingModeChangeListener(
@@ -2182,7 +2182,7 @@ public final class MapboxMap {
    * @param listener The callback that's invoked when the bearing tracking mode changes.
    *                 To unset the callback, use null.
    * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
    */
   @Deprecated
   public void setOnMyBearingTrackingModeChangeListener(@Nullable OnMyBearingTrackingModeChangeListener listener) {
