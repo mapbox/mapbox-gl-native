@@ -7,7 +7,7 @@ void DEMPyramid::buildLevels() {
     while (true) {
         auto& prev = levels.back();
         const int32_t dim = std::ceil(prev.dim / 2);
-        const size_t border = std::max<int32_t>(std::ceil(prev.border / 2), 1);
+        const int32_t border = std::max<int32_t>(std::ceil(prev.border / 2), 1);
 
         if (dim == 1) {
             break;
@@ -26,7 +26,7 @@ void DEMPyramid::buildLevels() {
 void DEMPyramid::loadFromImage(PremultipliedImage& image){
     assert(image.size.height == image.size.width);
     
-    const size_t border = std::max<int32_t>(std::ceil(image.size.height / 2), 1);
+    const int32_t border = std::max<int32_t>(std::ceil(image.size.height / 2), 1);
     
     Level first(image.size.height, border);
     
@@ -34,7 +34,7 @@ void DEMPyramid::loadFromImage(PremultipliedImage& image){
         for (int32_t x = 0; x < first.dim; x++) {
             const int32_t i = y * first.dim + x;
             const int32_t j = i * 4;
-            first.set(x, y, (image.data[j] * 256 * 256 + image.data[j+i] * 256 + image.data[j+2])/10 - 10000);
+            first.set(x, y, (image.data[j] * 256 * 256 + image.data[j+1] * 256 + image.data[j+2])/10 - 10000);
         }
     }
     
@@ -98,7 +98,7 @@ void DEMPyramid::backfillBorder(mbgl::DEMPyramid &borderTileData, int8_t dx, int
     }
 }
 
-DEMPyramid::Level::Level(int32_t dim_, size_t border_)
+DEMPyramid::Level::Level(int32_t dim_, int32_t border_)
     : dim(dim_),
       border(border_),
       stride(dim + 2 * border),
