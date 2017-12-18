@@ -10,10 +10,11 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
+#include <args/args.hxx>
+
 #include <csignal>
-#include <getopt.h>
 #include <fstream>
-#include <sstream>
+#include <iostream>
 #include <cstdlib>
 #include <cstdio>
 #include <array>
@@ -34,64 +35,47 @@ void quit_handler(int) {
 }
 
 int main(int argc, char *argv[]) {
+    args::ArgumentParser argumentParser("Mapbox GL GLFW example");
+    args::HelpFlag helpFlag(argumentParser, "help", "Display this help menu", {'h', "help"});
+
+    args::Flag fullscreenFlag(argumentParser, "fullscreen", "Toggle fullscreen", {'f', "fullscreen"});
+    args::Flag benchmarkFlag(argumentParser, "benchmark", "Toggle benchmark", {'b', "benchmark"});
+    args::Flag offlineFlag(argumentParser, "offline", "Toggle offline", {'o', "offline"});
+
+    args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
+    args::ValueFlag<double> lonValue(argumentParser, "degrees", "Longitude", {'x', "lon"});
+    args::ValueFlag<double> latValue(argumentParser, "degrees", "Latitude", {'y', "lat"});
+    args::ValueFlag<double> zoomValue(argumentParser, "number", "Zoom level", {'z', "zoom"});
+    args::ValueFlag<double> bearingValue(argumentParser, "degrees", "Bearing", {'b', "bearing"});
+    args::ValueFlag<double> pitchValue(argumentParser, "degrees", "Pitch", {'p', "pitch"});
+
+    try {
+        argumentParser.ParseCLI(argc, argv);
+    } catch (args::Help) {
+        std::cout << argumentParser;
+        exit(0);
+    } catch (args::ParseError e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << argumentParser;
+        exit(1);
+    } catch (args::ValidationError e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << argumentParser;
+        exit(2);
+    }
+
     // Load settings
     mbgl::Settings_JSON settings;
+    settings.online = !offlineFlag;
+    if (lonValue) settings.longitude = args::get(lonValue);
+    if (latValue) settings.latitude = args::get(latValue);
+    if (zoomValue) settings.zoom = args::get(zoomValue);
+    if (bearingValue) settings.bearing = args::get(bearingValue);
+    if (pitchValue) settings.pitch = args::get(pitchValue);
 
-    bool fullscreen = false;
-    bool benchmark = false;
-    std::string style;
-
-    const struct option long_options[] = {
-        {"fullscreen", no_argument, nullptr, 'f'},
-        {"benchmark", no_argument, nullptr, 'b'},
-        {"offline", no_argument, nullptr, 'o'},
-        {"style", required_argument, nullptr, 's'},
-        {"lon", required_argument, nullptr, 'x'},
-        {"lat", required_argument, nullptr, 'y'},
-        {"zoom", required_argument, nullptr, 'z'},
-        {"bearing", required_argument, nullptr, 'r'},
-        {"pitch", required_argument, nullptr, 'p'},
-        {nullptr, 0, nullptr, 0}
-    };
-
-    while (true) {
-        int option_index = 0;
-        int opt = getopt_long(argc, argv, "fbs:", long_options, &option_index);
-        if (opt == -1) break;
-        switch (opt)
-        {
-        case 'f':
-            fullscreen = true;
-            break;
-        case 'b':
-            benchmark = true;
-            break;
-        case 'o':
-            settings.online = false;
-            break;
-        case 's':
-            style = std::string(optarg);
-            break;
-        case 'x':
-            settings.longitude = atof(optarg);
-            break;
-        case 'y':
-            settings.latitude = atof(optarg);
-            break;
-        case 'z':
-            settings.zoom = atof(optarg);
-            break;
-        case 'r':
-            settings.bearing = atof(optarg);
-            break;
-        case 'p':
-            settings.pitch = atof(optarg);
-            break;
-        default:
-            break;
-        }
-
-    }
+    const bool fullscreen = fullscreenFlag ? args::get(fullscreenFlag) : false;
+    const bool benchmark = benchmarkFlag ? args::get(benchmarkFlag) : false;
+    std::string style = styleValue ? args::get(styleValue) : "";
 
     // sigint handling
     struct sigaction sigIntHandler;
