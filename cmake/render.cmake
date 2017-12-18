@@ -11,8 +11,8 @@ target_link_libraries(mbgl-render
 )
 
 target_add_mason_package(mbgl-render PRIVATE boost)
-target_add_mason_package(mbgl-render PRIVATE boost_libprogram_options)
 target_add_mason_package(mbgl-render PRIVATE geojson)
+target_add_mason_package(mbgl-render PRIVATE args)
 
 mbgl_platform_render()
 
