@@ -245,7 +245,7 @@ GeometryCollection VectorTileFeature::getGeometries() const {
             if (!line->empty()) {
                 line->push_back((*line)[0]);
             }
-
+            length = 0;
         } else {
             throw std::runtime_error("unknown command");
         }
