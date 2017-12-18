@@ -8,11 +8,8 @@
 #import "MGLStyleValue_Private.h"
 #import "MGLSymbolStyleLayer.h"
 
-#import "NSExpression+MGLAdditions.h"
-
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
-#include <mbgl/style/expression/parsing_context.hpp>
 
 namespace mbgl {
 
@@ -568,15 +565,10 @@ namespace mbgl {
 }
 
 - (void)setText:(NSExpression *)text {
-    NSArray *jsonExpression = text.mgl_jsonExpressionObject;
+    MGLAssertStyleLayerIsValid();
     
-    using namespace mbgl::style;
-    conversion::Error valueError;
-    auto value = conversion::convert<DataDrivenPropertyValue<std::string>>(
-        conversion::makeConvertible(jsonExpression), valueError);
-    NSAssert(value, @(valueError.message.c_str()));
-
-    self.rawLayer->setTextField(*value);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toDataDrivenPropertyValue(text);
+    self.rawLayer->setTextField(mbglValue);
 }
 
 - (NSExpression *)text {
