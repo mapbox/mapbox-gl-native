@@ -33,7 +33,7 @@ The following comparison operators are supported:
 
 The following compound operators are supported:
 
-`NSPredicateOperatorType` | Format string syntax
+`NSCompoundPredicateType` | Format string syntax
 --------------------------|---------------------
 `NSAndPredicateType`      | `predicate1 AND predicate2`<br />`predicate1 && predicate2`
 `NSOrPredicateType`       | `predicate1 OR predicate2`<br />`predicate1 || predicate2`
@@ -153,7 +153,7 @@ Initializer parameter | Format string syntax
 `modulus:by:`         | `modulus:by:(1, 2)`
 `sqrt:`               | `sqrt(2)`
 `log:`                | `log(10)`
-`ln:`                 | `log(e)`
+`ln:`                 | `ln(2)`
 `raise:toPower:`      | `2 ** 2`
 `exp:`                | `exp(0)`
 `ceiling:`            | `ceiling(0.99999)`

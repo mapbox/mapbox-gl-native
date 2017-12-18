@@ -315,6 +315,78 @@ translation downward. This is the reverse of how `CGVector` is interpreted on
 iOS.
 
 <% } -%>
+### Expression operators
+
+In style specification | Method, function, or predicate type | Format string syntax
+-----------------------|-------------------------------------|---------------------
+`array`                | |
+`boolean`              | |
+`literal`              | `+[NSExpression expressionForConstantValue:]` | `%@` representing `NSArray` or `NSDictionary`
+`number`               | |
+`string`               | |
+`to-boolean`           | `boolValue` |
+`to-color`             | |
+`to-number`            | `mgl_numberWithFallbackValues:` |
+`to-string`            | `stringValue` |
+`typeof`               | |
+`geometry-type`        | |
+`id`                   | |
+`properties`           | |
+`at`                   | |
+`get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
+`has`                  | |
+`length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
+`!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
+`!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`
+`<`                    | `NSLessThanPredicateOperatorType` | `key < value`
+`<=`                   | `NSLessThanOrEqualToPredicateOperatorType` | `key <= value`
+`==`                   | `NSEqualToPredicateOperatorType` | `key == value`
+`>`                    | `NSGreaterThanPredicateOperatorType` | `key > value`
+`>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
+`all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
+`any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
+`coalesce`             | |
+`match`                | |
+`interpolate`          | `mgl_interpolateWithCurveType:parameters:stops:` |
+`step`                 | `mgl_stepWithMinimum:stops:` |
+`let`                  | `mgl_expressionWithContext:` |
+`var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
+`concat`               | `stringByAppendingString:` |
+`downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
+`upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
+<% if (macOS) { -%>
+`rgb`                  | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
+`rgba`                 | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
+<% } else { %>
+`rgb`                  | `+[UIColor colorWithRed:green:blue:alpha:]` |
+`rgba`                 | `+[UIColor colorWithRed:green:blue:alpha:]` |
+<% } -%>
+`to-rgba`              | |
+`-`                    | `from:subtract:` | `2 - 1`
+`*`                    | `multiply:by:` | `1 * 2`
+`/`                    | `divide:by:` | `1 / 2`
+`%`                    | `modulus:by:` |
+`^`                    | `raise:toPower:` | `2 ** 2`
+`+`                    | `add:to:` | `1 + 2`
+`acos`                 | |
+`asin`                 | |
+`atan`                 | |
+`cos`                  | |
+`e`                    | | `%@` representing `NSNumber` containing `M_E`
+`ln`                   | `ln:` | `ln(2)`
+`ln2`                  | | `%@` representing `NSNumber` containing `M_LN2`
+`log10`                | `log:` | `log(1)`
+`log2`                 | |
+`max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
+`min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
+`pi`                   | | `%@` representing `NSNumber` containing `M_PI`
+`sin`                  | |
+`sqrt`                 | `sqrt:` | `sqrt(2)`
+`tan`                  | |
+`zoom`                 | | `$zoom`
+`heatmap-density`      | | `$heatmapDensity`
+
 ### Style functions
 
 A _style function_ allows you to vary the value of a layout or paint attribute

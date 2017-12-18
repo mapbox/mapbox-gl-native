@@ -257,12 +257,15 @@ In style JSON | In Objective-C | In Swift
 ## Setting attribute values
 
 Each property representing a layout or paint attribute is set to an
-`MGLStyleValue` object, which is either an `MGLConstantStyleValue` object (for
-constant values) or an `MGLStyleFunction` object (for style functions). The
-style value object is a container for the raw value or function parameters that
-you want the attribute to be set to.
+`NSExpression` object. `NSExpression` objects play the same role as
+[expressions in the Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions),
+but you create the former using a very different syntax. `NSExpression`’s format
+string syntax is reminiscent of a spreadsheet formula or an expression in a
+database query. See the
+“[Predicates and Expressions](Predicates and Expressions.md)” guide for an
+overview of the expression support in this SDK.
 
-### Constant style values
+### Constant values in expressions
 
 In contrast to the JSON type that the style specification defines for each
 layout or paint property, the style value object often contains a more specific
@@ -273,10 +276,10 @@ or set.
 In style JSON | In Objective-C        | In Swift
 --------------|-----------------------|---------
 Color         | `NSColor` | `NSColor`
-Enum          | `NSValue` (see `NSValue(MGLAdditions)`) | `NSValue` (see `NSValue(MGLAdditions)`)
+Enum          | `NSString`            | `String`
 String        | `NSString`            | `String`
-Boolean       | `NSNumber.boolValue`  | `Bool`
-Number        | `NSNumber.floatValue` | `Float`
+Boolean       | `NSNumber.boolValue`  | `NSNumber.boolValue`
+Number        | `NSNumber.floatValue` | `NSNumber.floatValue`
 Array (`-dasharray`) | `NSArray<NSNumber>` | `[Float]`
 Array (`-font`) | `NSArray<NSString>` | `[String]`
 Array (`-offset`, `-translate`) | `NSValue` containing `CGVector` | `NSValue` containing `CGVector`
@@ -293,6 +296,73 @@ lower-left corner of the screen. Therefore, a positive `CGVector.dy` means an
 offset or translation upward, while a negative `CGVector.dy` means an offset or
 translation downward. This is the reverse of how `CGVector` is interpreted on
 iOS.
+
+### Expression operators
+
+In style specification | Method, function, or predicate type | Format string syntax
+-----------------------|-------------------------------------|---------------------
+`array`                | |
+`boolean`              | |
+`literal`              | `+[NSExpression expressionForConstantValue:]` | `%@` representing `NSArray` or `NSDictionary`
+`number`               | |
+`string`               | |
+`to-boolean`           | `boolValue` |
+`to-color`             | |
+`to-number`            | `mgl_numberWithFallbackValues:` |
+`to-string`            | `stringValue` |
+`typeof`               | |
+`geometry-type`        | |
+`id`                   | |
+`properties`           | |
+`at`                   | |
+`get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
+`has`                  | |
+`length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
+`!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
+`!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`
+`<`                    | `NSLessThanPredicateOperatorType` | `key < value`
+`<=`                   | `NSLessThanOrEqualToPredicateOperatorType` | `key <= value`
+`==`                   | `NSEqualToPredicateOperatorType` | `key == value`
+`>`                    | `NSGreaterThanPredicateOperatorType` | `key > value`
+`>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
+`all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
+`any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
+`coalesce`             | |
+`match`                | |
+`interpolate`          | `mgl_interpolateWithCurveType:parameters:stops:` |
+`step`                 | `mgl_stepWithMinimum:stops:` |
+`let`                  | `mgl_expressionWithContext:` |
+`var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
+`concat`               | `stringByAppendingString:` |
+`downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
+`upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
+`rgb`                  | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
+`rgba`                 | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
+`to-rgba`              | |
+`-`                    | `from:subtract:` | `2 - 1`
+`*`                    | `multiply:by:` | `1 * 2`
+`/`                    | `divide:by:` | `1 / 2`
+`%`                    | `modulus:by:` |
+`^`                    | `raise:toPower:` | `2 ** 2`
+`+`                    | `add:to:` | `1 + 2`
+`acos`                 | |
+`asin`                 | |
+`atan`                 | |
+`cos`                  | |
+`e`                    | | `%@` representing `NSNumber` containing `M_E`
+`ln`                   | `ln:` | `ln(2)`
+`ln2`                  | | `%@` representing `NSNumber` containing `M_LN2`
+`log10`                | `log:` | `log(1)`
+`log2`                 | |
+`max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
+`min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
+`pi`                   | | `%@` representing `NSNumber` containing `M_PI`
+`sin`                  | |
+`sqrt`                 | `sqrt:` | `sqrt(2)`
+`tan`                  | |
+`zoom`                 | | `$zoom`
+`heatmap-density`      | | `$heatmapDensity`
 
 ### Style functions
 
@@ -350,5 +420,5 @@ In style JSON             | In the format string
 `["any", f0, …, fn]`      | `p0 OR … OR pn`
 `["none", f0, …, fn]`     | `NOT (p0 OR … OR pn)`
 
-See the `MGLVectorStyleLayer.predicate` documentation for a full description of
-the supported operators and operand types.
+See the “[Predicates and Expressions](Predicates and Expressions.md)” guide for
+a full description of the supported operators and operand types.
