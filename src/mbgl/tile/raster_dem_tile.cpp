@@ -22,8 +22,7 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
              ActorRef<RasterDEMTile>(*this, mailbox)) {
           
      const CanonicalTileID canonical = id_.canonical;
-     const u_int8_t dim = pow(2, canonical.z);
-     
+     const u_int32_t dim = pow(2, canonical.z);
      const u_int32_t px = (canonical.x - 1 + dim) % dim;
      const int16_t pxw = (canonical.x == 0) ? id_.wrap - 1 : id_.wrap;
      const u_int32_t nx = (canonical.x + 1 + dim) % dim;

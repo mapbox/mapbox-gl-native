@@ -102,7 +102,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             OffscreenTexture view(parameters.context, { 256, 256 });
             view.bind();
             
-            parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Linear, gl::TextureMipMap::Yes);
+            parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Linear, gl::TextureMipMap::No);
             const Properties<>::PossiblyEvaluated properties;
 
             mat4 mat;
@@ -131,26 +131,28 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             );
             bucket.texture = std::move(view.getTexture());
             bucket.prepared = true;
+        } else if (parameters.pass == RenderPass::Translucent) {
+            assert(bucket.texture);
+            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
+
+            if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
+                // Draw only the parts of the tile that aren't drawn by another tile in the layer.
+                draw(tile.matrix,
+                     *bucket.vertexBuffer,
+                     *bucket.indexBuffer,
+                     bucket.segments,
+                     tile.id);
+            } else {
+                // Draw the full tile.
+                draw(tile.matrix,
+                     parameters.staticData.rasterVertexBuffer,
+                     parameters.staticData.quadTriangleIndexBuffer,
+                     parameters.staticData.rasterSegments,
+                     tile.id);
+            }
         }
         
-        assert(bucket.texture);
-        parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
 
-        if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
-            // Draw only the parts of the tile that aren't drawn by another tile in the layer.
-            draw(tile.matrix,
-                 *bucket.vertexBuffer,
-                 *bucket.indexBuffer,
-                 bucket.segments,
-                 tile.id);
-        } else {
-            // Draw the full tile.
-            draw(tile.matrix,
-                 parameters.staticData.rasterVertexBuffer,
-                 parameters.staticData.quadTriangleIndexBuffer,
-                 parameters.staticData.rasterSegments,
-                 tile.id);
-        }
     }
 }
 
