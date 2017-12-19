@@ -450,7 +450,7 @@ jobs:
 # ------------------------------------------------------------------------------
   linux-clang-3.8-libcxx-debug:
     docker:
-      - image: mbgl/7d2403f42e:linux-clang-3.9
+      - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
     working_directory: /src
     environment:
       LIBSYSCONFCPUS: 4
@@ -464,11 +464,8 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - *build-linux
-      - *build-benchmark
-      - *build-test
       - *show-ccache-stats
       - *save-cache
-      - *run-unit-tests
 
 # ------------------------------------------------------------------------------
   linux-clang4-sanitize-address:
