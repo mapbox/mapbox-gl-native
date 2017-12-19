@@ -235,13 +235,13 @@ ios-test: $(IOS_PROJ_PATH)
 ios-integration-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'Integration Test Harness' test $(XCPRETTY)
 
+.PHONY: ios-sanitize
+ios-sanitize: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES -enableUndefinedBehaviorSanitizer YES test $(XCPRETTY)
+
 .PHONY: ios-sanitize-address
 ios-sanitize-address: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
-
-.PHONY: ios-sanitize-thread
-ios-sanitize-thread: $(IOS_PROJ_PATH)
-	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES test $(XCPRETTY)
 
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)

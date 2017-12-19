@@ -32,8 +32,8 @@ workflows:
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
       - ios-debug
+      - ios-sanitize
       #- ios-sanitize-address
-      - ios-sanitize-thread
       - ios-release:
           filters:
             tags:
@@ -732,6 +732,25 @@ jobs:
       - *save-cache
 
 # ------------------------------------------------------------------------------
+  ios-sanitize:
+    macos:
+      xcode: "9.2.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread and undefined behavior sanitizers
+          command: make ios-sanitize
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
   ios-sanitize-address:
     macos:
       xcode: "9.2.0"
@@ -747,25 +766,6 @@ jobs:
       - run:
           name: Build and run SDK unit tests with address sanitizer
           command: make ios-sanitize-address
-      - *show-ccache-stats
-      - *save-cache
-
-# ------------------------------------------------------------------------------
-  ios-sanitize-thread:
-    macos:
-      xcode: "9.2.0"
-    environment:
-      BUILDTYPE: Debug
-      HOMEBREW_NO_AUTO_UPDATE: 1
-    steps:
-      - checkout
-      - *install-macos-dependencies
-      - *generate-cache-key
-      - *restore-cache
-      - *reset-ccache-stats
-      - run:
-          name: Build and run SDK unit tests with thread sanitizer
-          command: make ios-sanitize-thread
       - *show-ccache-stats
       - *save-cache
 
