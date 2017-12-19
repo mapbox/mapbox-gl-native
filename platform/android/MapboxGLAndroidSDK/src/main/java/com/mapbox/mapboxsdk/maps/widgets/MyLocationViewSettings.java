@@ -1,4 +1,4 @@
-package com.mapbox.mapboxsdk.maps;
+package com.mapbox.mapboxsdk.maps.widgets;
 
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -9,7 +9,10 @@ import android.support.annotation.NonNull;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
+import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
+import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
+import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 /**
  * Settings to configure the visual appearance of the MyLocationView.
@@ -101,20 +104,20 @@ public class MyLocationViewSettings {
     setAccuracyThreshold(options.getMyLocationAccuracyThreshold());
   }
 
-  void onSaveInstanceState(Bundle outState) {
+  public void onSaveInstanceState(Bundle outState) {
     outState.putBoolean(MapboxConstants.STATE_LOCATION_VIEW_ENABLED, isEnabled());
     outState.putByteArray(
       MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_DRAWABLE,
-      MapboxMapOptions.getByteArrayFromDrawable(getForegroundDrawable())
+      BitmapUtils.getByteArrayFromDrawable(getForegroundDrawable())
     );
     outState.putByteArray(
       MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_BEARING_DRAWABLE,
-      MapboxMapOptions.getByteArrayFromDrawable(getForegroundBearingDrawable())
+      BitmapUtils.getByteArrayFromDrawable(getForegroundBearingDrawable())
     );
     outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_TINT_COLOR, getForegroundTintColor());
     outState.putByteArray(
       MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_DRAWABLE,
-      MapboxMapOptions.getByteArrayFromDrawable(getBackgroundDrawable())
+      BitmapUtils.getByteArrayFromDrawable(getBackgroundDrawable())
     );
     outState.putIntArray(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_OFFSET, getBackgroundOffset());
     outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_TINT_COLOR, getBackgroundTintColor());
@@ -124,21 +127,21 @@ public class MyLocationViewSettings {
     outState.putIntArray(MapboxConstants.STATE_LOCATION_VIEW_PADDING, getPadding());
   }
 
-  void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+  public void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
     setEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_LOCATION_VIEW_ENABLED));
     setForegroundDrawable(
-      MapboxMapOptions.getDrawableFromBytArray(
+      BitmapUtils.getDrawableFromByteArray(
         myLocationView.getContext(),
         savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_DRAWABLE)
       ),
-      MapboxMapOptions.getDrawableFromBytArray(
+      BitmapUtils.getDrawableFromByteArray(
         myLocationView.getContext(),
         savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_BEARING_DRAWABLE)
       )
     );
     setForegroundTintColor(savedInstanceState.getInt(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_TINT_COLOR));
     setBackgroundDrawable(
-      MapboxMapOptions.getDrawableFromBytArray(
+      BitmapUtils.getDrawableFromByteArray(
         myLocationView.getContext(),
         savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_DRAWABLE)
       ),

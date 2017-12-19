@@ -3,8 +3,6 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Parcel;
@@ -21,9 +19,9 @@ import android.view.Gravity;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
 /**
@@ -161,37 +159,6 @@ public class MapboxMapOptions implements Parcelable {
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
-  }
-
-  static Bitmap getBitmapFromDrawable(Drawable drawable) {
-    if (drawable instanceof BitmapDrawable) {
-      return ((BitmapDrawable) drawable).getBitmap();
-    } else {
-      Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
-        Bitmap.Config.ARGB_8888);
-      Canvas canvas = new Canvas(bitmap);
-      drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-      drawable.draw(canvas);
-      return bitmap;
-    }
-  }
-
-  static byte[] getByteArrayFromDrawable(Drawable drawable) {
-    if (drawable == null) {
-      return null;
-    }
-    Bitmap bitmap = getBitmapFromDrawable(drawable);
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-    return stream.toByteArray();
-  }
-
-  static Drawable getDrawableFromBytArray(Context context, byte[] array) {
-    if (array == null) {
-      return null;
-    }
-    Bitmap compass = BitmapFactory.decodeByteArray(array, 0, array.length);
-    return new BitmapDrawable(context.getResources(), compass);
   }
 
   /**
@@ -1150,7 +1117,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeIntArray(compassMargins);
     dest.writeByte((byte) (fadeCompassFacingNorth ? 1 : 0));
     dest.writeParcelable(compassImage != null
-      ? getBitmapFromDrawable(compassImage) : null, flags);
+      ? BitmapUtils.getBitmapFromDrawable(compassImage) : null, flags);
 
     dest.writeByte((byte) (logoEnabled ? 1 : 0));
     dest.writeInt(logoGravity);
@@ -1174,11 +1141,11 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeByte((byte) (myLocationEnabled ? 1 : 0));
 
     dest.writeParcelable(myLocationForegroundDrawable != null
-      ? getBitmapFromDrawable(myLocationForegroundDrawable) : null, flags);
+      ? BitmapUtils.getBitmapFromDrawable(myLocationForegroundDrawable) : null, flags);
     dest.writeParcelable(myLocationForegroundBearingDrawable != null
-      ? getBitmapFromDrawable(myLocationForegroundBearingDrawable) : null, flags);
+      ? BitmapUtils.getBitmapFromDrawable(myLocationForegroundBearingDrawable) : null, flags);
     dest.writeParcelable(myLocationBackgroundDrawable != null
-      ? getBitmapFromDrawable(myLocationBackgroundDrawable) : null, flags);
+      ? BitmapUtils.getBitmapFromDrawable(myLocationBackgroundDrawable) : null, flags);
     dest.writeInt(myLocationForegroundTintColor);
     dest.writeInt(myLocationBackgroundTintColor);
     dest.writeIntArray(myLocationBackgroundPadding);
