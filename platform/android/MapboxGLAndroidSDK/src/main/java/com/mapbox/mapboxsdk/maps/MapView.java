@@ -273,7 +273,7 @@ public class MapView extends FrameLayout {
   /**
    * <p>
    * You must call this method from the parent's Activity#onCreate(Bundle)} or
-   * Fragment#onCreate(Bundle).
+   * Fragment#onViewCreated(View, Bundle).
    * </p>
    * You must set a valid access token with {@link com.mapbox.mapboxsdk.Mapbox#getInstance(Context, String)}
    * before you call this method or an exception will be thrown.
@@ -410,7 +410,7 @@ public class MapView extends FrameLayout {
   }
 
   /**
-   * You must call this method from the parent's Activity#onDestroy() or Fragment#onDestroy().
+   * You must call this method from the parent's Activity#onDestroy() or Fragment#onDestroyView().
    */
   @UiThread
   public void onDestroy() {
