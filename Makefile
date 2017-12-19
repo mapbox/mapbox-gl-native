@@ -243,6 +243,10 @@ ios-sanitize: $(IOS_PROJ_PATH)
 ios-sanitize-address: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
 
+.PHONY: ios-static-analyzer
+ios-static-analyzer: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) analyze -scheme 'CI' test $(XCPRETTY)
+
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
 	FORMAT=$(FORMAT) BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \

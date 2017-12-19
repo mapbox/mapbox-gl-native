@@ -34,6 +34,7 @@ workflows:
       - ios-debug
       - ios-sanitize
       #- ios-sanitize-address
+      - ios-static-analyzer
       - ios-release:
           filters:
             tags:
@@ -766,6 +767,25 @@ jobs:
       - run:
           name: Build and run SDK unit tests with address sanitizer
           command: make ios-sanitize-address
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-static-analyzer:
+    macos:
+      xcode: "9.2.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
       - *show-ccache-stats
       - *save-cache
 
