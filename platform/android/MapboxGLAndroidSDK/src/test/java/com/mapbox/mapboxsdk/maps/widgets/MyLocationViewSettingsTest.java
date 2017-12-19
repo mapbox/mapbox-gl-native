@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 
 import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
+import com.mapbox.mapboxsdk.maps.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.maps.Projection;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 

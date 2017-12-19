@@ -33,7 +33,6 @@ import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer
 import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;

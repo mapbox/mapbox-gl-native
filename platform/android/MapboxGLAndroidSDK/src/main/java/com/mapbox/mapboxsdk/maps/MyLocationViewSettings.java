@@ -1,18 +1,19 @@
-package com.mapbox.mapboxsdk.maps.widgets;
+package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.drawable.Drawable;
+import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.maps.FocalPointChangeListener;
-import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
-import com.mapbox.mapboxsdk.maps.Projection;
+import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 /**
  * Settings to configure the visual appearance of the MyLocationView.
+ *
  * @deprecated use location layer plugin from
  * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
  */
@@ -98,6 +99,56 @@ public class MyLocationViewSettings {
     setAccuracyAlpha(options.getMyLocationAccuracyAlpha());
     setAccuracyTintColor(options.getMyLocationAccuracyTintColor());
     setAccuracyThreshold(options.getMyLocationAccuracyThreshold());
+  }
+
+  void onSaveInstanceState(Bundle outState) {
+    outState.putBoolean(MapboxConstants.STATE_LOCATION_VIEW_ENABLED, isEnabled());
+    outState.putByteArray(
+      MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_DRAWABLE,
+      MapboxMapOptions.getByteArrayFromDrawable(getForegroundDrawable())
+    );
+    outState.putByteArray(
+      MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_BEARING_DRAWABLE,
+      MapboxMapOptions.getByteArrayFromDrawable(getForegroundBearingDrawable())
+    );
+    outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_TINT_COLOR, getForegroundTintColor());
+    outState.putByteArray(
+      MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_DRAWABLE,
+      MapboxMapOptions.getByteArrayFromDrawable(getBackgroundDrawable())
+    );
+    outState.putIntArray(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_OFFSET, getBackgroundOffset());
+    outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_TINT_COLOR, getBackgroundTintColor());
+    outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_ALPHA, getAccuracyAlpha());
+    outState.putInt(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_TINT_COLOR, getAccuracyTintColor());
+    outState.putFloat(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_THRESHOLD, getAccuracyThreshold());
+    outState.putIntArray(MapboxConstants.STATE_LOCATION_VIEW_PADDING, getPadding());
+  }
+
+  void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+    setEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_LOCATION_VIEW_ENABLED));
+    setForegroundDrawable(
+      MapboxMapOptions.getDrawableFromBytArray(
+        myLocationView.getContext(),
+        savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_DRAWABLE)
+      ),
+      MapboxMapOptions.getDrawableFromBytArray(
+        myLocationView.getContext(),
+        savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_BEARING_DRAWABLE)
+      )
+    );
+    setForegroundTintColor(savedInstanceState.getInt(MapboxConstants.STATE_LOCATION_VIEW_FOREGROUND_TINT_COLOR));
+    setBackgroundDrawable(
+      MapboxMapOptions.getDrawableFromBytArray(
+        myLocationView.getContext(),
+        savedInstanceState.getByteArray(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_DRAWABLE)
+      ),
+      savedInstanceState.getIntArray(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_OFFSET)
+    );
+    setBackgroundTintColor(savedInstanceState.getInt(MapboxConstants.STATE_LOCATION_VIEW_BACKGROUND_TINT_COLOR));
+    setAccuracyAlpha(savedInstanceState.getInt(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_ALPHA));
+    setAccuracyTintColor(savedInstanceState.getInt(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_TINT_COLOR));
+    setAccuracyThreshold(savedInstanceState.getFloat(MapboxConstants.STATE_LOCATION_VIEW_ACCURACY_THRESHOLD));
+    setPadding(savedInstanceState.getIntArray(MapboxConstants.STATE_LOCATION_VIEW_PADDING));
   }
 
   /**
@@ -246,6 +297,10 @@ public class MyLocationViewSettings {
    */
   public void setPadding(int left, int top, int right, int bottom) {
     padding = new int[] {left, top, right, bottom};
+    setPadding(padding);
+  }
+
+  private void setPadding(int[] padding) {
     myLocationView.setContentPadding(padding);
     projection.invalidateContentPadding(padding);
     invalidateFocalPointForTracking(myLocationView);

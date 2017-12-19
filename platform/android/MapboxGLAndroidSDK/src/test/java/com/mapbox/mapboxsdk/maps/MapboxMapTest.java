@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import org.junit.After;
 import org.junit.Before;

@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -22,6 +23,7 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
 /**
@@ -172,6 +174,24 @@ public class MapboxMapOptions implements Parcelable {
       drawable.draw(canvas);
       return bitmap;
     }
+  }
+
+  static byte[] getByteArrayFromDrawable(Drawable drawable) {
+    if (drawable == null) {
+      return null;
+    }
+    Bitmap bitmap = getBitmapFromDrawable(drawable);
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+    return stream.toByteArray();
+  }
+
+  static Drawable getDrawableFromBytArray(Context context, byte[] array) {
+    if (array == null) {
+      return null;
+    }
+    Bitmap compass = BitmapFactory.decodeByteArray(array, 0, array.length);
+    return new BitmapDrawable(context.getResources(), compass);
   }
 
   /**

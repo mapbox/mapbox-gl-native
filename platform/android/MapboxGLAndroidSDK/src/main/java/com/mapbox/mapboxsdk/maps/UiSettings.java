@@ -3,11 +3,8 @@ package com.mapbox.mapboxsdk.maps;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.PointF;
-import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
@@ -25,8 +22,6 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
-
-import java.io.ByteArrayOutputStream;
 
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
@@ -170,13 +165,7 @@ public final class UiSettings {
     outState.putInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT, getCompassMarginRight());
     outState.putBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH, isCompassFadeWhenFacingNorth());
     outState.putByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP,
-      convert(MapboxMapOptions.getBitmapFromDrawable(getCompassImage())));
-  }
-
-  private byte[] convert(Bitmap resource) {
-    ByteArrayOutputStream stream = new ByteArrayOutputStream();
-    resource.compress(Bitmap.CompressFormat.PNG, 100, stream);
-    return stream.toByteArray();
+      MapboxMapOptions.getByteArrayFromDrawable(getCompassImage()));
   }
 
   private void restoreCompass(Bundle savedInstanceState) {
@@ -187,12 +176,8 @@ public final class UiSettings {
       savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_RIGHT),
       savedInstanceState.getInt(MapboxConstants.STATE_COMPASS_MARGIN_BOTTOM));
     setCompassFadeFacingNorth(savedInstanceState.getBoolean(MapboxConstants.STATE_COMPASS_FADE_WHEN_FACING_NORTH));
-    setCompassImage(decode(savedInstanceState.getByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP)));
-  }
-
-  private Drawable decode(byte[] bitmap) {
-    Bitmap compass = BitmapFactory.decodeByteArray(bitmap, 0, bitmap.length);
-    return new BitmapDrawable(compassView.getResources(), compass);
+    setCompassImage(MapboxMapOptions.getDrawableFromBytArray(
+      compassView.getContext(), savedInstanceState.getByteArray(MapboxConstants.STATE_COMPASS_IMAGE_BITMAP)));
   }
 
   private void initialiseLogo(MapboxMapOptions options, Resources resources) {

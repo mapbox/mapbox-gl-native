@@ -37,7 +37,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
@@ -136,6 +135,7 @@ public final class MapboxMap {
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
     trackingSettings.onSaveInstanceState(outState);
     uiSettings.onSaveInstanceState(outState);
+    myLocationViewSettings.onSaveInstanceState(outState);
   }
 
   /**
@@ -146,6 +146,7 @@ public final class MapboxMap {
   void onRestoreInstanceState(Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
 
+    myLocationViewSettings.onRestoreInstanceState(savedInstanceState);
     uiSettings.onRestoreInstanceState(savedInstanceState);
     trackingSettings.onRestoreInstanceState(savedInstanceState);
 

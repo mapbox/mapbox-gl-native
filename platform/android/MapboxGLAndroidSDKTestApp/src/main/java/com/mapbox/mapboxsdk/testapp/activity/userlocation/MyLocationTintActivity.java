@@ -16,7 +16,7 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
+import com.mapbox.mapboxsdk.maps.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
