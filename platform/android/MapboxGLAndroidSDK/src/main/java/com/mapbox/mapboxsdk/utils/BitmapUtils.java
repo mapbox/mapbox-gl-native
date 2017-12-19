@@ -1,9 +1,15 @@
 package com.mapbox.mapboxsdk.utils;
 
+import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
 import android.view.View;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Utility class for creating bitmaps
@@ -44,6 +50,53 @@ public class BitmapUtils {
     canvas.drawBitmap(background, 0f, 0f, null);
     canvas.drawBitmap(foreground, 10, 10, null);
     return result;
+  }
+
+  /**
+   * Extract an underlying bitmap from a drawable
+   * @param drawable The source drawable
+   * @return The underlying bitmap
+   */
+  public static Bitmap getBitmapFromDrawable(Drawable drawable) {
+    if (drawable instanceof BitmapDrawable) {
+      return ((BitmapDrawable) drawable).getBitmap();
+    } else {
+      Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+        Bitmap.Config.ARGB_8888);
+      Canvas canvas = new Canvas(bitmap);
+      drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+      drawable.draw(canvas);
+      return bitmap;
+    }
+  }
+
+  /**
+   * Create a byte array out of drawable
+   * @param drawable The source drawable
+   * @return The byte array of source drawable
+   */
+  public static byte[] getByteArrayFromDrawable(Drawable drawable) {
+    if (drawable == null) {
+      return null;
+    }
+    Bitmap bitmap = getBitmapFromDrawable(drawable);
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+    return stream.toByteArray();
+  }
+
+  /**
+   * Decode byte array to drawable object
+   * @param context Context to obtain {@link android.content.res.Resources}
+   * @param array The source byte array
+   * @return The drawable created from source byte array
+   */
+  public static Drawable getDrawableFromByteArray(Context context, byte[] array) {
+    if (array == null) {
+      return null;
+    }
+    Bitmap compass = BitmapFactory.decodeByteArray(array, 0, array.length);
+    return new BitmapDrawable(context.getResources(), compass);
   }
 
 }
