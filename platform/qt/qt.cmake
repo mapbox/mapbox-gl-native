@@ -124,9 +124,26 @@ elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
         )
     endif()
 elseif (CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    add_definitions("-DQT_COMPILING_QIMAGE_COMPAT_CPP")
+    add_definitions("-DRAPIDJSON_HAS_CXX11_RVALUE_REFS")
+    add_definitions("-D_USE_MATH_DEFINES")
+    add_definitions("-D_WINDOWS")
+
+    add_definitions("-Wno-deprecated-declarations")
+    add_definitions("-Wno-macro-redefined")
+    add_definitions("-Wno-microsoft-exception-spec")
+    add_definitions("-Wno-unknown-argument")
+    add_definitions("-Wno-unknown-warning-option")
+    add_definitions("-Wno-unused-command-line-argument")
+    add_definitions("-Wno-unused-local-typedef")
+    add_definitions("-Wno-unused-private-field")
+
     list(APPEND MBGL_QT_CORE_FILES
         PRIVATE platform/qt/src/thread.cpp
     )
+
+    target_add_mason_package(qmapboxgl PRIVATE optional)
+    target_add_mason_package(qmapboxgl PRIVATE tao_tuple)
 endif()
 
 add_custom_command(
