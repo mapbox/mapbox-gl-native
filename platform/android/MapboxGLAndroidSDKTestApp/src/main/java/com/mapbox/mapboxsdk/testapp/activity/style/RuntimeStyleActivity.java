@@ -13,9 +13,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
-import com.mapbox.mapboxsdk.style.functions.Function;
-import com.mapbox.mapboxsdk.style.functions.stops.ExponentialStops;
-import com.mapbox.mapboxsdk.style.functions.stops.Stop;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Layer;
@@ -42,9 +39,11 @@ import java.util.List;
 
 import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.functions.Function.zoom;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stop.stop;
-import static com.mapbox.mapboxsdk.style.functions.stops.Stops.exponential;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.layers.Filter.all;
 import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
 import static com.mapbox.mapboxsdk.style.layers.Filter.gte;
@@ -453,32 +452,21 @@ public class RuntimeStyleActivity extends AppCompatActivity {
     }
 
     // Set a zoom function to update the color of the water
-    layer.setProperties(fillColor(
-      zoom(
-        exponential(
-          stop(1, fillColor(Color.GREEN)),
-          stop(4, fillColor(Color.BLUE)),
-          stop(12, fillColor(Color.RED)),
-          stop(20, fillColor(Color.BLACK))
-        ).withBase(0.8f)
+    layer.setProperties(
+      fillColor(
+        interpolate(
+          exponential(0.8f),
+          zoom(),
+          stop(1, color(Color.GREEN)),
+          stop(4, color(Color.BLUE)),
+          stop(12, color(Color.RED)),
+          stop(20, color(Color.BLACK))
+        )
       )
-    ));
+    );
 
     // do some animations to show it off properly
     mapboxMap.animateCamera(CameraUpdateFactory.zoomTo(1), 1500);
-
-    PropertyValue<String> fillColor = layer.getFillColor();
-    Function<Float, String> function = (Function<Float, String>) fillColor.getFunction();
-    if (function != null) {
-      ExponentialStops<Float, String> stops = (ExponentialStops) function.getStops();
-      Timber.d("Fill color base: %s", stops.getBase());
-      Timber.d("Fill color #stops: %s", stops.size());
-      if (function.getStops() != null) {
-        for (Stop<Float, String> stop : stops) {
-          Timber.d("Fill color #stops: %s", stop);
-        }
-      }
-    }
   }
 
   private void addCustomTileSource() {
