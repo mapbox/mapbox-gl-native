@@ -14,6 +14,16 @@
     return coordinate;
 }
 
++ (instancetype)valueWithMGLMapPoint:(MGLMapPoint)point {
+    return [self valueWithBytes:&point objCType:@encode(MGLMapPoint)];
+}
+
+-(MGLMapPoint) MGLMapPointValue {
+    MGLMapPoint point;
+    [self getValue:&point];
+    return point;
+}
+
 + (instancetype)valueWithMGLCoordinateSpan:(MGLCoordinateSpan)span {
     return [self valueWithBytes:&span objCType:@encode(MGLCoordinateSpan)];
 }

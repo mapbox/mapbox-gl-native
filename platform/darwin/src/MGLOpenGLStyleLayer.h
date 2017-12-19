@@ -1,5 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
@@ -17,6 +18,7 @@ typedef struct MGLStyleLayerDrawingContext {
     CLLocationDirection direction;
     CGFloat pitch;
     CGFloat fieldOfView;
+    CATransform3D projectionMatrix;
 } MGLStyleLayerDrawingContext;
 
 MGL_EXPORT
