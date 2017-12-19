@@ -197,15 +197,14 @@ IOS_WORK_PATH = platform/ios/ios.xcworkspace
 IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 IOS_XCODEBUILD_SIM = xcodebuild \
-	  ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
-	  -derivedDataPath $(IOS_OUTPUT_PATH) \
-	  -configuration $(BUILDTYPE) -sdk iphonesimulator \
-	  -destination 'platform=iOS Simulator,name=iPhone 8,OS=latest' \
-	  -destination 'platform=iOS Simulator,name=iPad Pro (10.5-inch),OS=latest' \
-	  -destination 'platform=iOS Simulator,name=iPhone 7,OS=10.3.1' \
-	  -destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' \
-	  -destination 'platform=iOS Simulator,name=iPhone 6,OS=8.4' \
-	  -workspace $(IOS_WORK_PATH)
+	ARCHS=x86_64 ONLY_ACTIVE_ARCH=YES \
+	-derivedDataPath $(IOS_OUTPUT_PATH) \
+	-configuration $(BUILDTYPE) -sdk iphonesimulator \
+	-destination 'platform=iOS Simulator,name=iPhone 8,OS=latest' \
+	-destination 'platform=iOS Simulator,name=iPad Pro (10.5-inch),OS=latest' \
+	-destination 'platform=iOS Simulator,name=iPhone 7,OS=10.3.1' \
+	-destination 'platform=iOS Simulator,name=iPad Air 2,OS=10.3.1' \
+	-workspace $(IOS_WORK_PATH)
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
 	mkdir -p $(IOS_OUTPUT_PATH)
