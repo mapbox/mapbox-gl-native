@@ -135,4 +135,15 @@ public class MapboxConstants {
   public static final String STATE_ATTRIBUTION_ENABLED = "mapbox_atrrEnabled";
   public static final String STATE_LOCATION_CHANGE_ANIMATION_ENABLED = "mapbox_locationChangeAnimationEnabled";
   public static final String STATE_USING_CUSTOM_LOCATION_SOURCE = "mapbox_usingCustomLocationSource";
+  public static final String STATE_LOCATION_VIEW_ENABLED = "mapbox_locViewEnabled";
+  public static final String STATE_LOCATION_VIEW_FOREGROUND_DRAWABLE = "mapbox_locViewForegroundDrawable";
+  public static final String STATE_LOCATION_VIEW_FOREGROUND_BEARING_DRAWABLE = "mapbox_locViewBearingDrawable";
+  public static final String STATE_LOCATION_VIEW_FOREGROUND_TINT_COLOR = "mapbox_locViewForegroundTintColor";
+  public static final String STATE_LOCATION_VIEW_BACKGROUND_DRAWABLE = "mapbox_locViewBackgroundDrawable";
+  public static final String STATE_LOCATION_VIEW_BACKGROUND_OFFSET = "mapbox_locViewBackgroundOffset";
+  public static final String STATE_LOCATION_VIEW_BACKGROUND_TINT_COLOR = "mapbox_locViewBackgroundTintColor";
+  public static final String STATE_LOCATION_VIEW_ACCURACY_ALPHA = "mapbox_locViewAccuracyAlpha";
+  public static final String STATE_LOCATION_VIEW_ACCURACY_TINT_COLOR = "mapbox_locViewAccuracyTintColor";
+  public static final String STATE_LOCATION_VIEW_ACCURACY_THRESHOLD = "mapbox_locViewAccuracyThreshold";
+  public static final String STATE_LOCATION_VIEW_PADDING = "mapbox_locViewPadding";
 }
