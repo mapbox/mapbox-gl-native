@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -19,12 +19,13 @@ import android.view.ViewConfiguration;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.android.telemetry.MapboxEvent;
-import com.mapbox.services.android.telemetry.MapboxTelemetry;
-import com.mapbox.services.android.telemetry.utils.MathUtils;
-import com.mapbox.services.android.telemetry.utils.TelemetryUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
+import com.mapbox.services.android.telemetry.Event;
+import com.mapbox.services.android.telemetry.MapEventFactory;
+import com.mapbox.services.android.telemetry.MapState;
 
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -133,7 +134,8 @@ final class MapGestureDetector {
    */
   private Location getLocationFromGesture(float x, float y) {
     LatLng latLng = projection.fromScreenLocation(new PointF(x, y));
-    return TelemetryUtils.buildLocation(latLng.getLongitude(), latLng.getLatitude());
+//    return TelemetryUtils.buildLocation(latLng.getLongitude(), latLng.getLatitude());
+    return null;
   }
 
   /**
@@ -181,9 +183,16 @@ final class MapGestureDetector {
           && uiSettings.isZoomGesturesEnabled();
         if (twoTap) {
           // Confirmed 2nd Finger Down
-          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-            getLocationFromGesture(event.getX(), event.getY()),
-            MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, transform));
+          MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+          LatLng latLng = projection.fromScreenLocation(new PointF(event.getX(), event.getY()));
+          // TODO transform.getZoom() may cause a NullPointerException
+          MapState twoFingerTap = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float)
+            transform.getZoom());
+          twoFingerTap.setGesture("TwoFingerTap");
+          Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, twoFingerTap));
+//          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//            getLocationFromGesture(event.getX(), event.getY()),
+//            MapboxEvent.GESTURE_TWO_FINGER_SINGLETAP, transform));
         }
         break;
 
@@ -212,8 +221,14 @@ final class MapGestureDetector {
 
         // Scroll / Pan Has Stopped
         if (scrollGestureOccurred) {
-          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapDragEndEvent(
-            getLocationFromGesture(event.getX(), event.getY()), transform));
+          MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+          LatLng latLng = projection.fromScreenLocation(new PointF(event.getX(), event.getY()));
+          // TODO transform.getZoom() may cause a NullPointerException
+          MapState dragend = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float)
+            transform.getZoom());
+          Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_DRAGEND, dragend));
+//          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapDragEndEvent(
+//            getLocationFromGesture(event.getX(), event.getY()), transform));
           scrollGestureOccurred = false;
           cameraChangeDispatcher.onCameraIdle();
         }
@@ -329,10 +344,16 @@ final class MapGestureDetector {
           }
           break;
       }
-
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(e.getX(), e.getY()),
-        MapboxEvent.GESTURE_DOUBLETAP, transform));
+      MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+      LatLng latLng = projection.fromScreenLocation(new PointF(e.getX(), e.getY()));
+      // TODO transform.getZoom() may cause a NullPointerException
+      MapState doubleTap = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float)
+        transform.getZoom());
+      doubleTap.setGesture("DoubleTap");
+      Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, doubleTap));
+//      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//        getLocationFromGesture(e.getX(), e.getY()),
+//        MapboxEvent.GESTURE_DOUBLETAP, transform));
 
       return true;
     }
@@ -360,10 +381,16 @@ final class MapGestureDetector {
           onMapClickListener.onMapClick(projection.fromScreenLocation(tapPoint));
         }
       }
-
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(motionEvent.getX(), motionEvent.getY()),
-        MapboxEvent.GESTURE_SINGLETAP, transform));
+      MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+      LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+      // TODO transform.getZoom() may cause a NullPointerException
+      MapState singleTap = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float)
+        transform.getZoom());
+      singleTap.setGesture("SingleTap");
+      Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, singleTap));
+//      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//        getLocationFromGesture(motionEvent.getX(), motionEvent.getY()),
+//        MapboxEvent.GESTURE_SINGLETAP, transform));
 
       return true;
     }
@@ -438,9 +465,16 @@ final class MapGestureDetector {
           cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
         }
 
-        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-          getLocationFromGesture(e1.getX(), e1.getY()),
-          MapboxEvent.GESTURE_PAN_START, transform));
+        MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+        LatLng latLng = projection.fromScreenLocation(new PointF(e1.getX(), e1.getY()));
+        // TODO transform.getZoom() may cause a NullPointerException
+        MapState pan = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float) transform
+          .getZoom());
+        pan.setGesture("Pan");
+        Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, pan));
+//        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//          getLocationFromGesture(e1.getX(), e1.getY()),
+//          MapboxEvent.GESTURE_PAN_START, transform));
       }
 
       // reset tracking if needed
@@ -477,9 +511,16 @@ final class MapGestureDetector {
       recentScaleGestureOccurred = true;
       scalePointBegin = new PointF(detector.getFocusX(), detector.getFocusY());
       scaleBeginTime = detector.getEventTime();
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-        MapboxEvent.GESTURE_PINCH_START, transform));
+      MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+      LatLng latLng = projection.fromScreenLocation(new PointF(detector.getFocusX(), detector.getFocusY()));
+      // TODO transform.getZoom() may cause a NullPointerException
+      MapState pinch = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float) transform
+        .getZoom());
+      pinch.setGesture("Pinch");
+      Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, pinch));
+//      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//        getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
+//        MapboxEvent.GESTURE_PINCH_START, transform));
       return true;
     }
 
@@ -652,9 +693,16 @@ final class MapGestureDetector {
       // Also is zoom already started, don't rotate
       float angle = detector.getRotationDegreesDelta();
       if (Math.abs(angle) >= ROTATE_INVOKE_ANGLE) {
-        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-          MapboxEvent.GESTURE_ROTATION_START, transform));
+        MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+        LatLng latLng = projection.fromScreenLocation(new PointF(detector.getFocusX(), detector.getFocusY()));
+        // TODO transform.getZoom() may cause a NullPointerException
+        MapState rotation = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float)
+          transform.getZoom());
+        rotation.setGesture("Rotation");
+        Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, rotation));
+//        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
+//          MapboxEvent.GESTURE_ROTATION_START, transform));
         started = true;
       }
 
@@ -809,9 +857,16 @@ final class MapGestureDetector {
       if (!tiltGestureOccurred && ((totalDelta > 10.0f) || (totalDelta < -10.0f))) {
         tiltGestureOccurred = true;
         beginTime = detector.getEventTime();
-        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
-          MapboxEvent.GESTURE_PITCH_START, transform));
+        MapEventFactory mapEventFactory = new MapEventFactory(Mapbox.getApplicationContext());
+        LatLng latLng = projection.fromScreenLocation(new PointF(detector.getFocusX(), detector.getFocusY()));
+        // TODO transform.getZoom() may cause a NullPointerException
+        MapState pitch = new MapState((float) latLng.getLatitude(), (float) latLng.getLongitude(), (float) transform
+          .getZoom());
+        pitch.setGesture("Pitch");
+        Mapbox.obtainMapboxTelemetry().push(mapEventFactory.createMapEvent(Event.Type.MAP_CLICK, pitch));
+//        MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+//          getLocationFromGesture(detector.getFocusX(), detector.getFocusY()),
+//          MapboxEvent.GESTURE_PITCH_START, transform));
       }
 
       if (!tiltGestureOccurred) {

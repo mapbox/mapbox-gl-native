@@ -5,8 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
-import com.mapbox.services.android.telemetry.utils.MathUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 /**
  * A geographical location which contains a single latitude, longitude pair, with

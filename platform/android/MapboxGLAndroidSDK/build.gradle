@@ -19,7 +19,6 @@ dependencies {
 
     // Mapbox Android Services (Telemetry support)
     compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
-        transitive = true
         exclude group: 'com.android.support'
     }
 }

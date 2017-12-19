@@ -12,11 +12,16 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
-import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
-import com.mapbox.services.android.telemetry.location.LocationEngineProvider;
+import com.mapbox.services.android.core.location.LocationEngine;
+import com.mapbox.services.android.core.location.LocationEnginePriority;
+import com.mapbox.services.android.core.location.LocationEngineProvider;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Response;
 import timber.log.Timber;
 
 /**
@@ -36,6 +41,7 @@ public final class Mapbox {
   private String accessToken;
   private Boolean connected;
   private LocationEngine locationEngine;
+  private static MapboxTelemetry mapboxTelemetry;
 
   /**
    * Get an instance of Mapbox.
@@ -57,12 +63,22 @@ public final class Mapbox {
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
       try {
-        MapboxTelemetry.getInstance().initialize(
-          appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+        mapboxTelemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT,
+          new Callback() {
+            @Override
+            public void onFailure(Call call, IOException exception) {
+              Timber.d(exception, "Mapbox telemetry request failed");
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+              Timber.d("Mapbox telemetry response: ", response);
+            }
+          });
+        mapboxTelemetry.enable();
       } catch (Exception exception) {
         Timber.e(exception, "Unable to instantiate Mapbox telemetry");
       }
-
       ConnectivityReceiver.instance(appContext);
     }
     return INSTANCE;
@@ -164,5 +180,9 @@ public final class Mapbox {
    */
   public static LocationEngine getLocationEngine() {
     return INSTANCE.locationEngine;
+  }
+
+  public static MapboxTelemetry obtainMapboxTelemetry() {
+    return INSTANCE.mapboxTelemetry;
   }
 }
