@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.functions.Function;
 
 /**
@@ -88,6 +89,14 @@ public abstract class Layer {
   }
 
   private Object convertValue(Object value) {
-    return value != null && value instanceof Function ? ((Function) value).toValueObject() : value;
+    if (value != null) {
+      if (value instanceof Function) {
+        return ((Function) value).toValueObject();
+      } else if (value instanceof Expression) {
+        return ((Expression) value).toArray();
+      }
+    }
+    return value;
   }
+
 }
