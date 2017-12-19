@@ -14,10 +14,8 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -45,40 +43,34 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(final MapboxMap mapboxMap) {
-        QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
 
-        // Add custom window adapter
-        addCustomInfoWindowAdapter(mapboxMap);
+      // Add custom window adapter
+      addCustomInfoWindowAdapter(mapboxMap);
 
-        // Add a click listener
-        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-          @Override
-          public void onMapClick(@NonNull LatLng point) {
-            // Query
-            final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-            Timber.i(
-              "Requesting features for %sx%s (%sx%s adjusted for density)",
-              pixel.x, pixel.y, pixel.x / density, pixel.y / density
-            );
-            List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+      // Add a click listener
+      mapboxMap.setOnMapClickListener(point -> {
+        // Query
+        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+        Timber.i(
+          "Requesting features for %sx%s (%sx%s adjusted for density)",
+          pixel.x, pixel.y, pixel.x / density, pixel.y / density
+        );
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
-            // Debug output
-            debugOutput(features);
+        // Debug output
+        debugOutput(features);
 
-            // Remove any previous markers
-            if (marker != null) {
-              mapboxMap.removeMarker(marker);
-            }
+        // Remove any previous markers
+        if (marker != null) {
+          mapboxMap.removeMarker(marker);
+        }
 
-            // Add a marker on the clicked point
-            marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
-            mapboxMap.selectMarker(marker);
-          }
-        });
-      }
+        // Add a marker on the clicked point
+        marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
+        mapboxMap.selectMarker(marker);
+      });
     });
 
   }

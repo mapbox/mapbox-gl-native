@@ -1,11 +1,9 @@
 package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.constants.Style;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -37,17 +35,7 @@ public class MaxMinZoomActivity extends AppCompatActivity implements OnMapReadyC
     mapboxMap = map;
     mapboxMap.setMinZoomPreference(3);
     mapboxMap.setMaxZoomPreference(5);
-    mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-      @Override
-      public void onMapClick(@NonNull LatLng point) {
-        map.setStyle(Style.OUTDOORS, new MapboxMap.OnStyleLoadedListener() {
-          @Override
-          public void onStyleLoaded(String style) {
-            Timber.d("Style Loaded %s", style);
-          }
-        });
-      }
-    });
+    mapboxMap.setOnMapClickListener(point -> map.setStyle(Style.OUTDOORS, style -> Timber.d("Style Loaded %s", style)));
   }
 
   @Override

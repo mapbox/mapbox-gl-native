@@ -47,102 +47,88 @@ public class CameraAnimationTypeActivity extends AppCompatActivity implements On
     mapboxMap = map;
     mapboxMap.getUiSettings().setAttributionEnabled(false);
     mapboxMap.getUiSettings().setLogoEnabled(false);
-    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-      @Override
-      public void onCameraChange(CameraPosition position) {
-        Timber.w(position.toString());
-      }
-    });
+    mapboxMap.setOnCameraChangeListener(position -> Timber.w(position.toString()));
 
     // handle move button clicks
     View moveButton = findViewById(R.id.cameraMoveButton);
     if (moveButton != null) {
-      moveButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          CameraPosition cameraPosition = new CameraPosition.Builder()
-            .target(getNextLatLng())
-            .zoom(14)
-            .tilt(30)
-            .tilt(0)
-            .build();
-          mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
-        }
+      moveButton.setOnClickListener(view -> {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+          .target(getNextLatLng())
+          .zoom(14)
+          .tilt(30)
+          .tilt(0)
+          .build();
+        mapboxMap.moveCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
       });
     }
 
     // handle ease button clicks
     View easeButton = findViewById(R.id.cameraEaseButton);
     if (easeButton != null) {
-      easeButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          CameraPosition cameraPosition = new CameraPosition.Builder()
-            .target(getNextLatLng())
-            .zoom(15)
-            .bearing(180)
-            .tilt(30)
-            .build();
+      easeButton.setOnClickListener(view -> {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+          .target(getNextLatLng())
+          .zoom(15)
+          .bearing(180)
+          .tilt(30)
+          .build();
 
-          MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-            @Override
-            public void onCancel() {
-              Timber.i("Duration onCancel Callback called.");
-              Toast.makeText(
-                CameraAnimationTypeActivity.this,
-                "Ease onCancel Callback called.",
-                Toast.LENGTH_LONG).show();
-            }
+        MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+            Timber.i("Duration onCancel Callback called.");
+            Toast.makeText(
+              CameraAnimationTypeActivity.this,
+              "Ease onCancel Callback called.",
+              Toast.LENGTH_LONG).show();
+          }
 
-            @Override
-            public void onFinish() {
-              Timber.i("Duration onFinish Callback called.");
-              Toast.makeText(
-                CameraAnimationTypeActivity.this,
-                "Ease onFinish Callback called.",
-                Toast.LENGTH_LONG).show();
-            }
-          };
+          @Override
+          public void onFinish() {
+            Timber.i("Duration onFinish Callback called.");
+            Toast.makeText(
+              CameraAnimationTypeActivity.this,
+              "Ease onFinish Callback called.",
+              Toast.LENGTH_LONG).show();
+          }
+        };
 
-          mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
-        }
+        mapboxMap.easeCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
       });
     }
 
     // handle animate button clicks
     View animateButton = findViewById(R.id.cameraAnimateButton);
     if (animateButton != null) {
-      animateButton.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          CameraPosition cameraPosition = new CameraPosition.Builder()
-            .target(getNextLatLng())
-            .bearing(270)
-            .tilt(20)
-            .build();
+      animateButton.setOnClickListener(view -> {
+        CameraPosition cameraPosition = new CameraPosition.Builder()
+          .target(getNextLatLng())
+          .bearing(270)
+          .tilt(20)
+          .build();
 
-          MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
-            @Override
-            public void onCancel() {
-              Timber.i("Duration onCancel Callback called.");
-              Toast.makeText(
-                CameraAnimationTypeActivity.this,
-                "Duration onCancel Callback called.",
-                Toast.LENGTH_LONG).show();
-            }
+        MapboxMap.CancelableCallback callback = new MapboxMap.CancelableCallback() {
+          @Override
+          public void onCancel() {
+            Timber.i("Duration onCancel Callback called.");
+            Toast.makeText(
+              CameraAnimationTypeActivity.this,
+              "Duration onCancel Callback called.",
+              Toast.LENGTH_LONG).show();
+          }
 
-            @Override
-            public void onFinish() {
-              Timber.i("Duration onFinish Callback called.");
-              Toast.makeText(
-                CameraAnimationTypeActivity.this,
-                "Duration onFinish Callback called.",
-                Toast.LENGTH_LONG).show();
-            }
-          };
+          @Override
+          public void onFinish() {
+            Timber.i("Duration onFinish Callback called.");
+            Toast.makeText(
+              CameraAnimationTypeActivity.this,
+              "Duration onFinish Callback called.",
+              Toast.LENGTH_LONG).show();
+          }
+        };
 
-          mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
-        }
+        mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition), 7500, callback);
       });
     }
   }

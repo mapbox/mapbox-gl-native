@@ -11,12 +11,10 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -82,13 +80,10 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
 
   private void setupMapView(Bundle savedInstanceState) {
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-      @Override
-      public void onMapChanged(int change) {
-        if (change == MapView.DID_FINISH_LOADING_STYLE && mapboxMap != null) {
-          Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
-          setupNavigationView(mapboxMap.getLayers());
-        }
+    mapView.addOnMapChangedListener(change -> {
+      if (change == MapView.DID_FINISH_LOADING_STYLE && mapboxMap != null) {
+        Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
+        setupNavigationView(mapboxMap.getLayers());
       }
     });
 
@@ -110,25 +105,17 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
 
   private void setFpsView() {
     final TextView fpsView = (TextView) findViewById(R.id.fpsView);
-    mapboxMap.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
-      @Override
-      public void onFpsChanged(double fps) {
-        fpsView.setText(String.format(Locale.US,"FPS: %4.2f", fps));
-      }
-    });
+    mapboxMap.setOnFpsChangedListener(fps -> fpsView.setText(String.format(Locale.US,"FPS: %4.2f", fps)));
   }
 
   private void setupNavigationView(List<Layer> layerList) {
     final LayerListAdapter adapter = new LayerListAdapter(this, layerList);
     ListView listView = (ListView) findViewById(R.id.listView);
     listView.setAdapter(adapter);
-    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Layer clickedLayer = adapter.getItem(position);
-        toggleLayerVisibility(clickedLayer);
-        closeNavigationView();
-      }
+    listView.setOnItemClickListener((parent, view, position, id) -> {
+      Layer clickedLayer = adapter.getItem(position);
+      toggleLayerVisibility(clickedLayer);
+      closeNavigationView();
     });
   }
 
@@ -148,44 +135,29 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
 
   private void setupZoomView() {
     final TextView textView = (TextView) findViewById(R.id.textZoom);
-    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-      @Override
-      public void onCameraChange(CameraPosition position) {
-        textView.setText(String.format(getString(R.string.debug_zoom), position.zoom));
-      }
-    });
+    mapboxMap.setOnCameraChangeListener(position ->
+      textView.setText(String.format(getString(R.string.debug_zoom), position.zoom)));
   }
 
   private void setupDebugChangeView() {
     FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabDebug);
-    fabDebug.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mapboxMap != null) {
-          Timber.d("Debug FAB: isDebug Active? %s", mapboxMap.isDebugActive());
-          mapboxMap.cycleDebugOptions();
-        }
+    fabDebug.setOnClickListener(view -> {
+      if (mapboxMap != null) {
+        Timber.d("Debug FAB: isDebug Active? %s", mapboxMap.isDebugActive());
+        mapboxMap.cycleDebugOptions();
       }
     });
   }
 
   private void setupStyleChangeView() {
     FloatingActionButton fabStyles = (FloatingActionButton) findViewById(R.id.fabStyles);
-    fabStyles.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        if (mapboxMap != null) {
-          currentStyleIndex++;
-          if (currentStyleIndex == STYLES.length) {
-            currentStyleIndex = 0;
-          }
-          mapboxMap.setStyleUrl(STYLES[currentStyleIndex], new MapboxMap.OnStyleLoadedListener() {
-            @Override
-            public void onStyleLoaded(String style) {
-              Timber.d("Style loaded %s", style);
-            }
-          });
+    fabStyles.setOnClickListener(view -> {
+      if (mapboxMap != null) {
+        currentStyleIndex++;
+        if (currentStyleIndex == STYLES.length) {
+          currentStyleIndex = 0;
         }
+        mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style -> Timber.d("Style loaded %s", style));
       }
     });
   }

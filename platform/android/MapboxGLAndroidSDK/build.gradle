@@ -1,27 +1,19 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportFragmentV4
-    compile rootProject.ext.dep.timber
-    compile rootProject.ext.dep.okhttp3
-    provided(rootProject.ext.dep.lost) {
+    api rootProject.ext.dep.mapboxAndroidTelemetry
+    api rootProject.ext.dep.mapboxJavaGeoJSON
+    implementation rootProject.ext.dep.supportAnnotations
+    implementation rootProject.ext.dep.supportFragmentV4
+    implementation rootProject.ext.dep.timber
+    implementation rootProject.ext.dep.okhttp3
+    compileOnly(rootProject.ext.dep.lost) {
         exclude group: 'com.google.guava'
         exclude group: 'com.android.support'
     }
-    testCompile rootProject.ext.dep.junit
-    testCompile rootProject.ext.dep.mockito
-
-    // Mapbox Android Services (GeoJSON support)
-    compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
-        transitive = true
-    }
-
-    // Mapbox Android Services (Telemetry support)
-    compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
-        transitive = true
-        exclude group: 'com.android.support'
-    }
+    testImplementation rootProject.ext.dep.lost
+    testImplementation rootProject.ext.dep.junit
+    testImplementation rootProject.ext.dep.mockito
 }
 
 android {
@@ -120,7 +112,7 @@ android {
     }
 
     lintOptions {
-        disable 'MissingTranslation', 'TypographyQuotes'
+        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
         baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false

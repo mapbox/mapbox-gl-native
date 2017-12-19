@@ -3,16 +3,13 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
@@ -39,29 +36,16 @@ public class StyleFileActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull final MapboxMap map) {
-        mapboxMap = map;
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_file);
-        fab.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
-        fab.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            new CreateStyleFileTask(view.getContext(), mapboxMap).execute();
-          }
-        });
+      FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_file);
+      fab.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
+      fab.setOnClickListener(view -> new CreateStyleFileTask(view.getContext(), mapboxMap).execute());
 
-        FloatingActionButton fabStyleJson = (FloatingActionButton) findViewById(R.id.fab_style_json);
-        fabStyleJson.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
-        fabStyleJson.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            new LoadStyleFileTask(view.getContext(), mapboxMap).execute();
-          }
-        });
-      }
+      FloatingActionButton fabStyleJson = (FloatingActionButton) findViewById(R.id.fab_style_json);
+      fabStyleJson.setColorFilter(ContextCompat.getColor(StyleFileActivity.this, R.color.primary));
+      fabStyleJson.setOnClickListener(view -> new LoadStyleFileTask(view.getContext(), mapboxMap).execute());
     });
   }
 

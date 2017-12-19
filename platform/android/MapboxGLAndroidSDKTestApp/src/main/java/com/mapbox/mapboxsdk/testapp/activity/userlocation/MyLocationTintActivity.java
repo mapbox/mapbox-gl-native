@@ -15,7 +15,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -37,80 +36,65 @@ public class MyLocationTintActivity extends BaseLocationActivity implements Loca
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
 
-        // enable location updates
-        toggleGps(!mapboxMap.isMyLocationEnabled());
+      // enable location updates
+      toggleGps(!mapboxMap.isMyLocationEnabled());
 
-        // add some padding
-        final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
-        myLocationViewSettings.setPadding(0, 500, 0, 0);
+      // add some padding
+      final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
+      myLocationViewSettings.setPadding(0, 500, 0, 0);
 
-        // enable tracking
-        TrackingSettings settings = mapboxMap.getTrackingSettings();
-        settings.setDismissLocationTrackingOnGesture(false);
-        settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
+      // enable tracking
+      TrackingSettings settings = mapboxMap.getTrackingSettings();
+      settings.setDismissLocationTrackingOnGesture(false);
+      settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
 
-        // handle default button clicks
-        ViewUtils.attachClickListener(
-          MyLocationTintActivity.this,
-          R.id.default_user_dot_coloring_button,
-          new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(
-                MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setForegroundTintColor(ContextCompat.getColor(
-                MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
-            }
-          });
+      // handle default button clicks
+      ViewUtils.attachClickListener(
+        MyLocationTintActivity.this,
+        R.id.default_user_dot_coloring_button,
+        view -> {
+          myLocationViewSettings.setAccuracyTintColor(ContextCompat.getColor(
+            MyLocationTintActivity.this, R.color.mapbox_blue));
+          myLocationViewSettings.setForegroundTintColor(ContextCompat.getColor(
+            MyLocationTintActivity.this, R.color.mapbox_blue));
+          myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+        });
 
-        // handle tint user dot button clicks
-        ViewUtils.attachClickListener(
-          MyLocationTintActivity.this,
-          R.id.tint_user_dot_button,
-          new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
-              myLocationViewSettings.setForegroundTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
-            }
-          });
+      // handle tint user dot button clicks
+      ViewUtils.attachClickListener(
+        MyLocationTintActivity.this,
+        R.id.tint_user_dot_button,
+        view -> {
+          myLocationViewSettings.setAccuracyTintColor(
+            ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
+          myLocationViewSettings.setForegroundTintColor(
+            ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapboxGreen));
+          myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+        });
 
-        // handle tint accuracy ring button clicks
-        ViewUtils.attachClickListener(
-          MyLocationTintActivity.this,
-          R.id.user_accuracy_ring_tint_button,
-          new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-              myLocationViewSettings.setAccuracyTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.accent));
-              myLocationViewSettings.setForegroundTintColor(
-                ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_blue));
-              myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
-            }
-          });
+      // handle tint accuracy ring button clicks
+      ViewUtils.attachClickListener(
+        MyLocationTintActivity.this,
+        R.id.user_accuracy_ring_tint_button,
+        view -> {
+          myLocationViewSettings.setAccuracyTintColor(
+            ContextCompat.getColor(MyLocationTintActivity.this, R.color.accent));
+          myLocationViewSettings.setForegroundTintColor(
+            ContextCompat.getColor(MyLocationTintActivity.this, R.color.mapbox_blue));
+          myLocationViewSettings.setBackgroundTintColor(Color.WHITE);
+        });
 
-        ViewUtils.attachClickListener(
-          MyLocationTintActivity.this,
-          R.id.user_dot_transparent_button,
-          new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-              myLocationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
-              myLocationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
-            }
-          }
-        );
-      }
+      ViewUtils.attachClickListener(
+        MyLocationTintActivity.this,
+        R.id.user_dot_transparent_button,
+        view -> {
+          myLocationViewSettings.setForegroundTintColor(Color.TRANSPARENT);
+          myLocationViewSettings.setBackgroundTintColor(Color.TRANSPARENT);
+        }
+      );
     });
 
   }

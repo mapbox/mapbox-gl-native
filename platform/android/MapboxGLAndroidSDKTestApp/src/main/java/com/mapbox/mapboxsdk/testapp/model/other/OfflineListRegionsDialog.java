@@ -1,17 +1,16 @@
 package com.mapbox.mapboxsdk.testapp.model.other;
 
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 
-import timber.log.Timber;
-
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.ArrayList;
+
+import timber.log.Timber;
 
 public class OfflineListRegionsDialog extends DialogFragment {
 
@@ -29,18 +28,8 @@ public class OfflineListRegionsDialog extends DialogFragment {
 
     builder.setTitle("List of offline regions")
       .setIcon(R.drawable.ic_airplanemode_active_black)
-      .setItems(items, new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          Timber.d("Selected item: %s", which);
-        }
-      })
-      .setPositiveButton("Accept", new DialogInterface.OnClickListener() {
-        @Override
-        public void onClick(DialogInterface dialog, int which) {
-          Timber.d("Dialog dismissed");
-        }
-      });
+      .setItems(items, (dialog, which) -> Timber.d("Selected item: %s", which))
+      .setPositiveButton("Accept", (dialog, which) -> Timber.d("Dialog dismissed"));
 
     return builder.create();
   }

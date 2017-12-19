@@ -5,9 +5,9 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.annotation.SuppressLint;
 import android.support.annotation.ColorInt;
 
-import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.functions.Function;
 
 /**
  * Constructs paint/layout properties for Layers

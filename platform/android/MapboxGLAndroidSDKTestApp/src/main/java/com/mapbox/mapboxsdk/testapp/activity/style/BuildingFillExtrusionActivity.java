@@ -2,15 +2,12 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
@@ -46,13 +43,10 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
     setContentView(R.layout.activity_building_layer);
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull final MapboxMap map) {
-        mapboxMap = map;
-        setupBuildings();
-        setupLight();
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      setupBuildings();
+      setupLight();
     });
   }
 
@@ -73,24 +67,18 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
   private void setupLight() {
     light = mapboxMap.getLight();
 
-    findViewById(R.id.fabLightPosition).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        isInitPosition = !isInitPosition;
-        if (isInitPosition) {
-          light.setPosition(new Position(1.5f, 90, 80));
-        } else {
-          light.setPosition(new Position(1.15f, 210, 30));
-        }
+    findViewById(R.id.fabLightPosition).setOnClickListener(v -> {
+      isInitPosition = !isInitPosition;
+      if (isInitPosition) {
+        light.setPosition(new Position(1.5f, 90, 80));
+      } else {
+        light.setPosition(new Position(1.15f, 210, 30));
       }
     });
 
-    findViewById(R.id.fabLightColor).setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        isRedColor = !isRedColor;
-        light.setColor(PropertyFactory.colorToRgbaString(isRedColor ? Color.RED : Color.BLUE));
-      }
+    findViewById(R.id.fabLightColor).setOnClickListener(v -> {
+      isRedColor = !isRedColor;
+      light.setColor(PropertyFactory.colorToRgbaString(isRedColor ? Color.RED : Color.BLUE));
     });
   }
 

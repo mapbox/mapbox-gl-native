@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -49,18 +48,15 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   public void onClick(View view) {
     final long startTime = System.nanoTime();
-    mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
-      @Override
-      public void onSnapshotReady(Bitmap snapshot) {
-        long endTime = System.nanoTime();
-        long duration = (long) ((endTime - startTime) / 1e6);
-        ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
-        snapshotView.setImageBitmap(snapshot);
-        Toast.makeText(
-          SnapshotActivity.this,
-          String.format(Locale.getDefault(), "Snapshot taken in %d ms", duration),
-          Toast.LENGTH_LONG).show();
-      }
+    mapboxMap.snapshot(snapshot -> {
+      long endTime = System.nanoTime();
+      long duration = (long) ((endTime - startTime) / 1e6);
+      ImageView snapshotView = (ImageView) findViewById(R.id.imageView);
+      snapshotView.setImageBitmap(snapshot);
+      Toast.makeText(
+        SnapshotActivity.this,
+        String.format(Locale.getDefault(), "Snapshot taken in %d ms", duration),
+        Toast.LENGTH_LONG).show();
     });
   }
 

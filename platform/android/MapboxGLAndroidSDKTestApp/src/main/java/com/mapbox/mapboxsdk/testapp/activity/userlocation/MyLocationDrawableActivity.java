@@ -14,7 +14,6 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
@@ -50,12 +49,9 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
     parent.addView(mapView);
 
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        toggleGps(true);
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      toggleGps(true);
     });
   }
 

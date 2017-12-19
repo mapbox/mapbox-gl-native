@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
@@ -24,12 +23,7 @@ public class RuntimeStyleTestActivity extends AppCompatActivity {
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap mapboxMap) {
-        RuntimeStyleTestActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> RuntimeStyleTestActivity.this.mapboxMap = mapboxMap);
   }
 
   public MapboxMap getMapboxMap() {
