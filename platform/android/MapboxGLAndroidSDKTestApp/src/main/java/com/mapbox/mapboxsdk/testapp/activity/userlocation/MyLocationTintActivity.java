@@ -43,7 +43,7 @@ public class MyLocationTintActivity extends BaseLocationActivity implements Loca
         mapboxMap = map;
 
         // enable location updates
-        toggleGps(!mapboxMap.isMyLocationEnabled());
+        toggleGps(true);
 
         // add some padding
         final MyLocationViewSettings myLocationViewSettings = mapboxMap.getMyLocationViewSettings();
