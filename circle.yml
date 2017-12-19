@@ -22,7 +22,7 @@ workflows:
           filters:
             tags:
               only: /node-.*/
-      - linux-clang39-debug
+      - linux-clang-3.8-libcxx-debug
       - linux-clang4-sanitize-address
       - linux-clang4-sanitize-undefined
       - linux-clang4-sanitize-thread
@@ -448,7 +448,7 @@ jobs:
       - *upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
-  linux-clang39-debug:
+  linux-clang-3.8-libcxx-debug:
     docker:
       - image: mbgl/7d2403f42e:linux-clang-3.9
     working_directory: /src
@@ -457,6 +457,7 @@ jobs:
       JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
+      WITH_CXX11ABI: 1
     steps:
       - checkout
       - *generate-cache-key
