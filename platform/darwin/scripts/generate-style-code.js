@@ -13,6 +13,9 @@ const suffix = 'StyleLayer';
 
 let spec = _.merge(require('../../../mapbox-gl-js/src/style-spec/reference/v8'), require('./style-spec-overrides-v8.json'));
 
+// Temporarily ignore layer types defined in the style specification but not yet supported in mbgl.
+delete spec.layer.type.values.heatmap;
+
 // Rename properties and keep `original` for use with setters and getters
 _.forOwn(cocoaConventions, function (properties, kind) {
     _.forOwn(properties, function (newName, oldName) {
