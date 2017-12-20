@@ -12,6 +12,7 @@ import org.junit.rules.ExpectedException;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNotSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -255,8 +256,17 @@ public class LatLngTest {
 
   @Test
   public void testWrapped() {
-    LatLng latLng = new LatLng(45.0, -185.0).wrap();
-    assertEquals("longitude wrapped value", latLng.getLongitude(), 175.0, DELTA);
+    LatLng originalLatLng = new LatLng(45.0, -185.0);
+    LatLng newLatlng = originalLatLng.wrap();
+    assertNotSame(" new wrapped LatLng is created", originalLatLng, newLatlng);
+    assertEquals("longitude wrapped value", originalLatLng.getLongitude(), -185.0, DELTA);
+    assertEquals("longitude wrapped value", newLatlng.getLongitude(), 175.0, DELTA);
+
+    newLatlng = new LatLng(45.0, 180.0).wrap();
+    assertEquals("longitude wrapped max value", newLatlng.getLongitude(), 180.0, DELTA);
+
+    newLatlng = new LatLng(45.0, -180.0).wrap();
+    assertEquals("longitude wrapped min value", newLatlng.getLongitude(), -180.0, DELTA);
   }
 
   @Test
