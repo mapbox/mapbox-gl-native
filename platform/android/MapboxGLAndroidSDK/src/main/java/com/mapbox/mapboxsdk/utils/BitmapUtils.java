@@ -54,13 +54,25 @@ public class BitmapUtils {
 
   /**
    * Extract an underlying bitmap from a drawable
-   * @param drawable The source drawable
+   *
+   * @param sourceDrawable The source drawable
    * @return The underlying bitmap
    */
-  public static Bitmap getBitmapFromDrawable(Drawable drawable) {
-    if (drawable instanceof BitmapDrawable) {
-      return ((BitmapDrawable) drawable).getBitmap();
+  public static Bitmap getBitmapFromDrawable(Drawable sourceDrawable) {
+    if (sourceDrawable == null) {
+      return null;
+    }
+
+    if (sourceDrawable instanceof BitmapDrawable) {
+      return ((BitmapDrawable) sourceDrawable).getBitmap();
     } else {
+      //copying drawable object to not manipulate on the same reference
+      Drawable.ConstantState constantState = sourceDrawable.getConstantState();
+      if (constantState == null) {
+        return null;
+      }
+      Drawable drawable = constantState.newDrawable().mutate();
+
       Bitmap bitmap = Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
         Bitmap.Config.ARGB_8888);
       Canvas canvas = new Canvas(bitmap);
@@ -72,6 +84,7 @@ public class BitmapUtils {
 
   /**
    * Create a byte array out of drawable
+   *
    * @param drawable The source drawable
    * @return The byte array of source drawable
    */
@@ -79,7 +92,11 @@ public class BitmapUtils {
     if (drawable == null) {
       return null;
     }
+
     Bitmap bitmap = getBitmapFromDrawable(drawable);
+    if (bitmap == null) {
+      return null;
+    }
     ByteArrayOutputStream stream = new ByteArrayOutputStream();
     bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
     return stream.toByteArray();
@@ -87,8 +104,9 @@ public class BitmapUtils {
 
   /**
    * Decode byte array to drawable object
+   *
    * @param context Context to obtain {@link android.content.res.Resources}
-   * @param array The source byte array
+   * @param array   The source byte array
    * @return The drawable created from source byte array
    */
   public static Drawable getDrawableFromByteArray(Context context, byte[] array) {
