@@ -224,6 +224,18 @@ step-library:
         path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
 
+  - &collect-xcode-build-logs
+      run:
+        name: Collect Xcode build logs
+        when: always
+        command: |
+          export XCODE_LOG_DIR=build/logs
+          mkdir -p $XCODE_LOG_DIR
+          cp build/*.log $XCODE_LOG_DIR
+  - &upload-xcode-build-logs
+      store_artifacts:
+        path: build/logs
+
 jobs:
   nitpick:
     docker:
@@ -731,6 +743,8 @@ jobs:
           command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize:
@@ -750,6 +764,8 @@ jobs:
           command: make ios-sanitize
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
@@ -769,6 +785,8 @@ jobs:
           command: make ios-sanitize-address
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-static-analyzer:
@@ -788,6 +806,8 @@ jobs:
           command: make ios-static-analyzer
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-release:
@@ -843,6 +863,8 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-debug-qt5:
@@ -889,6 +911,8 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-release-node6:
@@ -910,3 +934,5 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs

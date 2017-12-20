@@ -45,7 +45,7 @@ ifeq ($(V), 1)
   export XCPRETTY
   NINJA_ARGS ?= -v
 else
-  export XCPRETTY ?= | xcpretty
+  export XCPRETTY ?= | tee '$(shell pwd)/build/xcodebuild-$(shell date +"%Y-%m-%d_%H%M%S").log' | xcpretty
   NINJA_ARGS ?=
 endif
 
