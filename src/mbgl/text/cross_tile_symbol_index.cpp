@@ -64,6 +64,10 @@ bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, Symbol
         return false;
     }
 
+    for (auto& symbolInstance: bucket.symbolInstances) {
+        symbolInstance.crossTileID = 0;
+    }
+
     for (auto& it : indexes) {
         auto zoom = it.first;
         auto zoomIndexes = it.second;
