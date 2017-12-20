@@ -57,9 +57,12 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
 CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
-void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
-    if (bucket.bucketInstanceId) return;
-    bucket.bucketInstanceId = ++maxBucketInstanceId;
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
+    auto thisZoomIndexes = indexes[coord.overscaledZ];
+    auto previousIndex = thisZoomIndexes.find(coord);
+    if (previousIndex != thisZoomIndexes.end() && previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
+        return false;
+    }
 
     uint8_t minZoom = 25;
     uint8_t maxZoom = 0;
@@ -109,6 +112,7 @@ void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
     }
 
     indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, bucket.symbolInstances, bucket.bucketInstanceId));
+    return true;
 }
 
 bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs) {
@@ -145,9 +149,11 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
         if (!symbolBucket.bucketInstanceId) {
-            symbolBucketsChanged = true;
+            symbolBucket.bucketInstanceId = ++maxBucketInstanceId;
         }
-        layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
+
+        const bool bucketAdded = layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
+        symbolBucketsChanged = symbolBucketsChanged || bucketAdded;
         currentBucketIDs.insert(symbolBucket.bucketInstanceId);
     }
 

@@ -95,8 +95,6 @@ public:
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
-    void resetCrossTileIDs() override;
-    
     bool holdForFade() const override;
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
