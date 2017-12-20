@@ -26,6 +26,7 @@ public:
 private:
     bool initialized = false;
     bool contextDestroyed = false;
+    void * context = nullptr;
 };
 
 template <>
