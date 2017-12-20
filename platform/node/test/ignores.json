@@ -17,6 +17,7 @@
   "expression-tests/not_equal/string": "https://github.com/mapbox/mapbox-gl-native/issues/10678",
   "expression-tests/not_equal/value": "https://github.com/mapbox/mapbox-gl-native/issues/10678",
   "expression-tests/interpolate/linear-color": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
+  "expression-tests/to-rgba/alpha": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
   "expression-tests/to-rgba/basic": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
   "query-tests/circle-stroke-width/inside": "https://github.com/mapbox/mapbox-gl-native/issues/10307",
   "query-tests/geometry/multilinestring": "needs investigation",

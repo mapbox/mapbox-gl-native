@@ -30,8 +30,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
 
 struct FillExtrusionLayoutAttributes : gl::Attributes<
     attributes::a_pos,
-    attributes::a_normal,
-    attributes::a_edgedistance>
+    attributes::a_normal_ed>
 {};
 
 struct FillExtrusionUniforms : gl::Uniforms<
@@ -100,12 +99,9 @@ public:
                 // We pack a bool (`t`) into the x component indicating whether it is an upper or lower vertex
                 static_cast<int16_t>(floor(nx * factor) * 2 + t),
                 static_cast<int16_t>(ny * factor * 2),
-                static_cast<int16_t>(nz * factor * 2)
-                
-            }},
-            {{
+                static_cast<int16_t>(nz * factor * 2),
                 // The edgedistance attribute is used for wrapping fill_extrusion patterns
-                e
+                static_cast<int16_t>(e)
             }}
         };
     }
