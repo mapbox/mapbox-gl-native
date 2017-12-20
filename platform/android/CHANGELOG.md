@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.3.0-cn.1 - December 20, 2017
+ - Enable CN endpoint [#10758](https://github.com/mapbox/mapbox-gl-native/pull/10758)
+
 ## 5.3.0 - December 20, 2017
  - Add support for TinySDF [#10706](https://github.com/mapbox/mapbox-gl-native/pull/10706)
  - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746) 

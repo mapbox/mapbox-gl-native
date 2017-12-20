@@ -355,7 +355,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "release-agua" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "release-android-v5.3.0-cn.1" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------
