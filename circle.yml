@@ -158,6 +158,8 @@ step-library:
       run:
         name: Install xcpretty fork
         command: |
+          brew install ruby
+          gem env
           git clone https://github.com/technology-ebay-de/xcpretty --branch feature/parallel-testing-support
           gem build xcpretty/xcpretty.gemspec
           sudo gem install xcpretty*.gem
