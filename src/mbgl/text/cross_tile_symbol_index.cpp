@@ -57,53 +57,31 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
 CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
-bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
-    auto thisZoomIndexes = indexes[coord.overscaledZ];
-    auto previousIndex = thisZoomIndexes.find(coord);
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
+    auto thisZoomIndexes = indexes[tileID.overscaledZ];
+    auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end() && previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
         return false;
     }
 
-    uint8_t minZoom = 25;
-    uint8_t maxZoom = 0;
     for (auto& it : indexes) {
-        auto z = it.first;
-        minZoom = std::min(minZoom, z);
-        maxZoom = std::max(maxZoom, z);
-    }
-
-
-    // make all higher-res child tiles block duplicate labels in this tile
-    for (auto z = maxZoom; z > coord.overscaledZ; z--) {
-        auto zoomIndexes = indexes.find(z);
-        if (zoomIndexes != indexes.end()) {
-            for (auto& childIndex : zoomIndexes->second) {
-                if (!childIndex.second.coord.isChildOf(coord)) {
-                    continue;
+        auto zoom = it.first;
+        auto zoomIndexes = it.second;
+        if (zoom > tileID.overscaledZ) {
+            for (auto& childIndex : zoomIndexes) {
+                if (childIndex.second.coord.isChildOf(tileID)) {
+                    childIndex.second.findMatches(bucket.symbolInstances, tileID);
                 }
-                childIndex.second.findMatches(bucket.symbolInstances, coord);
             }
-        }
-        if (z == 0) {
-            break;
+        } else {
+            auto parentTileID = tileID.scaledTo(zoom);
+            auto parentIndex = zoomIndexes.find(parentTileID);
+            if (parentIndex != zoomIndexes.end()) {
+                parentIndex->second.findMatches(bucket.symbolInstances, tileID);
+            }
         }
     }
 
-    // make this tile block duplicate labels in lower-res parent tiles
-    for (auto z = coord.overscaledZ; z >= minZoom; z--) {
-        auto parentCoord = coord.scaledTo(z);
-        auto zoomIndexes = indexes.find(z);
-        if (zoomIndexes != indexes.end()) {
-            auto parentIndex = zoomIndexes->second.find(parentCoord);
-            if (parentIndex != zoomIndexes->second.end()) {
-                parentIndex->second.findMatches(bucket.symbolInstances, coord);
-            }
-        }
-        if (z == 0) {
-            break;
-        }
-    }
-    
     for (auto& symbolInstance : bucket.symbolInstances) {
         if (!symbolInstance.crossTileID) {
             // symbol did not match any known symbol, assign a new id
@@ -111,7 +89,7 @@ bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolB
         }
     }
 
-    indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, bucket.symbolInstances, bucket.bucketInstanceId));
+    indexes[tileID.overscaledZ].emplace(tileID, TileLayerIndex(tileID, bucket.symbolInstances, bucket.bucketInstanceId));
     return true;
 }
 
