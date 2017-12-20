@@ -69,12 +69,12 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
-            android:name=".activity.annotation.AnimatedMarkerActivity"
-            android:description="@string/description_animated_marker"
-            android:label="@string/activity_animated_marker">
+            android:name=".activity.annotation.AnimatedSymbolLayerActivity"
+            android:description="@string/description_animated_symbollayer"
+            android:label="@string/activity_animated_symbollayer">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation"/>
+                android:value="@string/category_style"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
