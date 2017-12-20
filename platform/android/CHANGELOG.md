@@ -2,9 +2,21 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.3.0 - TBA
-
-* TBA
+## 5.3.0 - December 20, 2017
+ - Add support for TinySDF [#10706](https://github.com/mapbox/mapbox-gl-native/pull/10706)
+ - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746) 
+ - Post animation callback invocation [#10664](https://github.com/mapbox/mapbox-gl-native/pull/10664)
+ - Allow configuring Http logging [#10681](https://github.com/mapbox/mapbox-gl-native/pull/10681)
+ - Fix reverse scale gesture [#10688](https://github.com/mapbox/mapbox-gl-native/pull/10688)
+ - Update offline region metadata documentation [#10693](https://github.com/mapbox/mapbox-gl-native/pull/10693)
+ - Post camera listener invocation [#10690](https://github.com/mapbox/mapbox-gl-native/pull/10690)
+ - Activate filesource for offline region creation [#10718](https://github.com/mapbox/mapbox-gl-native/pull/10718)
+ - Update Spanish/Vietnamese translations [#10740](https://github.com/mapbox/mapbox-gl-native/pull/10740)
+ - Update instrumented make target [#10724](https://github.com/mapbox/mapbox-gl-native/pull/10724)
+ - Remove black flash on start for fragments [#10717](https://github.com/mapbox/mapbox-gl-native/pull/10717)
+ - CompassView decode crash [#10717](https://github.com/mapbox/mapbox-gl-native/pull/10717)
+ - Android SDK renaming [#10609](https://github.com/mapbox/mapbox-gl-native/pull/10609)
+ - Map touch listener based lists [#10749](https://github.com/mapbox/mapbox-gl-native/pull/10749)
 
 ## 5.2.1 - December 6, 2017
  - Close race condition in RunLoop [#10537](https://github.com/mapbox/mapbox-gl-native/pull/10537)
