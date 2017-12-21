@@ -145,11 +145,11 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
  
  let snapshotter = MGLMapSnapshotter(options: options)
  snapshotter.start { (snapshot, error) in
-     if error != nil {
-         // error handler
-     } else {
-         // image handler
+     if let error = error {
+         fatalError(error.localizedDescription)
      }
+     
+     image = snapshot?.image
  }
  ```
  */
