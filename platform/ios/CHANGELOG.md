@@ -2,9 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.7.2
+
+* Removed support for 32-bit simulators. ([#10772](https://github.com/mapbox/mapbox-gl-native/pull/10772))
+
 ## 3.7.1 - December 6, 2017
 
 ### Annotations
+
 * Fixed an issue that could cause `-[MGLMapViewDelegate mapView:didSelectAnnotation:]` to be triggered when tapping next to an `MGLAnnotationImage` annotation. ([#10538](https://github.com/mapbox/mapbox-gl-native/pull/10538))
 
 ### Packaging

@@ -56,7 +56,6 @@ else
     # Upload all dimensions that we are tracking
     publish_binary_size "Platform=iOS,Arch=armv7"
     publish_binary_size "Platform=iOS,Arch=arm64"
-    publish_binary_size "Platform=iOS,Arch=i386"
     publish_binary_size "Platform=iOS,Arch=x86_64"
     publish_binary_size "Platform=iOS,Arch=Dynamic"
 

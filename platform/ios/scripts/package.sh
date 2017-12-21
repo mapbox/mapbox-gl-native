@@ -70,7 +70,7 @@ xcodebuild \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
     CURRENT_COMMIT_HASH=${HASH} \
-    ONLY_ACTIVE_ARCH=NO \
+    ARCHS="x86_64" \
     -derivedDataPath ${DERIVED_DATA} \
     -workspace ./platform/ios/ios.xcworkspace \
     -scheme ${SCHEME} \
