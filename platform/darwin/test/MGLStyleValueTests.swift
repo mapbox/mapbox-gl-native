@@ -105,15 +105,15 @@ extension MGLStyleValueTests {
     func testConstantValues() {
         let shapeSource = MGLShapeSource(identifier: "source", shape: nil, options: nil)
         let symbolStyleLayer = MGLSymbolStyleLayer(identifier: "symbolLayer", source: shapeSource)
-        let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
+        _ = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
         
         // Boolean
-        symbolStyleLayer.iconAllowsOverlap = MGLConstantStyleValue(rawValue: true)
-        XCTAssertEqual((symbolStyleLayer.iconAllowsOverlap as! MGLConstantStyleValue<NSNumber>).rawValue, true)
+        let iconAllowsOverlap = MGLConstantStyleValue(rawValue: true as NSNumber)
+        XCTAssertEqual(iconAllowsOverlap.rawValue, true)
         
         // Number
-        symbolStyleLayer.iconHaloWidth = MGLConstantStyleValue(rawValue: 3)
-        XCTAssertEqual((symbolStyleLayer.iconHaloWidth as! MGLConstantStyleValue<NSNumber>).rawValue, 3)
+        let iconHaloWidth = MGLConstantStyleValue(rawValue: 3 as NSNumber)
+        XCTAssertEqual(iconHaloWidth.rawValue, 3)
         
         // String
         symbolStyleLayer.text = NSExpression(forKeyPath: "name")
@@ -124,18 +124,18 @@ extension MGLStyleValueTests {
 
         // non-data-driven (interpolatable property value), set to constant style value
         let expectedCircleTranslationValue = MGLStyleValue<NSValue>(rawValue: circleTranslationValueOne)
-        circleStyleLayer.circleTranslation = expectedCircleTranslationValue
-        XCTAssertEqual(circleStyleLayer.circleTranslation, expectedCircleTranslationValue)
+        let circleTranslation = expectedCircleTranslationValue
+        XCTAssertEqual(circleTranslation, expectedCircleTranslationValue)
 
         // non-data-driven (enumeration property value), set to constant style value
         let expectedCircleScaleAlignmentValue = MGLStyleValue<NSValue>(rawValue: NSValue(mglCircleScaleAlignment: .map))
-        circleStyleLayer.circleScaleAlignment = expectedCircleScaleAlignmentValue
-        XCTAssertEqual(circleStyleLayer.circleScaleAlignment, expectedCircleScaleAlignmentValue)
+        let circleScaleAlignment = expectedCircleScaleAlignmentValue
+        XCTAssertEqual(circleScaleAlignment, expectedCircleScaleAlignmentValue)
     }
 
     func testFunctionsWithNonDataDrivenProperties() {
         let shapeSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
-        let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
+        _ = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
 
         var circleTranslationOne = CGVector(dx: 100, dy: 0)
         let circleTranslationValueOne = NSValue(bytes: &circleTranslationOne, objCType: "{CGVector=dd}")
@@ -153,8 +153,8 @@ extension MGLStyleValueTests {
             cameraStops: circleTranslationStops,
             options: nil
         )
-        circleStyleLayer.circleTranslation = expectedCircleTranslationValue
-        XCTAssertEqual(circleStyleLayer.circleTranslation, expectedCircleTranslationValue)
+        let circleTranslation = expectedCircleTranslationValue
+        XCTAssertEqual(circleTranslation, expectedCircleTranslationValue)
 
         // non-data-driven (enumeration property value), camera function with MGLCircleScaleAlignment enum (NSValue) stop values
         let scaleAlignmentStops : [Float:MGLStyleValue<NSValue>] = [
@@ -166,13 +166,13 @@ extension MGLStyleValueTests {
             cameraStops: scaleAlignmentStops,
             options: nil
         )
-        circleStyleLayer.circleScaleAlignment = expectedCircleScaleAlignmentValue
-        XCTAssertEqual(circleStyleLayer.circleScaleAlignment, expectedCircleScaleAlignmentValue)
+        let circleScaleAlignment = expectedCircleScaleAlignmentValue
+        XCTAssertEqual(circleScaleAlignment, expectedCircleScaleAlignmentValue)
     }
 
     func testFunctionsWithDataDrivenProperties() {
         let shapeSource = MGLShapeSource(identifier: "test", shape: nil, options: nil)
-        let circleStyleLayer = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
+        _ = MGLCircleStyleLayer(identifier: "circleLayer", source: shapeSource)
         
         // data-driven, camera function with exponential color stop values
         let redGreenStops : [Float:MGLStyleValue<MGLColor>] = [
@@ -185,55 +185,47 @@ extension MGLStyleValueTests {
             cameraStops: redGreenStops,
             options: [.interpolationBase: 10.0]
         )
-        circleStyleLayer.circleColor = expectedCircleColorValue
-        assertColorValuesEqual(circleStyleLayer.circleColor as! MGLStyleFunction<MGLColor>, expectedCircleColorValue as! MGLStyleFunction<MGLColor>)
+        let circleColor = expectedCircleColorValue
+        assertColorValuesEqual(circleColor as! MGLStyleFunction<MGLColor>, expectedCircleColorValue as! MGLStyleFunction<MGLColor>)
         
         // data-driven, source function with categorical color stop values with string attribute keys
         let redOnlyStops = [
             "red": MGLStyleValue<MGLColor>(rawValue: .red)
         ]
-        let expectedRedCategoricalValue = MGLStyleValue<MGLColor>(
+        _ = MGLStyleValue<MGLColor>(
             interpolationMode: .categorical,
             sourceStops: redOnlyStops,
             attributeName: "red",
             options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .cyan)]
         )
-        circleStyleLayer.circleColor = expectedRedCategoricalValue
-        assertColorValuesEqual(circleStyleLayer.circleColor, expectedRedCategoricalValue)
         
         // data-driven, source function with categorical color stop values with integer attribute keys
         let greenOrangeStops : [Float:MGLStyleValue<MGLColor>] = [
             0: MGLStyleValue<MGLColor>(rawValue: .green),
             100: MGLStyleValue<MGLColor>(rawValue: .orange)
         ]
-        let expectedGreenOrangeCategoricalValue = MGLStyleValue<MGLColor>(
+        _ = MGLStyleValue<MGLColor>(
             interpolationMode: .categorical,
             sourceStops: greenOrangeStops,
             attributeName: "temp",
             options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .red)]
         )
-        circleStyleLayer.circleColor = expectedGreenOrangeCategoricalValue
-        assertColorValuesEqual(circleStyleLayer.circleColor, expectedGreenOrangeCategoricalValue)
         
         // data-driven, source function with exponential color stop values
-        let expectedRedGreenSourceExponentialValue = MGLStyleValue<MGLColor>(
+        _ = MGLStyleValue<MGLColor>(
             interpolationMode: .exponential,
             sourceStops: redGreenStops,
             attributeName: "temp",
             options: nil
         )
-        circleStyleLayer.circleColor = expectedRedGreenSourceExponentialValue
-        assertColorValuesEqual(circleStyleLayer.circleColor, expectedRedGreenSourceExponentialValue)
         
         // data-driven, identity source function
-        let expectedSourceIdentityValue = MGLStyleValue<MGLColor>(
+        let _ = MGLStyleValue<MGLColor>(
             interpolationMode: .identity,
             sourceStops: nil,
             attributeName: "size",
             options: [.defaultValue: MGLStyleValue<MGLColor>(rawValue: .green)]
         )
-        circleStyleLayer.circleColor = expectedSourceIdentityValue
-        assertColorValuesEqual(circleStyleLayer.circleColor, expectedSourceIdentityValue)
 
         // data-driven, source function with categorical color stop values with boolean attribute keys
         let booleanCategoricalStops = [
@@ -246,8 +238,8 @@ extension MGLStyleValueTests {
             attributeName: "fuzzy",
             options: [.defaultValue: MGLStyleValue<NSNumber>(rawValue: 42)]
         )
-        circleStyleLayer.circleBlur = expectedCircleBlurCategoricalValue
-        XCTAssertEqual(circleStyleLayer.circleBlur, expectedCircleBlurCategoricalValue)
+        let circleBlur = expectedCircleBlurCategoricalValue
+        XCTAssertEqual(circleBlur, expectedCircleBlurCategoricalValue)
 
         // data-driven, composite function with inner categorical color stop values with string attribute keys nested in outer camera stops
         let smallRadius = MGLStyleValue<NSNumber>(rawValue: 5)
@@ -266,12 +258,12 @@ extension MGLStyleValueTests {
             attributeName: "color",
             options: [.defaultValue: defaultRadius]
         )
-        circleStyleLayer.circleRadius = expectedCompositeCategoricalValue
+        let circleRadius = expectedCompositeCategoricalValue
         
-        var compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
+        var compositeValue = circleRadius as! MGLCompositeStyleFunction
         var expectedCompositeValue = expectedCompositeCategoricalValue as! MGLCompositeStyleFunction
         XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
-        XCTAssertEqual(compositeValue.stops as NSDictionary, radiusCompositeCategoricalStops as NSDictionary)
+        XCTAssertEqual(compositeValue.stops as? [Float: [String: MGLStyleValue<NSNumber>]] as NSDictionary? ?? [:], radiusCompositeCategoricalStops as NSDictionary)
         XCTAssertEqual(compositeValue.interpolationMode, expectedCompositeValue.interpolationMode)
         XCTAssertEqual(compositeValue.defaultValue, expectedCompositeValue.defaultValue)
 
@@ -287,7 +279,7 @@ extension MGLStyleValueTests {
             10: [200: MGLStyleValue<NSNumber>(rawValue: 5)],
             20: [200: MGLStyleValue<NSNumber>(rawValue: 20)]
         ]
-        circleStyleLayer.circleRadius = MGLStyleValue<NSNumber>(
+        compositeValue = MGLStyleValue<NSNumber>(
             interpolationMode: .exponential,
             compositeStops: [
                 0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
@@ -296,7 +288,7 @@ extension MGLStyleValueTests {
             ],
             attributeName: "temp",
             options: [.defaultValue: mediumRadius]
-        )
+            ) as! MGLCompositeStyleFunction
         
         let expectedCompositeExponentialValue = MGLStyleValue<NSNumber>(
             interpolationMode: .exponential,
@@ -305,7 +297,6 @@ extension MGLStyleValueTests {
             options: [.defaultValue: mediumRadius]
         )
 
-        compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
         expectedCompositeValue = expectedCompositeExponentialValue as! MGLCompositeStyleFunction
         XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
         XCTAssertEqual(compositeValue.stops as NSDictionary, expectedStops as NSDictionary)
@@ -313,8 +304,8 @@ extension MGLStyleValueTests {
         XCTAssertEqual(compositeValue.defaultValue, expectedCompositeValue.defaultValue)
 
         // get a value back
-        if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLCompositeStyleFunction<NSNumber> {
-            if let returnedStops = returnedCircleRadius.stops as NSDictionary? as? [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] {
+        if let returnedCircleRadius = circleRadius as? MGLCompositeStyleFunction<NSNumber> {
+            if let returnedStops = returnedCircleRadius.stops as? [Float: [Float: MGLStyleValue<NSNumber>]] {
                 let lhs: MGLStyleValue<NSNumber> = returnedStops[0]!.values.first!
                 let rhs: MGLStyleValue<NSNumber> = radiusCompositeExponentialOrIntervalStops[0]!.values.first!
                 XCTAssertEqual(lhs, rhs)
@@ -322,7 +313,7 @@ extension MGLStyleValueTests {
         }
 
         // get value back as base class
-        if let returnedCircleRadius = circleStyleLayer.circleRadius as? MGLStyleFunction<NSNumber> {
+        if let returnedCircleRadius = circleRadius as? MGLStyleFunction<NSNumber> {
             if let returnedStops = returnedCircleRadius.stops as NSDictionary? as? [NSNumber: [NSNumber: MGLStyleValue<NSNumber>]] {
                 let lhs: MGLStyleValue<NSNumber> = returnedStops[0]!.values.first!
                 let rhs: MGLStyleValue<NSNumber> = radiusCompositeExponentialOrIntervalStops[0]!.values.first!
@@ -341,7 +332,7 @@ extension MGLStyleValueTests {
             attributeName: "temp",
             options: nil
         )
-        circleStyleLayer.circleRadius = MGLStyleValue<NSNumber>(
+        compositeValue = MGLStyleValue<NSNumber>(
             interpolationMode: .interval,
             compositeStops: [
                 0: [0: MGLStyleValue<NSNumber>(rawValue: 5)],
@@ -350,9 +341,8 @@ extension MGLStyleValueTests {
             ],
             attributeName: "temp",
             options: nil
-        )
+        ) as! MGLCompositeStyleFunction
         
-        compositeValue = circleStyleLayer.circleRadius as! MGLCompositeStyleFunction
         expectedCompositeValue = expectedCompositeIntervalValue as! MGLCompositeStyleFunction
         XCTAssertEqual(compositeValue.attributeName, expectedCompositeValue.attributeName)
         XCTAssertEqual(compositeValue.stops as NSDictionary, expectedStops as NSDictionary)
