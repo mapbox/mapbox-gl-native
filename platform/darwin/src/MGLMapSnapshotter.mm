@@ -9,6 +9,7 @@
 #import <mbgl/util/default_thread_pool.hpp>
 #import <mbgl/util/string.hpp>
 #import <mbgl/util/shared_thread_pool.hpp>
+#import <mbgl/math/wrap.hpp>
 
 #import "MGLOfflineStorage_Private.h"
 #import "MGLGeometry_Private.h"
