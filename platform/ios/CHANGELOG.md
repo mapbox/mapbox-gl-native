@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.7.2
 
-* Removed support for 32-bit simulators. ([#10772](https://github.com/mapbox/mapbox-gl-native/pull/10772))
+* Reduced the file size of the dSYM by removing the i386 architecture. Support for the i386 architecture (used by 32-bit simulators) will also be removed from the framework itself in a future release. ([#10781](https://github.com/mapbox/mapbox-gl-native/pull/10781))
 
 ## 3.7.1 - December 6, 2017
 
