@@ -62,10 +62,14 @@ public:
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wnullability-completeness"
     template <class Fn>
-    static optional<Error> eachMember(const Holder&, Fn&&) {
+    static optional<Error> eachMember(const Holder& holder, Fn&& visit) {
 #pragma clang diagnostic pop
-        // Not implemented (unneeded for MGLStyleFunction conversion).
-        NSCAssert(NO, @"eachMember not implemented");
+        [holder.value enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+            auto result = visit(std::string(static_cast<const char *>([key UTF8String])), obj);
+            if (result) {
+                *stop = YES;
+            }
+        }];
         return {};
     }
 
