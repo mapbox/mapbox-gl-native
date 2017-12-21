@@ -6,7 +6,7 @@ import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 
 import com.mapbox.services.android.telemetry.constants.GeoConstants;
-import com.mapbox.services.android.telemetry.utils.MathUtils;
+
 
 /**
  * A geographical location which contains a single latitude, longitude pair, with
@@ -204,8 +204,33 @@ public class LatLng implements ILatLng, Parcelable {
    * @return new LatLng object with wrapped Longitude
    */
   public LatLng wrap() {
-    longitude = MathUtils.wrap(longitude, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE);
-    return this;
+    return new LatLng(latitude, wrap(longitude, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+  }
+
+
+  /**
+   * Constrains value to the given range (including min & max) via modular arithmetic.
+   * <p>
+   * Same formula as used in Core GL (wrap.hpp)
+   * std::fmod((std::fmod((value - min), d) + d), d) + min;
+   *
+   * Multiples of max value will be wrapped to max.
+   *
+   * @param value Value to wrap
+   * @param min   Minimum value
+   * @param max   Maximum value
+   * @return Wrapped value
+   */
+  static double wrap(double value, double min, double max) {
+    double delta = max - min;
+
+    double firstMod = (value - min) % delta;
+    double secondMod = (firstMod + delta) % delta;
+
+    if (value >= max && secondMod == 0) {
+      return max;
+    }
+    return secondMod + min;
   }
 
   /**
