@@ -34,6 +34,15 @@ public class InfoWindowAdapterActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
+      mapboxMap.setAllowConcurrentMultipleOpenInfoWindows(true);
+      mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
+        @Override
+        public void onMapClick(@NonNull LatLng point) {
+          for (Marker marker : mapboxMap.getMarkers()) {
+            marker.setTitle("bladslfbladb");
+          }
+        }
+      });
       addMarkers();
       addCustomInfoWindowAdapter();
     });

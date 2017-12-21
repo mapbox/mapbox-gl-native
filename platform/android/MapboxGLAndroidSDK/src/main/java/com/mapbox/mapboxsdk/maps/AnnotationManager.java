@@ -83,6 +83,7 @@ class AnnotationManager {
   AnnotationManager bind(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     this.markerViewManager.bind(mapboxMap);
+    this.infoWindowManager.bind(mapboxMap);
     return this;
   }
 
@@ -170,11 +171,15 @@ class AnnotationManager {
   //
 
   Marker addMarker(@NonNull BaseMarkerOptions markerOptions, @NonNull MapboxMap mapboxMap) {
-    return markers.addBy(markerOptions, mapboxMap);
+    Marker marker = markers.addBy(markerOptions, mapboxMap);
+    infoWindowManager.addMarker(mapView, marker);
+    return marker;
   }
 
   List<Marker> addMarkers(@NonNull List<? extends BaseMarkerOptions> markerOptionsList, @NonNull MapboxMap mapboxMap) {
-    return markers.addBy(markerOptionsList, mapboxMap);
+    List<Marker> markerList = markers.addBy(markerOptionsList, mapboxMap);
+    infoWindowManager.addMarkers(mapView, markerList);
+    return markerList;
   }
 
   void updateMarker(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
