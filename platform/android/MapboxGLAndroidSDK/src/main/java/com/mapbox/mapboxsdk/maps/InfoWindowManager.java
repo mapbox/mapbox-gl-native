@@ -11,7 +11,7 @@ import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.style.layers.Filter;
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
@@ -22,6 +22,10 @@ import com.mapbox.services.commons.geojson.Point;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 
 /**
  * Responsible for managing InfoWindows shown on the Map.
@@ -55,17 +59,21 @@ class InfoWindowManager {
   private MapboxMap.OnInfoWindowLongClickListener onInfoWindowLongClickListener;
   private MapboxMap.OnInfoWindowCloseListener onInfoWindowCloseListener;
 
-  void bind(MapboxMap mapboxMap) {
+  void initialise(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    initialise();
-  }
 
-  private void initialise() {
     infoWindowsSource = new GeoJsonSource(SOURCE_ID);
     mapboxMap.addSource(infoWindowsSource);
 
     infoWindowsLayer = new SymbolLayer(LAYER_ID, SOURCE_ID)
-      .withProperties(PropertyFactory.iconImage("{" + PROPERTY_ID + "}"))
+      .withProperties(
+        iconImage("{" + PROPERTY_ID + "}"),
+        /* set anchor of icon to bottom-left */
+        iconAnchor(Property.ICON_ANCHOR_BOTTOM_LEFT),
+
+        /* offset icon slightly to match bubble layout */
+        iconOffset(new Float[] {-20.0f, -10.0f})
+      )
       .withFilter(Filter.eq(PROPERTY_SELECTED, true));
     mapboxMap.addLayer(infoWindowsLayer);
   }
@@ -178,6 +186,9 @@ class InfoWindowManager {
   }
 
   private void refreshSource() {
+    if (mapboxMap.getSource(SOURCE_ID) == null) {
+      mapboxMap.addSource(infoWindowsSource);
+    }
     infoWindowsSource.setGeoJson(featureCollection);
   }
 }

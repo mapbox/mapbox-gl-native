@@ -83,7 +83,6 @@ class AnnotationManager {
   AnnotationManager bind(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
     this.markerViewManager.bind(mapboxMap);
-    this.infoWindowManager.bind(mapboxMap);
     return this;
   }
 

@@ -169,6 +169,7 @@ public final class MapboxMap {
    * Called before the OnMapReadyCallback is invoked.
    */
   void onPreMapReady() {
+    annotationManager.getInfoWindowManager().initialise(this);
     annotationManager.reloadMarkers();
     annotationManager.adjustTopOffsetPixels(this);
   }
