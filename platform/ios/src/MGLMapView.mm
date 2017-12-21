@@ -747,7 +747,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0 + self.contentInset.top]];
+                                       constant:5.0]];
     }
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.compassView
@@ -757,6 +757,7 @@ public:
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1.0
                                    constant:5.0 + self.contentInset.top]];
+    
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
@@ -781,7 +782,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0 + self.contentInset.top]];
+                                       constant:5.0]];
     }
     [self.scaleBarConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.scaleBar
