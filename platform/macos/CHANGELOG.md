@@ -43,6 +43,9 @@
 * Fixed distortion in the logo view on macOS 10.13 High Sierra. ([#10606](https://github.com/mapbox/mapbox-gl-native/pull/10606))
 * Fixed an issue that could cause line label rendering glitches when the line geometry is projected to a point behind the plane of the camera. ([#9865](https://github.com/mapbox/mapbox-gl-native/pull/9865))
 * Fixed an issue that could cause a crash when using `-[MGLMapView flyToCamera:completionHandler:]` and related methods with zoom levels at or near the maximum value. ([#9381](https://github.com/mapbox/mapbox-gl-native/pull/9381))
+* Fixed an issue where removing a `MGLOpenGLStyleLayer` from a map might result in a crash. ([#10765](https://github.com/mapbox/mapbox-gl-native/pull/10765))
+* Added documentation for usage of coordinate bounds that cross the anti-meridian. ([#10783](https://github.com/mapbox/mapbox-gl-native/pull/10783))
+* Removed duplicated variables in `MGLMapSnapshotter`. ([#10702](https://github.com/mapbox/mapbox-gl-native/pull/10702))
 
 ## 0.5.1
 
