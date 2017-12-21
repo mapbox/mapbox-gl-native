@@ -170,6 +170,10 @@ TEST(LatLng, Boundaries) {
     coordinate.wrap();
     ASSERT_DOUBLE_EQ(179.90000000000001, coordinate.longitude()); // 1E-14
 
+    coordinate = LatLng(0, 180);
+    coordinate.wrap();
+    ASSERT_DOUBLE_EQ(180.0, coordinate.longitude());
+
     coordinate = LatLng(0, 180.9);
     coordinate.wrap();
     ASSERT_DOUBLE_EQ(-179.09999999999999, coordinate.longitude());

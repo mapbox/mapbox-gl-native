@@ -8,6 +8,7 @@
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/math/clamp.hpp>
+#include <mbgl/math/wrap.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/platform.hpp>
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include <mbgl/math/clamp.hpp>
-#include <mbgl/math/wrap.hpp>
 #include <mbgl/util/constants.hpp>
 
 #include <mapbox/geometry/point.hpp>
@@ -53,8 +52,15 @@ public:
 
     LatLng wrapped() const { return { lat, lon, Wrapped }; }
 
+    double wrap (double value, double min, double max) {
+        const double d = max - min;
+        const double f = std::fmod(value - min, d);
+        const double s = std::fmod(f + d, d);
+        return value >= max && s == 0 ? max : s + min;
+    }
+
     void wrap() {
-        lon = util::wrap(lon, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
+        lon = wrap(lon, -util::LONGITUDE_MAX, util::LONGITUDE_MAX);
     }
 
     // If the distance from start to end longitudes is between half and full
