@@ -83,36 +83,32 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         mapView.style?.addSource(source)
         
         #if os(macOS)
-            let stops = [
-                0: MGLStyleValue<NSColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: NSColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
         #else
-            let stops = [
-                0: MGLStyleValue<UIColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: UIColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
         #endif
         
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         #if os(macOS)
-            layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
-                                              sourceStops: stops,
-                                              attributeName: "mag",
-                                              options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
+            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                             stops)
         #else
-            layer.circleColor = MGLStyleValue(interpolationMode: .exponential,
-                                              sourceStops: stops,
-                                              attributeName: "mag",
-                                              options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
+            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                             stops)
         #endif
-        layer.circleRadius = MGLStyleValue(rawValue: 10)
+        layer.circleRadius = NSExpression(forConstantValue: 10)
         mapView.style?.insertLayer(layer, below: symbolLayer)
         //#-end-example-code
     }
@@ -123,14 +119,13 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         
         //#-example-code
         let stops = [
-            12: MGLStyleValue<NSNumber>(rawValue: 0.5),
-            14: MGLStyleValue(rawValue: 2),
-            18: MGLStyleValue(rawValue: 18),
+            12: 0.5,
+            14: 2,
+            18: 18,
         ]
         
-        layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
-                                           cameraStops: stops,
-                                           options: [.interpolationBase: 1.5])
+        layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+                                          stops)
         //#-end-example-code
     }
     
@@ -140,31 +135,27 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         
         //#-example-code
         #if os(macOS)
-            let stops = [
-                0: MGLStyleValue<NSColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: NSColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
             
-            layer.circleColor = MGLStyleValue(interpolationMode: .interval,
-                                              sourceStops: stops,
-                                              attributeName: "mag",
-                                              options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .green)])
+            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+                                             NSColor.green, stops)
         #else
-            let stops = [
-                0: MGLStyleValue<UIColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: UIColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
             
-            layer.circleColor = MGLStyleValue(interpolationMode: .interval,
-                                              sourceStops: stops,
-                                              attributeName: "mag",
-                                              options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
+            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+                                             UIColor.green, stops)
         #endif
         //#-end-example-code
     }
@@ -175,28 +166,24 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         
         //#-example-code
         #if os(macOS)
-            let categoricalStops = [
-                "earthquake": MGLStyleValue<NSColor>(rawValue: .orange),
-                "explosion": MGLStyleValue(rawValue: .red),
-                "quarry blast": MGLStyleValue(rawValue: .yellow),
+            let colors: [String: NSColor] = [
+                "earthquake": .orange,
+                "explosion": .red,
+                "quarry blast": .yellow,
             ]
-            
-            layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
-                                              sourceStops: categoricalStops,
-                                              attributeName: "type",
-                                              options: [.defaultValue: MGLStyleValue<NSColor>(rawValue: .blue)])
+            let defaultColor = NSColor.blue
         #else
-            let categoricalStops = [
-                "earthquake": MGLStyleValue<UIColor>(rawValue: .orange),
-                "explosion": MGLStyleValue(rawValue: .red),
-                "quarry blast": MGLStyleValue(rawValue: .yellow),
+            let colors: [String: UIColor] = [
+                "earthquake": .orange,
+                "explosion": .red,
+                "quarry blast": .yellow,
             ]
-            
-            layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
-                                              sourceStops: categoricalStops,
-                                              attributeName: "type",
-                                              options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .blue)])
+            let defaultColor = UIColor.blue
         #endif
+        
+        layer.circleColor = NSExpression(
+            format: "TERNARY(FUNCTION(%@, 'valueForKeyPath:', type) != nil, FUNCTION(%@, 'valueForKeyPath:', type), %@)",
+            colors, colors, defaultColor)
         //#-end-example-code
     }
     
@@ -205,10 +192,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
         //#-example-code
-        layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
-                                           sourceStops: nil,
-                                           attributeName: "mag",
-                                           options: [.defaultValue: MGLStyleValue<NSNumber>(rawValue: 0)])
+        layer.circleRadius = NSExpression(forKeyPath: "mag")
         //#-end-example-code
     }
 }
