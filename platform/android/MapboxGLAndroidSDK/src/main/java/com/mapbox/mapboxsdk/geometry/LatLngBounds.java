@@ -5,8 +5,8 @@ import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +48,8 @@ public class LatLngBounds implements Parcelable {
    */
   public static LatLngBounds world() {
     return new LatLngBounds.Builder()
-      .include(new LatLng(GeoConstants.MAX_LATITUDE, GeoConstants.MAX_LONGITUDE))
-      .include(new LatLng(GeoConstants.MIN_LATITUDE, GeoConstants.MIN_LONGITUDE))
+      .include(new LatLng(GeometryConstants.MAX_LATITUDE, GeometryConstants.MAX_LONGITUDE))
+      .include(new LatLng(GeometryConstants.MIN_LATITUDE, GeometryConstants.MIN_LONGITUDE))
       .build();
   }
 
@@ -194,10 +194,10 @@ public class LatLngBounds implements Parcelable {
    * @return LatLngBounds
    */
   static LatLngBounds fromLatLngs(final List<? extends ILatLng> latLngs) {
-    double minLat = 90;
-    double minLon = 180;
-    double maxLat = -90;
-    double maxLon = -180;
+    double minLat = GeometryConstants.MAX_LATITUDE;
+    double minLon = GeometryConstants.MAX_LONGITUDE;
+    double maxLat = GeometryConstants.MIN_LATITUDE;
+    double maxLon = GeometryConstants.MIN_LONGITUDE;
 
     for (final ILatLng gp : latLngs) {
       final double latitude = gp.getLatitude();
@@ -237,11 +237,16 @@ public class LatLngBounds implements Parcelable {
   }
 
   private static double lon_(int z, int x) {
-    return x / Math.pow(2.0, z) * 360.0 - GeoConstants.MAX_LONGITUDE;
+    return x / Math.pow(2.0, z) * 360.0 - GeometryConstants.MAX_LONGITUDE;
   }
 
   /**
    * Constructs a LatLngBounds from a Tile identifier.
+   *
+   * Returned bounds will have latitude in the range of Mercator projection.
+   * @see GeometryConstants#MIN_MERCATOR_LATITUDE
+   * @see GeometryConstants#MAX_MERCATOR_LATITUDE
+   *
    * @param z Tile zoom level.
    * @param x Tile X coordinate.
    * @param y Tile Y coordinate.
