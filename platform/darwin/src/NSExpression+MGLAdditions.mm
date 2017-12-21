@@ -3,10 +3,13 @@
 #import "MGLTypes.h"
 #if TARGET_OS_IPHONE
     #import "UIColor+MGLAdditions.h"
+    #define MGLEdgeInsets UIEdgeInsets
 #else
     #import "NSColor+MGLAdditions.h"
+    #define MGLEdgeInsets NSEdgeInsets
 #endif
 #import "NSPredicate+MGLAdditions.h"
+#import "NSValue+MGLStyleAttributeAdditions.h"
 
 #import <mbgl/style/expression/expression.hpp>
 
@@ -179,6 +182,18 @@
 
 @end
 
+@implementation MGLColor (MGLExpressionAdditions)
+
+- (id)mgl_jsonExpressionObject {
+    auto color = [self mgl_color];
+    if (color.a == 1) {
+        return @[@"rgb", @(color.r * 255), @(color.g * 255), @(color.b * 255)];
+    }
+    return @[@"rgba", @(color.r * 255), @(color.g * 255), @(color.b * 255), @(color.a)];
+}
+
+@end
+
 @implementation NSArray (MGLExpressionAdditions)
 
 - (id)mgl_jsonExpressionObject {
@@ -221,7 +236,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     });
     
     if ([object isKindOfClass:[NSString class]] ||
-        [object isKindOfClass:[NSNumber class]]) {
+        [object isKindOfClass:[NSNumber class]] ||
+        [object isKindOfClass:[NSValue class]] ||
+        [object isKindOfClass:[MGLColor class]]) {
         return [NSExpression expressionForConstantValue:object];
     }
     
@@ -320,18 +337,32 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     
     switch (self.expressionType) {
         case NSConstantValueExpressionType: {
-            if ([self.constantValue isEqual:@(M_E)]) {
+            id constantValue = self.constantValue;
+            if ([constantValue isEqual:@(M_E)]) {
                 return @[@"e"];
             }
-            if ([self.constantValue isEqual:@(M_PI)]) {
+            if ([constantValue isEqual:@(M_PI)]) {
                 return @[@"pi"];
             }
-            if ([self.constantValue isKindOfClass:[MGLColor class]]) {
-                auto color = [self.constantValue mgl_color];
+            if ([constantValue isKindOfClass:[MGLColor class]]) {
+                auto color = [constantValue mgl_color];
                 if (color.a == 1) {
                     return @[@"rgb", @(color.r * 255), @(color.g * 255), @(color.b * 255)];
                 }
                 return @[@"rgba", @(color.r * 255), @(color.g * 255), @(color.b * 255), @(color.a)];
+            }
+            if ([constantValue isKindOfClass:[NSValue class]]) {
+                const auto boxedValue = (NSValue *)constantValue;
+                if (strcmp([boxedValue objCType], @encode(CGVector)) == 0) {
+                    // offset [x, y]
+                    std::array<float, 2> mglValue = boxedValue.mgl_offsetArrayValue;
+                    return @[@"literal", @[@(mglValue[0]), @(mglValue[1])]];
+                }
+                if (strcmp([boxedValue objCType], @encode(MGLEdgeInsets)) == 0) {
+                    // padding [x, y]
+                    std::array<float, 4> mglValue = boxedValue.mgl_paddingArrayValue;
+                    return @[@"literal", @[@(mglValue[0]), @(mglValue[1]), @(mglValue[2]), @(mglValue[3])]];
+                }
             }
             return self.constantValue;
         }

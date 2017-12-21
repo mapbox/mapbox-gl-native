@@ -1,4 +1,11 @@
 #import <Foundation/Foundation.h>
+#if TARGET_OS_IPHONE
+    #import <UIKit/UIKit.h>
+#else
+    #import <Cocoa/Cocoa.h>
+#endif
+
+#import "MGLTypes.h"
 
 #include <mbgl/style/filter.hpp>
 
@@ -36,6 +43,12 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface NSArray (MGLExpressionAdditions)
+
+@property (nonatomic, readonly) id mgl_jsonExpressionObject;
+
+@end
+
+@interface MGLColor (MGLExpressionAdditions)
 
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
