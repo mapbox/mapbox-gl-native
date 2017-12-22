@@ -647,13 +647,13 @@ double Map::getTopOffsetPixelsForAnnotationImage(const std::string& id) {
 }
 
 AnnotationID Map::addAnnotation(const Annotation& annotation) {
-    auto result = impl->annotationManager.addAnnotation(annotation, getMaxZoom());
+    auto result = impl->annotationManager.addAnnotation(annotation);
     impl->onUpdate();
     return result;
 }
 
 void Map::updateAnnotation(AnnotationID id, const Annotation& annotation) {
-    if (impl->annotationManager.updateAnnotation(id, annotation, getMaxZoom())) {
+    if (impl->annotationManager.updateAnnotation(id, annotation)) {
         impl->onUpdate();
     }
 }
