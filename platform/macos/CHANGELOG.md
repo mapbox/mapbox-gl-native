@@ -1,12 +1,10 @@
 # Changelog for Mapbox Maps SDK for macOS
 
-### Annotations
-
 ## v0.6.0
 
 ### Packaging
 
-* Renamed this SDK from Mapbox macOS SDK to Mapbox Maps SDK for macOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610))
+* Renamed this SDK from Mapbox macOS SDK to Mapbox Maps SDK for macOS. ([#10610](https://github.com/mapbox/mapbox-gl-native/pull/10610), [#10793](https://github.com/mapbox/mapbox-gl-native/pull/10793))
 * Added a Bulgarian localization. ([#10309](https://github.com/mapbox/mapbox-gl-native/pull/10309))
 
 ### Networking and storage
