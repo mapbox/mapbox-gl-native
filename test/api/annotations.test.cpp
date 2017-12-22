@@ -459,3 +459,19 @@ TEST(Annotations, DebugSparse) {
 
     test.checkRendering("debug_sparse");
 }
+
+TEST(Annotations, ChangeMaxZoom) {
+    AnnotationTest test;
+
+    LineString<double> line = {{ { 0, 0 }, { 45, 45 }, { 30, 0 } }};
+    LineAnnotation annotation { line };
+    annotation.color = Color::red();
+    annotation.width = { 5 };
+
+    test.map.setMaxZoom(6);
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.addAnnotation(annotation);
+    test.map.setMaxZoom(14);
+    test.map.setZoom(test.map.getMaxZoom());
+    test.checkRendering("line_annotation_max_zoom");
+}
