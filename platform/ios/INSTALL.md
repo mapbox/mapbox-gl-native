@@ -10,7 +10,10 @@ The Mapbox Maps SDK for iOS is intended to run on iOS 8.0 and above on the follo
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
 
-The Mapbox Maps SDK for iOS requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
+The Mapbox Maps SDK for iOS requires:
+
+* Xcode 9.1 or higher to compile from source
+* Xcode 8.0 or higher to integrate the compiled framework into an application
 
 ### Building the SDK
 
@@ -22,9 +25,8 @@ The Mapbox Maps SDK for iOS requires Xcode 8.0 or higher. To use this SDK with X
    [sudo] gem install jazzy
    ```
 
-1. Run `make ipackage`. The packaging script will produce a `build/ios/pkg/` folder containing:
+1. Run `make iframework BUILDTYPE=Release`. The packaging script will produce a `build/ios/pkg/` folder containing:
   - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
-  - a `static` folder containing a statically-linked framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
   - an example `Settings.bundle` containing an optional Mapbox Telemetry opt-out setting
 
@@ -58,7 +60,7 @@ A nightly build of the dynamic framework, based on the master branch, is availab
 
 You can alternatively install the SDK as a static framework:
 
-1. Build from source manually, per above.
+1. Build from source using the `make ipackage` command.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
