@@ -13,9 +13,8 @@ namespace mbgl {
 using namespace style;
 namespace geojsonvt = mapbox::geojsonvt;
 
-ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_, const uint8_t maxZoom_)
+ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_)
     : id(id_),
-      maxZoom(maxZoom_),
       layerID(AnnotationManager::ShapeLayerID + util::toString(id)) {
 }
 
@@ -28,7 +27,9 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             return Feature { std::move(geom) };
         }));
         mapbox::geojsonvt::Options options;
-        options.maxZoom = maxZoom;
+        // The annotation source is currently hard coded to maxzoom 16, so we're topping out at z16
+        // here as well.
+        options.maxZoom = 16;
         options.buffer = 255u;
         options.extent = util::EXTENT;
         options.tolerance = baseTolerance;
