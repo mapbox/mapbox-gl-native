@@ -6,7 +6,7 @@ This document explains how to build the Mapbox Maps SDK for iOS from source. It 
 
 The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above.
 
-The Mapbox Maps SDK for iOS requires Xcode 8.0 or above.
+The Mapbox Maps SDK for iOS requires Xcode 9.1 or above to compile from source.
 
 ## Building the SDK
 
@@ -30,7 +30,7 @@ Before building, use the scheme picker button in the toolbar to change the schem
 * **static** builds the SDK as a static library and separate resource bundle.
 * **dynamic+static** is a combination of the **dynamic** and **static** schemes.
 
-If you don’t have an Apple Developer account, change the destination to a simulator such as “iPhone 6s” before you run and build the app.
+If you don’t have an Apple Developer account, change the destination to a simulator such as “iPhone 6s” before you build and run the app.
 
 ### Packaging builds
 
@@ -52,12 +52,12 @@ You can customize the build output by passing the following arguments into the `
 * `BUILDTYPE=Release` will optimize for distribution. Defaults to `Debug`.
 * `BUILD_DEVICE=false` builds only for the iOS Simulator.
 * `FORMAT=dynamic` builds only a dynamic framework. `FORMAT=static` builds only a static framework, for legacy compatibility.
-* `SYMBOLS=NO` strips the build output of any debug symbols, yielding much smaller binaries. Defaults to `YES`.
+* `SYMBOLS=NO` strips the build output of any debug symbols, yielding smaller binaries. Defaults to `YES`.
 
 An example command that creates a dynamic framework suitable for eventual App Store distribution:
 
 ```bash
-make iframework BUILDTYPE=Release SYMBOLS=NO
+make iframework BUILDTYPE=Release
 ```
 
 The products of these build commands can be found in the `build/ios/pkg` folder at the base of the repository.
@@ -168,5 +168,5 @@ The included applications use Mapbox vector tiles, which require a Mapbox accoun
 - Use two fingers to rotate
 - Double-tap to zoom in one level
 - Two-finger single-tap to zoom out one level
-- Double-tap, long-pressing the second, then pan up and down to "quick zoom" (iPhone only, meant for one-handed use)
+- Double-tap, long-pressing the second, then pan up and down to "quick zoom" (meant for one-handed use)
 - Use the debug menu to add test annotations, reset position, and cycle through the debug options.
