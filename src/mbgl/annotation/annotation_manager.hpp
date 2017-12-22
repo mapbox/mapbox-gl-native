@@ -28,8 +28,8 @@ public:
     AnnotationManager(style::Style&);
     ~AnnotationManager();
 
-    AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);
-    bool updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
+    AnnotationID addAnnotation(const Annotation&);
+    bool updateAnnotation(const AnnotationID&, const Annotation&);
     void removeAnnotation(const AnnotationID&);
 
     void addImage(std::unique_ptr<style::Image>);
@@ -49,13 +49,13 @@ public:
     static const std::string ShapeLayerID;
 
 private:
-    void add(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
-    void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
-    void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    void add(const AnnotationID&, const SymbolAnnotation&);
+    void add(const AnnotationID&, const LineAnnotation&);
+    void add(const AnnotationID&, const FillAnnotation&);
 
-    void update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
-    void update(const AnnotationID&, const LineAnnotation&, const uint8_t);
-    void update(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    void update(const AnnotationID&, const SymbolAnnotation&);
+    void update(const AnnotationID&, const LineAnnotation&);
+    void update(const AnnotationID&, const FillAnnotation&);
 
     void remove(const AnnotationID&);
 
