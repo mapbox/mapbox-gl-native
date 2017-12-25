@@ -96,15 +96,12 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
             tileZoom = idealZoom;
+        }
 
-            // FIXME: Prefetching is only enabled for raster
-            // tiles until we fix #7026.
-
-            // Request lower zoom level tiles (if configure to do so) in an attempt
-            // to show something on the screen faster at the cost of a little of bandwidth.
-            if (parameters.prefetchZoomDelta) {
-                panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
-            }
+        // Request lower zoom level tiles (if configure to do so) in an attempt
+        // to show something on the screen faster at the cost of a little of bandwidth.
+        if (parameters.prefetchZoomDelta) {
+            panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
 
             if (panZoom < tileZoom) {
                 panTiles = util::tileCover(parameters.transformState, panZoom);
