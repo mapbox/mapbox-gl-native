@@ -54,6 +54,9 @@ static NSString *const MGLEventKeySessionId = @"sessionId";
 static NSString *const MGLEventKeyApplicationState = @"applicationState";
 static NSString *const MGLEventKeyAltitude = @"altitude";
 
+static NSString *const MGLMapboxAccountType = @"MGLMapboxAccountType";
+static NSString *const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
+
 // SDK event source
 static NSString *const MGLEventSource = @"mapbox";
 
@@ -124,6 +127,8 @@ const NSTimeInterval MGLFlushInterval = 180;
 @property (nonatomic) NSTimer *timer;
 @property (nonatomic) NSDate *instanceIDRotationDate;
 @property (nonatomic) NSDate *nextTurnstileSendDate;
+@property (nonatomic) NSNumber *currentAccountTypeValue;
+@property (nonatomic) BOOL currentMetricsEnabledValue;
 
 @end
 
@@ -135,10 +140,10 @@ const NSTimeInterval MGLFlushInterval = 180;
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
         NSBundle *bundle = [NSBundle mainBundle];
-        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:MGLMapboxAccountType];
         [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-             @"MGLMapboxAccountType": accountTypeNumber ?: @0,
-             @"MGLMapboxMetricsEnabled": @YES,
+             MGLMapboxAccountType: accountTypeNumber ?: @0,
+             MGLMapboxMetricsEnabled: @YES,
              @"MGLMapboxMetricsDebugLoggingEnabled": @NO,
          }];
     }
@@ -152,8 +157,8 @@ const NSTimeInterval MGLFlushInterval = 180;
     if ([NSProcessInfo instancesRespondToSelector:@selector(isLowPowerModeEnabled)]) {
         isLowPowerModeEnabled = [[NSProcessInfo processInfo] isLowPowerModeEnabled];
     }
-    return ([[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"] &&
-            [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0 &&
+    return ([[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabled] &&
+            [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType] == 0 &&
             !isLowPowerModeEnabled);
 #endif
 }
@@ -167,6 +172,9 @@ const NSTimeInterval MGLFlushInterval = 180;
 - (instancetype) init {
     self = [super init];
     if (self) {
+        _currentAccountTypeValue = @0;
+        _currentMetricsEnabledValue = YES;
+        
         _appBundleId = [[NSBundle mainBundle] bundleIdentifier];
         _apiClient = [[MGLAPIClient alloc] init];
 
@@ -249,38 +257,61 @@ const NSTimeInterval MGLFlushInterval = 180;
 }
 
 - (void)userDefaultsDidChange:(NSNotification *)notification {
-    dispatch_async(dispatch_get_main_queue(), ^{
-        [self pauseOrResumeMetricsCollectionIfRequired];
-    });
+    
+    // Guard against over calling pause / resume if the values this implementation actually
+    // cares about have not changed
+    
+    if ([[notification object] respondsToSelector:@selector(objectForKey:)]) {
+        NSUserDefaults *userDefaults = [notification object];
+        
+        NSNumber *accountType = [userDefaults objectForKey:MGLMapboxAccountType];
+        BOOL metricsEnabled = [[userDefaults objectForKey:MGLMapboxMetricsEnabled] boolValue];
+        
+        if (![accountType isEqualToNumber:self.currentAccountTypeValue] || metricsEnabled != self.currentMetricsEnabledValue) {
+            [self pauseOrResumeMetricsCollectionIfRequired];
+            self.currentAccountTypeValue = accountType;
+            self.currentMetricsEnabledValue = metricsEnabled;
+        }        
+    }
+    
 }
 
 - (void)pauseOrResumeMetricsCollectionIfRequired {
-    UIApplication *application = [UIApplication sharedApplication];
-
-    // Prevent blue status bar when host app has `when in use` permission only and it is not in foreground
-    if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusAuthorizedWhenInUse &&
-        application.applicationState == UIApplicationStateBackground) {
-
-        if (_backgroundTaskIdentifier == UIBackgroundTaskInvalid) {
-            _backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
-                [application endBackgroundTask:_backgroundTaskIdentifier];
-                _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
-            }];
-            [self flush];
-        }
-
-        [self pauseMetricsCollection];
-        return;
-    }
-
-    // Toggle pause based on current pause state, user opt-out state, and low-power state.
-    BOOL enabled = [[self class] isEnabled];
-    if (self.paused && enabled) {
-        [self resumeMetricsCollection];
-    } else if (!self.paused && !enabled) {
-        [self flush];
-        [self pauseMetricsCollection];
-    }
+    
+    // [CLLocationManager authorizationStatus] has been found to block in some cases so
+    // dispatch the call to a non-UI thread
+    dispatch_async(self.serialQueue, ^{
+        CLAuthorizationStatus status = [CLLocationManager authorizationStatus];
+        
+        // Checking application state must be done on the main thread for safety and
+        // to avoid a thread sanitizer error
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIApplication *application = [UIApplication sharedApplication];
+            UIApplicationState state = application.applicationState;
+            
+            // Prevent blue status bar when host app has `when in use` permission only and it is not in foreground
+            if (status == kCLAuthorizationStatusAuthorizedWhenInUse && state == UIApplicationStateBackground) {
+                if (_backgroundTaskIdentifier == UIBackgroundTaskInvalid) {
+                    _backgroundTaskIdentifier = [application beginBackgroundTaskWithExpirationHandler:^{
+                        [application endBackgroundTask:_backgroundTaskIdentifier];
+                        _backgroundTaskIdentifier = UIBackgroundTaskInvalid;
+                    }];
+                    [self flush];
+                }
+                [self pauseMetricsCollection];
+                return;
+            }
+            
+            // Toggle pause based on current pause state, user opt-out state, and low-power state.
+            BOOL enabled = [[self class] isEnabled];
+            if (self.paused && enabled) {
+                [self resumeMetricsCollection];
+            } else if (!self.paused && !enabled) {
+                [self flush];
+                [self pauseMetricsCollection];
+            }
+        });
+    });
 }
 
 - (void)pauseMetricsCollection {
@@ -602,7 +633,7 @@ const NSTimeInterval MGLFlushInterval = 180;
     BOOL metricsEnabledSettingShownInAppFlag = [shownInAppNumber boolValue];
 
     if (!metricsEnabledSettingShownInAppFlag &&
-        [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
+        [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType] == 0) {
         // Opt-out is not configured in UI, so check for Settings.bundle
         id defaultEnabledValue;
         NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -612,7 +643,7 @@ const NSTimeInterval MGLFlushInterval = 180;
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = settings[@"PreferenceSpecifiers"];
             for (NSDictionary *prefSpecification in preferences) {
-                if ([prefSpecification[@"Key"] isEqualToString:@"MGLMapboxMetricsEnabled"]) {
+                if ([prefSpecification[@"Key"] isEqualToString:MGLMapboxMetricsEnabled]) {
                     defaultEnabledValue = prefSpecification[@"DefaultValue"];
                 }
             }
