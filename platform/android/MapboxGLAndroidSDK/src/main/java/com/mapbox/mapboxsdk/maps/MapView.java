@@ -321,6 +321,10 @@ public class MapView extends FrameLayout {
           MapView.this.post(new Runnable() {
             @Override
             public void run() {
+              // There is no guarantee that onDestroy will not be called before the surface is created
+              if (destroyed) {
+                return;
+              }
               // Initialise only once
               if (mapboxMap == null) {
                 initialiseMap();
