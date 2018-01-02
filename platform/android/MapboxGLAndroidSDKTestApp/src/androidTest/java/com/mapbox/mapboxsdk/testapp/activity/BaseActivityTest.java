@@ -10,18 +10,14 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-
 import junit.framework.Assert;
-
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -72,7 +68,11 @@ public abstract class BaseActivityTest {
   }
 
   protected void waitLoop() {
-    onView(withId(R.id.mapView)).perform(new LoopAction(500));
+    waitLoop(500);
+  }
+
+  protected void waitLoop(long waitTime) {
+    onView(withId(R.id.mapView)).perform(new LoopAction(waitTime));
   }
 
   static boolean isConnected(Context context) {
