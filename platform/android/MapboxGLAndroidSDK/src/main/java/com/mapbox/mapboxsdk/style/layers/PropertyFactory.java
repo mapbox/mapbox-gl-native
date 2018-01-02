@@ -9,6 +9,8 @@ import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.functions.Function;
 
+import java.util.Locale;
+
 /**
  * Constructs paint/layout properties for Layers
  *
@@ -3363,7 +3365,6 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("text-optional", value);
   }
 
-
   /**
    * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
    *
@@ -3375,9 +3376,9 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("text-optional", function);
   }
 
-  @SuppressLint("DefaultLocale")
   public static String colorToRgbaString(@ColorInt int value) {
-    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+    return String.format(Locale.US,"rgba(%d, %d, %d, %d)",
+      (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
   }
 
 }
