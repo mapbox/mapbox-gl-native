@@ -2,9 +2,9 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -276,13 +276,11 @@ public class LatLngBoundsTest {
 
   @Test
   public void fromTileID() {
-    //GeoConstants.MAX_LATITUDE is not defined to a high enough precision
-    double MAX_LATITUDE = 85.05112877980659;
     LatLngBounds bounds = LatLngBounds.from(0, 0, 0);
-    assertEquals(-GeoConstants.MAX_LONGITUDE, bounds.getLonWest(), DELTA);
-    assertEquals(-MAX_LATITUDE, bounds.getLatSouth(), DELTA);
-    assertEquals(GeoConstants.MAX_LONGITUDE, bounds.getLonEast(), DELTA);
-    assertEquals(MAX_LATITUDE, bounds.getLatNorth(), DELTA);
+    assertEquals(GeometryConstants.MIN_LONGITUDE, bounds.getLonWest(), DELTA);
+    assertEquals(GeometryConstants.MIN_MERCATOR_LATITUDE, bounds.getLatSouth(), DELTA);
+    assertEquals(GeometryConstants.MAX_LONGITUDE, bounds.getLonEast(), DELTA);
+    assertEquals(GeometryConstants.MAX_MERCATOR_LATITUDE, bounds.getLatNorth(), DELTA);
 
     bounds = LatLngBounds.from(10, 288, 385);
     assertEquals(-78.75, bounds.getLonWest(), DELTA);
