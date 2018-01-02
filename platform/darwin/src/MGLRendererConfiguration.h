@@ -1,6 +1,6 @@
 #import <Foundation/Foundation.h>
 #import <mbgl/storage/default_file_source.hpp>
-#import <mbgl/renderer/mode.hpp>
+#import <mbgl/map/mode.hpp>
 
 NS_ASSUME_NONNULL_BEGIN
 
