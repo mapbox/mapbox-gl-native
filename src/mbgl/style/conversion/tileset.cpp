@@ -85,8 +85,12 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
             error = { "bounds array must contain numeric longitude and latitude values" };
             return {};
         }
-        if (!validateLatitude(*bottom) || !validateLatitude(*top)){
-            error = { "bounds latitude values must be between -90 and 90" };
+        if (!validateLatitude(*bottom) || !validateLatitude(*top) || top <= bottom){
+            error = { "bounds latitude values must be between -90 and 90 with bottom less than top" };
+            return {};
+        }
+        if(*left >= *right) {
+            error = { "bounds left longitude should be less than right longitude" };
             return {};
         }
         result.bounds = LatLngBounds::hull({ *bottom, *left }, { *top, *right });

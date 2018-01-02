@@ -35,6 +35,8 @@ void updateRenderables(GetTileFn getTile,
         auto tile = getTile(idealDataTileID);
         if (!tile) {
             tile = createTile(idealDataTileID);
+            // For source types where TileJSON.bounds is set, tiles outside the
+            // bounds are not created
             if(tile == nullptr) {
                 continue;
             }

@@ -19,10 +19,10 @@ public:
         auto swProj = Projection::project(bounds.southwest().wrapped(), z);
         auto ne = bounds.northeast();
         auto neProj = Projection::project(ne.longitude() > util::LONGITUDE_MAX ? ne.wrapped() : ne , z);
-        auto minX = std::floor(swProj.x);
-        auto maxX = std::ceil(neProj.x);
-        auto minY = std::floor(neProj.y);
-        auto maxY = std::ceil(swProj.y);
+        const auto minX = std::floor(swProj.x);
+        const auto maxX = std::ceil(neProj.x);
+        const auto minY = std::floor(neProj.y);
+        const auto maxY = std::ceil(swProj.y);
         return TileRange({ {minX, minY}, {maxX, maxY} }, z);
     }
 

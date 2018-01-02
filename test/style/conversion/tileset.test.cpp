@@ -60,7 +60,7 @@ TEST(Tileset, FullConversion) {
         "minzoom": 1,
         "maxzoom": 2,
         "attribution": "mapbox",
-        "bounds": [-180, 73, -120, -73]
+        "bounds": [-180, -73, -120, 73]
     })JSON", error);
 
     EXPECT_EQ(converted.tiles[0], "http://mytiles");
