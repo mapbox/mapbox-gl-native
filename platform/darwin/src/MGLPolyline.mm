@@ -1,9 +1,9 @@
-#import "MGLPolyline.h"
+#import "MGLPolyline_Private.h"
 
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
 
-#import "MGLPolyline+MGLAdditions.h"
+#import "MGLFeature.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mapbox/polylabel.hpp>
@@ -47,6 +47,15 @@
 - (NSDictionary *)geoJSONDictionary {
     return @{@"type": @"LineString",
              @"coordinates": self.mgl_coordinates};
+}
+
+- (NS_ARRAY_OF(id) *)mgl_coordinates {
+    NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
+    for (NSUInteger index = 0; index < self.pointCount; index++) {
+        CLLocationCoordinate2D coordinate = self.coordinates[index];
+        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
+    }
+    return [coordinates copy];
 }
 
 - (BOOL)isEqual:(id)other {

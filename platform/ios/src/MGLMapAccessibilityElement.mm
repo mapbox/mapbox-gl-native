@@ -2,10 +2,11 @@
 #import "MGLDistanceFormatter.h"
 #import "MGLCompassDirectionFormatter.h"
 #import "MGLFeature.h"
-#import "MGLVectorSource+MGLAdditions.h"
+
+#import "MGLGeometry_Private.h"
+#import "MGLVectorSource_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
-#import "MGLGeometry_Private.h"
 
 @implementation MGLMapAccessibilityElement
 
