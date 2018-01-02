@@ -296,49 +296,41 @@ public class MapView extends FrameLayout {
       mapRenderer = new TextureViewMapRenderer(getContext(), textureView, options.getLocalIdeographFontFamily()) {
         @Override
         protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          MapView.this.post(new Runnable() {
-            @Override
-            public void run() {
-              // Initialise only once
-              if (mapboxMap == null) {
-                initialiseMap();
-                mapboxMap.onStart();
-              }
-            }
-          });
-
+          initRenderSurface();
           super.onSurfaceCreated(gl, config);
         }
       };
+
       addView(textureView, 0);
     } else {
       GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
       glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
-
       mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, options.getLocalIdeographFontFamily()) {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          MapView.this.post(new Runnable() {
-            @Override
-            public void run() {
-              // Initialise only once
-              if (mapboxMap == null) {
-                initialiseMap();
-                mapboxMap.onStart();
-              }
-            }
-          });
-
+          initRenderSurface();
           super.onSurfaceCreated(gl, config);
         }
       };
 
       glSurfaceView.setVisibility(View.VISIBLE);
-
     }
 
     nativeMapView = new NativeMapView(this, mapRenderer);
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
+  }
+
+  private void initRenderSurface() {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        // Initialise only when not destroyed and only once
+        if (!destroyed && mapboxMap == null) {
+          initialiseMap();
+          mapboxMap.onStart();
+        }
+      }
+    });
   }
 
   /**
