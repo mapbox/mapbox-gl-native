@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.maps;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -10,10 +9,13 @@ import android.view.View;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
 import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
+import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.FeatureCollection;
@@ -21,11 +23,15 @@ import com.mapbox.services.commons.geojson.Point;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAllowOverlap;
 
 /**
  * Responsible for managing InfoWindows shown on the Map.
@@ -49,7 +55,8 @@ class InfoWindowManager {
   private MapboxMap mapboxMap;
 
   private final List<InfoWindow> infoWindows = new ArrayList<>();
-  private final HashMap<Long, Marker> markerHashMap = new HashMap<>();
+  private final HashMap<Marker, Feature> markerFeatureHashMap = new HashMap<>();
+  private final HashMap<Marker, View> markerViewHashMap = new HashMap<>();
   private final FeatureCollection featureCollection = FeatureCollection.fromFeatures(new ArrayList<Feature>());
 
   private MapboxMap.InfoWindowAdapter infoWindowAdapter;
@@ -72,7 +79,10 @@ class InfoWindowManager {
         iconAnchor(Property.ICON_ANCHOR_BOTTOM_LEFT),
 
         /* offset icon slightly to match bubble layout */
-        iconOffset(new Float[] {-20.0f, -10.0f})
+        iconOffset(new Float[] {-20.0f, -10.0f}),
+        iconIgnorePlacement(true),
+        textAllowOverlap(true),
+        iconAllowOverlap(true)
       )
       .withFilter(Filter.eq(PROPERTY_SELECTED, true));
     mapboxMap.addLayer(infoWindowsLayer);
@@ -130,18 +140,6 @@ class InfoWindowManager {
     return onInfoWindowCloseListener;
   }
 
-  void addMarker(MapView mapView, Marker marker) {
-    invalidateWindow(mapView, marker);
-    addNewFeature(marker);
-    refreshSource();
-  }
-
-  void invalidateWindows(MapView mapView) {
-    for (Marker marker : markerHashMap.values()) {
-      invalidateWindow(mapView, marker);
-    }
-  }
-
   private void invalidateWindow(MapView mapView, Marker marker) {
     LayoutInflater layoutInflater = LayoutInflater.from(mapView.getContext());
     View view;
@@ -150,12 +148,18 @@ class InfoWindowManager {
     } else {
       view = infoWindowAdapter.getInfoWindow(marker);
     }
-    markerHashMap.put(marker.getId(), marker);
+    markerViewHashMap.put(marker, view);
 
     if (view != null) {
       Bitmap bitmap = BitmapUtils.generate(view);
       mapboxMap.addImage(String.valueOf(marker.getId()), bitmap);
     }
+  }
+
+  void addMarker(MapView mapView, Marker marker) {
+    invalidateWindow(mapView, marker);
+    addNewFeature(marker);
+    refreshSource();
   }
 
   void addMarkers(MapView mapView, List<Marker> markers) {
@@ -166,14 +170,6 @@ class InfoWindowManager {
     refreshSource();
   }
 
-  void removeMarker(Context context, Marker marker) {
-
-  }
-
-  public void add(InfoWindow infoWindow) {
-    infoWindows.add(infoWindow);
-  }
-
   private void addNewFeature(Marker marker) {
     Feature feature = Feature.fromGeometry(
       Point.fromCoordinates(
@@ -181,8 +177,47 @@ class InfoWindowManager {
       )
     );
     feature.addNumberProperty(PROPERTY_ID, marker.getId());
-    feature.addBooleanProperty(PROPERTY_SELECTED, true);
+    feature.addBooleanProperty(PROPERTY_SELECTED, false);
     featureCollection.getFeatures().add(feature);
+    markerFeatureHashMap.put(marker, feature);
+  }
+
+  void removeMarker(Marker marker) {
+    Feature feature = markerFeatureHashMap.get(marker);
+    featureCollection.getFeatures().remove(feature);
+    markerFeatureHashMap.remove(marker);
+    markerViewHashMap.remove(marker);
+    refreshSource();
+  }
+
+  void removeAll() {
+    featureCollection.getFeatures().clear();
+    markerFeatureHashMap.clear();
+    markerViewHashMap.clear();
+    refreshSource();
+  }
+
+  public void show(Marker marker) {
+    Feature feature = markerFeatureHashMap.get(marker);
+    boolean isSelected = feature.getBooleanProperty(PROPERTY_SELECTED);
+    if (!isSelected) {
+      feature.addBooleanProperty(PROPERTY_SELECTED, true);
+      refreshSource();
+    }
+  }
+
+  void hide(Marker marker) {
+    Feature feature = markerFeatureHashMap.get(marker);
+    boolean isSelected = feature.getBooleanProperty(PROPERTY_SELECTED);
+    if (isSelected) {
+      feature.addBooleanProperty(PROPERTY_SELECTED, false);
+      refreshSource();
+
+      MapboxMap.OnInfoWindowCloseListener listener = mapboxMap.getOnInfoWindowCloseListener();
+      if (listener != null) {
+        listener.onInfoWindowClose(marker);
+      }
+    }
   }
 
   private void refreshSource() {

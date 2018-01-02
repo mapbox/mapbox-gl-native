@@ -274,7 +274,7 @@ public class InfoWindow {
   }
 
   /**
-   * Will result in getting this {@link InfoWindow} and updating the view being displayed.
+   * Will result in updating the view being displayed by this {@link InfoWindow}.
    */
   public void update() {
     MapboxMap mapboxMap = this.mapboxMap.get();

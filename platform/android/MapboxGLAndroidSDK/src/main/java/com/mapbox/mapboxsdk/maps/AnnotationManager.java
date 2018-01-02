@@ -110,10 +110,7 @@ class AnnotationManager {
   void removeAnnotation(@NonNull Annotation annotation) {
     if (annotation instanceof Marker) {
       Marker marker = (Marker) annotation;
-      marker.hideInfoWindow();
-      if (selectedMarkers.contains(marker)) {
-        selectedMarkers.remove(marker);
-      }
+      infoWindowManager.removeMarker(marker);
 
       if (marker instanceof MarkerView) {
         markerViewManager.removeMarkerView((MarkerView) marker);
@@ -129,10 +126,7 @@ class AnnotationManager {
     for (Annotation annotation : annotationList) {
       if (annotation instanceof Marker) {
         Marker marker = (Marker) annotation;
-        marker.hideInfoWindow();
-        if (selectedMarkers.contains(marker)) {
-          selectedMarkers.remove(marker);
-        }
+        infoWindowManager.removeMarker(marker);
 
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
@@ -148,13 +142,12 @@ class AnnotationManager {
     Annotation annotation;
     int count = annotationsArray.size();
     long[] ids = new long[count];
-    selectedMarkers.clear();
+    infoWindowManager.removeAll();
     for (int i = 0; i < count; i++) {
       ids[i] = annotationsArray.keyAt(i);
       annotation = annotationsArray.get(ids[i]);
       if (annotation instanceof Marker) {
         Marker marker = (Marker) annotation;
-        marker.hideInfoWindow();
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
         } else {
@@ -278,12 +271,13 @@ class AnnotationManager {
   }
 
   void selectMarker(@NonNull Marker marker) {
+    // If marker is already selected do nothing
     if (selectedMarkers.contains(marker)) {
       return;
     }
 
-    // Need to deselect any currently selected annotation first
     if (!infoWindowManager.isAllowConcurrentMultipleOpenInfoWindows()) {
+      // Need to deselect any currently selected annotation first
       deselectMarkers();
     }
 
@@ -293,7 +287,7 @@ class AnnotationManager {
     }
 
     if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
-      infoWindowManager.add(marker.showInfoWindow(mapboxMap, mapView));
+      infoWindowManager.show(marker);
     }
 
     // only add to selected markers if user didn't handle the click event themselves #3176
@@ -301,37 +295,15 @@ class AnnotationManager {
   }
 
   void deselectMarkers() {
-    if (selectedMarkers.isEmpty()) {
-      return;
+    List<Marker> markers = mapboxMap.getMarkers();
+    for (Marker marker : markers) {
+      infoWindowManager.hide(marker);
     }
-
-    for (Marker marker : selectedMarkers) {
-      if (marker.isInfoWindowShown()) {
-        marker.hideInfoWindow();
-      }
-
-      if (marker instanceof MarkerView) {
-        markerViewManager.deselect((MarkerView) marker, false);
-      }
-    }
-
-    // Removes all selected markers from the list
     selectedMarkers.clear();
   }
 
   void deselectMarker(@NonNull Marker marker) {
-    if (!selectedMarkers.contains(marker)) {
-      return;
-    }
-
-    if (marker.isInfoWindowShown()) {
-      marker.hideInfoWindow();
-    }
-
-    if (marker instanceof MarkerView) {
-      markerViewManager.deselect((MarkerView) marker, false);
-    }
-
+    infoWindowManager.hide(marker);
     selectedMarkers.remove(marker);
   }
 
