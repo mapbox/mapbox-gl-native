@@ -34,20 +34,20 @@ void AnnotationManager::onStyleLoaded() {
     updateStyle();
 }
 
-AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation, const uint8_t maxZoom) {
+AnnotationID AnnotationManager::addAnnotation(const Annotation& annotation) {
     std::lock_guard<std::mutex> lock(mutex);
     AnnotationID id = nextID++;
     Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->add(id, annotation_, maxZoom);
+        this->add(id, annotation_);
     });
     dirty = true;
     return id;
 }
 
-bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation, const uint8_t maxZoom) {
+bool AnnotationManager::updateAnnotation(const AnnotationID& id, const Annotation& annotation) {
     std::lock_guard<std::mutex> lock(mutex);
     Annotation::visit(annotation, [&] (const auto& annotation_) {
-        this->update(id, annotation_, maxZoom);
+        this->update(id, annotation_);
     });
     return dirty;
 }
@@ -58,25 +58,25 @@ void AnnotationManager::removeAnnotation(const AnnotationID& id) {
     dirty = true;
 }
 
-void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t) {
+void AnnotationManager::add(const AnnotationID& id, const SymbolAnnotation& annotation) {
     auto impl = std::make_shared<SymbolAnnotationImpl>(id, annotation);
     symbolTree.insert(impl);
     symbolAnnotations.emplace(id, impl);
 }
 
-void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::add(const AnnotationID& id, const LineAnnotation& annotation) {
     ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
-        std::make_unique<LineAnnotationImpl>(id, annotation, maxZoom)).first->second;
+        std::make_unique<LineAnnotationImpl>(id, annotation)).first->second;
     impl.updateStyle(*style.get().impl);
 }
 
-void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::add(const AnnotationID& id, const FillAnnotation& annotation) {
     ShapeAnnotationImpl& impl = *shapeAnnotations.emplace(id,
-        std::make_unique<FillAnnotationImpl>(id, annotation, maxZoom)).first->second;
+        std::make_unique<FillAnnotationImpl>(id, annotation)).first->second;
     impl.updateStyle(*style.get().impl);
 }
 
-void AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& annotation) {
     auto it = symbolAnnotations.find(id);
     if (it == symbolAnnotations.end()) {
         assert(false); // Attempt to update a non-existent symbol annotation
@@ -89,11 +89,11 @@ void AnnotationManager::update(const AnnotationID& id, const SymbolAnnotation& a
         dirty = true;
 
         remove(id);
-        add(id, annotation, maxZoom);
+        add(id, annotation);
     }
 }
 
-void AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::update(const AnnotationID& id, const LineAnnotation& annotation) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
         assert(false); // Attempt to update a non-existent shape annotation
@@ -101,11 +101,11 @@ void AnnotationManager::update(const AnnotationID& id, const LineAnnotation& ann
     }
 
     shapeAnnotations.erase(it);
-    add(id, annotation, maxZoom);
+    add(id, annotation);
     dirty = true;
 }
 
-void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation, const uint8_t maxZoom) {
+void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& annotation) {
     auto it = shapeAnnotations.find(id);
     if (it == shapeAnnotations.end()) {
         assert(false); // Attempt to update a non-existent shape annotation
@@ -113,7 +113,7 @@ void AnnotationManager::update(const AnnotationID& id, const FillAnnotation& ann
     }
 
     shapeAnnotations.erase(it);
-    add(id, annotation, maxZoom);
+    add(id, annotation);
     dirty = true;
 }
 
