@@ -5,7 +5,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.FloatRange;
 
-import com.mapbox.services.android.telemetry.constants.GeoConstants;
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 
 
 /**
@@ -105,20 +105,20 @@ public class LatLng implements ILatLng, Parcelable {
   /**
    * Set the latitude, in degrees.
    * <p>
-   * This value is in the range of [-85.05112878, 85.05112878], see {@link GeoConstants#MIN_LATITUDE} and
-   * {@link GeoConstants#MAX_LATITUDE}
+   * This value is in the range of [-90, 90], see {@link GeometryConstants#MIN_LATITUDE} and
+   * {@link GeometryConstants#MAX_LATITUDE}
    * </p>
    *
    * @param latitude the latitude value in degrees
-   * @see GeoConstants#MIN_LATITUDE
-   * @see GeoConstants#MAX_LATITUDE
+   * @see GeometryConstants#MIN_LATITUDE
+   * @see GeometryConstants#MAX_LATITUDE
    */
   public void setLatitude(
-    @FloatRange(from = GeoConstants.MIN_LATITUDE, to = GeoConstants.MAX_LATITUDE) double latitude) {
+    @FloatRange(from = GeometryConstants.MIN_LATITUDE, to = GeometryConstants.MAX_LATITUDE) double latitude) {
     if (Double.isNaN(latitude)) {
       throw new IllegalArgumentException("latitude must not be NaN");
     }
-    if (Math.abs(latitude) > 90.0) {
+    if (Math.abs(latitude) > GeometryConstants.MAX_LATITUDE) {
       throw new IllegalArgumentException("latitude must be between -90 and 90");
     }
     this.latitude = latitude;
@@ -127,13 +127,13 @@ public class LatLng implements ILatLng, Parcelable {
   /**
    * Get the latitude, in degrees.
    * <p>
-   * This value is in the range of [-85.05112878, 85.05112878], see {@link GeoConstants#MIN_LATITUDE} and
-   * {@link GeoConstants#MAX_LATITUDE}
+   * This value is in the range of [-90, 90], see {@link GeometryConstants#MIN_LATITUDE} and
+   * {@link GeometryConstants#MAX_LATITUDE}
    * </p>
    *
    * @return the latitude value in degrees
-   * @see GeoConstants#MIN_LATITUDE
-   * @see GeoConstants#MAX_LATITUDE
+   * @see GeometryConstants#MIN_LATITUDE
+   * @see GeometryConstants#MAX_LATITUDE
    */
   @Override
   public double getLatitude() {
@@ -143,15 +143,15 @@ public class LatLng implements ILatLng, Parcelable {
   /**
    * Set the longitude, in degrees.
    * <p>
-   * This value is in the range of [-180, 180], see {@link GeoConstants#MIN_LONGITUDE} and
-   * {@link GeoConstants#MAX_LONGITUDE}
+   * This value is in the range of [-180, 180], see {@link GeometryConstants#MIN_LONGITUDE} and
+   * {@link GeometryConstants#MAX_LONGITUDE}
    * </p>
    *
    * @param longitude the longitude value in degrees
-   * @see GeoConstants#MIN_LONGITUDE
-   * @see GeoConstants#MAX_LONGITUDE
+   * @see GeometryConstants#MIN_LONGITUDE
+   * @see GeometryConstants#MAX_LONGITUDE
    */
-  public void setLongitude(@FloatRange(from = GeoConstants.MIN_LONGITUDE, to = GeoConstants.MAX_LONGITUDE)
+  public void setLongitude(@FloatRange(from = GeometryConstants.MIN_LONGITUDE, to = GeometryConstants.MAX_LONGITUDE)
                              double longitude) {
     if (Double.isNaN(longitude)) {
       throw new IllegalArgumentException("longitude must not be NaN");
@@ -165,13 +165,13 @@ public class LatLng implements ILatLng, Parcelable {
   /**
    * Get the longitude, in degrees.
    * <p>
-   * This value is in the range of [-180, 180], see {@link GeoConstants#MIN_LONGITUDE} and
-   * {@link GeoConstants#MAX_LONGITUDE}
+   * This value is in the range of [-180, 180], see {@link GeometryConstants#MIN_LONGITUDE} and
+   * {@link GeometryConstants#MAX_LONGITUDE}
    * </p>
    *
    * @return the longitude value in degrees
-   * @see GeoConstants#MIN_LONGITUDE
-   * @see GeoConstants#MAX_LONGITUDE
+   * @see GeometryConstants#MIN_LONGITUDE
+   * @see GeometryConstants#MAX_LONGITUDE
    */
   @Override
   public double getLongitude() {
@@ -204,7 +204,7 @@ public class LatLng implements ILatLng, Parcelable {
    * @return new LatLng object with wrapped Longitude
    */
   public LatLng wrap() {
-    return new LatLng(latitude, wrap(longitude, GeoConstants.MIN_LONGITUDE, GeoConstants.MAX_LONGITUDE));
+    return new LatLng(latitude, wrap(longitude, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE));
   }
 
 
@@ -330,6 +330,6 @@ public class LatLng implements ILatLng, Parcelable {
     final double t3 = Math.sin(a1) * Math.sin(b1);
     final double tt = Math.acos(t1 + t2 + t3);
 
-    return GeoConstants.RADIUS_EARTH_METERS * tt;
+    return GeometryConstants.RADIUS_EARTH_METERS * tt;
   }
 }
