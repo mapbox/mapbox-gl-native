@@ -1,4 +1,4 @@
-mapbox-gl-native copyright (c) 2014-2017 Mapbox.
+mapbox-gl-native copyright (c) 2014-2018 Mapbox.
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
