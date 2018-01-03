@@ -25,7 +25,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2014–2017 Mapbox</string>
+	<string>© 2014–2018 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The map will ALWAYS display the user's location.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
