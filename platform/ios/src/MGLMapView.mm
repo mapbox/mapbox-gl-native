@@ -41,11 +41,11 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
+#import "MGLVectorSource_Private.h"
 #import "MGLFoundation_Private.h"
 #import "MGLRendererFrontend.h"
 #import "MGLRendererConfiguration.h"
 
-#import "MGLVectorSource+MGLAdditions.h"
 #import "NSBundle+MGLAdditions.h"
 #import "NSDate+MGLAdditions.h"
 #import "NSException+MGLAdditions.h"

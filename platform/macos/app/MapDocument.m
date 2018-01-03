@@ -6,7 +6,7 @@
 #import "MGLMapsnapshotter.h"
 
 #import "MGLStyle+MBXAdditions.h"
-#import "MGLVectorSource+MGLAdditions.h"
+#import "MGLVectorSource_Private.h"
 
 #import <Mapbox/Mapbox.h>
 

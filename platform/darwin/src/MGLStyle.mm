@@ -17,7 +17,7 @@
 #import "MGLLight_Private.h"
 #import "MGLTileSource_Private.h"
 #import "MGLVectorSource.h"
-#import "MGLVectorSource+MGLAdditions.h"
+#import "MGLVectorSource_Private.h"
 #import "MGLRasterSource.h"
 #import "MGLShapeSource.h"
 #import "MGLImageSource.h"
