@@ -27,7 +27,7 @@
 	<key>MGLIdeographicFontFamilyName</key>
 	<string>PingFang TC</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2014–2017 Mapbox</string>
+	<string>© 2014–2018 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>The map will display your location. The map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
