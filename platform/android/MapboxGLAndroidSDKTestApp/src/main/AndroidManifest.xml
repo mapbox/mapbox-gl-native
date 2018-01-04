@@ -9,7 +9,7 @@
         android:name=".MapboxApplication"
         android:allowBackup="true"
         android:fullBackupContent="true"
-        android:icon="@drawable/icon"
+        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@drawable/ic_launcher_round"
         android:supportsRtl="true"
