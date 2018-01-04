@@ -222,7 +222,7 @@ public:
 @property (nonatomic) CLLocationManager *locationManager;
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
-@property (nonatomic) CGFloat quickZoomStart;
+@property (nonatomic) CGPoint quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
@@ -1716,7 +1716,7 @@ public:
 - (void)handleQuickZoomGesture:(UILongPressGestureRecognizer *)quickZoom
 {
     if ( ! self.isZoomEnabled) return;
-
+    
     _mbglMap->cancelTransitions();
     
     if (quickZoom.state == UIGestureRecognizerStateBegan)
@@ -1725,14 +1725,18 @@ public:
 
         self.scale = powf(2, _mbglMap->getZoom());
 
-        self.quickZoomStart = [quickZoom locationInView:quickZoom.view].y;
-
+        self.quickZoomStart = [quickZoom locationInView:quickZoom.view];
+//        NSLog(@"Start: %@", self.quickZoomStart);
         [self notifyGestureDidBegin];
     }
     else if (quickZoom.state == UIGestureRecognizerStateChanged)
     {
-        CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart;
-
+        CGFloat distance = [quickZoom locationInView:quickZoom.view].y - self.quickZoomStart.y;
+        CGFloat horizontalDistance = [quickZoom locationInView:quickZoom.view].x - self.quickZoomStart.x;
+    
+        // TODO: Still performs quick zoom if you swipe vertically, then horizontally.
+        if (abs(distance) < abs(horizontalDistance)) { return; }
+        
         CGFloat newZoom = MAX(log2f(self.scale) + (distance / 75), _mbglMap->getMinZoom());
 
         if (_mbglMap->getZoom() == newZoom) return;
