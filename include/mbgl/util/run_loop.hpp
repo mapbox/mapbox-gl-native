@@ -62,6 +62,12 @@ public:
         push(task);
         return std::make_unique<WorkRequest>(task);
     }
+                    
+    void schedule(std::weak_ptr<Mailbox> mailbox) override {
+        invoke([mailbox] () {
+            Mailbox::maybeReceive(mailbox);
+        });
+    }
 
     class Impl;
 
@@ -71,12 +77,6 @@ private:
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
     void push(std::shared_ptr<WorkTask>);
-
-    void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        invoke([mailbox] () {
-            Mailbox::maybeReceive(mailbox);
-        });
-    }
 
     void withMutex(std::function<void()>&& fn) {
         std::lock_guard<std::mutex> lock(mutex);

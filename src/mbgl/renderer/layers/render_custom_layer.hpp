@@ -15,12 +15,17 @@ public:
     bool hasTransition() const override;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const final;
-    void render(Painter&, PaintParameters&, RenderSource*) final;
+    void render(PaintParameters&, RenderSource*) final;
 
     const style::CustomLayer::Impl& impl() const;
 
+    void markContextDestroyed() {
+        contextDestroyed = true;
+    };
+
 private:
     bool initialized = false;
+    bool contextDestroyed = false;
 };
 
 template <>

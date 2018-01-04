@@ -10,23 +10,31 @@ mbgl.on('message', function(msg) {
     console.log('%s (%s): %s', msg.severity, msg.class, msg.text);
 });
 
+// Map of map objects by pixel ratio
+var maps = new Map();
+
 module.exports = function (style, options, callback) {
-    var map = new mbgl.Map({
-        ratio: options.pixelRatio,
-        request: function(req, callback) {
-            request(req.url, {encoding: null}, function (err, response, body) {
-                if (err) {
-                    callback(err);
-                } else if (response.statusCode == 404) {
-                    callback();
-                } else if (response.statusCode != 200) {
-                    callback(new Error(response.statusMessage));
-                } else {
-                    callback(null, {data: body});
-                }
-            });
+    var tileMode = options.mapMode === 'tile';
+    if (options.recycleMap) {
+        var key = options.pixelRatio + '/' + tileMode;
+        if (maps.has(key)) {
+            var map = maps.get(key);
+            map.request = mapRequest;
+        } else {
+            maps.set(key, new mbgl.Map({
+                ratio: options.pixelRatio,
+                request: mapRequest,
+                mode: options.mapMode
+            }));
+            var map = maps.get(key);
         }
-    });
+    } else {
+        var map = new mbgl.Map({
+            ratio: options.pixelRatio,
+            request: mapRequest,
+            mode: options.mapMode
+        });
+    }
 
     var timedOut = false;
     var watchdog = setTimeout(function () {
@@ -46,14 +54,30 @@ module.exports = function (style, options, callback) {
     options.bearing = style.bearing || 0;
     options.pitch = style.pitch || 0;
 
-    map.load(style);
+    map.load(style, { defaultStyleCamera: true });
+
+    function mapRequest(req, callback) {
+        request(req.url, {encoding: null}, function (err, response, body) {
+            if (err) {
+                callback(err);
+            } else if (response.statusCode == 404) {
+                callback();
+            } else if (response.statusCode != 200) {
+                callback(new Error(response.statusMessage));
+            } else {
+                callback(null, {data: body});
+            }
+        });
+    };
 
     applyOperations(options.operations, function() {
         map.render(options, function (err, pixels) {
             var results = options.queryGeometry ?
               map.queryRenderedFeatures(options.queryGeometry, options.queryOptions || {}) :
               [];
-            map.release();
+            if (!options.recycleMap) {
+                map.release();
+            }
             if (timedOut) return;
             clearTimeout(watchdog);
             callback(err, pixels, results.map(prepareFeatures));
@@ -70,14 +94,24 @@ module.exports = function (style, options, callback) {
                 applyOperations(operations.slice(1), callback);
             });
 
+        } else if (operation[0] === 'sleep') {
+            // Prefer "wait", which renders until the map is loaded
+            // Use "sleep" when you need to test something that sidesteps the "loaded" logic
+            setTimeout(() => {
+                applyOperations(operations.slice(1), callback);
+            }, operation[1]);
         } else if (operation[0] === 'addImage' || operation[0] === 'updateImage') {
             var img = PNG.sync.read(fs.readFileSync(path.join(__dirname, '../../../mapbox-gl-js/test/integration', operation[2])));
+            const testOpts = (operation.length > 3) ? operation[3] : {};
 
-            map.addImage(operation[1], img.data, {
+            const options = {
                 height: img.height,
                 width: img.width,
-                pixelRatio: operation[3] || 1
-            });
+                pixelRatio: testOpts.pixelRatio || 1,
+                sdf: testOpts.sdf || false
+            }
+
+            map.addImage(operation[1], img.data, options);
 
             applyOperations(operations.slice(1), callback);
 

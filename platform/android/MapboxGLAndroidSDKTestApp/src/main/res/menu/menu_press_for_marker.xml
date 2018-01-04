@@ -4,6 +4,5 @@
     <item
         android:id="@+id/menuItemReset"
         android:title="@string/menuitem_title_reset"
-        app:showAsAction="always"
-        />
+        app:showAsAction="always"/>
 </menu>

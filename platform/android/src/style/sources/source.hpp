@@ -5,6 +5,7 @@
 #include <mbgl/style/source.hpp>
 
 #include "../value.hpp"
+#include "../../android_renderer_frontend.hpp"
 
 #include <jni/jni.hpp>
 
@@ -20,45 +21,40 @@ public:
 
     static void registerNative(jni::JNIEnv&);
 
-    /*
-     * Called when a Java object is created on the c++ side
-     */
-    Source(mbgl::Map&, mbgl::style::Source&);
+    static jni::Object<Source> peerForCoreSource(jni::JNIEnv&, mbgl::style::Source&, AndroidRendererFrontend&);
 
     /*
-     * Called when a Java object was created from the jvm side
+     * Called when a Java object is created for a core source that belongs to a map.
+     */
+    Source(jni::JNIEnv&, mbgl::style::Source&, jni::Object<Source>, AndroidRendererFrontend&);
+
+    /*
+     * Called when a Java object is created for a new core source that does not belong to a map.
      */
     Source(jni::JNIEnv&, std::unique_ptr<mbgl::style::Source>);
 
     virtual ~Source();
 
-    /**
-     * Set core source (ie return ownership after remove)
-     */
-    void setSource(std::unique_ptr<style::Source>);
+    void addToMap(JNIEnv&, jni::Object<Source>, mbgl::Map&, AndroidRendererFrontend&);
 
-    style::Source& get();
-
-    void addToMap(mbgl::Map&);
-
-    virtual jni::jobject* createJavaPeer(jni::JNIEnv&) = 0;
+    void removeFromMap(JNIEnv&, jni::Object<Source>, mbgl::Map&);
 
     jni::String getId(jni::JNIEnv&);
 
     jni::String getAttribution(jni::JNIEnv&);
 
 protected:
-    // Release the owned view and return it
-    std::unique_ptr<mbgl::style::Source> releaseCoreSource();
-
-    // Set on newly created sources until added to the map
+    // Set on newly created sources until added to the map.
     std::unique_ptr<mbgl::style::Source> ownedSource;
 
-    // Raw pointer that is valid until the source is removed from the map
+    // Raw pointer that is valid at all times.
     mbgl::style::Source& source;
 
-    // Map pointer is valid for newly created sources only after adding to the map
-    mbgl::Map* map;
+    // Set when the source is added to a map.
+    jni::UniqueObject<Source> javaPeer;
+
+    // RendererFrontend pointer is valid only when added to the map.
+    AndroidRendererFrontend* rendererFrontend { nullptr };
 };
 
 } // namespace android

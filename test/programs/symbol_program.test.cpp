@@ -10,7 +10,6 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_zoom_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 12.0f);
-    EXPECT_EQ(uniformValues.get<uniforms::u_layout_size>().t, 12.0f);
 
     binder = SymbolSizeBinder::create(1.0f, style::CameraFunction<float>(style::ExponentialStops<float>({
         {0.0f, 8.0f},
@@ -20,7 +19,6 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_zoom_constant>().t, false);
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 9.5f);
-    EXPECT_EQ(uniformValues.get<uniforms::u_layout_size>().t, 10.0f);
     
     binder = SymbolSizeBinder::create(0.0f, style::CameraFunction<float>(style::ExponentialStops<float>({
         {1.0f, 8.0f},
@@ -30,7 +28,6 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_zoom_constant>().t, false);
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 8.0f);
-    EXPECT_EQ(uniformValues.get<uniforms::u_layout_size>().t, 8.0f);
     
     binder = SymbolSizeBinder::create(12.0f, style::CameraFunction<float>(style::ExponentialStops<float>({
         {1.0f, 8.0f},
@@ -40,7 +37,6 @@ TEST(SymbolProgram, SymbolSizeBinder) {
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_zoom_constant>().t, false);
     EXPECT_EQ(uniformValues.get<uniforms::u_is_size_feature_constant>().t, true);
     EXPECT_EQ(uniformValues.get<uniforms::u_size>().t, 18.0f);
-    EXPECT_EQ(uniformValues.get<uniforms::u_layout_size>().t, 18.0f);
     
     binder = SymbolSizeBinder::create(0.0f, style::SourceFunction<float>("x", style::ExponentialStops<float>({
         {1.0f, 8.0f},

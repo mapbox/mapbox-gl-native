@@ -14,7 +14,10 @@ import com.mapbox.mapboxsdk.geometry.LatLng;
  *
  * @param <U> Type of the marker view to be composed.
  * @param <T> Type of the builder to be used for composing.
+ * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
+ * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
  */
+@Deprecated
 public abstract class BaseMarkerViewOptions<U extends MarkerView, T extends BaseMarkerViewOptions<U, T>>
   implements Parcelable {
 

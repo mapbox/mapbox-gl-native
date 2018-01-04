@@ -44,8 +44,8 @@ app.get('/cache', function(req, res) {
 
 app.get('/revalidate-same', function(req, res) {
     if (req.headers['if-none-match'] == 'snowfall') {
-        // Second request can be cached for 30 seconds.
-        res.setHeader('Cache-Control', 'max-age=30');
+        // Second request can be cached for 1 second.
+        res.setHeader('Cache-Control', 'max-age=1, must-revalidate');
         res.status(304).end();
     } else {
         // First request must always be revalidated.
@@ -67,7 +67,7 @@ app.get('/revalidate-modified', function(req, res) {
     if (req.headers['if-modified-since']) {
         var modified_since = new Date(req.headers['if-modified-since']);
         if (modified_since >= jan1) {
-            res.setHeader('Cache-Control', 'max-age=30');
+            res.setHeader('Cache-Control', 'max-age=1, must-revalidate');
             res.status(304).end();
             return;
         }

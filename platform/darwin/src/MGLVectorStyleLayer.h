@@ -9,10 +9,11 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLVectorStyleLayer` is an abstract superclass for style layers whose content
  is defined by an `MGLShapeSource` or `MGLVectorSource` object.
 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of the following concrete
- subclasses: `MGLCircleStyleLayer`, `MGLFillStyleLayer`, `MGLLineStyleLayer`,
- and `MGLSymbolStyleLayer`.
+ Create instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`,
+ `MGLFillExtrusionStyleLayer`, `MGLLineStyleLayer`, and `MGLSymbolStyleLayer` in
+ order to use `MGLVectorStyleLayer`'s properties and methods. Do not create
+ instances of `MGLVectorStyleLayer` directly, and do not create your own
+ subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLVectorStyleLayer : MGLForegroundStyleLayer

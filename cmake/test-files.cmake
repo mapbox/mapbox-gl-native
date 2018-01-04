@@ -10,17 +10,20 @@ set(MBGL_TEST_FILES
     test/algorithm/generate_clip_ids.test.cpp
     test/algorithm/mock.hpp
     test/algorithm/update_renderables.test.cpp
+    test/algorithm/update_tile_masks.test.cpp
 
     # api
     test/api/annotations.test.cpp
     test/api/api_misuse.test.cpp
+    test/api/custom_geometry_source.test.cpp
     test/api/custom_layer.test.cpp
     test/api/query.test.cpp
-    test/api/render_missing.test.cpp
-    test/api/repeated_render.test.cpp
+    test/api/recycle_map.cpp
+    test/api/zoom_history.cpp
 
     # gl
     test/gl/bucket.test.cpp
+    test/gl/context.test.cpp
     test/gl/object.test.cpp
 
     # include/mbgl
@@ -28,6 +31,7 @@ set(MBGL_TEST_FILES
 
     # map
     test/map/map.test.cpp
+    test/map/prefetch.test.cpp
     test/map/transform.test.cpp
 
     # math
@@ -40,6 +44,7 @@ set(MBGL_TEST_FILES
     test/programs/symbol_program.test.cpp
 
     # renderer
+    test/renderer/backend_scope.test.cpp
     test/renderer/group_by_layout.test.cpp
     test/renderer/image_manager.test.cpp
 
@@ -48,7 +53,6 @@ set(MBGL_TEST_FILES
     test/sprite/sprite_parser.test.cpp
 
     # src/mbgl/test
-    test/src/mbgl/test/conversion_stubs.hpp
     test/src/mbgl/test/fake_file_source.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
@@ -85,6 +89,10 @@ set(MBGL_TEST_FILES
     test/style/conversion/light.test.cpp
     test/style/conversion/stringify.test.cpp
 
+    # style/expression
+    test/style/expression/expression.test.cpp
+    test/style/expression/util.test.cpp
+
     # style
     test/style/filter.test.cpp
 
@@ -104,12 +112,14 @@ set(MBGL_TEST_FILES
     test/style/style_parser.test.cpp
 
     # text
-    test/text/glyph_loader.test.cpp
+    test/text/cross_tile_symbol_index.test.cpp
+    test/text/local_glyph_rasterizer.test.cpp
+    test/text/glyph_manager.test.cpp
     test/text/glyph_pbf.test.cpp
     test/text/quads.test.cpp
 
     # tile
-    test/tile/annotation_tile.test.cpp
+    test/tile/custom_geometry_tile.test.cpp
     test/tile/geojson_tile.test.cpp
     test/tile/geometry_tile_data.test.cpp
     test/tile/raster_tile.test.cpp
@@ -119,7 +129,9 @@ set(MBGL_TEST_FILES
 
     # util
     test/util/async_task.test.cpp
+    test/util/dtoa.test.cpp
     test/util/geo.test.cpp
+    test/util/grid_index.test.cpp
     test/util/http_timeout.test.cpp
     test/util/image.test.cpp
     test/util/mapbox.test.cpp
@@ -136,5 +148,6 @@ set(MBGL_TEST_FILES
     test/util/tile_cover.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
+    test/util/unique_any.test.cpp
     test/util/url.test.cpp
 )

@@ -109,7 +109,7 @@ namespace mbgl {
 - (void)setLineJoin:(MGLStyleValue<NSValue *> *)lineJoin {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumPropertyValue(lineJoin);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenPropertyValue(lineJoin);
     self.rawLayer->setLineJoin(mbglValue);
 }
 
@@ -118,9 +118,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getLineJoin();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(self.rawLayer->getDefaultLineJoin());
+        return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenStyleValue(self.rawLayer->getDefaultLineJoin());
     }
-    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setLineMiterLimit:(MGLStyleValue<NSNumber *> *)lineMiterLimit {

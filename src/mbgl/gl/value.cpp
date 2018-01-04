@@ -242,13 +242,13 @@ LineWidth::Type LineWidth::Get() {
     return lineWidth;
 }
 
-const constexpr ActiveTexture::Type ActiveTexture::Default;
+const constexpr ActiveTextureUnit::Type ActiveTextureUnit::Default;
 
-void ActiveTexture::Set(const Type& value) {
+void ActiveTextureUnit::Set(const Type& value) {
     MBGL_CHECK_ERROR(glActiveTexture(GL_TEXTURE0 + value));
 }
 
-ActiveTexture::Type ActiveTexture::Get() {
+ActiveTextureUnit::Type ActiveTextureUnit::Get() {
     GLint activeTexture;
     MBGL_CHECK_ERROR(glGetIntegerv(GL_ACTIVE_TEXTURE, &activeTexture));
     return static_cast<Type>(activeTexture - GL_TEXTURE0);
@@ -363,6 +363,24 @@ BindVertexArray::Type BindVertexArray::Get(const Context& context) {
 #endif
     }
     return binding;
+}
+
+const optional<AttributeBinding> VertexAttribute::Default {};
+
+void VertexAttribute::Set(const optional<AttributeBinding>& binding, Context& context, AttributeLocation location) {
+    if (binding) {
+        context.vertexBuffer = binding->vertexBuffer;
+        MBGL_CHECK_ERROR(glEnableVertexAttribArray(location));
+        MBGL_CHECK_ERROR(glVertexAttribPointer(
+            location,
+            static_cast<GLint>(binding->attributeSize),
+            static_cast<GLenum>(binding->attributeType),
+            static_cast<GLboolean>(false),
+            static_cast<GLsizei>(binding->vertexSize),
+            reinterpret_cast<GLvoid*>(binding->attributeOffset + (binding->vertexSize * binding->vertexOffset))));
+    } else {
+        MBGL_CHECK_ERROR(glDisableVertexAttribArray(location));
+    }
 }
 
 const constexpr PixelStorePack::Type PixelStorePack::Default;

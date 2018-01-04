@@ -6,6 +6,8 @@
 #include <mbgl/util/noncopyable.hpp>
 
 #include <memory>
+#include <future>
+#include <type_traits>
 
 namespace mbgl {
 
@@ -46,10 +48,18 @@ namespace mbgl {
 template <class Object>
 class Actor : public util::noncopyable {
 public:
-    template <class... Args>
+
+    // Enabled for Objects with a constructor taking ActorRef<Object> as the first parameter
+    template <typename U = Object, class... Args, typename std::enable_if<std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
     Actor(Scheduler& scheduler, Args&&... args_)
-        : mailbox(std::make_shared<Mailbox>(scheduler)),
-          object(self(), std::forward<Args>(args_)...) {
+            : mailbox(std::make_shared<Mailbox>(scheduler)),
+              object(self(), std::forward<Args>(args_)...) {
+    }
+
+    // Enabled for plain Objects
+    template<typename U = Object, class... Args, typename std::enable_if<!std::is_constructible<U, ActorRef<U>, Args...>::value>::type * = nullptr>
+    Actor(Scheduler& scheduler, Args&& ... args_)
+            : mailbox(std::make_shared<Mailbox>(scheduler)), object(std::forward<Args>(args_)...) {
     }
 
     ~Actor() {
@@ -59,6 +69,17 @@ public:
     template <typename Fn, class... Args>
     void invoke(Fn fn, Args&&... args) {
         mailbox->push(actor::makeMessage(object, fn, std::forward<Args>(args)...));
+    }
+
+    template <typename Fn, class... Args>
+    auto ask(Fn fn, Args&&... args) {
+        // Result type is deduced from the function's return type
+        using ResultType = typename std::result_of<decltype(fn)(Object, Args...)>::type;
+
+        std::promise<ResultType> promise;
+        auto future = promise.get_future();
+        mailbox->push(actor::makeMessage(std::move(promise), object, fn, std::forward<Args>(args)...));
+        return future;
     }
 
     ActorRef<std::decay_t<Object>> self() {

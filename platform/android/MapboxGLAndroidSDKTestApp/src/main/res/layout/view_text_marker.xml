@@ -11,6 +11,7 @@
         android:layout_height="wrap_content"
         android:textStyle="bold"
         android:padding="4dp"
+        android:textIsSelectable="false"
         android:layout_centerInParent="true" />
 
 </RelativeLayout>

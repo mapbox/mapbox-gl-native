@@ -16,9 +16,8 @@ namespace conversion {
 inline optional<mbgl::style::Filter> toFilter(jni::JNIEnv& env, jni::Array<jni::Object<>> jfilter) {
     mbgl::optional<mbgl::style::Filter> filter;
     if (jfilter) {
-      Value filterValue(env, jfilter);
       mbgl::style::conversion::Error error;
-      auto converted = mbgl::style::conversion::convert<mbgl::style::Filter>(filterValue, error);
+      auto converted = mbgl::style::conversion::convert<mbgl::style::Filter>(Value(env, jfilter), error);
       if (!converted) {
           mbgl::Log::Error(mbgl::Event::JNI, "Error converting filter: " + error.message);
       }

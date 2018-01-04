@@ -182,7 +182,7 @@
 - (mbgl::Annotation)annotationObjectWithDelegate:(__unused id <MGLMultiPointDelegate>)delegate
 {
     NSAssert(NO, @"Cannot add an annotation from an instance of %@", NSStringFromClass([self class]));
-    return mbgl::SymbolAnnotation({mbgl::Point<double>()});
+    return mbgl::SymbolAnnotation(mbgl::Point<double>());
 }
 
 - (NSString *)description

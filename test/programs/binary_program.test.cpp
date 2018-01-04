@@ -14,12 +14,12 @@ TEST(BinaryProgram, ObtainValues) {
     EXPECT_EQ(42u, binaryProgram.format());
     EXPECT_EQ("binary code", binaryProgram.code());
     EXPECT_EQ("identifier", binaryProgram.identifier());
-    EXPECT_EQ(1, binaryProgram.attributeLocation("a_pos"));
-    EXPECT_EQ(0, binaryProgram.attributeLocation("u_world"));
-    EXPECT_EQ(4, binaryProgram.attributeLocation("a_data"));
+    EXPECT_EQ(1u, binaryProgram.attributeLocation("a_pos"));
+    EXPECT_FALSE(binaryProgram.attributeLocation("u_world"));
+    EXPECT_EQ(4u, binaryProgram.attributeLocation("a_data"));
     EXPECT_EQ(1, binaryProgram.uniformLocation("u_world"));
     EXPECT_EQ(3, binaryProgram.uniformLocation("u_ratio"));
-    EXPECT_EQ(0, binaryProgram.uniformLocation("a_data"));
+    EXPECT_EQ(-1, binaryProgram.uniformLocation("a_data"));
 
     auto serialized = binaryProgram.serialize();
 
@@ -28,12 +28,12 @@ TEST(BinaryProgram, ObtainValues) {
     EXPECT_EQ(42u, binaryProgram2.format());
     EXPECT_EQ("binary code", binaryProgram2.code());
     EXPECT_EQ("identifier", binaryProgram2.identifier());
-    EXPECT_EQ(1, binaryProgram2.attributeLocation("a_pos"));
-    EXPECT_EQ(0, binaryProgram2.attributeLocation("u_world"));
-    EXPECT_EQ(4, binaryProgram2.attributeLocation("a_data"));
+    EXPECT_EQ(1u, binaryProgram2.attributeLocation("a_pos"));
+    EXPECT_FALSE(binaryProgram2.attributeLocation("u_world"));
+    EXPECT_EQ(4u, binaryProgram2.attributeLocation("a_data"));
     EXPECT_EQ(1, binaryProgram2.uniformLocation("u_world"));
     EXPECT_EQ(3, binaryProgram2.uniformLocation("u_ratio"));
-    EXPECT_EQ(0, binaryProgram2.uniformLocation("a_data"));
+    EXPECT_EQ(-1, binaryProgram2.uniformLocation("a_data"));
 
     EXPECT_THROW(BinaryProgram(""), std::runtime_error);
 }

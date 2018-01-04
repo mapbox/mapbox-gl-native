@@ -21,18 +21,21 @@ class Mailbox;
       Subject to these constraints, processing can happen on whatever thread in the
       pool is available.
 
-    * `RunLoop` is a `Scheduler` that is typically used to create a mailbox and
-      `ActorRef` for an object that lives on the main thread and is not itself wrapped
-      as an `Actor`:
-
-        auto mailbox = std::make_shared<Mailbox>(*util::RunLoop::Get());
+    * `Scheduler::GetCurrent()` is typically used to create a mailbox and `ActorRef`
+      for an object that lives on the main thread and is not itself wrapped an
+      `Actor`. The underlying implementation of this Scheduler should usually be
+      a `RunLoop`
+        auto mailbox = std::make_shared<Mailbox>(*Scheduler::Get());
         Actor<Worker> worker(threadPool, ActorRef<Foo>(*this, mailbox));
 */
-
 class Scheduler {
 public:
     virtual ~Scheduler() = default;
     virtual void schedule(std::weak_ptr<Mailbox>) = 0;
+
+    // Set/Get the current Scheduler for this thread
+    static Scheduler* GetCurrent();
+    static void SetCurrent(Scheduler*);
 };
 
 } // namespace mbgl

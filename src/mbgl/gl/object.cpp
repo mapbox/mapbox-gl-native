@@ -33,7 +33,9 @@ void TextureDeleter::operator()(TextureID id) const {
 
 void VertexArrayDeleter::operator()(VertexArrayID id) const {
     assert(context);
-    context->abandonedVertexArrays.push_back(id);
+    if (id != 0) {
+        context->abandonedVertexArrays.push_back(id);
+    }
 }
 
 void FramebufferDeleter::operator()(FramebufferID id) const {

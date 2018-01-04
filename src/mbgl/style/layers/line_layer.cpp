@@ -108,15 +108,15 @@ void LineLayer::setLineCap(PropertyValue<LineCapType> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
+DataDrivenPropertyValue<LineJoinType> LineLayer::getDefaultLineJoin() {
     return LineJoin::defaultValue();
 }
 
-PropertyValue<LineJoinType> LineLayer::getLineJoin() const {
+DataDrivenPropertyValue<LineJoinType> LineLayer::getLineJoin() const {
     return impl().layout.get<LineJoin>();
 }
 
-void LineLayer::setLineJoin(PropertyValue<LineJoinType> value) {
+void LineLayer::setLineJoin(DataDrivenPropertyValue<LineJoinType> value) {
     if (value == getLineJoin())
         return;
     auto impl_ = mutableImpl();

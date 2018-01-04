@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.camera;
 import android.content.res.TypedArray;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.FloatRange;
 
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
@@ -166,14 +167,14 @@ public final class CameraPosition implements Parcelable {
     private double zoom = -1;
 
     /**
-     * Creates an empty builder.
+     * Create an empty builder.
      */
     public Builder() {
       super();
     }
 
     /**
-     * Create Builder with an existing CameraPosition data.
+     * Create a builder with an existing CameraPosition data.
      *
      * @param previous Existing CameraPosition values to use
      */
@@ -188,7 +189,7 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Create Builder with an existing CameraPosition data.
+     * Create a builder with an existing CameraPosition data.
      *
      * @param typedArray TypedArray containing attribute values
      */
@@ -205,7 +206,7 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Create Builder from an existing CameraPositionUpdate update.
+     * Create a builder from an existing CameraPositionUpdate update.
      *
      * @param update Update containing camera options
      */
@@ -220,7 +221,7 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Create Builder from an existing CameraPositionUpdate update.
+     * Create builder from an existing CameraPositionUpdate update.
      *
      * @param update Update containing camera options
      */
@@ -235,7 +236,7 @@ public final class CameraPosition implements Parcelable {
      * Sets the direction that the camera is pointing in, in degrees clockwise from north.
      *
      * @param bearing Bearing
-     * @return Builder
+     * @return this
      */
     public Builder bearing(double bearing) {
       double direction = bearing;
@@ -252,19 +253,10 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Builds a CameraPosition.
+     * Sets the location where the camera is pointing at.
      *
-     * @return CameraPosition
-     */
-    public CameraPosition build() {
-      return new CameraPosition(target, zoom, tilt, bearing);
-    }
-
-    /**
-     * Sets the location that the camera is pointing at.
-     *
-     * @param location Location
-     * @return Builder
+     * @param location target of the camera
+     * @return this
      */
     public Builder target(LatLng location) {
       this.target = location;
@@ -272,28 +264,42 @@ public final class CameraPosition implements Parcelable {
     }
 
     /**
-     * Set the tilt in degrees
+     * Set the tilt of the camera in degrees
      * <p>
-     * value is clamped to 0 and 60.
+     * value is clamped to {@link MapboxConstants#MINIMUM_TILT} and {@link MapboxConstants#MAXIMUM_TILT}.
      * </p>
      *
-     * @param tilt Tilt value
-     * @return Builder
+     * @param tilt Tilt value of the camera
+     * @return this
      */
-    public Builder tilt(double tilt) {
+    public Builder tilt(@FloatRange(from = MapboxConstants.MINIMUM_TILT,
+      to = MapboxConstants.MAXIMUM_TILT) double tilt) {
       this.tilt = MathUtils.clamp(tilt, MapboxConstants.MINIMUM_TILT, MapboxConstants.MAXIMUM_TILT);
       return this;
     }
 
     /**
-     * Set the zoom
+     * Set the zoom of the camera
+     * <p>
+     * Zoom ranges from {@link MapboxConstants#MINIMUM_ZOOM} to {@link MapboxConstants#MAXIMUM_ZOOM}
+     * </p>
      *
-     * @param zoom Zoom value
-     * @return Builder
+     * @param zoom Zoom value of the camera
+     * @return this
      */
-    public Builder zoom(double zoom) {
+    public Builder zoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+      to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
       this.zoom = zoom;
       return this;
+    }
+
+    /**
+     * Builds the CameraPosition.
+     *
+     * @return CameraPosition
+     */
+    public CameraPosition build() {
+      return new CameraPosition(target, zoom, tilt, bearing);
     }
   }
 }

@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/fill_extrusion_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
@@ -102,13 +101,17 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
                     const auto d2 = convertPoint<double>(p2);
 
                     const Point<double> perp = util::unit(util::perp(d1 - d2));
+                    const auto dist = util::dist<int16_t>(d1, d2);
+                    if (dist > std::numeric_limits<int16_t>::max()) {
+                        edgeDistance = 0;
+                    }
 
                     vertices.emplace_back(
                         FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 0, edgeDistance));
                     vertices.emplace_back(
                         FillExtrusionProgram::layoutVertex(p1, perp.x, perp.y, 0, 1, edgeDistance));
 
-                    edgeDistance += util::dist<int16_t>(d1, d2);
+                    edgeDistance += dist;
 
                     vertices.emplace_back(
                         FillExtrusionProgram::layoutVertex(p2, perp.x, perp.y, 0, 0, edgeDistance));
@@ -152,13 +155,6 @@ void FillExtrusionBucket::upload(gl::Context& context) {
     }
 
     uploaded = true;
-}
-
-void FillExtrusionBucket::render(Painter& painter,
-                                 PaintParameters& parameters,
-                                 const RenderLayer& layer,
-                                 const RenderTile& tile) {
-    painter.renderFillExtrusion(parameters, *this, *layer.as<RenderFillExtrusionLayer>(), tile);
 }
 
 bool FillExtrusionBucket::hasData() const {

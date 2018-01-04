@@ -160,6 +160,88 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface ICON_TEXT_FIT {}
 
+  // ICON_ANCHOR: Part of the icon placed closest to the anchor.
+
+  /**
+   * The center of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_CENTER = "center";
+  /**
+   * The left side of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_LEFT = "left";
+  /**
+   * The right side of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_RIGHT = "right";
+  /**
+   * The top of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_TOP = "top";
+  /**
+   * The bottom of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_BOTTOM = "bottom";
+  /**
+   * The top left corner of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_TOP_LEFT = "top-left";
+  /**
+   * The top right corner of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_TOP_RIGHT = "top-right";
+  /**
+   * The bottom left corner of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_BOTTOM_LEFT = "bottom-left";
+  /**
+   * The bottom right corner of the icon is placed closest to the anchor.
+   */
+  public static final String ICON_ANCHOR_BOTTOM_RIGHT = "bottom-right";
+
+  /**
+   * Part of the icon placed closest to the anchor.
+   */
+  @StringDef({
+      ICON_ANCHOR_CENTER,
+      ICON_ANCHOR_LEFT,
+      ICON_ANCHOR_RIGHT,
+      ICON_ANCHOR_TOP,
+      ICON_ANCHOR_BOTTOM,
+      ICON_ANCHOR_TOP_LEFT,
+      ICON_ANCHOR_TOP_RIGHT,
+      ICON_ANCHOR_BOTTOM_LEFT,
+      ICON_ANCHOR_BOTTOM_RIGHT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface ICON_ANCHOR {}
+
+  // ICON_PITCH_ALIGNMENT: Orientation of icon when map is pitched.
+
+  /**
+   * The icon is aligned to the plane of the map.
+   */
+  public static final String ICON_PITCH_ALIGNMENT_MAP = "map";
+  /**
+   * The icon is aligned to the plane of the viewport.
+   */
+  public static final String ICON_PITCH_ALIGNMENT_VIEWPORT = "viewport";
+  /**
+   * Automatically matches the value of {@link ICON_ROTATION_ALIGNMENT}.
+   */
+  public static final String ICON_PITCH_ALIGNMENT_AUTO = "auto";
+
+  /**
+   * Orientation of icon when map is pitched.
+   */
+  @StringDef({
+      ICON_PITCH_ALIGNMENT_MAP,
+      ICON_PITCH_ALIGNMENT_VIEWPORT,
+      ICON_PITCH_ALIGNMENT_AUTO,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface ICON_PITCH_ALIGNMENT {}
+
   // TEXT_PITCH_ALIGNMENT: Orientation of text when map is pitched.
 
   /**
@@ -320,7 +402,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface TEXT_TRANSFORM {}
 
-  // FILL_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // FILL_TRANSLATE_ANCHOR: Controls the frame of reference for `fill-translate`.
 
   /**
    * The fill is translated relative to the map.
@@ -332,7 +414,7 @@ public final class Property {
   public static final String FILL_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `fill-translate`.
    */
   @StringDef({
       FILL_TRANSLATE_ANCHOR_MAP,
@@ -341,7 +423,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface FILL_TRANSLATE_ANCHOR {}
 
-  // LINE_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // LINE_TRANSLATE_ANCHOR: Controls the frame of reference for `line-translate`.
 
   /**
    * The line is translated relative to the map.
@@ -353,7 +435,7 @@ public final class Property {
   public static final String LINE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `line-translate`.
    */
   @StringDef({
       LINE_TRANSLATE_ANCHOR_MAP,
@@ -362,7 +444,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface LINE_TRANSLATE_ANCHOR {}
 
-  // ICON_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // ICON_TRANSLATE_ANCHOR: Controls the frame of reference for `icon-translate`.
 
   /**
    * Icons are translated relative to the map.
@@ -374,7 +456,7 @@ public final class Property {
   public static final String ICON_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `icon-translate`.
    */
   @StringDef({
       ICON_TRANSLATE_ANCHOR_MAP,
@@ -383,7 +465,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface ICON_TRANSLATE_ANCHOR {}
 
-  // TEXT_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // TEXT_TRANSLATE_ANCHOR: Controls the frame of reference for `text-translate`.
 
   /**
    * The text is translated relative to the map.
@@ -395,7 +477,7 @@ public final class Property {
   public static final String TEXT_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `text-translate`.
    */
   @StringDef({
       TEXT_TRANSLATE_ANCHOR_MAP,
@@ -404,7 +486,7 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface TEXT_TRANSLATE_ANCHOR {}
 
-  // CIRCLE_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // CIRCLE_TRANSLATE_ANCHOR: Controls the frame of reference for `circle-translate`.
 
   /**
    * The circle is translated relative to the map.
@@ -416,7 +498,7 @@ public final class Property {
   public static final String CIRCLE_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `circle-translate`.
    */
   @StringDef({
       CIRCLE_TRANSLATE_ANCHOR_MAP,
@@ -446,7 +528,28 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface CIRCLE_PITCH_SCALE {}
 
-  // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the translation reference point.
+  // CIRCLE_PITCH_ALIGNMENT: Orientation of circle when map is pitched.
+
+  /**
+   * The circle is aligned to the plane of the map.
+   */
+  public static final String CIRCLE_PITCH_ALIGNMENT_MAP = "map";
+  /**
+   * The circle is aligned to the plane of the viewport.
+   */
+  public static final String CIRCLE_PITCH_ALIGNMENT_VIEWPORT = "viewport";
+
+  /**
+   * Orientation of circle when map is pitched.
+   */
+  @StringDef({
+      CIRCLE_PITCH_ALIGNMENT_MAP,
+      CIRCLE_PITCH_ALIGNMENT_VIEWPORT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface CIRCLE_PITCH_ALIGNMENT {}
+
+  // FILL_EXTRUSION_TRANSLATE_ANCHOR: Controls the frame of reference for `fill-extrusion-translate`.
 
   /**
    * The fill extrusion is translated relative to the map.
@@ -458,7 +561,7 @@ public final class Property {
   public static final String FILL_EXTRUSION_TRANSLATE_ANCHOR_VIEWPORT = "viewport";
 
   /**
-   * Controls the translation reference point.
+   * Controls the frame of reference for `fill-extrusion-translate`.
    */
   @StringDef({
       FILL_EXTRUSION_TRANSLATE_ANCHOR_MAP,

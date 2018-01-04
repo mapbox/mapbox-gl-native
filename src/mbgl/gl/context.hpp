@@ -9,6 +9,7 @@
 #include <mbgl/gl/framebuffer.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/types.hpp>
 #include <mbgl/gl/draw_mode.hpp>
 #include <mbgl/gl/depth_mode.hpp>
@@ -24,9 +25,6 @@
 #include <string>
 
 namespace mbgl {
-
-class View;
-
 namespace gl {
 
 constexpr size_t TextureMax = 64;
@@ -53,9 +51,7 @@ public:
     void verifyProgramLinkage(ProgramID);
     void linkProgram(ProgramID);
     UniqueTexture createTexture();
-
-    bool supportsVertexArrays() const;
-    UniqueVertexArray createVertexArray();
+    VertexArray createVertexArray();
 
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
@@ -65,18 +61,31 @@ public:
     optional<std::pair<BinaryProgramFormat, std::string>> getBinaryProgram(ProgramID) const;
 
     template <class Vertex, class DrawMode>
-    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v) {
+    VertexBuffer<Vertex, DrawMode> createVertexBuffer(VertexVector<Vertex, DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return VertexBuffer<Vertex, DrawMode> {
             v.vertexSize(),
-            createVertexBuffer(v.data(), v.byteSize())
+            createVertexBuffer(v.data(), v.byteSize(), usage)
         };
     }
 
+    template <class Vertex, class DrawMode>
+    void updateVertexBuffer(VertexBuffer<Vertex, DrawMode>& buffer, VertexVector<Vertex, DrawMode>&& v) {
+        assert(v.vertexSize() == buffer.vertexCount);
+        updateVertexBuffer(buffer.buffer, v.data(), v.byteSize());
+    }
+
     template <class DrawMode>
-    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v) {
+    IndexBuffer<DrawMode> createIndexBuffer(IndexVector<DrawMode>&& v, const BufferUsage usage = BufferUsage::StaticDraw) {
         return IndexBuffer<DrawMode> {
-            createIndexBuffer(v.data(), v.byteSize())
+            v.indexSize(),
+            createIndexBuffer(v.data(), v.byteSize(), usage)
         };
+    }
+    
+    template <class DrawMode>
+    void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, IndexVector<DrawMode>&& v) {
+        assert(v.indexSize() == buffer.indexCount);
+        updateIndexBuffer(buffer.buffer, v.data(), v.byteSize());
     }
 
     template <RenderbufferType type>
@@ -188,7 +197,13 @@ public:
         return vertexArray.get();
     }
 
+    void setCleanupOnDestruction(bool cleanup) {
+        cleanupOnDestruction = cleanup;
+    }
+
 private:
+    bool cleanupOnDestruction = true;
+
     std::unique_ptr<extension::Debugging> debugging;
     std::unique_ptr<extension::VertexArray> vertexArray;
 #if MBGL_HAS_BINARY_PROGRAMS
@@ -196,15 +211,16 @@ private:
 #endif
 
 public:
-    State<value::ActiveTexture> activeTexture;
+    State<value::ActiveTextureUnit> activeTextureUnit;
     State<value::BindFramebuffer> bindFramebuffer;
     State<value::Viewport> viewport;
     State<value::ScissorTest> scissorTest;
     std::array<State<value::BindTexture>, 2> texture;
-    State<value::BindVertexArray, const Context&> vertexArrayObject { *this };
     State<value::Program> program;
     State<value::BindVertexBuffer> vertexBuffer;
-    State<value::BindElementBuffer> elementBuffer;
+
+    State<value::BindVertexArray, const Context&> bindVertexArray { *this };
+    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }), *this };
 
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;
@@ -239,8 +255,10 @@ private:
     State<value::PointSize> pointSize;
 #endif // MBGL_USE_GLES2
 
-    UniqueBuffer createVertexBuffer(const void* data, std::size_t size);
-    UniqueBuffer createIndexBuffer(const void* data, std::size_t size);
+    UniqueBuffer createVertexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
+    UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
+    void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
     UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
@@ -249,6 +267,8 @@ private:
 #if not MBGL_USE_GLES2
     void drawPixels(Size size, const void* data, TextureFormat);
 #endif // MBGL_USE_GLES2
+
+    bool supportsVertexArrays() const;
 
     friend detail::ProgramDeleter;
     friend detail::ShaderDeleter;
@@ -269,8 +289,13 @@ private:
     std::vector<RenderbufferID> abandonedRenderbuffers;
 
 public:
-    // For testing
+    // For testing and Windows because Qt + ANGLE
+    // crashes with VAO enabled.
+#if defined(_WINDOWS)
+    bool disableVAOExtension = true;
+#else
     bool disableVAOExtension = false;
+#endif
 };
 
 } // namespace gl

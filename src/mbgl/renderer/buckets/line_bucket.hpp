@@ -4,7 +4,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/line_program.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 
@@ -26,7 +26,6 @@ public:
     bool hasData() const override;
 
     void upload(gl::Context&) override;
-    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
 
     float getQueryRadius(const RenderLayer&) const override;
 
@@ -34,7 +33,7 @@ public:
 
     gl::VertexVector<LineLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<LineAttributes> segments;
+    SegmentVector<LineAttributes> segments;
 
     optional<gl::VertexBuffer<LineLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
@@ -42,7 +41,7 @@ public:
     std::map<std::string, LineProgram::PaintPropertyBinders> paintPropertyBinders;
 
 private:
-    void addGeometry(const GeometryCoordinates&, FeatureType);
+    void addGeometry(const GeometryCoordinates&, const GeometryTileFeature&);
 
     struct TriangleElement {
         TriangleElement(uint16_t a_, uint16_t b_, uint16_t c_) : a(a_), b(b_), c(c_) {}
@@ -60,6 +59,7 @@ private:
     std::ptrdiff_t e3;
 
     const uint32_t overscaling;
+    const float zoom;
 
     float getLineWidth(const RenderLineLayer& layer) const;
 };

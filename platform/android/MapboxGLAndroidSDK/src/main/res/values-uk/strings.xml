@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Компас. Натисніть щоб зорієнтувати мапу на північ.</string>
+    <string name="mapbox_attributionsIconContentDescription">Значок атрибуції. Натисніть, щоб показати діалог атрибуції.</string>
+    <string name="mapbox_myLocationViewContentDescription">Визначення положення. Показує ваше місцеположення на мапі.</string>
+    <string name="mapbox_mapActionDescription">Показує мапи створені за допомоги Mapbox. Пересувайте мапу двома пальцями. Змінюйте масштаб стуляючи/розводячи два пальці.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">Допоможіть зробити мапи Mapbox краще</string>
+    <string name="mapbox_attributionTelemetryMessage">Ви допомагаєте робити мапи OpenStreetMap та Mapbox краще пощирюючи анонімні дані про користування мапами.</string>
+    <string name="mapbox_attributionTelemetryPositive">Погоджуюсь</string>
+    <string name="mapbox_attributionTelemetryNegative">Не погоджуюсь</string>
+    <string name="mapbox_attributionTelemetryNeutral">Додаткова інформація</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Межі ділянки для оффлайнового користування даними за межами світу: %s</string>
+
+    </resources>

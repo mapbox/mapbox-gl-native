@@ -12,3 +12,10 @@
 #define MBGL_VERIFY_THREAD(tid)
 
 #endif
+
+// GCC 4.9 compatibility
+#if !defined(__GNUC__) || __GNUC__ >= 5
+#define MBGL_CONSTEXPR constexpr
+#else
+#define MBGL_CONSTEXPR inline
+#endif

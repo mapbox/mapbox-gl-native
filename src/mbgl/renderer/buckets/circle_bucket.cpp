@@ -1,6 +1,5 @@
 #include <mbgl/renderer/buckets/circle_bucket.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_impl.hpp>
 #include <mbgl/renderer/layers/render_circle_layer.hpp>
@@ -34,13 +33,6 @@ void CircleBucket::upload(gl::Context& context) {
     uploaded = true;
 }
 
-void CircleBucket::render(Painter& painter,
-                        PaintParameters& parameters,
-                        const RenderLayer& layer,
-                        const RenderTile& tile) {
-    painter.renderCircle(parameters, *this, *layer.as<RenderCircleLayer>(), tile);
-}
-
 bool CircleBucket::hasData() const {
     return !segments.empty();
 }
@@ -57,7 +49,7 @@ void CircleBucket::addFeature(const GeometryTileFeature& feature,
             // Do not include points that are outside the tile boundaries.
             // Include all points in Still mode. You need to include points from
             // neighbouring tiles so that they are not clipped at tile boundaries.
-            if ((mode != MapMode::Still) &&
+            if ((mode == MapMode::Continuous) &&
                 (x < 0 || x >= util::EXTENT || y < 0 || y >= util::EXTENT)) continue;
 
             if (segments.empty() || segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {

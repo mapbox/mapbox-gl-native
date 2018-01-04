@@ -7,11 +7,12 @@
 namespace mbgl {
 namespace android {
 
-    CustomLayer::CustomLayer(jni::JNIEnv& env, jni::String layerId, jni::jlong initializeFunction, jni::jlong renderFunction, jni::jlong deinitializeFunction, jni::jlong context)
+    CustomLayer::CustomLayer(jni::JNIEnv& env, jni::String layerId, jni::jlong initializeFunction, jni::jlong renderFunction, jni::jlong contextLostFunction, jni::jlong deinitializeFunction, jni::jlong context)
         : Layer(env, std::make_unique<mbgl::style::CustomLayer>(
                 jni::Make<std::string>(env, layerId),
                 reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initializeFunction),
                 reinterpret_cast<mbgl::style::CustomLayerRenderFunction>(renderFunction),
+                reinterpret_cast<mbgl::style::CustomLayerContextLostFunction>(contextLostFunction),
                 reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitializeFunction),
                 reinterpret_cast<void*>(context))
                 ) {
@@ -52,7 +53,7 @@ namespace android {
         // Register the peer
         jni::RegisterNativePeer<CustomLayer>(
             env, CustomLayer::javaClass, "nativePtr",
-            std::make_unique<CustomLayer, JNIEnv&, jni::String, jni::jlong, jni::jlong, jni::jlong, jni::jlong>,
+            std::make_unique<CustomLayer, JNIEnv&, jni::String, jni::jlong, jni::jlong, jni::jlong, jni::jlong, jni::jlong>,
             "initialize",
             "finalize",
             METHOD(&CustomLayer::update, "nativeUpdate"));

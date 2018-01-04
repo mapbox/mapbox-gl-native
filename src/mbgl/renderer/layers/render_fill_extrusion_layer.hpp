@@ -3,6 +3,8 @@
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer_properties.hpp>
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/offscreen_texture.hpp>
 
 namespace mbgl {
 
@@ -14,6 +16,7 @@ public:
     void transition(const TransitionParameters&) override;
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
+    void render(PaintParameters&, RenderSource*) override;
 
     bool queryIntersectsFeature(
         const GeometryCoordinates&,
@@ -29,6 +32,8 @@ public:
     style::FillExtrusionPaintProperties::PossiblyEvaluated evaluated;
 
     const style::FillExtrusionLayer::Impl& impl() const;
+
+    optional<OffscreenTexture> renderTexture;
 };
 
 template <>

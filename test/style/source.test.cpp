@@ -3,11 +3,13 @@
 #include <mbgl/test/stub_style_observer.hpp>
 #include <mbgl/test/stub_render_source_observer.hpp>
 
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
+#include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/style/layers/raster_layer.cpp>
 #include <mbgl/style/layers/line_layer.hpp>
 
@@ -23,7 +25,7 @@
 #include <mbgl/util/image.hpp>
 
 #include <mbgl/util/tileset.hpp>
-#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/shared_thread_pool.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/range.hpp>
@@ -37,6 +39,7 @@
 #include <cstdint>
 
 using namespace mbgl;
+using SourceType = mbgl::style::SourceType;
 
 class SourceTest {
 public:
@@ -47,7 +50,8 @@ public:
     Transform transform;
     TransformState transformState;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
+    Style style { loop, fileSource, 1 };
+    AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
 
@@ -60,7 +64,8 @@ public:
         MapMode::Continuous,
         annotationManager,
         imageManager,
-        glyphManager
+        glyphManager,
+        0
     };
 
     SourceTest() {
@@ -530,11 +535,11 @@ TEST(Source, ImageSourceImageUpdate) {
 
     // Load initial, so the source state will be loaded=true
     source.loadDescription(test.fileSource);
-    UnassociatedImage rgba({ 1, 1 });
+    PremultipliedImage rgba({ 1, 1 });
     rgba.data[0] = 255;
     rgba.data[1] = 254;
     rgba.data[2] = 253;
-    rgba.data[3] = 128;
+    rgba.data[3] = 0;
 
     // Schedule an update
     test.loop.invoke([&] () {
@@ -544,3 +549,39 @@ TEST(Source, ImageSourceImageUpdate) {
 
     test.run();
 }
+
+TEST(Source, CustomGeometrySourceSetTileData) {
+    SourceTest test;
+    std::shared_ptr<ThreadPool> threadPool = sharedThreadPool();
+    CustomGeometrySource source("source", CustomGeometrySource::Options());
+    source.loadDescription(test.fileSource);
+
+    LineLayer layer("id", "source");
+    layer.setSourceLayer("water");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    test.renderSourceObserver.tileChanged = [&] (RenderSource& source_, const OverscaledTileID&) {
+        EXPECT_EQ("source", source_.baseImpl->id);
+        test.end();
+    };
+
+    test.renderSourceObserver.tileError = [&] (RenderSource&, const OverscaledTileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.loop.invoke([&] () {
+        // Set Tile Data
+        source.setTileData(CanonicalTileID(0, 0, 0), GeoJSON{ FeatureCollection{} });
+    });
+
+    test.run();
+}
+

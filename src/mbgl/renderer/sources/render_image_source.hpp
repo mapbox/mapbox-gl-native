@@ -5,13 +5,8 @@
 #include <mbgl/style/sources/image_source_impl.hpp>
 
 namespace mbgl {
-class RenderLayer;
-class PaintParameters;
-class RasterBucket;
 
-namespace gl {
-class Context;
-} // namespace gl
+class RasterBucket;
 
 class RenderImageSource : public RenderSource {
 public:
@@ -20,9 +15,8 @@ public:
 
     bool isLoaded() const final;
 
-    void startRender(Painter&) final;
-    void render(Painter&, PaintParameters&, const RenderLayer&);
-    void finishRender(Painter&) final;
+    void startRender(PaintParameters&) final;
+    void finishRender(PaintParameters&) final;
 
     void update(Immutable<style::Source::Impl>,
                 const std::vector<Immutable<style::Layer::Impl>>&,
@@ -30,37 +24,36 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final {
-        return tiles;
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final {
+        return {};
     }
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const RenderStyle& style,
-                          const RenderedQueryOptions& options) const final;
+                          const std::vector<const RenderLayer*>& layers,
+                          const RenderedQueryOptions& options,
+                          const CollisionIndex& collisionIndex) const final;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void setCacheSize(size_t) final {
-    }
     void onLowMemory() final {
     }
     void dumpDebugLogs() const final;
 
 private:
+    friend class RenderRasterLayer;
+
     const style::ImageSource::Impl& impl() const;
-    std::map<UnwrappedTileID, RenderTile> tiles;
 
     std::vector<UnwrappedTileID> tileIds;
     std::unique_ptr<RasterBucket> bucket;
     std::vector<mat4> matrices;
-    bool shouldRender;
 };
 
 template <>
 inline bool RenderSource::is<RenderImageSource>() const {
-    return baseImpl->type == SourceType::Image;
+    return baseImpl->type == style::SourceType::Image;
 }
 
 } // namespace mbgl

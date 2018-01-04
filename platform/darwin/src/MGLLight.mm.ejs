@@ -1,0 +1,114 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated.
+// Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
+// test
+
+#import "MGLLight.h"
+
+#import "MGLTypes.h"
+#import "NSDate+MGLAdditions.h"
+#import "MGLStyleValue_Private.h"
+#import "NSValue+MGLAdditions.h"
+
+#import <mbgl/style/light.hpp>
+#import <mbgl/style/types.hpp>
+
+namespace mbgl {
+
+    MBGL_DEFINE_ENUM(MGLLightAnchor, {
+<% for (const property of properties) { -%>
+<% if (property.type == "enum") { -%>
+<% for (const value in property.values) { -%>
+        { MGLLightAnchor<%- camelize(value) %>, "<%- value %>" },
+<% } -%>
+<% } -%>
+<% } -%>
+    });
+    
+}
+
+NS_INLINE MGLTransition MGLTransitionFromOptions(const mbgl::style::TransitionOptions& options) {
+    MGLTransition transition;
+    transition.duration = MGLTimeIntervalFromDuration(options.duration.value_or(mbgl::Duration::zero()));
+    transition.delay = MGLTimeIntervalFromDuration(options.delay.value_or(mbgl::Duration::zero()));
+    
+    return transition;
+}
+
+NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition transition) {
+    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
+    return options;
+}
+
+@interface MGLLight()
+
+@end
+
+@implementation MGLLight
+
+- (instancetype)initWithMBGLLight:(const mbgl::style::Light *)mbglLight
+{
+    if (self = [super init]) {
+<% if (properties.length) { -%>
+<% for (const property of properties) { -%>
+<% if (property.type == "enum") { -%>
+        auto <%- camelizeWithLeadingLowercase(property.name) -%> = mbglLight->get<%- camelize(property.name) -%>();
+        MGLStyleValue<NSValue *> *<%- camelizeWithLeadingLowercase(property.name) -%>StyleValue;
+        if (<%- camelizeWithLeadingLowercase(property.name) -%>.isUndefined()) {
+            mbgl::style::PropertyValue<mbgl::style::Light<%- camelize(property.name) -%>Type> default<%- camelize(property.name) -%> = mbglLight->getDefault<%- camelize(property.name) -%>();
+            <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumStyleValue(default<%- camelize(property.name) -%>);
+        } else {
+            <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumStyleValue(<%- camelizeWithLeadingLowercase(property.name) -%>);
+        }
+
+        _<%- camelizeWithLeadingLowercase(property.name) -%> = <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue;
+
+<% if (property.transition) { -%>
+        _<%- camelizeWithLeadingLowercase(property.name) -%>Transition = MGLTransitionFromOptions(mbglLight->get<%- camelize(property.name) -%>Transition());
+
+<% } -%>
+<% } else {-%>
+        auto <%- camelizeWithLeadingLowercase(property.name) -%>Value = mbglLight->get<%- camelize(property.name) -%>();
+        if (<%- camelizeWithLeadingLowercase(property.name) -%>Value.isUndefined()) {
+            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(mbglLight->getDefault<%- camelize(property.name) -%>());
+        } else {
+            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(<%- camelizeWithLeadingLowercase(property.name) -%>Value);
+        }
+<% if (property.transition) { -%>        
+        _<%- camelizeWithLeadingLowercase(property.name) -%>Transition = MGLTransitionFromOptions(mbglLight->get<%- camelize(property.name) -%>Transition());
+<% } -%> 
+<% } -%>
+<% } -%>
+<% } -%>
+    }
+
+    return self;
+}
+
+- (mbgl::style::Light)mbglLight
+{
+    mbgl::style::Light mbglLight;
+<% if (properties.length) { -%>
+<% for (const property of properties) { -%>
+<% if (property.type == "enum") { -%>
+    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumPropertyValue(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
+    mbglLight.set<%- camelize(property.name) -%>(<%- camelizeWithLeadingLowercase(property.name) -%>);
+
+<% } else {-%>
+    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toInterpolatablePropertyValue(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
+    mbglLight.set<%- camelize(property.name) -%>(<%- camelizeWithLeadingLowercase(property.name) -%>);
+ 
+<% } -%>
+<% if (property.transition) { -%>
+    mbglLight.set<%- camelize(property.name) -%>Transition(MGLOptionsFromTransition(self.<%- camelizeWithLeadingLowercase(property.name) -%>Transition));
+
+<% } -%>
+<% } -%>
+<% } -%>
+    
+    return mbglLight;
+}
+
+@end

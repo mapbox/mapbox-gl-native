@@ -1,5 +1,7 @@
 #import <UIKit/UIKit.h>
 
+#import "MGLFoundation.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 /**
@@ -8,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
  objects and may be recycled later and put into a reuse queue that is maintained
  by the map view.
  */
+MGL_EXPORT
 @interface MGLAnnotationImage : NSObject <NSSecureCoding>
 
 #pragma mark Initializing and Preparing the Image Object

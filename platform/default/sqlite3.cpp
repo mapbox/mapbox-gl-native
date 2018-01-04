@@ -287,6 +287,11 @@ bool Statement::run() {
     }
 }
 
+template <> bool Statement::get(int offset) {
+    assert(impl);
+    return sqlite3_column_int(impl->stmt, offset);
+}
+
 template <> int Statement::get(int offset) {
     assert(impl);
     return sqlite3_column_int(impl->stmt, offset);
@@ -381,8 +386,8 @@ int64_t Statement::lastInsertRowId() const {
 
 uint64_t Statement::changes() const {
     assert(impl);
-    auto changes = impl->changes;
-    return (changes < 0 ? 0 : changes);
+    auto changes_ = impl->changes;
+    return (changes_ < 0 ? 0 : changes_);
 }
 
 Transaction::Transaction(Database& db_, Mode mode)

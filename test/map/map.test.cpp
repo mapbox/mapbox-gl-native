@@ -4,10 +4,8 @@
 #include <mbgl/test/fixture_log_observer.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
 #include <mbgl/gl/context.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/storage/network_status.hpp>
 #include <mbgl/storage/default_file_source.hpp>
@@ -25,39 +23,35 @@ using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
 
-class BackendTest : public HeadlessBackend {
+class StubMapObserver : public MapObserver {
 public:
-    BackendTest() : HeadlessBackend(test::sharedDisplay()) {}
-
-    void invalidate() {
-        if (invalidateCallback) {
-            invalidateCallback();
-        }
-    }
-
-    std::function<void()> invalidateCallback;
-
     void onWillStartLoadingMap() final {
         if (onWillStartLoadingMapCallback) {
             onWillStartLoadingMapCallback();
         }
     }
-
+    
     void onDidFinishLoadingMap() final {
         if (onDidFinishLoadingMapCallback) {
             onDidFinishLoadingMapCallback();
         }
     }
-
+    
     void onDidFailLoadingMap(std::exception_ptr) final {
         if (didFailLoadingMapCallback) {
             didFailLoadingMapCallback();
         }
     }
-
+    
     void onDidFinishLoadingStyle() final {
         if (didFinishLoadingStyleCallback) {
             didFinishLoadingStyleCallback();
+        }
+    }
+
+    void onDidFinishRenderingFrame(RenderMode mode) final {
+        if (didFinishRenderingFrame) {
+            didFinishRenderingFrame(mode);
         }
     }
 
@@ -65,67 +59,106 @@ public:
     std::function<void()> onDidFinishLoadingMapCallback;
     std::function<void()> didFailLoadingMapCallback;
     std::function<void()> didFinishLoadingStyleCallback;
+    std::function<void(RenderMode)> didFinishRenderingFrame;
 };
 
-struct MapTest {
+template <class FileSource = StubFileSource>
+class MapTest {
+public:
     util::RunLoop runLoop;
-    BackendTest backend;
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext() };
-    StubFileSource fileSource;
+    FileSource fileSource;
     ThreadPool threadPool { 4 };
+    StubMapObserver observer;
+    HeadlessFrontend frontend;
+    Map map;
+
+    MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
+        : frontend(pixelRatio, fileSource, threadPool)
+        , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
+    }
+
+    template <typename T = FileSource>
+    MapTest(const std::string& cachePath, const std::string& assetRoot,
+            float pixelRatio = 1, MapMode mode = MapMode::Static,
+            typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
+            : fileSource { cachePath, assetRoot }
+            , frontend(pixelRatio, fileSource, threadPool)
+            , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
+    }
 };
 
 TEST(Map, LatLngBehavior) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    MapTest<> test;
 
-    map.setLatLngZoom({ 1, 1 }, 0);
-    auto latLng1 = map.getLatLng();
+    test.map.setLatLngZoom({ 1, 1 }, 0);
+    auto latLng1 = test.map.getLatLng();
 
-    map.setLatLng({ 1, 1 });
-    auto latLng2 = map.getLatLng();
+    test.map.setLatLng({ 1, 1 });
+    auto latLng2 = test.map.getLatLng();
 
     ASSERT_DOUBLE_EQ(latLng1.latitude(), latLng2.latitude());
     ASSERT_DOUBLE_EQ(latLng1.longitude(), latLng2.longitude());
 }
 
 TEST(Map, LatLngBoundsToCamera) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    MapTest<> test;
 
-    map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
 
     LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
 
-    CameraOptions virtualCamera = map.cameraForLatLngBounds(bounds, {});
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {});
     ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.55467, 1e-5);
+}
+
+TEST(Map, LatLngBoundsToCameraWithAngle) {
+    MapTest<> test;
+
+    test.map.setLatLngZoom({ 40.712730, -74.005953 }, 16.0);
+
+    LatLngBounds bounds = LatLngBounds::hull({15.68169,73.499857}, {53.560711, 134.77281});
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {}, 35);
+    ASSERT_TRUE(bounds.contains(*virtualCamera.center));
+    EXPECT_NEAR(*virtualCamera.zoom, 1.21385, 1e-5);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -35 * util::DEG2RAD);
+}
+
+TEST(Map, LatLngsToCamera) {
+    MapTest<> test;
+
+    std::vector<LatLng> latLngs{{ 40.712730, 74.005953 }, {15.68169,73.499857}, {30.82678, 83.4082}};
+
+    CameraOptions virtualCamera = test.map.cameraForLatLngs(latLngs, {}, 23);
+    EXPECT_DOUBLE_EQ(virtualCamera.angle.value_or(0), -23 * util::DEG2RAD);
+    EXPECT_NEAR(virtualCamera.zoom.value_or(0), 2.75434, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->latitude(), 28.49288, 1e-5);
+    EXPECT_NEAR(virtualCamera.center->longitude(), 74.97437, 1e-5);
 }
 
 TEST(Map, CameraToLatLngBounds) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    MapTest<> test;
 
-    map.setLatLngZoom({ 45, 90 }, 16);
+    test.map.setLatLngZoom({ 45, 90 }, 16);
 
     LatLngBounds bounds = LatLngBounds::hull(
-            map.latLngForPixel({}),
-            map.latLngForPixel({ double(map.getSize().width), double(map.getSize().height) }));
+            test.map.latLngForPixel({}),
+            test.map.latLngForPixel({ double(test.map.getSize().width), double(test.map.getSize().height) }));
 
-    CameraOptions camera = map.getCameraOptions({});
+    CameraOptions camera = test.map.getCameraOptions({});
 
-    ASSERT_EQ(bounds, map.latLngBoundsForCamera(camera));
+    ASSERT_EQ(bounds, test.map.latLngBoundsForCamera(camera));
 
     // Map::cameraForLatLngBounds only sets zoom and center.
-    CameraOptions virtualCamera = map.cameraForLatLngBounds(bounds, {});
+    CameraOptions virtualCamera = test.map.cameraForLatLngBounds(bounds, {});
     ASSERT_NEAR(*camera.zoom, *virtualCamera.zoom, 1e-7);
     ASSERT_NEAR(camera.center->latitude(), virtualCamera.center->latitude(), 1e-7);
     ASSERT_NEAR(camera.center->longitude(), virtualCamera.center->longitude(), 1e-7);
 }
 
 TEST(Map, Offline) {
-    MapTest test;
-    DefaultFileSource fileSource(":memory:", ".");
+    MapTest<DefaultFileSource> test {":memory:", "."};
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
@@ -135,39 +168,50 @@ TEST(Map, Offline) {
     };
 
     const std::string prefix = "http://127.0.0.1:3000/";
-    fileSource.put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
-    fileSource.put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
-    fileSource.put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
-    fileSource.put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
-    fileSource.put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
-    fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
+    test.fileSource.put(Resource::style(prefix + "style.json"), expiredItem("style.json"));
+    test.fileSource.put(Resource::source(prefix + "streets.json"), expiredItem("streets.json"));
+    test.fileSource.put(Resource::spriteJSON(prefix + "sprite", 1.0), expiredItem("sprite.json"));
+    test.fileSource.put(Resource::spriteImage(prefix + "sprite", 1.0), expiredItem("sprite.png"));
+    test.fileSource.put(Resource::tile(prefix + "{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), expiredItem("0-0-0.vector.pbf"));
+    test.fileSource.put(Resource::glyphs(prefix + "{fontstack}/{range}.pbf", {{"Helvetica"}}, {0, 255}), expiredItem("glyph.pbf"));
     NetworkStatus::Set(NetworkStatus::Status::Offline);
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL(prefix + "style.json");
+    test.map.getStyle().loadURL(prefix + "style.json");
 
     test::checkImage("test/fixtures/map/offline",
-                     test::render(map, test.view),
+                     test.frontend.render(test.map),
                      0.0015,
                      0.1);
 
     NetworkStatus::Set(NetworkStatus::Status::Online);
 }
 
-TEST(Map, SetStyleInvalidJSON) {
-    MapTest test;
+TEST(Map, SetStyleDefaultCamera) {
+    MapTest<> test;
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getPitch(), 0.0);
+    EXPECT_DOUBLE_EQ(test.map.getBearing(), 0.0);
+    EXPECT_EQ(test.map.getLatLng(), LatLng {});
 
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
+
+    test.map.jumpTo(test.map.getStyle().getDefaultCamera());
+    EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.5);
+}
+
+TEST(Map, SetStyleInvalidJSON) {
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
     bool fail = false;
-    test.backend.didFailLoadingMapCallback = [&]() {
-        fail = true;
-    };
 
     {
-        Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool,
-                MapMode::Still);
-        map.getStyle().loadJSON("invalid");
+        MapTest<> test;
+        test.observer.didFailLoadingMapCallback = [&]() {
+            fail = true;
+        };
+        test.map.getStyle().loadJSON("invalid");
     }
 
     EXPECT_TRUE(fail);
@@ -181,7 +225,7 @@ TEST(Map, SetStyleInvalidJSON) {
 }
 
 TEST(Map, SetStyleInvalidURL) {
-    MapTest test;
+    MapTest<> test;
 
     test.fileSource.styleResponse = [] (const Resource&) {
         Response response;
@@ -191,40 +235,36 @@ TEST(Map, SetStyleInvalidURL) {
         return response;
     };
 
-    test.backend.didFailLoadingMapCallback = [&]() {
+    test.observer.didFailLoadingMapCallback = [&]() {
         test.runLoop.stop();
     };
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("mapbox://bar");
+    test.map.getStyle().loadURL("mapbox://bar");
 
     test.runLoop.run();
 }
 
 TEST(Map, DoubleStyleLoad) {
-    MapTest test;
+    MapTest<> test;
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadJSON("");
-    map.getStyle().loadJSON("");
+    test.map.getStyle().loadJSON("");
+    test.map.getStyle().loadJSON("");
 }
 
 TEST(Map, StyleFresh) {
     // The map should not revalidate fresh styles.
 
-    MapTest test;
-    FakeFileSource fileSource;
+    MapTest<FakeFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.map.getStyle().loadURL("mapbox://styles/test");
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = Timestamp::max();
 
-    fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, fileSource.requests.size());
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(0u, test.fileSource.requests.size());
 }
 
 TEST(Map, StyleExpired) {
@@ -232,26 +272,24 @@ TEST(Map, StyleExpired) {
 
     using namespace std::chrono_literals;
 
-    MapTest test;
-    FakeFileSource fileSource;
+    MapTest<FakeFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.map.getStyle().loadURL("mapbox://styles/test");
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, fileSource.requests.size());
-    EXPECT_NE(nullptr, map.getStyle().getLayer("bg"));
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
 
 TEST(Map, StyleExpiredWithAnnotations) {
@@ -259,100 +297,111 @@ TEST(Map, StyleExpiredWithAnnotations) {
 
     using namespace std::chrono_literals;
 
-    MapTest test;
-    FakeFileSource fileSource;
+    MapTest<FakeFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("mapbox://styles/test");
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.map.getStyle().loadURL("mapbox://styles/test");
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
     response.expires = util::now() - 1h;
 
-    fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.map.addAnnotation(LineAnnotation { LineString<double> {{ { 0, 0 }, { 10, 10 } }} });
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 
-    fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(1u, fileSource.requests.size());
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+}
+
+TEST(Map, StyleExpiredWithRender) {
+    // Rendering should not prevent revalidation of an expired style.
+
+    using namespace std::chrono_literals;
+
+    MapTest<FakeFileSource> test;
+
+    test.map.getStyle().loadURL("mapbox://styles/test");
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+
+    Response response;
+    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.expires = util::now() - 1h;
+
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+
+    test.frontend.render(test.map);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
 TEST(Map, StyleEarlyMutation) {
     // An early mutation should not prevent the initial style load.
 
-    MapTest test;
-    FakeFileSource fileSource;
+    MapTest<FakeFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("mapbox://styles/test");
-    map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
+    test.map.getStyle().loadURL("mapbox://styles/test");
+    test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
     Response response;
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
-    fileSource.respond(Resource::Style, response);
+    test.fileSource.respond(Resource::Style, response);
 
-    EXPECT_EQ(0u, fileSource.requests.size());
-    EXPECT_NE(nullptr, map.getStyle().getLayer("water"));
+    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));
 }
 
 TEST(Map, MapLoadingSignal) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    MapTest<> test;
 
     bool emitted = false;
-    test.backend.onWillStartLoadingMapCallback = [&]() {
+    test.observer.onWillStartLoadingMapCallback = [&]() {
         emitted = true;
     };
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 }
 
 TEST(Map, MapLoadedSignal) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Continuous);
+    MapTest<> test { 1, MapMode::Continuous };
 
-    test.backend.onDidFinishLoadingMapCallback = [&]() {
+    test.observer.onDidFinishLoadingMapCallback = [&]() {
         test.runLoop.stop();
     };
 
-    test.backend.invalidateCallback = [&]() {
-        map.render(test.view);
-    };
-
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     test.runLoop.run();
 }
 
 TEST(Map, StyleLoadedSignal) {
-    MapTest test;
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
+    MapTest<> test;
 
     // The map should emit a signal on style loaded
     bool emitted = false;
-    test.backend.didFinishLoadingStyleCallback = [&]() {
+    test.observer.didFinishLoadingStyleCallback = [&]() {
         emitted = true;
     };
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 
     // But not when the style couldn't be parsed
     emitted = false;
-    map.getStyle().loadJSON("invalid");
+    test.map.getStyle().loadJSON("invalid");
     EXPECT_FALSE(emitted);
 }
 
 // Test for https://github.com/mapbox/mapbox-gl-native/issues/7902
 TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
-    MapTest test;
-    OnlineFileSource fileSource;
+    MapTest<OnlineFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-500");
+    test.map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-500");
 
-    test.backend.didFinishLoadingStyleCallback = [&]() {
+    test.observer.didFinishLoadingStyleCallback = [&]() {
         test.runLoop.stop();
     };
 
@@ -360,21 +409,19 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNetworkErrorRetry)) {
 }
 
 TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
-    MapTest test;
-    OnlineFileSource fileSource;
+    MapTest<OnlineFileSource> test;
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404");
+    test.map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404");
 
     using namespace std::chrono_literals;
     util::Timer timer;
 
     // Not found errors should not trigger a retry like other errors.
-    test.backend.didFinishLoadingStyleCallback = [&]() {
+    test.observer.didFinishLoadingStyleCallback = [&]() {
         FAIL() << "Should not retry on not found!";
     };
 
-    test.backend.didFailLoadingMapCallback = [&]() {
+    test.observer.didFailLoadingMapCallback = [&]() {
         timer.start(Milliseconds(1100), 0s, [&] {
             test.runLoop.stop();
         });
@@ -383,52 +430,48 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
     test.runLoop.run();
 
     // Should also not retry if the response has cache headers.
-    map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404-cache");
+    test.map.getStyle().loadURL("http://127.0.0.1:3000/style-fail-once-404-cache");
     test.runLoop.run();
 }
 
 TEST(Map, AddLayer) {
-    MapTest test;
+    MapTest<> test;
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
-    map.getStyle().addLayer(std::move(layer));
+    test.map.getStyle().addLayer(std::move(layer));
 
-    test::checkImage("test/fixtures/map/add_layer", test::render(map, test.view));
+    test::checkImage("test/fixtures/map/add_layer", test.frontend.render(test.map));
 }
 
 TEST(Map, WithoutVAOExtension) {
-    MapTest test;
+    MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
 
-    test.backend.getContext().disableVAOExtension = true;
+    BackendScope scope { *test.frontend.getBackend() };
+    test.frontend.getBackend()->getContext().disableVAOExtension = true;
 
-    DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 
-    Map map(test.backend, test.view.getSize(), 1, fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
-
-    test::checkImage("test/fixtures/map/no_vao", test::render(map, test.view), 0.002);
+    test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map), 0.002);
 }
 
 TEST(Map, RemoveLayer) {
-    MapTest test;
+    MapTest<> test;
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
-    map.getStyle().addLayer(std::move(layer));
-    map.getStyle().removeLayer("background");
+    test.map.getStyle().addLayer(std::move(layer));
+    test.map.getStyle().removeLayer("background");
 
-    test::checkImage("test/fixtures/map/remove_layer", test::render(map, test.view));
+    test::checkImage("test/fixtures/map/remove_layer", test.frontend.render(test.map));
 }
 
 TEST(Map, DisabledSources) {
-    MapTest test;
+    MapTest<> test;
 
     // Always load the same image tile for raster layers.
     test.fileSource.response = [] (const Resource& res) -> optional<Response> {
@@ -441,15 +484,14 @@ TEST(Map, DisabledSources) {
         return {};
     };
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.setZoom(1);
+    test.map.setZoom(1);
 
     // This stylesheet has two raster layers, one that starts at zoom 1, the other at zoom 0.
     // We first render a map at zoom level 1, which should show both layers (both are "visible" due
     // to an opacity of 0.5). Then, we are zooming back out to a zoom level of 0.5 and rerender.
     // The "raster1" layer should not be visible anymore since it has minzoom 1, while "raster2"
     // should still be there. Both layers have a distinct color through "raster-hue-rotate".
-    map.getStyle().loadJSON(R"STYLE(
+    test.map.getStyle().loadJSON(R"STYLE(
 {
   "version": 8,
   "name": "Test",
@@ -483,16 +525,15 @@ TEST(Map, DisabledSources) {
 }
 )STYLE");
 
-    test::checkImage("test/fixtures/map/disabled_layers/first", test::render(map, test.view));
-    map.setZoom(0.5);
-    test::checkImage("test/fixtures/map/disabled_layers/second", test::render(map, test.view));
+    test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map));
+    test.map.setZoom(0.5);
+    test::checkImage("test/fixtures/map/disabled_layers/second", test.frontend.render(test.map));
 }
 
 TEST(Map, DontLoadUnneededTiles) {
-    MapTest test;
+    MapTest<> test;
 
-    Map map(test.backend, test.view.getSize(), 1, test.fileSource, test.threadPool, MapMode::Still);
-    map.getStyle().loadJSON(R"STYLE({
+    test.map.getStyle().loadJSON(R"STYLE({
   "sources": {
     "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
   },
@@ -530,65 +571,84 @@ TEST(Map, DontLoadUnneededTiles) {
         // Note: using z += 0.1 in the loop doesn't produce accurate floating point numbers.
         const double z = double(zoom) / 10;
         tiles.clear();
-        map.setZoom(z);
-        test::render(map, test.view);
+        test.map.setZoom(z);
+        test.frontend.render(test.map);
         EXPECT_EQ(referenceTiles[z], tiles) << "zoom level " << z;
     }
 }
 
-
-class MockBackend : public HeadlessBackend {
-public:
-    MockBackend(std::shared_ptr<HeadlessDisplay> display_)
-            : HeadlessBackend(display_) {
-    }
-
-    std::function<void()> callback;
-    void invalidate() override {
-        if (callback) {
-            callback();
-        }
-    }
-};
-
 TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     util::RunLoop runLoop;
-    MockBackend backend { test::sharedDisplay() };
-    BackendScope scope { backend };
-    OffscreenView view { backend.getContext() };
     ThreadPool threadPool { 4 };
     DefaultFileSource fileSource(":memory:", "test/fixtures/api/assets");
-    Map map(backend, view.getSize(), 1, fileSource, threadPool, MapMode::Continuous);
+    float pixelRatio { 1 };
 
     using namespace std::chrono_literals;
 
     util::Timer emergencyShutoff;
     emergencyShutoff.start(10s, 0s, [&] {
-        util::RunLoop::Get()->stop();
+        runLoop.stop();
         FAIL() << "Did not stop rendering";
     });
 
     util::Timer timer;
-    util::AsyncTask render{[&] {
-        if (map.isFullyLoaded()) {
-            // Abort the test after 1 second after the map loading fully. Note that a "fully loaded
-            // map" doesn't mean that we won't render anymore: we could still render fade in/fade
-            // out or other animations.
-            // If we are continuing to render indefinitely, the emergency shutoff above will trigger
-            // and the test will fail since the regular time will be constantly reset.
-            timer.start(1s, 0s, [&] {
-                util::RunLoop::Get()->stop();
-            });
-        }
 
-        BackendScope scope2(backend);
-        map.render(view);
-    }};
+    HeadlessFrontend frontend(pixelRatio, fileSource, threadPool);
 
-    backend.callback = [&] {
-        render.send();
+    StubMapObserver observer;
+    observer.didFinishRenderingFrame = [&] (MapObserver::RenderMode) {
+        // Start a timer that ends the test one second from now. If we are continuing to render
+        // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
+        // emergency shutoff above will trigger, failing the test.
+        timer.start(1s, 0s, [&] {
+            runLoop.stop();
+        });
     };
 
+    Map map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Continuous);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
-    util::RunLoop::Get()->run();
+
+    runLoop.run();
+}
+
+TEST(Map, NoContentTiles) {
+    MapTest<DefaultFileSource> test {":memory:", "."};
+
+    using namespace std::chrono_literals;
+
+    // Insert a 204 No Content response for the 0/0/0 tile
+    Response response;
+    response.noContent = true;
+    response.expires = util::now() + 1h;
+    test.fileSource.put(Resource::tile("http://example.com/{z}-{x}-{y}.vector.pbf", 1.0, 0, 0, 0,
+                                       Tileset::Scheme::XYZ),
+                        response);
+
+    test.map.getStyle().loadJSON(R"STYLE({
+      "version": 8,
+      "name": "Water",
+      "sources": {
+        "mapbox": {
+          "type": "vector",
+          "tiles": ["http://example.com/{z}-{x}-{y}.vector.pbf"]
+        }
+      },
+      "layers": [{
+        "id": "background",
+        "type": "background",
+        "paint": {
+          "background-color": "red"
+        }
+      }, {
+        "id": "water",
+        "type": "fill",
+        "source": "mapbox",
+        "source-layer": "water"
+      }]
+    })STYLE");
+
+    test::checkImage("test/fixtures/map/nocontent",
+                     test.frontend.render(test.map),
+                     0.0015,
+                     0.1);
 }

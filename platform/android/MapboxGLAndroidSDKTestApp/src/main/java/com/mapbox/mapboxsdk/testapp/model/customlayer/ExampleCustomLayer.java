@@ -11,5 +11,6 @@ public class ExampleCustomLayer {
 
   public static long InitializeFunction;
   public static long RenderFunction;
+  public static long ContextLostFunction;
   public static long DeinitializeFunction;
 }

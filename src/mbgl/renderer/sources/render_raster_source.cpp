@@ -1,6 +1,7 @@
 #include <mbgl/renderer/sources/render_raster_source.hpp>
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/raster_tile.hpp>
+#include <mbgl/algorithm/update_tile_masks.hpp>
 
 namespace mbgl {
 
@@ -56,32 +57,30 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-void RenderRasterSource::startRender(Painter& painter) {
-    tilePyramid.startRender(painter);
+void RenderRasterSource::startRender(PaintParameters& parameters) {
+    algorithm::updateTileMasks(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(parameters);
 }
 
-void RenderRasterSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderRasterSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderRasterSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderRasterSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
-                                          const RenderStyle&,
-                                          const RenderedQueryOptions&) const {
-    return {};
+                                          const std::vector<const RenderLayer*>&,
+                                          const RenderedQueryOptions&,
+                                          const CollisionIndex& ) const {
+    return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 
 std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
-}
-
-void RenderRasterSource::setCacheSize(size_t size) {
-    tilePyramid.setCacheSize(size);
 }
 
 void RenderRasterSource::onLowMemory() {

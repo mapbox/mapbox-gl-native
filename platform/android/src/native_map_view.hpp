@@ -1,30 +1,30 @@
 #pragma once
 
-#include <mbgl/map/backend.hpp>
 #include <mbgl/map/change.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
-#include "file_source.hpp"
 #include "annotation/marker.hpp"
 #include "annotation/polygon.hpp"
 #include "annotation/polyline.hpp"
 #include "graphics/pointf.hpp"
 #include "graphics/rectf.hpp"
 #include "geojson/feature.hpp"
+#include "geojson/geometry.hpp"
 #include "geometry/lat_lng.hpp"
 #include "geometry/projected_meters.hpp"
 #include "style/layers/layers.hpp"
-#include "style/sources/sources.hpp"
+#include "style/sources/source.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "map/camera_position.hpp"
+#include "map/image.hpp"
 #include "style/light.hpp"
+#include "bitmap.hpp"
 
 #include <exception>
 #include <string>
@@ -36,7 +36,11 @@
 namespace mbgl {
 namespace android {
 
-class NativeMapView : public View, public Backend {
+class AndroidRendererFrontend;
+class FileSource;
+class MapRenderer;
+
+class NativeMapView : public MapObserver {
 public:
 
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/maps/NativeMapView"; };
@@ -48,26 +52,15 @@ public:
     NativeMapView(jni::JNIEnv&,
                   jni::Object<NativeMapView>,
                   jni::Object<FileSource>,
-                  jni::jfloat pixelRatio,
-                  jni::String programCacheDir,
-                  jni::jint availableProcessors,
-                  jni::jlong totalMemory);
+                  jni::Object<MapRenderer>,
+                  jni::jfloat pixelRatio);
 
     virtual ~NativeMapView();
-
-    // mbgl::View //
-
-    void bind() override;
-
-    // mbgl::Backend //
-
-    void updateAssumedState() override;
-    void invalidate() override;
 
     // Deprecated //
     void notifyMapChange(mbgl::MapChange);
 
-    // mbgl::Backend (mbgl::MapObserver) //
+    // mbgl::RendererBackend (mbgl::MapObserver) //
     void onCameraWillChange(MapObserver::CameraChangeMode) override;
     void onCameraIsChanging() override;
     void onCameraDidChange(MapObserver::CameraChangeMode) override;
@@ -83,27 +76,7 @@ public:
 
     // JNI //
 
-    void destroy(jni::JNIEnv&);
-
-    void render(jni::JNIEnv&);
-
-    void update(jni::JNIEnv&);
-
     void resizeView(jni::JNIEnv&, int, int);
-
-    void resizeFramebuffer(jni::JNIEnv&, int, int);
-
-    void initializeDisplay(jni::JNIEnv&);
-
-    void terminateDisplay(jni::JNIEnv&);
-
-    void initializeContext(jni::JNIEnv&);
-
-    void terminateContext(jni::JNIEnv&);
-
-    void createSurface(jni::JNIEnv&, jni::Object<>);
-
-    void destroySurface(jni::JNIEnv&);
 
     jni::String getStyleUrl(jni::JNIEnv&);
 
@@ -132,6 +105,8 @@ public:
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
     jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
+
+    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double bearing);
 
     void setReachability(jni::JNIEnv&, jni::jboolean);
 
@@ -171,8 +146,6 @@ public:
 
     void scheduleSnapshot(jni::JNIEnv&);
 
-    void enableFps(jni::JNIEnv&, jni::jboolean enable);
-
     jni::Object<CameraPosition> getCameraPosition(jni::JNIEnv&);
 
     void updateMarker(jni::JNIEnv&, jni::jlong, jni::jdouble, jni::jdouble, jni::String);
@@ -211,6 +184,8 @@ public:
 
     void addAnnotationIcon(JNIEnv&, jni::String, jint, jint, jfloat, jni::Array<jbyte>);
 
+    void removeAnnotationIcon(JNIEnv&, jni::String);
+
     jni::jdouble getTopOffsetPixelsForAnnotationSymbol(JNIEnv&, jni::String);
 
     jni::jlong getTransitionDuration(JNIEnv&);
@@ -222,6 +197,8 @@ public:
     void setTransitionDelay(JNIEnv&, jni::jlong);
 
     jni::Array<jlong> queryPointAnnotations(JNIEnv&, jni::Object<RectF>);
+
+    jni::Array<jlong> queryShapeAnnotations(JNIEnv&, jni::Object<RectF>);
 
     jni::Array<jni::Object<geojson::Feature>> queryRenderedFeaturesForPoint(JNIEnv&, jni::jfloat, jni::jfloat,
                                                                    jni::Array<jni::String>,
@@ -253,89 +230,45 @@ public:
 
     jni::Object<Source> getSource(JNIEnv&, jni::String);
 
-    void addSource(JNIEnv&, jni::jlong);
+    void addSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
     jni::Object<Source> removeSourceById(JNIEnv&, jni::String);
 
-    void removeSource(JNIEnv&, jlong);
+    void removeSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
     void addImage(JNIEnv&, jni::String, jni::jint, jni::jint, jni::jfloat, jni::Array<jbyte>);
 
+    void addImages(JNIEnv&, jni::Array<jni::Object<mbgl::android::Image>>);
+
     void removeImage(JNIEnv&, jni::String);
 
-protected:
-    // mbgl::Backend //
+    jni::Object<Bitmap> getImage(JNIEnv&, jni::String);
 
-    gl::ProcAddress initializeExtension(const char*) override;
-    void activate() override;
-    void deactivate() override;
+    void setPrefetchesTiles(JNIEnv&, jni::jboolean);
 
-private:
-    void _initializeDisplay();
-
-    void _terminateDisplay();
-
-    void _initializeContext();
-
-    void _terminateContext();
-
-    void _createSurface(ANativeWindow*);
-
-    void _destroySurface();
-
-    EGLConfig chooseConfig(const EGLConfig configs[], EGLint numConfigs);
-
-    mbgl::Size getFramebufferSize() const;
-
-    void updateFps();
+    jni::jboolean getPrefetchesTiles(JNIEnv&);
 
 private:
-    void recalculateSourceTileCacheSize();
+    std::unique_ptr<AndroidRendererFrontend> rendererFrontend;
 
     JavaVM *vm = nullptr;
     jni::UniqueWeakObject<NativeMapView> javaPeer;
 
+    MapRenderer& mapRenderer;
+
     std::string styleUrl;
     std::string apiKey;
 
-    ANativeWindow *window = nullptr;
-
-    EGLConfig config = nullptr;
-    EGLint format = -1;
-
-    EGLDisplay oldDisplay = EGL_NO_DISPLAY;
-    EGLSurface oldReadSurface = EGL_NO_SURFACE;
-    EGLSurface oldDrawSurface = EGL_NO_SURFACE;
-    EGLContext oldContext = EGL_NO_CONTEXT;
-
-    EGLDisplay display = EGL_NO_DISPLAY;
-    EGLSurface surface = EGL_NO_SURFACE;
-    EGLContext context = EGL_NO_CONTEXT;
-
-
     float pixelRatio;
-    bool fpsEnabled = false;
-    bool snapshot = false;
-    bool firstRender = true;
-    double fps = 0.0;
 
     // Minimum texture size according to OpenGL ES 2.0 specification.
     int width = 64;
     int height = 64;
-    int fbWidth = 64;
-    int fbHeight = 64;
-
-    bool framebufferSizeChanged = true;
-
-    int availableProcessors = 0;
-    size_t totalMemory = 0;
 
     // Ensure these are initialised last
     std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> map;
     mbgl::EdgeInsets insets;
-
-    unsigned active = 0;
 };
 
 } // namespace android

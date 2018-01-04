@@ -95,6 +95,16 @@ function(_get_xcconfig_property target var)
     get_property(result TARGET ${target} PROPERTY INTERFACE_${var} SET)
     if (result)
         get_property(result TARGET ${target} PROPERTY INTERFACE_${var})
+        if (var STREQUAL "LINK_LIBRARIES")
+            # Remove target names from the list of linker flags, since Xcode can't deal with them.
+            set(link_flags)
+            foreach(item IN LISTS result)
+                if (NOT TARGET ${item})
+                    list(APPEND link_flags ${item})
+                endif()
+            endforeach()
+            set(result "${link_flags}")
+        endif()
         string(REPLACE ";-framework " ";-framework;" result "${result}")
         string(REPLACE ";" "\" \"" result "${result}")
         string(REPLACE "-" "_" target "${target}")
@@ -113,6 +123,35 @@ function(write_xcconfig_target_properties)
         @ONLY
     )
 endfunction()
+
+# Set Xcode project build settings to be consistent with the CXX flags we're
+# using. (Otherwise, Xcode's defaults may override some of these.)
+macro(initialize_xcode_cxx_build_settings target)
+    # -Wall
+    set_xcode_property(${target} GCC_WARN_SIGN_COMPARE YES)
+    set_xcode_property(${target} GCC_WARN_UNINITIALIZED_AUTOS YES)
+    set_xcode_property(${target} GCC_WARN_UNKNOWN_PRAGMAS YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_FUNCTION YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_LABEL YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_PARAMETER YES)
+    set_xcode_property(${target} GCC_WARN_UNUSED_VARIABLE YES)
+
+    # -Wextra
+    set_xcode_property(${target} CLANG_WARN_EMPTY_BODY YES)
+    set_xcode_property(${target} GCC_WARN_ABOUT_MISSING_FIELD_INITIALIZERS YES)
+
+    # -Wshadow
+    set_xcode_property(${target} GCC_WARN_SHADOW YES)
+
+    # -Wnon-virtual-dtor
+    set_xcode_property(${target} GCC_WARN_NON_VIRTUAL_DESTRUCTOR YES)
+
+    # -Wnon-literal-conversion
+    set_xcode_property(${target} CLANG_WARN_NON_LITERAL_NULL_CONVERSION YES)
+
+    # -Wrange-loop-analysis
+    set_xcode_property(${target} CLANG_WARN_RANGE_LOOP_ANALYSIS YES)
+endmacro(initialize_xcode_cxx_build_settings)
 
 # CMake 3.1 does not have this yet.
 set(CMAKE_CXX14_STANDARD_COMPILE_OPTION "-std=c++14")

@@ -1,5 +1,17 @@
-﻿/* Accessibility title */
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Не удалось загрузит карту из-за неизвестной ошибки.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Не удалось загрузить карту так как невозможно загрузить стиль.";
+
+/* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Не удалось загрузить карту из-за ошибки в стиле.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Не удалось загрузить карту так как стиль не найден или несовместим.";
 
 /* Label of Zoom In button */
 "ZOOM_IN_LABEL" = "+";

@@ -42,9 +42,9 @@ public:
     PropertyValue<LineCapType> getLineCap() const;
     void setLineCap(PropertyValue<LineCapType>);
 
-    static PropertyValue<LineJoinType> getDefaultLineJoin();
-    PropertyValue<LineJoinType> getLineJoin() const;
-    void setLineJoin(PropertyValue<LineJoinType>);
+    static DataDrivenPropertyValue<LineJoinType> getDefaultLineJoin();
+    DataDrivenPropertyValue<LineJoinType> getLineJoin() const;
+    void setLineJoin(DataDrivenPropertyValue<LineJoinType>);
 
     static PropertyValue<float> getDefaultLineMiterLimit();
     PropertyValue<float> getLineMiterLimit() const;

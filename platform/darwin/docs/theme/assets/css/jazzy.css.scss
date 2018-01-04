@@ -386,6 +386,7 @@ pre code {
 .nav-group-task[data-name="MGLStyleFunction"],
 .nav-group-task[data-name="MGLStyleLayer"],
 .nav-group-task[data-name="MGLTileSource"],
+.nav-group-task[data-name="MGLAbstractShapeSource"],
 .nav-group-task[data-name="MGLVectorStyleLayer"] {
   .nav-group-task-link::after {
     @extend %nav-group-task-gloss;

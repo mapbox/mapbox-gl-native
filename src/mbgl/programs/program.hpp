@@ -2,6 +2,7 @@
 
 #include <mbgl/gl/program.hpp>
 #include <mbgl/gl/features.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/program_parameters.hpp>
@@ -51,26 +52,40 @@ public:
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gl::ColorMode colorMode,
-              UniformValues&& uniformValues,
+              const UniformValues& uniformValues,
               const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
-              const gl::SegmentVector<Attributes>& segments,
+              const SegmentVector<Attributes>& segments,
               const PaintPropertyBinders& paintPropertyBinders,
               const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom) {
-        program.draw(
-            context,
-            std::move(drawMode),
-            std::move(depthMode),
-            std::move(stencilMode),
-            std::move(colorMode),
-            uniformValues
-                .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties)),
-            LayoutAttributes::bindings(layoutVertexBuffer)
-                .concat(paintPropertyBinders.attributeBindings(currentProperties)),
-            indexBuffer,
-            segments
-        );
+              float currentZoom,
+              const std::string& layerID) {
+        typename AllUniforms::Values allUniformValues = uniformValues
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+
+        typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+
+        for (auto& segment : segments) {
+            auto vertexArrayIt = segment.vertexArrays.find(layerID);
+
+            if (vertexArrayIt == segment.vertexArrays.end()) {
+                vertexArrayIt = segment.vertexArrays.emplace(layerID, context.createVertexArray()).first;
+            }
+
+            program.draw(
+                context,
+                std::move(drawMode),
+                std::move(depthMode),
+                std::move(stencilMode),
+                std::move(colorMode),
+                allUniformValues,
+                vertexArrayIt->second,
+                Attributes::offsetBindings(allAttributeBindings, segment.vertexOffset),
+                indexBuffer,
+                segment.indexOffset,
+                segment.indexLength);
+        }
     }
 };
 

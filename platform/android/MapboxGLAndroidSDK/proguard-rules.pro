@@ -7,3 +7,9 @@
 -keep interface com.mapbox.mapboxsdk.** { *; }
 -keep class com.mapbox.services.android.telemetry.** { *; }
 -keep class com.mapbox.services.commons.** { *;}
+-keep class com.google.gson.** { *; }
+
+# config for okhttp 3.8.0, https://github.com/square/okhttp/pull/3354
+-dontwarn okio.**
+-dontwarn javax.annotation.Nullable
+-dontwarn javax.annotation.ParametersAreNonnullByDefault

@@ -1,5 +1,4 @@
 #include <mbgl/renderer/buckets/line_bucket.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
@@ -16,7 +15,8 @@ LineBucket::LineBucket(const BucketParameters& parameters,
                        const std::vector<const RenderLayer*>& layers,
                        const style::LineLayoutProperties::Unevaluated& layout_)
     : layout(layout_.evaluate(PropertyEvaluationParameters(parameters.tileID.overscaledZ))),
-      overscaling(parameters.tileID.overscaleFactor()) {
+      overscaling(parameters.tileID.overscaleFactor()),
+      zoom(parameters.tileID.overscaledZ) {
     for (const auto& layer : layers) {
         paintPropertyBinders.emplace(
             std::piecewise_construct,
@@ -30,7 +30,7 @@ LineBucket::LineBucket(const BucketParameters& parameters,
 void LineBucket::addFeature(const GeometryTileFeature& feature,
                             const GeometryCollection& geometryCollection) {
     for (auto& line : geometryCollection) {
-        addGeometry(line, feature.getType());
+        addGeometry(line, feature);
     }
 
     for (auto& pair : paintPropertyBinders) {
@@ -63,7 +63,8 @@ const float LINE_DISTANCE_SCALE = 1.0 / 2.0;
 // The maximum line distance, in tile units, that fits in the buffer.
 const float MAX_LINE_DISTANCE = std::pow(2, LINE_DISTANCE_BUFFER_BITS) / LINE_DISTANCE_SCALE;
 
-void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType type) {
+void LineBucket::addGeometry(const GeometryCoordinates& coordinates, const GeometryTileFeature& feature) {
+    const FeatureType type = feature.getType();
     const std::size_t len = [&coordinates] {
         std::size_t l = coordinates.size();
         // If the line has duplicate vertices at the end, adjust length to remove them.
@@ -87,7 +88,9 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
         return;
     }
 
-    const float miterLimit = layout.get<LineJoin>() == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
+    const LineJoinType joinType = layout.evaluate<LineJoin>(zoom, feature);
+
+    const float miterLimit = joinType == LineJoinType::Bevel ? 1.05f : float(layout.get<LineMiterLimit>());
 
     const double sharpCornerOffset = SHARP_CORNER_OFFSET * (float(util::EXTENT) / (util::tileSize * overscaling));
 
@@ -194,7 +197,7 @@ void LineBucket::addGeometry(const GeometryCoordinates& coordinates, FeatureType
 
         // The join if a middle vertex, otherwise the cap
         const bool middleVertex = prevCoordinate && nextCoordinate;
-        LineJoinType currentJoin = layout.get<LineJoin>();
+        LineJoinType currentJoin = joinType;
         const LineCapType currentCap = nextCoordinate ? beginCap : endCap;
 
         if (middleVertex) {
@@ -398,7 +401,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     Point<double> extrude = normal;
     if (endLeft)
         extrude = extrude - (util::perp(normal) * endLeft);
-    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, false }, endLeft, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, false, endLeft, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -409,7 +412,7 @@ void LineBucket::addCurrentVertex(const GeometryCoordinate& currentCoordinate,
     extrude = normal * -1.0;
     if (endRight)
         extrude = extrude - (util::perp(normal) * endRight);
-    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, { round, true }, -endRight, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentCoordinate, extrude, round, true, -endRight, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -434,7 +437,7 @@ void LineBucket::addPieSliceVertex(const GeometryCoordinate& currentVertex,
                                    std::size_t startVertex,
                                    std::vector<TriangleElement>& triangleStore) {
     Point<double> flippedExtrude = extrude * (lineTurnsLeft ? -1.0 : 1.0);
-    vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, { false, lineTurnsLeft }, 0, distance * LINE_DISTANCE_SCALE));
+    vertices.emplace_back(LineProgram::layoutVertex(currentVertex, flippedExtrude, false, lineTurnsLeft, 0, distance * LINE_DISTANCE_SCALE));
     e3 = vertices.vertexSize() - 1 - startVertex;
     if (e1 >= 0 && e2 >= 0) {
         triangleStore.emplace_back(e1, e2, e3);
@@ -456,13 +459,6 @@ void LineBucket::upload(gl::Context& context) {
     }
 
     uploaded = true;
-}
-
-void LineBucket::render(Painter& painter,
-                        PaintParameters& parameters,
-                        const RenderLayer& layer,
-                        const RenderTile& tile) {
-    painter.renderLine(parameters, *this, *layer.as<RenderLineLayer>(), tile);
 }
 
 bool LineBucket::hasData() const {

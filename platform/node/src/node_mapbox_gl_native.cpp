@@ -10,6 +10,7 @@
 #include "node_map.hpp"
 #include "node_logging.hpp"
 #include "node_request.hpp"
+#include "node_expression.hpp"
 
 void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) {
     // This has the effect of:
@@ -20,6 +21,7 @@ void RegisterModule(v8::Local<v8::Object> target, v8::Local<v8::Object> module) 
 
     node_mbgl::NodeMap::Init(target);
     node_mbgl::NodeRequest::Init();
+    node_mbgl::NodeExpression::Init(target);
 
     // Exports Resource constants.
     v8::Local<v8::Object> resource = Nan::New<v8::Object>();

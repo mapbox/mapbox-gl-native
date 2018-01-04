@@ -1,7 +1,7 @@
 #include <mbgl/annotation/render_annotation_source.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/renderer/painter.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
 
 #include <mbgl/algorithm/generate_clip_ids.hpp>
 #include <mbgl/algorithm/generate_clip_ids_impl.hpp>
@@ -38,39 +38,38 @@ void RenderAnnotationSource::update(Immutable<style::Source::Impl> baseImpl_,
                        parameters,
                        SourceType::Annotations,
                        util::tileSize,
-                       { 0, 22 },
+                       // Zoom level 16 is typically sufficient for annotations.
+                       // See https://github.com/mapbox/mapbox-gl-native/issues/10197
+                       { 0, 16 },
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<AnnotationTile>(tileID, parameters);
                        });
 }
 
-void RenderAnnotationSource::startRender(Painter& painter) {
-    painter.clipIDGenerator.update(tilePyramid.getRenderTiles());
-    tilePyramid.startRender(painter);
+void RenderAnnotationSource::startRender(PaintParameters& parameters) {
+    parameters.clipIDGenerator.update(tilePyramid.getRenderTiles());
+    tilePyramid.startRender(parameters);
 }
 
-void RenderAnnotationSource::finishRender(Painter& painter) {
-    tilePyramid.finishRender(painter);
+void RenderAnnotationSource::finishRender(PaintParameters& parameters) {
+    tilePyramid.finishRender(parameters);
 }
 
-std::map<UnwrappedTileID, RenderTile>& RenderAnnotationSource::getRenderTiles() {
+std::vector<std::reference_wrapper<RenderTile>> RenderAnnotationSource::getRenderTiles() {
     return tilePyramid.getRenderTiles();
 }
 
 std::unordered_map<std::string, std::vector<Feature>>
 RenderAnnotationSource::queryRenderedFeatures(const ScreenLineString& geometry,
                                               const TransformState& transformState,
-                                              const RenderStyle& style,
-                                              const RenderedQueryOptions& options) const {
-    return tilePyramid.queryRenderedFeatures(geometry, transformState, style, options);
+                                              const std::vector<const RenderLayer*>& layers,
+                                              const RenderedQueryOptions& options,
+                                              const CollisionIndex& collisionIndex) const {
+    return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, collisionIndex);
 }
 
 std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQueryOptions&) const {
     return {};
-}
-
-void RenderAnnotationSource::setCacheSize(size_t size) {
-    tilePyramid.setCacheSize(size);
 }
 
 void RenderAnnotationSource::onLowMemory() {

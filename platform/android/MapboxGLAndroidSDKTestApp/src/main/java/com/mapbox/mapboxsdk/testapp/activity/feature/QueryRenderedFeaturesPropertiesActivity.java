@@ -14,10 +14,8 @@ import android.widget.TextView;
 import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.commons.geojson.Feature;
 
@@ -45,61 +43,54 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(final MapboxMap mapboxMap) {
-        QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      QueryRenderedFeaturesPropertiesActivity.this.mapboxMap = mapboxMap;
 
-        // Add custom window adapter
-        addCustomInfoWindowAdapter(mapboxMap);
+      // Add custom window adapter
+      addCustomInfoWindowAdapter(mapboxMap);
 
-        // Add a click listener
-        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-          @Override
-          public void onMapClick(@NonNull LatLng point) {
-            // Query
-            final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
-            Timber.i(String.format(
-              "Requesting features for %sx%s (%sx%s adjusted for density)",
-              pixel.x, pixel.y, pixel.x / density, pixel.y / density)
-            );
-            List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
+      // Add a click listener
+      mapboxMap.setOnMapClickListener(point -> {
+        // Query
+        final PointF pixel = mapboxMap.getProjection().toScreenLocation(point);
+        Timber.i(
+          "Requesting features for %sx%s (%sx%s adjusted for density)",
+          pixel.x, pixel.y, pixel.x / density, pixel.y / density
+        );
+        List<Feature> features = mapboxMap.queryRenderedFeatures(pixel);
 
-            // Debug output
-            debugOutput(features);
+        // Debug output
+        debugOutput(features);
 
-            // Remove any previous markers
-            if (marker != null) {
-              mapboxMap.removeMarker(marker);
-            }
+        // Remove any previous markers
+        if (marker != null) {
+          mapboxMap.removeMarker(marker);
+        }
 
-            // Add a marker on the clicked point
-            marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
-            mapboxMap.selectMarker(marker);
-          }
-        });
-      }
+        // Add a marker on the clicked point
+        marker = mapboxMap.addMarker(new CustomMarkerOptions().position(point).features(features));
+        mapboxMap.selectMarker(marker);
+      });
     });
 
   }
 
   private void debugOutput(List<Feature> features) {
-    Timber.i(String.format("Got %s features", features.size()));
+    Timber.i("Got %s features", features.size());
     for (Feature feature : features) {
       if (feature != null) {
-        Timber.i(String.format("Got feature %s with %s properties and Geometry %s",
+        Timber.i("Got feature %s with %s properties and Geometry %s",
           feature.getId(),
           feature.getProperties() != null ? feature.getProperties().entrySet().size() : "<null>",
-          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>")
+          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>"
         );
         if (feature.getProperties() != null) {
           for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
-            Timber.i(String.format("Prop %s - %s", entry.getKey(), entry.getValue()));
+            Timber.i("Prop %s - %s", entry.getKey(), entry.getValue());
           }
         }
       } else {
-        // TODO Question: Why not formatting here??
-        Timber.i("Got NULL feature %s");
+        Timber.i("Got NULL feature");
       }
     }
   }
@@ -185,7 +176,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
 
     private final List<Feature> features;
 
-    public CustomMarker(BaseMarkerOptions baseMarkerOptions, List<Feature> features) {
+    CustomMarker(BaseMarkerOptions baseMarkerOptions, List<Feature> features) {
       super(baseMarkerOptions);
       this.features = features;
     }
@@ -201,7 +192,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
       return this;
     }
 
-    public CustomMarkerOptions() {
+    CustomMarkerOptions() {
     }
 
     private CustomMarkerOptions(Parcel in) {

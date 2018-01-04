@@ -1,8 +1,0 @@
-language: cpp
-
-script:
-  - true
-
-notifications:
-  slack:
-    secure: HHQYr7sF8M1SzoWSqgKVYtwAgGdLLCyTMsQjFhEEQNYO92ZwURE5s03qWTGH5k8+4Yqn26yrXt3NztLC4JIOpcGervN2mSZyq4dZgFTcWEd61igw0qwSenlwvFfbE1ASK/KYCzfyn9MIfHN+ovwLoRxXZkPwinKDvl3DXjBaFNg=

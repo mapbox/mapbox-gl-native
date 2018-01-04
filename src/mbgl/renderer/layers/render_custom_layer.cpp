@@ -1,9 +1,10 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
-#include <mbgl/renderer/painter.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/map/backend_scope.hpp>
 
 namespace mbgl {
 
@@ -15,8 +16,12 @@ RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
 
 RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
-    if (initialized && impl().deinitializeFn) {
-        impl().deinitializeFn(impl().context);
+    if (initialized) {
+        if (contextDestroyed && impl().contextLostFn ) {
+            impl().contextLostFn(impl().context);
+        } else if (!contextDestroyed && impl().deinitializeFn) {
+            impl().deinitializeFn(impl().context);
+        }
     }
 }
 
@@ -37,21 +42,21 @@ std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&,
     return nullptr;
 }
 
-void RenderCustomLayer::render(Painter& painter, PaintParameters& paintParameters, RenderSource*) {
+void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
     if (!initialized) {
         assert(impl().initializeFn);
         impl().initializeFn(impl().context);
         initialized = true;
     }
 
-    gl::Context& context = painter.context;
-    const TransformState& state = painter.state;
+    gl::Context& context = paintParameters.context;
+    const TransformState& state = paintParameters.state;
 
     // Reset GL state to a known state so the CustomLayer always has a clean slate.
-    context.vertexArrayObject = 0;
-    context.setDepthMode(painter.depthModeForSublayer(0, gl::DepthMode::ReadOnly));
+    context.bindVertexArray = 0;
+    context.setDepthMode(paintParameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly));
     context.setStencilMode(gl::StencilMode::disabled());
-    context.setColorMode(painter.colorModeForRenderPass());
+    context.setColorMode(paintParameters.colorModeForRenderPass());
 
     CustomLayerRenderParameters parameters;
 
@@ -69,7 +74,7 @@ void RenderCustomLayer::render(Painter& painter, PaintParameters& paintParameter
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.
-    paintParameters.view.bind();
+    paintParameters.backend.bind();
     context.setDirtyState();
 }
 

@@ -1,11 +1,16 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.graphics.Bitmap;
 import android.graphics.PointF;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
+import android.view.View;
 
+import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -18,8 +23,9 @@ import com.mapbox.mapboxsdk.annotations.Polyline;
 import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+
+import timber.log.Timber;
 
 /**
  * Responsible for managing and tracking state of Annotations linked to Map. All events related to
@@ -34,7 +40,8 @@ import java.util.List;
  */
 class AnnotationManager {
 
-  private final NativeMapView nativeMapView;
+  private static final long NO_ANNOTATION_ID = -1;
+
   private final MapView mapView;
   private final IconManager iconManager;
   private final InfoWindowManager infoWindowManager = new InfoWindowManager();
@@ -44,15 +51,18 @@ class AnnotationManager {
 
   private MapboxMap mapboxMap;
   private MapboxMap.OnMarkerClickListener onMarkerClickListener;
+  private MapboxMap.OnPolygonClickListener onPolygonClickListener;
+  private MapboxMap.OnPolylineClickListener onPolylineClickListener;
+
   private Annotations annotations;
+  private ShapeAnnotations shapeAnnotations;
   private Markers markers;
   private Polygons polygons;
   private Polylines polylines;
 
   AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
                     MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
-                    Markers markers, Polygons polygons, Polylines polylines) {
-    this.nativeMapView = view;
+                    Markers markers, Polygons polygons, Polylines polylines, ShapeAnnotations shapeAnnotations) {
     this.mapView = mapView;
     this.annotationsArray = annotationsArray;
     this.markerViewManager = markerViewManager;
@@ -61,9 +71,10 @@ class AnnotationManager {
     this.markers = markers;
     this.polygons = polygons;
     this.polylines = polylines;
+    this.shapeAnnotations = shapeAnnotations;
     if (view != null) {
       // null checking needed for unit tests
-      nativeMapView.addOnMapChangedListener(markerViewManager);
+      view.addOnMapChangedListener(markerViewManager);
     }
   }
 
@@ -106,6 +117,9 @@ class AnnotationManager {
 
       if (marker instanceof MarkerView) {
         markerViewManager.removeMarkerView((MarkerView) marker);
+      } else {
+        // do icon cleanup
+        iconManager.iconCleanup(marker.getIcon());
       }
     }
     annotations.removeBy(annotation);
@@ -122,6 +136,8 @@ class AnnotationManager {
 
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
+        } else {
+          iconManager.iconCleanup(marker.getIcon());
         }
       }
     }
@@ -141,6 +157,8 @@ class AnnotationManager {
         marker.hideInfoWindow();
         if (marker instanceof MarkerView) {
           markerViewManager.removeMarkerView((MarkerView) marker);
+        } else {
+          iconManager.iconCleanup(marker.getIcon());
         }
       }
     }
@@ -160,6 +178,10 @@ class AnnotationManager {
   }
 
   void updateMarker(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
+    if (!isAddedToMap(updatedMarker)) {
+      logNonAdded(updatedMarker);
+      return;
+    }
     markers.update(updatedMarker, mapboxMap);
   }
 
@@ -203,6 +225,10 @@ class AnnotationManager {
   }
 
   void updatePolygon(Polygon polygon) {
+    if (!isAddedToMap(polygon)) {
+      logNonAdded(polygon);
+      return;
+    }
     polygons.update(polygon);
   }
 
@@ -223,6 +249,10 @@ class AnnotationManager {
   }
 
   void updatePolyline(Polyline polyline) {
+    if (!isAddedToMap(polyline)) {
+      logNonAdded(polyline);
+      return;
+    }
     polylines.update(polyline);
   }
 
@@ -231,9 +261,16 @@ class AnnotationManager {
   }
 
   // TODO Refactor from here still in progress
-
   void setOnMarkerClickListener(@Nullable MapboxMap.OnMarkerClickListener listener) {
     onMarkerClickListener = listener;
+  }
+
+  void setOnPolygonClickListener(@Nullable MapboxMap.OnPolygonClickListener listener) {
+    onPolygonClickListener = listener;
+  }
+
+  void setOnPolylineClickListener(@Nullable MapboxMap.OnPolylineClickListener listener) {
+    onPolylineClickListener = listener;
   }
 
   void selectMarker(@NonNull Marker marker) {
@@ -325,88 +362,203 @@ class AnnotationManager {
     }
   }
 
+  private boolean isAddedToMap(Annotation annotation) {
+    return annotation != null && annotation.getId() != -1 && annotationsArray.indexOfKey(annotation.getId()) > -1;
+  }
+
+  private void logNonAdded(Annotation annotation) {
+    Timber.w("Attempting to update non-added %s with value %s", annotation.getClass().getCanonicalName(), annotation);
+  }
+
   //
   // Click event
   //
 
-  boolean onTap(PointF tapPoint, float screenDensity) {
-    float toleranceSides = 4 * screenDensity;
-    float toleranceTopBottom = 10 * screenDensity;
-    boolean handledDefaultClick = false;
-
-    RectF tapRect = new RectF(tapPoint.x - iconManager.getAverageIconWidth() / 2 - toleranceSides,
-      tapPoint.y - iconManager.getAverageIconHeight() / 2 - toleranceTopBottom,
-      tapPoint.x + iconManager.getAverageIconWidth() / 2 + toleranceSides,
-      tapPoint.y + iconManager.getAverageIconHeight() / 2 + toleranceTopBottom);
-
-    List<Marker> nearbyMarkers = getMarkersInRect(tapRect);
-    long newSelectedMarkerId = -1;
-
-    // find a Marker that isn't selected yet
-    if (nearbyMarkers.size() > 0) {
-      Collections.sort(nearbyMarkers);
-      for (Marker nearbyMarker : nearbyMarkers) {
-        boolean found = false;
-        for (Marker selectedMarker : selectedMarkers) {
-          if (selectedMarker.equals(nearbyMarker)) {
-            found = true;
-          }
-        }
-        if (!found) {
-          newSelectedMarkerId = nearbyMarker.getId();
-          break;
-        }
+  boolean onTap(PointF tapPoint) {
+    ShapeAnnotationHit shapeAnnotationHit = getShapeAnnotationHitFromTap(tapPoint);
+    Annotation annotation = new ShapeAnnotationHitResolver(shapeAnnotations).execute(shapeAnnotationHit);
+    if (annotation != null) {
+      if (handleClickForShapeAnnotation(annotation)) {
+        return true;
       }
     }
 
-    // if unselected marker found
-    if (newSelectedMarkerId >= 0) {
-      List<Annotation> annotations = getAnnotations();
-      int count = annotations.size();
-      for (int i = 0; i < count; i++) {
-        Annotation annotation = annotations.get(i);
-        if (annotation instanceof Marker) {
-          if (annotation.getId() == newSelectedMarkerId) {
-            Marker marker = (Marker) annotation;
+    MarkerHit markerHit = getMarkerHitFromTouchArea(tapPoint);
+    long markerId = new MarkerHitResolver(mapboxMap).execute(markerHit);
+    return markerId != NO_ANNOTATION_ID && isClickHandledForMarker(markerId);
+  }
 
-            if (marker instanceof MarkerView) {
-              handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
-            } else {
-              if (onMarkerClickListener != null) {
-                // end developer has provided a custom click listener
-                handledDefaultClick = onMarkerClickListener.onMarkerClick(marker);
-              }
-            }
+  private ShapeAnnotationHit getShapeAnnotationHitFromTap(PointF tapPoint) {
+    float touchTargetSide = Mapbox.getApplicationContext().getResources().getDimension(R.dimen.mapbox_eight_dp);
+    RectF tapRect = new RectF(
+      tapPoint.x - touchTargetSide,
+      tapPoint.y - touchTargetSide,
+      tapPoint.x + touchTargetSide,
+      tapPoint.y + touchTargetSide
+    );
+    return new ShapeAnnotationHit(tapRect);
+  }
 
-            if (!handledDefaultClick) {
-              // only select marker if user didn't handle the click event themselves
-              selectMarker(marker);
-            }
-
-            return true;
-          }
-        }
-      }
-    } else if (nearbyMarkers.size() > 0) {
-      // we didn't find an unselected marker, check if we can close an already open markers
-      for (Marker nearbyMarker : nearbyMarkers) {
-        for (Marker selectedMarker : selectedMarkers) {
-          if (nearbyMarker.equals(selectedMarker)) {
-            if (nearbyMarker instanceof MarkerView) {
-              handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) nearbyMarker);
-            } else if (onMarkerClickListener != null) {
-              handledDefaultClick = onMarkerClickListener.onMarkerClick(nearbyMarker);
-            }
-
-            if (!handledDefaultClick) {
-              // only deselect marker if user didn't handle the click event themselves
-              deselectMarker(nearbyMarker);
-            }
-            return true;
-          }
-        }
-      }
+  private boolean handleClickForShapeAnnotation(Annotation annotation) {
+    if (annotation instanceof Polygon && onPolygonClickListener != null) {
+      onPolygonClickListener.onPolygonClick((Polygon) annotation);
+      return true;
+    } else if (annotation instanceof Polyline && onPolylineClickListener != null) {
+      onPolylineClickListener.onPolylineClick((Polyline) annotation);
+      return true;
     }
     return false;
+  }
+
+  private MarkerHit getMarkerHitFromTouchArea(PointF tapPoint) {
+    int touchSurfaceWidth = (int) (iconManager.getHighestIconHeight() * 1.5);
+    int touchSurfaceHeight = (int) (iconManager.getHighestIconWidth() * 1.5);
+    final RectF tapRect = new RectF(tapPoint.x - touchSurfaceWidth,
+      tapPoint.y - touchSurfaceHeight,
+      tapPoint.x + touchSurfaceWidth,
+      tapPoint.y + touchSurfaceHeight
+    );
+    return new MarkerHit(tapRect, getMarkersInRect(tapRect));
+  }
+
+  private boolean isClickHandledForMarker(long markerId) {
+    boolean handledDefaultClick;
+    Marker marker = (Marker) getAnnotation(markerId);
+    if (marker instanceof MarkerView) {
+      handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
+    } else {
+      handledDefaultClick = onClickMarker(marker);
+    }
+
+    if (!handledDefaultClick) {
+      toggleMarkerSelectionState(marker);
+    }
+    return true;
+  }
+
+  private boolean onClickMarker(Marker marker) {
+    return onMarkerClickListener != null && onMarkerClickListener.onMarkerClick(marker);
+  }
+
+  private void toggleMarkerSelectionState(Marker marker) {
+    if (!selectedMarkers.contains(marker)) {
+      selectMarker(marker);
+    } else {
+      deselectMarker(marker);
+    }
+  }
+
+  private static class ShapeAnnotationHitResolver {
+
+    private ShapeAnnotations shapeAnnotations;
+
+    ShapeAnnotationHitResolver(ShapeAnnotations shapeAnnotations) {
+      this.shapeAnnotations = shapeAnnotations;
+    }
+
+    public Annotation execute(ShapeAnnotationHit shapeHit) {
+      Annotation foundAnnotation = null;
+      List<Annotation> annotations = shapeAnnotations.obtainAllIn(shapeHit.tapPoint);
+      if (annotations.size() > 0) {
+        foundAnnotation = annotations.get(0);
+      }
+      return foundAnnotation;
+    }
+  }
+
+  private static class MarkerHitResolver {
+
+    private final MarkerViewManager markerViewManager;
+    private final Projection projection;
+
+    private View view;
+    private Bitmap bitmap;
+    private PointF markerLocation;
+
+    private Rect hitRectView = new Rect();
+    private RectF hitRectMarker = new RectF();
+    private RectF highestSurfaceIntersection = new RectF();
+
+    private long closestMarkerId = NO_ANNOTATION_ID;
+
+    MarkerHitResolver(@NonNull MapboxMap mapboxMap) {
+      this.markerViewManager = mapboxMap.getMarkerViewManager();
+      this.projection = mapboxMap.getProjection();
+    }
+
+    public long execute(MarkerHit markerHit) {
+      resolveForMarkers(markerHit);
+      return closestMarkerId;
+    }
+
+    private void resolveForMarkers(MarkerHit markerHit) {
+      for (Marker marker : markerHit.markers) {
+        if (marker instanceof MarkerView) {
+          resolveForMarkerView(markerHit, (MarkerView) marker);
+        } else {
+          resolveForMarker(markerHit, marker);
+        }
+      }
+    }
+
+    private void resolveForMarkerView(MarkerHit markerHit, MarkerView markerView) {
+      view = markerViewManager.getView(markerView);
+      if (view != null) {
+        view.getHitRect(hitRectView);
+        hitRectMarker = new RectF(hitRectView);
+        hitTestMarker(markerHit, markerView, hitRectMarker);
+      }
+    }
+
+    private void resolveForMarker(MarkerHit markerHit, Marker marker) {
+      markerLocation = projection.toScreenLocation(marker.getPosition());
+      bitmap = marker.getIcon().getBitmap();
+      hitRectMarker.set(0, 0, bitmap.getWidth(), bitmap.getHeight());
+      hitRectMarker.offsetTo(
+        markerLocation.x - bitmap.getWidth() / 2,
+        markerLocation.y - bitmap.getHeight() / 2
+      );
+      hitTestMarker(markerHit, marker, hitRectMarker);
+    }
+
+    private void hitTestMarker(MarkerHit markerHit, Marker marker, RectF hitRectMarker) {
+      if (hitRectMarker.contains(markerHit.getTapPointX(), markerHit.getTapPointY())) {
+        hitRectMarker.intersect(markerHit.tapRect);
+        if (isRectangleHighestSurfaceIntersection(hitRectMarker)) {
+          highestSurfaceIntersection = new RectF(hitRectMarker);
+          closestMarkerId = marker.getId();
+        }
+      }
+    }
+
+    private boolean isRectangleHighestSurfaceIntersection(RectF rectF) {
+      return rectF.width() * rectF.height() > highestSurfaceIntersection.width() * highestSurfaceIntersection.height();
+    }
+  }
+
+  private static class ShapeAnnotationHit {
+    private final RectF tapPoint;
+
+    ShapeAnnotationHit(RectF tapPoint) {
+      this.tapPoint = tapPoint;
+    }
+  }
+
+  private static class MarkerHit {
+    private final RectF tapRect;
+    private final List<Marker> markers;
+
+    MarkerHit(RectF tapRect, List<Marker> markers) {
+      this.tapRect = tapRect;
+      this.markers = markers;
+    }
+
+    float getTapPointX() {
+      return tapRect.centerX();
+    }
+
+    float getTapPointY() {
+      return tapRect.centerY();
+    }
   }
 }

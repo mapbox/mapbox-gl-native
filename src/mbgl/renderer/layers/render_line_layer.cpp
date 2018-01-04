@@ -1,11 +1,20 @@
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/buckets/line_bucket.hpp>
+#include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/paint_parameters.hpp>
+#include <mbgl/renderer/image_manager.hpp>
+#include <mbgl/programs/programs.hpp>
+#include <mbgl/programs/line_program.hpp>
+#include <mbgl/geometry/line_atlas.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
 
 namespace mbgl {
+
+using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Line, _impl),
@@ -41,6 +50,82 @@ void RenderLineLayer::evaluate(const PropertyEvaluationParameters& parameters) {
 
 bool RenderLineLayer::hasTransition() const {
     return unevaluated.hasTransition();
+}
+
+void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
+    if (parameters.pass == RenderPass::Opaque) {
+        return;
+    }
+
+    for (const RenderTile& tile : renderTiles) {
+        assert(dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl)));
+        LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
+
+        auto draw = [&] (auto& program, auto&& uniformValues) {
+            program.get(evaluated).draw(
+                parameters.context,
+                gl::Triangles(),
+                parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+                parameters.stencilModeForClipping(tile.clip),
+                parameters.colorModeForRenderPass(),
+                std::move(uniformValues),
+                *bucket.vertexBuffer,
+                *bucket.indexBuffer,
+                bucket.segments,
+                bucket.paintPropertyBinders.at(getID()),
+                evaluated,
+                parameters.state.getZoom(),
+                getID()
+            );
+        };
+
+        if (!evaluated.get<LineDasharray>().from.empty()) {
+            const LinePatternCap cap = bucket.layout.get<LineCap>() == LineCapType::Round
+                ? LinePatternCap::Round : LinePatternCap::Square;
+            LinePatternPos posA = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().from, cap);
+            LinePatternPos posB = parameters.lineAtlas.getDashPosition(evaluated.get<LineDasharray>().to, cap);
+
+            parameters.lineAtlas.bind(parameters.context, 0);
+
+            draw(parameters.programs.lineSDF,
+                 LineSDFProgram::uniformValues(
+                     evaluated,
+                     parameters.pixelRatio,
+                     tile,
+                     parameters.state,
+                     parameters.pixelsToGLUnits,
+                     posA,
+                     posB,
+                     parameters.lineAtlas.getSize().width));
+
+        } else if (!evaluated.get<LinePattern>().from.empty()) {
+            optional<ImagePosition> posA = parameters.imageManager.getPattern(evaluated.get<LinePattern>().from);
+            optional<ImagePosition> posB = parameters.imageManager.getPattern(evaluated.get<LinePattern>().to);
+
+            if (!posA || !posB)
+                return;
+
+            parameters.imageManager.bind(parameters.context, 0);
+
+            draw(parameters.programs.linePattern,
+                 LinePatternProgram::uniformValues(
+                     evaluated,
+                     tile,
+                     parameters.state,
+                     parameters.pixelsToGLUnits,
+                     parameters.imageManager.getPixelSize(),
+                     *posA,
+                     *posB));
+
+        } else {
+            draw(parameters.programs.line,
+                 LineProgram::uniformValues(
+                     evaluated,
+                     tile,
+                     parameters.state,
+                     parameters.pixelsToGLUnits));
+        }
+    }
 }
 
 optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const double offset) {

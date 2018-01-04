@@ -10,6 +10,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <functional>
+
 class QMapboxGLPrivate;
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
@@ -59,6 +61,9 @@ public:
     QString apiBaseUrl() const;
     void setApiBaseUrl(const QString &);
 
+    std::function<std::string(const std::string &&)> resourceTransform() const;
+    void setResourceTransform(const std::function<std::string(const std::string &&)> &);
+
 private:
     GLContextMode m_contextMode;
     ConstrainMode m_constrainMode;
@@ -69,6 +74,7 @@ private:
     QString m_assetPath;
     QString m_accessToken;
     QString m_apiBaseUrl;
+    std::function<std::string(const std::string &&)> m_resourceTransform;
 };
 
 struct Q_DECL_EXPORT QMapboxGLCameraOptions {

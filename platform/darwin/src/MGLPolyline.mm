@@ -1,9 +1,9 @@
-#import "MGLPolyline.h"
+#import "MGLPolyline_Private.h"
 
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
 
-#import "MGLPolyline+MGLAdditions.h"
+#import "MGLFeature.h"
 
 #import <mbgl/util/geojson.hpp>
 #import <mapbox/polylabel.hpp>
@@ -47,6 +47,15 @@
 - (NSDictionary *)geoJSONDictionary {
     return @{@"type": @"LineString",
              @"coordinates": self.mgl_coordinates};
+}
+
+- (NS_ARRAY_OF(id) *)mgl_coordinates {
+    NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
+    for (NSUInteger index = 0; index < self.pointCount; index++) {
+        CLLocationCoordinate2D coordinate = self.coordinates[index];
+        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
+    }
+    return [coordinates copy];
 }
 
 - (BOOL)isEqual:(id)other {
@@ -199,6 +208,16 @@
     }
     return @{@"type": @"MultiLineString",
              @"coordinates": coordinates};
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; title = %@, subtitle: = %@, count = %lu; bounds = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
+            self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle,
+            (unsigned long)self.polylines.count,
+            MGLStringFromCoordinateBounds(self.overlayBounds)];
 }
 
 @end

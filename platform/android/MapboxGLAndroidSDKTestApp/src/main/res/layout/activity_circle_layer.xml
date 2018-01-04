@@ -23,6 +23,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
+        android:layout_marginEnd="@dimen/fab_margin"
         android:src="@drawable/ic_directions_bus_black"
         app:backgroundTint="@android:color/white"/>
 
@@ -36,6 +37,7 @@
         android:layout_marginBottom="@dimen/fab_margin"
         android:layout_marginRight="@dimen/fab_margin"
         android:src="@drawable/ic_layers"
+        android:layout_marginEnd="@dimen/fab_margin"
         app:backgroundTint="@color/primary"/>
 
 </RelativeLayout>

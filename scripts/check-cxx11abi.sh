@@ -3,7 +3,9 @@
 set -e
 set -o pipefail
 
-if [ ! `uname -s` = 'Linux' ]; then
+if ! [ `uname -s` = 'Linux' ] || \
+   ! command -v readelf > /dev/null || \
+   ! command -v c++filt > /dev/null; then
     echo -n "OFF"
     exit 0
 fi

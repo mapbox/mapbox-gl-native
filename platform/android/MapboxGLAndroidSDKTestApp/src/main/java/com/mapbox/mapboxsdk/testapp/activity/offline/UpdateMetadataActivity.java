@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.offline;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -57,18 +56,10 @@ public class UpdateMetadataActivity extends AppCompatActivity implements Adapter
     input.setSelection(metadata.length());
     builder.setView(input);
 
-    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        updateMetadata(region, OfflineUtils.convertRegionName(input.getText().toString()));
-      }
-    });
-    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        dialog.cancel();
-      }
-    });
+    builder.setPositiveButton("OK", (dialog, which) ->
+      updateMetadata(region, OfflineUtils.convertRegionName(input.getText().toString()))
+    );
+    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
     builder.show();
   }

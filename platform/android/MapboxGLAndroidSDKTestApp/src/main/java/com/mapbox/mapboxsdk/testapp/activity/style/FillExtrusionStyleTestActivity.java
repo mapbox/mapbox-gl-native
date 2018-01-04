@@ -1,14 +1,15 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
-
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
+/**
+ * Test activity used for instrumentation tests of fill extrusion.
+ */
 public class FillExtrusionStyleTestActivity extends AppCompatActivity {
 
   public MapView mapView;
@@ -22,12 +23,7 @@ public class FillExtrusionStyleTestActivity extends AppCompatActivity {
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap mapboxMap) {
-        FillExtrusionStyleTestActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> FillExtrusionStyleTestActivity.this.mapboxMap = mapboxMap);
   }
 
   public MapboxMap getMapboxMap() {

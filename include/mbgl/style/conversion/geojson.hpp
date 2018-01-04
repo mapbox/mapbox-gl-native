@@ -7,15 +7,13 @@ namespace mbgl {
 namespace style {
 namespace conversion {
 
+// Workaround until https://github.com/mapbox/mapbox-gl-native/issues/5623 is done.
+optional<GeoJSON> parseGeoJSON(const std::string&, Error&);
+
 template <>
 struct Converter<GeoJSON> {
 public:
-    optional<GeoJSON> operator()(const std::string&, Error&) const;
-
-    // This is explicitly specialized in the .cpp file for JSValue. It may also be explicitly
-    // specialized for SDK-specific types (e.g. mbgl::android::Value).
-    template <class V>
-    optional<GeoJSON> operator()(const V&, Error&) const;
+    optional<GeoJSON> operator()(const Convertible&, Error&) const;
 };
 
 } // namespace conversion

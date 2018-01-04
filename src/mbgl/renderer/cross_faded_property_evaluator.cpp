@@ -27,7 +27,10 @@ Faded<T> CrossFadedPropertyEvaluator<T>::calculate(const T& min, const T& mid, c
     const float z = parameters.z;
     const float fraction = z - std::floor(z);
     const std::chrono::duration<float> d = parameters.defaultFadeDuration;
-    const float t = std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f);
+    const float t =
+        d != std::chrono::duration<float>::zero()
+            ? std::min((parameters.now - parameters.zoomHistory.lastIntegerZoomTime) / d, 1.0f)
+            : 1.0f;
 
     return z > parameters.zoomHistory.lastIntegerZoom
         ? Faded<T> { min, mid, 2.0f, 1.0f, fraction + (1.0f - fraction) * t }

@@ -18,21 +18,21 @@ public:
                 bool needsRelayout,
                 const TileParameters&) final;
 
-    void startRender(Painter&) final;
-    void finishRender(Painter&) final;
+    void startRender(PaintParameters&) final;
+    void finishRender(PaintParameters&) final;
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles() final;
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles() final;
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const RenderStyle& style,
-                          const RenderedQueryOptions& options) const final;
+                          const std::vector<const RenderLayer*>& layers,
+                          const RenderedQueryOptions& options,
+                          const CollisionIndex& collisionIndex) const final;
 
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void setCacheSize(size_t) final;
     void onLowMemory() final;
     void dumpDebugLogs() const final;
 
@@ -45,7 +45,7 @@ private:
 
 template <>
 inline bool RenderSource::is<RenderVectorSource>() const {
-    return baseImpl->type == SourceType::Vector;
+    return baseImpl->type == style::SourceType::Vector;
 }
 
 } // namespace mbgl

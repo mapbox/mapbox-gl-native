@@ -1,17 +1,11 @@
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/async_task.hpp>
-#include <mbgl/util/thread_local.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <CoreFoundation/CoreFoundation.h>
 
 namespace mbgl {
 namespace util {
-
-// Use a static function to avoid the static initialization order fiasco.
-static auto& current() {
-    static ThreadLocal<RunLoop> tl;
-    return tl;
-};
 
 class RunLoop::Impl {
 public:
@@ -19,25 +13,27 @@ public:
 };
 
 RunLoop* RunLoop::Get() {
-    assert(current().get());
-    return current().get();
+    assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
+    return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
 RunLoop::RunLoop(Type)
   : impl(std::make_unique<Impl>()) {
-    assert(!current().get());
-    current().set(this);
+    assert(!Scheduler::GetCurrent());
+    Scheduler::SetCurrent(this);
     impl->async = std::make_unique<AsyncTask>(std::bind(&RunLoop::process, this));
 }
 
 RunLoop::~RunLoop() {
-    assert(current().get());
-    current().set(nullptr);
+    assert(Scheduler::GetCurrent());
+    Scheduler::SetCurrent(nullptr);
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(std::move(task)); });
-    impl->async->send();
+    withMutex([&] {
+        queue.push(std::move(task));
+        impl->async->send();
+    });
 }
 
 void RunLoop::run() {

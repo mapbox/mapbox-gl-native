@@ -1,6 +1,6 @@
 # Info.plist Keys
 
-The Mapbox iOS SDK supports custom `Info.plist` keys in your application in order to configure various settings.
+The Mapbox Maps SDK for iOS supports custom `Info.plist` keys in your application in order to configure various settings.
 
 ## MGLMapboxAccessToken
 
@@ -19,3 +19,7 @@ The default value is `https://api.mapbox.com`.
 ## MGLMapboxMetricsEnabledSettingShownInApp
 
 If you have implemented custom opt-out of Mapbox Telemetry within the user interface of your app, use this key to disable the built-in check for opt-out support. See [this guide](https://www.mapbox.com/ios-sdk/#telemetry_opt_out) for more details.
+
+## MGLIdeographicFontFamilyName
+
+The name of the font family to use for client-side text rendering of CJK ideographs. Set this to the name of a font family which will be available at run time, e.g. `PingFang TC` (iOS 9+), `Heiti TC` (iOS 8+), another appropriate built-in font, or a font provided by your application. Note that if a non-existent font is specified, iOS will fall back to using Helvetica which is likely not to include support for the glyphs needed to render maps in your application.

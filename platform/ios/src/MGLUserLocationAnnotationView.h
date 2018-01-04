@@ -1,6 +1,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLAnnotationView.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -9,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLUserLocation;
 
 /** View representing an `MGLUserLocation` on screen. */
+MGL_EXPORT
 @interface MGLUserLocationAnnotationView : MGLAnnotationView
 
 /**

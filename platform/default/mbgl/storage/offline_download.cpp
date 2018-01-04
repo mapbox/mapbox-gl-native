@@ -80,7 +80,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
         auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
                 result.requiredResourceCount +=
-                    definition.tileCover(type, tileSize, urlOrTileset.get<Tileset>().zoomRange).size();
+                    definition.tileCount(type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
             } else {
                 result.requiredResourceCount += 1;
                 const auto& url = urlOrTileset.get<std::string>();
@@ -90,7 +90,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                     optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
                     if (tileset) {
                         result.requiredResourceCount +=
-                            definition.tileCover(type, tileSize, (*tileset).zoomRange).size();
+                            definition.tileCount(type, tileSize, (*tileset).zoomRange);
                     }
                 } else {
                     result.requiredResourceCountIsPrecise = false;
@@ -129,6 +129,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::Video:
         case SourceType::Annotations:
+        case SourceType::CustomVector:
             break;
         }
     }
@@ -214,6 +215,7 @@ void OfflineDownload::activateDownload() {
 
             case SourceType::Video:
             case SourceType::Annotations:
+            case SourceType::CustomVector:
                 break;
             }
         }

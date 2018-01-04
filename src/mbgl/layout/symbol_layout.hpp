@@ -16,10 +16,10 @@
 namespace mbgl {
 
 class BucketParameters;
-class CollisionTile;
 class SymbolBucket;
 class Anchor;
 class RenderLayer;
+class PlacedSymbol;
 
 namespace style {
 class Filter;
@@ -34,50 +34,44 @@ public:
                  GlyphDependencies&);
 
     void prepare(const GlyphMap&, const GlyphPositions&,
-                 const ImageMap&, const ImagePositions&);
+                 const ImageMap&, const ImagePositions&,
+                 const OverscaledTileID&, const std::string&);
 
-    std::unique_ptr<SymbolBucket> place(CollisionTile&);
+    std::unique_ptr<SymbolBucket> place(const bool showCollisionBoxes);
 
     bool hasSymbolInstances() const;
 
-    enum State {
-        Pending,  // Waiting for the necessary glyphs or icons to be available.
-        Placed    // The final positions have been determined, taking into account prior layers.
-    };
-
-    State state = Pending;
-
     std::map<std::string,
         std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
+
+    const std::string bucketName;
+    std::vector<SymbolInstance> symbolInstances;
 
 private:
     void addFeature(const size_t,
                     const SymbolFeature&,
                     const std::pair<Shaping, Shaping>& shapedTextOrientations,
                     optional<PositionedIcon> shapedIcon,
-                    const GlyphPositionMap&);
+                    const GlyphPositionMap&,
+                    const OverscaledTileID&,
+                    const std::string&);
 
     bool anchorIsTooClose(const std::u16string& text, const float repeatDistance, const Anchor&);
     std::map<std::u16string, std::vector<Anchor>> compareText;
 
-    void addToDebugBuffers(CollisionTile&, SymbolBucket&);
+    void addToDebugBuffers(SymbolBucket&);
 
     // Adds placed items to the buffer.
     template <typename Buffer>
-    void addSymbol(Buffer&,
-                   SymbolSizeBinder& sizeBinder,
+    size_t addSymbol(Buffer&,
+                   const Range<float> sizeData,
                    const SymbolQuad&,
-                   const SymbolFeature& feature,
-                   float scale,
-                   const bool keepUpright,
-                   const style::SymbolPlacementType,
-                   const float placementAngle,
-                   WritingModeType writingModes);
+                   const Anchor& labelAnchor,
+                   PlacedSymbol& placedSymbol);
 
     // Stores the layer so that we can hold on to GeometryTileFeature instances in SymbolFeature,
     // which may reference data from this object.
     const std::unique_ptr<GeometryTileLayer> sourceLayer;
-    const std::string bucketName;
     const float overscaling;
     const float zoom;
     const MapMode mode;
@@ -94,7 +88,6 @@ private:
     style::TextSize::UnevaluatedType textSize;
     style::IconSize::UnevaluatedType iconSize;
 
-    std::vector<SymbolInstance> symbolInstances;
     std::vector<SymbolFeature> features;
 
     BiDi bidi; // Consider moving this up to geometry tile worker to reduce reinstantiation costs; use of BiDi/ubiditransform object must be constrained to one thread

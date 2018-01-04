@@ -21,7 +21,7 @@ class Context;
 class ImageRequestor {
 public:
     virtual ~ImageRequestor() = default;
-    virtual void onImagesAvailable(ImageMap) = 0;
+    virtual void onImagesAvailable(ImageMap, uint64_t imageCorrelationID) = 0;
 };
 
 /*
@@ -39,11 +39,8 @@ public:
     ImageManager();
     ~ImageManager();
 
-    void onSpriteLoaded();
-
-    bool isLoaded() const {
-        return loaded;
-    }
+    void setLoaded(bool);
+    bool isLoaded() const;
 
     void dumpDebugLogs() const;
 
@@ -53,15 +50,15 @@ public:
     void updateImage(Immutable<style::Image::Impl>);
     void removeImage(const std::string&);
 
-    void getImages(ImageRequestor&, ImageDependencies);
+    void getImages(ImageRequestor&, ImageRequestPair&&);
     void removeRequestor(ImageRequestor&);
 
 private:
-    void notify(ImageRequestor&, const ImageDependencies&) const;
+    void notify(ImageRequestor&, const ImageRequestPair&) const;
 
     bool loaded = false;
 
-    std::unordered_map<ImageRequestor*, ImageDependencies> requestors;
+    std::unordered_map<ImageRequestor*, ImageRequestPair> requestors;
     ImageMap images;
 
 // Pattern stuff

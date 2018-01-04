@@ -3,10 +3,10 @@
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_action_intensity"
-        android:title="Change intensity"
+        android:title="@string/change_intensity"
         app:showAsAction="never"/>
     <item
         android:id="@+id/menu_action_anchor"
-        android:title="Change Anchor"
+        android:title="@string/change_anchor"
         app:showAsAction="never"/>
 </menu>

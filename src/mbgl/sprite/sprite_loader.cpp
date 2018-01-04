@@ -10,8 +10,8 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/run_loop.hpp>
 #include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <cassert>
 
@@ -21,7 +21,7 @@ static SpriteLoaderObserver nullObserver;
 
 struct SpriteLoader::Loader {
     Loader(Scheduler& scheduler, SpriteLoader& imageManager)
-        : mailbox(std::make_shared<Mailbox>(*util::RunLoop::Get())),
+        : mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
           worker(scheduler, ActorRef<SpriteLoader>(imageManager, mailbox)) {
     }
 

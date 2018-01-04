@@ -281,3 +281,80 @@ TEST(Actor, NonConcurrentMailbox) {
     test.invoke(&Test::end);
     endedFuture.wait();
 }
+
+TEST(Actor, Ask) {
+    // Asking for a result
+
+    struct Test {
+
+        Test(ActorRef<Test>) {}
+
+        int doubleIt(int i) {
+            return i * 2;
+        }
+    };
+
+    ThreadPool pool { 2 };
+    Actor<Test> test(pool);
+
+    auto result = test.ask(&Test::doubleIt, 1);
+
+    ASSERT_TRUE(result.valid());
+    
+    auto status = result.wait_for(std::chrono::seconds(1));
+    ASSERT_EQ(std::future_status::ready, status);
+    ASSERT_EQ(2, result.get());
+}
+
+TEST(Actor, AskVoid) {
+    // Ask waits for void methods
+
+    struct Test {
+        bool& executed;
+
+        Test(bool& executed_) : executed(executed_) {
+        }
+
+        void doIt() {
+            executed = true;
+        }
+    };
+
+    ThreadPool pool { 1 };
+    bool executed = false;
+    Actor<Test> actor(pool, executed);
+
+    actor.ask(&Test::doIt).get();
+    EXPECT_TRUE(executed);
+}
+
+TEST(Actor, NoSelfActorRef) {
+    // Not all actors need a reference to self
+    
+    // Trivially constructable
+    struct Trivial {};
+    
+    ThreadPool pool { 2 };
+    Actor<Trivial> trivial(pool);
+    
+    
+    // With arguments
+    struct WithArguments {
+        std::promise<void> promise;
+        
+        WithArguments(std::promise<void> promise_)
+        : promise(std::move(promise_)) {
+        }
+        
+        void receive() {
+            promise.set_value();
+        }
+    };
+    
+    std::promise<void> promise;
+    auto future = promise.get_future();
+    Actor<WithArguments> withArguments(pool, std::move(promise));
+    
+    withArguments.invoke(&WithArguments::receive);
+    future.wait();
+}

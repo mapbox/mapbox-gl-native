@@ -1,0 +1,75 @@
+function(get_target_filename OUTPUT TARGET)
+    get_target_property(_TYPE "${TARGET}" TYPE)
+    get_target_property(_PREFIX "${TARGET}" PREFIX)
+    if(NOT _PREFIX AND NOT _PREFIX STREQUAL "")
+        set(_PREFIX "${CMAKE_${_TYPE}_PREFIX}")
+    endif()
+    get_target_property(_BASENAME "${TARGET}" OUTPUT_NAME)
+    if(NOT _BASENAME)
+        get_target_property(_BASENAME "${TARGET}" NAME)
+    endif()
+    get_target_property(_SUFFIX "${TARGET}" SUFFIX)
+    if(NOT _SUFFIX AND NOT _SUFFIX STREQUAL "")
+        set(_SUFFIX "${CMAKE_${_TYPE}_SUFFIX}")
+    endif()
+    set(${OUTPUT} "${_PREFIX}${_BASENAME}${_SUFFIX}" PARENT_SCOPE)
+endfunction()
+
+function(xcode_create_scheme)
+    if (NOT CMAKE_GENERATOR STREQUAL "Xcode")
+        return()
+    endif()
+
+    cmake_parse_arguments(XCSCHEME "" "TARGET;TYPE;NAME" "ARGS;OPTIONAL_ARGS" ${ARGN})
+
+    if(XCSCHEME_UNPARSED_ARGUMENTS)
+        message(FATAL_ERROR "xcode_create_scheme() called with unrecognized arguments: ${XCSCHEME_UNPARSED_ARGUMENTS}")
+    endif()
+
+    if(NOT XCSCHEME_TARGET)
+        message(FATAL_ERROR "xcode_create_scheme() called without required argument TARGET")
+    endif()
+
+    if(NOT XCSCHEME_TYPE)
+        get_target_property(_TYPE "${XCSCHEME_TARGET}" TYPE)
+        if (_TYPE MATCHES "^.*_LIBRARY$")
+            set(XCSCHEME_TYPE "library")
+        elseif(_TYPE STREQUAL "EXECUTABLE")
+            set(XCSCHEME_TYPE "executable")
+        else()
+            message(FATAL_ERROR "xcode_create_scheme() could not determine type of ${XCSCHEME_TARGET}")
+        endif()
+    endif()
+
+    if(NOT XCSCHEME_NAME)
+        set(XCSCHEME_NAME "${XCSCHEME_TARGET}")
+    endif()
+
+    set(XCODEPROJ_PATH "${PROJECT_BINARY_DIR}/${PROJECT_NAME}.xcodeproj")
+    set(XCSCHEME_OUTPUT_FILE "${XCODEPROJ_PATH}/xcshareddata/xcschemes/${XCSCHEME_NAME}.xcscheme")
+
+    # Prevent overwriting of the scheme file on every CMake rerun.
+    if (EXISTS "${XCSCHEME_OUTPUT_FILE}")
+        return()
+    endif()
+
+    file(RELATIVE_PATH XCSCHEME_CONTAINER "${CMAKE_SOURCE_DIR}" "${XCODEPROJ_PATH}")
+    string(RANDOM LENGTH 24 ALPHABET "0123456789ABCDEF" XCSCHEME_BLUEPRINT_ID)
+    get_target_filename(XCSCHEME_BUILDABLE_NAME "${XCSCHEME_TARGET}")
+    set(XCSCHEME_BLUEPRINT_NAME "${XCSCHEME_TARGET}")
+    set(XCSCHEME_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+    set(XCSCHEME_NODE_EXECUTABLE "${NodeJS_EXECUTABLE}")
+    get_filename_component(XCSCHEME_NODE_PATH "${NodeJS_EXECUTABLE}" DIRECTORY)
+
+    set(XCSCHEME_COMMAND_LINE_ARGS "")
+    foreach(_ARG IN LISTS XCSCHEME_ARGS)
+        set(XCSCHEME_COMMAND_LINE_ARGS "${XCSCHEME_COMMAND_LINE_ARGS}\n         <CommandLineArgument\n            argument = \"${_ARG}\"\n            isEnabled = \"YES\">\n         </CommandLineArgument>")
+    endforeach()
+    foreach(_ARG IN LISTS XCSCHEME_OPTIONAL_ARGS)
+        set(XCSCHEME_COMMAND_LINE_ARGS "${XCSCHEME_COMMAND_LINE_ARGS}\n         <CommandLineArgument\n            argument = \"${_ARG}\"\n            isEnabled = \"NO\">\n         </CommandLineArgument>")
+    endforeach()
+
+    configure_file(
+        "${CMAKE_SOURCE_DIR}/cmake/${XCSCHEME_TYPE}.xcscheme"
+        "${XCSCHEME_OUTPUT_FILE}")
+endfunction()

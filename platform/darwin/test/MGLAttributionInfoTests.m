@@ -51,12 +51,12 @@
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
                           [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.sdk.ios#/77.63680/12.98108/14.00/0.0/0"]);
     XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.sdk.ios&owner=mapbox&id=satellite-streets-v99&access_token#/77.63680/12.98108/3.14/90.9/13"]);
+                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.sdk.ios&owner=mapbox&id=satellite-streets-v99&access_token&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
 #else
     XCTAssertEqualObjects([infos[3] feedbackURLAtCenterCoordinate:mapbox zoomLevel:14],
                           [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.MapboxGL#/77.63680/12.98108/14.00/0.0/0"]);
     XCTAssertEqualObjects([infos[3] feedbackURLForStyleURL:styleURL atCenterCoordinate:mapbox zoomLevel:3.14159 direction:90.9 pitch:12.5],
-                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.MapboxGL&owner=mapbox&id=satellite-streets-v99&access_token#/77.63680/12.98108/3.14/90.9/13"]);
+                          [NSURL URLWithString:@"https://www.mapbox.com/feedback/?referrer=com.mapbox.MapboxGL&owner=mapbox&id=satellite-streets-v99&access_token&map_sdk_version=1.0.0#/77.63680/12.98108/3.14/90.9/13"]);
 #endif
 }
 

@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "显示信息";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK version %@ is now available:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS version %@ is now available:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "The map failed to load because the style can’t be found or is incompatible.";

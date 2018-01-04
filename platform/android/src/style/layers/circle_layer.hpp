@@ -53,6 +53,8 @@ public:
 
     jni::Object<jni::ObjectTag> getCirclePitchScale(jni::JNIEnv&);
 
+    jni::Object<jni::ObjectTag> getCirclePitchAlignment(jni::JNIEnv&);
+
     jni::Object<jni::ObjectTag> getCircleStrokeWidth(jni::JNIEnv&);
     void setCircleStrokeWidthTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getCircleStrokeWidthTransition(jni::JNIEnv&);

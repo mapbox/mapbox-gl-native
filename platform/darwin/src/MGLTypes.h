@@ -47,6 +47,8 @@ typedef NS_ENUM(NSInteger, MGLErrorCode) {
     MGLErrorCodeParseStyleFailed = 4,
     /** An attempt to load the style failed. */
     MGLErrorCodeLoadStyleFailed = 5,
+    /** An error occurred while snapshotting the map. */
+    MGLErrorCodeSnapshotFailed = 6,
 };
 
 /** Options for enabling debugging features in an `MGLMapView` instance. */
@@ -78,7 +80,7 @@ typedef NS_OPTIONS(NSUInteger, MGLMapDebugMaskOptions) {
 /**
  A structure containing information about a transition.
  */
-typedef struct MGLTransition {
+typedef struct __attribute__((objc_boxable)) MGLTransition {
     /**
      The amount of time the animation should take, not including the delay.
      */

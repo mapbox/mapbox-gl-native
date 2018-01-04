@@ -3,9 +3,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/map/map.hpp>
-#include <mbgl/map/backend_scope.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/gl/headless_frontend.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/run_loop.hpp>
@@ -36,9 +34,6 @@ public:
     }
 
     util::RunLoop runLoop;
-    HeadlessBackend backend { test::sharedDisplay() };
-    BackendScope scope { backend };
-    OffscreenView view{ backend.getContext(), { 512, 512 } };
     StubFileSource fileSource;
     ThreadPool threadPool { 4 };
 
@@ -73,21 +68,27 @@ private:
 
 TEST(Memory, Vector) {
     MemoryTest test;
+    float ratio { 2 };
 
-    Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource, test.threadPool };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
+            test.threadPool, MapMode::Static);
     map.setZoom(16); // more map features
     map.getStyle().loadURL("mapbox://streets");
 
-    test::render(map, test.view);
+    frontend.render(map);
 }
 
 TEST(Memory, Raster) {
     MemoryTest test;
+    float ratio { 2 };
 
-    Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
+    HeadlessFrontend frontend { { 256, 256 }, ratio, test.fileSource, test.threadPool };
+    Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), ratio, test.fileSource,
+            test.threadPool, MapMode::Static);
     map.getStyle().loadURL("mapbox://satellite");
 
-    test::render(map, test.view);
+    frontend.render(map);
 }
 
 /**
@@ -114,46 +115,47 @@ TEST(Memory, Footprint) {
     if (!shouldRunFootprint()) {
         return;
     }
-    
+
     MemoryTest test;
 
-    auto renderMap = [&](Map& map, const char* style){
-        map.setZoom(16);
-        map.getStyle().loadURL(style);
-        test::render(map, test.view);
+    class FrontendAndMap {
+    public:
+        FrontendAndMap(MemoryTest& test_, const char* style)
+            : frontend(Size{ 256, 256 }, 2, test_.fileSource, test_.threadPool)
+            , map(frontend, MapObserver::nullObserver(), frontend.getSize(), 2, test_.fileSource, test_.threadPool, MapMode::Static) {
+            map.setZoom(16);
+            map.getStyle().loadURL(style);
+            frontend.render(map);
+        }
+
+        HeadlessFrontend frontend;
+        Map map;
     };
 
     // Warm up buffers and cache.
     for (unsigned i = 0; i < 10; ++i) {
-        Map map(test.backend, { 256, 256 }, 2, test.fileSource, test.threadPool, MapMode::Still);
-        renderMap(map, "mapbox://streets");
-        renderMap(map, "mapbox://satellite");
-    };
+        FrontendAndMap(test, "mapbox://streets");
+        FrontendAndMap(test, "mapbox://satellite");
+    }
 
     // Process close callbacks, mostly needed by
     // libuv runloop.
     test.runLoop.runOnce();
 
-    std::vector<std::unique_ptr<Map>> maps;
+    std::vector<std::unique_ptr<FrontendAndMap>> maps;
     unsigned runs = 15;
 
     long vectorInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        auto vector = std::make_unique<Map>(test.backend, Size{ 256, 256 }, 2, test.fileSource,
-                                            test.threadPool, MapMode::Still);
-        renderMap(*vector, "mapbox://streets");
-        maps.push_back(std::move(vector));
-    };
+        maps.emplace_back(std::make_unique<FrontendAndMap>(test, "mapbox://streets"));
+    }
 
     double vectorFootprint = (mbgl::test::getCurrentRSS() - vectorInitialRSS) / double(runs);
 
     long rasterInitialRSS = mbgl::test::getCurrentRSS();
     for (unsigned i = 0; i < runs; ++i) {
-        auto raster = std::make_unique<Map>(test.backend, Size{ 256, 256 }, 2, test.fileSource,
-                                            test.threadPool, MapMode::Still);
-        renderMap(*raster, "mapbox://satellite");
-        maps.push_back(std::move(raster));
-    };
+        maps.emplace_back(std::make_unique<FrontendAndMap>(test, "mapbox://satellite"));
+    }
 
     double rasterFootprint = (mbgl::test::getCurrentRSS() - rasterInitialRSS) / double(runs);
     

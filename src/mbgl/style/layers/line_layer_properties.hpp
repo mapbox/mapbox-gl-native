@@ -17,7 +17,7 @@ struct LineCap : LayoutProperty<LineCapType> {
     static LineCapType defaultValue() { return LineCapType::Butt; }
 };
 
-struct LineJoin : LayoutProperty<LineJoinType> {
+struct LineJoin : DataDrivenLayoutProperty<LineJoinType> {
     static constexpr const char * key = "line-join";
     static LineJoinType defaultValue() { return LineJoinType::Miter; }
 };

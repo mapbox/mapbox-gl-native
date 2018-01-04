@@ -40,6 +40,10 @@ struct CirclePitchScale : PaintProperty<CirclePitchScaleType> {
     static CirclePitchScaleType defaultValue() { return CirclePitchScaleType::Map; }
 };
 
+struct CirclePitchAlignment : PaintProperty<AlignmentType> {
+    static AlignmentType defaultValue() { return AlignmentType::Viewport; }
+};
+
 struct CircleStrokeWidth : DataDrivenPaintProperty<float, attributes::a_stroke_width, uniforms::u_stroke_width> {
     static float defaultValue() { return 0; }
 };
@@ -60,6 +64,7 @@ class CirclePaintProperties : public Properties<
     CircleTranslate,
     CircleTranslateAnchor,
     CirclePitchScale,
+    CirclePitchAlignment,
     CircleStrokeWidth,
     CircleStrokeColor,
     CircleStrokeOpacity

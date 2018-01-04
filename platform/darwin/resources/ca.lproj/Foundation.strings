@@ -1,8 +1,8 @@
 ﻿/* Clock position format, long: {hours} o’clock */
-"CLOCK_FMT_LONG" = "%@ en punt";
+"CLOCK_FMT_LONG" = "a les %@";
 
 /* Clock position format, medium: {hours} o’clock */
-"CLOCK_FMT_MEDIUM" = "%@ en punt";
+"CLOCK_FMT_MEDIUM" = "a les %@";
 
 /* Clock position format, short: {hours}:00 */
 "CLOCK_FMT_SHORT" = "%@:00";

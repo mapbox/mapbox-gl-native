@@ -15,7 +15,7 @@ public:
     void evaluate(const PropertyEvaluationParameters&) override;
     bool hasTransition() const override;
 
-    void render(Painter&, PaintParameters&, RenderSource*) override;
+    void render(PaintParameters&, RenderSource*) override;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
 

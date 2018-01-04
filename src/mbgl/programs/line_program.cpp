@@ -10,7 +10,7 @@ namespace mbgl {
 
 using namespace style;
 
-static_assert(sizeof(LineLayoutVertex) == 8, "expected LineLayoutVertex size");
+static_assert(sizeof(LineLayoutVertex) == 12, "expected LineLayoutVertex size");
 
 template <class Values, class...Args>
 Values makeValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,

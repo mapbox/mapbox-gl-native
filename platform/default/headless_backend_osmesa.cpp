@@ -7,12 +7,25 @@
 
 namespace mbgl {
 
-struct OSMesaImpl : public HeadlessBackend::Impl {
-    OSMesaImpl(OSMesaContext glContext_) : glContext(glContext_) {
+class OSMesaBackendImpl : public HeadlessBackend::Impl {
+public:
+    OSMesaBackendImpl() {
+#if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
+        glContext = OSMesaCreateContextExt(OSMESA_RGBA, 16, 0, 0, nullptr);
+#else
+        glContext = OSMesaCreateContext(OSMESA_RGBA, nullptr);
+#endif
+        if (glContext == nullptr) {
+            throw std::runtime_error("Error creating GL context object.");
+        }
     }
 
-    ~OSMesaImpl() {
+    ~OSMesaBackendImpl() final {
         OSMesaDestroyContext(glContext);
+    }
+
+    gl::ProcAddress getExtensionFunctionPointer(const char* name) final {
+        return OSMesaGetProcAddress(name);
     }
 
     void activateContext() final {
@@ -21,31 +34,14 @@ struct OSMesaImpl : public HeadlessBackend::Impl {
         }
     }
 
+private:
     OSMesaContext glContext = nullptr;
     GLubyte fakeBuffer = 0;
 };
 
-gl::ProcAddress HeadlessBackend::initializeExtension(const char* name) {
-    return OSMesaGetProcAddress(name);
-}
-
-bool HeadlessBackend::hasDisplay() {
-    return true;
-};
-
-void HeadlessBackend::createContext() {
-    assert(!hasContext());
-
-#if OSMESA_MAJOR_VERSION * 100 + OSMESA_MINOR_VERSION >= 305
-    OSMesaContext glContext = OSMesaCreateContextExt(OSMESA_RGBA, 16, 0, 0, nullptr);
-#else
-    OSMesaContext glContext = OSMesaCreateContext(OSMESA_RGBA, nullptr);
-#endif
-    if (glContext == nullptr) {
-        throw std::runtime_error("Error creating GL context object.");
-    }
-
-    impl.reset(new OSMesaImpl(glContext));
+void HeadlessBackend::createImpl() {
+    assert(!impl);
+    impl = std::make_unique<OSMesaBackendImpl>();
 }
 
 } // namespace mbgl

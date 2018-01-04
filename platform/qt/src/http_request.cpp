@@ -6,6 +6,7 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/http_header.hpp>
 #include <mbgl/util/string.hpp>
+#include <mbgl/util/version.hpp>
 
 #include <QByteArray>
 #include <QNetworkReply>
@@ -37,7 +38,9 @@ QNetworkRequest HTTPRequest::networkRequest() const
 {
     QNetworkRequest req = QNetworkRequest(requestUrl());
     req.setAttribute(QNetworkRequest::CacheLoadControlAttribute, QNetworkRequest::PreferCache);
-    req.setRawHeader("User-Agent", "MapboxGL/1.0 [Qt]");
+
+    static const QByteArray agent = QString("MapboxGL/%1 (Qt %2)").arg(version::revision).arg(QT_VERSION_STR).toLatin1();
+    req.setRawHeader("User-Agent", agent);
 
     if (m_resource.priorEtag) {
         const auto etag = m_resource.priorEtag;
@@ -49,7 +52,7 @@ QNetworkRequest HTTPRequest::networkRequest() const
     return req;
 }
 
-void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
+void HTTPRequest::handleNetworkReply(QNetworkReply *reply, const QByteArray& data)
 {
     m_handled = true;
 
@@ -79,7 +82,9 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
         } else if (header == "etag") {
             response.etag = std::string(line.second.constData(), line.second.size());
         } else if (header == "cache-control") {
-            response.expires = http::CacheControl::parse(line.second.constData()).toTimePoint();
+            const auto cc = http::CacheControl::parse(line.second.constData());
+            response.expires = cc.toTimePoint();
+            response.mustRevalidate = cc.mustRevalidate;
         } else if (header == "expires") {
             response.expires = util::parseTimestamp(line.second.constData());
         } else if (header == "retry-after") {
@@ -93,11 +98,10 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply)
 
     switch(responseCode) {
     case 200: {
-        QByteArray bytes = reply->readAll();
-        if (bytes.isEmpty()) {
+        if (data.isEmpty()) {
             response.data = std::make_shared<std::string>();
         } else {
-            response.data = std::make_shared<std::string>(bytes.constData(), bytes.size());
+            response.data = std::make_shared<std::string>(data.constData(), data.size());
         }
         break;
     }

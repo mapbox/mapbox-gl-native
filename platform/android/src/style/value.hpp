@@ -9,9 +9,13 @@ namespace android {
 
 class Value {
 public:
-
     Value(jni::JNIEnv&, jni::jobject*);
-    virtual ~Value();
+
+    Value(Value&&)                 = default;
+    Value& operator=(Value&&)      = default;
+
+    Value(const Value&)            = delete;
+    Value& operator=(const Value&) = delete;
 
     bool isNull() const;
     bool isArray() const;

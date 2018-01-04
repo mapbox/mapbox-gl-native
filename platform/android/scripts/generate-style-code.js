@@ -111,6 +111,9 @@ global.propertyNativeType = function (property) {
   if (/-(rotation|pitch|illumination)-alignment$/.test(property.name)) {
     return 'AlignmentType';
   }
+  if (/^(text|icon)-anchor$/.test(property.name)) {
+    return 'SymbolAnchorType';
+  }
   switch (property.type) {
   case 'boolean':
     return 'bool';
@@ -167,11 +170,11 @@ global.defaultValueJava = function(property) {
               case 'string':
                 return '[' + property['default'] + "]";
               case 'number':
-                var result ='new Float[]{';
+                var result ='new Float[] {';
                 for (var i = 0; i < property.length; i++) {
                     result += "0f";
                     if (i +1 != property.length) {
-                        result += ",";
+                        result += ", ";
                     }
                 }
                 return result + "}";
@@ -266,6 +269,9 @@ global.evaluatedType = function (property) {
   }
   if (/-(rotation|pitch|illumination)-alignment$/.test(property.name)) {
     return 'AlignmentType';
+  }
+  if (/^(text|icon)-anchor$/.test(property.name)) {
+    return 'SymbolAnchorType';
   }
   if (/position/.test(property.name)) {
     return 'Position';

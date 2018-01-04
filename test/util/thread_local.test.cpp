@@ -71,38 +71,38 @@ TEST(ThreadLocalStorage, NotSetReturnsNull) {
 
 namespace {
 
-struct DtorCounter {
-    ~DtorCounter() { ++(*value); }
-    unsigned *value;
-};
-
-class TestThreadReclaim {
+class TestThreadDataOwnership {
 public:
-    TestThreadReclaim(mbgl::ActorRef<TestThreadReclaim>, DtorCounter* counter_) {
-        counter.set(counter_);
+    TestThreadDataOwnership(mbgl::ActorRef<TestThreadDataOwnership>, int* data_) {
+        data.set(data_);
+    }
+
+    ~TestThreadDataOwnership() {
+        data.set(nullptr);
     }
 
 private:
-    static ThreadLocal<DtorCounter> counter;
+    static ThreadLocal<int> data;
 };
 
-ThreadLocal<DtorCounter> TestThreadReclaim::counter;
+ThreadLocal<int> TestThreadDataOwnership::data;
 
 } // namespace
 
-TEST(ThreadLocalStorage, AutoReclaim) {
+TEST(ThreadLocalStorage, ShouldNotTakeOwnership) {
     RunLoop loop;
 
-    unsigned counter = 0;
+    auto data1 = std::make_unique<int>(10);
+    auto data2 = std::make_unique<int>(20);
 
-    auto dtorCounter1 = new DtorCounter{ &counter };
-    auto dtorCounter2 = new DtorCounter{ &counter };
-
-    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter1);
-    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>("Test", dtorCounter2);
+    auto thread1 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data1.get());
+    auto thread2 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data2.get());
 
     thread1.reset();
     thread2.reset();
 
-    EXPECT_EQ(counter, 2u);
+    // Will crash if ThreadLocal destroys
+    // the pointer it is managing.
+    ASSERT_EQ(*data1, 10);
+    ASSERT_EQ(*data2, 20);
 }

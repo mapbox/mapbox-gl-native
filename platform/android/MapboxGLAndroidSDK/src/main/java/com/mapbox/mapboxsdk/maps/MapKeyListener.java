@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
@@ -204,7 +205,7 @@ final class MapKeyListener {
           currentTrackballLongPressTimeOut = null;
         }
         currentTrackballLongPressTimeOut = new TrackballLongPressTimeOut();
-        new Handler().postDelayed(currentTrackballLongPressTimeOut,
+        new Handler(Looper.getMainLooper()).postDelayed(currentTrackballLongPressTimeOut,
           ViewConfiguration.getLongPressTimeout());
         return true;
 

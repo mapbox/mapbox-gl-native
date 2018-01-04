@@ -7,9 +7,9 @@ namespace mbgl {
 
 using namespace style;
 
-LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_, uint8_t maxZoom_)
-    : ShapeAnnotationImpl(id_, maxZoom_),
-      annotation({ ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color }) {
+LineAnnotationImpl::LineAnnotationImpl(AnnotationID id_, LineAnnotation annotation_)
+    : ShapeAnnotationImpl(id_),
+      annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.width, annotation_.color) {
 }
 
 void LineAnnotationImpl::updateStyle(Style::Impl& style) const {

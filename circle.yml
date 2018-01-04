@@ -4,69 +4,258 @@ workflows:
   version: 2
   default:
     jobs:
-      - clang-tidy
+      - clang-tidy:
+          filters:
+            branches:
+              ignore: master
       - android-debug-arm-v7
       - android-release-all
-      - node4-clang39-release
-      - node6-clang39-release
-      - node6-clang39-debug
-      - linux-clang39-debug
+      - node4-clang39-release:
+          filters:
+            tags:
+              only: /node-.*/
+      - node6-clang39-release:
+          filters:
+            tags:
+              only: /node-.*/
+      - node6-gcc6-debug:
+          filters:
+            tags:
+              only: /node-.*/
+      - linux-clang-3.8-libcxx-debug
+      - linux-clang4-sanitize-address
+      - linux-clang4-sanitize-undefined
+      - linux-clang4-sanitize-thread
+      - linux-gcc4.9-debug
       - linux-gcc5-debug-coverage
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
+      - ios-debug
+      #- ios-sanitize-address
+      - ios-sanitize-thread
+      - macos-debug
+      - macos-debug-qt5
+      - macos-release-node4:
+          filters:
+            tags:
+              only: /node-.*/
+      - macos-release-node6:
+          filters:
+            tags:
+              only: /node-.*/
+
+step-library:
+  - &generate-cache-key
+      run:
+        name: Generate cache key
+        command: |
+          echo "$(date +"%Y-%V")" > .circle-week
+          ccache --clear
+          ccache --max-size=5G
+  - &restore-cache
+      restore_cache:
+        keys:
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+          - 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/master/{{ checksum ".circle-week" }}'
+  - &save-cache
+      save_cache:
+        key: 'v3/{{ .Environment.CIRCLE_JOB }}/{{ arch }}/{{ .Branch }}/{{ checksum ".circle-week" }}'
+        paths: [ "node_modules", "/root/.ccache", "~/.ccache", "mason_packages/.binaries" ]
+
+
+  - &restore-gradle-cache
+      restore_cache:
+        keys:
+          - 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+  - &save-gradle-cache
+      save_cache:
+        key: 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+        paths: [ "/root/.gradle" ]
+
+  - &reset-ccache-stats
+      run:
+        name: Clear ccache statistics
+        command: |
+          ccache --zero-stats
+          ccache --show-stats
+  - &show-ccache-stats
+      run:
+        name: Show ccache statistics
+        command: ccache --show-stats
+
+
+  - &setup-llvm-symbolizer
+      run:
+        name: Environment Setup
+        command: |
+          # LLVM has a hard check for "llvm-symbolizer" and doesn't support suffixed executables
+          ln -s /usr/bin/llvm-symbolizer-* /usr/bin/llvm-symbolizer
+          # We'll use tee to redirect stderr to a file so we can check for sanitiziation
+          # https://bugs.launchpad.net/ubuntu/+source/xorg-server/+bug/1059947
+          sed -i 's/"$@" 2>&1/"$@"/' /usr/bin/xvfb-run
+
+
+  - &build-node
+      run:
+        name: Build node
+        command: make node
+  - &build-linux
+      run:
+        name: Build linux
+        command: make linux
+  - &build-benchmark
+      run:
+        name: Build benchmark
+        command: make benchmark
+  - &build-test
+      run:
+        name: Build test
+        command: make test
+  - &build-qt-app
+      run:
+        name: Build qt-app
+        command: make qt-app
+  - &build-qt-test
+      run:
+        name: Build qt-test
+        command: make qt-test
+  - &build-ios-test
+      run:
+        name: Build ios-test
+        command: make ios-test
+  - &build-macos-test
+      run:
+        name: Build and run macOS tests
+        command: make run-test
+
+
+  - &check-public-symbols
+      run:
+        name: Check public symbols
+        command: make check-public-symbols
+
+
+  - &install-macos-dependencies
+      run:
+        name: Install macOS dependencies
+        command: |
+          brew install cmake
+          brew install ccache
+
+  - &install-macos-node4-dependencies
+      run:
+        name: Install macOS Node@4 dependencies
+        command: |
+          brew install node@4
+          brew link node@4 --force --overwrite
+
+  - &install-macos-node6-dependencies
+      run:
+        name: Install macOS Node@6 dependencies
+        command: |
+          brew install node@6
+          brew link node@6 --force --overwrite
+
+  - &install-macos-qt-dependencies
+      run:
+        name: Install macOS Qt dependencies
+        command: |
+          sudo chown -R $USER /usr/local
+          brew install qt
+          brew link qt --force
+          brew linkapps qt
+          export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
+          export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
+          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
+
+  - &run-node-macos-tests
+      run:
+        name: Run node tests
+        command: make test-node
+
+  - &run-node-linux-tests
+      run:
+        name: Run node tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v make test-node
+
+  - &run-node-linux-tests-recycle-map
+      run:
+        name: Run node tests (recycling the map object)
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            logbt -- apitrace trace --api=egl -v make test-node-recycle-map
+
+  - &run-unit-tests
+      run:
+        name: Run tests
+        command: |
+          xvfb-run --server-args="-screen 0 1024x768x24" \
+            make run-test
+
+
+  - &publish-node-package
+      run:
+        name: Publish node package
+        when: on_success
+        command: platform/node/scripts/after_success.sh
+
+
+  - &upload-render-tests
+      store_artifacts:
+        path: mapbox-gl-js/test/integration/render-tests/index.html
+        destination: render-tests
+  - &upload-render-tests-recycle-map
+      store_artifacts:
+        path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
+        destination: render-tests
 
 jobs:
-
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/7d2403f42e:linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
-    branches:
-      ignore:
-        - master
     steps:
       - checkout
-      - restore_cache:
-          key: v1-clang-tidy
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
       - run:
           name: Fetch 'origin/master' branch
           command: git fetch origin master:refs/remotes/origin/master
       - run:
           name: Generate compilation database
           command: make compdb
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Run Clang checks
           command: make check
-      - save_cache:
-          key: v1-clang-tidy
-          paths:
-            - node_modules
-            - /root/.ccache
 
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/ci:r3-android-ndk-r15-gradle
+      - image: mbgl/7d2403f42e:android-ndk-r16b
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
+      IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - restore_cache:
-          key: v1-android-debug-arm-v7
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *restore-gradle-cache
+      - *reset-ccache-stats
       - run:
           name: Build libmapbox-gl.so for arm-v7
           command: make android-lib-arm-v7
@@ -77,19 +266,27 @@ jobs:
           name: Test phone module
           command: make run-android-unit-test
       - run:
-          name: Test wear module
-          command: make run-android-wear-unit-test
-      - run:
           name: Generate Espresso sanity tests
           command: make test-code-android
       - run:
           name: Check Java code style
           command: make android-checkstyle
       - run:
+          name: Check Android modules for potential bugs (Lint SDK)
+          command: |
+            make android-lint-sdk
+      - run:
+          name: Check Android modules for potential bugs (Lint Test App)
+          command: |
+            make android-lint-test-app
+      - run:
           name: Build Test APK
           command: |
             echo "${MAPBOX_DEVELOPER_CONFIG_XML}" > platform/android/MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
             make android-ui-test-arm-v7
+      - *show-ccache-stats
+      - *save-cache
+      - *save-gradle-cache
       - run:
           name: Log in to Google Cloud Platform
           shell: /bin/bash -euo pipefail
@@ -99,49 +296,58 @@ jobs:
             rm secret.json
       - run:
           name: Run instrumentation tests on Firebase
+          no_output_timeout: 1200
           shell: /bin/bash -euo pipefail
           command: |
             gcloud firebase test android models list
             (gcloud firebase test android run --type instrumentation \
-              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug.apk \
-              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-              --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 15m \
-              --test-targets "class com.mapbox.mapboxsdk.testapp.maps.widgets.LogoTest" 2>&1 | tee firebase.log) || EXIT_CODE=$?
+              --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
+              --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
+              --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 20m \
+              2>&1 | tee firebase.log) || EXIT_CODE=$?
 
             FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
             echo "Downloading from: ${FIREBASE_TEST_BUCKET}"
-            gsutil -m cp -n -R -Z "$FIREBASE_TEST_BUCKET*" platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+            gsutil -m cp -n -R -Z "$FIREBASE_TEST_BUCKET*" platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
 
             echo "Try running ndk-stack on downloaded logcat to symbolicate the stacktraces:"
-            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk -type f -name "logcat" -print0 | \
+            find platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug -type f -name "logcat" -print0 | \
               xargs -0 -I '{}' ${ANDROID_NDK_HOME}/ndk-stack -sym build/android-arm-v7/Debug -dump {}
 
             exit ${EXIT_CODE:-0}
-      - save_cache:
-          key: v1-android-debug-arm-v7
-          paths:
-            - node_modules
-            - /root/.ccache
       - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDK/lint-baseline.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.html
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/reports/lint-results.xml
+      - store_artifacts:
+          path: platform/android/MapboxGLAndroidSDKTestApp/lint-baseline.xml
 
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/ci:r3-android-ndk-r15-gradle
+      - image: mbgl/7d2403f42e:android-ndk-r16b
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
+      IS_LOCAL_DEVELOPMENT: false
     steps:
       - checkout
-      - restore_cache:
-          key: v1-android-release-all
-          paths:
-            - node_modules
-            - /root/.ccache
+      - *generate-cache-key
+      - *restore-cache
+      - *restore-gradle-cache
+      - *reset-ccache-stats
       - run:
           name: Generate Maven credentials
           shell: /bin/bash -euo pipefail
@@ -155,8 +361,11 @@ jobs:
       - run:
           name: Build package
           command: make apackage
+      - *show-ccache-stats
+      - *save-cache
+      - *save-gradle-cache
       - store_artifacts:
-          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk
+          path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/release
           destination: .
       - deploy:
           name: Show statistics
@@ -166,311 +375,446 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "release-ios-v3.6.0-android-v5.1.0" ]; then make run-android-upload-archives ; fi
-      - save_cache:
-          key: v1-android-release-all
-          paths:
-            - node_modules
-            - /root/.ccache
+            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
+
 
 # ------------------------------------------------------------------------------
   node4-clang39-release:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9-node-4
+      - image: mbgl/7d2403f42e:linux-clang-3.9-node-4
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
-      BUILDTYPE: Release
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
+      WITH_CXX11ABI: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node4-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node4-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-linux-tests
+      - *publish-node-package
+      - *upload-render-tests
 
 # ------------------------------------------------------------------------------
   node6-clang39-release:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/7d2403f42e:linux-clang-3.9
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
-      BUILDTYPE: Release
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: RelWithDebInfo
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
+      WITH_CXX11ABI: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node6-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node6-clang39-release
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-linux-tests
+      - *publish-node-package
+      - *upload-render-tests
 
 # ------------------------------------------------------------------------------
-  node6-clang39-debug:
+  node6-gcc6-debug:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/7d2403f42e:linux-gcc-6
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      PACKAGE_JSON_VERSION: $(node -e "console.log(require('./package.json').version)")
-      PUBLISH: $([[ "${CIRCLE_BRANCH}" == "node-v${PACKAGE_JSON_VERSION}" ]] && echo true)
-      DISPLAY: :0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-node6-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build node
-          command: make node
-      - run:
-          name: Run node tests
-          command: |
-            source scripts/circle_setup.sh
-            mapbox_install_logbt
-            mapbox_install_apitrace
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              ./logbt -- apitrace trace --api=egl -v make test-node
-      - run:
-          name: Publish node package
-          when: on_success
-          command: platform/node/scripts/after_success.sh
-      - save_cache:
-          key: v1-node6-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - store_artifacts:
-          path: mapbox-gl-js/test/integration/render-tests/index.html
-          destination: render-tests
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-linux-tests-recycle-map
+      - *publish-node-package
+      - *upload-render-tests-recycle-map
 
 # ------------------------------------------------------------------------------
-  linux-clang39-debug:
+  linux-clang-3.8-libcxx-debug:
     docker:
-      - image: mbgl/ci:r3-linux-clang-3.9
+      - image: mbgl/7d2403f42e:linux-clang-3.8-libcxx
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 6
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
-      DISPLAY: :0
+      WITH_CXX11ABI: 1
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build linux
-          command: make linux
-      - run:
-          name: Build benchmark
-          command: make benchmark
-      - run:
-          name: Build test
-          command: make test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  linux-clang4-sanitize-address:
+    docker:
+      - image: mbgl/7d2403f42e:linux-clang-4
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Sanitize
+      WITH_EGL: 1
+      GDB: '' # Do not run with GDB
+      CXXFLAGS: -fsanitize=address
+      LDFLAGS: -fsanitize=address
+      ASAN_OPTIONS: detect_leaks=0:color=always:print_summary=1
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Run tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-test
-      - save_cache:
-          key: v1-linux-clang39-debug
-          paths:
-            - node_modules
-            - /root/.ccache
+            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
+            [ -z "$(sed -n '/^SUMMARY: AddressSanitizer:/p' sanitizer)" ]
+
+# ------------------------------------------------------------------------------
+  linux-clang4-sanitize-undefined:
+    docker:
+      - image: mbgl/7d2403f42e:linux-clang-4
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Sanitize
+      WITH_EGL: 1
+      GDB: '' # Do not run with GDB
+      CXXFLAGS: -fsanitize=undefined
+      LDFLAGS: -fsanitize=undefined
+      UBSAN_OPTIONS: print_stacktrace=1:color=always:print_summary=1
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
+      - run:
+          name: Run tests
+          command: |
+            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
+            [ -z "$(sed -n '/^SUMMARY: UndefinedBehaviorSanitizer:/p' sanitizer)" ]
+
+# ------------------------------------------------------------------------------
+  linux-clang4-sanitize-thread:
+    docker:
+      - image: mbgl/7d2403f42e:linux-clang-4
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Sanitize
+      WITH_EGL: 1
+      GDB: '' # Do not run with GDB
+      CXXFLAGS: -fsanitize=thread
+      LDFLAGS: -fsanitize=thread
+      TSAN_OPTIONS: color=always:print_summary=1
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *setup-llvm-symbolizer
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
+      - run:
+          name: Run tests
+          command: |
+            xvfb-run --server-args="-screen 0 1024x768x24" make run-test 2> >(tee sanitizer 1>&2)
+            # Unfortunately, Google Test eats the status code, so we'll have to check the output.
+            [ -z "$(sed -n '/^SUMMARY: ThreadSanitizer:/p' sanitizer)" ]
+
+# ------------------------------------------------------------------------------
+  linux-gcc4.9-debug:
+    docker:
+      - image: mbgl/7d2403f42e:linux-gcc-4.9
+    resource_class: large
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Debug
+      WITH_EGL: 1
+      WITH_CXX11ABI: 0
+      DISPLAY: :0
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *build-benchmark
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
+      - *run-unit-tests
 
 # ------------------------------------------------------------------------------
   linux-gcc5-debug-coverage:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5
+      - image: mbgl/7d2403f42e:linux-gcc-5
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 2
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Debug
       WITH_EGL: 1
       WITH_COVERAGE: 1
-      DISPLAY: :0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-debug-coverage
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build linux
-          command: make linux
-      - run:
-          name: Build benchmark
-          command: make benchmark
-      - run:
-          name: Build test
-          command: make test
-      - run:
-          name: Run tests
-          command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
-            xvfb-run --server-args="-screen 0 1024x768x24" \
-              make run-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-linux
+      - *build-benchmark
+      - *build-test
+      - *show-ccache-stats
+      - *save-cache
+      - *run-unit-tests
       - run:
           name: Upload coverage results to coveralls
           command: |
-            source scripts/circle_setup.sh
             platform/linux/scripts/coveralls.sh
-      - save_cache:
-          key: v1-linux-gcc5-debug-coverage
-          paths:
-            - node_modules
-            - /root/.ccache
 
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt4:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5-qt-4
+      - image: mbgl/7d2403f42e:linux-gcc-5-qt-4
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 2 # OOM, causing the compiler to crash.
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
       GTEST_OUTPUT: xml
       LD_PRELOAD: /usr/lib/x86_64-linux-gnu/libjemalloc.so
-      DISPLAY: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-release-qt4
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build qt-app
-          command: make qt-app
-      - run:
-          name: Build qt-test
-          command: make qt-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Run memory-load tests
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
               make run-qt-test-Memory.*:*.Load
             scripts/log_memory_benchmarks.sh test_detail.xml "Platform=Linux,Compiler=${_CC},Arch=$(uname -m)"
-      - save_cache:
-          key: v1-linux-gcc5-release-qt4
-          paths:
-            - node_modules
-            - /root/.ccache
 
 # ------------------------------------------------------------------------------
   linux-gcc5-release-qt5:
     docker:
-      - image: mbgl/ci:r3-linux-gcc-5-qt-5
+      - image: mbgl/7d2403f42e:linux-gcc-5-qt-5.9
+    resource_class: large
     working_directory: /src
     environment:
-      LIBSYSCONFCPUS: 6
-      JOBS: 2 # OOM, causing the compiler to crash.
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
       BUILDTYPE: Release
       WITH_QT_I18N: 1
-      DISPLAY: 0
     steps:
       - checkout
-      - restore_cache:
-          key: v1-linux-gcc5-release-qt5
-          paths:
-            - node_modules
-            - /root/.ccache
-      - run:
-          name: Build qt-app
-          command: make qt-app
-      - run:
-          name: Build qt-test
-          command: make qt-test
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
       - run:
           name: Build qt-docs
           command: make qt-docs
+      - *show-ccache-stats
+      - *save-cache
       - run:
           name: Run valgrind-backed tests
           environment:
             JOBS: 1 # https://github.com/mapbox/mapbox-gl-native/issues/9108
           command: |
-            source scripts/circle_setup.sh
-            mapbox_export_mesa_library_path
             xvfb-run --server-args="-screen 0 1024x768x24" \
-              scripts/valgrind.sh build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
-      - save_cache:
-          key: v1-linux-gcc5-release-qt5
-          paths:
-            - node_modules
-            - /root/.ccache
+              build/qt-linux-x86_64/Release/mbgl-test --gtest_filter=-*.Load --gtest_filter=-Memory.Vector
+
+# ------------------------------------------------------------------------------
+  ios-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-ios-test
+      - *check-public-symbols
+      - run:
+          name: Lint plist files
+          command: make ios-lint
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-address:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with address sanitizer
+          command: make ios-sanitize-address
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  ios-sanitize-thread:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread sanitizer
+          command: make ios-sanitize-thread
+      - *show-ccache-stats
+      - *save-cache
+
+# ------------------------------------------------------------------------------
+  macos-debug:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-macos-test
+      - *check-public-symbols
+      - run:
+          name: Lint plist files
+          command: make macos-lint
+      - *show-ccache-stats
+      - *save-cache
+      - store_artifacts:
+          path: test/fixtures
+          destination: test/fixtures
+
+# ------------------------------------------------------------------------------
+  macos-debug-qt5:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-qt-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-qt-app
+      - *build-qt-test
+      - run:
+          name: Run qt-test
+          command: make run-qt-test
+      - *show-ccache-stats
+      - *save-cache
+      - store_artifacts:
+          path: test/fixtures
+          destination: test/fixtures
+
+# ------------------------------------------------------------------------------
+  macos-release-node4:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-node4-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests
+
+# ------------------------------------------------------------------------------
+  macos-release-node6:
+    macos:
+      xcode: "9.0"
+    environment:
+      BUILDTYPE: RelWithDebInfo
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *install-macos-node6-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - *build-node
+      - *show-ccache-stats
+      - *save-cache
+      - *run-node-macos-tests
+      - *publish-node-package
+      - *upload-render-tests

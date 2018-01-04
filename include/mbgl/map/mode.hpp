@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/util.hpp>
 #include <mbgl/util/traits.hpp>
 
 #include <cstdint>
@@ -10,16 +11,8 @@ using EnumType = uint32_t;
 
 enum class MapMode : EnumType {
     Continuous, // continually updating map
-    Still, // a once-off still image
-};
-
-// We can avoid redundant GL calls when it is known that the GL context is not
-// being shared. In a shared GL context case, we need to make sure that the
-// correct GL configurations are in use - they might have changed between render
-// calls.
-enum class GLContextMode : EnumType {
-    Unique,
-    Shared,
+    Static, // a once-off still image of an arbitrary viewport
+    Tile // a once-off still image of a single tile
 };
 
 // We can choose to constrain the map both horizontally or vertically, or only
@@ -51,23 +44,23 @@ enum class MapDebugOptions : EnumType {
 #endif // MBGL_USE_GLES2
 };
 
-constexpr MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions operator|(MapDebugOptions lhs, MapDebugOptions rhs) {
     return MapDebugOptions(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs));
 }
 
-constexpr MapDebugOptions& operator|=(MapDebugOptions& lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions& operator|=(MapDebugOptions& lhs, MapDebugOptions rhs) {
     return (lhs = MapDebugOptions(mbgl::underlying_type(lhs) | mbgl::underlying_type(rhs)));
 }
 
-constexpr bool operator&(MapDebugOptions lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR bool operator&(MapDebugOptions lhs, MapDebugOptions rhs) {
     return mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs);
 }
 
-constexpr MapDebugOptions& operator&=(MapDebugOptions& lhs, MapDebugOptions rhs) {
+MBGL_CONSTEXPR MapDebugOptions& operator&=(MapDebugOptions& lhs, MapDebugOptions rhs) {
     return (lhs = MapDebugOptions(mbgl::underlying_type(lhs) & mbgl::underlying_type(rhs)));
 }
 
-constexpr MapDebugOptions operator~(MapDebugOptions value) {
+MBGL_CONSTEXPR MapDebugOptions operator~(MapDebugOptions value) {
     return MapDebugOptions(~mbgl::underlying_type(value));
 }
 

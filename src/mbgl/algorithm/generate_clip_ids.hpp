@@ -3,9 +3,9 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/clip_id.hpp>
 
-#include <unordered_set>
+#include <set>
 #include <vector>
-#include <unordered_map>
+#include <map>
 
 namespace mbgl {
 namespace algorithm {
@@ -17,18 +17,18 @@ private:
         void add(const CanonicalTileID &p);
         bool operator==(const Leaf &other) const;
 
-        std::unordered_set<CanonicalTileID> children;
+        std::set<CanonicalTileID> children;
         ClipID& clip;
     };
 
     uint8_t bit_offset = 0;
-    std::unordered_multimap<UnwrappedTileID, Leaf> pool;
+    std::multimap<UnwrappedTileID, Leaf> pool;
 
 public:
-    template <typename Renderables>
-    void update(Renderables& renderables);
+    template <typename Renderable>
+    void update(std::vector<std::reference_wrapper<Renderable>> renderables);
 
-    std::map<UnwrappedTileID, ClipID> getStencils() const;
+    std::map<UnwrappedTileID, ClipID> getClipIDs() const;
 };
 
 } // namespace algorithm

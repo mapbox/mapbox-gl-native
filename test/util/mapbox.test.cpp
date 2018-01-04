@@ -7,6 +7,7 @@
 #include <stdexcept>
 
 using namespace mbgl;
+using SourceType = mbgl::style::SourceType;
 
 TEST(Mapbox, SourceURL) {
     EXPECT_EQ(

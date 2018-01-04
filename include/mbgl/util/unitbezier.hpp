@@ -26,6 +26,7 @@
 #pragma once
 
 #include <cmath>
+#include <tuple>
 
 namespace mbgl {
 namespace util {
@@ -34,11 +35,11 @@ struct UnitBezier {
     // Calculate the polynomial coefficients, implicit first and last control points are (0,0) and (1,1).
     constexpr UnitBezier(double p1x, double p1y, double p2x, double p2y)
         : cx(3.0 * p1x)
-        , bx(3.0 * (p2x - p1x) - cx)
-        , ax(1.0 - cx - bx)
+        , bx(3.0 * (p2x - p1x) - (3.0 * p1x))
+        , ax(1.0 - (3.0 * p1x) - (3.0 * (p2x - p1x) - (3.0 * p1x)))
         , cy(3.0 * p1y)
-        , by(3.0 * (p2y - p1y) - cy)
-        , ay(1.0 - cy - by) {
+        , by(3.0 * (p2y - p1y) - (3.0 * p1y))
+        , ay(1.0 - (3.0 * p1y) - (3.0 * (p2y - p1y) - (3.0 * p1y))) {
     }
 
     double sampleCurveX(double t) const {
@@ -101,6 +102,11 @@ struct UnitBezier {
 
     double solve(double x, double epsilon) const {
         return sampleCurveY(solveCurveX(x, epsilon));
+    }
+    
+    bool operator==(const UnitBezier& rhs) const {
+        return std::tie(cx, bx, ax, cy, by, ay) ==
+            std::tie(rhs.cx, rhs.bx, rhs.ax, rhs.cy, rhs.by, rhs.ay);
     }
 
 private:

@@ -3,8 +3,6 @@
 #include <mbgl/annotation/annotation.hpp>
 #include <mbgl/annotation/symbol_annotation_impl.hpp>
 #include <mbgl/style/image.hpp>
-#include <mbgl/map/update.hpp>
-#include <mbgl/style/style.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
 #include <mutex>
@@ -21,20 +19,26 @@ class AnnotationTileData;
 class SymbolAnnotationImpl;
 class ShapeAnnotationImpl;
 
+namespace style {
+class Style;
+} // namespace style
+
 class AnnotationManager : private util::noncopyable {
 public:
-    AnnotationManager();
+    AnnotationManager(style::Style&);
     ~AnnotationManager();
 
-    AnnotationID addAnnotation(const Annotation&, const uint8_t maxZoom);
-    Update updateAnnotation(const AnnotationID&, const Annotation&, const uint8_t maxZoom);
+    AnnotationID addAnnotation(const Annotation&);
+    bool updateAnnotation(const AnnotationID&, const Annotation&);
     void removeAnnotation(const AnnotationID&);
 
     void addImage(std::unique_ptr<style::Image>);
     void removeImage(const std::string&);
     double getTopOffsetPixelsForImage(const std::string&);
 
-    void updateStyle(style::Style::Impl&);
+    void setStyle(style::Style&);
+    void onStyleLoaded();
+
     void updateData();
 
     void addTile(AnnotationTile&);
@@ -42,24 +46,29 @@ public:
 
     static const std::string SourceID;
     static const std::string PointLayerID;
+    static const std::string ShapeLayerID;
 
 private:
-    void add(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
-    void add(const AnnotationID&, const LineAnnotation&, const uint8_t);
-    void add(const AnnotationID&, const FillAnnotation&, const uint8_t);
+    void add(const AnnotationID&, const SymbolAnnotation&);
+    void add(const AnnotationID&, const LineAnnotation&);
+    void add(const AnnotationID&, const FillAnnotation&);
 
-    Update update(const AnnotationID&, const SymbolAnnotation&, const uint8_t);
-    Update update(const AnnotationID&, const LineAnnotation&, const uint8_t);
-    Update update(const AnnotationID&, const FillAnnotation&, const uint8_t);
-
-    void removeAndAdd(const AnnotationID&, const Annotation&, const uint8_t);
+    void update(const AnnotationID&, const SymbolAnnotation&);
+    void update(const AnnotationID&, const LineAnnotation&);
+    void update(const AnnotationID&, const FillAnnotation&);
 
     void remove(const AnnotationID&);
 
+    void updateStyle();
+
     std::unique_ptr<AnnotationTileData> getTileData(const CanonicalTileID&);
+
+    std::reference_wrapper<style::Style> style;
 
     std::mutex mutex;
 
+    bool dirty = false;
+    
     AnnotationID nextID = 0;
 
     using SymbolAnnotationTree = boost::geometry::index::rtree<std::shared_ptr<const SymbolAnnotationImpl>, boost::geometry::index::rstar<16, 4>>;
@@ -73,8 +82,7 @@ private:
     SymbolAnnotationMap symbolAnnotations;
     ShapeAnnotationMap shapeAnnotations;
     ImageMap images;
-    std::unordered_set<std::string> obsoleteShapeAnnotationLayers;
-    std::unordered_set<std::string> obsoleteImages;
+
     std::unordered_set<AnnotationTile*> tiles;
 
     friend class AnnotationTile;

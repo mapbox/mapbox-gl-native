@@ -41,6 +41,10 @@ public:
 
     void setResourceTransform(jni::JNIEnv&, jni::Object<FileSource::ResourceTransformCallback>);
 
+    void resume(jni::JNIEnv&);
+
+    void pause(jni::JNIEnv&);
+
     static jni::Class<FileSource> javaClass;
 
     static FileSource* getNativePeer(jni::JNIEnv&, jni::Object<FileSource>);
@@ -50,6 +54,7 @@ public:
     static void registerNative(jni::JNIEnv&);
 
 private:
+    optional<int> activationCounter;
     std::unique_ptr<Actor<ResourceTransform>> resourceTransform;
     std::unique_ptr<mbgl::DefaultFileSource> fileSource;
 };

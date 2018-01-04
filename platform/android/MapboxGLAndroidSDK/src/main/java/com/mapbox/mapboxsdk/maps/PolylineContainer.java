@@ -11,8 +11,6 @@ import com.mapbox.mapboxsdk.annotations.PolylineOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Encapsulates {@link Polyline}'s functionality.
  */
@@ -43,8 +41,7 @@ class PolylineContainer implements Polylines {
     int count = polylineOptionsList.size();
     Polyline polyline;
     List<Polyline> polylines = new ArrayList<>(count);
-
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       for (PolylineOptions options : polylineOptionsList) {
         polyline = options.getPolyline();
         if (!polyline.getPoints().isEmpty()) {
@@ -52,25 +49,12 @@ class PolylineContainer implements Polylines {
         }
       }
 
-      long[] ids = null;
-      if (nativeMapView != null) {
-        ids = nativeMapView.addPolylines(polylines);
-      }
-
-      long id = 0;
-      Polyline p;
-
-      for (int i = 0; i < polylines.size(); i++) {
-        p = polylines.get(i);
-        p.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
-        p.setId(id);
-        annotations.put(id, p);
+      long[] ids = nativeMapView.addPolylines(polylines);
+      for (int i = 0; i < ids.length; i++) {
+        Polyline polylineCreated = polylines.get(i);
+        polylineCreated.setMapboxMap(mapboxMap);
+        polylineCreated.setId(ids[i]);
+        annotations.put(ids[i], polylineCreated);
       }
     }
     return polylines;
@@ -78,10 +62,6 @@ class PolylineContainer implements Polylines {
 
   @Override
   public void update(Polyline polyline) {
-    if (!isAddedToMap(polyline)) {
-      Timber.w("Attempting to update non-added Polyline with value %s", polyline);
-    }
-
     nativeMapView.updatePolyline(polyline);
     annotations.setValueAt(annotations.indexOfKey(polyline.getId()), polyline);
   }
@@ -97,9 +77,5 @@ class PolylineContainer implements Polylines {
       }
     }
     return polylines;
-  }
-
-  private boolean isAddedToMap(Annotation annotation) {
-    return annotation != null && annotation.getId() != -1 && annotations.indexOfKey(annotation.getId()) != -1;
   }
 }

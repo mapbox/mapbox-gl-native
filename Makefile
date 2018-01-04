@@ -2,9 +2,11 @@ export BUILDTYPE ?= Debug
 export WITH_CXX11ABI ?= $(shell scripts/check-cxx11abi.sh)
 
 ifeq ($(BUILDTYPE), Release)
+else ifeq ($(BUILDTYPE), RelWithDebInfo)
+else ifeq ($(BUILDTYPE), Sanitize)
 else ifeq ($(BUILDTYPE), Debug)
 else
-  $(error BUILDTYPE must be Debug or Release)
+  $(error BUILDTYPE must be Debug, Sanitize, Release or RelWithDebInfo)
 endif
 
 buildtype := $(shell echo "$(BUILDTYPE)" | tr "[A-Z]" "[a-z]")
@@ -70,30 +72,9 @@ MACOS_XCODEBUILD = xcodebuild \
 	  -configuration $(BUILDTYPE) \
 	  -workspace $(MACOS_WORK_PATH)
 
-
-MACOS_XCSCHEMES += platform/macos/scripts/executable.xcscheme
-MACOS_XCSCHEMES += platform/macos/scripts/library.xcscheme
-MACOS_XCSCHEMES += platform/macos/scripts/node.xcscheme
-
-$(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(MACOS_XCSCHEMES)
+$(MACOS_PROJ_PATH): $(BUILD_DEPS) $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings
 	mkdir -p $(MACOS_OUTPUT_PATH)
 	(cd $(MACOS_OUTPUT_PATH) && cmake -G Xcode ../..)
-
-	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
-	@# create these automatically.
-	SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-render SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-offline SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-glfw SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME=mbgl-node SCHEME_TYPE=library BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node platform/macos/scripts/create_scheme.sh
-
-	@# Create schemes for running node tests. These have all of the environment variables set to
-	@# launch in the correct location.
-	SCHEME_NAME="node tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="`npm bin tape`/tape platform/node/test/js/**/*.test.js" platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME="node render tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/render.test.js" platform/macos/scripts/create_scheme.sh
-	SCHEME_NAME="node query tests" SCHEME_TYPE=node BUILDABLE_NAME=mbgl-node.node BLUEPRINT_NAME=mbgl-node NODE_ARGUMENT="platform/node/test/query.test.js" platform/macos/scripts/create_scheme.sh
 
 $(MACOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings: platform/macos/WorkspaceSettings.xcsettings
 	mkdir -p "$(MACOS_USER_DATA_PATH)"
@@ -127,7 +108,15 @@ run-test-%: test
 run-benchmark: run-benchmark-.
 
 run-benchmark-%: benchmark
-	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$*
+	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
+
+.PHONY: node-benchmark
+node-benchmark: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node-benchmark' build $(XCPRETTY)
+
+.PHONY: run-node-benchmark
+run-node-benchmark: node-benchmark
+	node platform/node/test/benchmark.js
 
 .PHONY: glfw-app
 glfw-app: $(MACOS_PROJ_PATH)
@@ -152,6 +141,10 @@ node: $(MACOS_PROJ_PATH)
 .PHONY: macos-test
 macos-test: $(MACOS_PROJ_PATH)
 	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: macos-lint
+macos-lint:
+	find platform/macos -type f -name '*.plist' | xargs plutil -lint
 
 .PHONY: xpackage
 xpackage: $(MACOS_PROJ_PATH)
@@ -229,9 +222,22 @@ ios: $(IOS_PROJ_PATH)
 iproj: $(IOS_PROJ_PATH)
 	open $(IOS_WORK_PATH)
 
+.PHONY: ios-lint
+ios-lint:
+	find platform/ios/framework -type f -name '*.plist' | xargs plutil -lint
+	find platform/ios/app -type f -name '*.plist' | xargs plutil -lint
+
 .PHONY: ios-test
 ios-test: $(IOS_PROJ_PATH)
 	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' test $(XCPRETTY)
+
+.PHONY: ios-sanitize-address
+ios-sanitize-address: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableAddressSanitizer YES test $(XCPRETTY)
+
+.PHONY: ios-sanitize-thread
+ios-sanitize-thread: $(IOS_PROJ_PATH)
+	set -o pipefail && $(IOS_XCODEBUILD_SIM) -scheme 'CI' -enableThreadSanitizer YES test $(XCPRETTY)
 
 .PHONY: ipackage
 ipackage: $(IOS_PROJ_PATH)
@@ -251,11 +257,6 @@ ipackage-sim: $(IOS_PROJ_PATH)
 .PHONY: iframework
 iframework: $(IOS_PROJ_PATH)
 	FORMAT=dynamic BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=$(SYMBOLS) \
-	./platform/ios/scripts/package.sh
-
-.PHONY: ifabric
-ifabric: $(IOS_PROJ_PATH)
-	FORMAT=static BUILD_DEVICE=$(BUILD_DEVICE) SYMBOLS=NO SELF_CONTAINED=YES \
 	./platform/ios/scripts/package.sh
 
 .PHONY: ideploy
@@ -278,7 +279,7 @@ darwin-update-examples:
 
 .PHONY: check-public-symbols
 check-public-symbols:
-	node platform/darwin/scripts/check-public-symbols.js macOS
+	node platform/darwin/scripts/check-public-symbols.js macOS iOS
 endif
 
 #### Linux targets #####################################################
@@ -304,7 +305,7 @@ linux: glfw-app render offline
 
 .PHONY: linux-core
 linux-core: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core mbgl-loop-uv
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-core mbgl-loop-uv mbgl-filesource
 
 .PHONY: test
 test: $(LINUX_BUILD)
@@ -315,8 +316,12 @@ benchmark: $(LINUX_BUILD)
 	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-benchmark
 
 ifneq (,$(shell command -v gdb 2> /dev/null))
-  GDB = $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
-        -batch -return-child-result -ex 'set print thread-events off' -ex 'run' -ex 'thread apply all bt' --args
+  GDB ?= $(shell scripts/mason.sh PREFIX gdb VERSION 2017-04-08-aebcde5)/bin/gdb \
+        	-batch -return-child-result \
+        	-ex 'set print thread-events off' \
+        	-ex 'set disable-randomization off' \
+        	-ex 'run' \
+        	-ex 'thread apply all bt' --args
 endif
 
 .PHONY: run-test
@@ -394,7 +399,7 @@ $(QT_BUILD): $(BUILD_DEPS)
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
 		-DWITH_QT_4=${WITH_QT_4} \
-		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
 
 ifeq ($(HOST_PLATFORM), macos)
@@ -410,16 +415,8 @@ $(MACOS_QT_PROJ_PATH): $(BUILD_DEPS)
 		-DWITH_QT_DECODERS=${WITH_QT_DECODERS} \
 		-DWITH_QT_I18N=${WITH_QT_I18N} \
 		-DWITH_QT_4=${WITH_QT_4} \
-		-DWITH_CXX11ABI=$(shell scripts/check-cxx11abi.sh) \
+		-DWITH_CXX11ABI=${WITH_CXX11ABI} \
 		-DWITH_COVERAGE=${WITH_COVERAGE})
-
-	@# Create Xcode schemes so that we can use xcodebuild from the command line. CMake doesn't
-	@# create these automatically.
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-qt SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-test SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-benchmark SCHEME_TYPE=executable platform/macos/scripts/create_scheme.sh
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=mbgl-core SCHEME_TYPE=library BUILDABLE_NAME=libmbgl-core.a BLUEPRINT_NAME=mbgl-core platform/macos/scripts/create_scheme.sh
-	XCODEPROJ=$(MACOS_QT_PROJ_PATH) SCHEME_NAME=qmapboxgl SCHEME_TYPE=library BUILDABLE_NAME=libqmapboxgl.dylib BLUEPRINT_NAME=qmapboxgl platform/macos/scripts/create_scheme.sh
 
 .PHONY: qtproj
 qtproj: $(MACOS_QT_PROJ_PATH)
@@ -460,6 +457,12 @@ test-node: node
 	npm test
 	npm run test-suite
 
+.PHONY: test-node-recycle-map
+test-node-recycle-map: node
+	npm test
+	npm run test-render -- --recycle-map --shuffle
+	npm run test-query
+
 #### Android targets ###########################################################
 
 MBGL_ANDROID_ABIS  = arm-v5;armeabi
@@ -480,21 +483,7 @@ MBGL_ANDROID_GRADLE = ./gradlew --parallel --max-workers=$(JOBS) -Pmapbox.buildt
 # Some devices return \r\n, so we'll have to remove the carriage return before concatenating.
 MBGL_ANDROID_ACTIVE_ARCHS = $(shell adb devices | sed '1d;/^\*/d;s/[[:space:]].*//' | xargs -n 1 -I DEV `type -P adb` -s DEV shell getprop ro.product.cpu.abi | tr -d '\r')
 
-.PHONY: android-help
-android-help:
-	@echo
-	@echo "Available Android architecture targets:"
-	@echo
-	@echo "    make android-arm-v5"
-	@echo "    make android-arm-v7, make android"
-	@echo "    make android-arm-v8"
-	@echo "    make android-mips"
-	@echo "    make android-mips-64"
-	@echo "    make android-x86"
-	@echo "    make android-x86-64"
-	@echo "    make apackage"
-	@echo
-
+# Generate code based on the style specification
 .PHONY: android-style-code
 android-style-code:
 	node platform/android/scripts/generate-style-code.js
@@ -512,14 +501,17 @@ define ANDROID_RULES
 android-test-lib-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
+# Build SDK for for specified abi
 .PHONY: android-lib-$1
 android-lib-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDK:assemble$(BUILDTYPE)
 
+# Build test app and SDK for for specified abi
 .PHONY: android-$1
 android-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
+# Build the core test for specified abi
 .PHONY: android-core-test-$1
 android-core-test-$1: android-test-lib-$1
 	# Compile main sources and extract the classes (using the test app to get all transitive dependencies in one place)
@@ -552,27 +544,36 @@ run-android-core-test-$1-%: android-core-test-$1
 	rm -rf $(MBGL_ANDROID_CORE_TEST_DIR)/results && mkdir -p $(MBGL_ANDROID_CORE_TEST_DIR)/results
 	tar -xzf $(MBGL_ANDROID_CORE_TEST_DIR)/results.tgz --strip-components=2 -C $(MBGL_ANDROID_CORE_TEST_DIR)/results
 
+# Run the core test for specified abi
 .PHONY: run-android-core-test-$1
 run-android-core-test-$1: run-android-core-test-$1-*
 
+# Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
 run-android-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
+# Build test app instrumentation tests apk and test app apk for specified abi
 .PHONY: android-ui-test-$1
 android-ui-test-$1: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
-# This test assumes that you have Android Simulator started locally.
+# Run test app instrumentation tests on a connected android device or emulator with specified abi
 .PHONY: run-android-ui-test-$1
 run-android-ui-test-$1: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest
 
+# Run Java Instrumentation tests on a connected android device or emulator with specified abi and test filter
 run-android-ui-test-$1-%: platform/android/configuration.gradle
-	adb uninstall com.mapbox.mapboxsdk.testapp > /dev/null
+	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
+
+# Symbolicate native stack trace with the specified abi
+.PHONY: android-ndk-stack-$1
+android-ndk-stack-$1: platform/android/configuration.gradle
+	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
 
 endef
 
@@ -583,39 +584,39 @@ endef
 
 $(foreach abi,$(MBGL_ANDROID_ABIS),$(eval $(call ANDROID_RULES_INVOKER,$(subst ;, ,$(abi)))))
 
+# Build the Android SDK and test app with abi set to arm-v7
 .PHONY: android
 android: android-arm-v7
 
+# Build the Android SDK with abi set to arm-v7
 .PHONY: android-lib
 android-lib: android-lib-arm-v7
 
+# Run the test app on connected android device with abi set to arm-v7
 .PHONY: run-android
 run-android: run-android-arm-v7
 
+# Run Java Instrumentation tests on a connected android device or emulator with abi set to arm-v7
 .PHONY: run-android-ui-test
 run-android-ui-test: run-android-ui-test-arm-v7
 run-android-ui-test-%: run-android-ui-test-arm-v7-%
 
-# Java-only test
+# Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
 run-android-unit-test: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
 run-android-unit-test-%: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:testDebugUnitTest --tests "$*"
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
 
-# Java-only test
-.PHONY: run-android-wear-unit-test
-run-android-wear-unit-test: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest
-run-android-wear-unit-test-%: platform/android/configuration.gradle
-	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKWearTestApp:testDebugUnitTest --tests "$*"
-
+# Run Instrumentation tests on AWS device farm, requires additional authentication through gradle.properties
 .PHONY: run-android-ui-test-aws
 run-android-ui-test-aws: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all devicefarmUpload
 
+# Builds a release package of the Android SDK
 .PHONY: apackage
 apackage: platform/android/configuration.gradle
+	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Uploads the compiled Android SDK to Maven
@@ -623,29 +624,57 @@ apackage: platform/android/configuration.gradle
 run-android-upload-archives: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
 
+# Dump system graphics information for the test app
+.PHONY: android-gfxinfo
+android-gfxinfo:
+	adb shell dumpsys gfxinfo com.mapbox.mapboxsdk.testapp reset
+
 # Runs Android UI tests on all connected devices using Spoon
 .PHONY: run-android-ui-test-spoon
 run-android-ui-test-spoon: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis="$(MBGL_ANDROID_ACTIVE_ARCHS)" spoon
 
+# Generates Activity sanity tests
 .PHONY: test-code-android
 test-code-android:
 	node platform/android/scripts/generate-test-code.js
 
+# Runs checkstyle and lint on the Android code
+.PHONY: android-check
+android-check : android-checkstyle android-lint-sdk android-lint-test-app
+
+# Runs checkstyle on the Android code
 .PHONY: android-checkstyle
 android-checkstyle: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
 
+# Runs lint on the Android SDK code
+.PHONY: android-lint-sdk
+android-lint-sdk: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
+
+# Runs lint on the Android test app code
+.PHONY: android-lint-test-app
+android-lint-test-app: platform/android/configuration.gradle
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint
+
+# Generates javadoc from the Android SDK
 .PHONY: android-javadoc
 android-javadoc: platform/android/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
+# Symbolicate ndk stack traces for the arm-v7 abi
+.PHONY: android-ndk-stack
+android-ndk-stack: android-ndk-stack-arm-v7
+
+# Open Android Studio if machine is macos
 ifeq ($(HOST_PLATFORM), macos)
 .PHONY: aproj
 aproj: platform/android/configuration.gradle
 	open -b com.google.android.studio platform/android
 endif
 
+# Creates the configuration needed to build with Android Studio
 .PHONY: android-configuration
 android-configuration: platform/android/configuration.gradle
 	cat platform/android/configuration.gradle
@@ -668,7 +697,6 @@ clean:
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
-	        ./platform/android/MapboxGLAndroidSDKWearTestApp/build \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/src/androidTest/java/com/mapbox/mapboxsdk/testapp/activity/gen \
 	        ./platform/android/MapboxGLAndroidSDK/src/main/assets
 

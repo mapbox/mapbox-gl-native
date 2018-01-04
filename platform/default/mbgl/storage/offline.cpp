@@ -1,6 +1,7 @@
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/tile_cover.hpp>
 #include <mbgl/util/tileset.hpp>
+#include <mbgl/util/projection.hpp>
 
 #include <rapidjson/document.h>
 #include <rapidjson/stringbuffer.h>
@@ -23,7 +24,32 @@ OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(
     }
 }
 
-std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+    const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
+
+    std::vector<CanonicalTileID> result;
+
+    for (uint8_t z = clampedZoomRange.min; z <= clampedZoomRange.max; z++) {
+        for (const auto& tile : util::tileCover(bounds, z)) {
+            result.emplace_back(tile.canonical);
+        }
+    }
+
+    return result;
+}
+
+uint64_t OfflineTilePyramidRegionDefinition::tileCount(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
+    
+    const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
+    unsigned long result = 0;;
+    for (uint8_t z = clampedZoomRange.min; z <= clampedZoomRange.max; z++) {
+        result +=  util::tileCount(bounds, z, tileSize);
+    }
+
+    return result;
+}
+
+Range<uint8_t> OfflineTilePyramidRegionDefinition::coveringZoomRange(style::SourceType type, uint16_t tileSize, const Range<uint8_t>& zoomRange) const {
     double minZ = std::max<double>(util::coveringZoomLevel(minZoom, type, tileSize), zoomRange.min);
     double maxZ = std::min<double>(util::coveringZoomLevel(maxZoom, type, tileSize), zoomRange.max);
 
@@ -31,16 +57,7 @@ std::vector<CanonicalTileID> OfflineTilePyramidRegionDefinition::tileCover(Sourc
     assert(maxZ >= 0);
     assert(minZ < std::numeric_limits<uint8_t>::max());
     assert(maxZ < std::numeric_limits<uint8_t>::max());
-
-    std::vector<CanonicalTileID> result;
-
-    for (uint8_t z = minZ; z <= maxZ; z++) {
-        for (const auto& tile : util::tileCover(bounds, z)) {
-            result.emplace_back(tile.canonical);
-        }
-    }
-
-    return result;
+    return { static_cast<uint8_t>(minZ), static_cast<uint8_t>(maxZ) };
 }
 
 OfflineRegionDefinition decodeOfflineRegionDefinition(const std::string& region) {

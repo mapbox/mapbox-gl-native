@@ -19,8 +19,8 @@ xcuserdata
 /test/fixtures/offline_database/offline.db-*
 /test/fixtures/offline_database/invalid.db
 /test/fixtures/offline_database/invalid.db-*
-/test/fixtures/offline_database/v*.db
-/test/fixtures/offline_database/v*.db-*
+/test/fixtures/offline_database/migrated.db
+/test/fixtures/offline_database/migrated.db-*
 /test/fixtures/**/actual.png
 /test/fixtures/**/diff.png
 /test/output
@@ -33,3 +33,4 @@ xcuserdata
 /documentation
 test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
+/.circle-week

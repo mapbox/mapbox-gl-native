@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Rodo daugiau informacijos";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Nepavyko užkrauti žemėlapio, nes stilius yra netinkamo formato.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK versija %@ jau prieinama.";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS versija %@ jau prieinama.";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Nepavyko užkrauti žemėlapio, nes neįmanoma rasti stiliaus arba jis nėra suderinamas.";

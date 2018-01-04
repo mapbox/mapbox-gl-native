@@ -51,7 +51,7 @@ To use annotation views, implement `MGLMapViewDelegate` `-mapView:viewForAnnotat
 * No limit on style or image size
 * Full support for animations
 * Relative control over z-ordering using the `zPosition` property on `CALayer`
-* [Familiar API for MapKit users](https://www.mapbox.com/help/switch-mapkit/#annotations-pins)
+* Familiar API for MapKit users
 
 **Cons**
 
@@ -63,7 +63,7 @@ To use annotation views, implement `MGLMapViewDelegate` `-mapView:viewForAnnotat
 
 For absolute full control of how points are displayed on a map, consider [runtime styling](runtime-styling.html).
 
-You can use `MGLPointFeature` or any of the other [style feature subclasses](Style%20Features.html) to add points and shapes to an `MGLShapeSource`.
+You can use `MGLPointFeature` or any other [style primitives](Style%20Primitives.html) to add points and shapes to an `MGLShapeSource`.
 
 From there, you can create one or many `MGLSymbolStyleLayer` or `MGLCircleStyleLayer` layers to filter and style points for display on the map ([example](https://www.mapbox.com/ios-sdk/examples/runtime-multiple-annotations)).
 

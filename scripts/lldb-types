@@ -1,0 +1,15 @@
+type summary add "mbgl::CanonicalTileID" --summary-string "${var.z%u}/${var.x}/${var.y}"
+type summary add "mbgl::UnwrappedTileID" --summary-string "${var.canonical}+${var.wrap}"
+type summary add "mbgl::OverscaledTileID" --summary-string "${var.canonical}=>${var.overscaledZ%u}"
+
+type summary add -e -x "^mbgl::Range<.+>$" --summary-string "${var.min%d} ⇒ ${var.max%d}"
+type summary add -e -x "^mbgl::Rect<.+>$" --summary-string "Size: ${var.w%d}×${var.h%d} — Offset: ${var.x}/${var.y}"
+type summary add "mbgl::Size" --summary-string "${var.width}/${var.height}"
+type summary add "mbgl::LatLng" --summary-string "${var.lat}/${var.lon}"
+
+type summary add "mbgl::Color" --summary-string "${var.r}, ${var.g}, ${var.b}, ${var.a}"
+
+type summary add -e -x "^mbgl::Point<.+>$" --summary-string "${var.x}/${var.y}"
+type summary add -e -x "^mapbox::geometry::point<.+>$" --summary-string "${var.x}/${var.y}"
+
+type summary add -e -x "^mbgl::optional<.+>$" --python-script "return valobj.GetChildAtIndex(0).GetChildAtIndex(0).GetChildAtIndex(1).GetValue() if valobj.GetChildMemberWithName('__engaged_').unsigned > 0 else '<empty>'"

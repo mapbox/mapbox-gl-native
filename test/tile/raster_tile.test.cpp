@@ -3,6 +3,7 @@
 #include <mbgl/tile/raster_tile.hpp>
 #include <mbgl/tile/tile_loader_impl.hpp>
 
+#include <mbgl/style/style.hpp>
 #include <mbgl/util/default_thread_pool.hpp>
 #include <mbgl/util/run_loop.hpp>
 #include <mbgl/map/transform.hpp>
@@ -20,7 +21,8 @@ public:
     TransformState transformState;
     util::RunLoop loop;
     ThreadPool threadPool { 1 };
-    AnnotationManager annotationManager;
+    style::Style style { loop, fileSource, 1 };
+    AnnotationManager annotationManager { style };
     ImageManager imageManager;
     GlyphManager glyphManager { fileSource };
     Tileset tileset { { "https://example.com" }, { 0, 22 }, "none" };
@@ -34,7 +36,8 @@ public:
         MapMode::Continuous,
         annotationManager,
         imageManager,
-        glyphManager
+        glyphManager,
+        0
     };
 };
 
@@ -50,7 +53,7 @@ TEST(RasterTile, setError) {
 TEST(RasterTile, onError) {
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
-    tile.onError(std::make_exception_ptr(std::runtime_error("test")));
+    tile.onError(std::make_exception_ptr(std::runtime_error("test")), 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());
@@ -59,8 +62,22 @@ TEST(RasterTile, onError) {
 TEST(RasterTile, onParsed) {
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
-    tile.onParsed(std::make_unique<RasterBucket>(UnassociatedImage{}));
+    tile.onParsed(std::make_unique<RasterBucket>(PremultipliedImage{}), 0);
     EXPECT_TRUE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
+
+    // Make sure that once we've had a renderable tile and then receive erroneous data, we retain
+    // the previously rendered data and keep the tile renderable.
+    tile.setError(std::make_exception_ptr(std::runtime_error("Connection offline")));
+    EXPECT_TRUE(tile.isRenderable());
+    EXPECT_TRUE(tile.isLoaded());
+    EXPECT_TRUE(tile.isComplete());
+
+    // Then simulate a parsing failure and make sure that we keep it renderable in this situation
+    // as well.
+    tile.onError(std::make_exception_ptr(std::runtime_error("Parse error")), 0);
+    ASSERT_TRUE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());
 }
@@ -68,7 +85,7 @@ TEST(RasterTile, onParsed) {
 TEST(RasterTile, onParsedEmpty) {
     RasterTileTest test;
     RasterTile tile(OverscaledTileID(0, 0, 0), test.tileParameters, test.tileset);
-    tile.onParsed(nullptr);
+    tile.onParsed(nullptr, 0);
     EXPECT_FALSE(tile.isRenderable());
     EXPECT_TRUE(tile.isLoaded());
     EXPECT_TRUE(tile.isComplete());

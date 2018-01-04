@@ -77,7 +77,7 @@ The Unit tests are executed as part of the build process on our CI and are
 automatically run for each new commit pushed to this repo. If a Unit tests
 fails, this will fail and stop the build.
 
-You can find this gradle command in our [buildscript](https://github.com/mapbox/mapbox-gl-native/blob/master/platform/android/bitrise.yml#L48):
+You can find this gradle command in our [buildscript](https://github.com/mapbox/mapbox-gl-native/blob/master/circle.yml#L146-L215):
 
 ```
 $ ./gradlew -Pmapbox.abis=none testReleaseUnitTest

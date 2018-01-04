@@ -4,6 +4,8 @@
 #import "MGLCompassCell.h"
 #import "MGLOpenGLLayer.h"
 #import "MGLStyle.h"
+#import "MGLRendererFrontend.h"
+#import "MGLRendererConfiguration.h"
 
 #import "MGLAnnotationImage_Private.h"
 #import "MGLAttributionInfo_Private.h"
@@ -13,6 +15,7 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
 #import "MGLStyle_Private.h"
+#import "MGLShape_Private.h"
 
 #import "MGLAccountManager.h"
 #import "MGLMapCamera.h"
@@ -23,15 +26,15 @@
 #import "MGLImageSource.h"
 
 #import <mbgl/map/map.hpp>
-#import <mbgl/map/view.hpp>
 #import <mbgl/style/style.hpp>
 #import <mbgl/annotation/annotation.hpp>
 #import <mbgl/map/camera.hpp>
 #import <mbgl/storage/reachability.h>
 #import <mbgl/util/default_thread_pool.hpp>
-#import <mbgl/map/backend.hpp>
-#import <mbgl/map/backend_scope.hpp>
 #import <mbgl/style/image.hpp>
+#import <mbgl/renderer/renderer.hpp>
+#import <mbgl/renderer/renderer_backend.hpp>
+#import <mbgl/renderer/backend_scope.hpp>
 #import <mbgl/storage/default_file_source.hpp>
 #import <mbgl/storage/network_status.hpp>
 #import <mbgl/math/wrap.hpp>
@@ -155,6 +158,7 @@ public:
     /// Cross-platform map view controller.
     mbgl::Map *_mbglMap;
     MGLMapViewImpl *_mbglView;
+    std::unique_ptr<MGLRenderFrontend> _rendererFrontend;
     std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
 
     NSPanGestureRecognizer *_panGestureRecognizer;
@@ -267,11 +271,12 @@ public:
     NSURL *legacyCacheURL = [cachesDirectoryURL URLByAppendingPathComponent:@"cache.db"];
     [[NSFileManager defaultManager] removeItemAtURL:legacyCacheURL error:NULL];
 
-    mbgl::DefaultFileSource* mbglFileSource = [MGLOfflineStorage sharedOfflineStorage].mbglFileSource;
-
     _mbglThreadPool = mbgl::sharedThreadPool();
-    _mbglMap = new mbgl::Map(*_mbglView, self.size, [NSScreen mainScreen].backingScaleFactor, *mbglFileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::GLContextMode::Unique, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
-    [self validateTileCacheSize];
+    MGLRendererConfiguration *config = [MGLRendererConfiguration currentConfiguration];
+
+    auto renderer = std::make_unique<mbgl::Renderer>(*_mbglView, config.scaleFactor, *config.fileSource, *_mbglThreadPool, config.contextMode, config.cacheDir, config.localFontFamilyName);
+    _rendererFrontend = std::make_unique<MGLRenderFrontend>(std::move(renderer), self, *_mbglView, true);
+    _mbglMap = new mbgl::Map(*_rendererFrontend, *_mbglView, self.size, config.scaleFactor, *config.fileSource, *_mbglThreadPool, mbgl::MapMode::Continuous, mbgl::ConstrainMode::None, mbgl::ViewportMode::Default);
 
     // Install the OpenGL layer. Interface Builder’s synchronous drawing means
     // we can’t display a map, so don’t even bother to have a map layer.
@@ -643,6 +648,10 @@ public:
     return _mbglMap;
 }
 
+- (mbgl::Renderer *)renderer {
+    return _rendererFrontend->getRenderer();
+}
+
 #pragma mark View hierarchy and drawing
 
 - (void)viewWillMoveToWindow:(NSWindow *)newWindow {
@@ -687,9 +696,6 @@ public:
 
 - (void)setFrame:(NSRect)frame {
     super.frame = frame;
-    if (!NSEqualRects(frame, self.frame)) {
-        [self validateTileCacheSize];
-    }
     if (!_isTargetingInterfaceBuilder) {
         _mbglMap->setSize(self.size);
     }
@@ -773,11 +779,8 @@ public:
 }
 
 - (void)renderSync {
-    if (!self.dormant) {
-        // The OpenGL implementation automatically enables the OpenGL context for us.
-        mbgl::BackendScope scope { *_mbglView, mbgl::BackendScope::ScopeType::Implicit };
-
-        _mbglMap->render(*_mbglView);
+    if (!self.dormant && _rendererFrontend) {
+        _rendererFrontend->render();
 
         if (_isPrinting) {
             _isPrinting = NO;
@@ -787,21 +790,6 @@ public:
 
 //        [self updateUserLocationAnnotationView];
     }
-}
-
-- (void)validateTileCacheSize {
-    if (!_mbglMap) {
-        return;
-    }
-
-    CGFloat zoomFactor   = self.maximumZoomLevel - self.minimumZoomLevel + 1;
-    CGFloat cpuFactor    = [NSProcessInfo processInfo].processorCount;
-    CGFloat memoryFactor = (CGFloat)[NSProcessInfo processInfo].physicalMemory / 1000 / 1000 / 1000;
-    CGFloat sizeFactor   = (NSWidth(self.bounds) / mbgl::util::tileSize) * (NSHeight(self.bounds) / mbgl::util::tileSize);
-
-    NSUInteger cacheSize = zoomFactor * cpuFactor * memoryFactor * sizeFactor * 0.5;
-
-    _mbglMap->setSourceTileCacheSize(cacheSize);
 }
 
 - (void)setNeedsGLDisplay {
@@ -1061,13 +1049,11 @@ public:
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
     _mbglMap->setMinZoom(minimumZoomLevel);
-    [self validateTileCacheSize];
 }
 
 - (void)setMaximumZoomLevel:(double)maximumZoomLevel
 {
     _mbglMap->setMaxZoom(maximumZoomLevel);
-    [self validateTileCacheSize];
 }
 
 - (double)maximumZoomLevel {
@@ -1136,6 +1122,10 @@ public:
 }
 
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion {
+    [self setCamera:camera withDuration:duration animationTimingFunction:function edgePadding:self.contentInsets completionHandler:completion];
+}
+
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(NSEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion {
     mbgl::AnimationOptions animationOptions;
     if (duration > 0) {
         animationOptions.duration.emplace(MGLDurationFromTimeInterval(duration));
@@ -1163,7 +1153,7 @@ public:
 
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:edgePadding];
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
@@ -1209,17 +1199,17 @@ public:
 
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
-    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera];
+    mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:self.contentInsets];
     _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
 }
 
 /// Returns a CameraOptions object that specifies parameters for animating to
 /// the given camera.
-- (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera {
+- (mbgl::CameraOptions)cameraOptionsObjectForAnimatingToCamera:(MGLMapCamera *)camera edgePadding:(NSEdgeInsets) edgePadding {
     mbgl::CameraOptions options;
     options.center = MGLLatLngFromLocationCoordinate2D(camera.centerCoordinate);
-    options.padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+    options.padding = MGLEdgeInsetsFromNSEdgeInsets(edgePadding);
     options.zoom = MGLZoomLevelForAltitude(camera.altitude, camera.pitch,
                                            camera.centerCoordinate.latitude,
                                            self.frame.size);
@@ -1279,6 +1269,15 @@ public:
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
     padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
     mbgl::CameraOptions cameraOptions = _mbglMap->cameraForLatLngBounds(MGLLatLngBoundsFromCoordinateBounds(bounds), padding);
+    return [self cameraForCameraOptions:cameraOptions];
+}
+
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets {
+    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(insets);
+    padding += MGLEdgeInsetsFromNSEdgeInsets(self.contentInsets);
+
+    mbgl::CameraOptions cameraOptions = _mbglMap->cameraForGeometry([shape geometryObject], padding, direction);
+
     return [self cameraForCameraOptions:cameraOptions];
 }
 
@@ -1374,7 +1373,7 @@ public:
             // Move the cursor back to the start point and show it again, creating
             // the illusion that it has stayed in place during the entire gesture.
             CGPoint cursorPoint = [self convertPoint:startPoint toView:nil];
-            cursorPoint = [self.window convertRectToScreen:{ startPoint, NSZeroSize }].origin;
+            cursorPoint = [self.window convertRectToScreen:{ cursorPoint, NSZeroSize }].origin;
             cursorPoint.y = self.window.screen.frame.size.height - cursorPoint.y;
             CGDisplayMoveCursorToPoint(kCGDirectMainDisplay, cursorPoint);
             CGDisplayShowCursor(kCGDirectMainDisplay);
@@ -1489,7 +1488,7 @@ public:
         if (hitAnnotationTag != _selectedAnnotationTag) {
             id <MGLAnnotation> annotation = [self annotationWithTag:hitAnnotationTag];
             NSAssert(annotation, @"Cannot select nonexistent annotation with tag %u", hitAnnotationTag);
-            [self selectAnnotation:annotation];
+            [self selectAnnotation:annotation atPoint:gesturePoint];
         }
     } else {
         [self deselectAnnotation:self.selectedAnnotation];
@@ -1792,6 +1791,12 @@ public:
     }
 
     std::vector<MGLAnnotationTag> annotationTags = [self annotationTagsInRect:rect];
+    std::vector<MGLAnnotationTag> shapeAnnotationTags = [self shapeAnnotationTagsInRect:rect];
+    
+    if (shapeAnnotationTags.size()) {
+        annotationTags.insert(annotationTags.end(), shapeAnnotationTags.begin(), shapeAnnotationTags.end());
+    }
+    
     if (annotationTags.size())
     {
         NSMutableArray *annotations = [NSMutableArray arrayWithCapacity:annotationTags.size()];
@@ -2051,13 +2056,18 @@ public:
     queryRect = NSInsetRect(queryRect, -MGLAnnotationImagePaddingForHitTest,
                             -MGLAnnotationImagePaddingForHitTest);
     std::vector<MGLAnnotationTag> nearbyAnnotations = [self annotationTagsInRect:queryRect];
+    std::vector<MGLAnnotationTag> nearbyShapeAnnotations = [self shapeAnnotationTagsInRect:queryRect];
+    
+    if (nearbyShapeAnnotations.size()) {
+        nearbyAnnotations.insert(nearbyAnnotations.end(), nearbyShapeAnnotations.begin(), nearbyShapeAnnotations.end());
+    }
 
     if (nearbyAnnotations.size()) {
         // Assume that the user is fat-fingering an annotation.
         NSRect hitRect = NSInsetRect({ point, NSZeroSize },
                                      -MGLAnnotationImagePaddingForHitTest,
                                      -MGLAnnotationImagePaddingForHitTest);
-
+        
         // Filter out any annotation whose image is unselectable or for which
         // hit testing fails.
         auto end = std::remove_if(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag annotationTag) {
@@ -2066,12 +2076,17 @@ public:
             if (!annotation) {
                 return true;
             }
-
+            
+            if ([annotation isKindOfClass:[MGLShape class]])
+            {
+                return false;
+            }
+            
             MGLAnnotationImage *annotationImage = [self imageOfAnnotationWithTag:annotationTag];
             if (!annotationImage.selectable) {
                 return true;
             }
-
+            
             // Filter out the annotation if the fattened finger didn’t land on a
             // translucent or opaque pixel in the image.
             NSRect annotationRect = [self frameOfImage:annotationImage.image
@@ -2144,7 +2159,15 @@ public:
 /// Returns the tags of the annotations coincident with the given rectangle.
 - (std::vector<MGLAnnotationTag>)annotationTagsInRect:(NSRect)rect {
     // Cocoa origin is at the lower-left corner.
-    return _mbglMap->queryPointAnnotations({
+    return self.renderer->queryPointAnnotations({
+        { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
+        { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
+    });
+}
+
+- (std::vector<MGLAnnotationTag>)shapeAnnotationTagsInRect:(NSRect)rect {
+    // Cocoa origin is at the lower-left corner.
+    return _rendererFrontend->getRenderer()->queryShapeAnnotations({
         { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },
         { NSMaxX(rect), NSHeight(self.bounds) - NSMinY(rect) },
     });
@@ -2193,11 +2216,11 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
 {
-    // Only point annotations can be selected.
-    if (!annotation || [annotation isKindOfClass:[MGLMultiPoint class]]) {
-        return;
-    }
+    [self selectAnnotation:annotation atPoint:NSZeroPoint];
+}
 
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
+{
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
         return;
@@ -2212,10 +2235,10 @@ public:
         [self addAnnotation:annotation];
     }
 
-    // The annotation can’t be selected if no part of it is hittable.
+    // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
     if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        return;
+        positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
     }
 
     self.selectedAnnotation = annotation;
@@ -2315,6 +2338,13 @@ public:
     if (!annotation) {
         return NSZeroRect;
     }
+    if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
+        CLLocationCoordinate2D origin = annotation.coordinate;
+        CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
+        return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
+        
+    }
+    
     NSImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if (!image) {
         image = [self dequeueReusableAnnotationImageWithIdentifier:MGLDefaultStyleMarkerSymbolName].image;
@@ -2565,7 +2595,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
     
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenCoordinate, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -2599,7 +2629,7 @@ public:
         optionalFilter = predicate.mgl_filter;
     }
     
-    std::vector<mbgl::Feature> features = _mbglMap->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
+    std::vector<mbgl::Feature> features = _rendererFrontend->getRenderer()->queryRenderedFeatures(screenBox, { optionalLayerIDs, optionalFilter });
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
@@ -2777,10 +2807,9 @@ public:
 }
 
 /// Adapter responsible for bridging calls from mbgl to MGLMapView and Cocoa.
-class MGLMapViewImpl : public mbgl::View, public mbgl::Backend {
+class MGLMapViewImpl : public mbgl::RendererBackend, public mbgl::MapObserver {
 public:
-    MGLMapViewImpl(MGLMapView *nativeView_)
-        : nativeView(nativeView_) {}
+    MGLMapViewImpl(MGLMapView *nativeView_) : nativeView(nativeView_) {}
 
     void onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode) override {
         bool animated = mode == mbgl::MapObserver::CameraChangeMode::Animated;
@@ -2858,7 +2887,7 @@ public:
         [nativeView sourceDidChange:nativeSource];
     }
 
-    mbgl::gl::ProcAddress initializeExtension(const char* name) override {
+    mbgl::gl::ProcAddress getExtensionFunctionPointer(const char* name) override {
         static CFBundleRef framework = CFBundleGetBundleWithIdentifier(CFSTR("com.apple.opengl"));
         if (!framework) {
             throw std::runtime_error("Failed to load OpenGL framework.");
@@ -2869,10 +2898,6 @@ public:
         CFRelease(str);
 
         return reinterpret_cast<mbgl::gl::ProcAddress>(symbol);
-    }
-
-    void invalidate() override {
-        [nativeView setNeedsGLDisplay];
     }
 
     void activate() override {
@@ -2901,6 +2926,10 @@ public:
     void bind() override {
         setFramebufferBinding(fbo);
         setViewport(0, 0, nativeView.framebufferSize);
+    }
+
+    mbgl::Size getFramebufferSize() const override {
+        return nativeView.framebufferSize;
     }
 
     mbgl::PremultipliedImage readStillImage() {

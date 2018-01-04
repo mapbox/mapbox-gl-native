@@ -26,6 +26,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -44,6 +45,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
         EXPECT_EQ("HTTP status code 404", res.error->message);
         EXPECT_FALSE(bool(res.data));
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -61,6 +63,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
         EXPECT_FALSE(bool(res.error));
         EXPECT_FALSE(bool(res.data));
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -78,6 +81,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
         EXPECT_FALSE(bool(res.error));
         EXPECT_EQ(*res.data, std::string());
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -95,6 +99,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
         EXPECT_FALSE(bool(res.error));
         EXPECT_FALSE(bool(res.data));
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -113,6 +118,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
         EXPECT_EQ("HTTP status code 500", res.error->message);
         EXPECT_FALSE(bool(res.data));
         EXPECT_FALSE(bool(res.expires));
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -131,6 +137,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_EQ(Timestamp{ Seconds(1420797926) }, res.expires);
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420794326) }, res.modified);
         EXPECT_EQ("foo", *res.etag);
         loop.stop();
@@ -148,6 +155,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
         ASSERT_TRUE(res.data.get());
         EXPECT_EQ("Hello World!", *res.data);
         EXPECT_GT(Seconds(2), util::abs(*res.expires - util::now() - Seconds(120))) << "Expiration date isn't about 120 seconds in the future";
+        EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
         EXPECT_FALSE(bool(res.etag));
         loop.stop();
@@ -176,6 +184,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) {
             ASSERT_TRUE(res.data.get());
             EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
             EXPECT_FALSE(bool(res.expires));
+            EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
             EXPECT_FALSE(bool(res.etag));
 

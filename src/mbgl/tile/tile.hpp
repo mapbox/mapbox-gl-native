@@ -6,6 +6,8 @@
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_necessity.hpp>
+#include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/storage/resource.hpp>
@@ -21,10 +23,11 @@ namespace mbgl {
 class DebugBucket;
 class TransformState;
 class TileObserver;
-class PlacementConfig;
-class RenderStyle;
+class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
+
+class CollisionIndex;
 
 namespace gl {
 class Context;
@@ -37,14 +40,7 @@ public:
 
     void setObserver(TileObserver* observer);
 
-    // Tiles can have two states: optional or required.
-    // - optional means that only low-cost actions should be taken to obtain the data
-    //   (e.g. load from cache, but accept stale data)
-    // - required means that every effort should be taken to obtain the data (e.g. load
-    //   from internet and keep the data fresh if it expires)
-    using Necessity = Resource::Necessity;
-
-    virtual void setNecessity(Necessity) = 0;
+    virtual void setNecessity(TileNecessity) {}
 
     // Mark this tile as no longer needed and cancel any pending work.
     virtual void cancel() = 0;
@@ -52,25 +48,27 @@ public:
     virtual void upload(gl::Context&) = 0;
     virtual Bucket* getBucket(const style::Layer::Impl&) const = 0;
 
-    virtual void setPlacementConfig(const PlacementConfig&) {}
+    virtual void setShowCollisionBoxes(const bool) {}
     virtual void setLayers(const std::vector<Immutable<style::Layer::Impl>>&) {}
+    virtual void setMask(TileMask&&) {}
 
     virtual void queryRenderedFeatures(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
-            const RenderStyle&,
-            const RenderedQueryOptions& options);
+            const std::vector<const RenderLayer*>&,
+            const RenderedQueryOptions& options,
+            const CollisionIndex&);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
             const SourceQueryOptions&);
 
-    void setTriedOptional();
+    void setTriedCache();
 
     // Returns true when the tile source has received a first response, regardless of whether a load
     // error occurred or actual data was loaded.
-    bool hasTriedOptional() const {
+    bool hasTriedCache() const {
         return triedOptional;
     }
 
@@ -96,6 +94,22 @@ public:
     bool isComplete() const {
         return loaded && !pending;
     }
+    
+    // "holdForFade" is used to keep tiles in the render tree after they're no longer
+    // ideal tiles in order to allow symbols to fade out
+    virtual bool holdForFade() const {
+        return false;
+    }
+    // Set whenever this tile is used as an ideal tile
+    virtual void markRenderedIdeal() {}
+    // Set when the tile is removed from the ideal render set but may still be held for fading
+    virtual void markRenderedPreviously() {}
+    // Placement operation performed while this tile is fading
+    // We hold onto a tile for two placements: fading starts with the first placement
+    // and will have time to finish by the second placement.
+    virtual void performedFadePlacement() {}
+    
+    virtual void resetCrossTileIDs() {};
 
     void dumpDebugLogs() const;
 

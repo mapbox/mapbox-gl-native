@@ -4,14 +4,16 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/response.hpp>
+#include <mbgl/util/tiny_sdf.hpp>
 
 namespace mbgl {
 
 static GlyphManagerObserver nullObserver;
 
-GlyphManager::GlyphManager(FileSource& fileSource_)
+GlyphManager::GlyphManager(FileSource& fileSource_, std::unique_ptr<LocalGlyphRasterizer> localGlyphRasterizer_)
     : fileSource(fileSource_),
-      observer(&nullObserver) {
+      observer(&nullObserver),
+      localGlyphRasterizer(std::move(localGlyphRasterizer_)) {
 }
 
 GlyphManager::~GlyphManager() = default;
@@ -30,14 +32,21 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         const GlyphIDs& glyphIDs = dependency.second;
         GlyphRangeSet ranges;
         for (const auto& glyphID : glyphIDs) {
-            ranges.insert(getGlyphRange(glyphID));
+            if (localGlyphRasterizer->canRasterizeGlyph(fontStack, glyphID)) {
+                if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
+                    entry.glyphs.emplace(glyphID, makeMutable<Glyph>(generateLocalSDF(fontStack, glyphID)));
+                }
+            } else {
+                ranges.insert(getGlyphRange(glyphID));
+            }
         }
 
         for (const auto& range : ranges) {
             auto it = entry.ranges.find(range);
             if (it == entry.ranges.end() || !it->second.parsed) {
-                GlyphRequest& request = requestRange(entry, fontStack, range);
+                GlyphRequest& request = entry.ranges[range];
                 request.requestors[&requestor] = dependencies;
+                requestRange(request, fontStack, range);
             }
         }
     }
@@ -49,18 +58,20 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
     }
 }
 
-GlyphManager::GlyphRequest& GlyphManager::requestRange(Entry& entry, const FontStack& fontStack, const GlyphRange& range) {
-    GlyphRequest& request = entry.ranges[range];
+Glyph GlyphManager::generateLocalSDF(const FontStack& fontStack, GlyphID glyphID) {
+    Glyph local = localGlyphRasterizer->rasterizeGlyph(fontStack, glyphID);
+    local.bitmap = util::transformRasterToSDF(local.bitmap, 8, .25);
+    return local;
+}
 
+void GlyphManager::requestRange(GlyphRequest& request, const FontStack& fontStack, const GlyphRange& range) {
     if (request.req) {
-        return request;
+        return;
     }
 
     request.req = fileSource.request(Resource::glyphs(glyphURL, fontStack, range), [this, fontStack, range](Response res) {
         processResponse(res, fontStack, range);
     });
-
-    return request;
 }
 
 void GlyphManager::processResponse(const Response& res, const FontStack& fontStack, const GlyphRange& range) {

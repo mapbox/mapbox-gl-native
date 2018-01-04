@@ -18,10 +18,10 @@
 
 namespace mbgl {
 
-class Painter;
+class PaintParameters;
 class TransformState;
 class RenderTile;
-class RenderStyle;
+class RenderLayer;
 class RenderedQueryOptions;
 class SourceQueryOptions;
 class TileParameters;
@@ -37,21 +37,22 @@ public:
                 bool needsRendering,
                 bool needsRelayout,
                 const TileParameters&,
-                SourceType type,
+                style::SourceType type,
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
-    void startRender(Painter&);
-    void finishRender(Painter&);
+    void startRender(PaintParameters&);
+    void finishRender(PaintParameters&);
 
-    std::map<UnwrappedTileID, RenderTile>& getRenderTiles();
+    std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
-                          const RenderStyle& style,
-                          const RenderedQueryOptions& options) const;
+                          const std::vector<const RenderLayer*>&,
+                          const RenderedQueryOptions& options,
+                          const CollisionIndex& collisionIndex) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 
@@ -63,12 +64,10 @@ public:
 
     bool enabled = false;
 
-    void removeStaleTiles(const std::set<OverscaledTileID>&);
-
     std::map<OverscaledTileID, std::unique_ptr<Tile>> tiles;
     TileCache cache;
 
-    std::map<UnwrappedTileID, RenderTile> renderTiles;
+    std::vector<RenderTile> renderTiles;
 
     TileObserver* observer = nullptr;
 };

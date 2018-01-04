@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/string.hpp>
 #include <mapbox/geojsonvt.hpp>
 
 #include <mbgl/annotation/annotation.hpp>
@@ -16,7 +17,7 @@ class CanonicalTileID;
 
 class ShapeAnnotationImpl {
 public:
-    ShapeAnnotationImpl(const AnnotationID, const uint8_t maxZoom);
+    ShapeAnnotationImpl(const AnnotationID);
     virtual ~ShapeAnnotationImpl() = default;
 
     virtual void updateStyle(style::Style::Impl&) const = 0;
@@ -25,7 +26,6 @@ public:
     void updateTileData(const CanonicalTileID&, AnnotationTileData&);
 
     const AnnotationID id;
-    const uint8_t maxZoom;
     const std::string layerID;
     std::unique_ptr<mapbox::geojsonvt::GeoJSONVT> shapeTiler;
 };

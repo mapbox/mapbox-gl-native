@@ -1,10 +1,8 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/style/conversion.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
-#include <mbgl/util/rapidjson.hpp>
 
 using namespace mbgl;
 using namespace mbgl::style;
@@ -12,10 +10,8 @@ using namespace mbgl::style::conversion;
 using namespace std::literals::chrono_literals;
 
 std::unique_ptr<Layer> parseLayer(const std::string& src) {
-    JSDocument doc;
-    doc.Parse<0>(src);
     Error error;
-    return std::move(*convert<std::unique_ptr<Layer>, JSValue>(doc, error));
+    return std::move(*convertJSON<std::unique_ptr<Layer>>(src, error));
 }
 
 TEST(StyleConversion, LayerTransition) {

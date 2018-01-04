@@ -9,7 +9,6 @@
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/renderer/render_tile.hpp>
-#include <mbgl/tile/tile.hpp>
 
 namespace mbgl {
 
@@ -67,15 +66,6 @@ bool RenderLayer::needsRendering(float zoom) const {
 void RenderLayer::setRenderTiles(std::vector<std::reference_wrapper<RenderTile>> tiles) {
     renderTiles = std::move(tiles);
 }
-
-void RenderLayer::render(Painter& painter, PaintParameters& parameters, RenderSource*) {
-    for (auto& tileRef : renderTiles) {
-        auto& tile = tileRef.get();
-        auto bucket = tile.tile.getBucket(*baseImpl);
-        bucket->render(painter, parameters, *this, tile);
-    }
-}
-
 
 } //namespace mbgl
 

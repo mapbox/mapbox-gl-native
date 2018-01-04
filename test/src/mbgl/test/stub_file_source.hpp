@@ -9,7 +9,12 @@ namespace mbgl {
 
 class StubFileSource : public FileSource {
 public:
-    StubFileSource();
+    enum class ResponseType {
+        Asynchronous = 0,
+        Synchronous
+    };
+
+    StubFileSource(ResponseType = ResponseType::Asynchronous);
     ~StubFileSource() override;
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
@@ -36,6 +41,7 @@ private:
     optional<Response> defaultResponse(const Resource&);
 
     std::unordered_map<AsyncRequest*, std::tuple<Resource, ResponseFunction, Callback>> pending;
+    ResponseType type;
     util::Timer timer;
 };
 

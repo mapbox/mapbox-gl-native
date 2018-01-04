@@ -1,7 +1,6 @@
 #include <mbgl/tile/geometry_tile_worker.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/tile/geometry_tile.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
 #include <mbgl/renderer/group_by_layout.hpp>
@@ -24,20 +23,36 @@ using namespace style;
 GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
                                        ActorRef<GeometryTile> parent_,
                                        OverscaledTileID id_,
+                                       const std::string& sourceID_,
                                        const std::atomic<bool>& obsolete_,
                                        const MapMode mode_,
-                                       const float pixelRatio_)
+                                       const float pixelRatio_,
+                                       const bool showCollisionBoxes_)
     : self(std::move(self_)),
       parent(std::move(parent_)),
       id(std::move(id_)),
+      sourceID(sourceID_),
       obsolete(obsolete_),
       mode(mode_),
-      pixelRatio(pixelRatio_) {
+      pixelRatio(pixelRatio_),
+      showCollisionBoxes(showCollisionBoxes_) {
 }
 
 GeometryTileWorker::~GeometryTileWorker() = default;
 
 /*
+   NOTE: The comments below are technically correct, but currently
+   conceptually misleading. The change to foreground label placement
+   means that:
+   (1) "placement" here is a misnomer: the remaining role of
+    "attemptPlacement" is symbol buffer generation
+   (2) Once a tile has completed layout, we will only run
+    "attemptPlacement" once
+   (3) Tiles won't be rendered until "attemptPlacement" has run once
+ 
+   TODO: Simplify GeometryTileWorker to fit its new role
+    https://github.com/mapbox/mapbox-gl-native/issues/10457
+
    GeometryTileWorker is a state machine. This is its transition diagram.
    States are indicated by [state], lines are transitions triggered by
    messages, (parentheses) are actions taken on transition.
@@ -88,7 +103,7 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -112,13 +127,13 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
-void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, uint64_t correlationID_) {
+void GeometryTileWorker::setShowCollisionBoxes(bool showCollisionBoxes_, uint64_t correlationID_) {
     try {
-        placementConfig = std::move(placementConfig_);
+        showCollisionBoxes = showCollisionBoxes_;
         correlationID = correlationID_;
 
         switch (state) {
@@ -136,7 +151,7 @@ void GeometryTileWorker::setPlacementConfig(PlacementConfig placementConfig_, ui
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -144,14 +159,14 @@ void GeometryTileWorker::symbolDependenciesChanged() {
     try {
         switch (state) {
         case Idle:
-            if (hasPendingSymbolLayouts()) {
+            if (symbolLayoutsNeedPreparation) {
                 attemptPlacement();
                 coalesce();
             }
             break;
 
         case Coalescing:
-            if (hasPendingSymbolLayouts()) {
+            if (symbolLayoutsNeedPreparation) {
                 state = NeedPlacement;
             }
             break;
@@ -161,7 +176,7 @@ void GeometryTileWorker::symbolDependenciesChanged() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -187,7 +202,7 @@ void GeometryTileWorker::coalesced() {
             break;
         }
     } catch (...) {
-        parent.invoke(&GeometryTile::onError, std::current_exception());
+        parent.invoke(&GeometryTile::onError, std::current_exception(), correlationID);
     }
 }
 
@@ -216,7 +231,10 @@ void GeometryTileWorker::onGlyphsAvailable(GlyphMap newGlyphMap) {
     symbolDependenciesChanged();
 }
 
-void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap) {
+void GeometryTileWorker::onImagesAvailable(ImageMap newImageMap, uint64_t imageCorrelationID_) {
+    if (imageCorrelationID != imageCorrelationID_) {
+        return; // Ignore outdated image request replies.
+    }
     imageMap = std::move(newImageMap);
     pendingImageDependencies.clear();
     symbolDependenciesChanged();
@@ -239,7 +257,7 @@ void GeometryTileWorker::requestNewGlyphs(const GlyphDependencies& glyphDependen
 void GeometryTileWorker::requestNewImages(const ImageDependencies& imageDependencies) {
     pendingImageDependencies = imageDependencies;
     if (!pendingImageDependencies.empty()) {
-        parent.invoke(&GeometryTile::getImages, pendingImageDependencies);
+        parent.invoke(&GeometryTile::getImages, std::make_pair(pendingImageDependencies, ++imageCorrelationID));
     }
 }
 
@@ -312,6 +330,7 @@ void GeometryTileWorker::redoLayout() {
             auto layout = leader.as<RenderSymbolLayer>()->createLayout(
                 parameters, group, std::move(geometryLayer), glyphDependencies, imageDependencies);
             symbolLayoutMap.emplace(leader.getID(), std::move(layout));
+            symbolLayoutsNeedPreparation = true;
         } else {
             const Filter& filter = leader.baseImpl->filter;
             const std::string& sourceLayerID = leader.baseImpl->sourceLayer;
@@ -353,20 +372,9 @@ void GeometryTileWorker::redoLayout() {
         std::move(buckets),
         std::move(featureIndex),
         *data ? (*data)->clone() : nullptr,
-        correlationID
-    });
+    }, correlationID);
 
     attemptPlacement();
-}
-
-bool GeometryTileWorker::hasPendingSymbolLayouts() const {
-    for (const auto& symbolLayout : symbolLayouts) {
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 bool GeometryTileWorker::hasPendingSymbolDependencies() const {
@@ -378,40 +386,46 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
     return !pendingImageDependencies.empty();
 }
 
-
 void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || !placementConfig || hasPendingSymbolDependencies()) {
+    if (!data || !layers || hasPendingSymbolDependencies()) {
         return;
     }
     
-    auto collisionTile = std::make_unique<CollisionTile>(*placementConfig);
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
-
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
+
+    if (symbolLayoutsNeedPreparation) {
+        GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
+        ImageAtlas imageAtlas = makeImageAtlas(imageMap);
+
+        glyphAtlasImage = std::move(glyphAtlas.image);
+        iconAtlasImage = std::move(imageAtlas.image);
+
+        for (auto& symbolLayout : symbolLayouts) {
+            if (obsolete) {
+                return;
+            }
+
+            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
+                                  imageMap, imageAtlas.positions,
+                                  id, sourceID);
+        }
+
+        symbolLayoutsNeedPreparation = false;
+    }
+
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
             return;
         }
 
-        if (symbolLayout->state == SymbolLayout::Pending) {
-            GlyphAtlas glyphAtlas = makeGlyphAtlas(glyphMap);
-            ImageAtlas imageAtlas = makeImageAtlas(imageMap);
-
-            symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions);
-            symbolLayout->state = SymbolLayout::Placed;
-
-            glyphAtlasImage = std::move(glyphAtlas.image);
-            iconAtlasImage = std::move(imageAtlas.image);
-        }
-
         if (!symbolLayout->hasSymbolInstances()) {
             continue;
         }
 
-        std::shared_ptr<Bucket> bucket = symbolLayout->place(*collisionTile);
+        std::shared_ptr<Bucket> bucket = symbolLayout->place(showCollisionBoxes);
         for (const auto& pair : symbolLayout->layerPaintProperties) {
             buckets.emplace(pair.first, bucket);
         }
@@ -419,11 +433,9 @@ void GeometryTileWorker::attemptPlacement() {
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
-        std::move(collisionTile),
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage),
-        correlationID
-    });
+    }, correlationID);
 }
 
 } // namespace mbgl

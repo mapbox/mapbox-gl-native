@@ -6,11 +6,11 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
@@ -20,7 +20,11 @@ import timber.log.Timber;
 
 /**
  * Settings for the user location and bearing tracking of a MapboxMap.
+ *
+ * @deprecated use location layer plugin from
+ * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
  */
+@Deprecated
 public final class TrackingSettings {
 
   private final MyLocationView myLocationView;
@@ -29,6 +33,8 @@ public final class TrackingSettings {
   private final CameraZoomInvalidator zoomInvalidator;
   private LocationEngine locationSource;
   private LocationEngineListener myLocationListener;
+  private boolean locationChangeAnimationEnabled = true;
+  private boolean isCustomLocationSource;
 
   private boolean myLocationEnabled;
   private boolean dismissLocationTrackingOnGesture = true;
@@ -46,7 +52,7 @@ public final class TrackingSettings {
   }
 
   void initialise(MapboxMapOptions options) {
-    locationSource = LocationSource.getLocationEngine(myLocationView.getContext());
+    locationSource = Mapbox.getLocationEngine();
     setMyLocationEnabled(options.getLocationEnabled());
   }
 
@@ -56,11 +62,16 @@ public final class TrackingSettings {
     outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, isDismissLocationTrackingOnGesture());
     outState.putBoolean(MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, isDismissBearingTrackingOnGesture());
     outState.putBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED, isMyLocationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_LOCATION_CHANGE_ANIMATION_ENABLED, isLocationChangeAnimationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_USING_CUSTOM_LOCATION_SOURCE, isCustomLocationSource());
   }
 
   void onRestoreInstanceState(Bundle savedInstanceState) {
     try {
-      setMyLocationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED));
+      setMyLocationEnabled(
+        savedInstanceState.getBoolean(MapboxConstants.STATE_MY_LOCATION_ENABLED),
+        savedInstanceState.getBoolean(MapboxConstants.STATE_USING_CUSTOM_LOCATION_SOURCE)
+      );
     } catch (SecurityException ignore) {
       // User did not accept location permissions
     }
@@ -74,6 +85,8 @@ public final class TrackingSettings {
       MapboxConstants.STATE_MY_LOCATION_TRACKING_DISMISS, true));
     setDismissBearingTrackingOnGesture(savedInstanceState.getBoolean(
       MapboxConstants.STATE_MY_BEARING_TRACKING_DISMISS, true));
+    setLocationChangeAnimationEnabled(savedInstanceState.getBoolean(
+      MapboxConstants.STATE_LOCATION_CHANGE_ANIMATION_ENABLED, true));
   }
 
   /**
@@ -91,6 +104,7 @@ public final class TrackingSettings {
    */
   @UiThread
   public void setMyLocationTrackingMode(@MyLocationTracking.Mode int myLocationTrackingMode) {
+    myLocationView.setLocationChangeAnimationEnabled(isLocationChangeAnimationEnabled());
     myLocationView.setMyLocationTrackingMode(myLocationTrackingMode);
 
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
@@ -254,6 +268,26 @@ public final class TrackingSettings {
   }
 
   /**
+   * Returns whether location change animation is applied for {@link MyLocationTracking#TRACKING_FOLLOW}.
+   *
+   * @return True if animation is applied, false otherwise.
+   */
+  public boolean isLocationChangeAnimationEnabled() {
+    return locationChangeAnimationEnabled;
+  }
+
+  /**
+   * Set whether location change animation should be applied for {@link MyLocationTracking#TRACKING_FOLLOW}.
+   *
+   * @param locationChangeAnimationEnabled True if animation should be applied, false otherwise.
+   */
+  public void setLocationChangeAnimationEnabled(boolean locationChangeAnimationEnabled) {
+    this.locationChangeAnimationEnabled = locationChangeAnimationEnabled;
+
+    myLocationView.setLocationChangeAnimationEnabled(locationChangeAnimationEnabled);
+  }
+
+  /**
    * Reset the tracking modes as necessary. Location tracking is reset if the map center is changed and not from
    * location, bearing tracking if there is a rotation.
    *
@@ -314,6 +348,10 @@ public final class TrackingSettings {
     }
   }
 
+  public boolean isCustomLocationSource() {
+    return isCustomLocationSource;
+  }
+
   void setOnMyLocationTrackingModeChangeListener(MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
     this.onMyLocationTrackingModeChangeListener = listener;
   }
@@ -332,16 +370,30 @@ public final class TrackingSettings {
   }
 
   void setMyLocationEnabled(boolean locationEnabled) {
+    setMyLocationEnabled(locationEnabled, isCustomLocationSource());
+  }
+
+  private void setMyLocationEnabled(boolean locationEnabled, boolean isCustomLocationSource) {
     if (!PermissionsManager.areLocationPermissionsGranted(myLocationView.getContext())) {
       Timber.e("Could not activate user location tracking: "
         + "user did not accept the permission or permissions were not requested.");
       return;
     }
     myLocationEnabled = locationEnabled;
-    myLocationView.setEnabled(locationEnabled);
+    this.isCustomLocationSource = isCustomLocationSource;
+    myLocationView.setEnabled(locationEnabled, isCustomLocationSource);
   }
 
   void setLocationSource(LocationEngine locationSource) {
+    if (this.locationSource != null && this.locationSource.equals(locationSource)) {
+      // this source is already active
+      return;
+    }
+
+    this.isCustomLocationSource = locationSource != null;
+    if (locationSource == null) {
+      locationSource = Mapbox.getLocationEngine();
+    }
     this.locationSource = locationSource;
     myLocationView.setLocationSource(locationSource);
   }

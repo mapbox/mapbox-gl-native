@@ -5,7 +5,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
-#include <mbgl/gl/segment.hpp>
+#include <mbgl/programs/segment.hpp>
 #include <mbgl/programs/circle_program.hpp>
 #include <mbgl/style/layers/circle_layer_properties.hpp>
 
@@ -23,13 +23,11 @@ public:
 
     void upload(gl::Context&) override;
 
-    void render(Painter&, PaintParameters&, const RenderLayer&, const RenderTile&) override;
-
     float getQueryRadius(const RenderLayer&) const override;
 
     gl::VertexVector<CircleLayoutVertex> vertices;
     gl::IndexVector<gl::Triangles> triangles;
-    gl::SegmentVector<CircleAttributes> segments;
+    SegmentVector<CircleAttributes> segments;
 
     optional<gl::VertexBuffer<CircleLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;

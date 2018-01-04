@@ -18,6 +18,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         android:layout_marginStart="16dp"
+        android:textIsSelectable="false"
         android:layout_marginTop="16dp"
         android:alpha="0.54"
         android:background="@android:color/transparent"

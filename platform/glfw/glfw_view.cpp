@@ -1,4 +1,5 @@
 #include "glfw_view.hpp"
+#include "glfw_renderer_frontend.hpp"
 #include "ny_route.hpp"
 
 #include <mbgl/annotation/annotation.hpp>
@@ -10,7 +11,8 @@
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
-#include <mbgl/map/backend_scope.hpp>
+#include <mbgl/renderer/renderer.hpp>
+#include <mbgl/renderer/backend_scope.hpp>
 #include <mbgl/map/camera.hpp>
 
 #include <mapbox/cheap_ruler.hpp>
@@ -108,6 +110,7 @@ GLFWView::GLFWView(bool fullscreen_, bool benchmark_)
     printf("- Press `N` to reset north\n");
     printf("- Press `R` to enable the route demo\n");
     printf("- Press `E` to insert an example building extrusion layer\n");
+    printf("- Press `O` to toggle online connectivity\n");
     printf("- Press `Z` to cycle through north orientations\n");
     printf("- Prezz `X` to cycle through the viewport modes\n");
     printf("- Press `A` to cycle through Mapbox offices in the world + dateline monument\n");
@@ -142,6 +145,10 @@ void GLFWView::setMap(mbgl::Map *map_) {
     map->addAnnotationImage(makeImage("default_marker", 22, 22, 1));
 }
 
+void GLFWView::setRenderFrontend(GLFWRendererFrontend* rendererFrontend_) {
+    rendererFrontend = rendererFrontend_;
+}
+
 void GLFWView::updateAssumedState() {
     assumeFramebufferBinding(0);
     assumeViewport(0, 0, getFramebufferSize());
@@ -170,6 +177,9 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             if (!mods)
                 view->map->resetPosition();
             break;
+        case GLFW_KEY_O:
+            view->onlineStatusCallback();
+            break;
         case GLFW_KEY_S:
             if (view->changeStyleCallback)
                 view->changeStyleCallback();
@@ -196,7 +206,7 @@ void GLFWView::onKey(GLFWwindow *window, int key, int /*scancode*/, int action, 
             view->nextOrientation();
             break;
         case GLFW_KEY_Q: {
-            auto result = view->map->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
+            auto result = view->rendererFrontend->getRenderer()->queryPointAnnotations({ {}, { double(view->getSize().width), double(view->getSize().height) } });
             printf("visible point annotations: %lu\n", result.size());
         } break;
         case GLFW_KEY_P:
@@ -489,16 +499,16 @@ void GLFWView::run() {
 
         glfwPollEvents();
 
-        if (dirty) {
+        if (dirty && rendererFrontend) {
+            dirty = false;
             const double started = glfwGetTime();
 
             if (animateRouteCallback)
                 animateRouteCallback(map);
 
             activate();
-            mbgl::BackendScope scope { *this, mbgl::BackendScope::ScopeType::Implicit };
 
-            map->render(*this);
+            rendererFrontend->render();
 
             glfwSwapBuffers(window);
 
@@ -507,7 +517,6 @@ void GLFWView::run() {
                 invalidate();
             }
 
-            dirty = false;
         }
     };
 
@@ -531,7 +540,7 @@ mbgl::Size GLFWView::getFramebufferSize() const {
     return { static_cast<uint32_t>(fbWidth), static_cast<uint32_t>(fbHeight) };
 }
 
-mbgl::gl::ProcAddress GLFWView::initializeExtension(const char* name) {
+mbgl::gl::ProcAddress GLFWView::getExtensionFunctionPointer(const char* name) {
     return glfwGetProcAddress(name);
 }
 

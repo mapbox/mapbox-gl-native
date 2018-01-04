@@ -1,6 +1,5 @@
 #include <mbgl/map/camera.hpp>
 #include <mbgl/map/transform.hpp>
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/math.hpp>
@@ -168,7 +167,7 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
     double angle = camera.angle.value_or(getAngle());
     double pitch = camera.pitch.value_or(getPitch());
 
-    if (std::isnan(zoom)) {
+    if (std::isnan(zoom) || state.size.isEmpty()) {
         return;
     }
 
@@ -292,6 +291,11 @@ void Transform::flyTo(const CameraOptions &camera, const AnimationOptions &anima
         // Calculate the current point and zoom level along the flight path.
         Point<double> framePoint = util::interpolate(startPoint, endPoint, us);
         double frameZoom = startZoom + state.scaleZoom(1 / w(s));
+
+        // Zoom can be NaN if size is empty.
+        if (std::isnan(frameZoom)) {
+            frameZoom = zoom;
+        }
 
         // Convert to geographic coordinates and set the new viewpoint.
         LatLng frameLatLng = Projection::unproject(framePoint, startScale);
@@ -521,6 +525,32 @@ void Transform::setViewportMode(mbgl::ViewportMode mode) {
 
 ViewportMode Transform::getViewportMode() const {
     return state.getViewportMode();
+}
+
+#pragma mark - Projection mode
+
+void Transform::setAxonometric(bool axonometric) {
+    state.axonometric = axonometric;
+}
+
+bool Transform::getAxonometric() const {
+    return state.axonometric;
+}
+
+void Transform::setXSkew(double xSkew) {
+    state.xSkew = xSkew;
+}
+
+double Transform::getXSkew() const {
+    return state.xSkew;
+}
+
+void Transform::setYSkew(double ySkew) {
+    state.ySkew = ySkew;
+}
+
+double Transform::getYSkew() const {
+    return state.ySkew;
 }
 
 #pragma mark - Transition

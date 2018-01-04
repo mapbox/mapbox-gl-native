@@ -1,0 +1,93 @@
+/* Accessibility hint */
+"ANNOTATION_A11Y_HINT" = "Több infót mutat";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_DESC" = "The session data task failed. Original request was: %@";
+
+/* No comment provided by engineer. */
+"API_CLIENT_400_REASON" = "A státuszkód %ld volt";
+
+/* No comment provided by engineer. */
+"CANCEL" = "Mégse";
+
+/* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
+"CLOSE_CALLOUT_A11Y_HINT" = "Visszatér a térképhez";
+
+/* Accessibility hint */
+"COMPASS_A11Y_HINT" = "Elforgatja a térképet, hogy észak felé nézzen";
+
+/* Accessibility label */
+"COMPASS_A11Y_LABEL" = "Iránytű";
+
+/* Compass abbreviation for north */
+"COMPASS_NORTH" = "É";
+
+/* Instructions in Interface Builder designable; {key}, {plist file name} */
+"DESIGNABLE" = "To display a Mapbox-hosted map here, set %1$@ to your access token in %2$@\n\nFor detailed instructions, see:";
+
+/* Setup documentation URL display string; keep as short as possible */
+"FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
+
+/* Accessibility hint */
+"INFO_A11Y_HINT" = "Shows credits, a feedback form, and more";
+
+/* Accessibility label */
+"INFO_A11Y_LABEL" = "Erről a térképről";
+
+/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert ismeretlen hiba történt.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílust nem lehetett betölteni.";
+
+/* Accessibility label */
+"LOGO_A11Y_LABEL" = "Mapbox";
+
+/* Accessibility label */
+"MAP_A11Y_LABEL" = "Térkép";
+
+/* Map accessibility value */
+"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotation(s) visible";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílus sérült.";
+
+/* Action sheet title */
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
+
+/* Developer-only SDK update notification; {latest version, in format x.x.x} */
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS %@ mostantól elérhető:";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Nem sikerült betölteni a térképet, mert a stílus nem található vagy inkompatibilis.";
+
+/* Telemetry prompt message */
+"TELEMETRY_DISABLED_MSG" = "You can help make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_OFF" = "Nem veszek részt";
+
+/* Telemetry prompt button */
+"TELEMETRY_DISABLED_ON" = "Részt veszek";
+
+/* Telemetry prompt message */
+"TELEMETRY_ENABLED_MSG" = "You are helping to make OpenStreetMap and Mapbox maps better by contributing anonymous usage data.";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_OFF" = "Részvétel befejezése";
+
+/* Telemetry prompt button */
+"TELEMETRY_ENABLED_ON" = "Részvétel folytatása";
+
+/* Telemetry prompt button */
+"TELEMETRY_MORE" = "Többet akarok tudni";
+
+/* Action in attribution sheet */
+"TELEMETRY_NAME" = "Mapbox telemetria";
+
+/* Telemetry prompt title */
+"TELEMETRY_TITLE" = "Tedd jobbá a Mapbox térképeket";
+
+/* Default user location annotation title */
+"USER_DOT_TITLE" = "Itt vagy";
+

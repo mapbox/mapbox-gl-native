@@ -84,3 +84,12 @@ TEST(TileCover, SanFranciscoZ0Wrapped) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{ { 0, 1, 0 } }),
               util::tileCover(sanFranciscoWrapped, 0));
 }
+
+TEST(TileCount, SanFranciscoZ10) {
+    EXPECT_EQ(4u, util::tileCount(sanFrancisco, 10, util::tileSize));
+}
+
+TEST(TileCount, SanFranciscoZ22) {
+    EXPECT_EQ(7254450u, util::tileCount(sanFrancisco, 22, util::tileSize));
+}
+

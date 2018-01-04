@@ -7,15 +7,17 @@
 namespace mbgl {
 namespace algorithm {
 
-template <typename Renderables>
-void ClipIDGenerator::update(Renderables& renderables) {
+template <typename Renderable>
+void ClipIDGenerator::update(std::vector<std::reference_wrapper<Renderable>> renderables) {
     std::size_t size = 0;
+
+    std::sort(renderables.begin(), renderables.end(),
+              [](const auto& a, const auto& b) { return a.get().id < b.get().id; });
 
     const auto end = renderables.end();
     for (auto it = renderables.begin(); it != end; it++) {
-        auto& tileID = it->first;
-        auto& renderable = it->second;
-        if (!renderable.used) {
+        auto& renderable = it->get();
+        if (!renderable.used || !renderable.needsClipping) {
             continue;
         }
 
@@ -28,17 +30,17 @@ void ClipIDGenerator::update(Renderables& renderables) {
         // can never be children of the current wrap.
         auto child_it = std::next(it);
         const auto children_end = std::lower_bound(
-            child_it, end, UnwrappedTileID{ static_cast<int16_t>(tileID.wrap + 1), { 0, 0, 0 } },
-            [](auto& a, auto& b) { return a.first < b; });
+            child_it, end, UnwrappedTileID{ static_cast<int16_t>(renderable.id.wrap + 1), { 0, 0, 0 } },
+            [](auto& a, auto& b) { return a.get().id < b; });
         for (; child_it != children_end; ++child_it) {
-            auto& childTileID = child_it->first;
-            if (childTileID.isChildOf(tileID)) {
+            auto& childTileID = child_it->get().id;
+            if (childTileID.isChildOf(it->get().id)) {
                 leaf.add(childTileID.canonical);
             }
         }
 
         // Find a leaf with matching children.
-        for (auto its = pool.equal_range(tileID); its.first != its.second; ++its.first) {
+        for (auto its = pool.equal_range(renderable.id); its.first != its.second; ++its.first) {
             auto& existing = its.first->second;
             if (existing == leaf) {
                 leaf.clip = existing.clip;
@@ -50,7 +52,7 @@ void ClipIDGenerator::update(Renderables& renderables) {
             size++;
         }
 
-        pool.emplace(tileID, std::move(leaf));
+        pool.emplace(renderable.id, std::move(leaf));
     }
 
     if (size > 0) {
@@ -60,8 +62,8 @@ void ClipIDGenerator::update(Renderables& renderables) {
         // We are starting our count with 1 since we need at least 1 bit set to distinguish between
         // areas without any tiles whatsoever and the current area.
         uint8_t count = 1;
-        for (auto& pair : renderables) {
-            auto& renderable = pair.second;
+        for (auto& it : renderables) {
+            auto& renderable = it.get();
             if (!renderable.used) {
                 continue;
             }

@@ -1,16 +1,19 @@
-# Integrating custom builds of the Mapbox iOS SDK into your application
+# Integrating custom builds of the Mapbox Maps SDK for iOS into your application
 
-This document explains how to build a development version of Mapbox iOS SDK for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox iOS SDK homepage](https://mapbox.com/ios-sdk).
+This document explains how to build a development version of Mapbox Maps SDK for iOS for use in your own Cocoa Touch application. To use a production-ready version of the SDK, see the [Mapbox Maps SDK for iOS installation page](https://www.mapbox.com/install/ios/).
 
 ### Requirements
 
-The Mapbox iOS SDK is intended to run on iOS 8.0 and above on the following devices and their simulators:
+The Mapbox Maps SDK for iOS is intended to run on iOS 8.0 and above on the following devices and their simulators:
 
 * iPhone 4S and above (5, 5c, 5s, 6, 6 Plus)
 * iPad 2 and above (3, 4, Mini, Air, Mini 2, Air 2)
 * iPod touch 5th generation and above
 
-The Mapbox iOS SDK requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.1, download and use a symbols build from the [releases](https://github.com/mapbox/mapbox-gl-native/releases) page.
+The Mapbox Maps SDK for iOS requires:
+
+* Xcode 9.1 or higher to compile from source
+* Xcode 8.0 or higher to integrate the compiled framework into an application
 
 ### Building the SDK
 
@@ -22,9 +25,8 @@ The Mapbox iOS SDK requires Xcode 8.0 or higher. To use this SDK with Xcode 7.3.
    [sudo] gem install jazzy
    ```
 
-1. Run `make ipackage`. The packaging script will produce a `build/ios/pkg/` folder containing:
+1. Run `make iframework BUILDTYPE=Release`. The packaging script will produce a `build/ios/pkg/` folder containing:
   - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
-  - a `static` folder containing a statically-linked framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
   - an example `Settings.bundle` containing an optional Mapbox Telemetry opt-out setting
 
@@ -32,7 +34,7 @@ See the [packaging documentation](DEVELOPING.md#packaging-builds) for other buil
 
 ### Installation
 
-There are several ways to install custom builds of the Mapbox iOS SDK:
+There are several ways to install custom builds of the Mapbox Maps SDK for iOS:
 
 #### Dynamic framework
 
@@ -58,7 +60,7 @@ A nightly build of the dynamic framework, based on the master branch, is availab
 
 You can alternatively install the SDK as a static framework:
 
-1. Build from source manually, per above.
+1. Build from source using the `make ipackage` command.
 
 1. Drag the Mapbox.bundle and Mapbox.framework from the `build/ios/pkg/static/` directory into the Project navigator. In the sheet that appears, make sure “Copy items if needed” is checked, then click Finish. Open the project editor and select your application target to verify that the following changes occurred automatically:
 
@@ -113,7 +115,7 @@ If using the static framework, add `$(inherited)` to your target’s Other Linke
 
 #### Carthage
 
-For instructions on installing stable release versions of the Mapbox iOS SDK with Carthage, see [our website](https://www.mapbox.com/ios-sdk/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
+For instructions on installing stable release versions of the Mapbox Maps SDK for iOS with Carthage, see [our website](https://www.mapbox.com/install/ios/carthage/). If you require a build without symbols pre-stripped, use [this feed URL](https://www.mapbox.com/ios-sdk/Mapbox-iOS-SDK-symbols.json) with Carthage.
 
 ##### Testing pre-releases with Carthage
 

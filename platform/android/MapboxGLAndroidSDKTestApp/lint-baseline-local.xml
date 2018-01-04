@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<issues format="4" by="lint 2.3.1">
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.mapbox_access_token` appears to be unused"
+        errorLine1="    &lt;string name=&quot;mapbox_access_token&quot;>YOUR_MAPBOX_ACCESS_TOKEN_GOES_HERE&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/developer-config.xml"
+            line="3"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `#cccc` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;#cccc&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/drawer_navigation_drawer.xml"
+            line="4"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `?android:attr/selectableItemBackground` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;?android:attr/selectableItemBackground&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/item_main_feature.xml"
+            line="6"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/mapboxGreen` with a theme that also paints a background (inferred theme is `@style/AppTheme`)"
+        errorLine1="    android:background=&quot;@color/mapboxGreen&quot;>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/view_text_marker.xml"
+            line="5"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="TypographyQuotes"
+        message="Replace straight quotes (&apos;&apos;) with directional quotes (‘’, &amp;#8216; and &amp;#8217;) ?"
+        errorLine1="    &lt;string name=&quot;mapbox_attributionTelemetryMessage&quot;>Estàs ajudant a millorar els mapes d\&apos;OpenStreetMap i de Mapbox aportant dades d\&apos;ús anònimes.&lt;/string>"
+        errorLine2="                                                      ^">
+        <location
+            file="src/main/res/values-ca/strings.xml"
+            line="9"
+            column="55"/>
+    </issue>
+
+    <issue
+        id="IconDuplicatesConfig"
+        message="The `icon_burned.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-xhdpi">
+        <location
+            file="src/main/res/drawable-xhdpi/icon_burned.png"/>
+        <location
+            file="src/main/res/drawable-hdpi/icon_burned.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-hdpi/ic_launcher_round.png`: expected 72x72, but was 216x216">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-mdpi/ic_launcher_round.png`: expected 48x48, but was 144x144">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xhdpi/ic_launcher_round.png`: expected 96x96, but was 288x288">
+        <location
+            file="src/main/res/drawable-xhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxhdpi/ic_launcher_round.png`: expected 144x144, but was 432x432">
+        <location
+            file="src/main/res/drawable-xxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxxhdpi/ic_launcher_round.png`: expected 192x192, but was 576x576">
+        <location
+            file="src/main/res/drawable-xxxhdpi/ic_launcher_round.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-hdpi/icon.png`: expected 72x72, but was 215x212">
+        <location
+            file="src/main/res/drawable-hdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-mdpi/icon.png`: expected 48x48, but was 143x141">
+        <location
+            file="src/main/res/drawable-mdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xhdpi/icon.png`: expected 96x96, but was 286x282">
+        <location
+            file="src/main/res/drawable-xhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxhdpi/icon.png`: expected 144x144, but was 429x423">
+        <location
+            file="src/main/res/drawable-xxhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconExpectedSize"
+        message="Incorrect icon size for `drawable-xxxhdpi/icon.png`: expected 192x192, but was 572x564">
+        <location
+            file="src/main/res/drawable-xxxhdpi/icon.png"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-hdpi`: ic_car_top.png, ic_taxi_top.png, ic_us.png, southeast_radar_0.png, southeast_radar_1.png... (2 more)">
+        <location
+            file="src/main/res/drawable-hdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-mdpi`: ic_car_top.png, ic_taxi_top.png, ic_us.png">
+        <location
+            file="src/main/res/drawable-mdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xhdpi`: ic_car_top.png, ic_taxi_top.png, ic_us.png, southeast_radar_0.png, southeast_radar_1.png... (2 more)">
+        <location
+            file="src/main/res/drawable-xhdpi"/>
+    </issue>
+
+    <issue
+        id="IconDensities"
+        message="Missing the following drawables in `drawable-xxhdpi`: ic_car_top.png, ic_taxi_top.png, southeast_radar_0.png, southeast_radar_1.png, southeast_radar_2.png... (1 more)">
+        <location
+            file="src/main/res/drawable-xxhdpi"/>
+    </issue>
+
+</issues>

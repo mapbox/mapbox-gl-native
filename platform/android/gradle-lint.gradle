@@ -1,0 +1,30 @@
+task ciLint(type: Copy) {
+    if (isLocalBuild()) {
+        from "${projectDir}/lint/lint-baseline-local.xml"
+        into "${projectDir}"
+        rename { String fileName ->
+            fileName.replace("lint-baseline-local.xml", "lint-baseline.xml")
+        }
+    } else {
+        from "${projectDir}/lint/lint-baseline-ci.xml"
+        into "${projectDir}"
+        rename { String fileName ->
+            fileName.replace("lint-baseline-ci.xml", "lint-baseline.xml")
+        }
+    }
+}
+
+def isLocalBuild() {
+    if (System.getenv('IS_LOCAL_DEVELOPMENT') != null) {
+        return System.getenv('IS_LOCAL_DEVELOPMENT').toBoolean()
+    }
+    return true
+}
+
+lint.dependsOn ciLint
+
+tasks.whenTaskAdded { task ->
+    if (task.name == 'lintVitalRelease') {
+        task.dependsOn ciLint
+    }
+}

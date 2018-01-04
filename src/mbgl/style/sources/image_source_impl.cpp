@@ -12,17 +12,17 @@ ImageSource::Impl::Impl(std::string id_, std::array<LatLng, 4> coords_)
 ImageSource::Impl::Impl(const Impl& other, std::array<LatLng, 4> coords_)
     : Source::Impl(other),
     coords(std::move(coords_)),
-    image(other.image.clone()) {
+    image(other.image) {
 }
 
-ImageSource::Impl::Impl(const Impl& rhs, UnassociatedImage image_)
+ImageSource::Impl::Impl(const Impl& rhs, PremultipliedImage&& image_)
     : Source::Impl(rhs),
     coords(rhs.coords),
-    image(std::move(image_)) {
+    image(std::make_shared<PremultipliedImage>(std::move(image_))) {
 }
 ImageSource::Impl::~Impl() = default;
 
-const UnassociatedImage& ImageSource::Impl::getImage() const {
+std::shared_ptr<PremultipliedImage> ImageSource::Impl::getImage() const {
     return image;
 }
 

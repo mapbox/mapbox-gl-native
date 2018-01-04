@@ -1,6 +1,6 @@
 # Developing the Mapbox GL Native Node.js module
 
-This document explains how to build the [Node.js](https://nodejs.org/) bindings for [../../README.md](Mapbox GL Native) for contributing to the development of the bindings themselves. If you just want to use the module, you can simply install it via `npm`; see [README.md](README.md) for installation and usage instructions.
+This document explains how to build the [Node.js](https://nodejs.org/) bindings for [Mapbox GL Native](../../README.md) for contributing to the development of the bindings themselves. If you just want to use the module, you can simply install it via `npm`; see [README.md](README.md) for installation and usage instructions.
 
 ## Building
 

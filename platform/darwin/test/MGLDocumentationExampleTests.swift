@@ -103,6 +103,18 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "pois"))
     }
+    
+    func testMGLPolyline() {
+        //#-example-code
+        let coordinates = [
+            CLLocationCoordinate2D(latitude: 35.68476, longitude: -220.24257),
+            CLLocationCoordinate2D(latitude: 37.78428, longitude: -122.41310)
+        ]
+        let polyline = MGLPolyline(coordinates: coordinates, count: UInt(coordinates.count))
+        //#-end-example-code
+        
+        XCTAssertNotNil(polyline)
+    }
 
     func testMGLImageSource() {
         //#-example-code
@@ -263,6 +275,24 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             }
             mapView.addGestureRecognizer(mapTapGestureRecognizer)
         #endif
+        //#-end-example-code
+    }
+    
+    func testMGLMapSnapshotter() {
+        //#-example-code
+        let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), fromDistance: 100, pitch: 20, heading: 0)
+
+        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+        options.zoomLevel = 10
+
+        let snapshotter = MGLMapSnapshotter(options: options)
+        snapshotter.start { (snapshot, error) in
+            if error != nil {
+                // error handler
+            } else {
+                // image handler
+            }
+        }
         //#-end-example-code
     }
     

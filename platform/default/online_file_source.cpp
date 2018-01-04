@@ -117,13 +117,24 @@ public:
     }
 
     void activateRequest(OnlineFileRequest* request) {
-        activeRequests.insert(request);
-        request->request = httpFileSource.request(request->resource, [=] (Response response) {
+        auto callback = [=](Response response) {
             activeRequests.erase(request);
-            activatePendingRequest();
             request->request.reset();
             request->completed(response);
-        });
+            activatePendingRequest();
+        };
+
+        activeRequests.insert(request);
+
+        if (online) {
+            request->request = httpFileSource.request(request->resource, callback);
+        } else {
+            Response response;
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection,
+                                                               "Online connectivity is disabled.");
+            callback(response);
+        }
+
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
@@ -153,6 +164,11 @@ public:
         resourceTransform = std::move(transform);
     }
 
+    void setOnlineStatus(const bool status) {
+        online = status;
+        networkIsReachableAgain();
+    }
+
 private:
     void networkIsReachableAgain() {
         for (auto& request : allRequests) {
@@ -178,6 +194,7 @@ private:
     std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
+    bool online = true;
     HTTPFileSource httpFileSource;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
@@ -320,6 +337,14 @@ void OnlineFileRequest::completed(Response response) {
         resource.priorModified = response.modified;
     }
 
+    if (response.notModified && resource.priorData) {
+        // When the priorData field is set, it indicates that we had to revalidate the request and
+        // that the requestor hasn't gotten data yet. If we get a 304 response, this means that we
+        // have send the cached data to give the requestor a chance to actually obtain the data.
+        response.data = std::move(resource.priorData);
+        response.notModified = false;
+    }
+
     bool isExpired = false;
 
     if (response.expires) {
@@ -375,10 +400,16 @@ ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
     if (!mailbox) {
         // Lazy constructed because this can be costly and
         // the ResourceTransform is not used by many apps.
-        mailbox = std::make_shared<Mailbox>(*util::RunLoop::Get());
+        mailbox = std::make_shared<Mailbox>(*Scheduler::GetCurrent());
     }
 
     return ActorRef<OnlineFileRequest>(*this, mailbox);
+}
+
+// For testing only:
+
+void OnlineFileSource::setOnlineStatus(const bool status) {
+    impl->setOnlineStatus(status);
 }
 
 } // namespace mbgl

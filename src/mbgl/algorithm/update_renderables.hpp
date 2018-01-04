@@ -1,8 +1,8 @@
 #pragma once
 
 #include <mbgl/tile/tile_id.hpp>
+#include <mbgl/tile/tile_necessity.hpp>
 #include <mbgl/util/range.hpp>
-#include <mbgl/storage/resource.hpp>
 
 #include <unordered_set>
 
@@ -31,7 +31,7 @@ void updateRenderables(GetTileFn getTile,
         assert(idealRenderTileID.canonical.z <= zoomRange.max);
         assert(dataTileZoom >= idealRenderTileID.canonical.z);
 
-        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.canonical);
+        const OverscaledTileID idealDataTileID(dataTileZoom, idealRenderTileID.wrap, idealRenderTileID.canonical);
         auto tile = getTile(idealDataTileID);
         if (!tile) {
             tile = createTile(idealDataTileID);
@@ -40,15 +40,15 @@ void updateRenderables(GetTileFn getTile,
 
         // if (source has the tile and bucket is loaded) {
         if (tile->isRenderable()) {
-            retainTile(*tile, Resource::Necessity::Required);
+            retainTile(*tile, TileNecessity::Required);
             renderTile(idealRenderTileID, *tile);
         } else {
             // We are now attempting to load child and parent tiles.
-            bool parentHasTriedOptional = tile->hasTriedOptional();
+            bool parentHasTriedOptional = tile->hasTriedCache();
             bool parentIsLoaded = tile->isLoaded();
 
             // The tile isn't loaded yet, but retain it anyway because it's an ideal tile.
-            retainTile(*tile, Resource::Necessity::Required);
+            retainTile(*tile, TileNecessity::Required);
             covered = true;
             overscaledZ = dataTileZoom + 1;
             if (overscaledZ > zoomRange.max) {
@@ -56,7 +56,7 @@ void updateRenderables(GetTileFn getTile,
                 const auto childDataTileID = idealDataTileID.scaledTo(overscaledZ);
                 tile = getTile(childDataTileID);
                 if (tile && tile->isRenderable()) {
-                    retainTile(*tile, Resource::Necessity::Optional);
+                    retainTile(*tile, TileNecessity::Optional);
                     renderTile(idealRenderTileID, *tile);
                 } else {
                     covered = false;
@@ -64,11 +64,11 @@ void updateRenderables(GetTileFn getTile,
             } else {
                 // Check all four actual child tiles.
                 for (const auto& childTileID : idealDataTileID.canonical.children()) {
-                    const OverscaledTileID childDataTileID(overscaledZ, childTileID);
+                    const OverscaledTileID childDataTileID(overscaledZ, idealRenderTileID.wrap, childTileID);
                     tile = getTile(childDataTileID);
                     if (tile && tile->isRenderable()) {
-                        retainTile(*tile, Resource::Necessity::Optional);
-                        renderTile(childDataTileID.unwrapTo(idealRenderTileID.wrap), *tile);
+                        retainTile(*tile, TileNecessity::Optional);
+                        renderTile(childDataTileID.toUnwrapped(), *tile);
                     } else {
                         // At least one child tile doesn't exist, so we are going to look for
                         // parents as well.
@@ -81,8 +81,7 @@ void updateRenderables(GetTileFn getTile,
                 // We couldn't find child tiles that entirely cover the ideal tile.
                 for (overscaledZ = dataTileZoom - 1; overscaledZ >= zoomRange.min; --overscaledZ) {
                     const auto parentDataTileID = idealDataTileID.scaledTo(overscaledZ);
-                    const auto parentRenderTileID =
-                        parentDataTileID.unwrapTo(idealRenderTileID.wrap);
+                    const auto parentRenderTileID = parentDataTileID.toUnwrapped();
 
                     if (checked.find(parentRenderTileID) != checked.end()) {
                         // Break parent tile ascent, this route has been checked by another child
@@ -98,12 +97,19 @@ void updateRenderables(GetTileFn getTile,
                     }
 
                     if (tile) {
-                        retainTile(*tile, parentIsLoaded ? Resource::Necessity::Required
-                                                         : Resource::Necessity::Optional);
+                        if (!parentIsLoaded) {
+                            // We haven't completed loading the child, so we only do an optional
+                            // (cache) request in an attempt to quickly load data that we can show.
+                            retainTile(*tile, TileNecessity::Optional);
+                        } else {
+                            // Now that we've checked the child and know for sure that we can't load
+                            // it, we attempt to load the parent from the network.
+                            retainTile(*tile, TileNecessity::Required);
+                        }
 
                         // Save the current values, since they're the parent of the next iteration
                         // of the parent tile ascent loop.
-                        parentHasTriedOptional = tile->hasTriedOptional();
+                        parentHasTriedOptional = tile->hasTriedCache();
                         parentIsLoaded = tile->isLoaded();
 
                         if (tile->isRenderable()) {

@@ -17,7 +17,6 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class Style {
 
-
   /**
    * Indicates the parameter accepts one of the values from Style. Using one of these
    * constants means your map style will always use the latest version and may change as we

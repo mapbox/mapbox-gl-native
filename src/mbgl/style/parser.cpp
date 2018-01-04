@@ -1,13 +1,16 @@
 #include <mbgl/style/parser.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/rapidjson_conversion.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/coordinate.hpp>
 #include <mbgl/style/conversion/source.hpp>
 #include <mbgl/style/conversion/layer.hpp>
 #include <mbgl/style/conversion/light.hpp>
+#include <mbgl/style/conversion/transition_options.hpp>
 
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 
@@ -148,7 +151,7 @@ void Parser::parseSources(const JSValue& value) {
     }
 
     for (const auto& property : value.GetObject()) {
-        std::string id = *conversion::toString(property.name);
+        std::string id { property.name.GetString(), property.name.GetStringLength() };
 
         conversion::Error error;
         optional<std::unique_ptr<Source>> source =
@@ -255,7 +258,7 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
         }
 
         layer = reference->cloneRef(id);
-        conversion::setPaintProperties(*layer, value);
+        conversion::setPaintProperties(*layer, conversion::Convertible(&value));
     } else {
         conversion::Error error;
         optional<std::unique_ptr<Layer>> converted = conversion::convert<std::unique_ptr<Layer>>(value, error);

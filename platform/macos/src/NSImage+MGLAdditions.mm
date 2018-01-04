@@ -5,7 +5,7 @@
 @implementation NSImage (MGLAdditions)
 
 - (nullable instancetype)initWithMGLPremultipliedImage:(mbgl::PremultipliedImage&&)src {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(std::move(src));
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(std::move(src));
     if (!image) {
         return nil;
     }
@@ -16,7 +16,7 @@
 }
 
 - (nullable instancetype)initWithMGLStyleImage:(const mbgl::style::Image *)styleImage {
-    CGImageRef image = CGImageFromMGLPremultipliedImage(styleImage->getImage().clone());
+    CGImageRef image = CGImageCreateWithMGLPremultipliedImage(styleImage->getImage().clone());
     if (!image) {
         return nil;
     }
@@ -42,15 +42,8 @@
 }
 
 - (mbgl::PremultipliedImage)mgl_premultipliedImage {
-    // Create a bitmap image representation from the image, respecting backing
-    // scale factor and any resizing done on the image at runtime.
-    // http://www.cocoabuilder.com/archive/cocoa/82430-nsimage-getting-raw-bitmap-data.html#82431
-    [self lockFocus];
-    NSBitmapImageRep *rep = [[NSBitmapImageRep alloc] initWithFocusedViewRect:{ NSZeroPoint, self.size }];
-    [self unlockFocus];
-
-    mbgl::PremultipliedImage cPremultipliedImage({ static_cast<uint32_t>(rep.pixelsWide), static_cast<uint32_t>(rep.pixelsHigh) });
-    std::copy(rep.bitmapData, rep.bitmapData + cPremultipliedImage.bytes(), cPremultipliedImage.data.get());
-    return cPremultipliedImage;
+    CGImageRef ref = [self CGImageForProposedRect:nullptr context:nullptr hints:nullptr];
+    return MGLPremultipliedImageFromCGImage(ref);
 }
+
 @end

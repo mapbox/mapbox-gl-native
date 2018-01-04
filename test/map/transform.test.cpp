@@ -28,6 +28,27 @@ TEST(Transform, InvalidZoom) {
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().latitude());
     ASSERT_DOUBLE_EQ(0, transform.getLatLng().longitude());
     ASSERT_DOUBLE_EQ(1, transform.getZoom());
+
+    transform.setZoom(transform.getState().getMaxZoom() + 0.1);
+    ASSERT_DOUBLE_EQ(transform.getZoom(), transform.getState().getMaxZoom());
+
+    CameraOptions cameraOptions;
+    cameraOptions.center = LatLng { util::LATITUDE_MAX, util::LONGITUDE_MAX };
+    cameraOptions.zoom = transform.getState().getMaxZoom();
+
+    // Executing flyTo with an empty size causes frameZoom to be NaN.
+    transform.flyTo(cameraOptions);
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+    ASSERT_DOUBLE_EQ(transform.getZoom(), transform.getState().getMaxZoom());
+
+    // Executing flyTo with maximum zoom level to the same zoom level causes
+    // frameZoom to be bigger than maximum zoom.
+    transform.resize(Size { 100, 100 });
+    transform.flyTo(cameraOptions);
+    transform.updateTransitions(transform.getTransitionStart() + transform.getTransitionDuration());
+
+    ASSERT_TRUE(transform.getState().valid());
+    ASSERT_DOUBLE_EQ(transform.getState().getMaxZoom(), transform.getZoom());
 }
 
 

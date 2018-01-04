@@ -37,7 +37,7 @@ void ImageSource::setURL(const std::string& url_) {
     }
 }
 
-void ImageSource::setImage(UnassociatedImage&& image_) {
+void ImageSource::setImage(PremultipliedImage&& image_) {
     url = {};
     if (req) {
         req.reset();
@@ -59,7 +59,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
     if (req ||  loaded) {
         return;
     }
-    const Resource imageResource { Resource::Image, *url, {}, Resource::Necessity::Required };
+    const Resource imageResource { Resource::Image, *url, {} };
 
     req = fileSource.request(imageResource, [this](Response res) {
         if (res.error) {
@@ -70,8 +70,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty image url")));
         } else {
             try {
-                UnassociatedImage image = util::unpremultiply(decodeImage(*res.data));
-                baseImpl = makeMutable<Impl>(impl(), std::move(image));
+                baseImpl = makeMutable<Impl>(impl(), decodeImage(*res.data));
             } catch (...) {
                 observer->onSourceError(*this, std::current_exception());
             }

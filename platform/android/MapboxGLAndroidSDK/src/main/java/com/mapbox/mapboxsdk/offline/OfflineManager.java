@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.offline;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
@@ -40,6 +41,7 @@ public class OfflineManager {
   private Handler handler;
 
   // This object is implemented as a singleton
+  @SuppressLint("StaticFieldLeak")
   private static OfflineManager instance;
 
   // The application context
@@ -90,11 +92,11 @@ public class OfflineManager {
    */
   private OfflineManager(Context context) {
     this.context = context.getApplicationContext();
-    this.fileSource = FileSource.getInstance(context);
+    this.fileSource = FileSource.getInstance(this.context);
     initialize(fileSource);
 
     // Delete any existing previous ambient cache database
-    deleteAmbientDatabase(context);
+    deleteAmbientDatabase(this.context);
   }
 
   private void deleteAmbientDatabase(final Context context) {
@@ -107,15 +109,21 @@ public class OfflineManager {
           File file = new File(path);
           if (file.exists()) {
             file.delete();
-            Timber.d("Old ambient cache database deleted to save space: " + path);
+            Timber.d("Old ambient cache database deleted to save space: %s", path);
           }
         } catch (Exception exception) {
-          Timber.e("Failed to delete old ambient cache database: ", exception);
+          Timber.e(exception, "Failed to delete old ambient cache database: ");
         }
       }
     }).start();
   }
 
+  /**
+   * Get the single instance of offline manager.
+   *
+   * @param context the context used to host the offline manager
+   * @return the single instance of offline manager
+   */
   public static synchronized OfflineManager getInstance(Context context) {
     if (instance == null) {
       instance = new OfflineManager(context);
@@ -141,8 +149,8 @@ public class OfflineManager {
    *
    * @param callback the callback to be invoked
    */
-  public void listOfflineRegions(@NonNull
-                                 final ListOfflineRegionsCallback callback) {
+  public void listOfflineRegions(@NonNull final ListOfflineRegionsCallback callback) {
+    fileSource.activate();
     listOfflineRegions(fileSource, new ListOfflineRegionsCallback() {
 
       @Override
@@ -150,6 +158,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            fileSource.deactivate();
             callback.onList(offlineRegions);
           }
         });
@@ -160,6 +169,7 @@ public class OfflineManager {
         getHandler().post(new Runnable() {
           @Override
           public void run() {
+            fileSource.deactivate();
             callback.onError(error);
           }
         });
@@ -230,10 +240,12 @@ public class OfflineManager {
     return LatLngBounds.world().contains(definition.getBounds());
   }
 
-  /*
-  * Changing or bypassing this limit without permission from Mapbox is prohibited
-  * by the Mapbox Terms of Service.
-  */
+  /**
+   * Changing or bypassing this limit without permission from Mapbox is prohibited
+   * by the Mapbox Terms of Service.
+   *
+   * @param limit the new tile count limit.
+   */
   public native void setOfflineMapboxTileCountLimit(long limit);
 
   private native void initialize(FileSource fileSource);

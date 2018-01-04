@@ -1,0 +1,27 @@
+﻿/* User-friendly error description */
+"LOAD_MAP_FAILED_DESC" = "Картата не се зареди поради неизвестна грешка.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Картата не се зареди, поради незареждане на стила.";
+
+/* Accessibility title */
+"MAP_A11Y_TITLE" = "Mapbox";
+
+/* User-friendly error description */
+"PARSE_STYLE_FAILED_DESC" = "Картата не се зареди поради повреден стил.";
+
+/* User-friendly error description */
+"STYLE_NOT_FOUND_DESC" = "Картата не се зареди поради неоткрит или несъвместим стил.";
+
+/* Label of Zoom In button */
+"ZOOM_IN_LABEL" = "+";
+
+/* Tooltip of Zoom In button */
+"ZOOM_IN_TOOLTIP" = "Приближи";
+
+/* Label of Zoom Out button; U+2212 MINUS SIGN */
+"ZOOM_OUT_LABEL" = "−";
+
+/* Tooltip of Zoom Out button */
+"ZOOM_OUT_TOOLTIP" = "Отдалечи";
+

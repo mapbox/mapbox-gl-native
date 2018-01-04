@@ -18,8 +18,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Encapsulates {@link Marker}'s functionality.
  */
@@ -55,7 +53,7 @@ class MarkerContainer implements Markers {
     mapboxMap) {
     int count = markerOptionsList.size();
     List<Marker> markers = new ArrayList<>(count);
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       BaseMarkerOptions markerOptions;
       Marker marker;
       for (int i = 0; i < count; i++) {
@@ -65,26 +63,13 @@ class MarkerContainer implements Markers {
       }
 
       if (markers.size() > 0) {
-        long[] ids = null;
-        if (nativeMapView != null) {
-          ids = nativeMapView.addMarkers(markers);
+        long[] ids = nativeMapView.addMarkers(markers);
+        for (int i = 0; i < ids.length; i++) {
+          Marker createdMarker = markers.get(i);
+          createdMarker.setMapboxMap(mapboxMap);
+          createdMarker.setId(ids[i]);
+          annotations.put(ids[i], createdMarker);
         }
-
-        long id = 0;
-        Marker m;
-        for (int i = 0; i < markers.size(); i++) {
-          m = markers.get(i);
-          m.setMapboxMap(mapboxMap);
-          if (ids != null) {
-            id = ids[i];
-          } else {
-            // unit test
-            id++;
-          }
-          m.setId(id);
-          annotations.put(id, m);
-        }
-
       }
     }
     return markers;
@@ -92,11 +77,6 @@ class MarkerContainer implements Markers {
 
   @Override
   public void update(@NonNull Marker updatedMarker, @NonNull MapboxMap mapboxMap) {
-    if (!isAddedToMap(updatedMarker)) {
-      Timber.w("Attempting to update non-added Marker with value %s", updatedMarker);
-      return;
-    }
-
     ensureIconLoaded(updatedMarker, mapboxMap);
     nativeMapView.updateMarker(updatedMarker);
     annotations.setValueAt(annotations.indexOfKey(updatedMarker.getId()), updatedMarker);
@@ -118,15 +98,8 @@ class MarkerContainer implements Markers {
   @NonNull
   @Override
   public List<Marker> obtainAllIn(@NonNull RectF rectangle) {
-    // convert Rectangle to be density depedent
-    float pixelRatio = nativeMapView.getPixelRatio();
-    RectF rect = new RectF(rectangle.left / pixelRatio,
-      rectangle.top / pixelRatio,
-      rectangle.right / pixelRatio,
-      rectangle.bottom / pixelRatio);
-
+    RectF rect = nativeMapView.getDensityDependantRectangle(rectangle);
     long[] ids = nativeMapView.queryPointAnnotations(rect);
-
     List<Long> idsList = new ArrayList<>(ids.length);
     for (long id : ids) {
       idsList.add(id);
@@ -237,10 +210,6 @@ class MarkerContainer implements Markers {
     return marker;
   }
 
-  private boolean isAddedToMap(Annotation annotation) {
-    return annotation != null && annotation.getId() != -1 && annotations.indexOfKey(annotation.getId()) != -1;
-  }
-
   private void ensureIconLoaded(Marker marker, MapboxMap mapboxMap) {
     if (!(marker instanceof MarkerView)) {
       iconManager.ensureIconLoaded(marker, mapboxMap);
@@ -261,6 +230,7 @@ class MarkerContainer implements Markers {
     if (icon == null) {
       icon = IconFactory.getInstance(mapView.getContext()).defaultMarkerView();
     }
+    iconManager.loadIconForMarkerView(marker);
     marker.setIcon(icon);
     return marker;
   }

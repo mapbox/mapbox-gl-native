@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.graphics.PointF;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -12,7 +11,6 @@ import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.text.DecimalFormat;
@@ -41,30 +39,17 @@ public class PressForMarkerActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(final MapboxMap map) {
-        mapboxMap = map;
-        resetMap();
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      resetMap();
 
-        mapboxMap.setOnMapLongClickListener(new MapboxMap.OnMapLongClickListener() {
-          @Override
-          public void onMapLongClick(@NonNull LatLng point) {
-            addMarker(point);
-          }
-        });
+      mapboxMap.setOnMapLongClickListener(point -> addMarker(point));
 
-        mapboxMap.setOnMapClickListener(new MapboxMap.OnMapClickListener() {
-          @Override
-          public void onMapClick(@NonNull LatLng point) {
-            addMarker(point);
-          }
-        });
+      mapboxMap.setOnMapClickListener(point -> addMarker(point));
 
-        if (savedInstanceState != null) {
-          markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
-          mapboxMap.addMarkers(markerList);
-        }
+      if (savedInstanceState != null) {
+        markerList = savedInstanceState.getParcelableArrayList(STATE_MARKER_LIST);
+        mapboxMap.addMarkers(markerList);
       }
     });
   }

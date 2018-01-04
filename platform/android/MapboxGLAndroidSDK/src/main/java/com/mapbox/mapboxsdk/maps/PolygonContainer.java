@@ -11,8 +11,6 @@ import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import java.util.ArrayList;
 import java.util.List;
 
-import timber.log.Timber;
-
 /**
  * Encapsulates {@link Polygon}'s functionality.
  */
@@ -44,7 +42,7 @@ class PolygonContainer implements Polygons {
 
     Polygon polygon;
     List<Polygon> polygons = new ArrayList<>(count);
-    if (count > 0) {
+    if (nativeMapView != null && count > 0) {
       for (PolygonOptions polygonOptions : polygonOptionsList) {
         polygon = polygonOptions.getPolygon();
         if (!polygon.getPoints().isEmpty()) {
@@ -52,23 +50,12 @@ class PolygonContainer implements Polygons {
         }
       }
 
-      long[] ids = null;
-      if (nativeMapView != null) {
-        ids = nativeMapView.addPolygons(polygons);
-      }
-
-      long id = 0;
-      for (int i = 0; i < polygons.size(); i++) {
+      long[] ids = nativeMapView.addPolygons(polygons);
+      for (int i = 0; i < ids.length; i++) {
         polygon = polygons.get(i);
         polygon.setMapboxMap(mapboxMap);
-        if (ids != null) {
-          id = ids[i];
-        } else {
-          // unit test
-          id++;
-        }
-        polygon.setId(id);
-        annotations.put(id, polygon);
+        polygon.setId(ids[i]);
+        annotations.put(ids[i], polygon);
       }
     }
     return polygons;
@@ -76,11 +63,6 @@ class PolygonContainer implements Polygons {
 
   @Override
   public void update(Polygon polygon) {
-    if (!isAddedToMap(polygon)) {
-      Timber.w("Attempting to update non-added Polygon with value %s", polygon);
-      return;
-    }
-
     nativeMapView.updatePolygon(polygon);
     annotations.setValueAt(annotations.indexOfKey(polygon.getId()), polygon);
   }
@@ -96,9 +78,5 @@ class PolygonContainer implements Polygons {
       }
     }
     return polygons;
-  }
-
-  private boolean isAddedToMap(Annotation annotation) {
-    return annotation != null && annotation.getId() != -1 && annotations.indexOfKey(annotation.getId()) != -1;
   }
 }

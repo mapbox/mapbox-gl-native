@@ -23,8 +23,10 @@ namespace android {
             ) {
     }
 
-    ImageSource::ImageSource(mbgl::Map& map, mbgl::style::ImageSource& coreSource)
-        : Source(map, coreSource) {
+    ImageSource::ImageSource(jni::JNIEnv& env,
+                             mbgl::style::Source& coreSource,
+                             AndroidRendererFrontend& frontend)
+            : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     ImageSource::~ImageSource() = default;
@@ -40,15 +42,14 @@ namespace android {
     }
 
     void ImageSource::setImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap) {
-        UnassociatedImage image = util::unpremultiply(Bitmap::GetImage(env, bitmap));
-        source.as<mbgl::style::ImageSource>()->setImage(std:: move(image));
+        source.as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
     }
 
     jni::Class<ImageSource> ImageSource::javaClass;
 
-    jni::jobject* ImageSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> ImageSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = ImageSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return ImageSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(ImageSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void ImageSource::registerNative(jni::JNIEnv& env) {

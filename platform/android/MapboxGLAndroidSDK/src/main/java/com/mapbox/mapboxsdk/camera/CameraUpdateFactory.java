@@ -42,7 +42,7 @@ public final class CameraUpdateFactory {
   }
 
   /**
-   * Returns a {@link CameraUpdate} that transforms the camera such that the specified
+   * Returns a CameraUpdate that transforms the camera such that the specified
    * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
    * You can specify padding, in order to inset the bounding box from the map view's edges.
    * The returned CameraUpdate has a bearing of 0 and a tilt of 0.
@@ -56,7 +56,7 @@ public final class CameraUpdateFactory {
   }
 
   /**
-   * Returns a {@link CameraUpdate} that transforms the camera such that the specified
+   * Returns a CameraUpdate that transforms the camera such that the specified
    * latitude/longitude bounds are centered on screen at the greatest possible zoom level.
    * You can specify padding, in order to inset the bounding box from the map view's edges.
    * The returned CameraUpdate has a bearing of 0 and a tilt of 0.

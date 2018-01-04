@@ -142,6 +142,12 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
+    jni::Object<jni::ObjectTag> CircleLayer::getCirclePitchAlignment(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::CircleLayer>()->CircleLayer::getCirclePitchAlignment());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
     jni::Object<jni::ObjectTag> CircleLayer::getCircleStrokeWidth(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::CircleLayer>()->CircleLayer::getCircleStrokeWidth());
@@ -236,6 +242,7 @@ namespace android {
             METHOD(&CircleLayer::getCircleTranslate, "nativeGetCircleTranslate"),
             METHOD(&CircleLayer::getCircleTranslateAnchor, "nativeGetCircleTranslateAnchor"),
             METHOD(&CircleLayer::getCirclePitchScale, "nativeGetCirclePitchScale"),
+            METHOD(&CircleLayer::getCirclePitchAlignment, "nativeGetCirclePitchAlignment"),
             METHOD(&CircleLayer::getCircleStrokeWidthTransition, "nativeGetCircleStrokeWidthTransition"),
             METHOD(&CircleLayer::setCircleStrokeWidthTransition, "nativeSetCircleStrokeWidthTransition"),
             METHOD(&CircleLayer::getCircleStrokeWidth, "nativeGetCircleStrokeWidth"),

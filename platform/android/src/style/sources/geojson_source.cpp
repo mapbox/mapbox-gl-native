@@ -1,17 +1,19 @@
 #include "geojson_source.hpp"
 
+#include <mbgl/renderer/query.hpp>
+
 // Java -> C++ conversion
 #include "../android_conversion.hpp"
 #include "../conversion/filter.hpp"
-#include "../conversion/geojson.hpp"
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/geojson.hpp>
+#include <mbgl/style/conversion/geojson_options.hpp>
 
 // C++ -> Java conversion
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/collection.hpp"
 #include "../../geojson/conversion/feature.hpp"
 #include "../conversion/url_or_tileset.hpp"
-#include <mbgl/style/conversion.hpp>
-#include <mbgl/style/conversion/geojson_options.hpp>
 
 #include <string>
 
@@ -27,7 +29,7 @@ namespace android {
             return style::GeoJSONOptions();
         }
         Error error;
-        optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(Value(env, options), error);
+        optional<style::GeoJSONOptions> result = convert<style::GeoJSONOptions>(mbgl::android::Value(env, options), error);
         if (!result) {
             throw std::logic_error(error.message);
         }
@@ -41,8 +43,10 @@ namespace android {
             ) {
     }
 
-    GeoJSONSource::GeoJSONSource(mbgl::Map& map, mbgl::style::GeoJSONSource& coreSource)
-        : Source(map, coreSource) {
+    GeoJSONSource::GeoJSONSource(jni::JNIEnv& env,
+                                 mbgl::style::Source& coreSource,
+                                 AndroidRendererFrontend& frontend)
+            : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     GeoJSONSource::~GeoJSONSource() = default;
@@ -52,7 +56,7 @@ namespace android {
 
         // Convert the jni object
         Error error;
-        optional<GeoJSON> converted = convert<GeoJSON>(Value(env, json), error);
+        optional<GeoJSON> converted = convert<GeoJSON>(mbgl::android::Value(env, json), error);
         if(!converted) {
             mbgl::Log::Error(mbgl::Event::JNI, "Error setting geo json: " + error.message);
             return;
@@ -108,17 +112,17 @@ namespace android {
         using namespace mbgl::android::geojson;
 
         std::vector<mbgl::Feature> features;
-        if (map) {
-            features = map->querySourceFeatures(source.getID(), { {},  toFilter(env, jfilter) });
+        if (rendererFrontend) {
+            features = rendererFrontend->querySourceFeatures(source.getID(), { {},  toFilter(env, jfilter) });
         }
         return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
     }
 
     jni::Class<GeoJSONSource> GeoJSONSource::javaClass;
 
-    jni::jobject* GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> GeoJSONSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = GeoJSONSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return GeoJSONSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(GeoJSONSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void GeoJSONSource::registerNative(jni::JNIEnv& env) {
