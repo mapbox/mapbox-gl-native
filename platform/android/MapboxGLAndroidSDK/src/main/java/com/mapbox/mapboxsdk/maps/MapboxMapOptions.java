@@ -55,7 +55,7 @@ public class MapboxMapOptions implements Parcelable {
   @ColorInt
   private int attributionTintColor = UNDEFINED_COLOR;
   private boolean attributionEnabled = true;
-  private int attributionGravity = Gravity.BOTTOM;
+  private int attributionGravity = Gravity.BOTTOM | Gravity.START;
   private int[] attributionMargins;
 
   private double minZoom = MapboxConstants.MINIMUM_ZOOM;
@@ -234,7 +234,7 @@ public class MapboxMapOptions implements Parcelable {
       mapboxMapOptions.attributionEnabled(typedArray.getBoolean(
         R.styleable.mapbox_MapView_mapbox_uiAttribution, true));
       mapboxMapOptions.attributionGravity(typedArray.getInt(
-        R.styleable.mapbox_MapView_mapbox_uiAttributionGravity, Gravity.BOTTOM));
+        R.styleable.mapbox_MapView_mapbox_uiAttributionGravity, Gravity.BOTTOM | Gravity.START));
       mapboxMapOptions.attributionMargins(new int[] {
         (int) (typedArray.getDimension(R.styleable.mapbox_MapView_mapbox_uiAttributionMarginLeft,
           NINETY_TWO_DP * pxlRatio)),
