@@ -41,7 +41,8 @@ public final class Mapbox {
   private String accessToken;
   private Boolean connected;
   private LocationEngine locationEngine;
-  private static MapboxTelemetry mapboxTelemetry;
+  @SuppressLint("StaticFieldLeak")
+  private static MapboxTelemetry telemetry;
 
   /**
    * Get an instance of Mapbox.
@@ -63,7 +64,7 @@ public final class Mapbox {
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
       try {
-        mapboxTelemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT,
+        telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT,
           new Callback() {
             @Override
             public void onFailure(Call call, IOException exception) {
@@ -72,10 +73,10 @@ public final class Mapbox {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-              Timber.d("Mapbox telemetry response: ", response);
+              Timber.d("Mapbox telemetry response: %s", response.body().string());
             }
           });
-        mapboxTelemetry.enable();
+        telemetry.enable();
       } catch (Exception exception) {
         Timber.e(exception, "Unable to instantiate Mapbox telemetry");
       }
@@ -182,7 +183,7 @@ public final class Mapbox {
     return INSTANCE.locationEngine;
   }
 
-  public static MapboxTelemetry obtainMapboxTelemetry() {
-    return INSTANCE.mapboxTelemetry;
+  public static MapboxTelemetry obtainTelemetry() {
+    return INSTANCE.telemetry;
   }
 }

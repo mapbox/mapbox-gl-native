@@ -90,7 +90,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        Mapbox.obtainMapboxTelemetry().optIn();
+        Mapbox.obtainTelemetry().optIn();
         dialog.cancel();
       }
     });
@@ -104,7 +104,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        Mapbox.obtainMapboxTelemetry().optOut();
+        Mapbox.obtainTelemetry().optOut();
         dialog.cancel();
       }
     });

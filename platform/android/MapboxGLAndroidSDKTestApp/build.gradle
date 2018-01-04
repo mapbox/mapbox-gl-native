@@ -69,7 +69,7 @@ dependencies {
     compile(rootProject.ext.dep.mapboxJavaServices) {
         transitive = true
     }
-    compile rootProject.ext.dep.lost
+    compile rootProject.ext.dep.gmsLocation
 
     // Testing dependencies
     androidTestCompile rootProject.ext.dep.supportAnnotations

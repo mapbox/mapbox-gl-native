@@ -19,7 +19,7 @@ class MapboxEventWrapper {
   static Hashtable<String, Object> buildMapClickEvent(
     @NonNull Location location, @NonNull String gestureId, Transform transform) {
     try {
-//      return MapboxEvent.buildMapClickEvent(location, gestureId, transform.getZoom());
+      // return MapboxEvent.buildMapClickEvent(location, gestureId, transform.getZoom());
       return null;
     } catch (NullPointerException exception) {
       // Map/Transform is not ready yet #8650
@@ -32,7 +32,7 @@ class MapboxEventWrapper {
   static Hashtable<String, Object> buildMapDragEndEvent(
     @NonNull Location location, Transform transform) {
     try {
-//      return MapboxEvent.buildMapDragEndEvent(location, transform.getZoom());
+      // return MapboxEvent.buildMapDragEndEvent(location, transform.getZoom());
       return null;
     } catch (NullPointerException exception) {
       // Map/Transform is not ready yet #8650
@@ -43,7 +43,7 @@ class MapboxEventWrapper {
 
   @Nullable
   static Hashtable<String, Object> buildMapLoadEvent() {
-//    return MapboxEvent.buildMapLoadEvent();
+    // return MapboxEvent.buildMapLoadEvent();
     return null;
   }
 }

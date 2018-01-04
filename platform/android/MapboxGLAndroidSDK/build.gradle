@@ -120,7 +120,6 @@ android {
 
     lintOptions {
         disable 'MissingTranslation', 'TypographyQuotes'
-        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false
     }
