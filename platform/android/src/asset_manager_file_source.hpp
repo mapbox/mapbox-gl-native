@@ -20,9 +20,10 @@ public:
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
 private:
-    jni::UniqueObject<android::AssetManager> assetManager;
     class Impl;
-    std::unique_ptr<util::Thread<Impl>> thread;
+
+    jni::UniqueObject<android::AssetManager> assetManager;
+    std::unique_ptr<util::Thread<Impl>> impl;
 };
 
 } // namespace mbgl

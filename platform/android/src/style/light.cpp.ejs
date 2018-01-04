@@ -1,0 +1,123 @@
+<%
+  const properties = locals.properties;
+-%>
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+#include <mbgl/map/map.hpp>
+#include "light.hpp"
+#include "conversion/transition_options.hpp"
+#include "conversion/position.hpp"
+
+namespace mbgl {
+namespace android {
+
+Light::Light(mbgl::Map& coreMap, mbgl::style::Light& coreLight)
+    : light(coreLight) , map(&coreMap) {
+}
+
+static Light* initializeLightPeer(mbgl::Map& map, mbgl::style::Light& coreLight) {
+    return new Light(map, coreLight);
+}
+
+jni::jobject* Light::createJavaLightPeer(jni::JNIEnv& env, Map& map, mbgl::style::Light& coreLight) {
+    std::unique_ptr<Light> peerLight = std::unique_ptr<Light>(initializeLightPeer(map, coreLight));
+    jni::jobject* result = peerLight->createJavaPeer(env);
+    peerLight.release();
+    return result;
+}
+
+jni::Class<Light> Light::javaClass;
+
+jni::jobject* Light::createJavaPeer(jni::JNIEnv& env) {
+    static auto constructor = Light::javaClass.template GetConstructor<jni::jlong>(env);
+    return Light::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+}
+
+<% for (const property of properties) { -%>
+<% if (property.name == "position") { -%>
+void Light::set<%- camelize(property.name) %>(jni::JNIEnv& env, jni::Object<<%- camelize(property.name) %>> j<%- property.name %>) {
+    using namespace mbgl::android::conversion;
+    auto position = *convert<mbgl::style::<%- camelize(property.name) %>>(env, jposition);
+    light.set<%- camelize(property.name) %>(<%- property.name %>);
+}
+
+jni::Object<Position> Light::get<%- camelize(property.name) %>(jni::JNIEnv& env) {
+    using namespace mbgl::android::conversion;
+    mbgl::style::<%- camelize(property.name) %> <%- property.name %> = light.get<%- camelize(property.name) %>().asConstant();
+    return *convert<jni::Object<<%- camelize(property.name) %>>>(env, <%- property.name %>);
+}
+<% } else { -%>
+<% if(property.name == "color") {-%>
+void Light::set<%- camelize(property.name) %>(jni::JNIEnv& env, jni::<%- propertyJNIType(property) %> property) {
+    auto color = Color::parse(jni::Make<std::string>(env, property));
+    if (color) {
+        light.set<%- camelize(property.name) %>(color.value());
+    }
+}
+
+jni::String Light::get<%- camelize(property.name) %>(jni::JNIEnv &env) {
+    auto color = light.get<%- camelize(property.name) %>().asConstant();
+    return jni::Make<jni::String>(env, color.stringify());
+}
+<% } else if(property.name == "anchor"){ -%>
+void Light::set<%- camelize(property.name) %>(jni::JNIEnv& env, jni::<%- propertyJNIType(property) %> property) {
+    std::string anchorStr = jni::Make<std::string>(env, property);
+    if (anchorStr.compare("map") == 0) {
+        light.setAnchor(LightAnchorType::Map);
+    } else if (anchorStr.compare("viewport") == 0) {
+        light.setAnchor(LightAnchorType::Viewport);
+    }
+}
+
+jni::String Light::getAnchor(jni::JNIEnv& env) {
+    auto anchorType = light.getAnchor();
+    if (anchorType == LightAnchorType::Map) {
+        return jni::Make<jni::String>(env, "map");
+    } else {
+        return jni::Make<jni::String>(env, "viewport");
+    }
+}
+<% } else { -%>
+void Light::set<%- camelize(property.name) %>(jni::JNIEnv&, jni::<%- propertyJNIType(property) %> property) {
+    light.set<%- camelize(property.name) %>(property);
+}
+
+jni::<%- propertyJNIType(property) %> Light::get<%- camelize(property.name) %>(jni::JNIEnv&) {
+    return light.get<%- camelize(property.name) %>().asConstant();
+}
+<% } -%>
+<% } -%>
+
+<% if (property.transition) { -%>
+jni::Object<TransitionOptions> Light::get<%- camelize(property.name) %>Transition(jni::JNIEnv& env) {
+   using namespace mbgl::android::conversion;
+   mbgl::style::TransitionOptions options = light.get<%- camelize(property.name) %>Transition();
+   return *convert<jni::Object<TransitionOptions>>(env, options);
+}
+
+void Light::set<%- camelize(property.name) %>Transition(jni::JNIEnv&, jlong duration, jlong delay) {
+   mbgl::style::TransitionOptions options;
+   options.duration.emplace(mbgl::Milliseconds(duration));
+   options.delay.emplace(mbgl::Milliseconds(delay));
+   light.set<%- camelize(property.name) %>Transition(options);
+}
+
+<% } -%>
+<% } -%>
+void Light::registerNative(jni::JNIEnv& env) {
+    // Lookup the class
+    Light::javaClass = *jni::Class<Light>::Find(env).NewGlobalRef(env).release();
+
+#define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
+    // Register the peer
+    jni::RegisterNativePeer<Light>(env, Light::javaClass, "nativePtr",<% for(var i = 0; i < properties.length; i++) {%>
+<% if (properties[i].transition) { -%>
+    METHOD(&Light::get<%- camelize(properties[i].name) %>Transition, "nativeGet<%- camelize(properties[i].name) %>Transition"),
+    METHOD(&Light::set<%- camelize(properties[i].name) %>Transition, "nativeSet<%- camelize(properties[i].name) %>Transition"),
+<% } -%>
+    METHOD(&Light::get<%- camelize(properties[i].name) %>, "nativeGet<%- camelize(properties[i].name) %>"),
+    METHOD(&Light::set<%- camelize(properties[i].name) %>, "nativeSet<%- camelize(properties[i].name) %>")<% if(i != (properties.length -1)) {-%>,<% } -%><% } -%>);
+}
+
+} // namespace android
+} // namespace mb

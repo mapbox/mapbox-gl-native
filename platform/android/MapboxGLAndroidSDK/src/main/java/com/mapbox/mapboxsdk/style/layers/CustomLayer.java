@@ -13,7 +13,16 @@ public class CustomLayer extends Layer {
                      long initializeFunction,
                      long renderFunction,
                      long deinitializeFunction) {
-    initialize(id, initializeFunction, renderFunction, deinitializeFunction, context);
+    this(id, context, initializeFunction, renderFunction, 0L, deinitializeFunction);
+  }
+
+  public CustomLayer(String id,
+                     long context,
+                     long initializeFunction,
+                     long renderFunction,
+                     long contextLostFunction,
+                     long deinitializeFunction) {
+    initialize(id, initializeFunction, renderFunction, contextLostFunction, deinitializeFunction, context);
   }
 
   public CustomLayer(long nativePtr) {
@@ -24,7 +33,8 @@ public class CustomLayer extends Layer {
     nativeUpdate();
   }
 
-  protected native void initialize(String id, long initializeFunction, long renderFunction, long deinitializeFunction,
+  protected native void initialize(String id, long initializeFunction, long renderFunction,
+                                   long contextLostFunction, long deinitializeFunction,
                                    long context);
 
   protected native void nativeUpdate();

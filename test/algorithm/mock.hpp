@@ -26,7 +26,7 @@ struct MockBucket {};
 struct MockTileData {
     MockTileData(const mbgl::OverscaledTileID& tileID_) : tileID(tileID_) {}
 
-    bool hasTriedOptional() const {
+    bool hasTriedCache() const {
         return triedOptional;
     }
 

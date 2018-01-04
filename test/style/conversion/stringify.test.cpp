@@ -121,10 +121,17 @@ TEST(Stringify, PropertyValue) {
 }
 
 TEST(Stringify, Layout) {
-    ASSERT_EQ(stringify(SymbolLayoutProperties()), "{}");
+    auto stringify = [] (const SymbolLayoutProperties::Unevaluated& layout) {
+        rapidjson::StringBuffer s;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(s);
+        layout.stringify(writer);
+        return std::string(s.GetString());
+    };
 
-    SymbolLayoutProperties layout;
-    layout.unevaluated.get<SymbolAvoidEdges>() = true;
-    layout.unevaluated.get<IconPadding>() = 2.0;
+    ASSERT_EQ(stringify(SymbolLayoutProperties::Unevaluated()), "{}");
+
+    SymbolLayoutProperties::Unevaluated layout;
+    layout.get<SymbolAvoidEdges>() = true;
+    layout.get<IconPadding>() = 2.0;
     ASSERT_EQ(stringify(layout), "{\"symbol-avoid-edges\":true,\"icon-padding\":2.0}");
 }

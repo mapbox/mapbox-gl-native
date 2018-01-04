@@ -2,16 +2,18 @@
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/storage/network_status.hpp>
 
+#include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/logging.hpp>
 
+#include <mbgl/actor/mailbox.hpp>
 #include <mbgl/util/constants.hpp>
-#include <mbgl/util/thread.hpp>
 #include <mbgl/util/mapbox.hpp>
 #include <mbgl/util/exception.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/async_task.hpp>
 #include <mbgl/util/noncopyable.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/timer.hpp>
 #include <mbgl/util/http_timeout.hpp>
 
@@ -35,11 +37,16 @@ public:
     void schedule(optional<Timestamp> expires);
     void completed(Response);
 
+    void setTransformedURL(const std::string&& url);
+    ActorRef<OnlineFileRequest> actor();
+
     OnlineFileSource::Impl& impl;
     Resource resource;
     std::unique_ptr<AsyncRequest> request;
     util::Timer timer;
     Callback callback;
+
+    std::shared_ptr<Mailbox> mailbox;
 
     // Counts the number of times a response was already expired when received. We're using
     // this to add a delay when making a new request so we don't keep retrying immediately
@@ -66,15 +73,12 @@ public:
     void add(OnlineFileRequest* request) {
         allRequests.insert(request);
         if (resourceTransform) {
-            // When there's a Resource transform callback set, replace the resource with the
+            // Request the ResourceTransform actor a new url and replace the resource url with the
             // transformed one before proceeding to schedule the request.
-            request->request =
-                resourceTransform(request->resource.kind, std::move(request->resource.url),
-                                  [request](std::string&& url) {
-                                      request->request.release();
-                                      request->resource.url = std::move(url);
-                                      request->schedule();
-                                  });
+            resourceTransform->invoke(&ResourceTransform::transform, request->resource.kind,
+                std::move(request->resource.url), [ref = request->actor()](const std::string&& url) mutable {
+                    ref.invoke(&OnlineFileRequest::setTransformedURL, std::move(url));
+                });
         } else {
             request->schedule();
         }
@@ -113,13 +117,24 @@ public:
     }
 
     void activateRequest(OnlineFileRequest* request) {
-        activeRequests.insert(request);
-        request->request = httpFileSource.request(request->resource, [=] (Response response) {
+        auto callback = [=](Response response) {
             activeRequests.erase(request);
-            activatePendingRequest();
             request->request.reset();
             request->completed(response);
-        });
+            activatePendingRequest();
+        };
+
+        activeRequests.insert(request);
+
+        if (online) {
+            request->request = httpFileSource.request(request->resource, callback);
+        } else {
+            Response response;
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Connection,
+                                                               "Online connectivity is disabled.");
+            callback(response);
+        }
+
         assert(pendingRequestsMap.size() == pendingRequestsList.size());
     }
 
@@ -145,8 +160,13 @@ public:
         return activeRequests.find(request) != activeRequests.end();
     }
 
-    void setResourceTransform(ResourceTransform&& transform) {
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
         resourceTransform = std::move(transform);
+    }
+
+    void setOnlineStatus(const bool status) {
+        online = status;
+        networkIsReachableAgain();
     }
 
 private:
@@ -156,7 +176,7 @@ private:
         }
     }
 
-    ResourceTransform resourceTransform;
+    optional<ActorRef<ResourceTransform>> resourceTransform;
 
     /**
      * The lifetime of a request is:
@@ -174,6 +194,7 @@ private:
     std::unordered_map<OnlineFileRequest*, std::list<OnlineFileRequest*>::iterator> pendingRequestsMap;
     std::unordered_set<OnlineFileRequest*> activeRequests;
 
+    bool online = true;
     HTTPFileSource httpFileSource;
     util::AsyncTask reachability { std::bind(&Impl::networkIsReachableAgain, this) };
 };
@@ -189,6 +210,7 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
 
     switch (resource.kind) {
     case Resource::Kind::Unknown:
+    case Resource::Kind::Image:
         break;
 
     case Resource::Kind::Style:
@@ -216,7 +238,7 @@ std::unique_ptr<AsyncRequest> OnlineFileSource::request(const Resource& resource
     return std::make_unique<OnlineFileRequest>(std::move(res), std::move(callback), *impl);
 }
 
-void OnlineFileSource::setResourceTransform(ResourceTransform&& transform) {
+void OnlineFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
     impl->setResourceTransform(std::move(transform));
 }
 
@@ -315,6 +337,14 @@ void OnlineFileRequest::completed(Response response) {
         resource.priorModified = response.modified;
     }
 
+    if (response.notModified && resource.priorData) {
+        // When the priorData field is set, it indicates that we had to revalidate the request and
+        // that the requestor hasn't gotten data yet. If we get a 304 response, this means that we
+        // have send the cached data to give the requestor a chance to actually obtain the data.
+        response.data = std::move(resource.priorData);
+        response.notModified = false;
+    }
+
     bool isExpired = false;
 
     if (response.expires) {
@@ -359,6 +389,27 @@ void OnlineFileRequest::networkIsReachableAgain() {
     if (failedRequestReason == Response::Error::Reason::Connection) {
         schedule(util::now());
     }
+}
+
+void OnlineFileRequest::setTransformedURL(const std::string&& url) {
+     resource.url = std::move(url);
+     schedule();
+}
+
+ActorRef<OnlineFileRequest> OnlineFileRequest::actor() {
+    if (!mailbox) {
+        // Lazy constructed because this can be costly and
+        // the ResourceTransform is not used by many apps.
+        mailbox = std::make_shared<Mailbox>(*Scheduler::GetCurrent());
+    }
+
+    return ActorRef<OnlineFileRequest>(*this, mailbox);
+}
+
+// For testing only:
+
+void OnlineFileSource::setOnlineStatus(const bool status) {
+    impl->setOnlineStatus(status);
 }
 
 } // namespace mbgl

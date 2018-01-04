@@ -62,14 +62,11 @@ public:
         push(task);
         return std::make_unique<WorkRequest>(task);
     }
-
-    // Invoke fn(args...) on this RunLoop, then invoke callback(results...) on the current RunLoop.
-    template <class Fn, class... Args>
-    std::unique_ptr<AsyncRequest>
-    invokeWithCallback(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::makeWithCallback(std::forward<Fn>(fn), std::forward<Args>(args)...);
-        push(task);
-        return std::make_unique<WorkRequest>(task);
+                    
+    void schedule(std::weak_ptr<Mailbox> mailbox) override {
+        invoke([mailbox] () {
+            Mailbox::maybeReceive(mailbox);
+        });
     }
 
     class Impl;
@@ -80,12 +77,6 @@ private:
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
     void push(std::shared_ptr<WorkTask>);
-
-    void schedule(std::weak_ptr<Mailbox> mailbox) override {
-        invoke([mailbox] () {
-            Mailbox::maybeReceive(mailbox);
-        });
-    }
 
     void withMutex(std::function<void()>&& fn) {
         std::lock_guard<std::mutex> lock(mutex);

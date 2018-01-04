@@ -58,15 +58,15 @@ struct Converter<jni::jobject*, mbgl::style::IconTextFitType> {
 };
 
 template <>
-struct Converter<jni::jobject*, mbgl::style::TextJustifyType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextJustifyType& value) const {
+struct Converter<jni::jobject*, mbgl::style::SymbolAnchorType> {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::SymbolAnchorType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
 
 template <>
-struct Converter<jni::jobject*, mbgl::style::TextAnchorType> {
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextAnchorType& value) const {
+struct Converter<jni::jobject*, mbgl::style::TextJustifyType> {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::TextJustifyType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };
@@ -88,6 +88,13 @@ struct Converter<jni::jobject*, mbgl::style::TranslateAnchorType> {
 template <>
 struct Converter<jni::jobject*, mbgl::style::CirclePitchScaleType> {
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::CirclePitchScaleType& value) const {
+        return convert<jni::jobject*, std::string>(env, toString(value));
+    }
+};
+
+template <>
+struct Converter<jni::jobject*, mbgl::style::LightAnchorType> {
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::LightAnchorType& value) const {
         return convert<jni::jobject*, std::string>(env, toString(value));
     }
 };

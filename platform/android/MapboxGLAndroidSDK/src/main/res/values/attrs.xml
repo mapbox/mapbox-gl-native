@@ -5,6 +5,7 @@
         <!--Configuration-->
         <attr name="mapbox_styleUrl" format="string"/>
         <attr name="mapbox_apiBaseUrl" format="string"/>
+        <attr name="mapbox_localIdeographFontFamily" format="string"/>
 
         <!--Camera-->
         <attr name="mapbox_cameraTargetLat" format="float"/>
@@ -40,6 +41,7 @@
         <attr name="mapbox_myLocationBackgroundMarginBottom" format="dimension"/>
         <attr name="mapbox_myLocationAccuracyTintColor" format="color"/>
         <attr name="mapbox_myLocationAccuracyAlpha" format="integer"/>
+        <attr name="mapbox_myLocationAccuracyThreshold" format="float"/>
 
         <!--Compass-->
         <attr name="mapbox_uiCompass" format="boolean"/>
@@ -113,8 +115,11 @@
         <attr name="mapbox_uiAttributionMarginBottom" format="dimension"/>
         <attr name="mapbox_uiAttributionTintColor" format="color"/>
 
-        <!-- Deprecated to use TextureView-->
+        <!-- Use TextureView-->
         <attr name="mapbox_renderTextureMode" format="boolean"/>
+
+        <attr name="mapbox_enableTilePrefetch" format="boolean"/>
+        <attr name="mapbox_enableZMediaOverlay" format="boolean"/>
 
     </declare-styleable>
 

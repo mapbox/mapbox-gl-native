@@ -115,6 +115,17 @@ TEST(Resource, SpriteImage) {
     Resource resource = Resource::spriteImage("http://example.com/sprite", 2.0);
     EXPECT_EQ(Resource::Kind::SpriteImage, resource.kind);
     EXPECT_EQ("http://example.com/sprite@2x.png", resource.url);
+
+    Resource paramResource = Resource::spriteImage("http://example.com/sprite?query=true", 2.0);
+    EXPECT_EQ(Resource::Kind::SpriteImage, paramResource.kind);
+    EXPECT_EQ("http://example.com/sprite@2x.png?query=true", paramResource.url);
+}
+
+TEST(Resource, Image) {
+    using namespace mbgl;
+    Resource resource = Resource::image("http://example.com/sprite.jpg");
+    EXPECT_EQ(Resource::Kind::Image, resource.kind);
+    EXPECT_EQ("http://example.com/sprite.jpg", resource.url);
 }
 
 TEST(Resource, SpriteJSON) {
@@ -122,4 +133,8 @@ TEST(Resource, SpriteJSON) {
     Resource resource = Resource::spriteJSON("http://example.com/sprite", 2.0);
     EXPECT_EQ(Resource::Kind::SpriteJSON, resource.kind);
     EXPECT_EQ("http://example.com/sprite@2x.json", resource.url);
+
+    Resource paramResource = Resource::spriteJSON("http://example.com/sprite?query=true", 2.0);
+    EXPECT_EQ(Resource::Kind::SpriteJSON, paramResource.kind);
+    EXPECT_EQ("http://example.com/sprite@2x.json?query=true", paramResource.url);
 }

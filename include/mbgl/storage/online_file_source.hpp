@@ -1,9 +1,13 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 
 namespace mbgl {
+
+class ResourceTransform;
 
 class OnlineFileSource : public FileSource {
 public:
@@ -16,11 +20,12 @@ public:
     void setAccessToken(const std::string& t) { accessToken = t; }
     std::string getAccessToken() const { return accessToken; }
 
-    using ResourceTransform =
-        std::function<std::unique_ptr<AsyncRequest>(Resource::Kind, std::string&&, std::function<void(std::string&&)>)>;
-    void setResourceTransform(ResourceTransform&& cb);
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&&);
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
+
+    // For testing only.
+    void setOnlineStatus(bool);
 
 private:
     friend class OnlineFileRequest;

@@ -2,19 +2,7 @@
 
 #import <ImageIO/ImageIO.h>
 
-namespace {
-
-template <typename T, typename S, void (*Releaser)(S)>
-struct CFHandle {
-    CFHandle(T t_): t(t_) {}
-    ~CFHandle() { Releaser(t); }
-    T operator*() { return t; }
-    operator bool() { return t; }
-private:
-    T t;
-};
-
-} // namespace
+#import "CFHandle.hpp"
 
 using CGImageHandle = CFHandle<CGImageRef, CGImageRef, CGImageRelease>;
 using CFDataHandle = CFHandle<CFDataRef, CFTypeRef, CFRelease>;
@@ -23,7 +11,7 @@ using CGDataProviderHandle = CFHandle<CGDataProviderRef, CGDataProviderRef, CGDa
 using CGColorSpaceHandle = CFHandle<CGColorSpaceRef, CGColorSpaceRef, CGColorSpaceRelease>;
 using CGContextHandle = CFHandle<CGContextRef, CGContextRef, CGContextRelease>;
 
-CGImageRef CGImageFromMGLPremultipliedImage(mbgl::PremultipliedImage&& src) {
+CGImageRef CGImageCreateWithMGLPremultipliedImage(mbgl::PremultipliedImage&& src) {
     // We're converting the PremultipliedImage's backing store to a CGDataProvider, and are taking
     // over ownership of the memory.
     CGDataProviderHandle provider(CGDataProviderCreateWithData(

@@ -10,22 +10,6 @@ using namespace mbgl::style;
  */
 class StubStyleObserver : public style::Observer {
 public:
-    void onGlyphsLoaded(const FontStack& fontStack, const GlyphRange& glyphRange) override {
-        if (glyphsLoaded) glyphsLoaded(fontStack, glyphRange);
-    }
-
-    void onGlyphsError(const FontStack& fontStack, const GlyphRange& glyphRange, std::exception_ptr error) override {
-        if (glyphsError) glyphsError(fontStack, glyphRange, error);
-    }
-
-    void onSpriteLoaded() override {
-        if (spriteLoaded) spriteLoaded();
-    }
-
-    void onSpriteError(std::exception_ptr error) override {
-        if (spriteError) spriteError(error);
-    }
-
     void onSourceLoaded(Source& source) override {
         if (sourceLoaded) sourceLoaded(source);
     }
@@ -46,10 +30,6 @@ public:
         if (resourceError) resourceError(error);
     };
 
-    std::function<void (const FontStack&, const GlyphRange&)> glyphsLoaded;
-    std::function<void (const FontStack&, const GlyphRange&, std::exception_ptr)> glyphsError;
-    std::function<void ()> spriteLoaded;
-    std::function<void (std::exception_ptr)> spriteError;
     std::function<void (Source&)> sourceLoaded;
     std::function<void (Source&)> sourceChanged;
     std::function<void (Source&, std::exception_ptr)> sourceError;

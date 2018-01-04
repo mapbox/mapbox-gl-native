@@ -14,10 +14,10 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLStyleLayer` object, which you can use to refine the map’s appearance. You
  can also add and remove style layers dynamically.
 
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, create instances of
- `MGLBackgroundStyleLayer` and the concrete subclasses of
- `MGLForegroundStyleLayer`.
+ Create instances of `MGLBackgroundStyleLayer` and the concrete subclasses of
+ `MGLForegroundStyleLayer` in order to use `MGLStyleLayer`'s properties and methods.
+ You do not create instances of `MGLStyleLayer` directly, and do not
+ create your own subclasses of this class.
  
  Do not add `MGLStyleLayer` objects to the `style` property of a `MGLMapView` before
  `-mapView:didFinishLoadingStyle:` is called.
@@ -45,12 +45,12 @@ MGL_EXPORT
 @property (nonatomic, assign, getter=isVisible) BOOL visible;
 
 /**
- The maximum zoom level at which the layer gets parsed and appears.
+ The maximum zoom level at which the layer gets parsed and appears. This value is a floating-point number.
  */
 @property (nonatomic, assign) float maximumZoomLevel;
 
 /**
- The minimum zoom level at which the layer gets parsed and appears.
+ The minimum zoom level at which the layer gets parsed and appears. This value is a floating-point number.
  */
 @property (nonatomic, assign) float minimumZoomLevel;
 

@@ -1,5 +1,6 @@
 #include <mbgl/annotation/shape_annotation_impl.hpp>
 #include <mbgl/annotation/annotation_tile.hpp>
+#include <mbgl/annotation/annotation_manager.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/math/wrap.hpp>
 #include <mbgl/math/clamp.hpp>
@@ -12,10 +13,9 @@ namespace mbgl {
 using namespace style;
 namespace geojsonvt = mapbox::geojsonvt;
 
-ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_, const uint8_t maxZoom_)
+ShapeAnnotationImpl::ShapeAnnotationImpl(const AnnotationID id_)
     : id(id_),
-      maxZoom(maxZoom_),
-      layerID("com.mapbox.annotations.shape." + util::toString(id)) {
+      layerID(AnnotationManager::ShapeLayerID + util::toString(id)) {
 }
 
 void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, AnnotationTileData& data) {
@@ -27,7 +27,9 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             return Feature { std::move(geom) };
         }));
         mapbox::geojsonvt::Options options;
-        options.maxZoom = maxZoom;
+        // The annotation source is currently hard coded to maxzoom 16, so we're topping out at z16
+        // here as well.
+        options.maxZoom = 16;
         options.buffer = 255u;
         options.extent = util::EXTENT;
         options.tolerance = baseTolerance;
@@ -38,7 +40,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
     if (shapeTile.features.empty())
         return;
 
-    AnnotationTileLayer& layer = data.layers.emplace(layerID, layerID).first->second;
+    auto layer = data.addLayer(layerID);
 
     ToGeometryCollection toGeometryCollection;
     ToFeatureType toFeatureType;
@@ -53,7 +55,7 @@ void ShapeAnnotationImpl::updateTileData(const CanonicalTileID& tileID, Annotati
             renderGeometry = fixupPolygons(renderGeometry);
         }
 
-        layer.features.emplace_back(id, featureType, renderGeometry);
+        layer->addFeature(id, featureType, renderGeometry);
     }
 }
 

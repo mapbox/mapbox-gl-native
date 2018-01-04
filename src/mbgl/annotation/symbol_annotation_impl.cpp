@@ -18,7 +18,7 @@ void SymbolAnnotationImpl::updateLayer(const CanonicalTileID& tileID, Annotation
     LatLng latLng { annotation.geometry.y, annotation.geometry.x };
     TileCoordinate coordinate = TileCoordinate::fromLatLng(0, latLng);
     GeometryCoordinate tilePoint = TileCoordinate::toGeometryCoordinate(UnwrappedTileID(0, tileID), coordinate.p);
-    layer.features.emplace_back(id, FeatureType::Point, GeometryCollection {{ {{ tilePoint }} }}, featureProperties);
+    layer.addFeature(id, FeatureType::Point, GeometryCollection {{ {{ tilePoint }} }}, featureProperties);
 }
 
 } // namespace mbgl

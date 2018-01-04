@@ -1,15 +1,12 @@
 #include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/style/conversion/json.hpp>
-#include <mbgl/style/conversion/geojson.hpp>
-#include <mbgl/style/source_observer.hpp>
+#include <mbgl/util/constants.hpp>
 #include <mbgl/tile/tile_id.hpp>
-#include <mbgl/storage/file_source.hpp>
-#include <mbgl/renderer/sources/render_geojson_source.hpp>
-#include <mbgl/util/constants.cpp>
-#include <mbgl/util/logging.hpp>
+#include <mbgl/util/string.hpp>
 
 #include <mapbox/geojsonvt.hpp>
 #include <supercluster.hpp>
+
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -42,33 +39,14 @@ private:
     mapbox::supercluster::Supercluster impl;
 };
 
-GeoJSONSource::Impl::Impl(std::string id_, Source& base_, const GeoJSONOptions options_)
-    : Source::Impl(SourceType::GeoJSON, std::move(id_), base_), options(options_) {
+GeoJSONSource::Impl::Impl(std::string id_, GeoJSONOptions options_)
+    : Source::Impl(SourceType::GeoJSON, std::move(id_)),
+      options(std::move(options_)) {
 }
 
-GeoJSONSource::Impl::~Impl() = default;
-
-void GeoJSONSource::Impl::setURL(std::string url_) {
-    url = std::move(url_);
-
-    // Signal that the source description needs a reload
-    if (loaded || req) {
-        loaded = false;
-        req.reset();
-        observer->onSourceDescriptionChanged(base);
-    }
-}
-
-optional<std::string> GeoJSONSource::Impl::getURL() const {
-    return url;
-}
-
-void GeoJSONSource::Impl::setGeoJSON(const GeoJSON& geoJSON) {
-    req.reset();
-    _setGeoJSON(geoJSON);
-}
-
-void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
+GeoJSONSource::Impl::Impl(const Impl& other, const GeoJSON& geoJSON)
+    : Source::Impl(other),
+      options(other.options) {
     double scale = util::EXTENT / util::tileSize;
 
     if (options.cluster
@@ -77,67 +55,31 @@ void GeoJSONSource::Impl::_setGeoJSON(const GeoJSON& geoJSON) {
         mapbox::supercluster::Options clusterOptions;
         clusterOptions.maxZoom = options.clusterMaxZoom;
         clusterOptions.extent = util::EXTENT;
-        clusterOptions.radius = std::round(scale * options.clusterRadius);
+        clusterOptions.radius = ::round(scale * options.clusterRadius);
         data = std::make_unique<SuperclusterData>(
             geoJSON.get<mapbox::geometry::feature_collection<double>>(), clusterOptions);
     } else {
         mapbox::geojsonvt::Options vtOptions;
         vtOptions.maxZoom = options.maxzoom;
         vtOptions.extent = util::EXTENT;
-        vtOptions.buffer = std::round(scale * options.buffer);
+        vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
         data = std::make_unique<GeoJSONVTData>(geoJSON, vtOptions);
     }
 }
 
-void GeoJSONSource::Impl::loadDescription(FileSource& fileSource) {
-    if (!url) {
-        loaded = true;
-        return;
-    }
-
-    if (req) {
-        return;
-    }
-
-    req = fileSource.request(Resource::source(*url), [this](Response res) {
-        if (res.error) {
-            observer->onSourceError(
-                base, std::make_exception_ptr(std::runtime_error(res.error->message)));
-        } else if (res.notModified) {
-            return;
-        } else if (res.noContent) {
-            observer->onSourceError(
-                base, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
-        } else {
-            conversion::Error error;
-            optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*res.data, error);
-            if (!geoJSON) {
-                Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s",
-                           error.message.c_str());
-                // Create an empty GeoJSON VT object to make sure we're not infinitely waiting for
-                // tiles to load.
-                _setGeoJSON(GeoJSON{ FeatureCollection{} });
-            } else {
-                _setGeoJSON(*geoJSON);
-            }
-
-            loaded = true;
-            observer->onSourceLoaded(base);
-        }
-    });
-}
-
-std::unique_ptr<RenderSource> GeoJSONSource::Impl::createRenderSource() const {
-    return std::make_unique<RenderGeoJSONSource>(*this);
-}
+GeoJSONSource::Impl::~Impl() = default;
 
 Range<uint8_t> GeoJSONSource::Impl::getZoomRange() const {
-    return { 0, options.maxzoom };
+    return { options.minzoom, options.maxzoom };
 }
 
 GeoJSONData* GeoJSONSource::Impl::getData() const {
     return data.get();
+}
+
+optional<std::string> GeoJSONSource::Impl::getAttribution() const {
+    return {};
 }
 
 } // namespace style

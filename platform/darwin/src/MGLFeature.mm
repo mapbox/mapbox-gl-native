@@ -7,11 +7,11 @@
 
 #import "MGLShape_Private.h"
 #import "MGLPointCollection_Private.h"
-#import "MGLPolyline+MGLAdditions.h"
-#import "MGLPolygon+MGLAdditions.h"
+#import "MGLPolyline_Private.h"
+#import "MGLPolygon_Private.h"
+
 #import "NSDictionary+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
-
 #import "NSExpression+MGLAdditions.h"
 
 #import <mbgl/util/geometry.hpp>
@@ -42,6 +42,15 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, coordinate = %f, %f, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            self.coordinate.latitude, self.coordinate.longitude,
+            self.attributes.count ? self.attributes : @"none"];
+}
+
 @end
 
 @interface MGLPolylineFeature ()
@@ -68,6 +77,16 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, count = %lu, bounds = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            (unsigned long)[self pointCount],
+            MGLStringFromCoordinateBounds(self.overlayBounds),
+            self.attributes.count ? self.attributes : @"none"];
+}
+
 @end
 
 @interface MGLPolygonFeature ()
@@ -92,6 +111,16 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (mbgl::GeoJSON)geoJSONObject {
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, count = %lu, bounds = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            (unsigned long)[self pointCount],
+            MGLStringFromCoordinateBounds(self.overlayBounds),
+            self.attributes.count ? self.attributes : @"none"];
 }
 
 @end
@@ -146,6 +175,16 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
 }
 
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, count = %lu, bounds = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            (unsigned long)self.polylines.count,
+            MGLStringFromCoordinateBounds(self.overlayBounds),
+            self.attributes.count ? self.attributes : @"none"];
+}
+
 @end
 
 @interface MGLMultiPolygonFeature ()
@@ -170,6 +209,16 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 - (mbgl::GeoJSON)geoJSONObject {
     return mbglFeature({[self geometryObject]}, identifier, self.attributes);
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; identifier = %@, count = %lu, bounds = %@, attributes = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.identifier ? [NSString stringWithFormat:@"\"%@\"", self.identifier] : self.identifier,
+            (unsigned long)self.polygons.count,
+            MGLStringFromCoordinateBounds(self.overlayBounds),
+            self.attributes.count ? self.attributes : @"none"];
 }
 
 @end

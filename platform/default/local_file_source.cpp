@@ -1,4 +1,5 @@
 #include <mbgl/storage/local_file_source.hpp>
+#include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/thread.hpp>
@@ -21,7 +22,9 @@ namespace mbgl {
 
 class LocalFileSource::Impl {
 public:
-    void request(const std::string& url, FileSource::Callback callback) {
+    Impl(ActorRef<Impl>) {}
+
+    void request(const std::string& url, ActorRef<FileSourceRequest> req) {
         // Cut off the protocol
         std::string path = mbgl::util::percentDecode(url.substr(protocolLength));
 
@@ -44,19 +47,23 @@ public:
             }
         }
 
-        callback(response);
+        req.invoke(&FileSourceRequest::setResponse, response);
     }
 
 };
 
 LocalFileSource::LocalFileSource()
-    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"LocalFileSource", util::ThreadPriority::Low})) {
+    : impl(std::make_unique<util::Thread<Impl>>("LocalFileSource")) {
 }
 
 LocalFileSource::~LocalFileSource() = default;
 
 std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource, Callback callback) {
-    return thread->invokeWithCallback(&Impl::request, resource.url, callback);
+    auto req = std::make_unique<FileSourceRequest>(std::move(callback));
+
+    impl->actor().invoke(&Impl::request, resource.url, req->actor());
+
+    return std::move(req);
 }
 
 bool LocalFileSource::acceptsURL(const std::string& url) {

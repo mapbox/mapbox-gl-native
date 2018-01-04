@@ -113,6 +113,17 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.camera.CameraAnimatorActivity"
+            android:description="@string/description_camera_animator"
+            android:label="@string/activity_camera_animator">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_camera"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.camera.CameraPositionActivity"
             android:description="@string/description_cameraposition"
             android:label="@string/activity_camera_position">
@@ -305,14 +316,12 @@
         </activity>
         <activity
             android:name=".activity.maplayout.DebugModeActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
             android:description="@string/description_debug_mode"
             android:label="@string/activity_debug_mode">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_maplayout"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
+                android:value="@string/category_basic"/>
         </activity>
         <activity
             android:name=".activity.offline.OfflineActivity"
@@ -359,6 +368,39 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
+            android:name=".activity.snapshot.MapSnapshotterActivity"
+            android:description="@string/description_map_snapshotter"
+            android:label="@string/activity_map_snapshotter">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.snapshot.MapSnapshotterReuseActivity"
+            android:description="@string/description_map_snapshotter_reuse"
+            android:label="@string/activity_map_snapshotter_reuse">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.snapshot.MapSnapshotterMarkerActivity"
+            android:description="@string/description_map_snapshotter_marker"
+            android:label="@string/activity_map_snapshotter_marker">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_imagegenerator"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
             android:name=".activity.maplayout.DoubleMapActivity"
             android:description="@string/description_doublemap"
             android:label="@string/activity_double_map">
@@ -392,10 +434,20 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
-            android:name=".activity.maplayout.NavigationDrawerActivity"
-            android:description="@string/description_navigation_drawer"
-            android:label="@string/activity_navigation_drawer"
-            android:theme="@style/AppTheme.ActionBar.Transparent">
+            android:name=".activity.maplayout.SimpleMapActivity"
+            android:description="@string/description_simple_map"
+            android:label="@string/activity_simple_map">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_basic"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.maplayout.MapChangeActivity"
+            android:description="@string/description_map_change"
+            android:label="@string/activity_map_change">
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_maplayout"/>
@@ -404,12 +456,12 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
-            android:name=".activity.maplayout.SimpleMapActivity"
-            android:description="@string/description_simple_map"
-            android:label="@string/activity_simple_map">
+            android:name=".activity.maplayout.VisibilityChangeActivity"
+            android:description="@string/description_visibility_map"
+            android:label="@string/activity_map_visibility">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_basic"/>
+                android:value="@string/category_maplayout"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
@@ -535,7 +587,28 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
-
+        <activity
+            android:name=".activity.style.AnimatedImageSourceActivity"
+            android:description="@string/description_animated_image_source"
+            android:label="@string/activity_animated_image_source">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.style.GridSourceActivity"
+            android:description="@string/description_grid_source"
+            android:label="@string/activity_grid_source">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
         <!-- Features -->
         <activity
             android:name=".activity.feature.QueryRenderedFeaturesPropertiesActivity"
@@ -593,12 +666,23 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
-            android:name=".activity.annotation.AddRemoveMarkerActivity"
+            android:name=".activity.style.SymbolGeneratorActivity"
+            android:description="@string/description_symbol_generator"
+            android:label="@string/activity_symbol_generator">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
+        <activity
+            android:name=".activity.style.ZoomFunctionSymbolLayerActivity"
             android:description="@string/description_add_remove_markers"
             android:label="@string/activity_add_remove_markers">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation"/>
+                android:value="@string/category_style"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
@@ -649,7 +733,51 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
+        <activity
+            android:name=".activity.maplayout.BottomSheetActivity"
+            android:description="@string/description_bottom_sheet"
+            android:label="@string/activity_bottom_sheet">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_maplayout"/>
+        </activity>
 
+        <!-- TextureView -->
+        <activity
+            android:name=".activity.textureview.TextureViewDebugModeActivity"
+            android:description="@string/description_textureview_debug"
+            android:label="@string/activity_textureview_debug">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+        <activity
+            android:name=".activity.textureview.TextureViewResizeActivity"
+            android:description="@string/description_textureview_resize"
+            android:label="@string/activity_textureview_resize">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+        <activity
+            android:name=".activity.textureview.TextureViewAnimationActivity"
+            android:description="@string/description_textureview_animate"
+            android:label="@string/activity_textureview_animate">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
+        <activity
+            android:name=".activity.maplayout.LocalGlyphActivity"
+            android:description="@string/description_local_glyph"
+            android:label="@string/activity_local_glyph">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_maplayout"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
 
         <!-- For Instrumentation tests -->
         <activity
@@ -661,7 +789,9 @@
         <activity
             android:name=".activity.espresso.EspressoTestActivity"
             android:screenOrientation="portrait"/>
-
+        <activity
+            android:name=".activity.style.FillExtrusionStyleTestActivity"
+            android:screenOrientation="portrait"/>
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"

@@ -5,6 +5,16 @@
     "mapbox": {
       "type": "vector",
       "url": "http://127.0.0.1:3000/streets.json"
+    },
+    "radar": {
+      "type": "image",
+      "url":"http://127.0.0.1:3000/radar.gif",
+      "coordinates": [
+        [-180, -85.0511],
+        [180, -85.0511],
+        [180, 85.0511],
+        [-180, 85.0511]
+      ]
     }
   },
   "glyphs": "http://127.0.0.1:3000/{fontstack}/{range}.pbf",

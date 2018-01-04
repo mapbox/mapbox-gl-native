@@ -8,33 +8,39 @@ namespace mbgl {
 
 struct ZoomHistory {
     float lastZoom;
+    float lastFloorZoom;
     float lastIntegerZoom;
     TimePoint lastIntegerZoomTime;
     bool first = true;
 
     bool update(float z, const TimePoint& now) {
+        constexpr TimePoint zero = TimePoint(Duration::zero());
+        const float floorZ = std::floor(z);
+
         if (first) {
             first = false;
-            lastIntegerZoom = std::floor(z);
-            lastIntegerZoomTime = TimePoint(Duration::zero());
+            lastIntegerZoom = floorZ;
+            lastIntegerZoomTime = zero;
             lastZoom = z;
+            lastFloorZoom = floorZ;
             return true;
-        } else {
-            if (std::floor(lastZoom) < std::floor(z)) {
-                lastIntegerZoom = std::floor(z);
-                lastIntegerZoomTime = now;
-            } else if (std::floor(lastZoom) > std::floor(z)) {
-                lastIntegerZoom = std::floor(z + 1);
-                lastIntegerZoomTime = now;
-            }
-
-            if (z != lastZoom) {
-                lastZoom = z;
-                return true;
-            }
-
-            return false;
         }
+
+        if (lastFloorZoom > floorZ) {
+            lastIntegerZoom = floorZ + 1;
+            lastIntegerZoomTime = now == Clock::time_point::max() ? zero : now;
+        } else if (lastFloorZoom < floorZ) {
+            lastIntegerZoom = floorZ;
+            lastIntegerZoomTime = now == Clock::time_point::max() ? zero : now;
+        }
+
+        if (z != lastZoom) {
+            lastZoom = z;
+            lastFloorZoom = floorZ;
+            return true;
+        }
+
+        return false;
     }
 };
 

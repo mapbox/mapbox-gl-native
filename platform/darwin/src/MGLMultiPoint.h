@@ -10,8 +10,9 @@ NS_ASSUME_NONNULL_BEGIN
  The `MGLMultiPoint` class is an abstract superclass used to define shapes
  composed of multiple vertices.
 
- You do not create instances of this class directly. Instead, you create
- instances of the `MGLPolyline` or `MGLPolygon` classes. However, you can use
+ Create instances of `MGLPolyline` or `MGLPolygon` in order to use 
+ properties of `MGLMultiPoint`. Do not create instances of `MGLMultiPoint`
+ directly and do not create your own subclasses of this class. You can use
  the method and properties of this class to access information about the
  vertices of the line or polygon.
 

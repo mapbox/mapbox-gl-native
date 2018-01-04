@@ -4,6 +4,7 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/programs/uniforms.hpp>
 #include <mbgl/shaders/extrusion_texture.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/util/geometry.hpp>
 
 namespace mbgl {
@@ -17,7 +18,7 @@ class ExtrusionTextureProgram : public Program<
         uniforms::u_world,
         uniforms::u_image,
         uniforms::u_opacity>,
-    style::PaintProperties<>> {
+    style::Properties<>> {
 public:
     using Program::Program;
 

@@ -1,24 +1,19 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    compile rootProject.ext.dep.supportAnnotations
-    compile rootProject.ext.dep.supportV4
-    compile rootProject.ext.dep.supportDesign
-    compile rootProject.ext.dep.timber
-    compile rootProject.ext.dep.okhttp3
-    compile rootProject.ext.dep.lost
-    testCompile rootProject.ext.dep.junit
-    testCompile rootProject.ext.dep.mockito
-
-    // Mapbox Android Services (GeoJSON support)
-    compile(rootProject.ext.dep.mapboxJavaGeoJSON) {
-        transitive = true
+    api rootProject.ext.dep.mapboxAndroidTelemetry
+    api rootProject.ext.dep.mapboxJavaGeoJSON
+    implementation rootProject.ext.dep.supportAnnotations
+    implementation rootProject.ext.dep.supportFragmentV4
+    implementation rootProject.ext.dep.timber
+    implementation rootProject.ext.dep.okhttp3
+    compileOnly(rootProject.ext.dep.lost) {
+        exclude group: 'com.google.guava'
+        exclude group: 'com.android.support'
     }
-
-    // Mapbox Android Services (Telemetry support)
-    compile(rootProject.ext.dep.mapboxAndroidTelemetry) {
-        transitive = true
-    }
+    testImplementation rootProject.ext.dep.lost
+    testImplementation rootProject.ext.dep.junit
+    testImplementation rootProject.ext.dep.mockito
 }
 
 android {
@@ -39,11 +34,14 @@ android {
     // to invoke the Java tests. When we explicitly specify an ABI of 'none', no native dependencies are
     // added. When another ABI is specified explicitly, we're just going to build that ABI. In all other
     // cases, all ABIs are built.
-    // When invoking from the command line, set `-Pmapbox.abis=...` to only build the desired architectures.
+    //
+    // When invoking from the command line or to override the device default, set `-Pmapbox.abis=...` to
+    // only build the desired architectures.
+    //
     // When building from Android Studio, gradle.properties sets `android.buildOnlyTargetAbi=true` so that
     // only the architecture for the device you're running on gets built.
     def abi = 'all'
-    if (!project.hasProperty('android.injected.invoked.from.ide')) {
+    if (!project.hasProperty('android.injected.invoked.from.ide') || project.hasProperty("mapbox.abis")) {
         // Errors when the user invokes Gradle from the command line and didn't set mapbox.abis
         abi = project.getProperty("mapbox.abis")
     }
@@ -95,6 +93,9 @@ android {
                 }
             }
         }
+
+        // proguard config for .aar
+        consumerProguardFiles 'proguard-rules.pro'
     }
 
     // avoid naming conflicts, force usage of prefix
@@ -111,8 +112,10 @@ android {
     }
 
     lintOptions {
+        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
+        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
-        warningsAsErrors true
+        warningsAsErrors false
     }
 
     testOptions {
@@ -126,7 +129,6 @@ android {
 
         release {
             // aar proguard configuration
-            consumerProguardFiles 'proguard-rules.pro'
             jniDebuggable false
         }
     }
@@ -148,3 +150,4 @@ apply from: 'gradle-javadoc.gradle'
 apply from: 'gradle-publish.gradle'
 apply from: 'gradle-checkstyle.gradle'
 apply from: 'gradle-tests-staticblockremover.gradle'
+apply from: '../gradle-lint.gradle'

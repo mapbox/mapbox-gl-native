@@ -9,14 +9,13 @@ namespace style {
 
 class LineLayer::Impl : public Layer::Impl {
 public:
-    std::unique_ptr<Layer> clone() const override;
-    std::unique_ptr<Layer> cloneRef(const std::string& id) const override;
+    using Layer::Impl::Impl;
+
+    bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    std::unique_ptr<RenderLayer> createRenderLayer() const override;
-
-    LineLayoutProperties layout;
-    LinePaintProperties::Cascading cascading;
+    LineLayoutProperties::Unevaluated layout;
+    LinePaintProperties::Transitionable paint;
 };
 
 } // namespace style

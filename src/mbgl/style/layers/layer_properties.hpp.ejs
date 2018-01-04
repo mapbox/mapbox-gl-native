@@ -10,7 +10,9 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layout_property.hpp>
 #include <mbgl/style/paint_property.hpp>
+#include <mbgl/style/properties.hpp>
 #include <mbgl/programs/attributes.hpp>
+#include <mbgl/programs/uniforms.hpp>
 
 namespace mbgl {
 namespace style {
@@ -29,7 +31,7 @@ struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %>
 
 <% } -%>
 <% if (layoutProperties.length) { -%>
-class <%- camelize(type) %>LayoutProperties : public LayoutProperties<
+class <%- camelize(type) %>LayoutProperties : public Properties<
 <% for (const property of layoutProperties.slice(0, -1)) { -%>
     <%- camelize(property.name) %>,
 <% } -%>
@@ -37,7 +39,7 @@ class <%- camelize(type) %>LayoutProperties : public LayoutProperties<
 > {};
 
 <% } -%>
-class <%- camelize(type) %>PaintProperties : public PaintProperties<
+class <%- camelize(type) %>PaintProperties : public Properties<
 <% for (const property of paintProperties.slice(0, -1)) { -%>
     <%- camelize(property.name) %>,
 <% } -%>

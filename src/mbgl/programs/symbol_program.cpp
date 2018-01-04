@@ -2,6 +2,8 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
+#include <mbgl/layout/symbol_projection.hpp>
+#include <mbgl/tile/tile.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/math/clamp.hpp>
 
@@ -32,8 +34,10 @@ Values makeValues(const bool isText,
                   const style::SymbolPropertyValues& values,
                   const Size& texsize,
                   const std::array<float, 2>& pixelsToGLUnits,
+                  const bool alongLine,
                   const RenderTile& tile,
                   const TransformState& state,
+                  const float symbolFadeChange,
                   Args&&... args) {
     std::array<float, 2> extrudeScale;
     
@@ -45,18 +49,48 @@ Values makeValues(const bool isText,
             pixelsToGLUnits[1] * state.getCameraToCenterDistance()
         }};
     }
+
+    const float pixelsToTileUnits = tile.id.pixelsToTileUnits(1.0, state.getZoom());
+    const bool pitchWithMap = values.pitchAlignment == style::AlignmentType::Map;
+    const bool rotateWithMap = values.rotationAlignment == style::AlignmentType::Map;
+    
+    // Line label rotation happens in `updateLineLabels`
+    // Pitched point labels are automatically rotated by the labelPlaneMatrix projection
+    // Unpitched point labels need to have their rotation applied after projection
+    const bool rotateInShader = rotateWithMap && !pitchWithMap && !alongLine;
+
+    mat4 labelPlaneMatrix;
+    if (alongLine) {
+        // For labels that follow lines the first part of the projection is handled on the cpu.
+        // Pass an identity matrix because no transformation needs to be done in the vertex shader.
+        matrix::identity(labelPlaneMatrix);
+    } else {
+        labelPlaneMatrix = getLabelPlaneMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
+    }
+
+    mat4 glCoordMatrix = getGlCoordMatrix(tile.matrix, pitchWithMap, rotateWithMap, state, pixelsToTileUnits);
         
     return Values {
         uniforms::u_matrix::Value{ tile.translatedMatrix(values.translate,
                                    values.translateAnchor,
                                    state) },
+        uniforms::u_label_plane_matrix::Value{labelPlaneMatrix},
+        uniforms::u_gl_coord_matrix::Value{ tile.translateVtxMatrix(glCoordMatrix,
+                                            values.translate,
+                                            values.translateAnchor,
+                                            state,
+                                            true) },
         uniforms::u_extrude_scale::Value{ extrudeScale },
-        uniforms::u_texsize::Value{ std::array<float, 2> {{ float(texsize.width) / 4, float(texsize.height) / 4 }} },
-        uniforms::u_zoom::Value{ float(state.getZoom()) },
-        uniforms::u_rotate_with_map::Value{ values.rotationAlignment == AlignmentType::Map },
+        uniforms::u_texsize::Value{ texsize },
         uniforms::u_texture::Value{ 0 },
-        uniforms::u_fadetexture::Value{ 1 },
+        uniforms::u_fade_change::Value{ symbolFadeChange },
         uniforms::u_is_text::Value{ isText },
+        uniforms::u_camera_to_center_distance::Value{ state.getCameraToCenterDistance() },
+        uniforms::u_pitch::Value{ state.getPitch() },
+        uniforms::u_pitch_with_map::Value{ pitchWithMap },
+        uniforms::u_max_camera_distance::Value{ values.maxCameraDistance },
+        uniforms::u_rotate_symbol::Value{ rotateInShader },
+        uniforms::u_aspect_ratio::Value{ state.getSize().aspectRatio() },
         std::forward<Args>(args)...
     };
 }
@@ -66,16 +100,20 @@ SymbolIconProgram::uniformValues(const bool isText,
                                  const style::SymbolPropertyValues& values,
                                  const Size& texsize,
                                  const std::array<float, 2>& pixelsToGLUnits,
+                                 const bool alongLine,
                                  const RenderTile& tile,
-                                 const TransformState& state)
+                                 const TransformState& state,
+                                 const float symbolFadeChange)
 {
     return makeValues<SymbolIconProgram::UniformValues>(
         isText,
         values,
         texsize,
         pixelsToGLUnits,
+        alongLine,
         tile,
-        state
+        state,
+        symbolFadeChange
     );
 }
 
@@ -85,26 +123,26 @@ typename SymbolSDFProgram<PaintProperties>::UniformValues SymbolSDFProgram<Paint
       const style::SymbolPropertyValues& values,
       const Size& texsize,
       const std::array<float, 2>& pixelsToGLUnits,
+      const bool alongLine,
       const RenderTile& tile,
       const TransformState& state,
+      const float symbolFadeChange,
       const SymbolSDFPart part)
 {
     const float gammaScale = (values.pitchAlignment == AlignmentType::Map
-                              ? std::cos(state.getPitch())
-                              : 1.0) * state.getCameraToCenterDistance();
+                              ? std::cos(state.getPitch()) * state.getCameraToCenterDistance()
+                              : 1.0);
     
     return makeValues<SymbolSDFProgram<PaintProperties>::UniformValues>(
         isText,
         values,
         texsize,
         pixelsToGLUnits,
+        alongLine,
         tile,
         state,
+        symbolFadeChange,
         uniforms::u_gamma_scale::Value{ gammaScale },
-        uniforms::u_pitch::Value{ state.getPitch() },
-        uniforms::u_bearing::Value{ -1.0f * state.getAngle() },
-        uniforms::u_aspect_ratio::Value{ (state.getSize().width * 1.0f) / (state.getSize().height * 1.0f) },
-        uniforms::u_pitch_with_map::Value{ values.pitchAlignment == AlignmentType::Map },
         uniforms::u_is_halo::Value{ part == SymbolSDFPart::Halo }
     );
 }

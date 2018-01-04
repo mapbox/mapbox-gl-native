@@ -34,7 +34,7 @@ struct LayerWrapper {
         } \
     } while (NO);
 
-@class MGLMapView;
+@class MGLStyle;
 
 @interface MGLStyleLayer (Private)
 
@@ -69,7 +69,7 @@ struct LayerWrapper {
  `mbgl::Map` and this object no longer has an active unique_ptr reference to the
  `mbgl::style::Layer`.
  */
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(nullable MGLStyleLayer *)otherLayer;
+- (void)addToStyle:(MGLStyle *)style belowLayer:(nullable MGLStyleLayer *)otherLayer;
 
 /**
  Removes the mbgl style layer that this object represents from the mbgl map.
@@ -78,7 +78,7 @@ struct LayerWrapper {
  to the `MGLStyleLayer` instance and the unique_ptr reference is valid again. It
  is safe to add the layer back to the style after it is removed.
  */
-- (void)removeFromMapView:(MGLMapView *)mapView;
+- (void)removeFromStyle:(MGLStyle *)style;
 
 @end
 

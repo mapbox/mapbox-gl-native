@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 @class MGLAnnotationImage;
 @class MGLMapCamera;
 @class MGLStyle;
+@class MGLShape;
 
 @protocol MGLAnnotation;
 @protocol MGLMapViewDelegate;
@@ -239,7 +240,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  The default value of this property is 0.
  */
-@property (nonatomic) double minimumZoomLevel;
+@property (nonatomic) IBInspectable double minimumZoomLevel;
 
 /**
  The maximum zoom level the map can be shown at.
@@ -247,9 +248,10 @@ MGL_EXPORT IB_DESIGNABLE
  If the value of this property is smaller than that of the `minimumZoomLevel`
  property, the behavior is undefined.
 
- The default value of this property is 20.
+ The default value of this property is 22. The upper bound for this property
+ is 25.5.
  */
-@property (nonatomic) double maximumZoomLevel;
+@property (nonatomic) IBInspectable double maximumZoomLevel;
 
 /**
  Changes the zoom level of the map and optionally animates the change.
@@ -320,6 +322,24 @@ MGL_EXPORT IB_DESIGNABLE
  @param completion The block to execute after the animation finishes.
  */
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
+
+ /**
+ Moves the viewpoint to a different location with respect to the map with an
+ optional transition duration and timing function.
+ 
+ @param camera The new viewpoint.
+ @param duration The amount of time, measured in seconds, that the transition
+ animation should take. Specify `0` to jump to the new viewpoint
+ instantaneously.
+ @param function A timing function used for the animation. Set this parameter to
+ `nil` for a transition that matches most system animations. If the duration
+ is `0`, this parameter is ignored.
+ @param edgePadding The minimum padding (in screen points) that would be visible
+ around the returned camera object if it were set as the receiver’s camera.
+  @param completion The block to execute after the animation finishes.
+ */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(NSEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion;
+
 
 /**
  Moves the viewpoint to a different location using a transition animation that
@@ -454,6 +474,20 @@ MGL_EXPORT IB_DESIGNABLE
     direction and pitch.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(NSEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given shape, with the specified direction,
+ optionally with some additional padding on each side.
+
+ @param shape The shape to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high 
+    (close to the ground) as possible while still including the entire shape. The
+    camera object uses the current pitch.
+ */
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(NSEdgeInsets)insets;
 
 /**
  A Boolean value indicating whether the receiver automatically adjusts its
@@ -728,6 +762,15 @@ MGL_EXPORT IB_DESIGNABLE
 - (id <MGLAnnotation>)annotationAtPoint:(NSPoint)point;
 
 #pragma mark Overlaying the Map
+
+/**
+ The complete list of overlays associated with the receiver. (read-only)
+
+ The objects in this array must adopt the `MGLOverlay` protocol. If no
+ overlays are associated with the map view, the value of this property is
+ empty array.
+ */
+@property (nonatomic, readonly, nonnull) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
 
 /**
  Adds a single overlay to the map.

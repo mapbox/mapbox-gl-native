@@ -1,5 +1,6 @@
 #include "asset_manager_file_source.hpp"
 
+#include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/response.hpp>
 #include <mbgl/util/util.hpp>
 #include <mbgl/util/thread.hpp>
@@ -12,10 +13,10 @@ namespace mbgl {
 
 class AssetManagerFileSource::Impl {
 public:
-    Impl(AAssetManager* assetManager_) : assetManager(assetManager_) {
+    Impl(ActorRef<Impl>, AAssetManager* assetManager_) : assetManager(assetManager_) {
     }
 
-    void request(const std::string& url, FileSource::Callback callback) {
+    void request(const std::string& url, ActorRef<FileSourceRequest> req) {
         // Note: AssetManager already prepends "assets" to the filename.
         const std::string path = mbgl::util::percentDecode(url.substr(8));
 
@@ -30,7 +31,7 @@ public:
                                                                "Could not read asset");
         }
 
-        callback(response);
+        req.invoke(&FileSourceRequest::setResponse, response);
     }
 
 private:
@@ -39,15 +40,18 @@ private:
 
 AssetManagerFileSource::AssetManagerFileSource(jni::JNIEnv& env, jni::Object<android::AssetManager> assetManager_)
     : assetManager(assetManager_.NewGlobalRef(env)),
-    thread(std::make_unique<util::Thread<Impl>>(
-        util::ThreadContext{"AssetManagerFileSource", util::ThreadPriority::Low},
-        AAssetManager_fromJava(&env, jni::Unwrap(**assetManager)))) {
+      impl(std::make_unique<util::Thread<Impl>>("AssetManagerFileSource",
+          AAssetManager_fromJava(&env, jni::Unwrap(**assetManager)))) {
 }
 
 AssetManagerFileSource::~AssetManagerFileSource() = default;
 
 std::unique_ptr<AsyncRequest> AssetManagerFileSource::request(const Resource& resource, Callback callback) {
-    return thread->invokeWithCallback(&Impl::request, resource.url, callback);
+    auto req = std::make_unique<FileSourceRequest>(std::move(callback));
+
+    impl->actor().invoke(&Impl::request, resource.url, req->actor());
+
+    return std::move(req);
 }
 
 } // namespace mbgl

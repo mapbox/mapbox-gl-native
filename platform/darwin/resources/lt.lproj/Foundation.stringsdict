@@ -16,8 +16,6 @@
 			<string>%d laipsniai</string>
 			<key>few</key>
 			<string>%d laipsniai</string>
-			<key>many</key>
-			<string>%d laipsniai</string>
 			<key>other</key>
 			<string>%d laipsnių</string>
 		</dict>
@@ -36,8 +34,6 @@
 			<string>%d minutė</string>
 			<key>few</key>
 			<string>%d minutės</string>
-			<key>many</key>
-			<string>%d minutės</string>
 			<key>other</key>
 			<string>%d minučių</string>
 		</dict>
@@ -55,8 +51,6 @@
 			<key>one</key>
 			<string>%d sekundė</string>
 			<key>few</key>
-			<string>%d sekundės</string>
-			<key>many</key>
 			<string>%d sekundės</string>
 			<key>other</key>
 			<string>%d sekundžių</string>

@@ -36,8 +36,35 @@ optional<TextTransformType> IdentityStops<TextTransformType>::evaluate(const Val
     if (!value.is<std::string>()) {
         return {};
     }
-    
+
     return Enum<TextTransformType>::toEnum(value.get<std::string>());
+}
+
+template <>
+optional<TextJustifyType> IdentityStops<TextJustifyType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<TextJustifyType>::toEnum(value.get<std::string>());
+}
+
+template <>
+optional<SymbolAnchorType> IdentityStops<SymbolAnchorType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<SymbolAnchorType>::toEnum(value.get<std::string>());
+}
+
+template <>
+optional<LineJoinType> IdentityStops<LineJoinType>::evaluate(const Value& value) const {
+    if (!value.is<std::string>()) {
+        return {};
+    }
+
+    return Enum<LineJoinType>::toEnum(value.get<std::string>());
 }
 
 template <>

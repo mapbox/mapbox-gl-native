@@ -3,11 +3,11 @@
 set -e
 set -o pipefail
 
-CLANG_TIDY_PREFIX=${CLANG_TIDY_PREFIX:-$(scripts/mason.sh PREFIX clang-tidy VERSION 4.0.0)}
+CLANG_TIDY_PREFIX=${CLANG_TIDY_PREFIX:-$(scripts/mason.sh PREFIX clang-tidy VERSION 4.0.1)}
 CLANG_TIDY=${CLANG_TIDY:-${CLANG_TIDY_PREFIX}/bin/clang-tidy}
 CLANG_APPLY=${CLANG_APPLY:-${CLANG_TIDY_PREFIX}/bin/clang-apply-replacements}
 
-CLANG_FORMAT=${CLANG_FORMAT:-$(scripts/mason.sh PREFIX clang-format VERSION 4.0.0)/bin/clang-format}
+CLANG_FORMAT=${CLANG_FORMAT:-$(scripts/mason.sh PREFIX clang-format VERSION 4.0.1)/bin/clang-format}
 
 for CLANG_FILE in "${CLANG_TIDY} ${CLANG_APPLY} ${CLANG_FORMAT}"; do
     command -v ${CLANG_TIDY} > /dev/null 2>&1 || {

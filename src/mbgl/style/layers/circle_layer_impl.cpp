@@ -1,11 +1,14 @@
 #include <mbgl/style/layers/circle_layer_impl.hpp>
-#include <mbgl/renderer/render_circle_layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<RenderLayer> CircleLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderCircleLayer>(*this);
+bool CircleLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
+    assert(dynamic_cast<const CircleLayer::Impl*>(&other));
+    const auto& impl = static_cast<const style::CircleLayer::Impl&>(other);
+    return filter     != impl.filter ||
+           visibility != impl.visibility ||
+           paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 
 } // namespace style

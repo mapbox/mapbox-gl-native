@@ -117,7 +117,9 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
     }
 
     if (cacheControl) {
-        response.expires = http::CacheControl::parse(jni::Make<std::string>(env, cacheControl).c_str()).toTimePoint();
+        const auto cc = http::CacheControl::parse(jni::Make<std::string>(env, cacheControl).c_str());
+        response.expires = cc.toTimePoint();
+        response.mustRevalidate = cc.mustRevalidate;
     }
 
     if (expires) {

@@ -7,6 +7,7 @@
 
 #include <array>
 #include <vector>
+#include <map>
 #include <functional>
 
 namespace mbgl {
@@ -22,15 +23,35 @@ public:
     T t;
 };
 
+class ActiveUniform {
+public:
+    std::size_t size;
+    UniformDataType type;
+};
+
+#ifndef NDEBUG
+
+template <class T>
+bool verifyUniform(const ActiveUniform&);
+
+using ActiveUniforms = std::map<std::string, ActiveUniform>;
+ActiveUniforms activeUniforms(ProgramID);
+
+#endif
+
 template <class Tag, class T>
 class Uniform {
 public:
     using Value = UniformValue<Tag, T>;
 
+    using Type = T;
+
     class State {
     public:
+        State(UniformLocation location_) : location(std::move(location_)) {}
+
         void operator=(const Value& value) {
-            if (!current || *current != value.t) {
+            if (location >= 0 && (!current || *current != value.t)) {
                 current = value.t;
                 bindUniform(location, value.t);
             }
@@ -70,19 +91,31 @@ public:
     using NamedLocations = std::vector<std::pair<const std::string, UniformLocation>>;
 
     static State bindLocations(const ProgramID& id) {
+#ifndef NDEBUG
+        // Verify active uniform types match the enum
+        const auto active = activeUniforms(id);
+
+        util::ignore(
+            { // Some shader programs have uniforms declared, but not used, so they're not active.
+              // Therefore, we'll only verify them when they are indeed active.
+              (active.find(Us::name()) != active.end()
+                   ? verifyUniform<typename Us::Type>(active.at(Us::name()))
+                   : false)... });
+#endif
+
         return State { { uniformLocation(id, Us::name()) }... };
     }
 
     template <class Program>
     static State loadNamedLocations(const Program& program) {
-        return State{ { program.uniformLocation(Us::name()) }... };
+        return State(typename Us::State(program.uniformLocation(Us::name()))...);
     }
 
     static NamedLocations getNamedLocations(const State& state) {
         return NamedLocations{ { Us::name(), state.template get<Us>().location }... };
     }
 
-    static void bind(State& state, Values&& values) {
+    static void bind(State& state, const Values& values) {
         util::ignore({ (state.template get<Us>() = values.template get<Us>(), 0)... });
     }
 };

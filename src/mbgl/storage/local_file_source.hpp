@@ -19,7 +19,8 @@ public:
 
 private:
     class Impl;
-    std::unique_ptr<util::Thread<Impl>> thread;
+
+    std::unique_ptr<util::Thread<Impl>> impl;
 };
 
 } // namespace mbgl

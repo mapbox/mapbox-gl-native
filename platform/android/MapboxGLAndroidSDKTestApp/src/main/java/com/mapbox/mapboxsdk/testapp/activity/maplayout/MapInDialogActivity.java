@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.FragmentManager;
@@ -27,13 +29,10 @@ public class MapInDialogActivity extends AppCompatActivity {
     setContentView(R.layout.activity_map_in_dialog);
 
     Button button = (Button) findViewById(R.id.button_open_dialog);
-    button.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        FragmentManager fm = getSupportFragmentManager();
-        MapDialogFragment editNameDialogFragment = MapDialogFragment.newInstance("Map Dialog");
-        editNameDialogFragment.show(fm, "fragment_dialog_map");
-      }
+    button.setOnClickListener(view -> {
+      FragmentManager fm = getSupportFragmentManager();
+      MapDialogFragment editNameDialogFragment = MapDialogFragment.newInstance("Map Dialog");
+      editNameDialogFragment.show(fm, "fragment_dialog_map");
     });
   }
 
@@ -65,6 +64,22 @@ public class MapInDialogActivity extends AppCompatActivity {
       mapView.onCreate(savedInstanceState);
     }
 
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+      return new Dialog(getActivity(), getTheme()) {
+        boolean destroyed = false;
+        @Override
+        public void dismiss() {
+          if (mapView != null && !destroyed) {
+            mapView.onDestroy();
+            destroyed = true;
+          }
+          super.dismiss();
+        }
+      };
+    }
+
     @Override
     public void onStart() {
       super.onStart();
@@ -87,12 +102,6 @@ public class MapInDialogActivity extends AppCompatActivity {
     public void onStop() {
       super.onStop();
       mapView.onStop();
-    }
-
-    @Override
-    public void onDestroy() {
-      super.onDestroy();
-      mapView.onDestroy();
     }
 
     @Override

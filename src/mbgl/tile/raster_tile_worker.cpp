@@ -1,6 +1,6 @@
 #include <mbgl/tile/raster_tile_worker.hpp>
 #include <mbgl/tile/raster_tile.hpp>
-#include <mbgl/renderer/raster_bucket.hpp>
+#include <mbgl/renderer/buckets/raster_bucket.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/util/premultiply.hpp>
 
@@ -10,17 +10,17 @@ RasterTileWorker::RasterTileWorker(ActorRef<RasterTileWorker>, ActorRef<RasterTi
     : parent(std::move(parent_)) {
 }
 
-void RasterTileWorker::parse(std::shared_ptr<const std::string> data) {
+void RasterTileWorker::parse(std::shared_ptr<const std::string> data, uint64_t correlationID) {
     if (!data) {
-        parent.invoke(&RasterTile::onParsed, nullptr); // No data; empty tile.
+        parent.invoke(&RasterTile::onParsed, nullptr, correlationID); // No data; empty tile.
         return;
     }
 
     try {
-        auto bucket = std::make_unique<RasterBucket>(util::unpremultiply(decodeImage(*data)));
-        parent.invoke(&RasterTile::onParsed, std::move(bucket));
+        auto bucket = std::make_unique<RasterBucket>(decodeImage(*data));
+        parent.invoke(&RasterTile::onParsed, std::move(bucket), correlationID);
     } catch (...) {
-        parent.invoke(&RasterTile::onError, std::current_exception());
+        parent.invoke(&RasterTile::onError, std::current_exception(), correlationID);
     }
 }
 

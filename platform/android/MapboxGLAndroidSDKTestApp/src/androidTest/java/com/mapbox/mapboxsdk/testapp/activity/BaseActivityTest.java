@@ -10,18 +10,14 @@ import android.support.test.espresso.UiController;
 import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
-
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
-
 import junit.framework.Assert;
-
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
-
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -49,8 +45,9 @@ public abstract class BaseActivityTest {
       throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n"
         + "The ViewHierarchy doesn't contain a view with resource id = R.id.mapView or \n"
         + "the Activity doesn't contain an instance variable with a name equal to mapboxMap.\n"
-        + "You can resolve this issue be implementing the requirements above or\n add "
-        + getActivityClass().getSimpleName() + " to the excludeActivities array in `generate-test-code.js`.\n");
+        + "You can resolve this issue by adding the requirements above or\n add "
+        + getActivityClass().getSimpleName() + " to the platform/android/scripts/exclude-activity-gen.json to blacklist"
+        + " the Activity from being generated.\n");
     }
   }
 
@@ -67,12 +64,15 @@ public abstract class BaseActivityTest {
   protected abstract Class getActivityClass();
 
   protected void checkViewIsDisplayed(int id) {
-    onView(withId(id))
-      .check(matches(isDisplayed()));
+    onView(withId(id)).check(matches(isDisplayed()));
   }
 
   protected void waitLoop() {
-    onView(withId(R.id.mapView)).perform(new LoopAction(500));
+    waitLoop(500);
+  }
+
+  protected void waitLoop(long waitTime) {
+    onView(withId(R.id.mapView)).perform(new LoopAction(waitTime));
   }
 
   static boolean isConnected(Context context) {

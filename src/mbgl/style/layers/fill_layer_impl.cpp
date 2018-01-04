@@ -1,11 +1,14 @@
 #include <mbgl/style/layers/fill_layer_impl.hpp>
-#include <mbgl/renderer/render_fill_layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<RenderLayer> FillLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderFillLayer>(*this);
+bool FillLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
+    assert(dynamic_cast<const FillLayer::Impl*>(&other));
+    const auto& impl = static_cast<const style::FillLayer::Impl&>(other);
+    return filter     != impl.filter ||
+           visibility != impl.visibility ||
+           paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 
 } // namespace style

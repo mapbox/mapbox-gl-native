@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -41,41 +40,34 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @SuppressWarnings("ConstantConditions")
-      @Override
-      public void onMapReady(final MapboxMap mapboxMap) {
-        QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
-        selectionBox.setOnClickListener(new View.OnClickListener() {
-          @Override
-          public void onClick(View view) {
-            // Query
-            int top = selectionBox.getTop() - mapView.getTop();
-            int left = selectionBox.getLeft() - mapView.getLeft();
-            RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-            Timber.i(String.format("Querying box %s for buildings", box));
-            List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
+    mapView.getMapAsync(mapboxMap -> {
+      QueryRenderedFeaturesBoxHighlightActivity.this.mapboxMap = mapboxMap;
 
-            // Show count
-            Toast.makeText(
-              QueryRenderedFeaturesBoxHighlightActivity.this,
-              String.format("%s features in box", features.size()),
-              Toast.LENGTH_SHORT).show();
+      // Add layer / source
+      final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
+      mapboxMap.addSource(source);
+      mapboxMap.addLayer(
+        new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
+          .withProperties(fillColor(Color.RED))
+      );
 
-            // remove layer / source if already added
-            mapboxMap.removeSource("highlighted-shapes-source");
-            mapboxMap.removeLayer("highlighted-shapes-layer");
+      selectionBox.setOnClickListener(view -> {
+        // Query
+        int top = selectionBox.getTop() - mapView.getTop();
+        int left = selectionBox.getLeft() - mapView.getLeft();
+        RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
+        Timber.i("Querying box %s for buildings", box);
+        List<Feature> features = mapboxMap.queryRenderedFeatures(box, Filter.lt("height", 10), "building");
 
-            // Add layer / source
-            mapboxMap.addSource(
-              new GeoJsonSource("highlighted-shapes-source",
-                FeatureCollection.fromFeatures(features))
-            );
-            mapboxMap.addLayer(new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
-              .withProperties(fillColor(Color.RED)));
-          }
-        });
-      }
+        // Show count
+        Toast.makeText(
+          QueryRenderedFeaturesBoxHighlightActivity.this,
+          String.format("%s features in box", features.size()),
+          Toast.LENGTH_SHORT).show();
+
+        // Update source data
+        source.setGeoJson(FeatureCollection.fromFeatures(features));
+      });
     });
   }
 

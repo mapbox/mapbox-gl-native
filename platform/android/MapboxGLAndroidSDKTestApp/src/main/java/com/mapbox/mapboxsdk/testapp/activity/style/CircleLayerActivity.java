@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.style;
 
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -14,7 +13,6 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -56,16 +54,12 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull
-                             final MapboxMap map) {
-        mapboxMap = map;
-        addBusStopSource();
-        addBusStopCircleLayer();
-        initFloatingActionButtons();
-        isLoadingStyle = false;
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      addBusStopSource();
+      addBusStopCircleLayer();
+      initFloatingActionButtons();
+      isLoadingStyle = false;
     });
   }
 
@@ -74,7 +68,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       source = new GeoJsonSource("bus_stop",
         new URL("https://raw.githubusercontent.com/cheeaun/busrouter-sg/master/data/2/bus-stops.geojson"));
     } catch (MalformedURLException exception) {
-      Timber.e("That's not an url... ", exception);
+      Timber.e(exception, "That's not an url... ");
     }
     mapboxMap.addSource(source);
   }
@@ -132,7 +126,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
         new URL("https://gist.githubusercontent.com/tobrun/7fbc0fe7e9ffea509f7608cda2601d5d/raw/"
           + "a4b8cc289020f91fa2e1553524820054395e36f5/line.geojson")));
     } catch (MalformedURLException malformedUrlException) {
-      Timber.e("That's not an url... ", malformedUrlException);
+      Timber.e(malformedUrlException, "That's not an url... ");
     }
   }
 
@@ -161,12 +155,9 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle(), new MapboxMap.OnStyleLoadedListener() {
-      @Override
-      public void onStyleLoaded(String style) {
-        addBusStop();
-        isLoadingStyle = false;
-      }
+    mapboxMap.setStyleUrl(getNextStyle(), style -> {
+      addBusStop();
+      isLoadingStyle = false;
     });
   }
 

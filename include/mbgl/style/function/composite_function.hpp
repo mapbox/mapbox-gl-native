@@ -1,5 +1,12 @@
 #pragma once
 
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/interpolate.hpp>
+#include <mbgl/style/expression/step.hpp>
+#include <mbgl/style/expression/find_zoom_curve.hpp>
+#include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/is_constant.hpp>
+#include <mbgl/style/function/convert.hpp>
 #include <mbgl/style/function/composite_exponential_stops.hpp>
 #include <mbgl/style/function/composite_interval_stops.hpp>
 #include <mbgl/style/function/composite_categorical_stops.hpp>
@@ -24,7 +31,7 @@ template <class T>
 class CompositeFunction {
 public:
     using InnerStops = std::conditional_t<
-        util::Interpolatable<T>,
+        util::Interpolatable<T>::value,
         variant<
             ExponentialStops<T>,
             IntervalStops<T>,
@@ -34,7 +41,7 @@ public:
             CategoricalStops<T>>>;
 
     using Stops = std::conditional_t<
-        util::Interpolatable<T>,
+        util::Interpolatable<T>::value,
         variant<
             CompositeExponentialStops<T>,
             CompositeIntervalStops<T>,
@@ -43,78 +50,71 @@ public:
             CompositeIntervalStops<T>,
             CompositeCategoricalStops<T>>>;
 
-    CompositeFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
-        : property(std::move(property_)),
-          stops(std::move(stops_)),
-          defaultValue(std::move(defaultValue_)) {
+    CompositeFunction(std::unique_ptr<expression::Expression> expression_)
+    :   expression(std::move(expression_)),
+        zoomCurve(expression::findZoomCurveChecked(expression.get()))
+    {
+        assert(!expression::isZoomConstant(*expression));
+        assert(!expression::isFeatureConstant(*expression));
     }
 
-    std::tuple<Range<float>, Range<InnerStops>>
-    coveringRanges(float zoom) const {
-        return stops.match(
-            [&] (const auto& s) {
-                assert(!s.stops.empty());
-                auto minIt = s.stops.lower_bound(zoom);
-                auto maxIt = s.stops.upper_bound(zoom);
-                
-                // lower_bound yields first element >= zoom, but we want the *last*
-                // element <= zoom, so if we found a stop > zoom, back up by one.
-                if (minIt != s.stops.begin() && minIt->first > zoom) {
-                    minIt--;
-                }
-                
-                return std::make_tuple(
-                    Range<float> {
-                        minIt == s.stops.end() ? s.stops.rbegin()->first : minIt->first,
-                        maxIt == s.stops.end() ? s.stops.rbegin()->first : maxIt->first
-                    },
-                    Range<InnerStops> {
-                        s.innerStops(minIt == s.stops.end() ? s.stops.rbegin()->second : minIt->second),
-                        s.innerStops(maxIt == s.stops.end() ? s.stops.rbegin()->second : maxIt->second)
-                    }
-                );
-            }
-        );
+    CompositeFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
+    :   property(std::move(property_)),
+        stops(std::move(stops_)),
+        defaultValue(std::move(defaultValue_)),
+        expression(stops.match([&] (const auto& s) {
+            return expression::Convert::toExpression(property, s);
+        })),
+        zoomCurve(expression::findZoomCurveChecked(expression.get()))
+    {}
+
+    // Return the range obtained by evaluating the function at each of the zoom levels in zoomRange
+    template <class Feature>
+    Range<T> evaluate(const Range<float>& zoomRange, const Feature& feature, T finalDefaultValue) {
+        return Range<T> {
+            evaluate(zoomRange.min, feature, finalDefaultValue),
+            evaluate(zoomRange.max, feature, finalDefaultValue)
+        };
     }
 
     template <class Feature>
-    Range<T> evaluate(Range<InnerStops> coveringStops,
-                      const Feature& feature,
-                      T finalDefaultValue) const {
-        optional<Value> v = feature.getValue(property);
-        if (!v) {
-            return {
-                defaultValue.value_or(finalDefaultValue),
-                defaultValue.value_or(finalDefaultValue)
-            };
+    T evaluate(float zoom, const Feature& feature, T finalDefaultValue) const {
+        const expression::EvaluationResult result = expression->evaluate(expression::EvaluationContext({zoom}, &feature));
+        if (result) {
+            const optional<T> typed = expression::fromExpressionValue<T>(*result);
+            return typed ? *typed : defaultValue ? *defaultValue : finalDefaultValue;
         }
-        auto eval = [&] (const auto& s) {
-            return s.evaluate(*v).value_or(defaultValue.value_or(finalDefaultValue));
-        };
-        return Range<T> {
-            coveringStops.min.match(eval),
-            coveringStops.max.match(eval)
-        };
+        return defaultValue ? *defaultValue : finalDefaultValue;
     }
-
-    T evaluate(float zoom, const GeometryTileFeature& feature, T finalDefaultValue) const {
-        std::tuple<Range<float>, Range<InnerStops>> ranges = coveringRanges(zoom);
-        Range<T> resultRange = evaluate(std::get<1>(ranges), feature, finalDefaultValue);
-        return util::interpolate(
-            resultRange.min,
-            resultRange.max,
-            util::interpolationFactor(1.0f, std::get<0>(ranges), zoom));
+    
+    float interpolationFactor(const Range<float>& inputLevels, const float inputValue) const {
+        return zoomCurve.match(
+            [&](const expression::InterpolateBase* z) {
+                return z->interpolationFactor(Range<double> { inputLevels.min, inputLevels.max }, inputValue);
+            },
+            [&](const expression::Step*) { return 0.0f; }
+        );
+    }
+    
+    Range<float> getCoveringStops(const float lower, const float upper) const {
+        return zoomCurve.match(
+            [&](auto z) { return z->getCoveringStops(lower, upper); }
+        );
     }
 
     friend bool operator==(const CompositeFunction& lhs,
                            const CompositeFunction& rhs) {
-        return std::tie(lhs.property, lhs.stops, lhs.defaultValue)
-            == std::tie(rhs.property, rhs.stops, rhs.defaultValue);
+        return *lhs.expression == *rhs.expression;
     }
 
     std::string property;
     Stops stops;
     optional<T> defaultValue;
+    bool useIntegerZoom = false;
+    
+private:
+    std::shared_ptr<expression::Expression> expression;
+    const variant<const expression::InterpolateBase*, const expression::Step*> zoomCurve;
 };
 
 } // namespace style

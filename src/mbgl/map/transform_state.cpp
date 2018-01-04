@@ -66,6 +66,15 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
     matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
                       pixel_y() - size.height / 2.0f, 0);
 
+    if (axonometric) {
+        // mat[11] controls perspective
+        projMatrix[11] = 0;
+
+        // mat[8], mat[9] control x-skew, y-skew
+        projMatrix[8] = xSkew;
+        projMatrix[9] = ySkew;
+    }
+
     matrix::scale(projMatrix, projMatrix, 1, 1,
                   1.0 / Projection::getMetersPerPixelAtLatitude(getLatLng(LatLng::Unwrapped).latitude(), getZoom()));
 }
@@ -132,7 +141,7 @@ double TransformState::getZoom() const {
     return scaleZoom(scale);
 }
 
-int32_t TransformState::getIntegerZoom() const {
+uint8_t TransformState::getIntegerZoom() const {
     return getZoom();
 }
 
@@ -142,12 +151,14 @@ double TransformState::getZoomFraction() const {
 
 #pragma mark - Bounds
 
-void TransformState::setLatLngBounds(const LatLngBounds& bounds_) {
-    bounds = bounds_;
-    setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
+void TransformState::setLatLngBounds(optional<LatLngBounds> bounds_) {
+    if (bounds_ != bounds) {
+        bounds = bounds_;
+        setLatLngZoom(getLatLng(LatLng::Unwrapped), getZoom());
+    }
 }
 
-LatLngBounds TransformState::getLatLngBounds() const {
+optional<LatLngBounds> TransformState::getLatLngBounds() const {
     return bounds;
 }
 
@@ -350,10 +361,13 @@ void TransformState::moveLatLng(const LatLng& latLng, const ScreenCoordinate& an
     setLatLngZoom(Projection::unproject(centerCoord + latLngCoord - anchorCoord, scale), getZoom());
 }
 
-void TransformState::setLatLngZoom(const LatLng &latLng, double zoom) {
-    const LatLng constrained = bounds.constrain(latLng);
+void TransformState::setLatLngZoom(const LatLng& latLng, double zoom) {
+    LatLng constrained = latLng;
+    if (bounds) {
+        constrained = bounds->constrain(latLng);
+    }
 
-    double newScale = zoomScale(zoom);
+    double newScale = util::clamp(zoomScale(zoom), min_scale, max_scale);
     const double newWorldSize = newScale * util::tileSize;
     Bc = newWorldSize / util::DEGREES_MAX;
     Cc = newWorldSize / util::M2PI;
@@ -378,6 +392,18 @@ void TransformState::setScalePoint(const double newScale, const ScreenCoordinate
     y = constrainedPoint.y;
     Bc = Projection::worldSize(scale) / util::DEGREES_MAX;
     Cc = Projection::worldSize(scale) / util::M2PI;
+}
+
+float TransformState::getCameraToTileDistance(const UnwrappedTileID& tileID) const {
+    mat4 projectionMatrix;
+    getProjMatrix(projectionMatrix);
+    mat4 tileProjectionMatrix;
+    matrixFor(tileProjectionMatrix, tileID);
+    matrix::multiply(tileProjectionMatrix, projectionMatrix, tileProjectionMatrix);
+    vec4 tileCenter = {{util::tileSize / 2, util::tileSize / 2, 0, 1}};
+    vec4 projectedCenter;
+    matrix::transformMat4(projectedCenter, tileCenter, tileProjectionMatrix);
+    return projectedCenter[3];
 }
 
 } // namespace mbgl

@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -14,18 +15,32 @@ import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
+import com.mapbox.services.android.telemetry.location.LocationEngineProvider;
 
+import timber.log.Timber;
+
+/**
+ * The entry point to initialize the Mapbox Android SDK.
+ * <p>
+ * Obtain a reference by calling {@link #getInstance(Context, String)}. Usually this class is configured in
+ * Application#onCreate() and is responsible for the active access token, application context, and
+ * connectivity state.
+ * </p>
+ */
+@UiThread
 public final class Mapbox {
 
+  @SuppressLint("StaticFieldLeak")
   private static Mapbox INSTANCE;
   private Context context;
   private String accessToken;
   private Boolean connected;
+  private LocationEngine locationEngine;
 
   /**
    * Get an instance of Mapbox.
    * <p>
-   * This class manages the active access token, application context and connectivity state.
+   * This class manages the active access token, application context, and connectivity state.
    * </p>
    *
    * @param context     Android context which holds or is an application context
@@ -36,25 +51,33 @@ public final class Mapbox {
   public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
-      INSTANCE = new Mapbox(appContext, accessToken);
-      LocationEngine locationEngine = LocationSource.getLocationEngine(appContext);
+      LocationEngineProvider locationEngineProvider = new LocationEngineProvider(context);
+      LocationEngine locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
+      INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
-      MapboxTelemetry.getInstance().initialize(
-        appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+
+      try {
+        MapboxTelemetry.getInstance().initialize(
+          appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
+      } catch (Exception exception) {
+        Timber.e(exception, "Unable to instantiate Mapbox telemetry");
+      }
+
       ConnectivityReceiver.instance(appContext);
     }
     return INSTANCE;
   }
 
-  Mapbox(@NonNull Context context, @NonNull String accessToken) {
+  Mapbox(@NonNull Context context, @NonNull String accessToken, LocationEngine locationEngine) {
     this.context = context;
     this.accessToken = accessToken;
+    this.locationEngine = locationEngine;
   }
 
   /**
-   * Access Token for this application.
+   * Access token for this application.
    *
-   * @return Mapbox Access Token
+   * @return Mapbox access token
    */
   public static String getAccessToken() {
     validateMapbox();
@@ -72,7 +95,7 @@ public final class Mapbox {
   }
 
   /**
-   * Runtime validation of Access Token.
+   * Runtime validation of access token.
    *
    * @throws MapboxConfigurationException exception thrown when not using a valid accessToken
    */
@@ -86,17 +109,19 @@ public final class Mapbox {
 
   /**
    * Application context
+   *
+   * @return the application context
    */
   public static Context getApplicationContext() {
     return INSTANCE.context;
   }
 
   /**
-   * Manually sets the connectivity state of the app. This is useful for apps that control their
+   * Manually sets the connectivity state of the app. This is useful for apps which control their
    * own connectivity state and want to bypass any checks to the ConnectivityManager.
    *
    * @param connected flag to determine the connectivity state, true for connected, false for
-   *                  disconnected, null for ConnectivityManager to determine.
+   *                  disconnected, and null for ConnectivityManager to determine.
    */
   public static synchronized void setConnected(Boolean connected) {
     // Connectivity state overridden by app
@@ -104,10 +129,10 @@ public final class Mapbox {
   }
 
   /**
-   * Determines whether we have an Internet connection available. Please do not rely on this
-   * method in your apps, this method is used internally by the SDK.
+   * Determines whether we have an internet connection available. Please do not rely on this
+   * method in your apps. This method is used internally by the SDK.
    *
-   * @return true if there is an Internet connection, false otherwise
+   * @return true if there is an internet connection, false otherwise
    */
   public static synchronized Boolean isConnected() {
     if (INSTANCE.connected != null) {
@@ -118,5 +143,26 @@ public final class Mapbox {
     ConnectivityManager cm = (ConnectivityManager) INSTANCE.context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return (activeNetwork != null && activeNetwork.isConnected());
+  }
+
+  /**
+   * Returns a location source instance with empty methods.
+   *
+   * @return an empty location source implementation
+   * @deprecated Replaced by {@link Mapbox#getLocationEngine()}
+   */
+  @Deprecated
+  public static LocationSource getLocationSource() {
+    return new EmptyLocationSource();
+  }
+
+
+  /**
+   * Returns the location engine used by the SDK.
+   *
+   * @return the location engine configured
+   */
+  public static LocationEngine getLocationEngine() {
+    return INSTANCE.locationEngine;
   }
 }

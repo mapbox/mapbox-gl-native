@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
 import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import static android.support.test.espresso.Espresso.onData;
@@ -67,6 +68,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testMapboxStreetsMapboxAttributionLink() {
     validateTestSetup();
     if (urlSpans == null) {
@@ -87,6 +89,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testMapboxStreetsOpenStreetMapAttributionLink() {
     validateTestSetup();
     if (urlSpans == null) {
@@ -107,6 +110,7 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   @Test
+  @Ignore
   public void testImproveMapLink() {
     validateTestSetup();
     if (urlSpans == null) {
@@ -146,15 +150,12 @@ public class AttributionTest extends BaseActivityTest {
   }
 
   private void buildUrlSpans() {
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction(new InvokeViewAction() {
-      @Override
-      public void onViewAction(UiController uiController, View view) {
-        for (Source source : mapboxMap.getSources()) {
-          String attributionSource = source.getAttribution();
-          if (!TextUtils.isEmpty(attributionSource)) {
-            SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
-            urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
-          }
+    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
+      for (Source source : mapboxMap.getSources()) {
+        String attributionSource = source.getAttribution();
+        if (!TextUtils.isEmpty(attributionSource)) {
+          SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);
+          urlSpans = htmlBuilder.getSpans(0, htmlBuilder.length(), URLSpan.class);
         }
       }
     }));

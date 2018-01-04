@@ -1,11 +1,12 @@
-#import "MGLPolyline.h"
+#import "MGLPolyline_Private.h"
 
 #import "MGLMultiPoint_Private.h"
 #import "MGLGeometry_Private.h"
 
-#import "MGLPolyline+MGLAdditions.h"
+#import "MGLFeature.h"
 
 #import <mbgl/util/geojson.hpp>
+#import <mapbox/polylabel.hpp>
 
 @implementation MGLPolyline
 
@@ -48,8 +49,72 @@
              @"coordinates": self.mgl_coordinates};
 }
 
+- (NS_ARRAY_OF(id) *)mgl_coordinates {
+    NSMutableArray *coordinates = [[NSMutableArray alloc] initWithCapacity:self.pointCount];
+    for (NSUInteger index = 0; index < self.pointCount; index++) {
+        CLLocationCoordinate2D coordinate = self.coordinates[index];
+        [coordinates addObject:@[@(coordinate.longitude), @(coordinate.latitude)]];
+    }
+    return [coordinates copy];
+}
+
 - (BOOL)isEqual:(id)other {
     return self == other || ([other isKindOfClass:[MGLPolyline class]] && [super isEqual:other]);
+}
+
+- (CLLocationCoordinate2D)coordinate {
+    NSUInteger count = self.pointCount;
+    NSAssert(count > 0, @"Polyline must have coordinates");
+
+    CLLocationCoordinate2D *coordinates = self.coordinates;
+    CLLocationDistance middle = [self length] / 2.0;
+    CLLocationDistance traveled = 0.0;
+    
+    if (count > 1 || middle > traveled) {
+        for (NSUInteger i = 0; i < count; i++) {
+            
+            MGLRadianCoordinate2D from = MGLRadianCoordinateFromLocationCoordinate(coordinates[i]);
+            MGLRadianCoordinate2D to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1]);
+            
+            if (traveled >= middle) {
+                double overshoot = middle - traveled;
+                if (overshoot == 0) {
+                    return coordinates[i];
+                }
+                to = MGLRadianCoordinateFromLocationCoordinate(coordinates[i - 1]);
+                CLLocationDirection direction = [self direction:from to:to] - 180;
+                MGLRadianCoordinate2D otherCoordinate = MGLRadianCoordinateAtDistanceFacingDirection(from,
+                                                                                                     overshoot/mbgl::util::EARTH_RADIUS_M,
+                                                                                                     MGLRadiansFromDegrees(direction));
+                return CLLocationCoordinate2DMake(MGLDegreesFromRadians(otherCoordinate.latitude),
+                                                  MGLDegreesFromRadians(otherCoordinate.longitude));
+            }
+            
+            traveled += (MGLDistanceBetweenRadianCoordinates(from, to) * mbgl::util::EARTH_RADIUS_M);
+            
+        }
+    }
+
+    return coordinates[count - 1];
+}
+
+- (CLLocationDistance)length
+{
+    CLLocationDistance length = 0.0;
+    
+    NSUInteger count = self.pointCount;
+    CLLocationCoordinate2D *coordinates = self.coordinates;
+    
+    for (NSUInteger i = 0; i < count - 1; i++) {        
+        length += (MGLDistanceBetweenRadianCoordinates(MGLRadianCoordinateFromLocationCoordinate(coordinates[i]),                                                  MGLRadianCoordinateFromLocationCoordinate(coordinates[i + 1])) * mbgl::util::EARTH_RADIUS_M);
+    }
+    
+    return length;
+}
+
+- (CLLocationDirection)direction:(MGLRadianCoordinate2D)from to:(MGLRadianCoordinate2D)to
+{
+    return MGLDegreesFromRadians(MGLRadianCoordinatesDirection(from, to));
 }
 
 @end
@@ -114,6 +179,15 @@
     return hash;
 }
 
+- (CLLocationCoordinate2D)coordinate {
+    MGLPolyline *polyline = self.polylines.firstObject;
+    CLLocationCoordinate2D *coordinates = polyline.coordinates;
+    NSAssert([polyline pointCount] > 0, @"Polyline must have coordinates");
+    CLLocationCoordinate2D firstCoordinate = coordinates[0];
+
+    return firstCoordinate;
+}
+
 - (BOOL)intersectsOverlayBounds:(MGLCoordinateBounds)overlayBounds {
     return MGLCoordinateBoundsIntersectsCoordinateBounds(_overlayBounds, overlayBounds);
 }
@@ -134,6 +208,16 @@
     }
     return @{@"type": @"MultiLineString",
              @"coordinates": coordinates};
+}
+
+- (NSString *)description
+{
+    return [NSString stringWithFormat:@"<%@: %p; title = %@, subtitle: = %@, count = %lu; bounds = %@>",
+            NSStringFromClass([self class]), (void *)self,
+            self.title ? [NSString stringWithFormat:@"\"%@\"", self.title] : self.title,
+            self.subtitle ? [NSString stringWithFormat:@"\"%@\"", self.subtitle] : self.subtitle,
+            (unsigned long)self.polylines.count,
+            MGLStringFromCoordinateBounds(self.overlayBounds)];
 }
 
 @end

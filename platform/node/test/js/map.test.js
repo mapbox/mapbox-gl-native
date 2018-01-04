@@ -108,8 +108,8 @@ test('Map', function(t) {
             'render',
             'release',
             'cancel',
-            'addClass',
             'addSource',
+            'removeSource',
             'addLayer',
             'removeLayer',
             'addImage',
@@ -121,6 +121,9 @@ test('Map', function(t) {
             'setZoom',
             'setBearing',
             'setPitch',
+            'setAxonometric',
+            'setXSkew',
+            'setYSkew',
             'dumpDebugLogs',
             'queryRenderedFeatures'
         ]);

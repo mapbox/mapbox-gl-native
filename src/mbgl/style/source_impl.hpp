@@ -3,35 +3,30 @@
 #include <mbgl/style/source.hpp>
 #include <mbgl/util/noncopyable.hpp>
 
+#include <string>
+
 namespace mbgl {
 
-class FileSource;
 class RenderSource;
 
 namespace style {
 
 class SourceObserver;
 
-class Source::Impl : private util::noncopyable {
+class Source::Impl {
 public:
-    Impl(SourceType, std::string id, Source&);
     virtual ~Impl() = default;
 
-    virtual void loadDescription(FileSource&) = 0;
-    virtual std::unique_ptr<RenderSource> createRenderSource() const = 0;
+    Impl& operator=(const Impl&) = delete;
 
-    virtual optional<std::string> getAttribution() const { return {}; };
+    virtual optional<std::string> getAttribution() const = 0;
 
     const SourceType type;
     const std::string id;
 
-    bool loaded = false;
-    Source& base;
-
-    void setObserver(SourceObserver*);
-    SourceObserver* observer = nullptr;
-
-    void dumpDebugLogs() const;
+protected:
+    Impl(SourceType, std::string);
+    Impl(const Impl&) = default;
 };
 
 } // namespace style

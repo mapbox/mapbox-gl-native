@@ -5,6 +5,7 @@ import android.content.res.ColorStateList;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.v4.graphics.drawable.DrawableCompat;
@@ -17,52 +18,70 @@ import com.mapbox.mapboxsdk.exceptions.ConversionException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Color utility class.
+ */
 public class ColorUtils {
 
   /**
-   * Returns a color integer associated as primary color from a theme based on a {@link Context}.
+   * Returns a color integer associated as primary color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The primary color value of current theme in the form 0xAARRGGBB.
    */
   @ColorInt
   public static int getPrimaryColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorPrimary, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorPrimary", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_blue);
+    }
   }
 
   /**
-   * Returns a color integer associated as primary dark color from a theme based on a {@link Context}.
+   * Returns a color integer associated as primary dark color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The primary dark color value of current theme in the form 0xAARRGGBB.
    */
   @ColorInt
   public static int getPrimaryDarkColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorPrimaryDark, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorPrimaryDark", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_blue);
+    }
   }
 
   /**
-   * Returns a color integer associated as accent color from a theme based on a {@link Context}.
+   * Returns a color integer associated as accent color from a theme based on a Context.
    *
    * @param context The context used to style the color attributes.
    * @return The accent color value of current theme in the form 0xAARRGGBB.
    */
   @ColorInt
   public static int getAccentColor(@NonNull Context context) {
-    TypedValue typedValue = new TypedValue();
-    Resources.Theme theme = context.getTheme();
-    theme.resolveAttribute(R.attr.colorAccent, typedValue, true);
-    return typedValue.data;
+    try {
+      TypedValue typedValue = new TypedValue();
+      Resources.Theme theme = context.getTheme();
+      int id = context.getResources().getIdentifier("colorAccent", "attrs", context.getPackageName());
+      theme.resolveAttribute(id, typedValue, true);
+      return typedValue.data;
+    } catch (Exception exception) {
+      return getColorCompat(context, R.color.mapbox_gray);
+    }
   }
 
   /**
-   * Returns a color state list associated with a theme based on a {@link Context}
+   * Returns a color state list associated with a theme based on a Context.
    *
    * @param color The color used for tinting.
    * @return A ColorStateList object containing the primary color of a theme
@@ -82,7 +101,7 @@ public class ColorUtils {
   }
 
   /**
-   * Set a color tint list to the {@link Drawable} of an {@link ImageView}.
+   * Set a color tint list to the Drawable of an ImageView.
    *
    * @param imageView The view to set the default tint list.
    * @param tintColor The color to tint.
@@ -117,6 +136,14 @@ public class ColorUtils {
         normalizeColorComponent(m.group(2)), normalizeColorComponent(m.group(3)));
     } else {
       throw new ConversionException("Not a valid rgb/rgba value");
+    }
+  }
+
+  private static int getColorCompat(Context context, int id) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return context.getResources().getColor(id, context.getTheme());
+    } else {
+      return context.getResources().getColor(id);
     }
   }
 }

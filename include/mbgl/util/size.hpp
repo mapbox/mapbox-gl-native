@@ -15,6 +15,10 @@ public:
     constexpr uint32_t area() const {
         return width * height;
     }
+    
+    constexpr float aspectRatio() const {
+        return static_cast<float>(width) / static_cast<float>(height);
+    }
 
     constexpr bool isEmpty() const {
         return width == 0 || height == 0;

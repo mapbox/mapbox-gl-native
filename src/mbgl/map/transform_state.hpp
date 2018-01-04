@@ -4,6 +4,7 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 #include <mbgl/util/projection.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/size.hpp>
@@ -46,12 +47,12 @@ public:
 
     // Zoom
     double getZoom() const;
-    int32_t getIntegerZoom() const;
+    uint8_t getIntegerZoom() const;
     double getZoomFraction() const;
 
     // Bounds
-    void setLatLngBounds(const LatLngBounds&);
-    LatLngBounds getLatLngBounds() const;
+    void setLatLngBounds(optional<LatLngBounds>);
+    optional<LatLngBounds> getLatLngBounds() const;
     void setMinZoom(double);
     double getMinZoom() const;
     void setMaxZoom(double);
@@ -85,15 +86,17 @@ public:
         return !size.isEmpty() && (scale >= min_scale && scale <= max_scale);
     }
 
+    float getCameraToTileDistance(const UnwrappedTileID&) const;
+
 private:
     bool rotatedNorth() const;
     void constrain(double& scale, double& x, double& y) const;
 
-    LatLngBounds bounds = LatLngBounds::world();
+    optional<LatLngBounds> bounds;
 
     // Limit the amount of zooming possible on the map.
     double min_scale = std::pow(2, 0);
-    double max_scale = std::pow(2, 20);
+    double max_scale = std::pow(2, util::DEFAULT_MAX_ZOOM);
     double min_pitch = 0.0;
     double max_pitch = util::PITCH_MAX;
 
@@ -131,6 +134,9 @@ private:
     // `fov = 2 * arctan((height / 2) / (height * 1.5))`
     double fov = 0.6435011087932844;
     double pitch = 0.0;
+    double xSkew = 0.0;
+    double ySkew = 1.0;
+    bool axonometric = false;
 
     // cache values for spherical mercator math
     double Bc = Projection::worldSize(scale) / util::DEGREES_MAX;

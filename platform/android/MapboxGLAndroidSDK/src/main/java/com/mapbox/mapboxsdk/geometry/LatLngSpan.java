@@ -64,19 +64,28 @@ public class LatLngSpan implements Parcelable {
     mLongitudeSpan = longitudeSpan;
   }
 
+  /**
+   * Indicates whether some other object is "equal to" this one.
+   *
+   * @param object The object to compare
+   * @return True if equal, false if not
+   */
   @Override
-  public boolean equals(Object o) {
-    if (this == o) {
+  public boolean equals(Object object) {
+    if (this == object) {
       return true;
     }
-    if (o instanceof LatLngSpan) {
-      LatLngSpan other = (LatLngSpan) o;
+    if (object instanceof LatLngSpan) {
+      LatLngSpan other = (LatLngSpan) object;
       return mLongitudeSpan == other.getLongitudeSpan()
         && mLatitudeSpan == other.getLatitudeSpan();
     }
     return false;
   }
 
+  /**
+   * Inner class responsible for recreating Parcels into objects.
+   */
   public static final Parcelable.Creator<LatLngSpan> CREATOR =
     new Parcelable.Creator<LatLngSpan>() {
       @Override
@@ -90,14 +99,41 @@ public class LatLngSpan implements Parcelable {
       }
     };
 
+  /**
+   * Describe the kinds of special objects contained in this Parcelable instance's marshaled representation.
+   *
+   * @return a bitmask indicating the set of special object types marshaled by this Parcelable object instance.
+   */
   @Override
   public int describeContents() {
     return 0;
   }
 
+  /**
+   * Flatten this object in to a Parcel.
+   *
+   * @param out   Parcel in which the object should be written
+   * @param flags Additional flags about how the object should be written
+   */
   @Override
-  public void writeToParcel(Parcel out, int arg1) {
+  public void writeToParcel(Parcel out, int flags) {
     out.writeDouble(mLatitudeSpan);
     out.writeDouble(mLongitudeSpan);
+  }
+
+  /**
+   * Returns a hash code value for the object.
+   *
+   * @return hash code value of this
+   */
+  @Override
+  public int hashCode() {
+    int result;
+    long temp;
+    temp = Double.doubleToLongBits(mLatitudeSpan);
+    result = (int) (temp ^ (temp >>> 32));
+    temp = Double.doubleToLongBits(mLongitudeSpan);
+    result = 31 * result + (int) (temp ^ (temp >>> 32));
+    return result;
   }
 }

@@ -75,9 +75,9 @@ typedef NS_ENUM(NSUInteger, MGLInterpolationMode) {
      */
     MGLInterpolationModeCategorical,
     /**
-     Values between two stops are not interpolated. Instead, values are set to their
-     input value. Use identity interpolation mode to show attribute values that can be
-     used as style values.
+     Values between two stops are not interpolated. Instead, for any given feature, the
+     style value matches a value in that feature’s attributes dictionary. Use identity
+     interpolation mode to show attribute values that can be used as style values.
      */
     MGLInterpolationModeIdentity
 };
@@ -239,11 +239,10 @@ MGL_EXPORT
  defined by an `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, or
  `MGLCompositeStyleFunction` object.
  
- Do not create instances of this class directly, and do not create your own
- subclasses of this class. Instead, use one of the class factory methods in
- `MGLStyleValue` to create instances of the following concrete subclasses:
- `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, and
- `MGLCompositeStyleFunction`.
+ Create instances of `MGLCameraStyleFunction`, `MGLSourceStyleFunction`, and
+ `MGLCompositeStyleFunction` in order to use `MGLStyleFunction`'s methods. Do
+ not create instances of `MGLStyleFunction` directly, and do not create your
+ own subclasses of this class.
 
  The `MGLStyleFunction` class takes a generic parameter `T` that indicates the
  Foundation class being wrapped by this class.

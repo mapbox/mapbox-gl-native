@@ -7,47 +7,45 @@
 
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
-#include <mbgl/style/conversion/stringify.hpp>
+#include <mbgl/style/layer_observer.hpp>
 
 namespace mbgl {
 namespace style {
 
 <% if (type === 'background') { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID)
-    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
-    impl->id = layerID;
+    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, std::string())) {
 }
 <% } else { -%>
 <%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const std::string& layerID, const std::string& sourceID)
-    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>())
-    , impl(static_cast<Impl*>(baseImpl.get())) {
-    impl->id = layerID;
-    impl->source = sourceID;
+    : Layer(makeMutable<Impl>(LayerType::<%- camelize(type) %>, layerID, sourceID)) {
 }
 <% } -%>
 
-<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(const Impl& other)
-    : Layer(LayerType::<%- camelize(type) %>, std::make_unique<Impl>(other))
-    , impl(static_cast<Impl*>(baseImpl.get())) {
+<%- camelize(type) %>Layer::<%- camelize(type) %>Layer(Immutable<Impl> impl_)
+    : Layer(std::move(impl_)) {
 }
 
 <%- camelize(type) %>Layer::~<%- camelize(type) %>Layer() = default;
 
-std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::clone() const {
-    return std::make_unique<<%- camelize(type) %>Layer>(*this);
+const <%- camelize(type) %>Layer::Impl& <%- camelize(type) %>Layer::impl() const {
+    return static_cast<const Impl&>(*baseImpl);
 }
 
-std::unique_ptr<Layer> <%- camelize(type) %>Layer::Impl::cloneRef(const std::string& id_) const {
-    auto result = std::make_unique<<%- camelize(type) %>Layer>(*this);
-    result->impl->id = id_;
-    result->impl->cascading = <%- camelize(type) %>PaintProperties::Cascading();
-    return std::move(result);
+Mutable<<%- camelize(type) %>Layer::Impl> <%- camelize(type) %>Layer::mutableImpl() const {
+    return makeMutable<Impl>(impl());
+}
+
+std::unique_ptr<Layer> <%- camelize(type) %>Layer::cloneRef(const std::string& id_) const {
+    auto impl_ = mutableImpl();
+    impl_->id = id_;
+    impl_->paint = <%- camelize(type) %>PaintProperties::Transitionable();
+    return std::make_unique<<%- camelize(type) %>Layer>(std::move(impl_));
 }
 
 <% if (layoutProperties.length) { -%>
 void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>& writer) const {
-    conversion::stringify(writer, layout);
+    layout.stringify(writer);
 }
 <% } else { -%>
 void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const {
@@ -58,30 +56,59 @@ void <%- camelize(type) %>Layer::Impl::stringifyLayout(rapidjson::Writer<rapidjs
 // Source
 
 const std::string& <%- camelize(type) %>Layer::getSourceID() const {
-    return impl->source;
+    return impl().source;
 }
 
 <% if (type !== 'raster') { -%>
 void <%- camelize(type) %>Layer::setSourceLayer(const std::string& sourceLayer) {
-    impl->sourceLayer = sourceLayer;
+    auto impl_ = mutableImpl();
+    impl_->sourceLayer = sourceLayer;
+    baseImpl = std::move(impl_);
 }
 
 const std::string& <%- camelize(type) %>Layer::getSourceLayer() const {
-    return impl->sourceLayer;
+    return impl().sourceLayer;
 }
 
 // Filter
 
 void <%- camelize(type) %>Layer::setFilter(const Filter& filter) {
-    impl->filter = filter;
-    impl->observer->onLayerFilterChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->filter = filter;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
 const Filter& <%- camelize(type) %>Layer::getFilter() const {
-    return impl->filter;
+    return impl().filter;
 }
 <% } -%>
 <% } -%>
+
+// Visibility
+
+void <%- camelize(type) %>Layer::setVisibility(VisibilityType value) {
+    if (value == getVisibility())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->visibility = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+// Zoom range
+
+void <%- camelize(type) %>Layer::setMinZoom(float minZoom) {
+    auto impl_ = mutableImpl();
+    impl_->minZoom = minZoom;
+    baseImpl = std::move(impl_);
+}
+
+void <%- camelize(type) %>Layer::setMaxZoom(float maxZoom) {
+    auto impl_ = mutableImpl();
+    impl_->maxZoom = maxZoom;
+    baseImpl = std::move(impl_);
+}
 
 // Layout properties
 
@@ -91,14 +118,16 @@ const Filter& <%- camelize(type) %>Layer::getFilter() const {
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
-    return impl->layout.unevaluated.get<<%- camelize(property.name) %>>();
+    return impl().layout.get<<%- camelize(property.name) %>>();
 }
 
 void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
     if (value == get<%- camelize(property.name) %>())
         return;
-    impl->layout.unevaluated.get<<%- camelize(property.name) %>>() = value;
-    impl->observer->onLayerLayoutPropertyChanged(*this, "<%- property.name %>");
+    auto impl_ = mutableImpl();
+    impl_->layout.get<<%- camelize(property.name) %>>() = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 <% } -%>
 
@@ -108,31 +137,27 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
     return { <%- defaultValue(property) %> };
 }
 
-<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>(const optional<std::string>& klass) const {
-    return impl->cascading.template get<<%- camelize(property.name) %>>().get(klass);
+<%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {
+    return impl().paint.template get<<%- camelize(property.name) %>>().value;
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value, const optional<std::string>& klass) {
-    if (value == get<%- camelize(property.name) %>(klass))
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> value) {
+    if (value == get<%- camelize(property.name) %>())
         return;
-    impl->cascading.template get<<%- camelize(property.name) %>>().set(value, klass);
-<% if (isDataDriven(property)) { -%>
-    if (value.isDataDriven()) {
-        impl->observer->onLayerDataDrivenPaintPropertyChanged(*this);
-    } else {
-        impl->observer->onLayerPaintPropertyChanged(*this);
-    }
-<% } else { -%>
-    impl->observer->onLayerPaintPropertyChanged(*this);
-<% } -%>
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<<%- camelize(property.name) %>>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
-void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& value, const optional<std::string>& klass) {
-    impl->cascading.template get<<%- camelize(property.name) %>>().setTransition(value, klass);
+void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>Transition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<<%- camelize(property.name) %>>().options = options;
+    baseImpl = std::move(impl_);
 }
 
-TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition(const optional<std::string>& klass) const {
-    return impl->cascading.template get<<%- camelize(property.name) %>>().getTransition(klass);
+TransitionOptions <%- camelize(type) %>Layer::get<%- camelize(property.name) %>Transition() const {
+    return impl().paint.template get<<%- camelize(property.name) %>>().options;
 }
 <% } -%>
 

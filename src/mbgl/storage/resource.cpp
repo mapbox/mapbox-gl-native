@@ -53,18 +53,27 @@ Resource Resource::source(const std::string& url) {
     };
 }
 
-Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
+Resource Resource::image(const std::string& url) {
     return Resource {
-        Resource::Kind::SpriteImage,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".png"
+        Resource::Kind::Image,
+        url
     };
 }
 
+Resource Resource::spriteImage(const std::string& base, float pixelRatio) {
+    util::URL url(base);
+    return Resource{ Resource::Kind::SpriteImage,
+                     base.substr(0, url.path.first + url.path.second) +
+                         (pixelRatio > 1 ? "@2x" : "") + ".png" +
+                         base.substr(url.query.first, url.query.second) };
+}
+
 Resource Resource::spriteJSON(const std::string& base, float pixelRatio) {
-    return Resource {
-        Resource::Kind::SpriteJSON,
-        base + (pixelRatio > 1 ? "@2x" : "") + ".json"
-    };
+    util::URL url(base);
+    return Resource{ Resource::Kind::SpriteJSON,
+                     base.substr(0, url.path.first + url.path.second) +
+                         (pixelRatio > 1 ? "@2x" : "") + ".json" +
+                         base.substr(url.query.first, url.query.second) };
 }
 
 Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontStack, const std::pair<uint16_t, uint16_t>& glyphRange) {
@@ -88,7 +97,7 @@ Resource Resource::tile(const std::string& urlTemplate,
                         int32_t y,
                         int8_t z,
                         Tileset::Scheme scheme,
-                        Necessity necessity) {
+                        LoadingMethod loadingMethod) {
     bool supportsRatio = urlTemplate.find("{ratio}") != std::string::npos;
     if (scheme == Tileset::Scheme::TMS) {
         y = (1 << z) - y - 1;
@@ -124,7 +133,7 @@ Resource Resource::tile(const std::string& urlTemplate,
             y,
             z
         },
-        necessity
+        loadingMethod
     };
 }
 

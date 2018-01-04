@@ -3,6 +3,7 @@
 #include <protozero/pbf_reader.hpp>
 #include <protozero/pbf_writer.hpp>
 #include <utility>
+#include <stdexcept>
 
 template <class Binding>
 static std::pair<const std::string, Binding> parseBinding(protozero::pbf_reader&& pbf) {
@@ -97,7 +98,7 @@ std::string BinaryProgram::serialize() const {
     return data;
 }
 
-gl::AttributeLocation BinaryProgram::attributeLocation(const std::string& name) const {
+optional<gl::AttributeLocation> BinaryProgram::attributeLocation(const std::string& name) const {
     for (const auto& pair : attributes) {
         if (pair.first == name) {
             return pair.second;
@@ -112,7 +113,7 @@ gl::UniformLocation BinaryProgram::uniformLocation(const std::string& name) cons
             return pair.second;
         }
     }
-    return {};
+    return -1;
 }
 
 } // namespace mbgl

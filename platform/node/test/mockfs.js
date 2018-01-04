@@ -5,7 +5,7 @@ var path = require('path');
 
 function readFixture(file) {
     return fs.readFileSync(path.join('test/fixtures/resources', file));
-};
+}
 
 var style_raster  = readFixture('style_raster.json').toString('utf8');
 var style_vector  = readFixture('style_vector.json').toString('utf8');
@@ -18,7 +18,7 @@ var tile_raster   = readFixture('raster.tile');
 var tile_vector   = readFixture('vector.tile');
 
 function dataForRequest(req) {
-    if (req.url == null) {
+    if (req.url === null) {
         return null;
     } else if (req.url.indexOf('sprite') > -1 && req.url.endsWith('json')) {
         return sprite_json;
@@ -37,7 +37,7 @@ function dataForRequest(req) {
     } else {
         return null;
     }
-};
+}
 
 module.exports = {
     dataForRequest: dataForRequest,

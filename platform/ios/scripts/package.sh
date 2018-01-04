@@ -21,33 +21,19 @@ elif [[ ${FORMAT} == "dynamic" ]]; then
     BUILD_STATIC=false
 fi
 
-SELF_CONTAINED=${SELF_CONTAINED:-}
-STATIC_BUNDLE_DIR=
-if [[ ${SELF_CONTAINED} ]]; then
-    STATIC_BUNDLE_DIR="${OUTPUT}/static/${NAME}.framework"
-else
-    STATIC_BUNDLE_DIR="${OUTPUT}/static"
-fi
-
-STATIC_SETTINGS_DIR=
-if [[ ${SELF_CONTAINED} ]]; then
-    STATIC_SETTINGS_DIR="${OUTPUT}/static/${NAME}.framework"
-else
-    STATIC_SETTINGS_DIR="${OUTPUT}"
-fi
-
 SDK=iphonesimulator
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
     SDK=iphoneos
 fi
 IOS_SDK_VERSION=`xcrun --sdk ${SDK} --show-sdk-version`
 
-echo "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK}; symbols: ${SYMBOLS}; self-contained static framework: ${SELF_CONTAINED:-NO}"
-
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
+step "Configuring ${FORMAT:-dynamic and static} ${BUILDTYPE} framework for ${SDK} ${IOS_SDK_VERSION}; symbols: ${SYMBOLS}"
+
+xcodebuild -version
 
 rm -rf ${OUTPUT}
 if [[ ${BUILD_STATIC} == true ]]; then
@@ -69,7 +55,7 @@ PROJ_VERSION=$(git rev-list --count HEAD)
 SEM_VERSION=$( git describe --tags --match=ios-v*.*.* --abbrev=0 | sed 's/^ios-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
 
-step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
+step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})"
 
 SCHEME='dynamic'
 if [[ ${BUILD_DYNAMIC} == true && ${BUILD_STATIC} == true ]]; then
@@ -78,6 +64,7 @@ elif [[ ${BUILD_STATIC} == true ]]; then
     SCHEME='static'
 fi
 
+step "Building for iOS Simulator using scheme ${SCHEME}"
 xcodebuild \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
@@ -92,6 +79,7 @@ xcodebuild \
     -jobs ${JOBS} | xcpretty
 
 if [[ ${BUILD_FOR_DEVICE} == true ]]; then
+    step "Building for iOS devices using scheme ${SCHEME}"
     xcodebuild \
         CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
         CURRENT_SHORT_VERSION=${SHORT_VERSION} \
@@ -119,7 +107,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
             ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/lib} \
             `cmake -LA -N ${DERIVED_DATA} | grep MASON_PACKAGE_icu_LIBRARIES | cut -d= -f2`
 
-        cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.bundle ${STATIC_BUNDLE_DIR}
+        cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/${NAME}.bundle ${OUTPUT}/static
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
@@ -149,7 +137,7 @@ if [[ ${BUILD_FOR_DEVICE} == true ]]; then
             -create -output ${OUTPUT}/dynamic/${NAME}.framework/${NAME} | echo
     fi
 
-    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${STATIC_SETTINGS_DIR}
+    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphoneos/Settings.bundle ${OUTPUT}
 else
     if [[ ${BUILD_STATIC} == true ]]; then
         step "Assembling static library for iOS Simulator…"
@@ -159,7 +147,7 @@ else
             ${LIBS[@]/#/${PRODUCTS}/${BUILDTYPE}-iphonesimulator/lib} \
             `cmake -LA -N ${DERIVED_DATA} | grep MASON_PACKAGE_icu_LIBRARIES | cut -d= -f2`
 
-        cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.bundle ${STATIC_BUNDLE_DIR}
+        cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/${NAME}.bundle ${OUTPUT}/static
     fi
 
     if [[ ${BUILD_DYNAMIC} == true ]]; then
@@ -174,7 +162,7 @@ else
         fi
     fi
 
-    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${STATIC_SETTINGS_DIR}
+    cp -rv ${PRODUCTS}/${BUILDTYPE}-iphonesimulator/Settings.bundle ${OUTPUT}
 fi
 
 if [[ ${SYMBOLS} = NO ]]; then
@@ -244,12 +232,16 @@ if [[ ${BUILD_STATIC} == true ]]; then
 fi
 
 step "Copying library resources…"
-cp -pv LICENSE.md ${STATIC_SETTINGS_DIR}
+cp -pv LICENSE.md ${OUTPUT}
 if [[ ${BUILD_STATIC} == true ]]; then
-    cp -pv "${STATIC_BUNDLE_DIR}/${NAME}.bundle/Info.plist" "${OUTPUT}/static/${NAME}.framework/Info.plist"
+    cp -pv "${OUTPUT}/static/${NAME}.bundle/Info.plist" "${OUTPUT}/static/${NAME}.framework/Info.plist"
     plutil -replace CFBundlePackageType -string FMWK "${OUTPUT}/static/${NAME}.framework/Info.plist"
     mkdir "${OUTPUT}/static/${NAME}.framework/Modules"
     cp -pv platform/ios/framework/modulemap "${OUTPUT}/static/${NAME}.framework/Modules/module.modulemap"
+fi
+if [[ ${BUILD_DYNAMIC} == true && ${BUILD_FOR_DEVICE} == true ]]; then
+    step "Copying bitcode symbol maps…"
+    find "${PRODUCTS}/${BUILDTYPE}-iphoneos" -name '*.bcsymbolmap' -type f -exec cp -pv {} "${OUTPUT}/dynamic/" \;
 fi
 sed -n -e '/^## /,$p' platform/ios/CHANGELOG.md > "${OUTPUT}/CHANGELOG.md"
 

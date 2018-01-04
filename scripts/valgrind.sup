@@ -1,142 +1,19 @@
 {
-   Graphics driver buffers
-   Memcheck:Leak
-   ...
-   obj:*/r600_dri.*
-   obj:*/r600_dri.*
-   obj:*/r600_dri.*
-   ...
-}
-{
-   Graphics driver buffers
-   Memcheck:Leak
-   ...
-   obj:*/i965_dri.*
-   obj:*/i965_dri.*
-   obj:*/i965_dri.*
-   ...
-}
-{
-   Graphics driver buffers
-   Memcheck:Leak
-   ...
-   obj:*/nouveau_dri.*
-   obj:*/nouveau_dri.*
-   obj:*/nouveau_dri.*
-   ...
-}
-{
-   Ubuntu 16.04 - GLFW
-   Memcheck:Leak
-   ...
-   fun:glfwInit
-   ...
-}
-{
-   Ubuntu 16.04 - GLFW
+   Graphics driver bugs
    Memcheck:Cond
    ...
-   fun:glfwInit
+   obj:*/swrast_dri.*
+   obj:*/swrast_dri.*
+   obj:*/swrast_dri.*
    ...
 }
 {
-   Ubuntu 16.04 - Qt + glib
-   Memcheck:Cond
-   fun:g_utf8_offset_to_pointer
+   Graphics driver bugs
+   Memcheck:Value8
    ...
-}
-{
-   Ubuntu 16.04 - Qt + glib
-   Memcheck:Cond
-   ...
-   fun:g_signal_emit_valist
-   ...
-   fun:*QApplicationPrivate*
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + X11
-   Memcheck:Param
-   writev(vector[...])
-   ...
-   obj:*/libxcb.*
-   fun:xcb_flush
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + X11
-   Memcheck:Leak
-   ...
-   fun:_XmbTextListToTextProperty
-   ...
-   fun:*QWidget*setVisible*
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + Fontconfig
-   Memcheck:Leak
-   ...
-   obj:*/libfontconfig.*
-   obj:*/libfontconfig.*
-   ...
-   fun:FcFontRenderPrepare
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + Fontconfig
-   Memcheck:Leak
-   ...
-   obj:*/libfontconfig.*
-   obj:*/libfontconfig.*
-   ...
-   fun:FcPatternAddInteger
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + Fontconfig
-   Memcheck:Leak
-   ...
-   obj:*/libfontconfig.*
-   obj:*/libfontconfig.*
-   ...
-   fun:FcConfigParseAndLoad
-   ...
-}
-{
-   Ubuntu 16.04 - Qt + Dbus
-   Memcheck:Leak
-   ...
-   fun:dbus_connection_send_with_reply
-   ...
-   fun:*QWidget*
-}
-{
-   Ubuntu 16.04 - Qt + Dbus
-   Memcheck:Leak
-   ...
-   fun:px_proxy_factory_get_proxies
-   obj:*/libQt5Network.*
-}
-{
-   Ubuntu 16.04 - Qt
-   Memcheck:Leak
-   ...
-   fun:*QGuiApplicationPrivate*createEventDispatcher*
-   fun:*QCoreApplication*init*
-   ...
-}
-{
-   Ubuntu 16.04 - Qt
-   Memcheck:Leak
-   ...
-   fun:*QWidget*setWindowTitle*
-   ...
-}
-{
-   Ubuntu 16.04 - Qt
-   Memcheck:Leak
-   ...
-   fun:*QNetworkConfigurationManagerPrivate*updateConfigurations*
+   obj:*/swrast_dri.*
+   obj:*/swrast_dri.*
+   obj:*/swrast_dri.*
    ...
 }
 {
@@ -156,184 +33,46 @@
    obj:*
 }
 {
-   Ubuntu 16.04 - Mysterious leak when running utests
-   Memcheck:Leak
-   fun:malloc
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-   obj:*
-}
-{
-   Ubuntu 14.04 - Travis CI bot using swrast
-   Memcheck:Cond
-   fun:do_stencil_test
-   fun:_swrast_stencil_and_ztest_span
-   fun:_swrast_write_rgba_span
-   fun:draw_wide_line
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + Qt5
-   Memcheck:Leak
-   ...
-   obj:*/libQt5Core.*
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + Qt5
+   Qt5
    Memcheck:Cond
    ...
    obj:*/libQt5Core.*
    ...
 }
 {
-   Ubuntu 14.04 - Travis + Qt5
+   Qt5
    Memcheck:Value8
    ...
    obj:*/libQt5Core.*
    ...
 }
 {
-   Ubuntu 14.04 - Travis + Qt5
-   Memcheck:Leak
-   ...
-   obj:*/libQt5Gui.*
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + Qt5
+   Qt5
    Memcheck:Cond
    ...
    obj:*/libQt5Gui.*
    ...
 }
 {
-   Ubuntu 14.04 - Travis + Qt5
+   Qt5
    Memcheck:Value8
    ...
    obj:*/libQt5Gui.*
    ...
 }
 {
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
-   Memcheck:Cond
-   ...
-   obj:*/mesa/libGL.so.*
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
-   Memcheck:Value8
-   ...
-   obj:*/mesa/libGL.so.*
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
-   Memcheck:Cond
-   ...
-   fun:do_rasterize_bin
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
-   Memcheck:Value8
-   ...
-   fun:do_rasterize_bin
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   mapbox::pixelmatch
    Memcheck:Cond
    ...
    fun:_ZN6mapbox10pixelmatchEPKhS1_mmPhdb
    ...
 }
 {
-   Ubuntu 14.04 - Travis + mesa 13.0.0-glx
+   util::write_file
    Memcheck:Param
    write(buf)
    ...
    obj:*/libc-*
-   fun:_ZN4mbgl4util10write_fileERKSsS2_
-   ...
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.3
-   Memcheck:Cond
-   fun:_ZN12_GLOBAL__N_117PeepholeOptimizer20runOnMachineFunctionERN4llvm15MachineFunctionE
-   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
-   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
-   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
-   fun:_ZN4llvm5MCJIT21generateCodeForModuleEPNS_6ModuleE
-   fun:_ZN4llvm5MCJIT14finalizeObjectEv
-   fun:LLVMGetPointerToGlobal
-   fun:gallivm_jit_function
-   fun:generate_variant
-   fun:llvmpipe_update_fs
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.3
-   Memcheck:Cond
-   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
-   fun:_ZN12_GLOBAL__N_117RegisterCoalescer23reMaterializeTrivialDefERKN4llvm13CoalescerPairEPNS1_12MachineInstrERb
-   fun:_ZN12_GLOBAL__N_117RegisterCoalescer8joinCopyEPN4llvm12MachineInstrERb
-   fun:_ZN12_GLOBAL__N_117RegisterCoalescer20runOnMachineFunctionERN4llvm15MachineFunctionE
-   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
-   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
-   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
-   fun:_ZN4llvm5MCJIT21generateCodeForModuleEPNS_6ModuleE
-   fun:_ZN4llvm5MCJIT14finalizeObjectEv
-   fun:LLVMGetPointerToGlobal
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.3
-   Memcheck:Cond
-   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
-   fun:_ZN4llvm13LiveRangeEdit15rematerializeAtERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjRKNS0_5RematERKNS_18TargetRegisterInfoEb
-   fun:_ZN12_GLOBAL__N_113InlineSpiller5spillERN4llvm13LiveRangeEditE
-   fun:_ZN12_GLOBAL__N_18RAGreedy17selectOrSplitImplERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEERNS1_8SmallSetIjLj16ESt4lessIjEEEj
-   fun:_ZN12_GLOBAL__N_18RAGreedy13selectOrSplitERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEE
-   fun:_ZN4llvm12RegAllocBase16allocatePhysRegsEv
-   fun:_ZN12_GLOBAL__N_18RAGreedy20runOnMachineFunctionERN4llvm15MachineFunctionE
-   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
-   fun:_ZN4llvm6legacy15PassManagerImpl3runERNS_6ModuleE
-   fun:_ZN4llvm5MCJIT10emitObjectEPNS_6ModuleE
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.3
-   Memcheck:Cond
-   fun:_ZNK4llvm12X86InstrInfo13reMaterializeERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjjPKS4_RKNS_18TargetRegisterInfoE
-   fun:_ZN4llvm13LiveRangeEdit15rematerializeAtERNS_17MachineBasicBlockENS1_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS4_EEEEjRKNS0_5RematERKNS_18TargetRegisterInfoEb
-   fun:_ZN4llvm11SplitEditor13defFromParentEjPNS_6VNInfoENS_9SlotIndexERNS_17MachineBasicBlockENS4_15bundle_iteratorINS_12MachineInstrENS_14ilist_iteratorIS7_EEEE
-   fun:_ZN4llvm11SplitEditor16splitRegOutBlockERKNS_13SplitAnalysis9BlockInfoEjNS_9SlotIndexE
-   fun:_ZN12_GLOBAL__N_18RAGreedy13doRegionSplitERN4llvm12LiveIntervalEjbRNS1_15SmallVectorImplIjEE
-   fun:_ZN12_GLOBAL__N_18RAGreedy17selectOrSplitImplERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEERNS1_8SmallSetIjLj16ESt4lessIjEEEj
-   fun:_ZN12_GLOBAL__N_18RAGreedy13selectOrSplitERN4llvm12LiveIntervalERNS1_15SmallVectorImplIjEE
-   fun:_ZN4llvm12RegAllocBase16allocatePhysRegsEv
-   fun:_ZN12_GLOBAL__N_18RAGreedy20runOnMachineFunctionERN4llvm15MachineFunctionE
-   fun:_ZN4llvm19MachineFunctionPass13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager13runOnFunctionERNS_8FunctionE
-   fun:_ZN4llvm13FPPassManager11runOnModuleERNS_6ModuleE
-}
-{
-   Ubuntu 14.04 - Travis + mesa 13.0.3
-   Memcheck:Leak
-   match-leak-kinds: definite
-   fun:_Znwm
+   fun:_ZN4mbgl4util10write_fileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES8_
    ...
 }

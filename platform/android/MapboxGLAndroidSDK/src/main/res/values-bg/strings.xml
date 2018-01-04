@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="mapbox_compassContentDescription">Компас на картата. Активирай, за да насочиш картата на север.</string>
+    <string name="mapbox_attributionsIconContentDescription">Иконка функции. Активирай, за да покажеш диалог функции.</string>
+    <string name="mapbox_myLocationViewContentDescription">Изглед локация. Това показва местоположението ти на картата.</string>
+    <string name="mapbox_mapActionDescription">Показва карта създадена с Mapbox. Скролни с два пръста. Мащабирай с два пръста.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_attributionTelemetryTitle">Направи Mapbox картите по-добри.</string>
+    <string name="mapbox_attributionTelemetryMessage">Помагаш OpenStreetMap и Mapbox картите да станат по-добри, като предоставяш анонимни данни за потребление.</string>
+    <string name="mapbox_attributionTelemetryPositive">Съгласявам се</string>
+    <string name="mapbox_attributionTelemetryNegative">Не се съгласявам</string>
+    <string name="mapbox_attributionTelemetryNeutral">Повече инфо</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Предоставените OfflineRegionDefinition не пасват в границите на света: %s</string>
+
+    </resources>

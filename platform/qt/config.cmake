@@ -15,16 +15,17 @@ endif()
 
 macro(mbgl_platform_core)
     target_sources(mbgl-core
-        ${MBGL_QT_FILES}
+        ${MBGL_QT_CORE_FILES}
     )
 
     target_include_directories(mbgl-core
         PUBLIC platform/default
+        PRIVATE platform/qt
         PRIVATE platform/qt/include
     )
 
     target_link_libraries(mbgl-core
-        ${MBGL_QT_LIBRARIES}
+        ${MBGL_QT_CORE_LIBRARIES}
     )
 
     if(NOT WITH_QT_DECODERS)
@@ -48,19 +49,31 @@ macro(mbgl_platform_core)
         target_sources(mbgl-core PRIVATE platform/qt/src/bidi.cpp)
     endif()
 
+    target_sources(mbgl-core PRIVATE platform/default/local_glyph_rasterizer.cpp)
+
 endmacro()
+
+
+macro(mbgl_filesource)
+    target_sources(mbgl-filesource
+        ${MBGL_QT_FILESOURCE_FILES}
+    )
+
+    target_link_libraries(mbgl-filesource
+        ${MBGL_QT_FILESOURCE_LIBRARIES}
+    )
+endmacro()
+
 
 macro(mbgl_platform_test)
     target_sources(mbgl-test
-        PRIVATE platform/default/mbgl/gl/headless_backend.cpp
-        PRIVATE platform/default/mbgl/gl/headless_backend.hpp
-        PRIVATE platform/default/mbgl/gl/headless_display.cpp
-        PRIVATE platform/default/mbgl/gl/headless_display.hpp
-        PRIVATE platform/default/mbgl/gl/offscreen_view.cpp
-        PRIVATE platform/default/mbgl/gl/offscreen_view.hpp
-        PRIVATE platform/qt/test/headless_backend_qt.cpp
         PRIVATE platform/qt/test/main.cpp
-        PRIVATE platform/qt/test/qmapboxgl.cpp
+        PRIVATE platform/qt/test/qmapboxgl.test.cpp
+        PRIVATE platform/qt/test/qmapboxgl.test.cpp
+    )
+
+    target_include_directories(mbgl-test
+        PRIVATE platform/qt
     )
 
     set_source_files_properties(
@@ -72,7 +85,7 @@ macro(mbgl_platform_test)
 
     target_link_libraries(mbgl-test
         PRIVATE qmapboxgl
-        ${MBGL_QT_TEST_LIBRARIES}
+        PRIVATE mbgl-filesource
     )
 endmacro()
 

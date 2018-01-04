@@ -7,7 +7,7 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /** Defines the area spanned by an `MGLCoordinateBounds`. */
-typedef struct MGLCoordinateSpan {
+typedef struct __attribute__((objc_boxable)) MGLCoordinateSpan {
     /** Latitudes spanned by an `MGLCoordinateBounds`. */
     CLLocationDegrees latitudeDelta;
     /** Longitudes spanned by an `MGLCoordinateBounds`. */
@@ -38,12 +38,30 @@ NS_INLINE BOOL MGLCoordinateSpanEqualToCoordinateSpan(MGLCoordinateSpan span1, M
 extern MGL_EXPORT const MGLCoordinateSpan MGLCoordinateSpanZero;
 
 /** A rectangular area as measured on a two-dimensional map projection. */
-typedef struct MGLCoordinateBounds {
+typedef struct __attribute__((objc_boxable)) MGLCoordinateBounds {
     /** Coordinate at the southwest corner. */
     CLLocationCoordinate2D sw;
     /** Coordinate at the northeast corner. */
     CLLocationCoordinate2D ne;
 } MGLCoordinateBounds;
+
+/** 
+ A quadrilateral area as measured on a two-dimensional map projection.
+ `MGLCoordinateQuad` differs from `MGLCoordinateBounds` in that it allows
+ representation of non-axis aligned bounds and non-rectangular quadrilaterals.
+ The coordinates are described in counter clockwise order from top left.
+ */
+typedef struct MGLCoordinateQuad {
+    /** Coordinate at the top left corner. */
+    CLLocationCoordinate2D topLeft;
+    /** Coordinate at the bottom left corner. */
+    CLLocationCoordinate2D bottomLeft;
+    /** Coordinate at the bottom right corner. */
+    CLLocationCoordinate2D bottomRight;
+    /** Coordinate at the top right corner. */
+    CLLocationCoordinate2D topRight;
+} MGLCoordinateQuad;
+
 
 /**
  Creates a new `MGLCoordinateBounds` structure from the given southwest and
@@ -54,6 +72,33 @@ NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsMake(CLLocationCoordinate2D sw,
     bounds.sw = sw;
     bounds.ne = ne;
     return bounds;
+}
+
+/**
+ Creates a new `MGLCoordinateQuad` structure from the given top left,
+  bottom left, bottom right, and top right coordinates.
+ */
+NS_INLINE MGLCoordinateQuad MGLCoordinateQuadMake(CLLocationCoordinate2D topLeft, CLLocationCoordinate2D bottomLeft, CLLocationCoordinate2D bottomRight, CLLocationCoordinate2D topRight) {
+    MGLCoordinateQuad quad;
+    quad.topLeft = topLeft;
+    quad.bottomLeft = bottomLeft;
+    quad.bottomRight = bottomRight;
+    quad.topRight = topRight;
+    return quad;
+}
+
+/**
+ Creates a new `MGLCoordinateQuad` structure from the given `MGLCoordinateBounds`.
+ The returned quad uses the bounds' northeast coordinate as the top right, and the
+  southwest coordinate at the bottom left.
+ */
+NS_INLINE MGLCoordinateQuad MGLCoordinateQuadFromCoordinateBounds(MGLCoordinateBounds bounds) {
+    MGLCoordinateQuad quad;
+    quad.topLeft = CLLocationCoordinate2DMake(bounds.ne.latitude, bounds.sw.longitude);
+    quad.bottomLeft = bounds.sw;
+    quad.bottomRight = CLLocationCoordinate2DMake(bounds.sw.latitude, bounds.ne.longitude);
+    quad.topRight = bounds.ne;
+    return quad;
 }
 
 /** Returns `YES` if the two coordinate bounds are equal to each other. */
@@ -115,6 +160,15 @@ NS_INLINE NSString *MGLStringFromCoordinateBounds(MGLCoordinateBounds bounds) {
     return [NSString stringWithFormat:@"{ sw = {%.1f, %.1f}, ne = {%.1f, %.1f}}",
             bounds.sw.latitude, bounds.sw.longitude,
             bounds.ne.latitude, bounds.ne.longitude];
+}
+
+/** Returns a formatted string for the given coordinate quad. */
+NS_INLINE NSString *MGLStringFromCoordinateQuad(MGLCoordinateQuad quad) {
+    return [NSString stringWithFormat:@"{ topleft = {%.1f, %.1f}, bottomleft = {%.1f, %.1f}}, bottomright = {%.1f, %.1f}, topright = {%.1f, %.1f}",
+            quad.topLeft.latitude, quad.topLeft.longitude,
+            quad.bottomLeft.latitude, quad.bottomLeft.longitude,
+            quad.bottomRight.latitude, quad.bottomRight.longitude,
+            quad.topRight.latitude, quad.topRight.longitude];
 }
 
 /** Returns radians, converted from degrees. */

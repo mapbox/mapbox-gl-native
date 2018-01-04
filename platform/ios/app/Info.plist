@@ -24,12 +24,16 @@
 	<string>7877</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>MGLIdeographicFontFamilyName</key>
+	<string>PingFang TC</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2014–2017 Mapbox</string>
+	<string>© 2014–2018 Mapbox</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>The map will ALWAYS display the user’s location.</string>
+	<string>The map will display your location. The map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>The map will display the user’s location.</string>
+	<string>The map will display your location.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>The map will display your location. If you choose Always, the map may also use your location when it isn’t visible in order to improve OpenStreetMap and Mapbox products.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -50,6 +54,17 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
+	</array>
+	<key>UIApplicationShortcutItems</key>
+	<array>
+		<dict>
+			<key>UIApplicationShortcutItemTitle</key>
+			<string>Settings</string>
+			<key>UIApplicationShortcutItemType</key>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER).settings</string>
+			<key>UIApplicationShortcutItemIconFile</key>
+			<string>settings</string>
+		</dict>
 	</array>
 </dict>
 </plist>

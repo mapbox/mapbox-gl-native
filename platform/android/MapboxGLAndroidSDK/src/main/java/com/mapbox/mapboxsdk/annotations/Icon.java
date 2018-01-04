@@ -1,15 +1,18 @@
 package com.mapbox.mapboxsdk.annotations;
 
 import android.graphics.Bitmap;
+import android.util.DisplayMetrics;
 
-import com.mapbox.mapboxsdk.maps.MapView;
+import java.nio.ByteBuffer;
 
 /**
- * Icon is the visual representation of a {@link Marker} on a {@link MapView}.
+ * Icon is the visual representation of a Marker on a MapView.
  *
  * @see Marker
+ * @see IconFactory
  */
 public class Icon {
+
   private Bitmap mBitmap;
   private String mId;
 
@@ -19,29 +22,67 @@ public class Icon {
   }
 
   /**
-   * {@link String} identifier for this {@link Icon}.
+   * String identifier for this icon.
    *
-   * @return {@link String} identifier for this {@link Icon}.
+   * @return String identifier for this icon.
    */
   public String getId() {
     return mId;
   }
 
   /**
-   * Get the {@link Bitmap} being used for this {@link Icon}.
+   * Get the bitmap being used for this icon.
    *
-   * @return The {@link Bitmap} being used for the {@link Icon}.
+   * @return The bitmap being used for the icon.
    */
   public Bitmap getBitmap() {
+    if (mBitmap != null && mBitmap.getConfig() != Bitmap.Config.ARGB_8888) {
+      mBitmap = mBitmap.copy(Bitmap.Config.ARGB_8888, false);
+    }
     return mBitmap;
   }
 
   /**
-   * Compares this {@link Icon} object with another {@link Icon} and determines if they match.
+   * Get the icon bitmap scale.
+   * <p>
+   * Requires the bitmap to be set before calling this method.
+   * </p>
    *
-   * @param object Another {@link Icon} to compare with this object.
-   * @return True if the {@link Icon} being passed in matches this {@link Icon} object. Else,
-   * false.
+   * @return the scale of the bitmap
+   */
+  public float getScale() {
+    if (mBitmap == null) {
+      throw new IllegalStateException("Required to set a Icon before calling getScale");
+    }
+    float density = mBitmap.getDensity();
+    if (density == Bitmap.DENSITY_NONE) {
+      density = DisplayMetrics.DENSITY_DEFAULT;
+    }
+    return density / DisplayMetrics.DENSITY_DEFAULT;
+  }
+
+  /**
+   * Get the icon bitmap bytes.
+   * <p>
+   * Requires the bitmap to be set before calling this method.
+   * </p>
+   *
+   * @return the bytes of the bitmap
+   */
+  public byte[] toBytes() {
+    if (mBitmap == null) {
+      throw new IllegalStateException("Required to set a Icon before calling toBytes");
+    }
+    ByteBuffer buffer = ByteBuffer.allocate(mBitmap.getRowBytes() * mBitmap.getHeight());
+    mBitmap.copyPixelsToBuffer(buffer);
+    return buffer.array();
+  }
+
+  /**
+   * Compares this icon object with another icon and determines if they match.
+   *
+   * @param object Another iconi to compare with this object.
+   * @return True if the icon being passed in matches this icon object. Else, false.
    */
   @Override
   public boolean equals(Object object) {
@@ -53,11 +94,7 @@ public class Icon {
     }
 
     Icon icon = (Icon) object;
-
-    if (!mBitmap.equals(icon.mBitmap)) {
-      return false;
-    }
-    return mId.equals(icon.mId);
+    return mBitmap.equals(icon.mBitmap) && mId.equals(icon.mId);
   }
 
   /**

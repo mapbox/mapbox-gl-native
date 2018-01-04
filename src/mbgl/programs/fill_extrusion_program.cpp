@@ -1,5 +1,5 @@
 #include <mbgl/programs/fill_extrusion_program.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/map/transform_state.hpp>
@@ -45,8 +45,9 @@ FillExtrusionUniforms::values(mat4 matrix,
 
 FillExtrusionPatternUniforms::Values
 FillExtrusionPatternUniforms::values(mat4 matrix,
-                                     const SpriteAtlasElement& a,
-                                     const SpriteAtlasElement& b,
+                                     Size atlasSize,
+                                     const ImagePosition& a,
+                                     const ImagePosition& b,
                                      const Faded<std::string>& fading,
                                      const UnwrappedTileID& tileID,
                                      const TransformState& state,
@@ -58,14 +59,15 @@ FillExtrusionPatternUniforms::values(mat4 matrix,
 
     return FillExtrusionPatternUniforms::Values{
         uniforms::u_matrix::Value{ matrix },
-        uniforms::u_pattern_tl_a::Value{ a.tl },
-        uniforms::u_pattern_br_a::Value{ a.br },
-        uniforms::u_pattern_tl_b::Value{ b.tl },
-        uniforms::u_pattern_br_b::Value{ b.br },
-        uniforms::u_pattern_size_a::Value{ a.size },
-        uniforms::u_pattern_size_b::Value{ b.size },
+        uniforms::u_pattern_tl_a::Value{ a.tl() },
+        uniforms::u_pattern_br_a::Value{ a.br() },
+        uniforms::u_pattern_tl_b::Value{ b.tl() },
+        uniforms::u_pattern_br_b::Value{ b.br() },
+        uniforms::u_pattern_size_a::Value{ a.displaySize() },
+        uniforms::u_pattern_size_b::Value{ b.displaySize() },
         uniforms::u_scale_a::Value{ fading.fromScale },
         uniforms::u_scale_b::Value{ fading.toScale },
+        uniforms::u_texsize::Value{ atlasSize },
         uniforms::u_mix::Value{ fading.t },
         uniforms::u_image::Value{ 0 },
         uniforms::u_pixel_coord_upper::Value{ std::array<float, 2>{{ float(pixelX >> 16), float(pixelY >> 16) }} },

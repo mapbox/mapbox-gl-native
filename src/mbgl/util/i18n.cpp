@@ -1,5 +1,6 @@
 #include "i18n.hpp"
 
+#include <algorithm>
 #include <map>
 
 namespace {
@@ -14,7 +15,7 @@ namespace {
         return codepoint >= first && codepoint <= last;                                            \
     }
 
-// The following table comes from <http://www.unicode.org/Public/9.0.0/ucd/Blocks.txt>.
+// The following table comes from <http://www.unicode.org/Public/10.0.0/ucd/Blocks.txt>.
 // Keep it synchronized with <http://www.unicode.org/Public/UCD/latest/ucd/Blocks.txt>.
 
 // DEFINE_IS_IN_UNICODE_BLOCK(BasicLatin, 0x0000, 0x007F)
@@ -29,14 +30,15 @@ DEFINE_IS_IN_UNICODE_BLOCK(Latin1Supplement, 0x0080, 0x00FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CyrillicSupplement, 0x0500, 0x052F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Armenian, 0x0530, 0x058F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Hebrew, 0x0590, 0x05FF)
-// DEFINE_IS_IN_UNICODE_BLOCK(Arabic, 0x0600, 0x06FF)
+DEFINE_IS_IN_UNICODE_BLOCK(Arabic, 0x0600, 0x06FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Syriac, 0x0700, 0x074F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicSupplement, 0x0750, 0x077F)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicSupplement, 0x0750, 0x077F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Thaana, 0x0780, 0x07BF)
 // DEFINE_IS_IN_UNICODE_BLOCK(NKo, 0x07C0, 0x07FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Samaritan, 0x0800, 0x083F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Mandaic, 0x0840, 0x085F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicExtendedA, 0x08A0, 0x08FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(Syriac Supplement, 0x0860, 0x086F)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicExtendedA, 0x08A0, 0x08FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Devanagari, 0x0900, 0x097F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Bengali, 0x0980, 0x09FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Gurmukhi, 0x0A00, 0x0A7F)
@@ -169,13 +171,13 @@ DEFINE_IS_IN_UNICODE_BLOCK(HangulJamoExtendedB, 0xD7B0, 0xD7FF)
 DEFINE_IS_IN_UNICODE_BLOCK(PrivateUseArea, 0xE000, 0xF8FF)
 DEFINE_IS_IN_UNICODE_BLOCK(CJKCompatibilityIdeographs, 0xF900, 0xFAFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(AlphabeticPresentationForms, 0xFB00, 0xFB4F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsA, 0xFB50, 0xFDFF)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsA, 0xFB50, 0xFDFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(VariationSelectors, 0xFE00, 0xFE0F)
 DEFINE_IS_IN_UNICODE_BLOCK(VerticalForms, 0xFE10, 0xFE1F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CombiningHalfMarks, 0xFE20, 0xFE2F)
 DEFINE_IS_IN_UNICODE_BLOCK(CJKCompatibilityForms, 0xFE30, 0xFE4F)
 DEFINE_IS_IN_UNICODE_BLOCK(SmallFormVariants, 0xFE50, 0xFE6F)
-// DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsB, 0xFE70, 0xFEFF)
+DEFINE_IS_IN_UNICODE_BLOCK(ArabicPresentationFormsB, 0xFE70, 0xFEFF)
 DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Specials, 0xFFF0, 0xFFFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(LinearBSyllabary, 0x10000, 0x1007F)
@@ -238,9 +240,12 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Takri, 0x11680, 0x116CF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Ahom, 0x11700, 0x1173F)
 // DEFINE_IS_IN_UNICODE_BLOCK(WarangCiti, 0x118A0, 0x118FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(ZanabazarSquare, 0x11A00, 0x11A4F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Soyombo, 0x11A50, 0x11AAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(PauCinHau, 0x11AC0, 0x11AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Bhaiksuki, 0x11C00, 0x11C6F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Marchen, 0x11C70, 0x11CBF)
+// DEFINE_IS_IN_UNICODE_BLOCK(MasaramGondi, 0x11D00, 0x11D5F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Cuneiform, 0x12000, 0x123FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CuneiformNumbersandPunctuation, 0x12400, 0x1247F)
 // DEFINE_IS_IN_UNICODE_BLOCK(EarlyDynasticCuneiform, 0x12480, 0x1254F)
@@ -255,6 +260,8 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Tangut, 0x17000, 0x187FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(TangutComponents, 0x18800, 0x18AFF)
 // DEFINE_IS_IN_UNICODE_BLOCK(KanaSupplement, 0x1B000, 0x1B0FF)
+// DEFINE_IS_IN_UNICODE_BLOCK(KanaExtendedA, 0x1B100, 0x1B12F)
+// DEFINE_IS_IN_UNICODE_BLOCK(Nushu, 0x1B170, 0x1B2FF)
 // DEFINE_IS_IN_UNICODE_BLOCK(Duployan, 0x1BC00, 0x1BC9F)
 // DEFINE_IS_IN_UNICODE_BLOCK(ShorthandFormatControls, 0x1BCA0, 0x1BCAF)
 // DEFINE_IS_IN_UNICODE_BLOCK(ByzantineMusicalSymbols, 0x1D000, 0x1D0FF)
@@ -285,6 +292,7 @@ DEFINE_IS_IN_UNICODE_BLOCK(HalfwidthandFullwidthForms, 0xFF00, 0xFFEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionC, 0x2A700, 0x2B73F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionD, 0x2B740, 0x2B81F)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionE, 0x2B820, 0x2CEAF)
+// DEFINE_IS_IN_UNICODE_BLOCK(CJKUnifiedIdeographsExtensionF, 0x2CEB0, 0x2EBEF)
 // DEFINE_IS_IN_UNICODE_BLOCK(CJKCompatibilityIdeographsSupplement, 0x2F800, 0x2FA1F)
 // DEFINE_IS_IN_UNICODE_BLOCK(Tags, 0xE0000, 0xE007F)
 // DEFINE_IS_IN_UNICODE_BLOCK(VariationSelectorsSupplement, 0xE0100, 0xE01EF)
@@ -332,6 +340,14 @@ bool allowsWordBreaking(char16_t chr) {
             || chr == 0x2013 /* en dash */);
 }
 
+bool charAllowsLetterSpacing(char16_t chr) {
+    return !(isInArabic(chr) || isInArabicSupplement(chr) || isInArabicExtendedA(chr) || isInArabicPresentationFormsA(chr) || isInArabicPresentationFormsB(chr));
+}
+
+bool allowsLetterSpacing(const std::u16string& string) {
+    return std::all_of(string.begin(), string.end(), charAllowsLetterSpacing);
+}
+
 bool allowsIdeographicBreaking(const std::u16string& string) {
     for (char16_t chr : string) {
         if (!allowsIdeographicBreaking(chr)) {
@@ -366,12 +382,19 @@ bool allowsIdeographicBreaking(char16_t chr) {
     // return (isInTangut(chr)
     //        || isInTangutComponents(chr)
     //        || isInIdeographicSymbolsandPunctuation(chr)
+    //        || isInNushu(chr)
     //        || isInEnclosedIdeographicSupplement(chr)
     //        || isInCJKUnifiedIdeographsExtensionB(chr)
     //        || isInCJKUnifiedIdeographsExtensionC(chr)
     //        || isInCJKUnifiedIdeographsExtensionD(chr)
     //        || isInCJKUnifiedIdeographsExtensionE(chr)
+    //        || isInCJKUnifiedIdeographsExtensionF(chr)
     //        || isInCJKCompatibilityIdeographsSupplement(chr));
+}
+
+bool allowsFixedWidthGlyphGeneration(char16_t chr) {
+    // Mirrors conservative set of characters used in glyph_manager.js/_tinySDF
+    return isInCJKUnifiedIdeographs(chr) || isInHangulSyllables(chr);
 }
 
 bool allowsVerticalWritingMode(const std::u16string& string) {
@@ -384,7 +407,7 @@ bool allowsVerticalWritingMode(const std::u16string& string) {
 }
 
 // The following logic comes from
-// <http://www.unicode.org/Public/vertical/revision-16/VerticalOrientation-16.txt>.
+// <http://www.unicode.org/Public/vertical/revision-17/VerticalOrientation-17.txt>.
 // The data file denotes with “U” or “Tu” any codepoint that may be drawn
 // upright in vertical text but does not distinguish between upright and
 // “neutral” characters.
@@ -448,6 +471,8 @@ bool hasUprightVerticalOrientation(char16_t chr) {
     // if (isInTangut(chr)) return true;
     // if (isInTangutComponents(chr)) return true;
     // if (isInKanaSupplement(chr)) return true;
+    // if (isInKanaExtendedA(chr)) return true;
+    // if (isInNushu(chr)) return true;
     // if (isInByzantineMusicalSymbols(chr)) return true;
     // if (isInMusicalSymbols(chr)) return true;
     // if (isInTaiXuanJingSymbols(chr)) return true;
@@ -469,6 +494,7 @@ bool hasUprightVerticalOrientation(char16_t chr) {
     // if (isInCJKUnifiedIdeographsExtensionC(chr)) return true;
     // if (isInCJKUnifiedIdeographsExtensionD(chr)) return true;
     // if (isInCJKUnifiedIdeographsExtensionE(chr)) return true;
+    // if (isInCJKUnifiedIdeographsExtensionF(chr)) return true;
     // if (isInCJKCompatibilityIdeographsSupplement(chr)) return true;
 
     return false;
@@ -533,7 +559,7 @@ std::u16string verticalizePunctuation(const std::u16string& input) {
     std::u16string output;
 
     for (size_t i = 0; i < input.size(); i++) {
-        char16_t nextCharCode = i < input.size() ? input[i + 1] : 0;
+        char16_t nextCharCode = i < input.size() - 1 ? input[i + 1] : 0;
         char16_t prevCharCode = i ? input[i - 1] : 0;
 
         bool canReplacePunctuation =

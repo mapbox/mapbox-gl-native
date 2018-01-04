@@ -1,6 +1,5 @@
 #pragma once
 
-#include <mbgl/map/view.hpp>
 #include <mbgl/util/image.hpp>
 
 namespace mbgl {
@@ -10,21 +9,18 @@ class Context;
 class Texture;
 } // namespace gl
 
-enum class OffscreenTextureAttachment {
-    None,
-    Depth,
-};
-
-class OffscreenTexture : public View {
+class OffscreenTexture {
 public:
     OffscreenTexture(gl::Context&,
-                     Size size = { 256, 256 },
-                     OffscreenTextureAttachment type = OffscreenTextureAttachment::None);
-    ~OffscreenTexture() override;
+                     Size size = { 256, 256 });
+    OffscreenTexture(gl::Context&,
+                     Size size,
+                     gl::Renderbuffer<gl::RenderbufferType::DepthComponent>&);
+    ~OffscreenTexture();
     OffscreenTexture(OffscreenTexture&&);
     OffscreenTexture& operator=(OffscreenTexture&&);
 
-    void bind() override;
+    void bind();
 
     PremultipliedImage readStillImage();
 

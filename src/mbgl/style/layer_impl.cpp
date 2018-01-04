@@ -3,8 +3,10 @@
 namespace mbgl {
 namespace style {
 
-void Layer::Impl::setObserver(LayerObserver* observer_) {
-    observer = observer_ ? observer_ : &nullObserver;
+Layer::Impl::Impl(LayerType type_, std::string layerID, std::string sourceID)
+    : type(type_),
+      id(std::move(layerID)),
+      source(std::move(sourceID)) {
 }
 
 } // namespace style

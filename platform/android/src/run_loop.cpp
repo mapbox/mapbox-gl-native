@@ -1,10 +1,10 @@
 #include "run_loop_impl.hpp"
 
 #include <mbgl/util/platform.hpp>
-#include <mbgl/util/thread.hpp>
-#include <mbgl/util/thread_context.hpp>
 #include <mbgl/util/thread_local.hpp>
+#include <mbgl/util/thread.hpp>
 #include <mbgl/util/timer.hpp>
+#include <mbgl/actor/scheduler.hpp>
 
 #include <android/looper.h>
 
@@ -24,7 +24,6 @@
 namespace {
 
 using namespace mbgl::util;
-static ThreadLocal<RunLoop>& current = *new ThreadLocal<RunLoop>;
 
 int looperCallbackNew(int fd, int, void* data) {
     int buffer[1];
@@ -62,9 +61,13 @@ namespace util {
 // timeout, but on the main thread `ALooper_pollAll` is called by the activity
 // automatically, thus we cannot set the timeout. Instead we wake the loop
 // with an external file descriptor event coming from this thread.
+//
+// Usually an actor should not carry pointers to other threads, but in
+// this case the RunLoop itself owns the Alarm and calling wake() is the most
+// efficient way of waking up the RunLoop and it is also thread-safe.
 class Alarm {
 public:
-    Alarm(RunLoop::Impl* loop_) : loop(loop_) {}
+    Alarm(ActorRef<Alarm>, RunLoop::Impl* loop_) : loop(loop_) {}
 
     void set(const Milliseconds& timeout) {
         alarm.start(timeout, mbgl::Duration::zero(), [this]() { loop->wake(); });
@@ -102,7 +105,7 @@ RunLoop::Impl::Impl(RunLoop* runLoop_, RunLoop::Type type) : runLoop(runLoop_) {
     case Type::Default:
         ret = ALooper_addFd(loop, fds[PIPE_OUT], ALOOPER_POLL_CALLBACK,
             ALOOPER_EVENT_INPUT, looperCallbackDefault, this);
-        alarm = std::make_unique<Thread<Alarm>>(ThreadContext{"Alarm"}, this);
+        alarm = std::make_unique<Thread<Alarm>>("Alarm", this);
         running = true;
         break;
     }
@@ -190,31 +193,34 @@ Milliseconds RunLoop::Impl::processRunnables() {
 
     auto timeout = std::chrono::duration_cast<Milliseconds>(nextDue - now);
     if (alarm) {
-        alarm->invoke(&Alarm::set, timeout);
+        alarm->actor().invoke(&Alarm::set, timeout);
     }
 
     return timeout;
 }
 
 RunLoop* RunLoop::Get() {
-    return current.get();
+    assert(static_cast<RunLoop*>(Scheduler::GetCurrent()));
+    return static_cast<RunLoop*>(Scheduler::GetCurrent());
 }
 
 RunLoop::RunLoop(Type type) : impl(std::make_unique<Impl>(this, type)) {
-    current.set(this);
+    Scheduler::SetCurrent(this);
 }
 
 RunLoop::~RunLoop() {
-    current.set(nullptr);
+    Scheduler::SetCurrent(nullptr);
 }
 
 LOOP_HANDLE RunLoop::getLoopHandle() {
-    return current.get()->impl.get();
+    return Get()->impl.get();
 }
 
 void RunLoop::push(std::shared_ptr<WorkTask> task) {
-    withMutex([&] { queue.push(std::move(task)); });
-    impl->wake();
+    withMutex([&] {
+        queue.push(std::move(task));
+        impl->wake();
+    });
 }
 
 void RunLoop::run() {

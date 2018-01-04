@@ -1,11 +1,10 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/style/conversion.hpp>
-#include <mbgl/style/rapidjson_conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/light.hpp>
 #include <mbgl/style/position.hpp>
-#include <mbgl/util/rapidjson.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/util/chrono.hpp>
 
@@ -19,9 +18,7 @@ TEST(StyleConversion, Light) {
     Error error;
 
     auto parseLight = [&](const std::string& src) {
-        JSDocument doc;
-        doc.Parse<0>(src);
-        return convert<Light>(doc, error);
+        return convertJSON<Light>(src, error);
     };
 
     {

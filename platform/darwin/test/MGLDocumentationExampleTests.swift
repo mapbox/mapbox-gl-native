@@ -103,6 +103,32 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "pois"))
     }
+    
+    func testMGLPolyline() {
+        //#-example-code
+        let coordinates = [
+            CLLocationCoordinate2D(latitude: 35.68476, longitude: -220.24257),
+            CLLocationCoordinate2D(latitude: 37.78428, longitude: -122.41310)
+        ]
+        let polyline = MGLPolyline(coordinates: coordinates, count: UInt(coordinates.count))
+        //#-end-example-code
+        
+        XCTAssertNotNil(polyline)
+    }
+
+    func testMGLImageSource() {
+        //#-example-code
+        let coordinates = MGLCoordinateQuad(
+          topLeft: CLLocationCoordinate2D(latitude: 46.437, longitude: -80.425),
+          bottomLeft: CLLocationCoordinate2D(latitude: 37.936, longitude: -80.425),
+          bottomRight: CLLocationCoordinate2D(latitude: 37.936, longitude: -71.516),
+          topRight: CLLocationCoordinate2D(latitude: 46.437, longitude: -71.516))
+        let source = MGLImageSource(identifier: "radar", coordinateQuad: coordinates, url: URL(string: "https://www.mapbox.com/mapbox-gl-js/assets/radar.gif")!)
+        mapView.style?.addSource(source)
+        //#-end-example-code
+
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "radar"))
+    }
 
     func testMGLCircleStyleLayer() {
         let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
@@ -168,7 +194,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         layer.sourceLayerIdentifier = "building"
         layer.fillExtrusionHeight = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "height", options: nil)
         layer.fillExtrusionBase = MGLStyleValue(interpolationMode: .identity, sourceStops: nil, attributeName: "min_height", options: nil)
-        layer.predicate = NSPredicate(format: "extrude == TRUE")
+        layer.predicate = NSPredicate(format: "extrude == 'true'")
         mapView.style?.addLayer(layer)
         //#-end-example-code
         
@@ -249,6 +275,24 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             }
             mapView.addGestureRecognizer(mapTapGestureRecognizer)
         #endif
+        //#-end-example-code
+    }
+    
+    func testMGLMapSnapshotter() {
+        //#-example-code
+        let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), fromDistance: 100, pitch: 20, heading: 0)
+
+        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+        options.zoomLevel = 10
+
+        let snapshotter = MGLMapSnapshotter(options: options)
+        snapshotter.start { (snapshot, error) in
+            if error != nil {
+                // error handler
+            } else {
+                // image handler
+            }
+        }
         //#-end-example-code
     }
     

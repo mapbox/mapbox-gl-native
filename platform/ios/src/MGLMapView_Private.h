@@ -2,6 +2,7 @@
 
 namespace mbgl {
     class Map;
+    class Renderer;
 }
 
 /// Minimum size of an annotation’s accessibility element.
@@ -16,6 +17,8 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 - (void)setNeedsGLDisplay;
 
 - (mbgl::Map *)mbglMap;
+
+- (mbgl::Renderer *)renderer;
 
 /** Returns whether the map view is currently loading or processing any assets required to render the map */
 - (BOOL)isFullyLoaded;

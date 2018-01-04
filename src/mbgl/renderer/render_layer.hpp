@@ -12,27 +12,27 @@ namespace mbgl {
 
 class Bucket;
 class BucketParameters;
-class CascadeParameters;
+class TransitionParameters;
 class PropertyEvaluationParameters;
+class PaintParameters;
+class RenderSource;
+class RenderTile;
 
 class RenderLayer {
-
 protected:
-    RenderLayer(style::LayerType, const style::Layer::Impl&);
+    RenderLayer(style::LayerType, Immutable<style::Layer::Impl>);
 
     const style::LayerType type;
 
 public:
+    static std::unique_ptr<RenderLayer> create(Immutable<style::Layer::Impl>);
 
     virtual ~RenderLayer() = default;
 
-    // Create an identical copy of this layer.
-    virtual std::unique_ptr<RenderLayer> clone() const = 0;
+    // Begin transitions for any properties that have changed since the last frame.
+    virtual void transition(const TransitionParameters&) = 0;
 
-    // Partially evaluate paint properties based on a set of classes.
-    virtual void cascade(const CascadeParameters&) = 0;
-
-    // Fully evaluate cascaded paint properties based on a zoom level.
+    // Fully evaluate possibly-transitioning paint properties based on a zoom level.
     virtual void evaluate(const PropertyEvaluationParameters&) = 0;
 
     // Returns true if any paint properties have active transitions.
@@ -61,6 +61,8 @@ public:
     // Checks whether this layer can be rendered.
     bool needsRendering(float zoom) const;
 
+    virtual void render(PaintParameters&, RenderSource*) = 0;
+
     // Check wether the given geometry intersects
     // with the feature
     virtual bool queryIntersectsFeature(
@@ -72,11 +74,20 @@ public:
 
     virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
 
+    void setRenderTiles(std::vector<std::reference_wrapper<RenderTile>>);
     // Private implementation
-    const style::Layer::Impl& baseImpl;
+    Immutable<style::Layer::Impl> baseImpl;
+    void setImpl(Immutable<style::Layer::Impl>);
 
     friend std::string layoutKey(const RenderLayer&);
+
 protected:
+    // renderTiles are exposed directly to CrossTileSymbolIndex and Placement so they
+    // can update opacities in the symbol buckets immediately before rendering
+    friend class CrossTileSymbolIndex;
+    friend class Placement;
+    // Stores current set of tiles to be rendered for this layer.
+    std::vector<std::reference_wrapper<RenderTile>> renderTiles;
 
     // Stores what render passes this layer is currently enabled for. This depends on the
     // evaluated StyleProperties object and is updated accordingly.

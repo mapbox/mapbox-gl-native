@@ -3,8 +3,12 @@
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/util/type_list.hpp>
+#include <mbgl/renderer/possibly_evaluated_property_value.hpp>
 #include <mbgl/renderer/paint_property_statistics.hpp>
+
+#include <bitset>
 
 namespace mbgl {
 
@@ -54,8 +58,7 @@ std::array<float, N*2> zoomInterpolatedAttributeValue(const std::array<float, N>
 
    * For _constant_ properties -- those whose value is a constant, or the constant
      result of evaluating a camera function at a particular camera position -- we
-     don't need a vertex buffer, and can instead use a constant attribute binding
-     via the `glVertexAttrib*` family of functions.
+     don't need a vertex buffer, and instead use a uniform.
    * For source functions, we use a vertex buffer with a single attribute value,
      the evaluated result of the source function for the given feature.
    * For composite functions, we use a vertex buffer with two attributes: min and
@@ -66,15 +69,8 @@ std::array<float, N*2> zoomInterpolatedAttributeValue(const std::array<float, N>
      between the min and max value at the final displayed zoom level. The use of a
      uniform allows us to cheaply update the value on every frame.
 
-   Note that the shader source is the same regardless of the strategy used to bind
-   the attribute -- in all cases the attribute is declared as a vec2, in order to
-   support composite min and max values (color attributes use a vec4 with special
-   packing). When the constant or source function strategies are used, the
-   interpolation uniform value is set to zero, and the second attribute element is
-   unused. This differs from the GL JS implementation, which dynamically generates
-   shader source based on the strategy used. We found that in WebGL, using
-   `glVertexAttrib*` was unnacceptably slow. Additionally, in GL Native we have
-   implemented binary shader caching, which works better if the shaders are constant.
+   Note that the shader source varies depending on whether we're using a uniform or
+   attribute. Like GL JS, we dynamically compile shaders at runtime to accomodate this.
 */
 template <class T, class A>
 class PaintPropertyBinder {
@@ -86,8 +82,9 @@ public:
 
     virtual void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) = 0;
     virtual void upload(gl::Context& context) = 0;
-    virtual AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
+    virtual optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
     virtual float interpolationFactor(float currentZoom) const = 0;
+    virtual T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const = 0;
 
     static std::unique_ptr<PaintPropertyBinder> create(const PossiblyEvaluatedPropertyValue<T>& value, float zoom, T defaultValue);
 
@@ -107,15 +104,16 @@ public:
     void populateVertexVector(const GeometryTileFeature&, std::size_t) override {}
     void upload(gl::Context&) override {}
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
-        auto value = attributeValue(currentValue.constantOr(constant));
-        return typename Attribute::ConstantBinding {
-            zoomInterpolatedAttributeValue(value, value)
-        };
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>&) const override {
+        return {};
     }
 
     float interpolationFactor(float) const override {
         return 0.0f;
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        return currentValue.constantOr(constant);
     }
 
 private:
@@ -150,19 +148,25 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            BaseAttributeValue value = attributeValue(*currentValue.constant());
-            return typename Attribute::ConstantBinding {
-                zoomInterpolatedAttributeValue(value, value)
-            };
+            return {};
         } else {
-            return Attribute::variableBinding(*vertexBuffer, 0, BaseAttribute::Dimensions);
+            return Attribute::binding(*vertexBuffer, 0, BaseAttribute::Dimensions);
         }
     }
 
     float interpolationFactor(float) const override {
         return 0.0f;
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        if (currentValue.isConstant()) {
+            return *currentValue.constant();
+        } else {
+            // Uniform values for vertex attribute arrays are unused.
+            return {};
+        }
     }
 
 private:
@@ -186,11 +190,11 @@ public:
     CompositeFunctionPaintPropertyBinder(style::CompositeFunction<T> function_, float zoom, T defaultValue_)
         : function(std::move(function_)),
           defaultValue(std::move(defaultValue_)),
-          coveringRanges(function.coveringRanges(zoom)) {
+          zoomRange({zoom, zoom + 1}) {
     }
 
     void populateVertexVector(const GeometryTileFeature& feature, std::size_t length) override {
-        Range<T> range = function.evaluate(std::get<1>(coveringRanges), feature, defaultValue);
+        Range<T> range = function.evaluate(zoomRange, feature, defaultValue);
         this->statistics.add(range.min);
         this->statistics.add(range.max);
         AttributeValue value = zoomInterpolatedAttributeValue(
@@ -205,26 +209,35 @@ public:
         vertexBuffer = context.createVertexBuffer(std::move(vertexVector));
     }
 
-    AttributeBinding attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+    optional<AttributeBinding> attributeBinding(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
         if (currentValue.isConstant()) {
-            BaseAttributeValue value = attributeValue(*currentValue.constant());
-            return typename Attribute::ConstantBinding {
-                zoomInterpolatedAttributeValue(value, value)
-            };
+            return {};
         } else {
-            return Attribute::variableBinding(*vertexBuffer, 0);
+            return Attribute::binding(*vertexBuffer, 0);
         }
     }
 
     float interpolationFactor(float currentZoom) const override {
-        return util::interpolationFactor(1.0f, std::get<0>(coveringRanges), currentZoom);
+        if (function.useIntegerZoom) {
+            return function.interpolationFactor(zoomRange, std::floor(currentZoom));
+        } else {
+            return function.interpolationFactor(zoomRange, currentZoom);
+        }
+    }
+
+    T uniformValue(const PossiblyEvaluatedPropertyValue<T>& currentValue) const override {
+        if (currentValue.isConstant()) {
+            return *currentValue.constant();
+        } else {
+            // Uniform values for vertex attribute arrays are unused.
+            return {};
+        }
     }
 
 private:
-    using InnerStops = typename style::CompositeFunction<T>::InnerStops;
     style::CompositeFunction<T> function;
     T defaultValue;
-    std::tuple<Range<float>, Range<InnerStops>> coveringRanges;
+    Range<float> zoomRange;
     gl::VertexVector<Vertex> vertexVector;
     optional<gl::VertexBuffer<Vertex>> vertexBuffer;
 };
@@ -306,14 +319,18 @@ public:
         };
     }
 
-    using Uniforms = gl::Uniforms<InterpolationUniform<typename Ps::Attribute>...>;
+    using Uniforms = gl::Uniforms<InterpolationUniform<typename Ps::Attribute>..., typename Ps::Uniform...>;
     using UniformValues = typename Uniforms::Values;
 
-    UniformValues uniformValues(float currentZoom) const {
+    template <class EvaluatedProperties>
+    UniformValues uniformValues(float currentZoom, const EvaluatedProperties& currentProperties) const {
         (void)currentZoom; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
         return UniformValues {
             typename InterpolationUniform<typename Ps::Attribute>::Value {
                 binders.template get<Ps>()->interpolationFactor(currentZoom)
+            }...,
+            typename Ps::Uniform::Value {
+                binders.template get<Ps>()->uniformValue(currentProperties.template get<Ps>())
             }...
         };
     }
@@ -321,6 +338,30 @@ public:
     template <class P>
     const auto& statistics() const {
         return binders.template get<P>()->statistics;
+    }
+
+
+    using Bitset = std::bitset<sizeof...(Ps)>;
+
+    template <class EvaluatedProperties>
+    static Bitset constants(const EvaluatedProperties& currentProperties) {
+        Bitset result;
+        util::ignore({
+            result.set(TypeIndex<Ps, Ps...>::value,
+                       currentProperties.template get<Ps>().isConstant())...
+        });
+        return result;
+    }
+
+    template <class EvaluatedProperties>
+    static std::vector<std::string> defines(const EvaluatedProperties& currentProperties) {
+        std::vector<std::string> result;
+        util::ignore({
+            (result.push_back(currentProperties.template get<Ps>().isConstant()
+                ? std::string("#define HAS_UNIFORM_") + Ps::Uniform::name()
+                : std::string()), 0)...
+        });
+        return result;
     }
 
 private:

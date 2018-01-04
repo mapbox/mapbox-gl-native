@@ -23,6 +23,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
+        android:textIsSelectable="false"
         android:maxEms="17"
         android:textColor="@android:color/black"
         android:textSize="18sp"
@@ -34,13 +35,13 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="2dp"
         android:layout_marginTop="2dp"
+        android:textIsSelectable="false"
         android:lineSpacingExtra="1dp"
         android:maxEms="17"
         android:textColor="@color/mapbox_gray"
         android:textSize="14sp"/>
 
     <TextView
-        android:id="@+id/infowindow_subdescription"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:maxEms="17"

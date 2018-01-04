@@ -5,16 +5,27 @@
 
 #include <mbgl/style/light.hpp>
 #include <mbgl/style/light_impl.hpp>
-#include <mbgl/style/light_properties.hpp>
+#include <mbgl/style/light_observer.hpp>
 
 namespace mbgl {
 namespace style {
 
+static LightObserver nullObserver;
+
 Light::Light()
-        : impl(std::make_unique<Impl>()) {
+    : impl(makeMutable<Impl>()),
+      observer(&nullObserver) {
 }
 
 Light::~Light() = default;
+
+void Light::setObserver(LightObserver* observer_) {
+    observer = observer_ ? observer_ : &nullObserver;
+}
+
+Mutable<Light::Impl> Light::mutableImpl() const {
+    return makeMutable<Impl>(*impl);
+}
 
 <% for (const property of properties) { -%>
 <%- evaluatedType(property) %> Light::getDefault<%- camelize(property.name) %>() {
@@ -26,17 +37,21 @@ Light::~Light() = default;
 }
 
 void Light::set<%- camelize(property.name) %>(<%- propertyValueType(property) %> property) {
-    impl->properties.template get<Light<%- camelize(property.name) %>>().value = property;
-    impl->observer->onLightChanged(*this);
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<Light<%- camelize(property.name) %>>().value = property;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
-void Light::set<%- camelize(property.name) %>Transition(const TransitionOptions& transition) {
-    impl->properties.template get<Light<%- camelize(property.name) %>>().transition = transition;
-    impl->observer->onLightChanged(*this);
+void Light::set<%- camelize(property.name) %>Transition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->properties.template get<Light<%- camelize(property.name) %>>().options = options;
+    impl = std::move(impl_);
+    observer->onLightChanged(*this);
 }
 
 TransitionOptions Light::get<%- camelize(property.name) %>Transition() const {
-    return impl->properties.template get<Light<%- camelize(property.name) %>>().transition;
+    return impl->properties.template get<Light<%- camelize(property.name) %>>().options;
 }
 
 <% } -%>

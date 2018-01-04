@@ -17,7 +17,12 @@ public:
     StubFileSource& fileSource;
 };
 
-StubFileSource::StubFileSource() {
+StubFileSource::StubFileSource(ResponseType type_)
+        : type(type_) {
+    if (type == ResponseType::Synchronous) {
+        return;
+    }
+
     timer.start(1ms, 1ms, [this] {
         // Explicit copy to avoid iterator invalidation if ~StubFileRequest gets called within the loop.
         auto pending_ = pending;
@@ -46,7 +51,14 @@ StubFileSource::~StubFileSource() = default;
 
 std::unique_ptr<AsyncRequest> StubFileSource::request(const Resource& resource, Callback callback) {
     auto req = std::make_unique<StubFileRequest>(*this);
-    pending.emplace(req.get(), std::make_tuple(resource, response, callback));
+    if (type == ResponseType::Synchronous) {
+        optional<Response> res = response(resource);
+        if (res) {
+            callback(*res);
+        }
+    } else {
+        pending.emplace(req.get(), std::make_tuple(resource, response, callback));
+    }
     return std::move(req);
 }
 
@@ -77,6 +89,9 @@ optional<Response> StubFileSource::defaultResponse(const Resource& resource) {
     case Resource::Kind::SpriteImage:
         if (!spriteImageResponse) throw std::runtime_error("unexpected sprite image request");
         return spriteImageResponse(resource);
+    case Resource::Kind::Image:
+        if (!imageResponse) throw std::runtime_error("unexpected image request");
+        return imageResponse(resource);
     case Resource::Kind::Unknown:
         throw std::runtime_error("unknown resource type");
     }

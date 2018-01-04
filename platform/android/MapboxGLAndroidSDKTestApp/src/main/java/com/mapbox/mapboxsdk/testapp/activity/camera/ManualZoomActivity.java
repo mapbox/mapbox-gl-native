@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.graphics.Point;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,7 +11,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -35,14 +33,11 @@ public class ManualZoomActivity extends AppCompatActivity {
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.setStyleUrl(Style.SATELLITE);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull final MapboxMap mapboxMap) {
-        ManualZoomActivity.this.mapboxMap = mapboxMap;
+    mapView.getMapAsync(mapboxMap -> {
+      ManualZoomActivity.this.mapboxMap = mapboxMap;
 
-        UiSettings uiSettings = ManualZoomActivity.this.mapboxMap.getUiSettings();
-        uiSettings.setAllGesturesEnabled(false);
-      }
+      UiSettings uiSettings = ManualZoomActivity.this.mapboxMap.getUiSettings();
+      uiSettings.setAllGesturesEnabled(false);
     });
   }
 

@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.app.ProgressDialog;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -17,29 +16,24 @@ import android.widget.ArrayAdapter;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.GeoParseUtil;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-
-import org.json.JSONException;
+import timber.log.Timber;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Random;
-
-import timber.log.Timber;
 
 /**
  * Test activity showcasing adding a large amount of Markers or MarkerViews.
@@ -50,6 +44,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   private MapView mapView;
   private boolean customMarkerView;
   private List<LatLng> locations;
+  private ProgressDialog progressDialog;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,12 +53,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(@NonNull MapboxMap mapboxMap) {
-        BulkMarkerActivity.this.mapboxMap = mapboxMap;
-      }
-    });
+    mapView.getMapAsync(mapboxMap -> BulkMarkerActivity.this.mapboxMap = mapboxMap);
 
     final View fab = findViewById(R.id.fab);
     if (fab != null) {
@@ -88,6 +78,7 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
     int amount = Integer.valueOf(getResources().getStringArray(R.array.bulk_marker_list)[position]);
     if (locations == null) {
+      progressDialog = ProgressDialog.show(this, "Loading", "Fetching markers", false);
       new LoadLocationTask(this, amount).execute();
     } else {
       showMarkers(amount);
@@ -95,11 +86,16 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
   }
 
   private void onLatLngListLoaded(List<LatLng> latLngs, int amount) {
+    progressDialog.hide();
     locations = latLngs;
     showMarkers(amount);
   }
 
   private void showMarkers(int amount) {
+    if (mapboxMap == null || locations == null) {
+      return;
+    }
+
     mapboxMap.clear();
 
     if (locations.size() < amount) {
@@ -228,29 +224,22 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
         viewCountView = (TextView) findViewById(R.id.countView);
 
-        mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
-          @Override
-          public void onMapChanged(@MapView.MapChange int change) {
-            if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
-              if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
-                viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
-                  mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
-              }
+        mapView.addOnMapChangedListener(change -> {
+          if (change == MapView.REGION_IS_CHANGING || change == MapView.REGION_DID_CHANGE) {
+            if (!mapboxMap.getMarkerViewManager().getMarkerViewAdapters().isEmpty()) {
+              viewCountView.setText(String.format(Locale.getDefault(), "ViewCache size %d",
+                mapboxMap.getMarkerViewManager().getMarkerViewContainer().getChildCount()));
             }
           }
         });
 
         mapboxMap.getMarkerViewManager().setOnMarkerViewClickListener(
-          new MapboxMap.OnMarkerViewClickListener() {
-            @Override
-            public boolean onMarkerClick(
-              @NonNull Marker marker, @NonNull View view, @NonNull MapboxMap.MarkerViewAdapter adapter) {
-              Toast.makeText(
-                BulkMarkerActivity.this,
-                "Hello " + marker.getId(),
-                Toast.LENGTH_SHORT).show();
-              return false;
-            }
+          (marker, view1, adapter) -> {
+            Toast.makeText(
+              BulkMarkerActivity.this,
+              "Hello " + marker.getId(),
+              Toast.LENGTH_SHORT).show();
+            return false;
           });
       }
     }
@@ -258,32 +247,39 @@ public class BulkMarkerActivity extends AppCompatActivity implements AdapterView
 
   private static class LoadLocationTask extends AsyncTask<Void, Integer, List<LatLng>> {
 
-    private BulkMarkerActivity activity;
-    private ProgressDialog progressDialog;
+    private WeakReference<BulkMarkerActivity> activity;
     private int amount;
 
     private LoadLocationTask(BulkMarkerActivity activity, int amount) {
       this.amount = amount;
-      this.activity = activity;
-      progressDialog = ProgressDialog.show(activity, "Loading", "Fetching markers", false);
+      this.activity = new WeakReference<>(activity);
     }
 
     @Override
     protected List<LatLng> doInBackground(Void... params) {
-      try {
-        String json = GeoParseUtil.loadStringFromAssets(activity.getApplicationContext(), "points.geojson");
-        return GeoParseUtil.parseGeoJsonCoordinates(json);
-      } catch (IOException | JSONException exception) {
-        Timber.e("Could not add markers,", exception);
-        return null;
+      BulkMarkerActivity activity = this.activity.get();
+      if (activity != null) {
+        String json = null;
+        try {
+          json = GeoParseUtil.loadStringFromAssets(activity.getApplicationContext(), "points.geojson");
+        } catch (IOException exception) {
+          Timber.e(exception, "Could not add markers");
+        }
+
+        if (json != null) {
+          return GeoParseUtil.parseGeoJsonCoordinates(json);
+        }
       }
+      return null;
     }
 
     @Override
     protected void onPostExecute(List<LatLng> locations) {
       super.onPostExecute(locations);
-      activity.onLatLngListLoaded(locations, amount);
-      progressDialog.hide();
+      BulkMarkerActivity activity = this.activity.get();
+      if (activity != null) {
+        activity.onLatLngListLoaded(locations, amount);
+      }
     }
   }
 }

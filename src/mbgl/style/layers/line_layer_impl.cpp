@@ -1,11 +1,15 @@
 #include <mbgl/style/layers/line_layer_impl.hpp>
-#include <mbgl/renderer/render_line_layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<RenderLayer> LineLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderLineLayer>(*this);
+bool LineLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
+    assert(dynamic_cast<const LineLayer::Impl*>(&other));
+    const auto& impl = static_cast<const style::LineLayer::Impl&>(other);
+    return filter     != impl.filter ||
+           visibility != impl.visibility ||
+           layout     != impl.layout ||
+           paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 
 } // namespace style

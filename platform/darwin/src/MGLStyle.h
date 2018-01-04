@@ -6,6 +6,7 @@
 #import "MGLTypes.h"
 
 @class MGLSource;
+@class MGLLight;
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -232,66 +233,38 @@ MGL_EXPORT
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
 /**
- Returns the URL to the current version of the
+ Returns the URL to version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
  style.
 
- Traffic Day color-codes roads based on live traffic congestion data. Traffic
- data is currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
- @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-trafficDayStyleURLWithVersion:` method instead. Such details may change
-    significantly from version to version.
  */
-+ (NSURL *)trafficDayStyleURL;
++ (NSURL *)trafficDayStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
 
 /**
  Returns the URL to the given version of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
  style as of publication.
-
- Traffic Day color-codes roads based on live traffic congestion data. Traffic
- data is currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
+ 
  @param version A specific version of the style.
  */
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version;
++ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
 
 /**
- Returns the URL to the current version of the
+ Returns the URL to the version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
  style.
 
- Traffic Night color-codes roads based on live traffic congestion data and is
- designed to maximize legibility in low-light situations. Traffic data is
- currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
- @warning The return value may change in a future release of the SDK. If you use
-    any feature that depends on a specific aspect of a default style – for
-    instance, the minimum zoom level that includes roads – use the
-    `-trafficNightStyleURLWithVersion:` method instead. Such details may change
-    significantly from version to version.
  */
-+ (NSURL *)trafficNightStyleURL;
++ (NSURL *)trafficNightStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 /**
- Returns the URL to the given version of the
+ Returns the URL to to the version 2 of the
  <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
  style as of publication.
-
- Traffic Night color-codes roads based on live traffic congestion data and is
- designed to maximize legibility in low-light situations. Traffic data is
- currently available in
- <a href="https://www.mapbox.com/api-documentation/pages/traffic-countries.html">these select countries</a>.
-
+ 
  @param version A specific version of the style.
  */
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version;
++ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 #pragma mark Accessing Metadata About the Style
 
@@ -483,40 +456,24 @@ MGL_EXPORT
 #pragma mark Managing Style Classes
 
 /**
- Currently active style classes, represented as an array of string identifiers.
+ Support for style classes has been removed. This property always returns an empty array.
  */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property will be removed in a future release.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
 /**
- Returns a Boolean value indicating whether the style class with the given
- identifier is currently active.
-
- @param styleClass The style class to query for.
- @return Whether the style class is currently active.
+ Support for style classes has been removed. This method always returns NO.
  */
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 /**
- Activates the style class with the given identifier.
-
- @param styleClass The style class to activate.
+ Support for style classes has been removed. This method is a no-op.
  */
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 /**
- Deactivates the style class with the given identifier.
-
- @note Style class names are not guaranteed to exist across styles or different
-    versions of the same style. Applications that use this API must first set the
-    style URL to an explicitly versioned style using a convenience method like
-    `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
-    inspectable in Interface Builder, or a manually constructed `NSURL`. This
-    approach also avoids style class name changes that will occur in the default
-    style over time.
-
- @param styleClass The style class to deactivate.
+ Support for style classes has been removed. This method is a no-op.
  */
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method will be removed in a future release.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 #pragma mark Managing a Style’s Images
 
@@ -563,6 +520,29 @@ MGL_EXPORT
  @param name The name of the image to remove.
  */
 - (void)removeImageForName:(NSString *)name;
+
+
+#pragma mark Managing the Style's Light
+
+/**
+ Provides global light source for the style.
+ */
+@property (nonatomic, strong) MGLLight *light;
+
+#pragma mark Localizing Map Content
+
+/**
+ A Boolean value that determines whether the style attempts to localize labels in 
+ the style into the system’s preferred language.
+ 
+ When this property is enabled, the style automatically modifies the text property 
+ of any symbol style layer whose source is the 
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox 
+ Streets source</a>. On iOS, the user can set the system’s preferred language in 
+ Settings, General Settings, Language & Region. On macOS, the user can set the 
+ system’s preferred language in the Language & Region pane of System Preferences.
+ */
+@property (nonatomic) BOOL localizesLabels;
 
 @end
 

@@ -5,8 +5,10 @@
 #include <mbgl/storage/response.hpp>
 #include <mbgl/storage/http_file_source.hpp>
 #include <mbgl/style/parser.hpp>
-#include <mbgl/style/sources/geojson_source_impl.hpp>
-#include <mbgl/style/tile_source_impl.hpp>
+#include <mbgl/style/sources/vector_source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/geojson_source.hpp>
+#include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/tileset.hpp>
 #include <mbgl/text/glyph.hpp>
@@ -18,6 +20,8 @@
 #include <set>
 
 namespace mbgl {
+
+using namespace style;
 
 OfflineDownload::OfflineDownload(int64_t id_,
                                  OfflineRegionDefinition&& definition_,
@@ -71,18 +75,12 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     result.requiredResourceCountIsPrecise = true;
 
     for (const auto& source : parser.sources) {
-        SourceType type = source->baseImpl->type;
+        SourceType type = source->getType();
 
-        switch (type) {
-        case SourceType::Vector:
-        case SourceType::Raster: {
-            auto* tileSource = static_cast<style::TileSourceImpl*>(source->baseImpl.get());
-            const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
-            const uint16_t tileSize = tileSource->getTileSize();
-
+        auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
             if (urlOrTileset.is<Tileset>()) {
                 result.requiredResourceCount +=
-                    definition.tileCover(type, tileSize, urlOrTileset.get<Tileset>().zoomRange).size();
+                    definition.tileCount(type, tileSize, urlOrTileset.get<Tileset>().zoomRange);
             } else {
                 result.requiredResourceCount += 1;
                 const auto& url = urlOrTileset.get<std::string>();
@@ -92,18 +90,38 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                     optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
                     if (tileset) {
                         result.requiredResourceCount +=
-                            definition.tileCover(type, tileSize, (*tileset).zoomRange).size();
+                            definition.tileCount(type, tileSize, (*tileset).zoomRange);
                     }
                 } else {
                     result.requiredResourceCountIsPrecise = false;
                 }
             }
+        };
+
+        switch (type) {
+        case SourceType::Vector: {
+            const auto& vectorSource = *source->as<VectorSource>();
+            handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
+            break;
+        }
+
+        case SourceType::Raster: {
+            const auto& rasterSource = *source->as<RasterSource>();
+            handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
             break;
         }
 
         case SourceType::GeoJSON: {
-            auto* geojsonSource = source->as<style::GeoJSONSource>();
-            if (geojsonSource->getURL()) {
+            const auto& geojsonSource = *source->as<GeoJSONSource>();
+            if (geojsonSource.getURL()) {
+                result.requiredResourceCount += 1;
+            }
+            break;
+        }
+
+        case SourceType::Image: {
+            const auto& imageSource = *source->as<ImageSource>();
+            if (imageSource.getURL()) {
                 result.requiredResourceCount += 1;
             }
             break;
@@ -111,6 +129,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
 
         case SourceType::Video:
         case SourceType::Annotations:
+        case SourceType::CustomVector:
             break;
         }
     }
@@ -137,16 +156,9 @@ void OfflineDownload::activateDownload() {
         parser.parse(*styleResponse.data);
 
         for (const auto& source : parser.sources) {
-            SourceType type = source->baseImpl->type;
+            SourceType type = source->getType();
 
-            switch (type) {
-            case SourceType::Vector:
-            case SourceType::Raster: {
-                const style::TileSourceImpl* tileSource =
-                    static_cast<style::TileSourceImpl*>(source->baseImpl.get());
-                const variant<std::string, Tileset>& urlOrTileset = tileSource->getURLOrTileset();
-                const uint16_t tileSize = tileSource->getTileSize();
-
+            auto handleTiledSource = [&] (const variant<std::string, Tileset>& urlOrTileset, const uint16_t tileSize) {
                 if (urlOrTileset.is<Tileset>()) {
                     queueTiles(type, tileSize, urlOrTileset.get<Tileset>());
                 } else {
@@ -169,21 +181,41 @@ void OfflineDownload::activateDownload() {
                         }
                     });
                 }
+            };
+
+            switch (type) {
+            case SourceType::Vector: {
+                const auto& vectorSource = *source->as<VectorSource>();
+                handleTiledSource(vectorSource.getURLOrTileset(), util::tileSize);
+                break;
+            }
+
+            case SourceType::Raster: {
+                const auto& rasterSource = *source->as<RasterSource>();
+                handleTiledSource(rasterSource.getURLOrTileset(), rasterSource.getTileSize());
                 break;
             }
 
             case SourceType::GeoJSON: {
-                auto* geojsonSource =
-                    static_cast<style::GeoJSONSource::Impl*>(source->baseImpl.get());
+                const auto& geojsonSource = *source->as<GeoJSONSource>();
+                if (geojsonSource.getURL()) {
+                    queueResource(Resource::source(*geojsonSource.getURL()));
+                }
+                break;
+            }
 
-                if (geojsonSource->getURL()) {
-                    queueResource(Resource::source(*geojsonSource->getURL()));
+            case SourceType::Image: {
+                const auto& imageSource = *source->as<ImageSource>();
+                auto imageUrl = imageSource.getURL();
+                if (imageUrl && !imageUrl->empty()) {
+                    queueResource(Resource::image(*imageUrl));
                 }
                 break;
             }
 
             case SourceType::Video:
             case SourceType::Annotations:
+            case SourceType::CustomVector:
                 break;
             }
         }

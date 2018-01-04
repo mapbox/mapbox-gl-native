@@ -11,6 +11,7 @@
     <!--Configuration-->
     <public name="mapbox_styleUrl" type="attr" />
     <public name="mapbox_apiBaseUrl" type="attr" />
+    <public name="mapbox_localIdeographFontFamily" type="attr" />
 
     <!--Camera-->
     <public name="mapbox_cameraTargetLng" type="attr" />
@@ -20,7 +21,7 @@
     <public name="mapbox_cameraTilt" type="attr" />
 
     <!--Zoom-->
-    <public name="mapbox_cameraZoomMax" ftype="attr" />
+    <public name="mapbox_cameraZoomMax" type="attr" />
     <public name="mapbox_cameraZoomMin" type="attr" />
 
     <!--Gestures-->
@@ -72,19 +73,24 @@
     <public name="mapbox_uiAttributionMarginRight" type="attr" />
     <public name="mapbox_uiAttributionMarginBottom" type="attr" />
 
-    <!-- Deprecated to use TextureView-->
+    <!-- Use TextureView-->
     <public name="mapbox_renderTextureMode" type="attr" />
+
+    <public name="mapbox_enableTilePrefetch" type="attr" />
+    <public name="mapbox_enableZMediaOverlay" type="attr" />
 
     <!-- Exposed content descriptions -->
     <public name="mapbox_logoContentDescription" type="string" />
 
     <!-- Exposed styles -->
     <public name="mapbox_style_mapbox_streets" type="string" />
-    <public name="mapbox_style_emerald" type="string" />
+    <public name="mapbox_style_outdoors" type="string" />
     <public name="mapbox_style_light" type="string" />
     <public name="mapbox_style_dark" type="string" />
     <public name="mapbox_style_satellite" type="string" />
     <public name="mapbox_style_satellite_streets" type="string" />
+    <public name="mapbox_style_traffic_day" type="string" />
+    <public name="mapbox_style_traffic_night" type="string" />
 
     <!-- Exposed strings -->
     <public name="mapbox_compassContentDescription" type="string" />

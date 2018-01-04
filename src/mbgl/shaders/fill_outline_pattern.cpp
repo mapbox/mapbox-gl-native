@@ -23,12 +23,24 @@ varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 varying vec2 v_pos;
 
+
+#ifndef HAS_UNIFORM_u_opacity
 uniform lowp float a_opacity_t;
 attribute lowp vec2 a_opacity;
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
+
 
 void main() {
+    
+#ifndef HAS_UNIFORM_u_opacity
     opacity = unpack_mix_vec2(a_opacity, a_opacity_t);
+#else
+    lowp float opacity = u_opacity;
+#endif
+
 
     gl_Position = u_matrix * vec4(a_pos, 0, 1);
 
@@ -44,6 +56,7 @@ uniform vec2 u_pattern_tl_a;
 uniform vec2 u_pattern_br_a;
 uniform vec2 u_pattern_tl_b;
 uniform vec2 u_pattern_br_b;
+uniform vec2 u_texsize;
 uniform float u_mix;
 
 uniform sampler2D u_image;
@@ -52,23 +65,33 @@ varying vec2 v_pos_a;
 varying vec2 v_pos_b;
 varying vec2 v_pos;
 
+
+#ifndef HAS_UNIFORM_u_opacity
 varying lowp float opacity;
+#else
+uniform lowp float u_opacity;
+#endif
+
 
 void main() {
     
+#ifdef HAS_UNIFORM_u_opacity
+    lowp float opacity = u_opacity;
+#endif
+
 
     vec2 imagecoord = mod(v_pos_a, 1.0);
-    vec2 pos = mix(u_pattern_tl_a, u_pattern_br_a, imagecoord);
+    vec2 pos = mix(u_pattern_tl_a / u_texsize, u_pattern_br_a / u_texsize, imagecoord);
     vec4 color1 = texture2D(u_image, pos);
 
     vec2 imagecoord_b = mod(v_pos_b, 1.0);
-    vec2 pos2 = mix(u_pattern_tl_b, u_pattern_br_b, imagecoord_b);
+    vec2 pos2 = mix(u_pattern_tl_b / u_texsize, u_pattern_br_b / u_texsize, imagecoord_b);
     vec4 color2 = texture2D(u_image, pos2);
 
     // find distance to outline for alpha interpolation
 
     float dist = length(v_pos - gl_FragCoord.xy);
-    float alpha = smoothstep(1.0, 0.0, dist);
+    float alpha = 1.0 - smoothstep(0.0, 1.0, dist);
 
 
     gl_FragColor = mix(color1, color2, u_mix) * alpha * opacity;

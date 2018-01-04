@@ -11,6 +11,7 @@ import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -36,6 +37,7 @@ public class PropertyFactory {
    * @param function the visibility function
    * @return property wrapper around a String function
    */
+  @Deprecated
   public static <T> PropertyValue<Function<T, String>> visibility(Function<T, String> function) {
     return new LayoutPropertyValue<>("visibility", function);
   }
@@ -63,6 +65,16 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", value);
   }
 
+  /**
+   * <%- propertyFactoryMethodDoc(property) %>
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> <%- camelizeWithLeadingLowercase(property.name) %>(Expression expression) {
+    return new PaintPropertyValue<>("<%-  property.name %>", expression);
+  }
+
 <% if (supportsPropertyFunction(property)) { -%>
 
   /**
@@ -72,6 +84,7 @@ public class PropertyFactory {
    * @param function a wrapper function for <%- propertyType(property) %>
    * @return property wrapper around a <%- propertyType(property) %> function
    */
+  @Deprecated
   public static <T> PropertyValue<Function<T, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<T, <%- propertyType(property) %>> function) {
     return new PaintPropertyValue<>("<%-  property.name %>", function);
   }
@@ -85,6 +98,7 @@ public class PropertyFactory {
    * @param function a wrapper {@link CameraFunction} for <%- propertyType(property) %>
    * @return property wrapper around a <%- propertyType(property) %> function
    */
+  @Deprecated
   public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(CameraFunction<Z, <%- propertyType(property) %>> function) {
     return new PaintPropertyValue<>("<%-  property.name %>", function);
   }
@@ -102,6 +116,15 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
 
+  /**
+   * <%- propertyFactoryMethodDoc(property) %>
+   *
+   * @param value a <%- propertyType(property) %> value
+   * @return property wrapper around <%- propertyType(property) %>
+   */
+  public static PropertyValue<Expression> <%- camelizeWithLeadingLowercase(property.name) %>(Expression value) {
+    return new LayoutPropertyValue<>("<%-  property.name %>", value);
+  }
 
 <% if (supportsPropertyFunction(property)) { -%>
 

@@ -10,16 +10,18 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_below="@id/toolbar"
+        android:textIsSelectable="false"
         app:mapbox_cameraTargetLat="38.907192"
         app:mapbox_cameraTargetLng="-77.036871"
-        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"
-        app:mapbox_cameraZoom="12" />
+        app:mapbox_cameraZoom="12"
+        app:mapbox_styleUrl="@string/mapbox_style_mapbox_streets"/>
 
     <TextView
         android:id="@+id/countView"
+        android:textIsSelectable="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="16dp"
-        android:textSize="20sp" />
+        android:textSize="20sp"/>
 
 </RelativeLayout>

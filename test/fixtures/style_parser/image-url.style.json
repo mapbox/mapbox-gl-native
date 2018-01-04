@@ -1,0 +1,9 @@
+{
+  "version": 8,
+  "center" : [ 75.123, 81.123],
+  "sources": {
+    "image": {
+      "type": "image"
+    }
+  }
+}

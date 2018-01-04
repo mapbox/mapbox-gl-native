@@ -1,9 +1,11 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/storage/asset_file_source.hpp>
+#include <mbgl/storage/file_source_request.hpp>
 #include <mbgl/storage/local_file_source.hpp>
 #include <mbgl/storage/online_file_source.hpp>
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/offline_download.hpp>
+#include <mbgl/storage/resource_transform.hpp>
 
 #include <mbgl/util/platform.hpp>
 #include <mbgl/util/url.hpp>
@@ -26,8 +28,15 @@ namespace mbgl {
 
 class DefaultFileSource::Impl {
 public:
-    Impl(const std::string& cachePath, uint64_t maximumCacheSize)
-        : offlineDatabase(cachePath, maximumCacheSize) {
+    Impl(ActorRef<Impl> self, std::shared_ptr<FileSource> assetFileSource_, const std::string& cachePath, uint64_t maximumCacheSize)
+            : assetFileSource(assetFileSource_)
+            , localFileSource(std::make_unique<LocalFileSource>()) {
+        // Initialize the Database asynchronously so as to not block Actor creation.
+        self.invoke(&Impl::initializeOfflineDatabase, cachePath, maximumCacheSize);
+    }
+
+    void initializeOfflineDatabase(std::string cachePath, uint64_t maximumCacheSize) {
+        offlineDatabase = std::make_unique<OfflineDatabase>(cachePath, maximumCacheSize);
     }
 
     void setAPIBaseURL(const std::string& url) {
@@ -46,13 +55,13 @@ public:
         return onlineFileSource.getAccessToken();
     }
 
-    void setResourceTransform(OnlineFileSource::ResourceTransform&& transform) {
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
         onlineFileSource.setResourceTransform(std::move(transform));
     }
 
     void listRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
         try {
-            callback({}, offlineDatabase.listRegions());
+            callback({}, offlineDatabase->listRegions());
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -62,7 +71,7 @@ public:
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
         try {
-            callback({}, offlineDatabase.createRegion(definition, metadata));
+            callback({}, offlineDatabase->createRegion(definition, metadata));
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -72,7 +81,7 @@ public:
                       const OfflineRegionMetadata& metadata,
                       std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
         try {
-            callback({}, offlineDatabase.updateMetadata(regionID, metadata));
+            callback({}, offlineDatabase->updateMetadata(regionID, metadata));
         } catch (...) {
             callback(std::current_exception(), {});
         }
@@ -89,7 +98,7 @@ public:
     void deleteRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
         try {
             downloads.erase(region.getID());
-            offlineDatabase.deleteRegion(std::move(region));
+            offlineDatabase->deleteRegion(std::move(region));
             callback({});
         } catch (...) {
             callback(std::current_exception());
@@ -104,35 +113,59 @@ public:
         getDownload(regionID).setState(state);
     }
 
-    void request(AsyncRequest* req, Resource resource, Callback callback) {
-        Resource revalidation = resource;
+    void request(AsyncRequest* req, Resource resource, ActorRef<FileSourceRequest> ref) {
+        auto callback = [ref] (const Response& res) mutable {
+            ref.invoke(&FileSourceRequest::setResponse, res);
+        };
 
-        const bool hasPrior = resource.priorEtag || resource.priorModified || resource.priorExpires;
-        if (!hasPrior || resource.necessity == Resource::Optional) {
-            auto offlineResponse = offlineDatabase.get(resource);
+        if (isAssetURL(resource.url)) {
+            //Asset request
+            tasks[req] = assetFileSource->request(resource, callback);
+        } else if (LocalFileSource::acceptsURL(resource.url)) {
+            //Local file request
+            tasks[req] = localFileSource->request(resource, callback);
+        } else {
+            // Try the offline database
+            if (resource.hasLoadingMethod(Resource::LoadingMethod::Cache)) {
+                auto offlineResponse = offlineDatabase->get(resource);
 
-            if (resource.necessity == Resource::Optional && !offlineResponse) {
-                // Ensure there's always a response that we can send, so the caller knows that
-                // there's no optional data available in the cache.
-                offlineResponse.emplace();
-                offlineResponse->noContent = true;
-                offlineResponse->error = std::make_unique<Response::Error>(
-                    Response::Error::Reason::NotFound, "Not found in offline database");
+                if (resource.loadingMethod == Resource::LoadingMethod::CacheOnly) {
+                    if (!offlineResponse) {
+                        // Ensure there's always a response that we can send, so the caller knows that
+                        // there's no optional data available in the cache, when it's the only place
+                        // we're supposed to load from.
+                        offlineResponse.emplace();
+                        offlineResponse->noContent = true;
+                        offlineResponse->error = std::make_unique<Response::Error>(
+                                Response::Error::Reason::NotFound, "Not found in offline database");
+                    } else if (!offlineResponse->isUsable()) {
+                        // Don't return resources the server requested not to show when they're stale.
+                        // Even if we can't directly use the response, we may still use it to send a
+                        // conditional HTTP request, which is why we're saving it above.
+                        offlineResponse->error = std::make_unique<Response::Error>(
+                            Response::Error::Reason::NotFound, "Cached resource is unusable");
+                    }
+                    callback(*offlineResponse);
+                } else if (offlineResponse) {
+                    // Copy over the fields so that we can use them when making a refresh request.
+                    resource.priorModified = offlineResponse->modified;
+                    resource.priorExpires = offlineResponse->expires;
+                    resource.priorEtag = offlineResponse->etag;
+                    resource.priorData = offlineResponse->data;
+
+                    if (offlineResponse->isUsable()) {
+                        callback(*offlineResponse);
+                    }
+                }
             }
 
-            if (offlineResponse) {
-                revalidation.priorModified = offlineResponse->modified;
-                revalidation.priorExpires = offlineResponse->expires;
-                revalidation.priorEtag = offlineResponse->etag;
-                callback(*offlineResponse);
+            // Get from the online file source
+            if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
+                tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
+                    this->offlineDatabase->put(resource, onlineResponse);
+                    callback(onlineResponse);
+                });
             }
-        }
-
-        if (resource.necessity == Resource::Required) {
-            tasks[req] = onlineFileSource.request(revalidation, [=] (Response onlineResponse) {
-                this->offlineDatabase.put(revalidation, onlineResponse);
-                callback(onlineResponse);
-            });
         }
     }
 
@@ -141,11 +174,15 @@ public:
     }
 
     void setOfflineMapboxTileCountLimit(uint64_t limit) {
-        offlineDatabase.setOfflineMapboxTileCountLimit(limit);
+        offlineDatabase->setOfflineMapboxTileCountLimit(limit);
+    }
+
+    void setOnlineStatus(const bool status) {
+        onlineFileSource.setOnlineStatus(status);
     }
 
     void put(const Resource& resource, const Response& response) {
-        offlineDatabase.put(resource, response);
+        offlineDatabase->put(resource, response);
     }
 
 private:
@@ -155,10 +192,13 @@ private:
             return *it->second;
         }
         return *downloads.emplace(regionID,
-            std::make_unique<OfflineDownload>(regionID, offlineDatabase.getRegionDefinition(regionID), offlineDatabase, onlineFileSource)).first->second;
+            std::make_unique<OfflineDownload>(regionID, offlineDatabase->getRegionDefinition(regionID), *offlineDatabase, onlineFileSource)).first->second;
     }
 
-    OfflineDatabase offlineDatabase;
+    // shared so that destruction is done on the creating thread
+    const std::shared_ptr<FileSource> assetFileSource;
+    const std::unique_ptr<FileSource> localFileSource;
+    std::unique_ptr<OfflineDatabase> offlineDatabase;
     OnlineFileSource onlineFileSource;
     std::unordered_map<AsyncRequest*, std::unique_ptr<AsyncRequest>> tasks;
     std::unordered_map<int64_t, std::unique_ptr<OfflineDownload>> downloads;
@@ -173,118 +213,106 @@ DefaultFileSource::DefaultFileSource(const std::string& cachePath,
 DefaultFileSource::DefaultFileSource(const std::string& cachePath,
                                      std::unique_ptr<FileSource>&& assetFileSource_,
                                      uint64_t maximumCacheSize)
-    : thread(std::make_unique<util::Thread<Impl>>(util::ThreadContext{"DefaultFileSource", util::ThreadPriority::Low},
-            cachePath, maximumCacheSize)),
-      assetFileSource(std::move(assetFileSource_)),
-      localFileSource(std::make_unique<LocalFileSource>()) {
+        : assetFileSource(std::move(assetFileSource_))
+        , impl(std::make_unique<util::Thread<Impl>>("DefaultFileSource", assetFileSource, cachePath, maximumCacheSize)) {
 }
 
 DefaultFileSource::~DefaultFileSource() = default;
 
 void DefaultFileSource::setAPIBaseURL(const std::string& baseURL) {
-    thread->invoke(&Impl::setAPIBaseURL, baseURL);
-    cachedBaseURL = baseURL;
+    impl->actor().invoke(&Impl::setAPIBaseURL, baseURL);
+
+    {
+        std::lock_guard<std::mutex> lock(cachedBaseURLMutex);
+        cachedBaseURL = baseURL;
+    }
 }
 
-std::string DefaultFileSource::getAPIBaseURL() const {
+std::string DefaultFileSource::getAPIBaseURL() {
+    std::lock_guard<std::mutex> lock(cachedBaseURLMutex);
     return cachedBaseURL;
 }
 
 void DefaultFileSource::setAccessToken(const std::string& accessToken) {
-    thread->invoke(&Impl::setAccessToken, accessToken);
-    cachedAccessToken = accessToken;
+    impl->actor().invoke(&Impl::setAccessToken, accessToken);
+
+    {
+        std::lock_guard<std::mutex> lock(cachedAccessTokenMutex);
+        cachedAccessToken = accessToken;
+    }
 }
 
-std::string DefaultFileSource::getAccessToken() const {
+std::string DefaultFileSource::getAccessToken() {
+    std::lock_guard<std::mutex> lock(cachedAccessTokenMutex);
     return cachedAccessToken;
 }
 
-void DefaultFileSource::setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)> transform) {
-    if (transform) {
-        auto loop = util::RunLoop::Get();
-        thread->invoke(&Impl::setResourceTransform, [loop, transform](Resource::Kind kind_, std::string&& url_, auto callback_) {
-            return loop->invokeWithCallback([transform](Resource::Kind kind, std::string&& url, auto callback) {
-                callback(transform(kind, std::move(url)));
-            }, kind_, std::move(url_), callback_);
-        });
-    } else {
-        thread->invoke(&Impl::setResourceTransform, nullptr);
-    }
+void DefaultFileSource::setResourceTransform(optional<ActorRef<ResourceTransform>>&& transform) {
+    impl->actor().invoke(&Impl::setResourceTransform, std::move(transform));
 }
 
 std::unique_ptr<AsyncRequest> DefaultFileSource::request(const Resource& resource, Callback callback) {
-    class DefaultFileRequest : public AsyncRequest {
-    public:
-        DefaultFileRequest(Resource resource_, FileSource::Callback callback_, util::Thread<DefaultFileSource::Impl>& thread_)
-            : thread(thread_),
-              workRequest(thread.invokeWithCallback(&DefaultFileSource::Impl::request, this, resource_, callback_)) {
-        }
+    auto req = std::make_unique<FileSourceRequest>(std::move(callback));
 
-        ~DefaultFileRequest() override {
-            thread.invoke(&DefaultFileSource::Impl::cancel, this);
-        }
+    req->onCancel([fs = impl->actor(), req = req.get()] () mutable { fs.invoke(&Impl::cancel, req); });
 
-        util::Thread<DefaultFileSource::Impl>& thread;
-        std::unique_ptr<AsyncRequest> workRequest;
-    };
+    impl->actor().invoke(&Impl::request, req.get(), resource, req->actor());
 
-    if (isAssetURL(resource.url)) {
-        return assetFileSource->request(resource, callback);
-    } else if (LocalFileSource::acceptsURL(resource.url)) {
-        return localFileSource->request(resource, callback);
-    } else {
-        return std::make_unique<DefaultFileRequest>(resource, callback, *thread);
-    }
+    return std::move(req);
 }
 
 void DefaultFileSource::listOfflineRegions(std::function<void (std::exception_ptr, optional<std::vector<OfflineRegion>>)> callback) {
-    thread->invoke(&Impl::listRegions, callback);
+    impl->actor().invoke(&Impl::listRegions, callback);
 }
 
 void DefaultFileSource::createOfflineRegion(const OfflineRegionDefinition& definition,
                                             const OfflineRegionMetadata& metadata,
                                             std::function<void (std::exception_ptr, optional<OfflineRegion>)> callback) {
-    thread->invoke(&Impl::createRegion, definition, metadata, callback);
+    impl->actor().invoke(&Impl::createRegion, definition, metadata, callback);
 }
 
 void DefaultFileSource::updateOfflineMetadata(const int64_t regionID,
                                             const OfflineRegionMetadata& metadata,
                                             std::function<void (std::exception_ptr, optional<OfflineRegionMetadata>)> callback) {
-    thread->invoke(&Impl::updateMetadata, regionID, metadata, callback);
+    impl->actor().invoke(&Impl::updateMetadata, regionID, metadata, callback);
 }
 
 void DefaultFileSource::deleteOfflineRegion(OfflineRegion&& region, std::function<void (std::exception_ptr)> callback) {
-    thread->invoke(&Impl::deleteRegion, std::move(region), callback);
+    impl->actor().invoke(&Impl::deleteRegion, std::move(region), callback);
 }
 
 void DefaultFileSource::setOfflineRegionObserver(OfflineRegion& region, std::unique_ptr<OfflineRegionObserver> observer) {
-    thread->invoke(&Impl::setRegionObserver, region.getID(), std::move(observer));
+    impl->actor().invoke(&Impl::setRegionObserver, region.getID(), std::move(observer));
 }
 
 void DefaultFileSource::setOfflineRegionDownloadState(OfflineRegion& region, OfflineRegionDownloadState state) {
-    thread->invoke(&Impl::setRegionDownloadState, region.getID(), state);
+    impl->actor().invoke(&Impl::setRegionDownloadState, region.getID(), state);
 }
 
 void DefaultFileSource::getOfflineRegionStatus(OfflineRegion& region, std::function<void (std::exception_ptr, optional<OfflineRegionStatus>)> callback) const {
-    thread->invoke(&Impl::getRegionStatus, region.getID(), callback);
+    impl->actor().invoke(&Impl::getRegionStatus, region.getID(), callback);
 }
 
 void DefaultFileSource::setOfflineMapboxTileCountLimit(uint64_t limit) const {
-    thread->invokeSync(&Impl::setOfflineMapboxTileCountLimit, limit);
+    impl->actor().invoke(&Impl::setOfflineMapboxTileCountLimit, limit);
 }
 
 void DefaultFileSource::pause() {
-    thread->pause();
+    impl->pause();
 }
 
 void DefaultFileSource::resume() {
-    thread->resume();
+    impl->resume();
 }
 
 // For testing only:
 
+void DefaultFileSource::setOnlineStatus(const bool status) {
+    impl->actor().invoke(&Impl::setOnlineStatus, status);
+}
+
 void DefaultFileSource::put(const Resource& resource, const Response& response) {
-    thread->invokeSync(&Impl::put, resource, response);
+    impl->actor().invoke(&Impl::put, resource, response);
 }
 
 } // namespace mbgl

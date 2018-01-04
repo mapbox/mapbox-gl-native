@@ -4,6 +4,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreLocation/CoreLocation.h>
 
+#import "MGLFoundation.h"
 #import "MGLTypes.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -23,13 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 
 /** The default deceleration rate for a map view. */
-extern const CGFloat MGLMapViewDecelerationRateNormal;
+extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateNormal;
 
 /** A fast deceleration rate for a map view. */
-extern const CGFloat MGLMapViewDecelerationRateFast;
+extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateFast;
 
 /** Disables deceleration in a map view. */
-extern const CGFloat MGLMapViewDecelerationRateImmediate;
+extern MGL_EXPORT const CGFloat MGLMapViewDecelerationRateImmediate;
 
 /**
  The vertical alignment of an annotation within a map view. Used with
@@ -125,7 +126,7 @@ typedef NS_ENUM(NSUInteger, MGLUserTrackingMode) {
  ensuring that your use adheres to the relevant terms of use.
 
  */
-IB_DESIGNABLE
+MGL_EXPORT IB_DESIGNABLE
 @interface MGLMapView : UIView
 
 #pragma mark Creating Instances
@@ -252,6 +253,9 @@ IB_DESIGNABLE
  A view showing legally required copyright notices and telemetry settings,
  positioned at the bottom-right of the map view.
 
+ If you choose to reimplement this view, assign the `-showAttribution:` method
+ as the action for your view to present the default notices and settings.
+
  @note The Mapbox terms of service, which governs the use of Mapbox-hosted
     vector tiles and styles,
     <a href="https://www.mapbox.com/help/attribution/">requires</a> these
@@ -270,13 +274,26 @@ IB_DESIGNABLE
  */
 @property (nonatomic, readonly) UIButton *attributionButton;
 
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("Use style.styleClasses.")));
+/**
+ Show the attribution and telemetry action sheet.
 
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.hasStyleClass:.")));
+ This action is performed when the user taps on the attribution button provided
+ by default via the `attributionButton` property. If you implement a custom
+ attribution button, you should add this action to the button.
+ */
+- (IBAction)showAttribution:(id)sender;
 
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.addStyleClass:.")));
+/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("Use style.removeStyleClass:.")));
+/// :nodoc: Support for style classes has been removed. This property always returns NO.
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+
+/// :nodoc: Support for style classes has been removed. This property is a no-op.
+- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+
+/// :nodoc: Support for style classes has been removed. This property is a no-op.
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
 
 #pragma mark Displaying the User’s Location
 
@@ -355,6 +372,23 @@ IB_DESIGNABLE
     instantaneously moves to its new position.
  */
 - (void)setUserLocationVerticalAlignment:(MGLAnnotationVerticalAlignment)alignment animated:(BOOL)animated;
+
+/**
+ A Boolean value indicating whether the user location annotation may display a
+ permanent heading indicator.
+
+ Setting this property to `YES` causes the default user location annotation to
+ appear and always show an arrow-shaped heading indicator, if heading is
+ available. This property does not rotate the map; for that, see
+ `MGLUserTrackingModeFollowWithHeading`.
+
+ This property has no effect when `userTrackingMode` is
+ `MGLUserTrackingModeFollowWithHeading` or
+ `MGLUserTrackingModeFollowWithCourse`.
+
+ The default value of this property is `NO`.
+ */
+@property (nonatomic, assign) BOOL showsUserHeadingIndicator;
 
 /**
  Whether the map view should display a heading calibration alert when necessary.
@@ -576,7 +610,7 @@ IB_DESIGNABLE
  *
  * The default minimumZoomLevel is 0.
  */
-@property (nonatomic) double minimumZoomLevel;
+@property (nonatomic) IBInspectable double minimumZoomLevel;
 
 /**
  * The maximum zoom level the map can be shown at.
@@ -584,9 +618,10 @@ IB_DESIGNABLE
  * If the value of this property is smaller than that of the
  * minimumZoomLevel property, the behavior is undefined.
  *
- * The default maximumZoomLevel is 20.
+ * The default maximumZoomLevel is 22. The upper bound for this property
+ * is 25.5.
  */
-@property (nonatomic) double maximumZoomLevel;
+@property (nonatomic) IBInspectable double maximumZoomLevel;
 
 /**
  The heading of the map, measured in degrees clockwise from true north.
@@ -764,6 +799,23 @@ IB_DESIGNABLE
 - (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion;
 
 /**
+ Moves the viewpoint to a different location with respect to the map with an
+ optional transition duration and timing function.
+ 
+ @param camera The new viewpoint.
+ @param duration The amount of time, measured in seconds, that the transition
+ animation should take. Specify `0` to jump to the new viewpoint
+ instantaneously.
+ @param function A timing function used for the animation. Set this parameter to
+ `nil` for a transition that matches most system animations. If the duration
+ is `0`, this parameter is ignored.
+ @param edgePadding The minimum padding (in screen points) that would be visible
+ around the returned camera object if it were set as the receiver’s camera.
+ @param completion The block to execute after the animation finishes.
+ */
+- (void)setCamera:(MGLMapCamera *)camera withDuration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function edgePadding:(UIEdgeInsets)edgePadding completionHandler:(nullable void (^)(void))completion;
+
+/**
  Moves the viewpoint to a different location using a transition animation that
  evokes powered flight and a default duration based on the length of the flight
  path.
@@ -836,6 +888,20 @@ IB_DESIGNABLE
     direction and pitch.
  */
 - (MGLMapCamera *)cameraThatFitsCoordinateBounds:(MGLCoordinateBounds)bounds edgePadding:(UIEdgeInsets)insets;
+
+/**
+ Returns the camera that best fits the given shape, with the specified direction,
+ optionally with some additional padding on each side.
+
+ @param shape The shape to fit to the receiver’s viewport.
+ @param direction The direction of the viewport, measured in degrees clockwise from true north.
+ @param insets The minimum padding (in screen points) that would be visible
+    around the returned camera object if it were set as the receiver’s camera.
+ @return A camera object centered on the shape's center with zoom level as high 
+    (close to the ground) as possible while still including the entire shape. The
+    camera object uses the current pitch.
+ */
+- (MGLMapCamera *)cameraThatFitsShape:(MGLShape *)shape direction:(CLLocationDirection)direction edgePadding:(UIEdgeInsets)insets;
 
 /**
  Returns the point in this view’s coordinate system on which to "anchor" in
@@ -973,16 +1039,6 @@ IB_DESIGNABLE
 @property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *annotations;
 
 /**
- The complete list of annotations associated with the receiver that are
- currently visible.
-
- The objects in this array must adopt the `MGLAnnotation` protocol. If no
- annotations are associated with the map view or if no annotations associated
- with the map view are currently visible, the value of this property is `nil`.
- */
-@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
-
-/**
  Adds an annotation to the map view.
 
  @note `MGLMultiPolyline`, `MGLMultiPolygon`, `MGLShapeCollection`, and
@@ -1077,6 +1133,16 @@ IB_DESIGNABLE
 - (nullable __kindof MGLAnnotationView *)dequeueReusableAnnotationViewWithIdentifier:(NSString *)identifier;
 
 /**
+ The complete list of annotations associated with the receiver that are
+ currently visible.
+
+ The objects in this array must adopt the `MGLAnnotation` protocol. If no
+ annotations are associated with the map view or if no annotations associated
+ with the map view are currently visible, the value of this property is `nil`.
+ */
+@property (nonatomic, readonly, nullable) NS_ARRAY_OF(id <MGLAnnotation>) *visibleAnnotations;
+
+/**
  Returns the list of annotations associated with the receiver that intersect with
  the given rectangle.
 
@@ -1117,6 +1183,15 @@ IB_DESIGNABLE
 - (void)deselectAnnotation:(nullable id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
 #pragma mark Overlaying the Map
+
+/**
+ The complete list of overlays associated with the receiver. (read-only)
+
+ The objects in this array must adopt the `MGLOverlay` protocol. If no
+ overlays are associated with the map view, the value of this property is
+ empty array.
+ */
+@property (nonatomic, readonly, nonnull) NS_ARRAY_OF(id <MGLOverlay>) *overlays;
 
 /**
  Adds a single overlay object to the map.
@@ -1235,6 +1310,11 @@ IB_DESIGNABLE
  visibility, use the
  `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
+
+ The returned features may also include features corresponding to annotations.
+ These features are not object-equal to the `MGLAnnotation` objects that were
+ originally added to the map. To query the map for annotations, use
+ `visibleAnnotations` or `-[MGLMapView visibleAnnotationsInRect:]`.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set

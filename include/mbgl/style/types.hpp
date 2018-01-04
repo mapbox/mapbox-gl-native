@@ -4,16 +4,18 @@
 
 namespace mbgl {
 
-// TODO: should be in public source.hpp header and style namespace
+namespace style {
+
+// TODO: should be in public source.hpp header
 enum class SourceType : uint8_t {
     Vector,
     Raster,
     GeoJSON,
     Video,
-    Annotations
+    Annotations,
+    Image,
+    CustomVector
 };
-
-namespace style {
 
 enum class VisibilityType : bool {
     Visible,
@@ -67,7 +69,7 @@ enum class TextJustifyType : uint8_t {
     Right
 };
 
-enum class TextAnchorType : uint8_t {
+enum class SymbolAnchorType : uint8_t {
     Center,
     Left,
     Right,

@@ -1,11 +1,12 @@
 #include "file_source.hpp"
 
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/storage/resource_transform.hpp>
 #include <mbgl/util/logging.hpp>
 
 #include "asset_manager_file_source.hpp"
 #include "jni/generic_global_ref_deleter.hpp"
-
-#include <string>
 
 namespace mbgl {
 namespace android {
@@ -42,21 +43,41 @@ void FileSource::setAPIBaseUrl(jni::JNIEnv& env, jni::String url) {
 
 void FileSource::setResourceTransform(jni::JNIEnv& env, jni::Object<FileSource::ResourceTransformCallback> transformCallback) {
     if (transformCallback) {
-        // Launch transformCallback
-        fileSource->setResourceTransform([
+        resourceTransform = std::make_unique<Actor<ResourceTransform>>(*Scheduler::GetCurrent(),
             // Capture the ResourceTransformCallback object as a managed global into
             // the lambda. It is released automatically when we're setting a new ResourceTransform in
             // a subsequent call.
             // Note: we're converting it to shared_ptr because this lambda is converted to a std::function,
             // which requires copyability of its captured variables.
-            callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release()->Get(), GenericGlobalRefDeleter())
-        ](mbgl::Resource::Kind kind, std::string&& url_) {
-            android::UniqueEnv _env = android::AttachEnv();
-            return FileSource::ResourceTransformCallback::onURL(*_env, jni::Object<FileSource::ResourceTransformCallback>(*callback), int(kind), url_);
-        });
+            [callback = std::shared_ptr<jni::jobject>(transformCallback.NewGlobalRef(env).release()->Get(), GenericGlobalRefDeleter())]
+            (mbgl::Resource::Kind kind, const std::string&& url_) {
+                android::UniqueEnv _env = android::AttachEnv();
+                return FileSource::ResourceTransformCallback::onURL(*_env, jni::Object<FileSource::ResourceTransformCallback>(*callback), int(kind), url_);
+            });
+        fileSource->setResourceTransform(resourceTransform->self());
     } else {
         // Reset the callback
-        fileSource->setResourceTransform(nullptr);
+        resourceTransform.reset();
+        fileSource->setResourceTransform({});
+    }
+}
+
+void FileSource::resume(jni::JNIEnv&) {
+    if (!activationCounter) {
+        activationCounter = optional<int>(1) ;
+        return;
+    }
+
+    activationCounter.value()++;
+    if (activationCounter == 1) {
+       fileSource->resume();
+    }
+}
+
+void FileSource::pause(jni::JNIEnv&) {
+    activationCounter.value()--;
+    if (activationCounter == 0) {
+        fileSource->pause();
     }
 }
 
@@ -89,7 +110,9 @@ void FileSource::registerNative(jni::JNIEnv& env) {
         METHOD(&FileSource::getAccessToken, "getAccessToken"),
         METHOD(&FileSource::setAccessToken, "setAccessToken"),
         METHOD(&FileSource::setAPIBaseUrl, "setApiBaseUrl"),
-        METHOD(&FileSource::setResourceTransform, "setResourceTransform")
+        METHOD(&FileSource::setResourceTransform, "setResourceTransform"),
+        METHOD(&FileSource::resume, "activate"),
+        METHOD(&FileSource::pause, "deactivate")
     );
 }
 

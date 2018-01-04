@@ -44,3 +44,28 @@ TEST(CompositeFunction, ZoomInterpolation) {
     }), 0.0f)
     .evaluate(0.0f, oneInteger, -1.0f)) << "Should interpolate TO the first stop";
 }
+
+TEST(CompositeFunction, Issue8460) {
+    CompositeFunction<float> fn1("property", CompositeExponentialStops<float>({
+        {15.0f, {{uint64_t(1), 0.0f}}},
+        {15.2f, {{uint64_t(1), 600.0f}}},
+    }), 0.0f);
+
+    EXPECT_NEAR(  0.0f, fn1.evaluate(15.0f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(300.0f, fn1.evaluate(15.1f, oneInteger, -1.0f), 0.01);
+    EXPECT_NEAR(600.0f, fn1.evaluate(15.2f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(600.0f, fn1.evaluate(16.0f, oneInteger, -1.0f), 0.00);
+
+    CompositeFunction<float> fn2("property", CompositeExponentialStops<float>({
+        {15.0f, {{uint64_t(1), 0.0f}}},
+        {15.2f, {{uint64_t(1), 300.0f}}},
+        {18.0f, {{uint64_t(1), 600.0f}}},
+    }), 0.0f);
+
+    EXPECT_NEAR(  0.0f, fn2.evaluate(15.0f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(150.0f, fn2.evaluate(15.1f, oneInteger, -1.0f), 0.01);
+    EXPECT_NEAR(300.0f, fn2.evaluate(15.2f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(385.71f, fn2.evaluate(16.0f, oneInteger, -1.0f), 0.01);
+    EXPECT_NEAR(600.0f, fn2.evaluate(18.0f, oneInteger, -1.0f), 0.00);
+    EXPECT_NEAR(600.0f, fn2.evaluate(19.0f, oneInteger, -1.0f), 0.00);
+}

@@ -9,6 +9,7 @@ class BucketParameters {
 public:
     const OverscaledTileID tileID;
     const MapMode mode;
+    const float pixelRatio;
 };
 
 } // namespace mbgl

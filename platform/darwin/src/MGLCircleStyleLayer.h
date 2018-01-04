@@ -8,6 +8,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ Orientation of circle when map is pitched.
+
+ Values of this type are used in the `MGLCircleStyleLayer.circlePitchAlignment`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLCirclePitchAlignment) {
+    /**
+     The circle is aligned to the plane of the map.
+     */
+    MGLCirclePitchAlignmentMap,
+    /**
+     The circle is aligned to the plane of the viewport.
+     */
+    MGLCirclePitchAlignmentViewport,
+};
+
+/**
  Controls the scaling behavior of the circle when the map is pitched.
 
  Values of this type are used in the `MGLCircleStyleLayer.circleScaleAlignment`
@@ -219,6 +236,21 @@ MGL_EXPORT
  This property corresponds to the `circle-opacity-transition` property in the style JSON file format.
 */
 @property (nonatomic) MGLTransition circleOpacityTransition;
+
+/**
+ Orientation of circle when map is pitched.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLCirclePitchAlignmentViewport`. Set this
+ property to `nil` to reset it to the default value.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circlePitchAlignment;
 
 /**
  Circle radius.
@@ -489,6 +521,19 @@ MGL_EXPORT
 @interface NSValue (MGLCircleStyleLayerAdditions)
 
 #pragma mark Working with Circle Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLCirclePitchAlignment` enumeration.
+
+ @param circlePitchAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLCirclePitchAlignment:(MGLCirclePitchAlignment)circlePitchAlignment;
+
+/**
+ The `MGLCirclePitchAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLCirclePitchAlignment MGLCirclePitchAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLCircleScaleAlignment` enumeration.

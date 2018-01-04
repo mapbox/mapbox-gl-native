@@ -51,7 +51,11 @@ class GeometryTileLayer {
 public:
     virtual ~GeometryTileLayer() = default;
     virtual std::size_t featureCount() const = 0;
+
+    // Returns the feature object at the given position within the layer. The returned feature
+    // object may *not* outlive the layer object.
     virtual std::unique_ptr<GeometryTileFeature> getFeature(std::size_t) const = 0;
+
     virtual std::string getName() const = 0;
 };
 
@@ -59,7 +63,10 @@ class GeometryTileData {
 public:
     virtual ~GeometryTileData() = default;
     virtual std::unique_ptr<GeometryTileData> clone() const = 0;
-    virtual const GeometryTileLayer* getLayer(const std::string&) const = 0;
+
+    // Returns the layer with the given name. The returned layer object *may* outlive the data
+    // object.
+    virtual std::unique_ptr<GeometryTileLayer> getLayer(const std::string&) const = 0;
 };
 
 // classifies an array of rings into polygons with outer rings and holes

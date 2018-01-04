@@ -23,8 +23,10 @@ public:
 private:
     Scheduler& scheduler;
 
-    std::mutex closingMutex;
-    bool closing { false };
+    std::recursive_mutex receivingMutex;
+    std::mutex pushingMutex;
+
+    bool closed { false };
 
     std::mutex queueMutex;
     std::queue<std::unique_ptr<Message>> queue;

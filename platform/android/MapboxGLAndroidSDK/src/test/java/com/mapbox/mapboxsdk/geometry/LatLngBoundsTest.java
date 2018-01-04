@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.geometry;
 
 import android.os.Parcelable;
 
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
 import com.mapbox.mapboxsdk.exceptions.InvalidLatLngBoundsException;
 import com.mapbox.mapboxsdk.utils.MockParcel;
 
@@ -71,15 +72,6 @@ public class LatLngBoundsTest {
   public void center() {
     LatLng center = latLngBounds.getCenter();
     assertEquals("Center should match", new LatLng(1, 1), center);
-  }
-
-  @Test
-  public void emptySpan() {
-    latLngBounds = new LatLngBounds.Builder()
-      .include(LAT_LNG_NOT_NULL_ISLAND)
-      .include(LAT_LNG_NOT_NULL_ISLAND)
-      .build();
-    assertTrue("Should be empty", latLngBounds.isEmptySpan());
   }
 
   @Test
@@ -280,5 +272,21 @@ public class LatLngBoundsTest {
       .build();
     Parcelable parcel = MockParcel.obtain(latLngBounds);
     assertEquals("Parcel should match original object", parcel, latLngBounds);
+  }
+
+  @Test
+  public void fromTileID() {
+    LatLngBounds bounds = LatLngBounds.from(0, 0, 0);
+    assertEquals(GeometryConstants.MIN_LONGITUDE, bounds.getLonWest(), DELTA);
+    assertEquals(GeometryConstants.MIN_MERCATOR_LATITUDE, bounds.getLatSouth(), DELTA);
+    assertEquals(GeometryConstants.MAX_LONGITUDE, bounds.getLonEast(), DELTA);
+    assertEquals(GeometryConstants.MAX_MERCATOR_LATITUDE, bounds.getLatNorth(), DELTA);
+
+    bounds = LatLngBounds.from(10, 288, 385);
+    assertEquals(-78.75, bounds.getLonWest(), DELTA);
+    assertEquals(40.446947059600497, bounds.getLatSouth(), DELTA);
+    assertEquals(-78.3984375, bounds.getLonEast(), DELTA);
+    assertEquals(40.713955826286039, bounds.getLatNorth(), DELTA);
+
   }
 }

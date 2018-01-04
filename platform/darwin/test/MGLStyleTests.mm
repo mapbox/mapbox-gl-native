@@ -99,6 +99,8 @@
                           @(mbgl::util::default_styles::satelliteStreets.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString,
                           @"mapbox://styles/mapbox/satellite-streets-v99");
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
     XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:mbgl::util::default_styles::trafficDay.currentVersion].absoluteString,
                           @(mbgl::util::default_styles::trafficDay.url));
     XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:99].absoluteString,
@@ -107,6 +109,7 @@
                           @(mbgl::util::default_styles::trafficNight.url));
     XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:99].absoluteString,
                           @"mapbox://styles/mapbox/traffic-night-v99");
+#pragma clang diagnostic pop
 
     static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");
@@ -140,7 +143,7 @@
     NSString *styleHeader = self.stringWithContentsOfStyleHeader;
 
     NSError *versionedMethodError;
-    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*;)RE");
+    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*\b)RE");
     NSRegularExpression *versionedMethodExpression = [NSRegularExpression regularExpressionWithPattern:versionedMethodExpressionString options:NSRegularExpressionAnchorsMatchLines error:&versionedMethodError];
     XCTAssertNil(versionedMethodError, @"Error compiling regular expression to search for versioned methods.");
     NSUInteger numVersionedMethodDeclarations = [versionedMethodExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
@@ -210,9 +213,9 @@
     MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
     [self.style addSource:rasterSource];
 
-    // Attempt to remove a shape source with the same identifier as the raster source
-    MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"some-identifier" shape:nil options:nil];
-    [self.style removeSource:shapeSource];
+    // Attempt to remove an image source with the same identifier as the raster source
+    MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinateQuad: { } URL:[NSURL URLWithString:@"http://host/image.png"]];
+    [self.style removeSource:imageSource];
     // The raster source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
 
@@ -220,16 +223,16 @@
     [self.style removeSource:rasterSource];
 
     // Add the shape source
-    [self.style addSource:shapeSource];
+    [self.style addSource:imageSource];
 
     // Attempt to remove a vector source with the same identifer as the shape source
     MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
     [self.style removeSource:vectorSource];
-    // The shape source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:shapeSource.identifier] isMemberOfClass:[MGLShapeSource class]]);
+    // The image source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLImageSource class]]);
 
-    // Remove the shape source
-    [self.style removeSource:shapeSource];
+    // Remove the image source
+    [self.style removeSource:imageSource];
 
     // Add the vector source
     [self.style addSource:vectorSource];
@@ -237,7 +240,23 @@
     // Attempt to remove the previously created raster source that has the same identifer as the shape source
     [self.style removeSource:rasterSource];
     // The vector source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:shapeSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
+}
+
+- (void)testRemovingSourceInUse {
+    // Add a raster source
+    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterSource];
+    
+    // Add a layer using it
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterSource];
+    [self.style addLayer:fillLayer];
+
+    // Attempt to remove the raster source
+    [self.style removeSource:rasterSource];
+    
+    // Ensure it is still there
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
 }
 
 - (void)testLayers {

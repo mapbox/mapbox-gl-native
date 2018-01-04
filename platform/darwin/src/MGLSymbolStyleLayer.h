@@ -8,6 +8,72 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ Part of the icon placed closest to the anchor.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.iconAnchor`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLIconAnchor) {
+    /**
+     The center of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorCenter,
+    /**
+     The left side of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorLeft,
+    /**
+     The right side of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorRight,
+    /**
+     The top of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTop,
+    /**
+     The bottom of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottom,
+    /**
+     The top left corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTopLeft,
+    /**
+     The top right corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorTopRight,
+    /**
+     The bottom left corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottomLeft,
+    /**
+     The bottom right corner of the icon is placed closest to the anchor.
+     */
+    MGLIconAnchorBottomRight,
+};
+
+/**
+ Orientation of icon when map is pitched.
+
+ Values of this type are used in the `MGLSymbolStyleLayer.iconPitchAlignment`
+ property.
+ */
+typedef NS_ENUM(NSUInteger, MGLIconPitchAlignment) {
+    /**
+     The icon is aligned to the plane of the map.
+     */
+    MGLIconPitchAlignmentMap,
+    /**
+     The icon is aligned to the plane of the viewport.
+     */
+    MGLIconPitchAlignmentViewport,
+    /**
+     Automatically matches the value of `iconRotationAlignment`.
+     */
+    MGLIconPitchAlignmentAuto,
+};
+
+/**
  In combination with `symbolPlacement`, determines the rotation behavior of
  icons.
 
@@ -324,6 +390,34 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconAllowOverlap __attribute__((unavailable("Use iconAllowsOverlap instead.")));
 
 /**
+ Part of the icon placed closest to the anchor.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLIconAnchorCenter`. Set this property to `nil`
+ to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconAnchor;
+
+/**
  If true, other symbols can be visible even if they collide with the icon.
  
  The default value of this property is an `MGLStyleValue` object containing an
@@ -477,6 +571,24 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconPadding;
 
 /**
+ Orientation of icon when map is pitched.
+ 
+ The default value of this property is an `MGLStyleValue` object containing an
+ `NSValue` object containing `MGLIconPitchAlignmentAuto`. Set this property to
+ `nil` to reset it to the default value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an instance of:
+ 
+ * `MGLConstantStyleValue`
+ * `MGLCameraStyleFunction` with an interpolation mode of
+ `MGLInterpolationModeInterval`
+ */
+@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconPitchAlignment;
+
+/**
  Rotates the icon clockwise.
  
  This property is measured in degrees.
@@ -533,7 +645,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconRotationAlignment;
 
 /**
- Scale factor for icon. 1 is original size, 3 triples the size.
+ Scales the original size of the icon by the provided factor. The new point size
+ of the image will be the original point size multiplied by `iconSize`. 1 is the
+ original size; 3 triples the size of the image.
+ 
+ This property is measured in factor of the original icon sizes.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSNumber` object containing the float `1`. Set this property to `nil` to reset
@@ -741,6 +857,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumTextWidth;
 
@@ -881,8 +1006,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textAnchor;
 
@@ -1000,8 +1135,18 @@ MGL_EXPORT
  You can set this property to an instance of:
  
  * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * `MGLCameraStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textJustification;
 
@@ -1026,6 +1171,15 @@ MGL_EXPORT
  * `MGLCameraStyleFunction` with an interpolation mode of:
    * `MGLInterpolationModeExponential`
    * `MGLInterpolationModeInterval`
+ * `MGLSourceStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
+   * `MGLInterpolationModeIdentity`
+ * `MGLCompositeStyleFunction` with an interpolation mode of:
+   * `MGLInterpolationModeExponential`
+   * `MGLInterpolationModeInterval`
+   * `MGLInterpolationModeCategorical`
  */
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *textLetterSpacing;
 
@@ -1919,6 +2073,32 @@ MGL_EXPORT
 @interface NSValue (MGLSymbolStyleLayerAdditions)
 
 #pragma mark Working with Symbol Style Layer Attribute Values
+
+/**
+ Creates a new value object containing the given `MGLIconAnchor` enumeration.
+
+ @param iconAnchor The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconAnchor:(MGLIconAnchor)iconAnchor;
+
+/**
+ The `MGLIconAnchor` enumeration representation of the value.
+ */
+@property (readonly) MGLIconAnchor MGLIconAnchorValue;
+
+/**
+ Creates a new value object containing the given `MGLIconPitchAlignment` enumeration.
+
+ @param iconPitchAlignment The value for the new object.
+ @return A new value object that contains the enumeration value.
+ */
++ (instancetype)valueWithMGLIconPitchAlignment:(MGLIconPitchAlignment)iconPitchAlignment;
+
+/**
+ The `MGLIconPitchAlignment` enumeration representation of the value.
+ */
+@property (readonly) MGLIconPitchAlignment MGLIconPitchAlignmentValue;
 
 /**
  Creates a new value object containing the given `MGLIconRotationAlignment` enumeration.

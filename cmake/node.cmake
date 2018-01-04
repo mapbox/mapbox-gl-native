@@ -13,6 +13,7 @@ set_target_properties("mbgl-node" PROPERTIES CXX_STANDARD 14)
 target_sources(mbgl-node
     PRIVATE platform/node/src/node_logging.hpp
     PRIVATE platform/node/src/node_logging.cpp
+    PRIVATE platform/node/src/node_conversion.hpp
     PRIVATE platform/node/src/node_map.hpp
     PRIVATE platform/node/src/node_map.cpp
     PRIVATE platform/node/src/node_request.hpp
@@ -21,12 +22,9 @@ target_sources(mbgl-node
     PRIVATE platform/node/src/node_feature.cpp
     PRIVATE platform/node/src/node_thread_pool.hpp
     PRIVATE platform/node/src/node_thread_pool.cpp
+    PRIVATE platform/node/src/node_expression.hpp
+    PRIVATE platform/node/src/node_expression.cpp
     PRIVATE platform/node/src/util/async_queue.hpp
-)
-
-target_compile_options(mbgl-node
-    PRIVATE -fPIC
-    PRIVATE -fvisibility-inlines-hidden
 )
 
 target_include_directories(mbgl-node
@@ -53,3 +51,61 @@ add_custom_command(
 mbgl_platform_node()
 
 create_source_groups(mbgl-node)
+
+initialize_xcode_cxx_build_settings(mbgl-node)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node tests"
+    ARGS
+        "node_modules/.bin/tape platform/node/test/js/**/*.test.js"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node render tests"
+    ARGS
+        "platform/node/test/render.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node query tests"
+    ARGS
+        "platform/node/test/query.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node expression tests"
+    ARGS
+        "platform/node/test/expression.test.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)
+
+xcode_create_scheme(
+    TARGET mbgl-node
+    TYPE node
+    NAME "node-benchmark"
+    ARGS
+        "platform/node/test/benchmark.js"
+    OPTIONAL_ARGS
+        "group"
+        "test"
+)

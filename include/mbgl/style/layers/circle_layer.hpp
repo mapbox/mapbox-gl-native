@@ -27,80 +27,94 @@ public:
     void setFilter(const Filter&);
     const Filter& getFilter() const;
 
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
     // Paint properties
 
     static DataDrivenPropertyValue<float> getDefaultCircleRadius();
-    DataDrivenPropertyValue<float> getCircleRadius(const optional<std::string>& klass = {}) const;
-    void setCircleRadius(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setCircleRadiusTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleRadiusTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getCircleRadius() const;
+    void setCircleRadius(DataDrivenPropertyValue<float>);
+    void setCircleRadiusTransition(const TransitionOptions&);
+    TransitionOptions getCircleRadiusTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultCircleColor();
-    DataDrivenPropertyValue<Color> getCircleColor(const optional<std::string>& klass = {}) const;
-    void setCircleColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setCircleColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getCircleColor() const;
+    void setCircleColor(DataDrivenPropertyValue<Color>);
+    void setCircleColorTransition(const TransitionOptions&);
+    TransitionOptions getCircleColorTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultCircleBlur();
-    DataDrivenPropertyValue<float> getCircleBlur(const optional<std::string>& klass = {}) const;
-    void setCircleBlur(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setCircleBlurTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleBlurTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getCircleBlur() const;
+    void setCircleBlur(DataDrivenPropertyValue<float>);
+    void setCircleBlurTransition(const TransitionOptions&);
+    TransitionOptions getCircleBlurTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultCircleOpacity();
-    DataDrivenPropertyValue<float> getCircleOpacity(const optional<std::string>& klass = {}) const;
-    void setCircleOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setCircleOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleOpacityTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getCircleOpacity() const;
+    void setCircleOpacity(DataDrivenPropertyValue<float>);
+    void setCircleOpacityTransition(const TransitionOptions&);
+    TransitionOptions getCircleOpacityTransition() const;
 
     static PropertyValue<std::array<float, 2>> getDefaultCircleTranslate();
-    PropertyValue<std::array<float, 2>> getCircleTranslate(const optional<std::string>& klass = {}) const;
-    void setCircleTranslate(PropertyValue<std::array<float, 2>>, const optional<std::string>& klass = {});
-    void setCircleTranslateTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleTranslateTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<std::array<float, 2>> getCircleTranslate() const;
+    void setCircleTranslate(PropertyValue<std::array<float, 2>>);
+    void setCircleTranslateTransition(const TransitionOptions&);
+    TransitionOptions getCircleTranslateTransition() const;
 
     static PropertyValue<TranslateAnchorType> getDefaultCircleTranslateAnchor();
-    PropertyValue<TranslateAnchorType> getCircleTranslateAnchor(const optional<std::string>& klass = {}) const;
-    void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>, const optional<std::string>& klass = {});
-    void setCircleTranslateAnchorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleTranslateAnchorTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<TranslateAnchorType> getCircleTranslateAnchor() const;
+    void setCircleTranslateAnchor(PropertyValue<TranslateAnchorType>);
+    void setCircleTranslateAnchorTransition(const TransitionOptions&);
+    TransitionOptions getCircleTranslateAnchorTransition() const;
 
     static PropertyValue<CirclePitchScaleType> getDefaultCirclePitchScale();
-    PropertyValue<CirclePitchScaleType> getCirclePitchScale(const optional<std::string>& klass = {}) const;
-    void setCirclePitchScale(PropertyValue<CirclePitchScaleType>, const optional<std::string>& klass = {});
-    void setCirclePitchScaleTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCirclePitchScaleTransition(const optional<std::string>& klass = {}) const;
+    PropertyValue<CirclePitchScaleType> getCirclePitchScale() const;
+    void setCirclePitchScale(PropertyValue<CirclePitchScaleType>);
+    void setCirclePitchScaleTransition(const TransitionOptions&);
+    TransitionOptions getCirclePitchScaleTransition() const;
+
+    static PropertyValue<AlignmentType> getDefaultCirclePitchAlignment();
+    PropertyValue<AlignmentType> getCirclePitchAlignment() const;
+    void setCirclePitchAlignment(PropertyValue<AlignmentType>);
+    void setCirclePitchAlignmentTransition(const TransitionOptions&);
+    TransitionOptions getCirclePitchAlignmentTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultCircleStrokeWidth();
-    DataDrivenPropertyValue<float> getCircleStrokeWidth(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeWidth(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setCircleStrokeWidthTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleStrokeWidthTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getCircleStrokeWidth() const;
+    void setCircleStrokeWidth(DataDrivenPropertyValue<float>);
+    void setCircleStrokeWidthTransition(const TransitionOptions&);
+    TransitionOptions getCircleStrokeWidthTransition() const;
 
     static DataDrivenPropertyValue<Color> getDefaultCircleStrokeColor();
-    DataDrivenPropertyValue<Color> getCircleStrokeColor(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeColor(DataDrivenPropertyValue<Color>, const optional<std::string>& klass = {});
-    void setCircleStrokeColorTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleStrokeColorTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<Color> getCircleStrokeColor() const;
+    void setCircleStrokeColor(DataDrivenPropertyValue<Color>);
+    void setCircleStrokeColorTransition(const TransitionOptions&);
+    TransitionOptions getCircleStrokeColorTransition() const;
 
     static DataDrivenPropertyValue<float> getDefaultCircleStrokeOpacity();
-    DataDrivenPropertyValue<float> getCircleStrokeOpacity(const optional<std::string>& klass = {}) const;
-    void setCircleStrokeOpacity(DataDrivenPropertyValue<float>, const optional<std::string>& klass = {});
-    void setCircleStrokeOpacityTransition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions getCircleStrokeOpacityTransition(const optional<std::string>& klass = {}) const;
+    DataDrivenPropertyValue<float> getCircleStrokeOpacity() const;
+    void setCircleStrokeOpacity(DataDrivenPropertyValue<float>);
+    void setCircleStrokeOpacityTransition(const TransitionOptions&);
+    TransitionOptions getCircleStrokeOpacityTransition() const;
 
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    CircleLayer(const Impl&);
-    CircleLayer(const CircleLayer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    CircleLayer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<CircleLayer>() const {
-    return type == LayerType::Circle;
+    return getType() == LayerType::Circle;
 }
 
 } // namespace style

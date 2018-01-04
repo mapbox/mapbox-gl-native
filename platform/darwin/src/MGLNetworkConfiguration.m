@@ -13,7 +13,7 @@
 + (instancetype)sharedManager {
     static dispatch_once_t onceToken;
     static MGLNetworkConfiguration *_sharedManager;
-    void (^setupBlock)() = ^{
+    void (^setupBlock)(void) = ^{
         dispatch_once(&onceToken, ^{
             _sharedManager = [[self alloc] init];
         });

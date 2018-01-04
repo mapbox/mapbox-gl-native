@@ -1,16 +1,21 @@
 #pragma once
 
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/storage/offline.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
+#include <mutex>
 
 namespace mbgl {
 
 namespace util {
 template <typename T> class Thread;
 } // namespace util
+
+class ResourceTransform;
 
 class DefaultFileSource : public FileSource {
 public:
@@ -29,17 +34,17 @@ public:
                       uint64_t maximumCacheSize = util::DEFAULT_MAX_CACHE_SIZE);
     ~DefaultFileSource() override;
 
-    bool supportsOptionalRequests() const override {
+    bool supportsCacheOnlyRequests() const override {
         return true;
     }
 
     void setAPIBaseURL(const std::string&);
-    std::string getAPIBaseURL() const;
+    std::string getAPIBaseURL();
 
     void setAccessToken(const std::string&);
-    std::string getAccessToken() const;
+    std::string getAccessToken();
 
-    void setResourceTransform(std::function<std::string(Resource::Kind, std::string&&)>);
+    void setResourceTransform(optional<ActorRef<ResourceTransform>>&&);
 
     std::unique_ptr<AsyncRequest> request(const Resource&, Callback) override;
 
@@ -135,15 +140,20 @@ public:
     void resume();
 
     // For testing only.
+    void setOnlineStatus(bool);
     void put(const Resource&, const Response&);
 
     class Impl;
 
 private:
-    const std::unique_ptr<util::Thread<Impl>> thread;
-    const std::unique_ptr<FileSource> assetFileSource;
-    const std::unique_ptr<FileSource> localFileSource;
+    // Shared so destruction is done on this thread
+    const std::shared_ptr<FileSource> assetFileSource;
+    const std::unique_ptr<util::Thread<Impl>> impl;
+
+    std::mutex cachedBaseURLMutex;
     std::string cachedBaseURL = mbgl::util::API_BASE_URL;
+
+    std::mutex cachedAccessTokenMutex;
     std::string cachedAccessToken;
 };
 

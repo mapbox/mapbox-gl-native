@@ -4,8 +4,7 @@
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/storage/file_source.hpp>
-#include <mbgl/gl/headless_backend.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
+#include <mbgl/util/image.hpp>
 
 #include <exception>
 
@@ -15,12 +14,15 @@
 #include <nan.h>
 #pragma GCC diagnostic pop
 
+namespace mbgl {
+class Map;
+class HeadlessFrontend;
+} // namespace mbgl
+
 namespace node_mbgl {
 
-class NodeBackend : public mbgl::HeadlessBackend {
-public:
-    NodeBackend();
-    void onDidFailLoadingMap(std::exception_ptr) final;
+class NodeMapObserver : public mbgl::MapObserver {
+    void onDidFailLoadingMap(std::exception_ptr) override;
 };
 
 class NodeMap : public Nan::ObjectWrap,
@@ -42,8 +44,8 @@ public:
     static void Render(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Release(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void Cancel(const Nan::FunctionCallbackInfo<v8::Value>&);
-    static void AddClass(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddSource(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void RemoveSource(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddLayer(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddImage(const Nan::FunctionCallbackInfo<v8::Value>&);
@@ -55,6 +57,9 @@ public:
     static void SetZoom(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetBearing(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPitch(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetAxonometric(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetXSkew(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetYSkew(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void DumpDebugLogs(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void QueryRenderedFeatures(const Nan::FunctionCallbackInfo<v8::Value>&);
 
@@ -69,9 +74,10 @@ public:
     std::unique_ptr<mbgl::AsyncRequest> request(const mbgl::Resource&, mbgl::FileSource::Callback);
 
     const float pixelRatio;
-    NodeBackend backend;
-    std::unique_ptr<mbgl::OffscreenView> view;
+    mbgl::MapMode mode;
     NodeThreadPool threadpool;
+    NodeMapObserver mapObserver;
+    std::unique_ptr<mbgl::HeadlessFrontend> frontend;
     std::unique_ptr<mbgl::Map> map;
 
     std::exception_ptr error;

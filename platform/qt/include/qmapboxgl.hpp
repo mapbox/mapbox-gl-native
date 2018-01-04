@@ -10,6 +10,8 @@
 #include <QString>
 #include <QStringList>
 
+#include <functional>
+
 class QMapboxGLPrivate;
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
@@ -59,6 +61,9 @@ public:
     QString apiBaseUrl() const;
     void setApiBaseUrl(const QString &);
 
+    std::function<std::string(const std::string &&)> resourceTransform() const;
+    void setResourceTransform(const std::function<std::string(const std::string &&)> &);
+
 private:
     GLContextMode m_contextMode;
     ConstrainMode m_constrainMode;
@@ -69,6 +74,7 @@ private:
     QString m_assetPath;
     QString m_accessToken;
     QString m_apiBaseUrl;
+    std::function<std::string(const std::string &&)> m_resourceTransform;
 };
 
 struct Q_DECL_EXPORT QMapboxGLCameraOptions {
@@ -168,12 +174,6 @@ public:
 
     void setGestureInProgress(bool inProgress);
 
-    void addClass(const QString &);
-    void removeClass(const QString &);
-    bool hasClass(const QString &) const;
-    void setClasses(const QStringList &);
-    QStringList getClasses() const;
-
     void setTransitionOptions(qint64 duration, qint64 delay = 0);
 
     void addAnnotationIcon(const QString &name, const QImage &sprite);
@@ -183,7 +183,7 @@ public:
     void removeAnnotation(QMapbox::AnnotationID);
 
     void setLayoutProperty(const QString &layer, const QString &property, const QVariant &value);
-    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value, const QString &klass = QString());
+    void setPaintProperty(const QString &layer, const QString &property, const QVariant &value);
 
     bool isFullyLoaded() const;
 

@@ -56,7 +56,7 @@ public:
 
     // Bounds
 
-    void setLatLngBounds(const LatLngBounds&);
+    void setLatLngBounds(optional<LatLngBounds>);
     void setMinZoom(double);
     void setMaxZoom(double);
     void setMinPitch(double);
@@ -124,6 +124,14 @@ public:
     // Viewport mode
     void setViewportMode(ViewportMode);
     ViewportMode getViewportMode() const;
+
+    // Projection mode
+    void setAxonometric(bool);
+    bool getAxonometric() const;
+    void setXSkew(double xSkew);
+    double getXSkew() const;
+    void setYSkew(double ySkew);
+    double getYSkew() const;
 
     // Transitions
     bool inTransition() const;

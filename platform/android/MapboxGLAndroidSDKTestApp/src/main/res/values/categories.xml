@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="category">category</string>
+    <string name="category_basic">_Basic</string>
+    <string name="category_annotation">Annotation</string>
+    <string name="category_camera">Camera</string>
+    <string name="category_custom_layer">Custom Layer</string>
+    <string name="category_fragment">Fragment</string>
+    <string name="category_imagegenerator">Image Generator</string>
+    <string name="category_infowindow">Info Window</string>
+    <string name="category_maplayout">Map Layout</string>
+    <string name="category_offline">Offline</string>
+    <string name="category_userlocation">User Location</string>
+    <string name="category_style">Styling</string>
+    <string name="category_features">Features</string>
+    <string name="category_storage">Storage</string>
+    <string name="category_textureview">Texture View</string>
+</resources>

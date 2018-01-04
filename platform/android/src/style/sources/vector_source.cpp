@@ -1,5 +1,7 @@
 #include "vector_source.hpp"
 
+#include <mbgl/renderer/query.hpp>
+
 // Java -> C++ conversion
 #include "../android_conversion.hpp"
 #include "../conversion/filter.hpp"
@@ -28,8 +30,10 @@ namespace android {
         ) {
     }
 
-    VectorSource::VectorSource(mbgl::Map& map, mbgl::style::VectorSource& coreSource)
-        : Source(map, coreSource) {
+    VectorSource::VectorSource(jni::JNIEnv& env,
+                               mbgl::style::Source& coreSource,
+                               AndroidRendererFrontend& frontend)
+        : Source(env, coreSource, createJavaPeer(env), frontend) {
     }
 
     VectorSource::~VectorSource() = default;
@@ -46,17 +50,17 @@ namespace android {
         using namespace mbgl::android::geojson;
 
         std::vector<mbgl::Feature> features;
-        if (map) {
-            features = map->querySourceFeatures(source.getID(), { toVector(env, jSourceLayerIds), toFilter(env, jfilter) });
+        if (rendererFrontend) {
+            features = rendererFrontend->querySourceFeatures(source.getID(), { toVector(env, jSourceLayerIds), toFilter(env, jfilter) });
         }
         return *convert<jni::Array<jni::Object<Feature>>, std::vector<mbgl::Feature>>(env, features);
     }
 
     jni::Class<VectorSource> VectorSource::javaClass;
 
-    jni::jobject* VectorSource::createJavaPeer(jni::JNIEnv& env) {
+    jni::Object<Source> VectorSource::createJavaPeer(jni::JNIEnv& env) {
         static auto constructor = VectorSource::javaClass.template GetConstructor<jni::jlong>(env);
-        return VectorSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this));
+        return jni::Object<Source>(VectorSource::javaClass.New(env, constructor, reinterpret_cast<jni::jlong>(this)).Get());
     }
 
     void VectorSource::registerNative(jni::JNIEnv& env) {

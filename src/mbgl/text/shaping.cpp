@@ -7,22 +7,70 @@
 #include <boost/algorithm/string.hpp>
 
 #include <algorithm>
+#include <cmath>
 
 namespace mbgl {
 
-optional<PositionedIcon> PositionedIcon::shapeIcon(const SpriteAtlasElement& image, const std::array<float, 2>& iconOffset, const float iconRotation) {
-    if (!image.pos.hasArea()) {
-        return {};
+struct AnchorAlignment {
+    AnchorAlignment(float horizontal_, float vertical_)
+        : horizontalAlign(horizontal_), verticalAlign(vertical_) {
     }
 
+    float horizontalAlign;
+    float verticalAlign;
+};
+
+AnchorAlignment getAnchorAlignment(style::SymbolAnchorType anchor) {
+    float horizontalAlign = 0.5;
+    float verticalAlign = 0.5;
+
+    switch (anchor) {
+    case style::SymbolAnchorType::Top:
+    case style::SymbolAnchorType::Bottom:
+    case style::SymbolAnchorType::Center:
+        break;
+    case style::SymbolAnchorType::Right:
+    case style::SymbolAnchorType::TopRight:
+    case style::SymbolAnchorType::BottomRight:
+        horizontalAlign = 1;
+        break;
+    case style::SymbolAnchorType::Left:
+    case style::SymbolAnchorType::TopLeft:
+    case style::SymbolAnchorType::BottomLeft:
+        horizontalAlign = 0;
+        break;
+    }
+
+    switch (anchor) {
+    case style::SymbolAnchorType::Left:
+    case style::SymbolAnchorType::Right:
+    case style::SymbolAnchorType::Center:
+        break;
+    case style::SymbolAnchorType::Bottom:
+    case style::SymbolAnchorType::BottomLeft:
+    case style::SymbolAnchorType::BottomRight:
+        verticalAlign = 1;
+        break;
+    case style::SymbolAnchorType::Top:
+    case style::SymbolAnchorType::TopLeft:
+    case style::SymbolAnchorType::TopRight:
+        verticalAlign = 0;
+        break;
+    }
+
+    return AnchorAlignment(horizontalAlign, verticalAlign);
+}
+
+PositionedIcon PositionedIcon::shapeIcon(const ImagePosition& image, const std::array<float, 2>& iconOffset, style::SymbolAnchorType iconAnchor, const float iconRotation) {
+    AnchorAlignment anchorAlign = getAnchorAlignment(iconAnchor);
     float dx = iconOffset[0];
     float dy = iconOffset[1];
-    float x1 = dx - image.width/ 2.0f;
-    float x2 = x1 + image.width;
-    float y1 = dy - image.height / 2.0f;
-    float y2 = y1 + image.height;
+    float x1 = dx - image.displaySize()[0] * anchorAlign.horizontalAlign;
+    float x2 = x1 + image.displaySize()[0];
+    float y1 = dy - image.displaySize()[1] * anchorAlign.verticalAlign;
+    float y2 = y1 + image.displaySize()[1];
 
-    return { PositionedIcon { image, y1, y2, x1, x2, iconRotation } };
+    return PositionedIcon { image, y1, y2, x1, x2, iconRotation };
 }
 
 void align(Shaping& shaping,
@@ -31,12 +79,9 @@ void align(Shaping& shaping,
            const float verticalAlign,
            const float maxLineLength,
            const float lineHeight,
-           const std::size_t lineCount,
-           const Point<float>& translate) {
-    const float shiftX =
-    (justify - horizontalAlign) * maxLineLength + ::round(translate.x);
-    const float shiftY =
-    (-verticalAlign * lineCount + 0.5) * lineHeight + ::round(translate.y);
+           const std::size_t lineCount) {
+    const float shiftX = (justify - horizontalAlign) * maxLineLength;
+    const float shiftY = (-verticalAlign * lineCount + 0.5) * lineHeight;
     
     for (auto& glyph : shaping.positionedGlyphs) {
         glyph.x += shiftX;
@@ -46,7 +91,7 @@ void align(Shaping& shaping,
 
 // justify left = 0, right = 1, center = .5
 void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
-                 const GlyphPositions& glyphs,
+                 const Glyphs& glyphs,
                  std::size_t start,
                  std::size_t end,
                  float justify) {
@@ -57,7 +102,7 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     PositionedGlyph& glyph = positionedGlyphs[end];
     auto it = glyphs.find(glyph.glyph);
     if (it != glyphs.end() && it->second) {
-        const uint32_t lastAdvance = it->second->metrics.advance;
+        const uint32_t lastAdvance = (*it->second)->metrics.advance;
         const float lineIndent = float(glyph.x + lastAdvance) * justify;
         
         for (std::size_t j = start; j <= end; j++) {
@@ -69,17 +114,17 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
 float determineAverageLineWidth(const std::u16string& logicalInput,
                                 const float spacing,
                                 float maxWidth,
-                                const GlyphPositions& glyphs) {
+                                const Glyphs& glyphs) {
     float totalWidth = 0;
     
     for (char16_t chr : logicalInput) {
         auto it = glyphs.find(chr);
         if (it != glyphs.end() && it->second) {
-            totalWidth += it->second->metrics.advance + spacing;
+            totalWidth += (*it->second)->metrics.advance + spacing;
         }
     }
     
-    int32_t targetLineCount = std::fmax(1, std::ceil(totalWidth / maxWidth));
+    int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
     return totalWidth / targetLineCount;
 }
 
@@ -168,7 +213,7 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
                                           const float spacing,
                                           float maxWidth,
                                           const WritingModeType writingMode,
-                                          const GlyphPositions& glyphs) {
+                                          const Glyphs& glyphs) {
     if (!maxWidth || writingMode != WritingModeType::Horizontal) {
         return {};
     }
@@ -186,7 +231,7 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
         const char16_t codePoint = logicalInput[i];
         auto it = glyphs.find(codePoint);
         if (it != glyphs.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
-            currentX += it->second->metrics.advance + spacing;
+            currentX += (*it->second)->metrics.advance + spacing;
         }
         
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
@@ -206,13 +251,11 @@ void shapeLines(Shaping& shaping,
                           const std::vector<std::u16string>& lines,
                           const float spacing,
                           const float lineHeight,
-                          const float horizontalAlign,
-                          const float verticalAlign,
-                          const float justify,
-                          const Point<float>& translate,
+                          const style::SymbolAnchorType textAnchor,
+                          const style::TextJustifyType textJustify,
                           const float verticalHeight,
                           const WritingModeType writingMode,
-                          const GlyphPositions& glyphs) {
+                          const Glyphs& glyphs) {
     
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = -17;
@@ -221,6 +264,10 @@ void shapeLines(Shaping& shaping,
     float y = yOffset;
     
     float maxLineLength = 0;
+
+    const float justify = textJustify == style::TextJustifyType::Right ? 1 :
+        textJustify == style::TextJustifyType::Left ? 0 :
+        0.5;
     
     for (std::u16string line : lines) {
         // Collapse whitespace so it doesn't throw off justification
@@ -238,13 +285,13 @@ void shapeLines(Shaping& shaping,
                 continue;
             }
             
-            const Glyph& glyph = *it->second;
+            const Glyph& glyph = **it->second;
             
             if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
-                shaping.positionedGlyphs.emplace_back(chr, x, y, 0);
+                shaping.positionedGlyphs.emplace_back(chr, x, y, false);
                 x += glyph.metrics.advance + spacing;
             } else {
-                shaping.positionedGlyphs.emplace_back(chr, x, 0, -M_PI_2);
+                shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
                 x += verticalHeight + spacing;
             }
         }
@@ -261,38 +308,39 @@ void shapeLines(Shaping& shaping,
         x = 0;
         y += lineHeight;
     }
-    
-    align(shaping, justify, horizontalAlign, verticalAlign, maxLineLength, lineHeight,
-          lines.size(), translate);
-    const uint32_t height = lines.size() * lineHeight;
-    
+
+    auto anchorAlign = getAnchorAlignment(textAnchor);
+
+    align(shaping, justify, anchorAlign.horizontalAlign, anchorAlign.verticalAlign, maxLineLength,
+          lineHeight, lines.size());
+    const float height = lines.size() * lineHeight;
+
     // Calculate the bounding box
-    shaping.top += -verticalAlign * height;
+    shaping.top += -anchorAlign.verticalAlign * height;
     shaping.bottom = shaping.top + height;
-    shaping.left += -horizontalAlign * maxLineLength;
+    shaping.left += -anchorAlign.horizontalAlign * maxLineLength;
     shaping.right = shaping.left + maxLineLength;
 }
 
 const Shaping getShaping(const std::u16string& logicalInput,
                          const float maxWidth,
                          const float lineHeight,
-                         const float horizontalAlign,
-                         const float verticalAlign,
-                         const float justify,
+                         const style::SymbolAnchorType textAnchor,
+                         const style::TextJustifyType textJustify,
                          const float spacing,
                          const Point<float>& translate,
                          const float verticalHeight,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const GlyphPositions& glyphs) {
+                         const Glyphs& glyphs) {
     Shaping shaping(translate.x, translate.y, writingMode);
     
     std::vector<std::u16string> reorderedLines =
     bidi.processText(logicalInput,
                      determineLineBreaks(logicalInput, spacing, maxWidth, writingMode, glyphs));
     
-    shapeLines(shaping, reorderedLines, spacing, lineHeight, horizontalAlign, verticalAlign,
-               justify, translate, verticalHeight, writingMode, glyphs);
+    shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
+               textJustify, verticalHeight, writingMode, glyphs);
     
     return shaping;
 }

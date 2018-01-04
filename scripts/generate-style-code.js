@@ -29,6 +29,9 @@ global.evaluatedType = function (property) {
   if (/-(rotation|pitch|illumination)-alignment$/.test(property.name)) {
     return 'AlignmentType';
   }
+  if (/^(text|icon)-anchor$/.test(property.name)) {
+    return 'SymbolAnchorType';
+  }
   if (/position/.test(property.name)) {
     return 'Position';
   }
@@ -53,7 +56,7 @@ global.evaluatedType = function (property) {
   }
 };
 
-function attributeType(property, type) {
+function attributeUniformType(property, type) {
     const attributeNameExceptions = {
       'text-opacity': 'opacity',
       'icon-opacity': 'opacity',
@@ -64,11 +67,12 @@ function attributeType(property, type) {
       'text-halo-blur': 'halo_blur',
       'icon-halo-blur': 'halo_blur',
       'text-halo-width': 'halo_width',
-      'icon-halo-width': 'halo_width'
+      'icon-halo-width': 'halo_width',
+      'line-gap-width': 'gapwidth'
     }
     const name = attributeNameExceptions[property.name] ||
         property.name.replace(type + '-', '').replace(/-/g, '_');
-    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}`;
+    return `attributes::a_${name}${name === 'offset' ? '<1>' : ''}, uniforms::u_${name}`;
 }
 
 global.layoutPropertyType = function (property) {
@@ -81,7 +85,7 @@ global.layoutPropertyType = function (property) {
 
 global.paintPropertyType = function (property, type) {
   if (isDataDriven(property)) {
-    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeType(property, type)}>`;
+    return `DataDrivenPaintProperty<${evaluatedType(property)}, ${attributeUniformType(property, type)}>`;
   } else if (/-pattern$/.test(property.name) || property.name === 'line-dasharray') {
     return `CrossFadedPaintProperty<${evaluatedType(property)}>`;
   } else {
@@ -182,8 +186,8 @@ for (const layer of layers) {
   writeIfModified(`src/mbgl/style/layers/${layerFileName}_layer_properties.cpp`, propertiesCpp(layer));
 }
 
-const propertySettersHpp = ejs.compile(fs.readFileSync('include/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
-writeIfModified('include/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
+const propertySettersHpp = ejs.compile(fs.readFileSync('src/mbgl/style/conversion/make_property_setters.hpp.ejs', 'utf8'), {strict: true});
+writeIfModified('src/mbgl/style/conversion/make_property_setters.hpp', propertySettersHpp({layers: layers}));
 
 // Light
 const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {

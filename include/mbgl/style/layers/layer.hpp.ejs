@@ -44,6 +44,13 @@ public:
 <% } -%>
 
 <% } -%>
+    // Visibility
+    void setVisibility(VisibilityType) final;
+
+    // Zoom range
+    void setMinZoom(float) final;
+    void setMaxZoom(float) final;
+
 <% if (layoutProperties.length) { -%>
     // Layout properties
 
@@ -58,24 +65,25 @@ public:
 
 <% for (const property of paintProperties) { -%>
     static <%- propertyValueType(property) %> getDefault<%- camelize(property.name) %>();
-    <%- propertyValueType(property) %> get<%- camelize(property.name) %>(const optional<std::string>& klass = {}) const;
-    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>, const optional<std::string>& klass = {});
-    void set<%- camelize(property.name) %>Transition(const TransitionOptions&, const optional<std::string>& klass = {});
-    TransitionOptions get<%- camelize(property.name) %>Transition(const optional<std::string>& klass = {}) const;
+    <%- propertyValueType(property) %> get<%- camelize(property.name) %>() const;
+    void set<%- camelize(property.name) %>(<%- propertyValueType(property) %>);
+    void set<%- camelize(property.name) %>Transition(const TransitionOptions&);
+    TransitionOptions get<%- camelize(property.name) %>Transition() const;
 
 <% } -%>
     // Private implementation
 
     class Impl;
-    Impl* const impl;
+    const Impl& impl() const;
 
-    <%- camelize(type) %>Layer(const Impl&);
-    <%- camelize(type) %>Layer(const <%- camelize(type) %>Layer&) = delete;
+    Mutable<Impl> mutableImpl() const;
+    <%- camelize(type) %>Layer(Immutable<Impl>);
+    std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 };
 
 template <>
 inline bool Layer::is<<%- camelize(type) %>Layer>() const {
-    return type == LayerType::<%- camelize(type) %>;
+    return getType() == LayerType::<%- camelize(type) %>;
 }
 
 } // namespace style

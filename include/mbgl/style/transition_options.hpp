@@ -8,8 +8,13 @@ namespace style {
 
 class TransitionOptions {
 public:
-    optional<Duration> duration = {};
-    optional<Duration> delay = {};
+    optional<Duration> duration;
+    optional<Duration> delay;
+
+    TransitionOptions(optional<Duration> duration_ = {},
+                      optional<Duration> delay_ = {})
+        : duration(std::move(duration_)),
+          delay(std::move(delay_)) {}
 
     TransitionOptions reverseMerge(const TransitionOptions& defaults) const {
         return {

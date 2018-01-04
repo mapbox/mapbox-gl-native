@@ -1,12 +1,15 @@
 #pragma once
 
 #include <mbgl/util/noncopyable.hpp>
-#include <mbgl/util/any.hpp>
+#include <mbgl/util/unique_any.hpp>
+#include <mbgl/util/immutable.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/style/types.hpp>
 
+#include <cassert>
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 namespace mbgl {
 namespace style {
@@ -19,6 +22,7 @@ class RasterLayer;
 class BackgroundLayer;
 class CustomLayer;
 class FillExtrusionLayer;
+class LayerObserver;
 
 /**
  * The runtime representation of a [layer](https://www.mapbox.com/mapbox-gl-style-spec/#layers) from the Mapbox Style
@@ -38,15 +42,6 @@ class FillExtrusionLayer;
  */
 class Layer : public mbgl::util::noncopyable {
 public:
-    class Impl;
-
-protected:
-
-    const LayerType type;
-    Layer(LayerType, std::unique_ptr<Impl>);
-
-public:
-
     virtual ~Layer();
 
     // Check whether this layer is of the given subtype.
@@ -78,45 +73,60 @@ public:
     //
     template <class V>
     auto accept(V&& visitor) {
-        switch (type) {
+        switch (getType()) {
         case LayerType::Fill:
-            return visitor(*as<FillLayer>());
+            return std::forward<V>(visitor)(*as<FillLayer>());
         case LayerType::Line:
-            return visitor(*as<LineLayer>());
+            return std::forward<V>(visitor)(*as<LineLayer>());
         case LayerType::Circle:
-            return visitor(*as<CircleLayer>());
+            return std::forward<V>(visitor)(*as<CircleLayer>());
         case LayerType::Symbol:
-            return visitor(*as<SymbolLayer>());
+            return std::forward<V>(visitor)(*as<SymbolLayer>());
         case LayerType::Raster:
-            return visitor(*as<RasterLayer>());
+            return std::forward<V>(visitor)(*as<RasterLayer>());
         case LayerType::Background:
-            return visitor(*as<BackgroundLayer>());
+            return std::forward<V>(visitor)(*as<BackgroundLayer>());
         case LayerType::Custom:
-            return visitor(*as<CustomLayer>());
+            return std::forward<V>(visitor)(*as<CustomLayer>());
         case LayerType::FillExtrusion:
-            return visitor(*as<FillExtrusionLayer>());
+            return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
         }
+
+
+        // Not reachable, but placate GCC.
+        assert(false);
+        throw new std::runtime_error("unknown layer type");
     }
 
-    const std::string& getID() const;
+    LayerType getType() const;
+    std::string getID() const;
 
     // Visibility
     VisibilityType getVisibility() const;
-    void setVisibility(VisibilityType);
+    virtual void setVisibility(VisibilityType) = 0;
 
     // Zoom range
     float getMinZoom() const;
-    void setMinZoom(float) const;
     float getMaxZoom() const;
-    void setMaxZoom(float) const;
+    virtual void setMinZoom(float) = 0;
+    virtual void setMaxZoom(float) = 0;
 
     // Private implementation
-    const std::unique_ptr<Impl> baseImpl;
+    class Impl;
+    Immutable<Impl> baseImpl;
+
+    Layer(Immutable<Impl>);
+
+    // Create a layer, copying all properties except id and paint properties from this layer.
+    virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
+
+    LayerObserver* observer = nullptr;
+    void setObserver(LayerObserver*);
 
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share
     // identical platform-native peers.
-    any peer;
+    util::unique_any peer;
 };
 
 } // namespace style

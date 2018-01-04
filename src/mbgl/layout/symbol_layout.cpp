@@ -1,14 +1,13 @@
 #include <mbgl/layout/symbol_layout.hpp>
 #include <mbgl/layout/merge_lines.hpp>
 #include <mbgl/layout/clip_lines.hpp>
-#include <mbgl/renderer/symbol_bucket.hpp>
+#include <mbgl/renderer/buckets/symbol_bucket.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/renderer/bucket_parameters.hpp>
-#include <mbgl/renderer/render_symbol_layer.hpp>
+#include <mbgl/renderer/layers/render_symbol_layer.hpp>
+#include <mbgl/renderer/image_atlas.hpp>
 #include <mbgl/style/layers/symbol_layer_impl.hpp>
-#include <mbgl/sprite/sprite_atlas.hpp>
 #include <mbgl/text/get_anchors.hpp>
-#include <mbgl/text/collision_tile.hpp>
 #include <mbgl/text/shaping.hpp>
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/utf.hpp>
@@ -40,21 +39,22 @@ static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) 
 
 SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            const std::vector<const RenderLayer*>& layers,
-                           const GeometryTileLayer& sourceLayer,
-                           IconDependencies& iconDependencies,
+                           std::unique_ptr<GeometryTileLayer> sourceLayer_,
+                           ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : sourceLayerName(sourceLayer.getName()),
-      bucketName(layers.at(0)->getID()),
+    : bucketName(layers.at(0)->getID()),
+      sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
       mode(parameters.mode),
+      pixelRatio(parameters.pixelRatio),
       tileSize(util::tileSize * overscaling),
       tilePixelRatio(float(util::EXTENT) / tileSize),
-      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<TextSize>()),
-      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl->layout.unevaluated.get<IconSize>())
+      textSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<TextSize>()),
+      iconSize(layers.at(0)->as<RenderSymbolLayer>()->impl().layout.get<IconSize>())
     {
 
-    const SymbolLayer::Impl& leader = *layers.at(0)->as<RenderSymbolLayer>()->impl;
+    const SymbolLayer::Impl& leader = layers.at(0)->as<RenderSymbolLayer>()->impl();
 
     layout = leader.layout.evaluate(PropertyEvaluationParameters(zoom));
 
@@ -74,9 +74,12 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         }
     }
 
-    // If unspecified `text-pitch-alignment` inherits `text-rotation-alignment`
+    // If unspecified `*-pitch-alignment` inherits `*-rotation-alignment`
     if (layout.get<TextPitchAlignment>() == AlignmentType::Auto) {
         layout.get<TextPitchAlignment>() = layout.get<TextRotationAlignment>();
+    }
+    if (layout.get<IconPitchAlignment>() == AlignmentType::Auto) {
+        layout.get<IconPitchAlignment>() = layout.get<IconRotationAlignment>();
     }
 
     const bool hasText = has<TextField>(layout) && !layout.get<TextFont>().empty();
@@ -94,9 +97,9 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
     }
 
     // Determine glyph dependencies
-    const size_t featureCount = sourceLayer.featureCount();
+    const size_t featureCount = sourceLayer->featureCount();
     for (size_t i = 0; i < featureCount; ++i) {
-        auto feature = sourceLayer.getFeature(i);
+        auto feature = sourceLayer->getFeature(i);
         if (!leader.filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
             continue;
         
@@ -136,12 +139,17 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             }
 
             ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
+            const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
+                                         && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
+                                         && util::i18n::allowsVerticalWritingMode(*ft.text);
 
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
                 glyphDependencies[layout.get<TextFont>()].insert(chr);
-                if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
-                    glyphDependencies[layout.get<TextFont>()].insert(verticalChr);
+                if (canVerticalizeText) {
+                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
+                        glyphDependencies[layout.get<TextFont>()].insert(verticalChr);
+                    }
                 }
             }
         }
@@ -152,7 +160,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                 icon = util::replaceTokens(icon, getValue);
             }
             ft.icon = icon;
-            iconDependencies.insert(*ft.icon);
+            imageDependencies.insert(*ft.icon);
         }
 
         if (ft.text || ft.icon) {
@@ -169,51 +177,19 @@ bool SymbolLayout::hasSymbolInstances() const {
     return !symbolInstances.empty();
 }
 
-void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons) {
-    float horizontalAlign = 0.5;
-    float verticalAlign = 0.5;
-
-    switch (layout.get<TextAnchor>()) {
-        case TextAnchorType::Top:
-        case TextAnchorType::Bottom:
-        case TextAnchorType::Center:
-            break;
-        case TextAnchorType::Right:
-        case TextAnchorType::TopRight:
-        case TextAnchorType::BottomRight:
-            horizontalAlign = 1;
-            break;
-        case TextAnchorType::Left:
-        case TextAnchorType::TopLeft:
-        case TextAnchorType::BottomLeft:
-            horizontalAlign = 0;
-            break;
-    }
-
-    switch (layout.get<TextAnchor>()) {
-        case TextAnchorType::Left:
-        case TextAnchorType::Right:
-        case TextAnchorType::Center:
-            break;
-        case TextAnchorType::Bottom:
-        case TextAnchorType::BottomLeft:
-        case TextAnchorType::BottomRight:
-            verticalAlign = 1;
-            break;
-        case TextAnchorType::Top:
-        case TextAnchorType::TopLeft:
-        case TextAnchorType::TopRight:
-            verticalAlign = 0;
-            break;
-    }
-
-    const float justify = layout.get<TextJustify>() == TextJustifyType::Right ? 1 :
-        layout.get<TextJustify>() == TextJustifyType::Left ? 0 :
-        0.5;
-
-
+void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyphPositions,
+                           const ImageMap& imageMap, const ImagePositions& imagePositions,
+                           const OverscaledTileID& tileID, const std::string& sourceID) {
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
+
+    auto glyphMapIt = glyphMap.find(layout.get<TextFont>());
+    const Glyphs& glyphs = glyphMapIt != glyphMap.end()
+        ? glyphMapIt->second : Glyphs();
+
+    auto glyphPositionsIt = glyphPositions.find(layout.get<TextFont>());
+    const GlyphPositionMap& glyphPositionMap = glyphPositionsIt != glyphPositions.end()
+        ? glyphPositionsIt->second : GlyphPositionMap();
 
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
@@ -221,51 +197,48 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;
-        GlyphPositions face;
 
         // if feature has text, shape the text
         if (feature.text) {
-            auto glyphPositions = glyphs.find(layout.get<TextFont>());
-            if (glyphPositions != glyphs.end()) { // If there are no glyphs available for this feature, skip shaping
-                auto applyShaping = [&] (const std::u16string& text, WritingModeType writingMode) {
-                    const float oneEm = 24.0f;
-                    const Shaping result = getShaping(
-                        /* string */ text,
-                        /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
-                            layout.get<TextMaxWidth>() * oneEm : 0,
-                        /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
-                        /* horizontalAlign */ horizontalAlign,
-                        /* verticalAlign */ verticalAlign,
-                        /* justify */ justify,
-                        /* spacing: ems */ layout.get<TextLetterSpacing>() * oneEm,
-                        /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
-                        /* verticalHeight */ oneEm,
-                        /* writingMode */ writingMode,
-                        /* bidirectional algorithm object */ bidi,
-                        /* glyphs */ glyphPositions->second);
+            auto applyShaping = [&] (const std::u16string& text, WritingModeType writingMode) {
+                const float oneEm = 24.0f;
+                const Shaping result = getShaping(
+                    /* string */ text,
+                    /* maxWidth: ems */ layout.get<SymbolPlacement>() != SymbolPlacementType::Line ?
+                        layout.evaluate<TextMaxWidth>(zoom, feature) * oneEm : 0,
+                    /* lineHeight: ems */ layout.get<TextLineHeight>() * oneEm,
+                    /* anchor */ layout.evaluate<TextAnchor>(zoom, feature),
+                    /* justify */ layout.evaluate<TextJustify>(zoom, feature),
+                    /* spacing: ems */ util::i18n::allowsLetterSpacing(*feature.text) ? layout.evaluate<TextLetterSpacing>(zoom, feature) * oneEm : 0.0f,
+                    /* translate */ Point<float>(layout.evaluate<TextOffset>(zoom, feature)[0] * oneEm, layout.evaluate<TextOffset>(zoom, feature)[1] * oneEm),
+                    /* verticalHeight */ oneEm,
+                    /* writingMode */ writingMode,
+                    /* bidirectional algorithm object */ bidi,
+                    /* glyphs */ glyphs);
 
-                    return result;
-                };
+                return result;
+            };
 
-                shapedTextOrientations.first = applyShaping(*feature.text, WritingModeType::Horizontal);
+            shapedTextOrientations.first = applyShaping(*feature.text, WritingModeType::Horizontal);
 
-                if (util::i18n::allowsVerticalWritingMode(*feature.text) && textAlongLine) {
-                    shapedTextOrientations.second = applyShaping(util::i18n::verticalizePunctuation(*feature.text), WritingModeType::Vertical);
-                }
+            if (util::i18n::allowsVerticalWritingMode(*feature.text) && textAlongLine) {
+                shapedTextOrientations.second = applyShaping(util::i18n::verticalizePunctuation(*feature.text), WritingModeType::Vertical);
             }
         }
 
         // if feature has icon, get sprite atlas position
         if (feature.icon) {
-            auto image = icons.find(*feature.icon);
-            if (image != icons.end()) {
-                shapedIcon = PositionedIcon::shapeIcon(image->second,
+            auto image = imageMap.find(*feature.icon);
+            if (image != imageMap.end()) {
+                shapedIcon = PositionedIcon::shapeIcon(
+                    imagePositions.at(*feature.icon),
                     layout.evaluate<IconOffset>(zoom, feature),
+                    layout.evaluate<IconAnchor>(zoom, feature),
                     layout.evaluate<IconRotate>(zoom, feature) * util::DEG2RAD);
-                if (image->second.sdf) {
+                if (image->second->sdf) {
                     sdfIcons = true;
                 }
-                if (image->second.relativePixelRatio != 1.0f) {
+                if (image->second->pixelRatio != pixelRatio) {
                     iconsNeedLinear = true;
                 } else if (layout.get<IconRotate>().constantOr(1) != 0) {
                     iconsNeedLinear = true;
@@ -275,8 +248,7 @@ void SymbolLayout::prepare(const GlyphPositionMap& glyphs, const IconMap& icons)
 
         // if either shapedText or icon position is present, add the feature
         if (shapedTextOrientations.first || shapedIcon) {
-            auto glyphPositionsIt = glyphs.find(layout.get<TextFont>());
-            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionsIt == glyphs.end() ? GlyphPositions() : glyphPositionsIt->second);
+            addFeature(std::distance(features.begin(), it), feature, shapedTextOrientations, shapedIcon, glyphPositionMap, tileID, sourceID);
         }
         
         feature.geometry.clear();
@@ -289,12 +261,16 @@ void SymbolLayout::addFeature(const std::size_t index,
                               const SymbolFeature& feature,
                               const std::pair<Shaping, Shaping>& shapedTextOrientations,
                               optional<PositionedIcon> shapedIcon,
-                              const GlyphPositions& glyphs) {
+                              const GlyphPositionMap& glyphPositionMap,
+                              const OverscaledTileID& tileID,
+                              const std::string& sourceID) {
     const float minScale = 0.5f;
     const float glyphSize = 24.0f;
     
     const float layoutTextSize = layout.evaluate<TextSize>(zoom + 1, feature);
     const float layoutIconSize = layout.evaluate<IconSize>(zoom + 1, feature);
+    const std::array<float, 2> textOffset = layout.evaluate<TextOffset>(zoom, feature);
+    const std::array<float, 2> iconOffset = layout.evaluate<IconOffset>(zoom, feature);
     
     // To reduce the number of labels that jump around when zooming we need
     // to use a text-size value that is the same for all zoom levels.
@@ -314,12 +290,11 @@ void SymbolLayout::addFeature(const std::size_t index,
     const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
                                                   ? SymbolPlacementType::Point
                                                   : layout.get<SymbolPlacement>();
-    const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
+
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature = {feature.index, sourceLayerName, bucketName, symbolInstances.size()};
-    
+    IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketName, symbolInstances.size(),
+                                     sourceID, tileID.canonical);
+
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
         // +-------------------+ Symbols with anchors located on tile edges
@@ -339,14 +314,14 @@ void SymbolLayout::addFeature(const std::size_t index,
 
         if (avoidEdges && !inside) return;
 
-        const bool addToBuffers = mode == MapMode::Still || withinPlus0;
-
-        symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
-                layout.evaluate(zoom, feature), layoutTextSize,
-                addToBuffers, symbolInstances.size(),
-                textBoxScale, textPadding, textPlacement,
-                iconBoxScale, iconPadding, iconPlacement,
-                glyphs, indexedFeature, index);
+        if (mode == MapMode::Tile || withinPlus0) {
+            symbolInstances.emplace_back(anchor, line, shapedTextOrientations, shapedIcon,
+                    layout.evaluate(zoom, feature), layoutTextSize,
+                    symbolInstances.size(),
+                    textBoxScale, textPadding, textPlacement, textOffset,
+                    iconBoxScale, iconPadding, iconOffset,
+                    glyphPositionMap, indexedFeature, index, feature.text.value_or(std::u16string()), overscaling);
+        }
     };
     
     const auto& type = feature.getType();
@@ -417,94 +392,93 @@ bool SymbolLayout::anchorIsTooClose(const std::u16string& text, const float repe
     return false;
 }
 
-std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) {
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear);
+// Analog of `addToLineVertexArray` in JS. This version doesn't need to build up a line array like the
+// JS version does, but it uses the same logic to calculate tile distances.
+std::vector<float> CalculateTileDistances(const GeometryCoordinates& line, const Anchor& anchor) {
+    std::vector<float> tileDistances(line.size());
+    if (anchor.segment != -1) {
+        auto sumForwardLength = util::dist<float>(anchor.point, line[anchor.segment + 1]);
+        auto sumBackwardLength = util::dist<float>(anchor.point, line[anchor.segment]);
+        for (size_t i = anchor.segment + 1; i < line.size(); i++) {
+            tileDistances[i] = sumForwardLength;
+            if (i < line.size() - 1) {
+                sumForwardLength += util::dist<float>(line[i + 1], line[i]);
+            }
+        }
+        for (auto i = anchor.segment; i >= 0; i--) {
+            tileDistances[i] = sumBackwardLength;
+            if (i > 0) {
+                sumBackwardLength += util::dist<float>(line[i - 1], line[i]);
+            }
+        }
+    }
+    return tileDistances;
+}
 
-    // Calculate which labels can be shown and when they can be shown and
-    // create the bufers used for rendering.
-
-    const SymbolPlacementType textPlacement = layout.get<TextRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
-    const SymbolPlacementType iconPlacement = layout.get<IconRotationAlignment>() != AlignmentType::Map
-                                                  ? SymbolPlacementType::Point
-                                                  : layout.get<SymbolPlacement>();
-
+std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes) {
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
+    
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, std::move(symbolInstances));
 
-    const bool keepUpright = layout.get<TextKeepUpright>();
-
-    // Sort symbols by their y position on the canvas so that they lower symbols
-    // are drawn on top of higher symbols.
-    // Don't sort symbols that won't overlap because it isn't necessary and
-    // because it causes more labels to pop in and out when rotating.
-    if (mayOverlap) {
-        const float sin = std::sin(collisionTile.config.angle);
-        const float cos = std::cos(collisionTile.config.angle);
-
-        std::sort(symbolInstances.begin(), symbolInstances.end(), [sin, cos](SymbolInstance &a, SymbolInstance &b) {
-            const int32_t aRotated = sin * a.point.x + cos * a.point.y;
-            const int32_t bRotated = sin * b.point.x + cos * b.point.y;
-            return aRotated != bRotated ?
-                aRotated < bRotated :
-                a.index > b.index;
-        });
-    }
-
-    for (SymbolInstance &symbolInstance : symbolInstances) {
+    for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
         const bool hasText = symbolInstance.hasText;
         const bool hasIcon = symbolInstance.hasIcon;
-
-        const bool iconWithoutText = layout.get<TextOptional>() || !hasText;
-        const bool textWithoutIcon = layout.get<IconOptional>() || !hasIcon;
-
-        // Calculate the scales at which the text and icon can be placed without collision.
-
-        float glyphScale = hasText ?
-            collisionTile.placeFeature(symbolInstance.textCollisionFeature,
-                    layout.get<TextAllowOverlap>(), layout.get<SymbolAvoidEdges>()) :
-            collisionTile.minScale;
-        float iconScale = hasIcon ?
-            collisionTile.placeFeature(symbolInstance.iconCollisionFeature,
-                    layout.get<IconAllowOverlap>(), layout.get<SymbolAvoidEdges>()) :
-            collisionTile.minScale;
-
-
-        // Combine the scales for icons and text.
-
-        if (!iconWithoutText && !textWithoutIcon) {
-            iconScale = glyphScale = util::max(iconScale, glyphScale);
-        } else if (!textWithoutIcon && glyphScale) {
-            glyphScale = util::max(iconScale, glyphScale);
-        } else if (!iconWithoutText && iconScale) {
-            iconScale = util::max(iconScale, glyphScale);
-        }
 
         const auto& feature = features.at(symbolInstance.featureIndex);
 
         // Insert final placement into collision tree and add glyphs/icons to buffers
 
         if (hasText) {
-            const float placementZoom = util::max(util::log2(glyphScale) + zoom, 0.0f);
-            collisionTile.insertFeature(symbolInstance.textCollisionFeature, glyphScale, layout.get<TextIgnorePlacement>());
-            if (glyphScale < collisionTile.maxScale) {
-                for (const auto& symbol : symbolInstance.glyphQuads) {
-                    addSymbol(
-                        bucket->text, *bucket->textSizeBinder, symbol, feature, placementZoom,
-                        keepUpright, textPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+            const Range<float> sizeData = bucket->textSizeBinder->getVertexSizeData(feature);
+            bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                    symbolInstance.textOffset, symbolInstance.writingModes, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
+            symbolInstance.placedTextIndex = bucket->text.placedSymbols.size() - 1;
+            PlacedSymbol& horizontalSymbol = bucket->text.placedSymbols.back();
+
+            bool firstHorizontal = true;
+            for (const auto& symbol : symbolInstance.horizontalGlyphQuads) {
+                size_t index = addSymbol(
+                    bucket->text, sizeData, symbol,
+                    symbolInstance.anchor, horizontalSymbol);
+                if (firstHorizontal) {
+                    horizontalSymbol.vertexStartIndex = index;
+                    firstHorizontal = false;
+                }
+            }
+            
+            if (symbolInstance.writingModes & WritingModeType::Vertical) {
+                bucket->text.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                        symbolInstance.textOffset, WritingModeType::Vertical, symbolInstance.line, CalculateTileDistances(symbolInstance.line, symbolInstance.anchor));
+                symbolInstance.placedVerticalTextIndex = bucket->text.placedSymbols.size() - 1;
+                
+                PlacedSymbol& verticalSymbol = bucket->text.placedSymbols.back();
+                bool firstVertical = true;
+                
+                for (const auto& symbol : symbolInstance.verticalGlyphQuads) {
+                    size_t index = addSymbol(
+                        bucket->text, sizeData, symbol,
+                        symbolInstance.anchor, verticalSymbol);
+                    
+                    if (firstVertical) {
+                        verticalSymbol.vertexStartIndex = index;
+                        firstVertical = false;
+                    }
                 }
             }
         }
 
         if (hasIcon) {
-            const float placementZoom = util::max(util::log2(iconScale) + zoom, 0.0f);
-            collisionTile.insertFeature(symbolInstance.iconCollisionFeature, iconScale, layout.get<IconIgnorePlacement>());
-            if (iconScale < collisionTile.maxScale && symbolInstance.iconQuad) {
-                addSymbol(
-                    bucket->icon, *bucket->iconSizeBinder, *symbolInstance.iconQuad, feature, placementZoom,
-                    keepUpright, iconPlacement, collisionTile.config.angle, symbolInstance.writingModes);
+            if (symbolInstance.iconQuad) {
+                const Range<float> sizeData = bucket->iconSizeBinder->getVertexSizeData(feature);
+                bucket->icon.placedSymbols.emplace_back(symbolInstance.anchor.point, symbolInstance.anchor.segment, sizeData.min, sizeData.max,
+                        symbolInstance.iconOffset, WritingModeType::None, symbolInstance.line, std::vector<float>());
+                symbolInstance.placedIconIndex = bucket->icon.placedSymbols.size() - 1;
+                PlacedSymbol& iconSymbol = bucket->icon.placedSymbols.back();
+                iconSymbol.vertexStartIndex = addSymbol(
+                                                        bucket->icon, sizeData, *symbolInstance.iconQuad,
+                                                        symbolInstance.anchor, iconSymbol);
             }
         }
         
@@ -514,23 +488,19 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(CollisionTile& collisionTile) 
         }
     }
 
-    if (collisionTile.config.debug) {
-        addToDebugBuffers(collisionTile, *bucket);
+    if (showCollisionBoxes) {
+        addToDebugBuffers(*bucket);
     }
 
     return bucket;
 }
 
 template <typename Buffer>
-void SymbolLayout::addSymbol(Buffer& buffer,
-                             SymbolSizeBinder& sizeBinder,
+size_t SymbolLayout::addSymbol(Buffer& buffer,
+                             const Range<float> sizeData,
                              const SymbolQuad& symbol,
-                             const SymbolFeature& feature,
-                             const float placementZoom,
-                             const bool keepUpright,
-                             const style::SymbolPlacementType placement,
-                             const float placementAngle,
-                             const WritingModeType writingModes) {
+                             const Anchor& labelAnchor,
+                             PlacedSymbol& placedSymbol) {
     constexpr const uint16_t vertexLength = 4;
 
     const auto &tl = symbol.tl;
@@ -538,32 +508,6 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     const auto &bl = symbol.bl;
     const auto &br = symbol.br;
     const auto &tex = symbol.tex;
-
-    float minZoom = util::max(zoom + util::log2(symbol.minScale), placementZoom);
-    float maxZoom = util::min(zoom + util::log2(symbol.maxScale), util::MAX_ZOOM_F);
-    const auto &anchorPoint = symbol.anchorPoint;
-
-    // drop incorrectly oriented glyphs
-    const float a = std::fmod(symbol.anchorAngle + placementAngle + M_PI, M_PI * 2);
-    if (writingModes & WritingModeType::Vertical) {
-        if (placement == style::SymbolPlacementType::Line && symbol.writingMode == WritingModeType::Vertical) {
-            if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 5 / 4) || a > (M_PI * 7 / 4)))
-                return;
-        } else if (keepUpright && placement == style::SymbolPlacementType::Line && (a <= (M_PI * 3 / 4) || a > (M_PI * 5 / 4)))
-            return;
-    } else if (keepUpright && placement == style::SymbolPlacementType::Line &&
-        (a <= M_PI / 2 || a > M_PI * 3 / 2)) {
-        return;
-    }
-
-    if (maxZoom <= minZoom)
-        return;
-
-    // Lower min zoom so that while fading out the label
-    // it can be shown outside of collision-free zoom levels
-    if (minZoom == placementZoom) {
-        minZoom = 0;
-    }
 
     if (buffer.segments.empty() || buffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
         buffer.segments.emplace_back(buffer.vertices.vertexSize(), buffer.triangles.indexSize());
@@ -575,20 +519,25 @@ void SymbolLayout::addSymbol(Buffer& buffer,
     assert(segment.vertexLength <= std::numeric_limits<uint16_t>::max());
     uint16_t index = segment.vertexLength;
 
-    // Encode angle of glyph
-    uint8_t glyphAngle = std::round((symbol.glyphAngle / (M_PI * 2)) * 256);
-
     // coordinates (2 triangles)
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tl, tex.x, tex.y,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, tr, tex.x + tex.w, tex.y,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, bl, tex.x, tex.y + tex.h,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
-    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(anchorPoint, br, tex.x + tex.w, tex.y + tex.h,
-                        minZoom, maxZoom, placementZoom, glyphAngle));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tl, symbol.glyphOffset.y, tex.x, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, tr, symbol.glyphOffset.y, tex.x + tex.w, tex.y, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, bl, symbol.glyphOffset.y, tex.x, tex.y + tex.h, sizeData));
+    buffer.vertices.emplace_back(SymbolLayoutAttributes::vertex(labelAnchor.point, br, symbol.glyphOffset.y, tex.x + tex.w, tex.y + tex.h, sizeData));
     
-    sizeBinder.populateVertexVector(feature);
+    // Dynamic/Opacity vertices are initialized so that the vertex count always agrees with
+    // the layout vertex buffer, but they will always be updated before rendering happens
+    auto dynamicVertex = SymbolDynamicLayoutAttributes::vertex(labelAnchor.point, 0);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    buffer.dynamicVertices.emplace_back(dynamicVertex);
+    
+    auto opacityVertex = SymbolOpacityAttributes::vertex(1.0, 1.0);
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
+    buffer.opacityVertices.emplace_back(opacityVertex);
 
     // add the two triangles, referencing the four coordinates we just inserted.
     buffer.triangles.emplace_back(index + 0, index + 1, index + 2);
@@ -596,54 +545,64 @@ void SymbolLayout::addSymbol(Buffer& buffer,
 
     segment.vertexLength += vertexLength;
     segment.indexLength += 6;
+
+    placedSymbol.glyphOffsets.push_back(symbol.glyphOffset.x);
+    
+    return index;
 }
 
-void SymbolLayout::addToDebugBuffers(CollisionTile& collisionTile, SymbolBucket& bucket) {
+void SymbolLayout::addToDebugBuffers(SymbolBucket& bucket) {
 
     if (!hasSymbolInstances()) {
         return;
     }
 
-    const float yStretch = collisionTile.yStretch;
-
-    auto& collisionBox = bucket.collisionBox;
-
     for (const SymbolInstance &symbolInstance : symbolInstances) {
         auto populateCollisionBox = [&](const auto& feature) {
+            SymbolBucket::CollisionBuffer& collisionBuffer = feature.alongLine ?
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionCircle) :
+                static_cast<SymbolBucket::CollisionBuffer&>(bucket.collisionBox);
             for (const CollisionBox &box : feature.boxes) {
                 auto& anchor = box.anchor;
 
-                Point<float> tl{box.x1, box.y1 * yStretch};
-                Point<float> tr{box.x2, box.y1 * yStretch};
-                Point<float> bl{box.x1, box.y2 * yStretch};
-                Point<float> br{box.x2, box.y2 * yStretch};
-                tl = util::matrixMultiply(collisionTile.reverseRotationMatrix, tl);
-                tr = util::matrixMultiply(collisionTile.reverseRotationMatrix, tr);
-                bl = util::matrixMultiply(collisionTile.reverseRotationMatrix, bl);
-                br = util::matrixMultiply(collisionTile.reverseRotationMatrix, br);
-
-                const float maxZoom = util::clamp(zoom + util::log2(box.maxScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
-                const float placementZoom = util::clamp(zoom + util::log2(box.placementScale), util::MIN_ZOOM_F, util::MAX_ZOOM_F);
+                Point<float> tl{box.x1, box.y1};
+                Point<float> tr{box.x2, box.y1};
+                Point<float> bl{box.x1, box.y2};
+                Point<float> br{box.x2, box.y2};
 
                 static constexpr std::size_t vertexLength = 4;
-                static constexpr std::size_t indexLength = 8;
+                const std::size_t indexLength = feature.alongLine ? 6 : 8;
 
-                if (collisionBox.segments.empty() || collisionBox.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
-                    collisionBox.segments.emplace_back(collisionBox.vertices.vertexSize(), collisionBox.lines.indexSize());
+                if (collisionBuffer.segments.empty() || collisionBuffer.segments.back().vertexLength + vertexLength > std::numeric_limits<uint16_t>::max()) {
+                    collisionBuffer.segments.emplace_back(collisionBuffer.vertices.vertexSize(),
+                      feature.alongLine? bucket.collisionCircle.triangles.indexSize() : bucket.collisionBox.lines.indexSize());
                 }
 
-                auto& segment = collisionBox.segments.back();
+                auto& segment = collisionBuffer.segments.back();
                 uint16_t index = segment.vertexLength;
 
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tl, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, tr, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, br, maxZoom, placementZoom));
-                collisionBox.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, bl, maxZoom, placementZoom));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tl));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, tr));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, br));
+                collisionBuffer.vertices.emplace_back(CollisionBoxProgram::vertex(anchor, symbolInstance.anchor.point, bl));
 
-                collisionBox.lines.emplace_back(index + 0, index + 1);
-                collisionBox.lines.emplace_back(index + 1, index + 2);
-                collisionBox.lines.emplace_back(index + 2, index + 3);
-                collisionBox.lines.emplace_back(index + 3, index + 0);
+                // Dynamic vertices are initialized so that the vertex count always agrees with
+                // the layout vertex buffer, but they will always be updated before rendering happens
+                auto dynamicVertex = CollisionBoxDynamicAttributes::vertex(false, false);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+                collisionBuffer.dynamicVertices.emplace_back(dynamicVertex);
+
+                if (feature.alongLine) {
+                    bucket.collisionCircle.triangles.emplace_back(index, index + 1, index + 2);
+                    bucket.collisionCircle.triangles.emplace_back(index, index + 2, index + 3);
+                } else {
+                    bucket.collisionBox.lines.emplace_back(index + 0, index + 1);
+                    bucket.collisionBox.lines.emplace_back(index + 1, index + 2);
+                    bucket.collisionBox.lines.emplace_back(index + 2, index + 3);
+                    bucket.collisionBox.lines.emplace_back(index + 3, index + 0);
+                }
 
                 segment.vertexLength += vertexLength;
                 segment.indexLength += indexLength;

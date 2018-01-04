@@ -4,6 +4,8 @@
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/convert.hpp>
 
+#include <memory>
+
 namespace mbgl {
 namespace gl {
 
@@ -78,6 +80,97 @@ void bindUniform<std::array<uint16_t, 2>>(UniformLocation location, const std::a
 }
 
 // Add more as needed.
+
+#ifndef NDEBUG
+
+ActiveUniforms activeUniforms(ProgramID id) {
+    ActiveUniforms active;
+
+    GLint count;
+    GLint maxLength;
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_UNIFORMS, &count));
+    MBGL_CHECK_ERROR(glGetProgramiv(id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &maxLength));
+
+    auto name = std::make_unique<GLchar[]>(maxLength);
+    GLsizei length;
+    GLint size;
+    GLenum type;
+    for (GLint index = 0; index < count; index++) {
+        MBGL_CHECK_ERROR(
+            glGetActiveUniform(id, index, maxLength, &length, &size, &type, name.get()));
+        active.emplace(
+            std::string{ name.get(), static_cast<size_t>(length) },
+            ActiveUniform{ static_cast<size_t>(size), static_cast<UniformDataType>(type) });
+    }
+
+    return active;
+}
+
+template <>
+bool verifyUniform<float>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::Float);
+    return true;
+}
+
+template <>
+bool verifyUniform<std::array<float, 2>>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::FloatVec2);
+    return true;
+}
+
+template <>
+bool verifyUniform<std::array<float, 3>>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::FloatVec3);
+    return true;
+}
+
+template <>
+bool verifyUniform<std::array<double, 16>>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::FloatMat4);
+    return true;
+}
+
+template <>
+bool verifyUniform<bool>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 &&
+           (uniform.type == UniformDataType::Bool ||
+            uniform.type == UniformDataType::Int ||
+            uniform.type == UniformDataType::Float));
+    return true;
+}
+
+template <>
+bool verifyUniform<uint8_t>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 &&
+           (uniform.type == UniformDataType::Int ||
+            uniform.type == UniformDataType::Float ||
+            uniform.type == UniformDataType::Sampler2D));
+    return true;
+}
+
+template <>
+bool verifyUniform<Color>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::FloatVec4);
+    return true;
+}
+
+template <>
+bool verifyUniform<Size>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 && uniform.type == UniformDataType::FloatVec2);
+    return true;
+}
+
+template <>
+bool verifyUniform<std::array<uint16_t, 2>>(const ActiveUniform& uniform) {
+    assert(uniform.size == 1 &&
+           (uniform.type == UniformDataType::IntVec2 ||
+            uniform.type == UniformDataType::FloatVec2));
+    return true;
+}
+
+// Add more as needed.
+
+#endif
 
 } // namespace gl
 } // namespace mbgl

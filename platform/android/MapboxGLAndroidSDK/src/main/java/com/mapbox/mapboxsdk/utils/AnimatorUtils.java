@@ -10,13 +10,31 @@ import android.support.annotation.Nullable;
 import android.support.v4.view.animation.FastOutSlowInInterpolator;
 import android.view.View;
 
+/**
+ * Animator utility class.
+ */
 public class AnimatorUtils {
 
+  /**
+   * Animate a view from an animator resource.
+   *
+   * @param view        the view to be animated
+   * @param animatorRes the animator resource to be loaded
+   * @param listener    the animator end listener
+   */
   public static void animate(@NonNull final View view, @AnimatorRes int animatorRes,
                              @Nullable OnAnimationEndListener listener) {
     animate(view, animatorRes, -1, listener);
   }
 
+  /**
+   * Animate a view from an animator resource.
+   *
+   * @param view        the view to be animated
+   * @param animatorRes the animator resource to be loaded
+   * @param duration    the duration of the animator
+   * @param listener    the animator end listener
+   */
   public static void animate(final View view, @AnimatorRes int animatorRes, int duration,
                              @Nullable final OnAnimationEndListener listener) {
     if (view == null) {
@@ -43,14 +61,33 @@ public class AnimatorUtils {
     animator.start();
   }
 
+  /**
+   * Animate a view from an animator resource.
+   *
+   * @param view        the view to be animated
+   * @param animatorRes the animator resource to be loaded
+   */
   public static void animate(@NonNull final View view, @AnimatorRes int animatorRes) {
     animate(view, animatorRes, -1);
   }
 
+  /**
+   * Animate a view from an animator resource.
+   *
+   * @param view        the view to be animated
+   * @param animatorRes the animator resource to be loaded
+   * @param duration    the duration of the animator
+   */
   public static void animate(@NonNull final View view, @AnimatorRes int animatorRes, int duration) {
     animate(view, animatorRes, duration, null);
   }
 
+  /**
+   * Animate a view rotation property to a value.
+   *
+   * @param view     the view to be rotated
+   * @param rotation the value to animate to
+   */
   public static void rotate(@NonNull final View view, float rotation) {
     view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     ObjectAnimator rotateAnimator = ObjectAnimator.ofFloat(view, View.ROTATION, view.getRotation(), rotation);
@@ -64,6 +101,12 @@ public class AnimatorUtils {
     rotateAnimator.start();
   }
 
+  /**
+   * Animate a view rotation property by a value.
+   *
+   * @param view       the view to be rotated
+   * @param rotationBy the value to animate by
+   */
   public static void rotateBy(@NonNull final View view, float rotationBy) {
     view.setLayerType(View.LAYER_TYPE_HARDWARE, null);
     view.animate().rotationBy(rotationBy).setInterpolator(new FastOutSlowInInterpolator()).setListener(
@@ -76,6 +119,13 @@ public class AnimatorUtils {
       });
   }
 
+  /**
+   * Animate a view alpha property to a value.
+   *
+   * @param convertView the view to be animated
+   * @param alpha       the value to animate to
+   * @param listener    the animator end listener
+   */
   public static void alpha(@NonNull final View convertView, float alpha,
                            @Nullable final OnAnimationEndListener listener) {
     convertView.setLayerType(View.LAYER_TYPE_HARDWARE, null);
@@ -99,10 +149,19 @@ public class AnimatorUtils {
     rotateAnimator.start();
   }
 
+  /**
+   * Animate a view alpha property to a value.
+   *
+   * @param convertView the view to be animated
+   * @param alpha       the value to animate to
+   */
   public static void alpha(@NonNull final View convertView, float alpha) {
     alpha(convertView, alpha, null);
   }
 
+  /**
+   * An interface definition that is invoked when an animation ends.
+   */
   public interface OnAnimationEndListener {
     void onAnimationEnd();
   }

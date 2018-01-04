@@ -18,9 +18,6 @@ public:
 
     template <class Fn, class... Args>
     static std::shared_ptr<WorkTask> make(Fn&&, Args&&...);
-
-    template <class Fn, class... Args>
-    static std::shared_ptr<WorkTask> makeWithCallback(Fn&&, Args&&...);
 };
 
 } // namespace mbgl

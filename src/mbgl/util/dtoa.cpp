@@ -1,9 +1,17 @@
 #include "dtoa.hpp"
 
+// Clang/C2 on Windows 64-bits can't parse rapidjson's dtoa
+// and it was causing the compiler to crash.
+#if !defined(_WINDOWS)
 #include <rapidjson/internal/dtoa.h>
+#endif
+
+#include <mbgl/util/string.hpp>
 
 namespace mbgl {
 namespace util {
+
+#if !defined(_WINDOWS)
 
 namespace {
 
@@ -100,6 +108,14 @@ std::string dtoa(double value) {
     data.resize(end - data.data());
     return data;
 }
+
+#else
+
+std::string dtoa(double value) {
+    return std::to_string(value);
+}
+
+#endif
 
 } // namespace util
 } // namespace mbgl

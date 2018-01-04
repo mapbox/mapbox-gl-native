@@ -19,13 +19,13 @@ std::string layoutKey(const RenderLayer& layer) {
 
     writer.StartArray();
     writer.Uint(static_cast<uint32_t>(layer.type));
-    writer.String(layer.baseImpl.source);
-    writer.String(layer.baseImpl.sourceLayer);
-    writer.Double(layer.baseImpl.minZoom);
-    writer.Double(layer.baseImpl.maxZoom);
-    writer.Uint(static_cast<uint32_t>(layer.baseImpl.visibility));
-    stringify(writer, layer.baseImpl.filter);
-    layer.baseImpl.stringifyLayout(writer);
+    writer.String(layer.baseImpl->source);
+    writer.String(layer.baseImpl->sourceLayer);
+    writer.Double(layer.baseImpl->minZoom);
+    writer.Double(layer.baseImpl->maxZoom);
+    writer.Uint(static_cast<uint32_t>(layer.baseImpl->visibility));
+    stringify(writer, layer.baseImpl->filter);
+    layer.baseImpl->stringifyLayout(writer);
     writer.EndArray();
 
     return s.GetString();

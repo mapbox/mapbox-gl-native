@@ -13,6 +13,11 @@
 
 namespace mbgl {
 
+    MBGL_DEFINE_ENUM(MGLCirclePitchAlignment, {
+        { MGLCirclePitchAlignmentMap, "map" },
+        { MGLCirclePitchAlignmentViewport, "viewport" },
+    });
+
     MBGL_DEFINE_ENUM(MGLCircleScaleAlignment, {
         { MGLCircleScaleAlignmentMap, "map" },
         { MGLCircleScaleAlignmentViewport, "viewport" },
@@ -185,6 +190,23 @@ namespace mbgl {
     transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
 
     return transition;
+}
+
+- (void)setCirclePitchAlignment:(MGLStyleValue<NSValue *> *)circlePitchAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLCirclePitchAlignment>().toEnumPropertyValue(circlePitchAlignment);
+    self.rawLayer->setCirclePitchAlignment(mbglValue);
+}
+
+- (MGLStyleValue<NSValue *> *)circlePitchAlignment {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getCirclePitchAlignment();
+    if (propertyValue.isUndefined()) {
+        return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLCirclePitchAlignment>().toEnumStyleValue(self.rawLayer->getDefaultCirclePitchAlignment());
+    }
+    return MGLStyleValueTransformer<mbgl::style::AlignmentType, NSValue *, mbgl::style::AlignmentType, MGLCirclePitchAlignment>().toEnumStyleValue(propertyValue);
 }
 
 - (void)setCircleRadius:(MGLStyleValue<NSNumber *> *)circleRadius {
@@ -420,6 +442,16 @@ namespace mbgl {
 @end
 
 @implementation NSValue (MGLCircleStyleLayerAdditions)
+
++ (NSValue *)valueWithMGLCirclePitchAlignment:(MGLCirclePitchAlignment)circlePitchAlignment {
+    return [NSValue value:&circlePitchAlignment withObjCType:@encode(MGLCirclePitchAlignment)];
+}
+
+- (MGLCirclePitchAlignment)MGLCirclePitchAlignmentValue {
+    MGLCirclePitchAlignment circlePitchAlignment;
+    [self getValue:&circlePitchAlignment];
+    return circlePitchAlignment;
+}
 
 + (NSValue *)valueWithMGLCircleScaleAlignment:(MGLCircleScaleAlignment)circleScaleAlignment {
     return [NSValue value:&circleScaleAlignment withObjCType:@encode(MGLCircleScaleAlignment)];

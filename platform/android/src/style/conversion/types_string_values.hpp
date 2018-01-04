@@ -109,6 +109,41 @@ namespace conversion {
         }
     }
 
+    // icon-anchor
+    inline std::string toString(mbgl::style::SymbolAnchorType value) {
+        switch (value) {
+          case mbgl::style::SymbolAnchorType::Center:
+            return "center";
+            break;
+          case mbgl::style::SymbolAnchorType::Left:
+            return "left";
+            break;
+          case mbgl::style::SymbolAnchorType::Right:
+            return "right";
+            break;
+          case mbgl::style::SymbolAnchorType::Top:
+            return "top";
+            break;
+          case mbgl::style::SymbolAnchorType::Bottom:
+            return "bottom";
+            break;
+          case mbgl::style::SymbolAnchorType::TopLeft:
+            return "top-left";
+            break;
+          case mbgl::style::SymbolAnchorType::TopRight:
+            return "top-right";
+            break;
+          case mbgl::style::SymbolAnchorType::BottomLeft:
+            return "bottom-left";
+            break;
+          case mbgl::style::SymbolAnchorType::BottomRight:
+            return "bottom-right";
+            break;
+          default:
+            throw std::runtime_error("Not implemented");
+        }
+    }
+
     // text-justify
     inline std::string toString(mbgl::style::TextJustifyType value) {
         switch (value) {
@@ -120,41 +155,6 @@ namespace conversion {
             break;
           case mbgl::style::TextJustifyType::Right:
             return "right";
-            break;
-          default:
-            throw std::runtime_error("Not implemented");
-        }
-    }
-
-    // text-anchor
-    inline std::string toString(mbgl::style::TextAnchorType value) {
-        switch (value) {
-          case mbgl::style::TextAnchorType::Center:
-            return "center";
-            break;
-          case mbgl::style::TextAnchorType::Left:
-            return "left";
-            break;
-          case mbgl::style::TextAnchorType::Right:
-            return "right";
-            break;
-          case mbgl::style::TextAnchorType::Top:
-            return "top";
-            break;
-          case mbgl::style::TextAnchorType::Bottom:
-            return "bottom";
-            break;
-          case mbgl::style::TextAnchorType::TopLeft:
-            return "top-left";
-            break;
-          case mbgl::style::TextAnchorType::TopRight:
-            return "top-right";
-            break;
-          case mbgl::style::TextAnchorType::BottomLeft:
-            return "bottom-left";
-            break;
-          case mbgl::style::TextAnchorType::BottomRight:
-            return "bottom-right";
             break;
           default:
             throw std::runtime_error("Not implemented");
@@ -199,6 +199,20 @@ namespace conversion {
             return "map";
             break;
           case mbgl::style::CirclePitchScaleType::Viewport:
+            return "viewport";
+            break;
+          default:
+            throw std::runtime_error("Not implemented");
+        }
+    }
+
+    // anchor
+    inline std::string toString(mbgl::style::LightAnchorType value) {
+        switch (value) {
+          case mbgl::style::LightAnchorType::Map:
+            return "map";
+            break;
+          case mbgl::style::LightAnchorType::Viewport:
             return "viewport";
             break;
           default:

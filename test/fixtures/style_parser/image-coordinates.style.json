@@ -1,0 +1,14 @@
+{
+  "version": 8,
+  "center" : [ 75.123, 81.123],
+  "sources": {
+    "image": {
+      "type": "image",
+      "url": "local://0.png",
+      "coordinates": [
+        [ 12.2344, 87.23434],
+	[-12.234, 12.41242]
+      ]
+    }
+  }
+}

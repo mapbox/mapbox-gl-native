@@ -148,7 +148,13 @@ global.mbglTestValue = function (property, layerType) {
             if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
                 type = 'Alignment';
             }
+            if (/^(text|icon)-anchor$/.test(originalPropertyName(property))) {
+                type = 'SymbolAnchor'
+            }
             let value = camelize(_.last(_.keys(property.values)));
+            if (property['light-property']) {
+                return `mbgl::style::Light${type}Type::${value}`;
+            }
             return `mbgl::style::${type}Type::${value}`;
         }
         case 'color':
@@ -225,6 +231,9 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     let doc = property.doc.replace(/`([^`]+?)` is set to `([^`]+?)`/g, function (m, peerPropertyName, propertyValue, offset, str) {
         let otherProperty = camelizeWithLeadingLowercase(peerPropertyName);
         let otherValue = objCType(layerType, peerPropertyName) + camelize(propertyValue);
+        if (property.type == 'array' && kind == 'light') {
+            otherValue = propertyValue;
+        }
         return '`' + `${otherProperty}` + '` is set to `' + `${otherValue}` + '`';
     });
     // Match references to our own property values.
@@ -256,7 +265,7 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     if (kind !== 'enum') {
         if ('default' in property) {
             doc += `\n\nThe default value of this property is ${propertyDefault(property, layerType)}.`;
-            if (!property.required) {
+            if (!property.required && kind != 'light') {
                 doc += ' Set this property to `nil` to reset it to the default value.';
             }
         }
@@ -348,6 +357,8 @@ global.describeValue = function (value, property, layerType) {
                 let objCType = global.objCType(layerType, property.name);
                 return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
               }).join(separator);
+            } else if (property['light-property']) {
+              displayValue = `\`${prefix}Light${camelize(property.name)}${camelize(value)}\``;
             } else {
               let objCType = global.objCType(layerType, property.name);
               displayValue = `\`${objCType}${camelize(value)}\``;
@@ -382,6 +393,8 @@ global.describeValue = function (value, property, layerType) {
                 case 'offset':
                 case 'translate':
                     return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} rightward and ${value[1]}${units} downward`;
+                case 'position':
+                    return 'an `MGLSphericalPosition` struct set to' + ` ${value[0]} radial, ${value[1]} azimuthal and ${value[2]} polar`;
                 default:
                     return 'the array `' + value.join('`, `') + '`';
             }
@@ -418,6 +431,7 @@ global.propertyType = function (property) {
                     return 'NSArray<NSString *> *';
                 case 'padding':
                     return 'NSValue *';
+                case 'position':
                 case 'offset':
                 case 'translate':
                     return 'NSValue *';
@@ -457,6 +471,8 @@ global.valueTransformerArguments = function (property) {
                     return ['std::vector<std::string>', objCType, 'std::string'];
                 case 'padding':
                     return ['std::array<float, 4>', objCType];
+                case 'position':
+                    return ['mbgl::style::Position', objCType];
                 case 'offset':
                 case 'translate':
                     return ['std::array<float, 2>', objCType];
@@ -478,11 +494,17 @@ global.mbglType = function(property) {
             return 'std::string';
         case 'enum': {
             let type = camelize(originalPropertyName(property));
+            if (property['light-property']) {
+                return `mbgl::style::Light${type}Type`;
+            }
             if (/-translate-anchor$/.test(originalPropertyName(property))) {
                 type = 'TranslateAnchor';
             }
             if (/-(rotation|pitch)-alignment$/.test(originalPropertyName(property))) {
                 type = 'Alignment';
+            }
+            if (/^(text|icon)-anchor$/.test(originalPropertyName(property))) {
+                type = 'SymbolAnchor'
             }
             return `mbgl::style::${type}Type`;
         }
@@ -499,6 +521,8 @@ global.mbglType = function(property) {
                 case 'offset':
                 case 'translate':
                     return 'std::array<float, 2>';
+                case 'position':
+                    return 'mbgl::style::Position';
                 default:
                     throw new Error(`unknown array type for ${property.name}`);
             }
@@ -519,11 +543,31 @@ global.setSourceLayer = function() {
     return `_layer->setSourceLayer(sourceLayer.UTF8String);`
 };
 
+const lightProperties = Object.keys(spec['light']).reduce((memo, name) => {
+  var property = spec['light'][name];
+  property.name = name;
+  property['light-property'] = true;
+  memo.push(property);
+  return memo;
+}, []);
+
+const lightDoc = spec['light-cocoa-doc'];
+const lightType = 'light';
+
 const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.ejs', 'utf8'), { strict: true });
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
-const guideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
+const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
 const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
+const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
+
+const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
+const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});
+const testLight = ejs.compile(fs.readFileSync('platform/darwin/test/MGLLightTest.mm.ejs', 'utf8'), { strict: true});
+fs.writeFileSync(`platform/darwin/src/MGLLight.h`, duplicatePlatformDecls(lightH({ properties: lightProperties, doc: lightDoc, type: lightType })));
+fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, doc: lightDoc, type: lightType }));
+fs.writeFileSync(`platform/darwin/test/MGLLightTest.mm`, testLight({ properties: lightProperties, doc: lightDoc, type: lightType }));
+
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
     const layoutProperties = Object.keys(spec[`layout_${layerType}`]).reduce((memo, name) => {
@@ -610,10 +654,10 @@ while ((match = exampleRegex.exec(examplesSrc)) !== null) {
     let testMethodName = match[1],
         indentation = match[2],
         exampleCode = match[3];
-    
+
     // Trim leading whitespace from the example code.
     exampleCode = exampleCode.replace(new RegExp('^' + indentation, 'gm'), '');
-    
+
     examples[testMethodName] = exampleCode;
 }
 
@@ -625,22 +669,22 @@ global.guideExample = function (guide, exampleId, os) {
         console.error(`MGLDocumentationExampleTests.test${testMethodName}() not found.`);
         process.exit(1);
     }
-    
+
     // Resolve conditional compilation blocks.
     example = example.replace(/^(\s*)#if\s+os\((iOS|macOS)\)\n([^]*?)(?:^\1#else\n([^]*?))?^\1#endif\b\n?/gm,
                               function (m, indentation, ifOs, ifCase, elseCase) {
       return (os === ifOs ? ifCase : elseCase).replace(new RegExp('^    ', 'gm'), '');
     }).replace(/\n$/, '');
-    
+
     return '```swift\n' + example + '\n```';
 };
 
-fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, guideMD({
+fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'iOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, guideMD({
+fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'macOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
@@ -649,5 +693,11 @@ fs.writeFileSync(`platform/ios/docs/guides/Using Style Functions at Runtime.md`,
     os: 'iOS',
 }));
 fs.writeFileSync(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+    os: 'macOS',
+}));
+fs.writeFileSync(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({
+    os: 'iOS',
+}));
+fs.writeFileSync(`platform/macos/docs/guides/Tile URL Templates.md`, templatesMD({
     os: 'macOS',
 }));

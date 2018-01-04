@@ -16,7 +16,7 @@
 
 namespace mbgl {
 
-class SpriteAtlasElement;
+class ImagePosition;
 class UnwrappedTileID;
 class TransformState;
 template <class> class Faded;
@@ -30,8 +30,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(float,    u_height_factor);
 
 struct FillExtrusionLayoutAttributes : gl::Attributes<
     attributes::a_pos,
-    attributes::a_normal,
-    attributes::a_edgedistance>
+    attributes::a_normal_ed>
 {};
 
 struct FillExtrusionUniforms : gl::Uniforms<
@@ -55,6 +54,7 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_pattern_size_b,
     uniforms::u_scale_a,
     uniforms::u_scale_b,
+    uniforms::u_texsize,
     uniforms::u_mix,
     uniforms::u_image,
     uniforms::u_pixel_coord_upper,
@@ -66,8 +66,9 @@ struct FillExtrusionPatternUniforms : gl::Uniforms<
     uniforms::u_lightintensity>
 {
     static Values values(mat4,
-                         const SpriteAtlasElement&,
-                         const SpriteAtlasElement&,
+                         Size atlasSize,
+                         const ImagePosition&,
+                         const ImagePosition&,
                          const Faded<std::string>&,
                          const UnwrappedTileID&,
                          const TransformState&,
@@ -98,12 +99,9 @@ public:
                 // We pack a bool (`t`) into the x component indicating whether it is an upper or lower vertex
                 static_cast<int16_t>(floor(nx * factor) * 2 + t),
                 static_cast<int16_t>(ny * factor * 2),
-                static_cast<int16_t>(nz * factor * 2)
-                
-            }},
-            {{
+                static_cast<int16_t>(nz * factor * 2),
                 // The edgedistance attribute is used for wrapping fill_extrusion patterns
-                e
+                static_cast<int16_t>(e)
             }}
         };
     }

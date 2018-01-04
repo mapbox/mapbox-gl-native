@@ -108,95 +108,12 @@ MGL_EXPORT
  Returns a raster source initialized an identifier, tile URL templates, and
  options.
 
+ Tile URL templates are strings that specify the URLs of the raster tile images
+ to load. See the “<a href="../tile-url-templates.html">Tile URL Templates</a>”
+ guide for information about the format of a tile URL template.
+
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
-
- #### Tile URL templates
-
- Tile URL templates are strings that specify the URLs of the tile images to
- load. Each template resembles an absolute URL, but with any number of
- placeholder strings that the source evaluates based on the tile it needs to
- load. For example:
-
- <ul>
- <li><code>http://www.example.com/tiles/{z}/{x}/{y}.pbf</code> could be
-    evaluated as <code>http://www.example.com/tiles/14/6/9.pbf</code>.</li>
- <li><code>http://www.example.com/tiles/{z}/{x}/{y}{ratio}.png</code> could be
-    evaluated as <code>http://www.example.com/tiles/14/6/9@2x.png</code>.</li>
- </ul>
-
- Tile sources support the following placeholder strings in tile URL templates,
- all of which are optional:
-
- <table>
- <thead>
- <tr><th>Placeholder string</th><th>Description</th></tr>
- </thead>
- <tbody>
- <tr>
-     <td><code>{x}</code></td>
-     <td>The index of the tile along the map’s x axis according to Spherical
-        Mercator projection. If the value is 0, the tile’s left edge corresponds
-        to the 180th meridian west. If the value is 2<sup><var>z</var></sup>−1,
-        the tile’s right edge corresponds to the 180th meridian east.</td>
- </tr>
- <tr>
-     <td><code>{y}</code></td>
-     <td>The index of the tile along the map’s y axis according to Spherical
-        Mercator projection. If the value is 0, the tile’s tile edge corresponds
-        to arctan(sinh(π)), or approximately 85.0511 degrees north. If the value
-        is 2<sup><var>z</var></sup>−1, the tile’s bottom edge corresponds to
-        −arctan(sinh(π)), or approximately 85.0511 degrees south. The y axis is
-        inverted if the <code>options</code> parameter contains
-        <code>MGLTileSourceOptionTileCoordinateSystem</code> with a value of
-        <code>MGLTileCoordinateSystemTMS</code>.</td>
- </tr>
- <tr>
-     <td><code>{z}</code></td>
-     <td>The tile’s zoom level. At zoom level 0, each tile covers the entire
-        world map; at zoom level 1, it covers ¼ of the world; at zoom level 2,
-        <sup>1</sup>⁄<sub>16</sub> of the world, and so on. For tiles loaded by
-        a <code>MGLRasterSource</code> object, whether the tile zoom level
-        matches the map’s current zoom level depends on the value of the
-        source’s tile size as specified in the
-        <code>MGLTileSourceOptionTileSize</code> key of the
-        <code>options</code> parameter.</td>
- </tr>
- <tr>
-     <td><code>{bbox-epsg-3857}</code></td>
-     <td>The tile’s bounding box, expressed as a comma-separated list of the
-        tile’s western, southern, eastern, and northern extents according to
-        Spherical Mercator (EPSG:3857) projection. The bounding box is typically
-        used with map services conforming to the
-        <a href="http://www.opengeospatial.org/standards/wms">Web Map Service</a>
-        protocol.</td>
- </tr>
- <tr>
-     <td><code>{quadkey}</code></td>
-     <td>A quadkey indicating both the tile’s location and its zoom level. The
-        quadkey is typically used with
-        <a href="https://msdn.microsoft.com/en-us/library/bb259689.aspx">Bing Maps</a>.
-     </td>
- </tr>
- <tr>
-     <td><code>{ratio}</code></td>
-     <td>A suffix indicating the resolution of the tile image. The suffix is the
-        empty string for standard resolution displays and <code>@2x</code> for
-        Retina displays, including displays for which
-        <code>NSScreen.backingScaleFactor</code> or <code>UIScreen.scale</code>
-        is 3.</td>
- </tr>
- <tr>
-     <td><code>{prefix}</code></td>
-     <td>Two hexadecimal digits chosen such that each visible tile has a
-        different prefix. The prefix is typically used for domain sharding.</td>
- </tr>
- </tbody>
- </table>
-
- For more information about the `{x}`, `{y}`, and `{z}` placeholder strings,
- consult the
- <a href="https://wiki.openstreetmap.org/wiki/Slippy_map_tilenames">OpenStreetMap Wiki</a>.
 
  @param identifier A string that uniquely identifies the source in the style to
     which it is added.

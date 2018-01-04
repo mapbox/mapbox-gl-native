@@ -3,6 +3,7 @@
 #include "conversion.hpp"
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/color.hpp>
 #include <jni/jni.hpp>
 
 #include <string>

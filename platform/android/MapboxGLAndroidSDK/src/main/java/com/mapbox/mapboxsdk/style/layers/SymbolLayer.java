@@ -8,8 +8,6 @@ import android.support.annotation.UiThread;
 
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
-import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
-
 /**
  * An icon or a text label.
  *
@@ -249,6 +247,26 @@ public class SymbolLayer extends Layer {
   @SuppressWarnings("unchecked")
   public PropertyValue<Float[]> getIconOffset() {
     return (PropertyValue<Float[]>) new PropertyValue("icon-offset", nativeGetIconOffset());
+  }
+
+  /**
+   * Get the IconAnchor property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getIconAnchor() {
+    return (PropertyValue<String>) new PropertyValue("icon-anchor", nativeGetIconAnchor());
+  }
+
+  /**
+   * Get the IconPitchAlignment property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getIconPitchAlignment() {
+    return (PropertyValue<String>) new PropertyValue("icon-pitch-alignment", nativeGetIconPitchAlignment());
   }
 
   /**
@@ -890,6 +908,10 @@ public class SymbolLayer extends Layer {
   private native Object nativeGetIconKeepUpright();
 
   private native Object nativeGetIconOffset();
+
+  private native Object nativeGetIconAnchor();
+
+  private native Object nativeGetIconPitchAlignment();
 
   private native Object nativeGetTextPitchAlignment();
 

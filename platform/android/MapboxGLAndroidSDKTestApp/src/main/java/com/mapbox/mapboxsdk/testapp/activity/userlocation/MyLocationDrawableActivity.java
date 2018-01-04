@@ -11,11 +11,9 @@ import android.view.ViewGroup;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.services.android.telemetry.location.LocationEngineListener;
 
@@ -31,13 +29,10 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
   protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_my_location_customization);
-
     findViewById(R.id.progress).setVisibility(View.GONE);
 
     MapboxMapOptions mapboxMapOptions = new MapboxMapOptions();
     mapboxMapOptions.styleUrl(Style.MAPBOX_STREETS);
-
-    // configure MyLocationView drawables
     mapboxMapOptions.myLocationForegroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
     mapboxMapOptions.myLocationBackgroundDrawable(ContextCompat.getDrawable(this, R.drawable.ic_android));
     mapboxMapOptions.myLocationForegroundTintColor(Color.GREEN);
@@ -45,38 +40,24 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
     mapboxMapOptions.myLocationBackgroundPadding(new int[] {0, 0,
       (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding),
       (int) getResources().getDimension(R.dimen.locationview_background_drawable_padding)});
-
     mapboxMapOptions.myLocationAccuracyTint(Color.RED);
     mapboxMapOptions.myLocationAccuracyAlpha(155);
 
     mapView = new MapView(this, mapboxMapOptions);
     mapView.setId(R.id.mapView);
-    ViewGroup parent = (ViewGroup) findViewById(R.id.container);
+    ViewGroup parent = (ViewGroup) findViewById(android.R.id.content);
     parent.addView(mapView);
 
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap map) {
-        mapboxMap = map;
-        toggleGps(true);
-      }
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
+      toggleGps(true);
     });
   }
 
   @Override
   protected void enableLocation(boolean enabled) {
-    if (enabled) {
-      mapboxMap.setMyLocationEnabled(true);
-      Location location = mapboxMap.getMyLocation();
-      if (location != null) {
-        onLocationChanged(location);
-      } else {
-        LocationSource.getLocationEngine(this).addLocationEngineListener(this);
-      }
-    } else {
-      mapboxMap.setMyLocationEnabled(false);
-    }
+    mapboxMap.setMyLocationEnabled(enabled);
   }
 
   @Override
@@ -86,9 +67,7 @@ public class MyLocationDrawableActivity extends BaseLocationActivity implements 
 
   @Override
   public void onLocationChanged(Location location) {
-    if (mapboxMap != null) {
-      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 14));
-    }
+    mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 14));
   }
 
   @Override

@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.offline;
 
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -53,18 +52,8 @@ public class DeleteRegionActivity extends AppCompatActivity implements AdapterVi
     input.setText(metadata);
     builder.setView(input);
 
-    builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        delete(region);
-      }
-    });
-    builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        dialog.cancel();
-      }
-    });
+    builder.setPositiveButton("OK", (dialog, which) -> delete(region));
+    builder.setNegativeButton("Cancel", (dialog, which) -> dialog.cancel());
 
     builder.show();
   }

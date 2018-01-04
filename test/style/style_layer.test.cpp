@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_layer_observer.hpp>
 #include <mbgl/test/stub_file_source.hpp>
-#include <mbgl/style/style.hpp>
+#include <mbgl/style/style_impl.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/background_layer_impl.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
@@ -28,15 +28,6 @@ using namespace mbgl::style;
 
 namespace {
 
-template <class T, class... Params> void testClone(Params... params) {
-    auto layer = std::make_unique<T>(std::forward<Params>(params)...);
-    auto clone = layer->baseImpl->clone();
-    EXPECT_NE(layer.get(), clone.get());
-    EXPECT_TRUE(reinterpret_cast<typename T::Impl*>(clone->baseImpl.get()));
-    layer->impl->id = "test";
-    EXPECT_EQ("test", layer->baseImpl->clone()->getID());
-}
-
 const auto color = Color { 1, 0, 0, 1 };
 const auto opacity = 1.0f;
 const auto radius = 1.0f;
@@ -60,16 +51,6 @@ const auto contrast = 1.0f;
 const auto duration = 1.0f;
 
 } // namespace
-
-TEST(Layer, Clone) {
-    testClone<BackgroundLayer>("background");
-    testClone<CircleLayer>("circle", "source");
-    testClone<CustomLayer>("custom", [](void*){}, [](void*, const CustomLayerRenderParameters&){}, [](void*){}, nullptr),
-    testClone<FillLayer>("fill", "source");
-    testClone<LineLayer>("line", "source");
-    testClone<RasterLayer>("raster", "source");
-    testClone<SymbolLayer>("symbol", "source");
-}
 
 TEST(Layer, BackgroundProperties) {
     auto layer = std::make_unique<BackgroundLayer>("background");
@@ -222,11 +203,11 @@ TEST(Layer, RasterProperties) {
 TEST(Layer, Observer) {
     auto layer = std::make_unique<LineLayer>("line", "source");
     StubLayerObserver observer;
-    layer->baseImpl->setObserver(&observer);
+    layer->setObserver(&observer);
 
     // Notifies observer on filter change.
     bool filterChanged = false;
-    observer.layerFilterChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         filterChanged = true;
     };
@@ -235,7 +216,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on visibility change.
     bool visibilityChanged = false;
-    observer.layerVisibilityChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         visibilityChanged = true;
     };
@@ -244,7 +225,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on paint property change.
     bool paintPropertyChanged = false;
-    observer.layerPaintPropertyChanged = [&] (Layer& layer_) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         paintPropertyChanged = true;
     };
@@ -253,7 +234,7 @@ TEST(Layer, Observer) {
 
     // Notifies observer on layout property change.
     bool layoutPropertyChanged = false;
-    observer.layerLayoutPropertyChanged = [&] (Layer& layer_, const char *) {
+    observer.layerChanged = [&] (Layer& layer_) {
         EXPECT_EQ(layer.get(), &layer_);
         layoutPropertyChanged = true;
     };
@@ -262,16 +243,28 @@ TEST(Layer, Observer) {
 
     // Does not notify observer on no-op visibility change.
     visibilityChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        visibilityChanged = true;
+    };
     layer->setVisibility(VisibilityType::None);
     EXPECT_FALSE(visibilityChanged);
 
     // Does not notify observer on no-op paint property change.
     paintPropertyChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        paintPropertyChanged = true;
+    };
     layer->setLineColor(color);
     EXPECT_FALSE(paintPropertyChanged);
 
     // Does not notify observer on no-op layout property change.
     layoutPropertyChanged = false;
+    observer.layerChanged = [&] (Layer& layer_) {
+        EXPECT_EQ(layer.get(), &layer_);
+        layoutPropertyChanged = true;
+    };
     layer->setLineCap(lineCap);
     EXPECT_FALSE(layoutPropertyChanged);
 }
@@ -282,8 +275,8 @@ TEST(Layer, DuplicateLayer) {
     // Setup style
     ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
-    Style style { threadPool, fileSource, 1.0 };
-    style.setJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+    Style::Impl style { threadPool, fileSource, 1.0 };
+    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
 
     // Add initial layer
     style.addLayer(std::make_unique<LineLayer>("line", "unusedsource"));

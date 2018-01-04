@@ -17,6 +17,7 @@
 
     <TextView
         android:id="@+id/countView"
+        android:textIsSelectable="false"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@id/toolbar"

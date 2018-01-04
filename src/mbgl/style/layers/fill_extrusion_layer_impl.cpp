@@ -1,11 +1,14 @@
 #include <mbgl/style/layers/fill_extrusion_layer_impl.hpp>
-#include <mbgl/renderer/render_fill_extrusion_layer.hpp>
 
 namespace mbgl {
 namespace style {
 
-std::unique_ptr<RenderLayer> FillExtrusionLayer::Impl::createRenderLayer() const {
-    return std::make_unique<RenderFillExtrusionLayer>(*this);
+bool FillExtrusionLayer::Impl::hasLayoutDifference(const Layer::Impl& other) const {
+    assert(dynamic_cast<const FillExtrusionLayer::Impl*>(&other));
+    const auto& impl = static_cast<const style::FillExtrusionLayer::Impl&>(other);
+    return filter     != impl.filter ||
+           visibility != impl.visibility ||
+           paint.hasDataDrivenPropertyDifference(impl.paint);
 }
 
 } // namespace style

@@ -19,7 +19,7 @@
 
     XCTAssertEqualObjects([@"Improve the map" mgl_titleCasedStringWithLocale:locale], @"Improve the Map");
     XCTAssertEqualObjects([@"Improve The Map" mgl_titleCasedStringWithLocale:locale], @"Improve The Map");
-
+    
     XCTAssertEqualObjects([@"Improve a map" mgl_titleCasedStringWithLocale:locale], @"Improve a Map");
     XCTAssertEqualObjects([@"Improve A Map" mgl_titleCasedStringWithLocale:locale], @"Improve A Map");
 

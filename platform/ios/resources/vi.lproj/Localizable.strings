@@ -1,4 +1,4 @@
-﻿/* Accessibility hint */
+/* Accessibility hint */
 "ANNOTATION_A11Y_HINT" = "Hiển thị thêm thông tin";
 
 /* No comment provided by engineer. */
@@ -53,10 +53,10 @@
 "PARSE_STYLE_FAILED_DESC" = "Bản đồ bị thất bại khi tải vì bảng kiểu bị hỏng.";
 
 /* Action sheet title */
-"SDK_NAME" = "Mapbox iOS SDK";
+"SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox iOS SDK mới ra phiên bản %@:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS mới ra phiên bản %@:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Bản đồ bị thất bại khi tải vì không tìm thấy bảng kiểu hoặc bảng kiểu không tương thích.";

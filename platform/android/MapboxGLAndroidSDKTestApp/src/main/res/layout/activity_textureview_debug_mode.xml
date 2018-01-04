@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drawer_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/coordinator_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <com.mapbox.mapboxsdk.maps.MapView
+            android:id="@+id/mapView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:mapbox_renderTextureMode="true"
+            app:mapbox_uiAttribution="false"
+            app:mapbox_uiCompass="false"
+            app:mapbox_uiLogo="false"/>
+
+        <TextView
+            android:id="@+id/textZoom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_margin="8dp"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            app:layout_anchor="@id/bottom_sheet"
+            app:layout_anchorGravity="bottom|start"/>
+
+        <TextView
+            android:id="@+id/fpsView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_margin="8dp"
+            android:textIsSelectable="true"
+            android:textSize="14sp"
+            app:layout_anchor="@id/textZoom"
+            app:layout_anchorGravity="top"/>
+
+        <android.support.v4.widget.NestedScrollView
+            android:id="@+id/bottom_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="250dp"
+            android:background="@color/white"
+            android:visibility="invisible"
+            app:behavior_hideable="true"
+            app:layout_behavior="android.support.design.widget.BottomSheetBehavior"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/fabDebug"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|end"
+            android:layout_marginBottom="82dp"
+            android:layout_marginEnd="@dimen/fab_margin"
+            android:layout_marginRight="@dimen/fab_margin"
+            android:src="@drawable/ic_refresh"
+            app:backgroundTint="@color/accent"
+            app:layout_anchor="@+id/fabStyles"
+            app:layout_anchorGravity="top"/>
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@id/fabStyles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="@dimen/fab_margin"
+            android:src="@drawable/ic_layers"
+            app:backgroundTint="@color/primary"
+            app:layout_anchor="@id/bottom_sheet"
+            app:layout_anchorGravity="bottom|end"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.NavigationView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:background="@android:color/white">
+
+        <ListView
+            android:id="@+id/listView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+    </android.support.design.widget.NavigationView>
+
+</android.support.v4.widget.DrawerLayout>

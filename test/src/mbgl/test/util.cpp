@@ -1,13 +1,8 @@
 #include <mbgl/test/util.hpp>
 
-#include <mbgl/map/map.hpp>
-#include <mbgl/gl/offscreen_view.hpp>
-#include <mbgl/gl/headless_display.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/io.hpp>
-#include <mbgl/util/chrono.hpp>
-#include <mbgl/util/run_loop.hpp>
 
 #include <mapbox/pixelmatch.hpp>
 
@@ -97,24 +92,6 @@ Server::~Server() {
     if (fd > 0) {
         close(fd);
     }
-}
-
-std::shared_ptr<HeadlessDisplay> sharedDisplay() {
-    static auto display = std::make_shared<HeadlessDisplay>();
-    return display;
-}
-
-PremultipliedImage render(Map& map, OffscreenView& view) {
-    PremultipliedImage result;
-    map.renderStill(view, [&](std::exception_ptr) {
-        result = view.readStillImage();
-    });
-
-    while (!result.valid()) {
-        util::RunLoop::Get()->runOnce();
-    }
-
-    return result;
 }
 
 void checkImage(const std::string& base,

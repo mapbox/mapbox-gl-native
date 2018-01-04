@@ -1,0 +1,121 @@
+<%
+  const properties = locals.properties;
+  const doc = locals.doc;
+-%>
+// This file is generated. Edit android/platform/scripts/generate-style-code.js, then run `make android-style-code`.
+
+package com.mapbox.mapboxsdk.style.light;
+
+import android.support.annotation.ColorInt;
+import android.support.annotation.NonNull;
+import android.support.annotation.UiThread;
+
+import com.mapbox.mapboxsdk.style.layers.Property;
+import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
+
+/**
+ * The global light source.
+ *
+ * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#light">The online documentation</a>
+ */
+@UiThread
+public class Light {
+
+  private long nativePtr;
+
+  /**
+   * Creates a Light.
+   *
+   * @param nativePtr pointer used by core
+   */
+  public Light(long nativePtr) {
+    this.nativePtr = nativePtr;
+  }
+<% for (const property of properties) { -%>
+<% if (property.name == "position") {-%>
+
+  /**
+   * Set the <%- camelize(property.name) %> property. <%- property.doc %>
+   *
+   * @param position of the light
+   */
+  public void set<%- camelize(property.name) %>(@NonNull Position position) {
+    nativeSet<%- camelize(property.name) %>(position);
+  }
+
+  /**
+   * Get the <%- camelize(property.name) %> property. <%- property.doc %>
+   *
+   * @return <%- property.name %> as Position
+   */
+  public Position get<%- camelize(property.name) %>() {
+    return nativeGet<%- camelize(property.name) %>();
+  }
+<% } else { -%>
+<% if (property.name == "color") {-%>
+
+  /**
+   * Set the <%- camelize(property.name) %> property. <%- property.doc %>
+   *
+   * @param <%- property.name %> as int
+   */
+  public void set<%- camelize(property.name) %>(@ColorInt int <%- property.name %>) {
+    nativeSet<%- camelize(property.name) %>(PropertyFactory.colorToRgbaString(<%- property.name %>));
+  }
+<% } -%>
+
+  /**
+   * Set the <%- camelize(property.name) %> property. <%- property.doc %>
+   *
+   * @param <%- property.name %> as <%- propertyType(property) %>
+   */
+  public void set<%- camelize(property.name) %>(<%- propertyTypeAnnotation(property) %><%- iff(() => propertyTypeAnnotation(property), " ") %><%- propertyJavaType(property) %> <%- property.name %>) {
+    nativeSet<%- camelize(property.name) %>(<%- property.name %>);
+  }
+
+  /**
+   * Get the <%- camelize(property.name) %> property. <%- property.doc %>
+   *
+   * @return <%- property.name %> as <%- propertyType(property) %>
+   */
+  <%- propertyTypeAnnotation(property) %> public <%- propertyJavaType(property) %> get<%- camelize(property.name) %>() {
+    return nativeGet<%- camelize(property.name) %>();
+  }
+<% } -%>
+<% if (property.transition) { -%>
+
+  /**
+   * Get the <%- camelize(property.name) %> property transition options.
+   *
+   * @return transition options for <%- property.name %>
+   */
+  public TransitionOptions get<%- camelize(property.name) %>Transition() {
+    return nativeGet<%- camelize(property.name) %>Transition();
+  }
+
+  /**
+   * Set the <%- camelize(property.name) %> property transition options.
+   *
+   * @param options transition options for <%- property.name %>
+   */
+  public void set<%- camelize(property.name) %>Transition(TransitionOptions options) {
+    nativeSet<%- camelize(property.name) %>Transition(options.getDuration(), options.getDelay());
+  }
+<% } -%>
+<% } -%>
+
+<% for (const property of properties) { -%>
+<% if (property.name == "position") {-%>
+  private native void nativeSet<%- camelize(property.name) %>(Position position);
+  private native Position nativeGet<%- camelize(property.name) %>();
+<% } else { -%>
+  private native void nativeSet<%- camelize(property.name) %>(<%- propertyJavaType(property) -%> <%- property.name %>);
+  private native <%- propertyJavaType(property) -%> nativeGet<%- camelize(property.name) %>();
+<% } -%>
+<% if (property.transition) { -%>
+  private native TransitionOptions nativeGet<%- camelize(property.name) %>Transition();
+  private native void nativeSet<%- camelize(property.name) %>Transition(long duration, long delay);
+<% } -%>
+<% } -%>
+}

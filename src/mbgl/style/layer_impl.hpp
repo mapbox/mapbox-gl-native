@@ -3,13 +3,10 @@
 #include <mbgl/style/layer.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/layer_observer.hpp>
-#include <mbgl/util/noncopyable.hpp>
 
 #include <rapidjson/writer.h>
 #include <rapidjson/stringbuffer.h>
 
-#include <memory>
 #include <string>
 #include <limits>
 
@@ -32,22 +29,19 @@ namespace style {
  */
 class Layer::Impl {
 public:
+    Impl(LayerType, std::string layerID, std::string sourceID);
     virtual ~Impl() = default;
 
-    // Create an identical copy of this layer.
-    virtual std::unique_ptr<Layer> clone() const = 0;
+    Impl& operator=(const Impl&) = delete;
 
-    // Create a layer, copying all properties except id and paint properties from this layer.
-    virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
+    // Returns true buckets if properties affecting layout have changed: i.e. filter,
+    // visibility, layout properties, or data-driven paint properties.
+    virtual bool hasLayoutDifference(const Layer::Impl&) const = 0;
 
     // Utility function for automatic layer grouping.
     virtual void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const = 0;
 
-    virtual std::unique_ptr<RenderLayer> createRenderLayer() const = 0;
-
-    void setObserver(LayerObserver*);
-
-public:
+    const LayerType type;
     std::string id;
     std::string source;
     std::string sourceLayer;
@@ -56,13 +50,8 @@ public:
     float maxZoom = std::numeric_limits<float>::infinity();
     VisibilityType visibility = VisibilityType::Visible;
 
-    LayerObserver nullObserver;
-    LayerObserver* observer = &nullObserver;
-
 protected:
-    Impl() = default;
     Impl(const Impl&) = default;
-    Impl& operator=(const Impl&) = delete;
 };
 
 } // namespace style

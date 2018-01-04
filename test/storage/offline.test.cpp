@@ -4,6 +4,7 @@
 #include <gtest/gtest.h>
 
 using namespace mbgl;
+using SourceType = mbgl::style::SourceType;
 
 static const LatLngBounds sanFrancisco =
     LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
@@ -51,4 +52,12 @@ TEST(OfflineTilePyramidRegionDefinition, TileCoverWrapped) {
 
     EXPECT_EQ((std::vector<CanonicalTileID>{ { 0, 0, 0 } }),
               region.tileCover(SourceType::Vector, 512, { 0, 22 }));
+}
+
+TEST(OfflineTilePyramidRegionDefinition, TileCount) {
+    OfflineTilePyramidRegionDefinition region("", sanFranciscoWrapped, 0, 22, 1.0);
+
+    //These numbers match the count from tileCover().size().
+    EXPECT_EQ(38424u, region.tileCount(SourceType::Vector, 512, { 10, 18 }));
+    EXPECT_EQ(9675240u, region.tileCount(SourceType::Vector, 512, { 3, 22 }));
 }

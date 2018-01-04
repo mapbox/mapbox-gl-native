@@ -5,14 +5,15 @@
 #include <mbgl/gl/context.hpp>
 #include <mbgl/gl/vertex_buffer.hpp>
 #include <mbgl/gl/index_buffer.hpp>
+#include <mbgl/gl/vertex_array.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
 
 #include <mbgl/util/io.hpp>
+#include <mbgl/util/logging.hpp>
 #include <mbgl/programs/binary_program.hpp>
 #include <mbgl/programs/program_parameters.hpp>
 #include <mbgl/shaders/shaders.hpp>
-
 
 #include <string>
 
@@ -33,15 +34,17 @@ public:
         : program(
               context.createProgram(context.createShader(ShaderType::Vertex, vertexSource),
                                     context.createShader(ShaderType::Fragment, fragmentSource))),
-          attributeLocations(Attributes::bindLocations(program)),
-          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))) {
+          uniformsState((context.linkProgram(program), Uniforms::bindLocations(program))),
+          attributeLocations(Attributes::bindLocations(program)) {
+        // Re-link program after manually binding only active attributes in Attributes::bindLocations
+        context.linkProgram(program);
     }
 
     template <class BinaryProgram>
     Program(Context& context, const BinaryProgram& binaryProgram)
         : program(context.createProgram(binaryProgram.format(), binaryProgram.code())),
-          attributeLocations(Attributes::loadNamedLocations(binaryProgram)),
-          uniformsState(Uniforms::loadNamedLocations(binaryProgram)) {
+          uniformsState(Uniforms::loadNamedLocations(binaryProgram)),
+          attributeLocations(Attributes::loadNamedLocations(binaryProgram)) {
     }
     
     static Program createProgram(gl::Context& context,
@@ -49,19 +52,16 @@ public:
                                  const char* name,
                                  const char* vertexSource_,
                                  const char* fragmentSource_) {
+        const std::string vertexSource = shaders::vertexSource(programParameters, vertexSource_);
+        const std::string fragmentSource = shaders::fragmentSource(programParameters, fragmentSource_);
+
 #if MBGL_HAS_BINARY_PROGRAMS
-        if (!programParameters.cacheDir.empty() && context.supportsProgramBinaries()) {
-            const std::string vertexSource =
-                shaders::vertexSource(programParameters, vertexSource_);
-            const std::string fragmentSource =
-                shaders::fragmentSource(programParameters, fragmentSource_);
-            const std::string cachePath =
-                shaders::programCachePath(programParameters, name);
-            const std::string identifier =
-                shaders::programIdentifier(vertexSource, fragmentSource_);
+        optional<std::string> cachePath = programParameters.cachePath(name);
+        if (cachePath && context.supportsProgramBinaries()) {
+            const std::string identifier = shaders::programIdentifier(vertexSource, fragmentSource);
 
             try {
-                if (auto cachedBinaryProgram = util::readFile(cachePath)) {
+                if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
                     const BinaryProgram binaryProgram(std::move(*cachedBinaryProgram));
                     if (binaryProgram.identifier() == identifier) {
                         return Program { context, binaryProgram };
@@ -82,8 +82,8 @@ public:
             try {
                 if (const auto binaryProgram =
                         result.template get<BinaryProgram>(context, identifier)) {
-                    util::write_file(cachePath, binaryProgram->serialize());
-                    Log::Warning(Event::OpenGL, "Caching program in: %s", cachePath.c_str());
+                    util::write_file(*cachePath, binaryProgram->serialize());
+                    Log::Warning(Event::OpenGL, "Caching program in: %s", (*cachePath).c_str());
                 }
             } catch (std::runtime_error& error) {
                 Log::Warning(Event::OpenGL, "Failed to cache program: %s", error.what());
@@ -92,11 +92,9 @@ public:
             return std::move(result);
         }
 #endif
+
         (void)name;
-        return Program {
-            context, shaders::vertexSource(programParameters, vertexSource_),
-            shaders::fragmentSource(programParameters, fragmentSource_)
-        };
+        return Program { context, vertexSource, fragmentSource };
     }
 
     template <class BinaryProgram>
@@ -115,10 +113,12 @@ public:
               DepthMode depthMode,
               StencilMode stencilMode,
               ColorMode colorMode,
-              UniformValues&& uniformValues,
-              AttributeBindings&& attributeBindings,
+              const UniformValues& uniformValues,
+              VertexArray& vertexArray,
+              const AttributeBindings& attributeBindings,
               const IndexBuffer<DrawMode>& indexBuffer,
-              const SegmentVector<Attributes>& segments) {
+              std::size_t indexOffset,
+              std::size_t indexLength) {
         static_assert(std::is_same<Primitive, typename DrawMode::Primitive>::value, "incompatible draw mode");
 
         context.setDrawMode(drawMode);
@@ -128,25 +128,22 @@ public:
 
         context.program = program;
 
-        Uniforms::bind(uniformsState, std::move(uniformValues));
+        Uniforms::bind(uniformsState, uniformValues);
 
-        for (const auto& segment : segments) {
-            segment.bind(context,
-                         indexBuffer.buffer,
-                         attributeLocations,
-                         attributeBindings);
+        vertexArray.bind(context,
+                        indexBuffer.buffer,
+                        Attributes::toBindingArray(attributeLocations, attributeBindings));
 
-            context.draw(drawMode.primitiveType,
-                         segment.indexOffset,
-                         segment.indexLength);
-        }
+        context.draw(drawMode.primitiveType,
+                     indexOffset,
+                     indexLength);
     }
 
 private:
     UniqueProgram program;
 
-    typename Attributes::Locations attributeLocations;
     typename Uniforms::State uniformsState;
+    typename Attributes::Locations attributeLocations;
 };
 
 } // namespace gl

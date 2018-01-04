@@ -1,24 +1,30 @@
 #pragma once
 
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/immutable.hpp>
+
+#include <string>
 
 namespace mbgl {
 namespace style {
 
 class Image {
 public:
-    Image(PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Image(std::string id, PremultipliedImage&&, float pixelRatio, bool sdf = false);
+    Image(const Image&);
 
-    PremultipliedImage image;
+    std::string getID() const;
+
+    const PremultipliedImage& getImage() const;
 
     // Pixel ratio of the sprite image.
-    const float pixelRatio;
+    float getPixelRatio() const;
 
     // Whether this image should be interpreted as a signed distance field icon.
-    const bool sdf;
+    bool isSdf() const;
 
-    float getWidth() const { return image.size.width / pixelRatio; }
-    float getHeight() const { return image.size.height / pixelRatio; }
+    class Impl;
+    Immutable<Impl> baseImpl;
 };
 
 } // namespace style

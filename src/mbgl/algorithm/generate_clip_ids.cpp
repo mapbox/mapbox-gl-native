@@ -31,14 +31,14 @@ bool ClipIDGenerator::Leaf::operator==(const Leaf& other) const {
     return children == other.children;
 }
 
-std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getStencils() const {
-    std::map<UnwrappedTileID, ClipID> stencils;
+std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getClipIDs() const {
+    std::map<UnwrappedTileID, ClipID> clipIDs;
 
     // Merge everything.
     for (auto& pair : pool) {
         auto& id = pair.first;
         auto& leaf = pair.second;
-        auto res = stencils.emplace(id, leaf.clip);
+        auto res = clipIDs.emplace(id, leaf.clip);
         if (!res.second) {
             // Merge with the existing ClipID when there was already an element with the
             // same tile ID.
@@ -46,14 +46,14 @@ std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getStencils() const {
         }
     }
 
-    for (auto it = stencils.begin(); it != stencils.end(); ++it) {
+    for (auto it = clipIDs.begin(); it != clipIDs.end(); ++it) {
         auto& childId = it->first;
         auto& childClip = it->second;
 
         // Loop through all preceding stencils, and find all parents.
 
         for (auto parentIt = std::reverse_iterator<decltype(it)>(it);
-             parentIt != stencils.rend(); ++parentIt) {
+             parentIt != clipIDs.rend(); ++parentIt) {
             auto& parentId = parentIt->first;
             if (childId.isChildOf(parentId)) {
                 // Once we have a parent, we add the bits  that this ID hasn't set yet.
@@ -66,11 +66,11 @@ std::map<UnwrappedTileID, ClipID> ClipIDGenerator::getStencils() const {
     }
 
     // Remove tiles that are entirely covered by children.
-    util::erase_if(stencils, [&](const auto& stencil) {
-        return algorithm::coveredByChildren(stencil.first, stencils);
+    util::erase_if(clipIDs, [&](const auto& stencil) {
+        return algorithm::coveredByChildren(stencil.first, clipIDs);
     });
 
-    return stencils;
+    return clipIDs;
 }
 
 } // namespace algorithm

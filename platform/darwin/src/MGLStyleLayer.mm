@@ -1,7 +1,7 @@
 #import "MGLStyleLayer_Private.h"
-#import "MGLMapView_Private.h"
+#import "MGLStyle_Private.h"
 
-#include <mbgl/map/map.hpp>
+#include <mbgl/style/style.hpp>
 #include <mbgl/style/layer.hpp>
 
 @interface MGLStyleLayer ()
@@ -30,26 +30,26 @@
     return self;
 }
 
-- (void)addToMapView:(MGLMapView *)mapView belowLayer:(MGLStyleLayer *)otherLayer
+- (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer
 {
     if (_pendingLayer == nullptr) {
         [NSException raise:@"MGLRedundantLayerException"
             format:@"This instance %@ was already added to %@. Adding the same layer instance " \
-                    "to the style more than once is invalid.", self, mapView.style];
+                    "to the style more than once is invalid.", self, style];
     }
 
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
-        mapView.mbglMap->addLayer(std::move(_pendingLayer), belowLayerId);
+        style.rawStyle->addLayer(std::move(_pendingLayer), belowLayerId);
     } else {
-        mapView.mbglMap->addLayer(std::move(_pendingLayer));
+        style.rawStyle->addLayer(std::move(_pendingLayer));
     }
 }
 
-- (void)removeFromMapView:(MGLMapView *)mapView
+- (void)removeFromStyle:(MGLStyle *)style
 {
-    if (self.rawLayer == mapView.mbglMap->getLayer(self.identifier.UTF8String)) {
-        _pendingLayer = mapView.mbglMap->removeLayer(self.identifier.UTF8String);
+    if (self.rawLayer == style.rawStyle->getLayer(self.identifier.UTF8String)) {
+        _pendingLayer = style.rawStyle->removeLayer(self.identifier.UTF8String);
     }
 }
 

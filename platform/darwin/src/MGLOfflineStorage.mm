@@ -7,9 +7,16 @@
 #import "MGLOfflinePack_Private.h"
 #import "MGLOfflineRegion_Private.h"
 #import "MGLTilePyramidOfflineRegion.h"
+#import "NSBundle+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 
+#include <mbgl/actor/actor.hpp>
+#include <mbgl/actor/scheduler.hpp>
+#include <mbgl/storage/resource_transform.hpp>
+#include <mbgl/util/run_loop.hpp>
 #include <mbgl/util/string.hpp>
+
+#include <memory>
 
 static NSString * const MGLOfflineStorageFileName = @"cache.db";
 static NSString * const MGLOfflineStorageFileName3_2_0_beta_1 = @"offline.db";
@@ -35,7 +42,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 
 @end
 
-@implementation MGLOfflineStorage
+@implementation MGLOfflineStorage {
+    std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> _mbglResourceTransform;
+}
 
 + (instancetype)sharedOfflineStorage {
     static dispatch_once_t onceToken;
@@ -73,7 +82,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
 - (void)setDelegate:(id<MGLOfflineStorageDelegate>)newValue {
     _delegate = newValue;
     if ([self.delegate respondsToSelector:@selector(offlineStorage:URLForResourceOfKind:withURL:)]) {
-        _mbglFileSource->setResourceTransform([offlineStorage = self](auto kind_, std::string&& url_) -> std::string {
+        _mbglResourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(), [offlineStorage = self](auto kind_, const std::string&& url_) -> std::string {
             NSURL* url =
             [NSURL URLWithString:[[NSString alloc] initWithBytes:url_.data()
                                                           length:url_.length()
@@ -98,6 +107,9 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                 case mbgl::Resource::Kind::SpriteJSON:
                     kind = MGLResourceKindSpriteJSON;
                     break;
+                case mbgl::Resource::Kind::Image:
+                    kind = MGLResourceKindImage;
+                    break;
                 case mbgl::Resource::Kind::Unknown:
                     kind = MGLResourceKindUnknown;
                     break;
@@ -108,8 +120,11 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                   withURL:url];
             return url.absoluteString.UTF8String;
         });
+
+        _mbglFileSource->setResourceTransform(_mbglResourceTransform->self());
     } else {
-        _mbglFileSource->setResourceTransform(nullptr);
+        _mbglResourceTransform.reset();
+        _mbglFileSource->setResourceTransform({});
     }
 }
 
@@ -132,7 +147,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                              appropriateForURL:nil
                                                                         create:YES
                                                                          error:nil];
-    NSString *bundleIdentifier = [self bundleIdentifier];
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     if (!bundleIdentifier) {
         // There’s no main bundle identifier when running in a unit test bundle.
         bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
@@ -166,7 +181,7 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
     NSString *legacyCachePath = [legacyPaths.firstObject stringByAppendingPathComponent:MGLOfflineStorageFileName3_2_0_beta_1];
 #elif TARGET_OS_MAC
     // ~/Library/Caches/tld.app.bundle.id/offline.db
-    NSString *bundleIdentifier = [self bundleIdentifier];
+    NSString *bundleIdentifier = [NSBundle mgl_applicationBundleIdentifier];
     NSURL *legacyCacheDirectoryURL = [[NSFileManager defaultManager] URLForDirectory:NSCachesDirectory
                                                                             inDomain:NSUserDomainMask
                                                                    appropriateForURL:nil
@@ -217,15 +232,6 @@ NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoK
                                                context:NULL];
     }
     return self;
-}
-
-+ (NSString *)bundleIdentifier {
-    NSString *bundleIdentifier = [NSBundle mainBundle].bundleIdentifier;
-    if (!bundleIdentifier) {
-        // There’s no main bundle identifier when running in a unit test bundle.
-        bundleIdentifier = [NSBundle bundleForClass:self].bundleIdentifier;
-    }
-    return bundleIdentifier;
 }
 
 - (void)dealloc {

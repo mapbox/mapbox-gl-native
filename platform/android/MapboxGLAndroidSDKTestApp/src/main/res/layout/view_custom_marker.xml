@@ -6,6 +6,7 @@
     <ImageView
         android:id="@id/imageView"
         android:layout_width="64dp"
+        android:contentDescription="@null"
         android:layout_height="64dp"/>
 
     <TextView
@@ -14,6 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
         android:padding="2dp"
+        android:textIsSelectable="false"
         android:textColor="@android:color/white"
         android:textStyle="bold"/>
 

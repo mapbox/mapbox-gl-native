@@ -18,27 +18,30 @@
         android:layout_height="match_parent"
         android:layout_below="@+id/progress_bar"/>
 
-    <Button
-        android:id="@+id/button_download_region"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        style="?android:attr/buttonBarStyle"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_margin="@dimen/fab_margin"
-        android:background="@color/white"
-        android:padding="10dp"
-        android:text="@string/button_download_region"/>
+        android:background="@color/primary"
+        android:orientation="horizontal"
+        android:weightSum="2">
 
-    <Button
-        android:id="@+id/button_list_regions"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignBottom="@+id/button_download_region"
-        android:layout_alignParentRight="true"
-        android:layout_marginRight="@dimen/fab_margin"
-        android:background="@color/white"
-        android:padding="10dp"
-        android:text="@string/button_list_regions"/>
+        <Button
+            android:id="@+id/button_download_region"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_download_region"/>
+
+        <Button
+            android:id="@+id/button_list_regions"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_list_regions"/>
+    </LinearLayout>
 
 </RelativeLayout>

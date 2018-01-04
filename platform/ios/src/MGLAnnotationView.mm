@@ -11,6 +11,7 @@
 
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
+@property (nonatomic, readwrite) CATransform3D lastAppliedRotateTransform;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -19,21 +20,32 @@
 
 @implementation MGLAnnotationView
 
-- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier
-{
-    self = [self initWithFrame:CGRectZero];
-    if (self)
-    {
-        _lastAppliedScaleTransform = CATransform3DIdentity;
-        _reuseIdentifier = [reuseIdentifier copy];
-        _scalesWithViewingDistance = YES;
-        _enabled = YES;
++ (BOOL)supportsSecureCoding {
+    return YES;
+}
+
+- (instancetype)initWithReuseIdentifier:(NSString *)reuseIdentifier {
+    self = [super initWithFrame:CGRectZero];
+    if (self) {
+        [self commonInitWithAnnotation:nil reuseIdentifier:reuseIdentifier];
     }
     return self;
 }
 
-+ (BOOL)supportsSecureCoding {
-    return YES;
+- (instancetype)initWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
+    self = [super initWithFrame:CGRectZero];
+    if (self) {
+        [self commonInitWithAnnotation:annotation reuseIdentifier:reuseIdentifier];
+    }
+    return self;
+}
+
+- (void)commonInitWithAnnotation:(nullable id<MGLAnnotation>)annotation reuseIdentifier:(nullable NSString *)reuseIdentifier {
+    _lastAppliedScaleTransform = CATransform3DIdentity;
+    _annotation = annotation;
+    _reuseIdentifier = [reuseIdentifier copy];
+    _scalesWithViewingDistance = YES;
+    _enabled = YES;
 }
 
 - (instancetype)initWithCoder:(NSCoder *)decoder {
@@ -42,6 +54,7 @@
         _annotation = [decoder decodeObjectOfClass:[NSObject class] forKey:@"annotation"];
         _centerOffset = [decoder decodeCGVectorForKey:@"centerOffset"];
         _scalesWithViewingDistance = [decoder decodeBoolForKey:@"scalesWithViewingDistance"];
+        _rotatesToMatchCamera = [decoder decodeBoolForKey:@"rotatesToMatchCamera"];
         _selected = [decoder decodeBoolForKey:@"selected"];
         _enabled = [decoder decodeBoolForKey:@"enabled"];
         self.draggable = [decoder decodeBoolForKey:@"draggable"];
@@ -55,6 +68,7 @@
     [coder encodeObject:_annotation forKey:@"annotation"];
     [coder encodeCGVector:_centerOffset forKey:@"centerOffset"];
     [coder encodeBool:_scalesWithViewingDistance forKey:@"scalesWithViewingDistance"];
+    [coder encodeBool:_rotatesToMatchCamera forKey:@"rotatesToMatchCamera"];
     [coder encodeBool:_selected forKey:@"selected"];
     [coder encodeBool:_enabled forKey:@"enabled"];
     [coder encodeBool:_draggable forKey:@"draggable"];
@@ -98,6 +112,7 @@
 
     super.center = center;
     [self updateScaleTransformForViewingDistance];
+    [self updateRotateTransform];
 }
 
 - (void)setScalesWithViewingDistance:(BOOL)scalesWithViewingDistance
@@ -144,6 +159,26 @@
         self.layer.transform = CATransform3DConcat(self.layer.transform, effectiveTransform);
         _lastAppliedScaleTransform = newScaleTransform;
     }
+}
+
+- (void)setRotatesToMatchCamera:(BOOL)rotatesToMatchCamera
+{
+    if (_rotatesToMatchCamera != rotatesToMatchCamera)
+    {
+        _rotatesToMatchCamera = rotatesToMatchCamera;
+        [self updateRotateTransform];
+    }
+}
+
+- (void)updateRotateTransform
+{
+    if (self.rotatesToMatchCamera == NO) return;
+
+    CGFloat directionRad = self.mapView.direction * M_PI / 180.0;
+    CATransform3D newRotateTransform = CATransform3DMakeRotation(-directionRad, 0, 0, 1);
+    self.layer.transform = CATransform3DConcat(CATransform3DIdentity, newRotateTransform);
+    
+    _lastAppliedRotateTransform = newRotateTransform;
 }
 
 #pragma mark - Draggable

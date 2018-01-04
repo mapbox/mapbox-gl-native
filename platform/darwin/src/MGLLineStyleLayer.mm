@@ -109,7 +109,7 @@ namespace mbgl {
 - (void)setLineJoin:(MGLStyleValue<NSValue *> *)lineJoin {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumPropertyValue(lineJoin);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenPropertyValue(lineJoin);
     self.rawLayer->setLineJoin(mbglValue);
 }
 
@@ -118,9 +118,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getLineJoin();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(self.rawLayer->getDefaultLineJoin());
+        return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenStyleValue(self.rawLayer->getDefaultLineJoin());
     }
-    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::LineJoinType, NSValue *, mbgl::style::LineJoinType, MGLLineJoin>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setLineMiterLimit:(MGLStyleValue<NSNumber *> *)lineMiterLimit {
@@ -480,7 +480,7 @@ namespace mbgl {
 - (void)setLineWidth:(MGLStyleValue<NSNumber *> *)lineWidth {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(lineWidth);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(lineWidth);
     self.rawLayer->setLineWidth(mbglValue);
 }
 
@@ -489,9 +489,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getLineWidth();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultLineWidth());
+        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultLineWidth());
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setLineWidthTransition:(MGLTransition )transition {

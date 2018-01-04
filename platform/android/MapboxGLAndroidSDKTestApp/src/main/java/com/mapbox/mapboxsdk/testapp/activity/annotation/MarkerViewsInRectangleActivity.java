@@ -19,6 +19,9 @@ import java.util.List;
 
 import timber.log.Timber;
 
+/**
+ * Test activity showcasing counting MarkerViews in a rectangle.
+ */
 public class MarkerViewsInRectangleActivity extends AppCompatActivity implements OnMapReadyCallback,
   View.OnClickListener {
 
@@ -53,7 +56,7 @@ public class MarkerViewsInRectangleActivity extends AppCompatActivity implements
     int top = selectionBox.getTop() - mapView.getTop();
     int left = selectionBox.getLeft() - mapView.getLeft();
     RectF box = new RectF(left, top, left + selectionBox.getWidth(), top + selectionBox.getHeight());
-    Timber.i(String.format("Querying box %s", box));
+    Timber.i("Querying box %s", box);
     List<MarkerView> markers = mapboxMap.getMarkerViewsInRect(box);
 
     // Show count

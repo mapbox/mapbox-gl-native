@@ -1,63 +1,58 @@
-#include <mbgl/util/thread.hpp>
-#include <mbgl/util/run_loop.hpp>
-
+#include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/test/util.hpp>
+#include <mbgl/util/default_thread_pool.hpp>
+#include <mbgl/util/run_loop.hpp>
+#include <mbgl/util/thread.hpp>
+#include <mbgl/util/timer.hpp>
 
 #include <atomic>
+#include <memory>
 
+using namespace mbgl;
 using namespace mbgl::util;
 
 class TestObject {
 public:
-    TestObject(std::thread::id otherTid)
+    TestObject(ActorRef<TestObject>, std::thread::id otherTid)
         : tid(std::this_thread::get_id()) {
         EXPECT_NE(tid, otherTid);
     }
 
-    void fn1(int val) {
+    ~TestObject() {
+        EXPECT_EQ(tid, std::this_thread::get_id());
+    }
+
+    void fn1(int val) const {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(val, 1);
     }
 
-    void fn2(std::function<void (int)> cb) {
+    void fn2(std::function<void (int)> cb) const {
         EXPECT_EQ(tid, std::this_thread::get_id());
         cb(1);
     }
 
-    void transferIn(std::unique_ptr<int> val) {
+    void transferIn(std::unique_ptr<int> val) const {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(*val, 1);
     }
 
-    void transferOut(std::function<void (std::unique_ptr<int>)> cb) {
-        EXPECT_EQ(tid, std::this_thread::get_id());
-        cb(std::make_unique<int>(1));
-    }
-
-    void transferInOut(std::unique_ptr<int> val, std::function<void (std::unique_ptr<int>)> cb) {
-        EXPECT_EQ(tid, std::this_thread::get_id());
-        EXPECT_EQ(*val, 1);
-        cb(std::move(val));
-    }
-
-    void transferInShared(std::shared_ptr<int> val) {
+    void transferInShared(std::shared_ptr<int> val) const {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(*val, 1);
     }
 
-    void transferOutShared(std::function<void (std::shared_ptr<int>)> cb) {
-        EXPECT_EQ(tid, std::this_thread::get_id());
-        cb(std::make_shared<int>(1));
-    }
-
-    void transferString(const std::string& string, std::function<void (std::string)> cb) {
+    void transferString(const std::string& string) const {
         EXPECT_EQ(tid, std::this_thread::get_id());
         EXPECT_EQ(string, "test");
-        cb(string);
     }
 
-    void checkContext(std::function<void (bool)> cb) const {
-        cb(tid == std::this_thread::get_id());
+    void checkContext(std::promise<bool> result) const {
+        result.set_value(tid == std::this_thread::get_id());
+    }
+
+    void sync(std::promise<void> result) const {
+        result.set_value();
     }
 
     const std::thread::id tid;
@@ -65,95 +60,61 @@ public:
 
 TEST(Thread, invoke) {
     const std::thread::id tid = std::this_thread::get_id();
+    Thread<TestObject> thread("Test", tid);
 
-    RunLoop loop;
-    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
+    thread.actor().invoke(&TestObject::fn1, 1);
+    thread.actor().invoke(&TestObject::fn2, [] (int result) { EXPECT_EQ(result, 1); } );
+    thread.actor().invoke(&TestObject::transferIn, std::make_unique<int>(1));
+    thread.actor().invoke(&TestObject::transferInShared, std::make_shared<int>(1));
 
-    loop.invoke([&] {
-        EXPECT_EQ(tid, std::this_thread::get_id());
-        Thread<TestObject> thread({"Test"}, tid);
+    std::string test("test");
+    thread.actor().invoke(&TestObject::transferString, test);
 
-        thread.invoke(&TestObject::fn1, 1);
-        requests.push_back(thread.invokeWithCallback(&TestObject::fn2, [&] (int result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(result, 1);
-        }));
-
-        thread.invoke(&TestObject::transferIn, std::make_unique<int>(1));
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferOut, [&] (std::unique_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
-
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferInOut, std::make_unique<int>(1), [&] (std::unique_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
-
-        thread.invoke(&TestObject::transferInShared, std::make_shared<int>(1));
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferOutShared, [&] (std::shared_ptr<int> result) {
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(*result, 1);
-        }));
-
-        // Cancelled request
-        thread.invokeWithCallback(&TestObject::fn2, [&] (int) {
-            ADD_FAILURE();
-        });
-
-        std::string test("test");
-        requests.push_back(thread.invokeWithCallback(&TestObject::transferString, test, [&] (std::string result){
-            EXPECT_EQ(tid, std::this_thread::get_id());
-            EXPECT_EQ(result, "test");
-            loop.stop();
-        }));
-        test.clear();
-    });
-
-    loop.run();
+    // Make sure the message queue was consumed before ending the test.
+    std::promise<void> result;
+    auto resultFuture = result.get_future();
+    thread.actor().invoke(&TestObject::sync, std::move(result));
+    resultFuture.get();
 }
 
-TEST(Thread, context) {
+TEST(Thread, Context) {
     const std::thread::id tid = std::this_thread::get_id();
+    Thread<TestObject> thread("Test", tid);
 
-    RunLoop loop;
-    std::vector<std::unique_ptr<mbgl::AsyncRequest>> requests;
+    std::promise<bool> result;
+    auto resultFuture = result.get_future();
 
-    loop.invoke([&] {
-        Thread<TestObject> thread({"Test"}, tid);
-
-        requests.push_back(thread.invokeWithCallback(&TestObject::checkContext, [&] (bool inTestThreadContext) {
-            EXPECT_EQ(inTestThreadContext, true);
-            loop.stop();
-        }));
-    });
-
-    loop.run();
+    thread.actor().invoke(&TestObject::checkContext, std::move(result));
+    EXPECT_EQ(resultFuture.get(), true);
 }
 
 class TestWorker {
 public:
-    TestWorker() = default;
+    TestWorker(ActorRef<TestWorker>) {}
 
-    void send(std::function<void ()> fn, std::function<void ()> cb) {
-        fn();
+    void send(std::function<void ()> cb) {
         cb();
     }
+
+    void sendDelayed(std::function<void ()> cb) {
+        timer.start(Milliseconds(300), mbgl::Duration::zero(), [cb] {
+            cb();
+        });
+    }
+
+private:
+    Timer timer;
 };
 
 TEST(Thread, ExecutesAfter) {
     RunLoop loop;
-    Thread<TestWorker> thread({"Test"});
+    Thread<TestWorker> thread("Test");
 
     bool didWork = false;
     bool didAfter = false;
 
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        didWork = true;
-    }, [&] {
-        didAfter = true;
-        loop.stop();
-    });
+    thread.actor().invoke(&TestWorker::send, [&] { didWork = true; });
+    thread.actor().invoke(&TestWorker::send, [&] { didAfter = true; loop.stop(); });
 
     loop.run();
 
@@ -161,72 +122,92 @@ TEST(Thread, ExecutesAfter) {
     EXPECT_TRUE(didAfter);
 }
 
-TEST(Thread, WorkRequestDeletionWaitsForWorkToComplete) {
+TEST(Thread, CanSelfWakeUp) {
     RunLoop loop;
+    Thread<TestWorker> thread("Test");
 
-    Thread<TestWorker> thread({"Test"});
-
-    std::promise<void> started;
-    bool didWork = false;
-
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        started.set_value();
-        usleep(10000);
-        didWork = true;
-    }, [&] {});
-
-    started.get_future().get();
-    request.reset();
-    EXPECT_TRUE(didWork);
-}
-
-TEST(Thread, WorkRequestDeletionCancelsAfter) {
-    RunLoop loop;
-    Thread<TestWorker> thread({"Test"});
-
-    std::promise<void> started;
-    bool didAfter = false;
-
-    auto request = thread.invokeWithCallback(&TestWorker::send, [&] {
-        started.set_value();
-    }, [&] {
-        didAfter = true;
+    thread.actor().invoke(&TestWorker::sendDelayed, [&] {
+        loop.stop();
     });
 
-    started.get_future().get();
-    request.reset();
-    loop.runOnce();
-    EXPECT_FALSE(didAfter);
+    loop.run();
 }
 
-TEST(Thread, WorkRequestDeletionCancelsImmediately) {
-    RunLoop loop;
-    Thread<TestWorker> thread({"Test"});
+TEST(Thread, Concurrency) {
+    auto loop = std::make_shared<RunLoop>();
 
-    std::promise<void> started;
+    unsigned numMessages = 100000;
+    std::atomic_uint completed(numMessages);
 
-    auto request1 = thread.invokeWithCallback(&TestWorker::send, [&] {
-        usleep(10000);
-        started.set_value();
-    }, [&] {});
+    ThreadPool threadPool(10);
+    Actor<TestWorker> poolWorker(threadPool);
+    auto poolWorkerRef = poolWorker.self();
 
-    auto request2 = thread.invokeWithCallback(&TestWorker::send, [&] {
-        ADD_FAILURE() << "Second work item should not be invoked";
-    }, [&] {});
-    request2.reset();
+    Thread<TestWorker> threadedObject("Test");
+    auto threadedObjectRef = threadedObject.actor();
 
-    started.get_future().get();
-    request1.reset();
+    // 10 threads sending 100k messages to the Thread. The
+    // idea here is to test if the scheduler is handling concurrency
+    // correctly, otherwise this test should crash.
+    for (unsigned i = 0; i < numMessages; ++i) {
+        poolWorkerRef.invoke(&TestWorker::send, [threadedObjectRef, loop, &completed] () mutable {
+            threadedObjectRef.invoke(&TestWorker::send, [loop, &completed] () {
+                if (!--completed) {
+                    loop->stop();
+                }
+            });
+        });
+    };
+
+    loop->run();
+}
+
+TEST(Thread, ThreadPoolMessaging) {
+    auto loop = std::make_shared<RunLoop>();
+
+    ThreadPool threadPool(1);
+    Actor<TestWorker> poolWorker(threadPool);
+    auto poolWorkerRef = poolWorker.self();
+
+    Thread<TestWorker> threadedObject("Test");
+    auto threadedObjectRef = threadedObject.actor();
+
+    // This is sending a message to the Thread from the main
+    // thread. Then the Thread will send another message to
+    // a worker on the ThreadPool.
+    threadedObjectRef.invoke(&TestWorker::send, [poolWorkerRef, loop] () mutable {
+        poolWorkerRef.invoke(&TestWorker::send, [loop] () { loop->stop(); });
+    });
+
+    loop->run();
+
+    // Same as before, but in the opposite direction.
+    poolWorkerRef.invoke(&TestWorker::send, [threadedObjectRef, loop] () mutable {
+        threadedObjectRef.invoke(&TestWorker::send, [loop] () { loop->stop(); });
+    });
+
+    loop->run();
+}
+
+TEST(Thread, ReferenceCanOutliveThread) {
+    auto thread = std::make_unique<Thread<TestWorker>>("Test");
+    auto worker = thread->actor();
+
+    thread.reset();
+
+    for (unsigned i = 0; i < 1000; ++i) {
+        worker.invoke(&TestWorker::send, [&] { ADD_FAILURE() << "Should never happen"; });
+    }
+
+    usleep(10000);
 }
 
 TEST(Thread, DeletePausedThread) {
-    RunLoop loop;
-
     std::atomic_bool flag(false);
 
-    auto thread = std::make_unique<Thread<TestWorker>>(ThreadContext{"Test"});
+    auto thread = std::make_unique<Thread<TestWorker>>("Test");
     thread->pause();
-    thread->invoke(&TestWorker::send, [&] { flag = true; }, [] {});
+    thread->actor().invoke(&TestWorker::send, [&] { flag = true; });
 
     // Should not hang.
     thread.reset();
@@ -240,18 +221,18 @@ TEST(Thread, Pause) {
 
     std::atomic_bool flag(false);
 
-    Thread<TestWorker> thread1({"Test1"});
+    Thread<TestWorker> thread1("Test1");
     thread1.pause();
 
-    Thread<TestWorker> thread2({"Test2"});
+    Thread<TestWorker> thread2("Test2");
 
     for (unsigned i = 0; i < 100; ++i) {
-        thread1.invoke(&TestWorker::send, [&] { flag = true; }, [] {});
-        thread2.invoke(&TestWorker::send, [&] { ASSERT_FALSE(flag); }, [] {});
+        thread1.actor().invoke(&TestWorker::send, [&] { flag = true; });
+        thread2.actor().invoke(&TestWorker::send, [&] { ASSERT_FALSE(flag); });
     }
 
     // Queue a message at the end of thread2 queue.
-    thread2.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+    thread2.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
 }
 
@@ -260,16 +241,16 @@ TEST(Thread, Resume) {
 
     std::atomic_bool flag(false);
 
-    Thread<TestWorker> thread({"Test"});
+    Thread<TestWorker> thread("Test");
     thread.pause();
 
     for (unsigned i = 0; i < 100; ++i) {
-        thread.invoke(&TestWorker::send, [&] { flag = true; }, [] {});
+        thread.actor().invoke(&TestWorker::send, [&] { flag = true; });
     }
 
     // Thread messages are ondered, when we resume, this is going
     // to me the last thing to run on the message queue.
-    thread.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+    thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
 
     // This test will be flaky if the thread doesn't get paused.
     ASSERT_FALSE(flag);
@@ -283,7 +264,7 @@ TEST(Thread, Resume) {
 TEST(Thread, PauseResume) {
     RunLoop loop;
 
-    Thread<TestWorker> thread({"Test"});
+    Thread<TestWorker> thread("Test");
 
     // Test if multiple pause/resume work.
     for (unsigned i = 0; i < 100; ++i) {
@@ -291,6 +272,6 @@ TEST(Thread, PauseResume) {
         thread.resume();
     }
 
-    thread.invoke(&TestWorker::send, [&] { loop.stop(); }, [] {});
+    thread.actor().invoke(&TestWorker::send, [&] { loop.stop(); });
     loop.run();
 }

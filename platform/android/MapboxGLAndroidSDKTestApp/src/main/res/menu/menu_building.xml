@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/menu_action_intensity"
+        android:title="@string/change_intensity"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/menu_action_anchor"
+        android:title="@string/change_anchor"
+        app:showAsAction="never"/>
+</menu>

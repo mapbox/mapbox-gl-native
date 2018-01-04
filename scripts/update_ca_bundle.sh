@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
 
-cd common
+cd misc
 curl https://raw.githubusercontent.com/curl/curl/master/lib/mk-ca-bundle.pl | perl
 rm certdata.txt

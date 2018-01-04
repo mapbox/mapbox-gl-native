@@ -5,6 +5,7 @@
 #include <mbgl/util/size.hpp>
 
 #include <string>
+#include <cstring>
 #include <memory>
 #include <algorithm>
 
@@ -66,9 +67,9 @@ public:
 
     template <typename T = Image>
     T clone() const {
-        T copy(size);
-        std::copy(data.get(), data.get() + bytes(), copy.data.get());
-        return copy;
+        T copy_(size);
+        std::copy(data.get(), data.get() + bytes(), copy_.data.get());
+        return copy_;
     }
 
     size_t stride() const { return channels * size.width; }
@@ -78,10 +79,52 @@ public:
         std::fill(data.get(), data.get() + bytes(), value);
     }
 
+    void resize(Size size_) {
+        if (size == size_) {
+            return;
+        }
+        Image newImage(size_);
+        newImage.fill(0);
+        copy(*this, newImage, {0, 0}, {0, 0}, {
+            std::min(size.width, size_.width),
+            std::min(size.height, size_.height)
+        });
+        operator=(std::move(newImage));
+    }
+
+    // Clears the rect area specified by `pt` and `size` from `dstImage`.
+    static void clear(Image& dstImg, const Point<uint32_t>& pt, const Size& size) {
+        if (size.isEmpty()) {
+            return;
+        }
+
+        if (!dstImg.valid()) {
+            throw std::invalid_argument("invalid destination for image clear");
+        }
+
+        if (size.width > dstImg.size.width ||
+            size.height > dstImg.size.height ||
+            pt.x > dstImg.size.width - size.width ||
+            pt.y > dstImg.size.height - size.height) {
+            throw std::out_of_range("out of range destination coordinates for image clear");
+        }
+
+        uint8_t* dstData = dstImg.data.get();
+
+        for (uint32_t y = 0; y < size.height; y++) {
+            const std::size_t dstOffset = (pt.y + y) * dstImg.stride() + pt.x * channels;
+            std::memset(dstData + dstOffset, 0, size.width * channels);
+        }
+    }
+
     // Copy image data within `rect` from `src` to the rectangle of the same size at `pt`
     // in `dst`. If the specified bounds exceed the bounds of the source or destination,
     // throw `std::out_of_range`. Must not be used to move data within a single Image.
     static void copy(const Image& srcImg, Image& dstImg, const Point<uint32_t>& srcPt, const Point<uint32_t>& dstPt, const Size& size) {
+        if (size.isEmpty()) {
+            return;
+        }
+
         if (!srcImg.valid()) {
             throw std::invalid_argument("invalid source for image copy");
         }

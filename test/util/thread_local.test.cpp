@@ -4,13 +4,15 @@
 
 #include <mbgl/test/util.hpp>
 
+#include <future>
+
 using namespace mbgl::util;
 
 namespace {
 
 class TestThread {
 public:
-    TestThread(int *number_) {
+    TestThread(mbgl::ActorRef<TestThread>, int *number_) {
         number.set(number_);
     }
 
@@ -18,8 +20,8 @@ public:
         number.set(nullptr);
     }
 
-    int getNumber() {
-        return *number.get();
+    void getNumber(std::promise<int> result){
+        result.set_value(*number.get());
     }
 
 private:
@@ -37,15 +39,28 @@ TEST(ThreadLocalStorage, Basic) {
     int number2 = 2;
     int number3 = 3;
 
-    ThreadContext context = {"Test"};
+    Thread<TestThread> thread1("Test", &number1);
+    Thread<TestThread> thread2("Test", &number2);
+    Thread<TestThread> thread3("Test", &number3);
 
-    Thread<TestThread> thread1(context, &number1);
-    Thread<TestThread> thread2(context, &number2);
-    Thread<TestThread> thread3(context, &number3);
+    auto thread1Ref = thread1.actor();
+    auto thread2Ref = thread2.actor();
+    auto thread3Ref = thread3.actor();
 
-    EXPECT_EQ(number1, thread1.invokeSync(&TestThread::getNumber));
-    EXPECT_EQ(number2, thread2.invokeSync(&TestThread::getNumber));
-    EXPECT_EQ(number3, thread3.invokeSync(&TestThread::getNumber));
+    std::promise<int> result1;
+    auto result1Future = result1.get_future();
+    thread1Ref.invoke(&TestThread::getNumber, std::move(result1));
+    EXPECT_EQ(number1, result1Future.get());
+
+    std::promise<int> result2;
+    auto result2Future = result2.get_future();
+    thread2Ref.invoke(&TestThread::getNumber, std::move(result2));
+    EXPECT_EQ(number2, result2Future.get());
+
+    std::promise<int> result3;
+    auto result3Future = result3.get_future();
+    thread3Ref.invoke(&TestThread::getNumber, std::move(result3));
+    EXPECT_EQ(number3, result3Future.get());
 }
 
 TEST(ThreadLocalStorage, NotSetReturnsNull) {
@@ -56,40 +71,38 @@ TEST(ThreadLocalStorage, NotSetReturnsNull) {
 
 namespace {
 
-struct DtorCounter {
-    ~DtorCounter() { ++(*value); }
-    unsigned *value;
-};
-
-class TestThreadReclaim {
+class TestThreadDataOwnership {
 public:
-    TestThreadReclaim(DtorCounter* counter_) {
-        counter.set(counter_);
+    TestThreadDataOwnership(mbgl::ActorRef<TestThreadDataOwnership>, int* data_) {
+        data.set(data_);
+    }
+
+    ~TestThreadDataOwnership() {
+        data.set(nullptr);
     }
 
 private:
-    static ThreadLocal<DtorCounter> counter;
+    static ThreadLocal<int> data;
 };
 
-ThreadLocal<DtorCounter> TestThreadReclaim::counter;
+ThreadLocal<int> TestThreadDataOwnership::data;
 
 } // namespace
 
-TEST(ThreadLocalStorage, AutoReclaim) {
+TEST(ThreadLocalStorage, ShouldNotTakeOwnership) {
     RunLoop loop;
 
-    unsigned counter = 0;
+    auto data1 = std::make_unique<int>(10);
+    auto data2 = std::make_unique<int>(20);
 
-    auto dtorCounter1 = new DtorCounter{ &counter };
-    auto dtorCounter2 = new DtorCounter{ &counter };
-
-    ThreadContext context = {"Test"};
-
-    auto thread1 = std::make_unique<Thread<TestThreadReclaim>>(context, dtorCounter1);
-    auto thread2 = std::make_unique<Thread<TestThreadReclaim>>(context, dtorCounter2);
+    auto thread1 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data1.get());
+    auto thread2 = std::make_unique<Thread<TestThreadDataOwnership>>("Test", data2.get());
 
     thread1.reset();
     thread2.reset();
 
-    EXPECT_EQ(counter, 2u);
+    // Will crash if ThreadLocal destroys
+    // the pointer it is managing.
+    ASSERT_EQ(*data1, 10);
+    ASSERT_EQ(*data2, 20);
 }

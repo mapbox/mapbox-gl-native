@@ -9,6 +9,7 @@ namespace mbgl {
 
 class Tileset;
 class TileParameters;
+class RasterBucket;
 
 namespace style {
 class Layer;
@@ -21,18 +22,21 @@ public:
                    const Tileset&);
     ~RasterTile() final;
 
-    void setNecessity(Necessity) final;
+    void setNecessity(TileNecessity) final;
 
     void setError(std::exception_ptr);
-    void setData(std::shared_ptr<const std::string> data,
-                 optional<Timestamp> modified_,
-                 optional<Timestamp> expires_);
+    void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
+    void setData(std::shared_ptr<const std::string> data);
 
     void cancel() override;
-    Bucket* getBucket(const RenderLayer&) const override;
 
-    void onParsed(std::unique_ptr<Bucket> result);
-    void onError(std::exception_ptr);
+    void upload(gl::Context&) override;
+    Bucket* getBucket(const style::Layer::Impl&) const override;
+
+    void setMask(TileMask&&) override;
+
+    void onParsed(std::unique_ptr<RasterBucket> result, uint64_t correlationID);
+    void onError(std::exception_ptr, uint64_t correlationID);
 
 private:
     TileLoader<RasterTile> loader;
@@ -40,9 +44,11 @@ private:
     std::shared_ptr<Mailbox> mailbox;
     Actor<RasterTileWorker> worker;
 
+    uint64_t correlationID = 0;
+
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
-    std::unique_ptr<Bucket> bucket;
+    std::unique_ptr<RasterBucket> bucket;
 };
 
 } // namespace mbgl

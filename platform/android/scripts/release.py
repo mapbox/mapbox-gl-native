@@ -1,5 +1,5 @@
 '''
-Utility to schedule SDK builds in Bitrise.
+Utility to schedule SDK builds on CircleCI.
 
 Examples:
 
@@ -33,7 +33,7 @@ Examples:
 
 TODO:
 
-- Add a flag to wait until the release has been built (Bitrise) and published (Maven).
+- Add a flag to wait until the release has been built (CircleCI) and published (Maven).
 
 '''
 
@@ -49,8 +49,8 @@ ALLOWED_STAGES = ['snapshot', 'beta', 'final']
 # Get the version from GRADLE_PROPERTIES_PATH below
 CURRENT_VERSION_TAG = 'current'
 
-# You can find the API token in https://www.bitrise.io/app/79cdcbdc42de4303#/code -> API token
-BITRISE_API_TOKEN_ENV_VAR = 'BITRISE_API_TOKEN'
+# You can add your API token on https://circleci.com/account/api
+CIRCLECI_API_TOKEN_ENV_VAR = 'CIRCLECI_API_TOKEN'
 
 # In the future we might want to consider alpha, or rc.
 ALLOWED_PRE_RELEASE = ['beta']
@@ -62,8 +62,8 @@ GRADLE_TOKEN = 'VERSION_NAME='
 FABRIC_PROPERTIES_PATH = '%s/src/main/resources/fabric/com.mapbox.mapboxsdk.mapbox-android-sdk.properties' % MAPBOX_GL_ANDROID_SDK_PATH
 FABRIC_TOKEN = 'fabric-version='
 
-# Bitrise
-URL_BITRISE = 'https://www.bitrise.io/app/79cdcbdc42de4303/build/start.json'
+# Triggers a new build, returns a summary of the build
+URL_CIRCLECI = 'https://circleci.com/api/v1.1/project/github/mapbox/mapbox-gl-native/tree/'  # + :branch
 
 # We support three parameters: stage, branch, and version
 @click.command()
@@ -129,7 +129,7 @@ def publish_snapshot(branch, version):
 		if dirty_gradle:
 			git_add(path=GRADLE_PROPERTIES_PATH)
 			git_commit_and_push(branch=branch, version=version)
-	do_bitrise_request(build_params={'branch': branch, 'workflow_id': 'scheduled'})
+	do_circleci_request(branch=branch)
 
 def publish_beta(branch, version):
 	click.echo('Publishing beta from branch: %s (version: %s).' % (branch, version))
@@ -137,7 +137,7 @@ def publish_beta(branch, version):
 	if dirty_gradle:
 		git_add(path=GRADLE_PROPERTIES_PATH)
 		git_commit_and_push(branch=branch, version=version)
-	do_bitrise_request(build_params={'branch': branch, 'workflow_id': 'scheduled'})
+	do_circleci_request(branch=branch)
 
 def publish_final(branch, version):
 	click.echo('Publishing final release from branch: %s (version: %s).' % (branch, version))
@@ -149,7 +149,7 @@ def publish_final(branch, version):
 		git_add(path=FABRIC_PROPERTIES_PATH)
 	if dirty_gradle or dirty_fabric:
 		git_commit_and_push(branch=branch, version=version)
-	do_bitrise_request(build_params={'branch': branch, 'workflow_id': 'scheduled'})
+	do_circleci_request(branch=branch)
 
 #
 # Utils
@@ -166,26 +166,24 @@ def execute_call(command):
 		abort_with_message('Command failed: %s' % command)
 
 #
-# Bitrise
+# CircleCI
 #
 
-def get_bitrise_api_token():
-	bitrise_api_token = os.environ.get(BITRISE_API_TOKEN_ENV_VAR)
-	if not bitrise_api_token:
-		abort_with_message('You need to set the BITRISE_API_TOKEN environment variable.')
-	click.echo('Found Bitrise API token.')
-	return bitrise_api_token
+def get_circleci_api_token():
+	circleci_api_token = os.environ.get(CIRCLECI_API_TOKEN_ENV_VAR)
+	if not circleci_api_token:
+		abort_with_message('You need to set the CIRCLECI_API_TOKEN environment variable.')
+	click.echo('Found CircleCI API token.')
+	return circleci_api_token
 
-def do_bitrise_request(build_params):
-	data = {
-		'hook_info': {'type': 'bitrise', 'api_token': get_bitrise_api_token()},
-		'build_params' : build_params}
-	click.echo('Bitrise request data: %s' % json.dumps(data))
+def do_circleci_request(branch):
+	url = URL_CIRCLECI + branch
+	params = {'circle-token': get_circleci_api_token()}
+	click.echo('CircleCI request to %s (params: %s)' % (url, json.dumps(params)))
 	click.confirm('\nDo you want to start a build?', abort=True)
 
-	r = requests.post(URL_BITRISE, data=json.dumps(data))
-	click.echo('- Bitrise response code: %s' % r.status_code)
-	click.echo('- Bitrise response content: %s' % r.text)
+	r = requests.post(url, params=params)
+	click.echo('- CircleCI response code: %s' % r.status_code)
 
 #
 # Git
