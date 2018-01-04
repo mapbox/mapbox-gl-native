@@ -91,7 +91,7 @@ public class MapboxMapOptionsTest {
 
   @Test
   public void testAttributionGravity() {
-    assertEquals(Gravity.BOTTOM, new MapboxMapOptions().getAttributionGravity());
+    assertEquals(Gravity.BOTTOM | Gravity.START, new MapboxMapOptions().getAttributionGravity());
     assertEquals(Gravity.BOTTOM, new MapboxMapOptions().attributionGravity(Gravity.BOTTOM).getAttributionGravity());
     assertNotEquals(Gravity.START, new MapboxMapOptions().attributionGravity(Gravity.BOTTOM).getAttributionGravity());
   }
