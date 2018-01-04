@@ -1,4 +1,4 @@
-﻿/* Clock position format, long: {hours} o’clock */
+/* Clock position format, long: {hours} o’clock */
 "CLOCK_FMT_LONG" = "%@ часа";
 
 /* Clock position format, medium: {hours} o’clock */
@@ -289,3 +289,8 @@
 /* West longitude format, short: {longitude} */
 "COORD_W_SHORT" = "%@З";
 
+/* OpenStreetMap full name attribution */
+"OSM_FULL_NAME" = "OpenStreetMap";
+
+/* OpenStreetMap short name attribution */
+"OSM_SHORT_NAME" = "OSM";

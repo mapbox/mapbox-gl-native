@@ -2,7 +2,49 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## 5.2.0 - TBA
+## 5.3.0 - December 20, 2017
+ - Add support for TinySDF [#10706](https://github.com/mapbox/mapbox-gl-native/pull/10706)
+ - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746) 
+ - Post animation callback invocation [#10664](https://github.com/mapbox/mapbox-gl-native/pull/10664)
+ - Allow configuring Http logging [#10681](https://github.com/mapbox/mapbox-gl-native/pull/10681)
+ - Fix reverse scale gesture [#10688](https://github.com/mapbox/mapbox-gl-native/pull/10688)
+ - Update offline region metadata documentation [#10693](https://github.com/mapbox/mapbox-gl-native/pull/10693)
+ - Post camera listener invocation [#10690](https://github.com/mapbox/mapbox-gl-native/pull/10690)
+ - Activate filesource for offline region creation [#10718](https://github.com/mapbox/mapbox-gl-native/pull/10718)
+ - Update Spanish/Vietnamese translations [#10740](https://github.com/mapbox/mapbox-gl-native/pull/10740)
+ - Update instrumented make target [#10724](https://github.com/mapbox/mapbox-gl-native/pull/10724)
+ - Remove black flash on start for fragments [#10717](https://github.com/mapbox/mapbox-gl-native/pull/10717)
+ - CompassView decode crash [#10717](https://github.com/mapbox/mapbox-gl-native/pull/10717)
+ - Android SDK renaming [#10609](https://github.com/mapbox/mapbox-gl-native/pull/10609)
+ - Map touch listener based lists [#10749](https://github.com/mapbox/mapbox-gl-native/pull/10749)
+
+## 5.2.1 - December 6, 2017
+ - Close race condition in RunLoop [#10537](https://github.com/mapbox/mapbox-gl-native/pull/10537)
+ - OkHttp 3.9.1 [#10515](https://github.com/mapbox/mapbox-gl-native/pull/10515)
+ - Attribution anchor point fix [#10558](https://github.com/mapbox/mapbox-gl-native/pull/10558)
+ - Pre API 19 VerifyError [#10579](https://github.com/mapbox/mapbox-gl-native/pull/10579)
+ - Set larger Http request limit [#10567](https://github.com/mapbox/mapbox-gl-native/pull/10567)
+ - Remove jar generation from maven publish [#10625](https://github.com/mapbox/mapbox-gl-native/pull/10625)
+ - Enable Map Rendering when paused for multiple window support [#10509](https://github.com/mapbox/mapbox-gl-native/pull/10509)
+ - Activate FileSource when listing offline regions [#10531](https://github.com/mapbox/mapbox-gl-native/pull/10531)
+ - Harden MarkerView integration by checking for null bitmap [#10532](https://github.com/mapbox/mapbox-gl-native/pull/10532)
+ - Use concurrent lists for camera change listeners [#10542](https://github.com/mapbox/mapbox-gl-native/pull/10542)
+ - Handle destroy activity as part of theme switching [#10589](https://github.com/mapbox/mapbox-gl-native/pull/10589)
+ - add FileSource activation/deactivation to MapSnapshotter [#10556](https://github.com/mapbox/mapbox-gl-native/pull/10556)
+
+## 5.2.0 - November 17, 2017
+
+- Monkey crashes [#10472](https://github.com/mapbox/mapbox-gl-native/pull/10472)
+
+## 5.2.0-beta.5 - November 14, 2017
+
+- MapSnapshot attribution [#10362](https://github.com/mapbox/mapbox-gl-native/pull/10362)
+- Downgrade min sdk to 14 [#10355](https://github.com/mapbox/mapbox-gl-native/pull/10355)
+- Harden deselection mechanism for markers [#10403](https://github.com/mapbox/mapbox-gl-native/pull/10403)
+- Cherry picks to agua [#10442](https://github.com/mapbox/mapbox-gl-native/pull/10442)
+- Rework test activity gen script setup [#10365](https://github.com/mapbox/mapbox-gl-native/pull/10365)
+- Fix broken android unit tests, update test make target to SDK [#10387](https://github.com/mapbox/mapbox-gl-native/pull/10387)
+- Check for null value when calling mapboxMap.clear [#10388](https://github.com/mapbox/mapbox-gl-native/pull/10388)
 
 ## 5.2.0-beta.4 - November 3, 2017
 

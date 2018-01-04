@@ -757,7 +757,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0 + self.contentInset.top]];
+                                       constant:5.0]];
     }
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.compassView
@@ -767,6 +767,7 @@ public:
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1.0
                                    constant:5.0 + self.contentInset.top]];
+    
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
                                   attribute:NSLayoutAttributeTrailing
@@ -791,7 +792,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0 + self.contentInset.top]];
+                                       constant:5.0]];
     }
     [self.scaleBarConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.scaleBar
@@ -895,8 +896,10 @@ public:
         // compass view
         [self removeConstraints:self.compassViewConstraints];
         [self.compassViewConstraints removeAllObjects];
-        [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor
-                                                                                          constant:5.0 + self.contentInset.top]];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+            [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
+#pragma clang diagnostic pop
         [self.compassViewConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.compassView.rightAnchor
                                                                                           constant:8.0 + self.contentInset.right]];
         [self addConstraints:self.compassViewConstraints];
@@ -904,8 +907,10 @@ public:
         // scale bar view
         [self removeConstraints:self.scaleBarConstraints];
         [self.scaleBarConstraints removeAllObjects];
-        [self.scaleBarConstraints addObject:[self.scaleBar.topAnchor constraintEqualToAnchor:safeAreaLayoutGuide.topAnchor
-                                                                                    constant:5.0 + self.contentInset.top]];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        [self.scaleBarConstraints addObject:[self.scaleBar.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
+#pragma clang diagnostic pop
         [self.scaleBarConstraints addObject:[self.scaleBar.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
                                                                                      constant:8.0 + self.contentInset.left]];
         [self addConstraints:self.scaleBarConstraints];
@@ -1811,18 +1816,17 @@ public:
     return panCamera;
 }
 
-- (MGLMapCamera *)cameraByZoomingToZoomLevel:(double)zoom  aroundAnchorPoint:(CGPoint)anchorPoint
+- (MGLMapCamera *)cameraByZoomingToZoomLevel:(double)zoom aroundAnchorPoint:(CGPoint)anchorPoint
 {
-    mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
-    mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
-    MGLMapCamera *camera;
-    
     mbgl::ScreenCoordinate anchor = mbgl::ScreenCoordinate { anchorPoint.x, anchorPoint.y };
+    mbgl::EdgeInsets padding = mbgl::EdgeInsets(anchor.y, anchor.x, self.size.height - anchor.y, self.size.width - anchor.x);
+    mbgl::CameraOptions currentCameraOptions = _mbglMap->getCameraOptions(padding);
+
     currentCameraOptions.zoom = mbgl::util::clamp(zoom, self.minimumZoomLevel, self.maximumZoomLevel);
     currentCameraOptions.anchor = anchor;
-    camera = [self cameraForCameraOptions:currentCameraOptions];
+    MGLCoordinateBounds bounds = MGLCoordinateBoundsFromLatLngBounds(_mbglMap->latLngBoundsForCamera(currentCameraOptions));
     
-    return camera;
+    return [self cameraThatFitsCoordinateBounds:bounds];
 }
 
 - (MGLMapCamera *)cameraByRotatingToDirection:(CLLocationDirection)degrees aroundAnchorPoint:(CGPoint)anchorPoint
@@ -2956,6 +2960,7 @@ public:
 
 - (void)setMinimumZoomLevel:(double)minimumZoomLevel
 {
+    _mbglMap->setMinZoom(minimumZoomLevel);
 }
 
 - (double)minimumZoomLevel
@@ -4071,7 +4076,7 @@ public:
             }
             else
             {
-                if ([annotation isKindOfClass:[MGLShape class]])
+                if ([annotation isKindOfClass:[MGLMultiPoint class]])
                 {
                     return false;
                 }

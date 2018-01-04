@@ -28,7 +28,7 @@ public class MapSnapshot {
   }
 
   /**
-   * @return the bitmap
+   * @return the large
    */
   public Bitmap getBitmap() {
     return bitmap;

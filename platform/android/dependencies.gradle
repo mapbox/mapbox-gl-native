@@ -1,5 +1,5 @@
 ext {
-    minSdkVersion = 15
+    minSdkVersion = 14
     targetSdkVersion = 25
     compileSdkVersion = 25
     buildToolsVersion = "26.0.3"
@@ -7,7 +7,7 @@ ext {
     versionCode = 12
     versionName = "6.0.0"
 
-    mapboxServicesVersion = "2.2.8"
+    mapboxServicesVersion = "2.2.9"
     supportLibVersion = "25.4.0"
     espressoVersion = '3.0.1'
     testRunnerVersion = '1.0.1'
@@ -20,11 +20,12 @@ ext {
             mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
 
             // mapzen lost
-            lost                   : 'com.mapzen.android:lost:1.1.1',
+            lost                   : 'com.mapzen.android:lost:3.0.4',
 
             // unit test
             junit                  : 'junit:junit:4.12',
             mockito                : 'org.mockito:mockito-core:2.10.0',
+            robolectric            : 'org.robolectric:robolectric:3.5.1',
 
             // instrumentation test
             testRunner             : "com.android.support.test:runner:${testRunnerVersion}",
@@ -41,7 +42,7 @@ ext {
 
             // square crew
             timber                 : 'com.jakewharton.timber:timber:4.5.1',
-            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.0',
+            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.1',
             leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
             leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
     ]

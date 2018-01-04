@@ -14,20 +14,15 @@ repositories {
     mavenCentral()
 }
 
-// From https://raw.github.com/mcxiaoke/gradle-mvn-push/master/jar.gradle
-android.libraryVariants.all { variant ->
-    def jarTask = project.tasks.create(name: "jar${variant.name.capitalize()}", type: Jar) {
-        from variant.javaCompile.destinationDir
-        exclude "**/R.class"
-        exclude "**/BuildConfig.class"
-    }
-    jarTask.dependsOn variant.javaCompile
-    artifacts.add('archives', jarTask);
-}
-
-// From https://raw.github.com/mcxiaoke/gradle-mvn-push/master/gradle-mvn-push.gradle
 def isReleaseBuild() {
     return VERSION_NAME.contains("SNAPSHOT") == false
+}
+
+def isLocalBuild() {
+    if (System.getenv('IS_LOCAL_DEVELOPMENT') != null) {
+        return System.getenv('IS_LOCAL_DEVELOPMENT').toBoolean()
+    }
+    return true
 }
 
 def getReleaseRepositoryUrl() {
@@ -40,6 +35,10 @@ def getSnapshotRepositoryUrl() {
             "https://oss.sonatype.org/content/repositories/snapshots/"
 }
 
+def obtainMavenLocalUrl() {
+    return getRepositories().mavenLocal().getUrl()
+}
+
 def getRepositoryUsername() {
     return hasProperty('USERNAME') ? USERNAME :
             (hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : "")
@@ -48,22 +47,6 @@ def getRepositoryUsername() {
 def getRepositoryPassword() {
     return hasProperty('PASSWORD') ? PASSWORD :
             (hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : "")
-}
-
-task apklib(type: Zip) {
-    appendix = extension = 'apklib'
-
-    from 'AndroidManifest.xml'
-    into('res') {
-        from 'res'
-    }
-    into('src') {
-        from 'src'
-    }
-}
-
-artifacts {
-    archives apklib
 }
 
 afterEvaluate { project ->
@@ -76,24 +59,16 @@ afterEvaluate { project ->
                 pom.artifactId = POM_ARTIFACT_ID
                 pom.version = VERSION_NAME
 
-                repository(url: getReleaseRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(),
-                            password: getRepositoryPassword())
+                if (isLocalBuild()) {
+                    repository(url: obtainMavenLocalUrl())
+                } else {
+                    repository(url: getReleaseRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
+                    snapshotRepository(url: getSnapshotRepositoryUrl()) {
+                        authentication(userName: getRepositoryUsername(), password: getRepositoryPassword())
+                    }
                 }
-                snapshotRepository(url: getSnapshotRepositoryUrl()) {
-                    authentication(userName: getRepositoryUsername(),
-                            password: getRepositoryPassword())
-                }
-
-/*
-                // Leaving out as artifact was incorrectly named when found
-                addFilter('aar') { artifact, file ->
-                    artifact.name == archivesBaseName
-                }
-                addFilter('apklib') { artifact, file ->
-                    artifact.name == archivesBaseName + '-apklib'
-                }
-*/
 
                 pom.project {
                     name POM_NAME
@@ -149,5 +124,14 @@ afterEvaluate { project ->
     artifacts {
         archives androidSourcesJar
         archives androidJavadocsJar
+    }
+}
+
+// See: https://github.com/chrisbanes/gradle-mvn-push/issues/43#issuecomment-84140513
+afterEvaluate { project ->
+    android.libraryVariants.all { variant ->
+        tasks.androidJavadocs.doFirst {
+            classpath += files(variant.javaCompile.classpath.files)
+        }
     }
 }

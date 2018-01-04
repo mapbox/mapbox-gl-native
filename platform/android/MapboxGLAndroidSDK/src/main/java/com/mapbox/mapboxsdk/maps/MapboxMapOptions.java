@@ -725,8 +725,11 @@ public class MapboxMapOptions implements Parcelable {
   }
 
   /**
-   * Set the font-family for generating glyphs locally for ideographs in the ‘CJK Unified Ideographs’
+   * Set the font family for generating glyphs locally for ideographs in the ‘CJK Unified Ideographs’
    * and ‘Hangul Syllables’ ranges.
+   *
+   * The font family argument is passed to {@link android.graphics.Typeface#create(String, int)}.
+   * Default system fonts are defined in '/system/etc/fonts.xml'
    *
    * @param fontFamily font family for local ideograph generation.
    * @return This

@@ -1,7 +1,7 @@
 package com.mapbox.mapboxsdk.utils;
 
 /**
- * Comparisons from std sdk, which aren't available in API level <= 15
+ * Comparisons from std sdk, which aren't available in API level 15 and below
  */
 public class Compare {
 
