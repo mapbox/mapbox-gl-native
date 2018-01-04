@@ -1683,8 +1683,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                  numStyleURLMethods, (unsigned long)styleNames.count);
     });
 
-    self.styleIndex = (self.styleIndex + 1) % styleNames.count;
+    MGLStyle *oldStyle = self.mapView.style;
+    MGLStyleLayer *oldLayer = [oldStyle layerWithIdentifier:@"test-layer"];
+    [oldStyle removeLayer:oldLayer];
 
+    self.styleIndex = (self.styleIndex + 1) % styleNames.count;
     self.mapView.styleURL = styleURLs[self.styleIndex];
 
     UIButton *titleButton = (UIButton *)self.navigationItem.titleView;
@@ -1931,6 +1934,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+
+    MGLOpenGLStyleLayer *glLayer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"test-layer"];
+    [style addLayer:glLayer];
 }
 
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
