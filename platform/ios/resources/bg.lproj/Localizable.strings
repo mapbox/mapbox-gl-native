@@ -2,16 +2,16 @@
 "ANNOTATION_A11Y_HINT" = "Показва повече инфо";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_DESC" = "Неуспешна сесия за данни. Оригинална заявка: %@";
+"API_CLIENT_400_DESC" = "Незавършена сесия от данни. Оригинална заявка:%@";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_REASON" = "Статус кодът беше %ld";
+"API_CLIENT_400_REASON" = "Статус код %ld";
 
 /* No comment provided by engineer. */
 "CANCEL" = "Отказ";
 
 /* Accessibility hint for closing the selected annotation’s callout view and returning to the map */
-"CLOSE_CALLOUT_A11Y_HINT" = "Връща към картата";
+"CLOSE_CALLOUT_A11Y_HINT" = "Обратно към картата";
 
 /* Accessibility hint */
 "COMPASS_A11Y_HINT" = "Завърта картата в посока север";
@@ -23,16 +23,19 @@
 "COMPASS_NORTH" = "С";
 
 /* Instructions in Interface Builder designable; {key}, {plist file name} */
-"DESIGNABLE" = "За да се показва Mapbox карта тук, добави %1$@ към твоя токен за достъп в %2$@\n\nЗа подробни инструкции, виж:";
+"DESIGNABLE" = "За да покажеш Mapbox-хоствана карта тук, задай %1$@ към своя токен за достъп в %2$@\nЗа повече детайли, виж:";
 
 /* Setup documentation URL display string; keep as short as possible */
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
 
 /* Accessibility hint */
-"INFO_A11Y_HINT" = "Показва кредитите, форма за връзка и още";
+"INFO_A11Y_HINT" = "Показва благодарности, форма за обратна връзка и още";
 
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "За тази карта";
+
+/* List separator */
+"LIST_SEPARATOR" = ",";
 
 /* User-friendly error description */
 "LOAD_MAP_FAILED_DESC" = "Картата не се зареди поради неизвестна грешка.";
@@ -46,23 +49,41 @@
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Карта";
 
-/* Map accessibility value */
-"MAP_A11Y_VALUE" = "Мащаб %1$dх\n@2$ld видима(и) анотация(и)";
+/* Map accessibility value; {number of visible annotations} */
+"MAP_A11Y_VALUE_ANNOTATIONS" = "%ld видима анотация(и).";
+
+/* Map accessibility value; {list of visible places} */
+"MAP_A11Y_VALUE_PLACES" = "Видими места: %@.";
+
+/* Map accessibility value; {number of visible roads} */
+"MAP_A11Y_VALUE_ROADS" = "%ld видим път(я).";
+
+/* Map accessibility value; {zoom level} */
+"MAP_A11Y_VALUE_ZOOM" = "Мащаб %dx.";
 
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "Картата не се зареди поради повреден стил.";
 
+/* Accessibility value indicating that a road is a divided road (dual carriageway) */
+"ROAD_DIVIDED_A11Y_VALUE" = "Разделен път";
+
+/* Accessibility value indicating that a road is a one-way road */
+"ROAD_ONEWAY_A11Y_VALUE" = "Еднопосочно";
+
+/* String format for accessibility value for road feature; {route number} */
+"ROAD_REF_A11Y_FMT" = "Маршрут %@";
+
 /* Action sheet title */
-"SDK_NAME" = "Mapbox Maps SDK for iOS";
+"SDK_NAME" = "Mapbox Maps SDK за iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Сега е налична Mapbox Maps SDK for iOS версия %@:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK за iOS версия %@ е вече налична:";
 
 /* User-friendly error description */
 "STYLE_NOT_FOUND_DESC" = "Картата не се зареди поради неоткрит или несъвместим стил.";
 
 /* Telemetry prompt message */
-"TELEMETRY_DISABLED_MSG" = "Можеш да помогнеш OpenStreetMap и Mapbox да станат по-добри, като предоставиш анонимни данни за потребление.";
+/* OpenStreetMap full name attribution */
 
 /* Telemetry prompt button */
 "TELEMETRY_DISABLED_OFF" = "Не участвам";
@@ -71,7 +92,7 @@
 "TELEMETRY_DISABLED_ON" = "Участвам";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "Помагаш OpenStreetMap и Mapbox да станат по-добри, като предоставяш анонимни данни за потребление.";
+"TELEMETRY_ENABLED_MSG" = "Ти помагаш OpenStreetMap и Mapbox картите да стават по-добри, като предоставяш анонимни данни за употреба.";
 
 /* Telemetry prompt button */
 "TELEMETRY_ENABLED_OFF" = "Спирам участие";
@@ -80,14 +101,14 @@
 "TELEMETRY_ENABLED_ON" = "Продължавам да участвам";
 
 /* Telemetry prompt button */
-"TELEMETRY_MORE" = "Искам още инфо";
+"TELEMETRY_MORE" = "Покажи ми още";
 
 /* Action in attribution sheet */
-"TELEMETRY_NAME" = "Mapbox Телеметрия";
+"TELEMETRY_NAME" = "Mapbox телеметрия";
 
 /* Telemetry prompt title */
-"TELEMETRY_TITLE" = "Направи Mapbox картите по-добри";
+"OSM_FULL_NAME" = "OpenStreetMap";
 
-/* Default user location annotation title */
-"USER_DOT_TITLE" = "Сега си тук";
+/* OpenStreetMap short name attribution */
+"OSM_SHORT_NAME" = "OSM";
 

@@ -302,12 +302,14 @@ class AnnotationManager {
     }
 
     for (Marker marker : selectedMarkers) {
-      if (marker.isInfoWindowShown()) {
-        marker.hideInfoWindow();
-      }
+      if (marker != null) {
+        if (marker.isInfoWindowShown()) {
+          marker.hideInfoWindow();
+        }
 
-      if (marker instanceof MarkerView) {
-        markerViewManager.deselect((MarkerView) marker, false);
+        if (marker instanceof MarkerView) {
+          markerViewManager.deselect((MarkerView) marker, false);
+        }
       }
     }
 

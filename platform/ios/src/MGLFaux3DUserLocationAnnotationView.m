@@ -63,6 +63,7 @@ const CGFloat MGLUserLocationHeadingUpdateThreshold = 0.01;
     if (_puckModeActivated)
     {
         _puckArrow.fillColor = newTintColor;
+        _puckArrow.strokeColor = newTintColor;
     }
     else
     {

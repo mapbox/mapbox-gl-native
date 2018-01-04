@@ -127,6 +127,15 @@
     return self;
 }
 
+- (id)copyWithZone:(nullable NSZone *)zone
+{
+    MGLAttributionInfo *info = [[[self class] allocWithZone:zone] initWithTitle:_title
+                                                                            URL:_URL];
+    info.feedbackLink = _feedbackLink;
+    
+    return info;
+}
+
 - (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel {
     return [self feedbackURLForStyleURL:nil atCenterCoordinate:centerCoordinate zoomLevel:zoomLevel direction:0 pitch:0];
 }
@@ -158,6 +167,25 @@
     components.queryItems = queryItems;
     
     return components.URL;
+}
+
+- (NSAttributedString *)titleWithStyle:(MGLAttributionInfoStyle)style
+{
+    NSString *openStreetMap = NSLocalizedStringWithDefaultValue(@"OSM_FULL_NAME", @"Foundation", nil, @"OpenStreetMap", @"OpenStreetMap full name attribution");
+    NSString *OSM = NSLocalizedStringWithDefaultValue(@"OSM_SHORT_NAME", @"Foundation", nil, @"OSM", @"OpenStreetMap short name attribution");
+    
+    NSMutableAttributedString *title = [[NSMutableAttributedString alloc] initWithAttributedString:self.title];
+    [title removeAttribute:NSUnderlineStyleAttributeName range:NSMakeRange(0, [title.string length])];
+    
+    BOOL isAbbreviated = (style == MGLAttributionInfoStyleShort);
+    
+    if ([title.string rangeOfString:@"OpenStreetMap"].location != NSNotFound) {
+        [title.mutableString replaceOccurrencesOfString:@"OpenStreetMap" withString:isAbbreviated ? OSM : openStreetMap
+                                                options:NSCaseInsensitiveSearch
+                                                  range:NSMakeRange(0, [title.mutableString length])];
+    }
+    
+    return title;
 }
 
 - (BOOL)isEqual:(id)object {

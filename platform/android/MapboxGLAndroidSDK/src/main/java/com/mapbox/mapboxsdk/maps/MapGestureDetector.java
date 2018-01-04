@@ -550,7 +550,7 @@ final class MapGestureDetector {
         return super.onScale(detector);
       }
 
-      wasZoomingIn = (Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2)) >= 0;
+      wasZoomingIn = (Math.log(detector.getScaleFactor()) / Math.log(Math.PI / 2)) > 0;
       if (tiltGestureOccurred) {
         return false;
       }

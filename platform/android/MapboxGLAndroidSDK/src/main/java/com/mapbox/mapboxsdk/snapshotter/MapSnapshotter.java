@@ -5,19 +5,31 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.graphics.PointF;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.v4.content.res.ResourcesCompat;
+import android.text.Html;
 import android.util.DisplayMetrics;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.R;
+import com.mapbox.mapboxsdk.attribution.AttributionLayout;
+import com.mapbox.mapboxsdk.attribution.AttributionMeasure;
+import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
+import timber.log.Timber;
+
 /**
- * The map snapshotter creates a bitmap of the map, rendered
+ * The map snapshotter creates a large of the map, rendered
  * off the UI thread. The snapshotter itself must be used on
  * the UI thread (for access to the main looper)
  */
@@ -269,43 +281,126 @@ public class MapSnapshotter {
    * @param mapSnapshot the map snapshot to draw the overlay on
    */
   protected void addOverlay(MapSnapshot mapSnapshot) {
-    Bitmap original = mapSnapshot.getBitmap();
-    Canvas canvas = new Canvas(original);
-    addLogo(canvas, original);
+    Bitmap snapshot = mapSnapshot.getBitmap();
+    Canvas canvas = new Canvas(snapshot);
+    int margin = (int) context.getResources().getDisplayMetrics().density * LOGO_MARGIN_DP;
+    drawOverlay(mapSnapshot, snapshot, canvas, margin);
+  }
+
+  private void drawOverlay(MapSnapshot mapSnapshot, Bitmap snapshot, Canvas canvas, int margin) {
+    AttributionMeasure measure = getAttributionMeasure(mapSnapshot, snapshot, margin);
+    AttributionLayout layout = measure.measure();
+    drawLogo(mapSnapshot, canvas, margin, layout);
+    drawAttribution(mapSnapshot, canvas, measure, layout);
+  }
+
+  private AttributionMeasure getAttributionMeasure(MapSnapshot mapSnapshot, Bitmap snapshot, int margin) {
+    Logo logo = createScaledLogo(snapshot);
+    TextView longText = createTextView(mapSnapshot, false, logo.getScale());
+    TextView shortText = createTextView(mapSnapshot, true, logo.getScale());
+
+    return new AttributionMeasure.Builder()
+      .setSnapshot(snapshot)
+      .setLogo(logo.getLarge())
+      .setLogoSmall(logo.getSmall())
+      .setTextView(longText)
+      .setTextViewShort(shortText)
+      .setMarginPadding(margin)
+      .build();
+  }
+
+  private void drawLogo(MapSnapshot mapSnapshot, Canvas canvas, int margin, AttributionLayout layout) {
+    if (mapSnapshot.isShowLogo()) {
+      drawLogo(mapSnapshot.getBitmap(), canvas, margin, layout);
+    }
+  }
+
+  private void drawLogo(Bitmap snapshot, Canvas canvas, int margin, AttributionLayout placement) {
+    Bitmap selectedLogo = placement.getLogo();
+    if (selectedLogo != null) {
+      canvas.drawBitmap(selectedLogo, margin, snapshot.getHeight() - selectedLogo.getHeight() - margin, null);
+    }
+  }
+
+  private void drawAttribution(MapSnapshot mapSnapshot, Canvas canvas,
+                               AttributionMeasure measure, AttributionLayout layout) {
+    // draw attribution
+    PointF anchorPoint = layout.getAnchorPoint();
+    if (anchorPoint != null) {
+      drawAttribution(canvas, measure, anchorPoint);
+    } else {
+      Bitmap snapshot = mapSnapshot.getBitmap();
+      Timber.e("Could not generate attribution for snapshot size: %s x %s."
+          + " You are required to provide your own attribution for the used sources: %s",
+        snapshot.getWidth(), snapshot.getHeight(), mapSnapshot.getAttributions());
+    }
+  }
+
+  private void drawAttribution(Canvas canvas, AttributionMeasure measure, PointF anchorPoint) {
+    canvas.save();
+    canvas.translate(anchorPoint.x, anchorPoint.y);
+    measure.getTextView().draw(canvas);
+    canvas.restore();
+  }
+
+  private TextView createTextView(MapSnapshot mapSnapshot, boolean shortText, float scale) {
+    int textColor = ResourcesCompat.getColor(context.getResources(), R.color.mapbox_gray_dark, context.getTheme());
+    int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+    int heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED);
+    TextView textView = new TextView(context);
+    textView.setLayoutParams(new ViewGroup.LayoutParams(
+      ViewGroup.LayoutParams.WRAP_CONTENT,
+      ViewGroup.LayoutParams.WRAP_CONTENT)
+    );
+    textView.setSingleLine(true);
+    textView.setTextSize(10 * scale);
+    textView.setTextColor(textColor);
+    textView.setBackgroundResource(R.drawable.mapbox_rounded_corner);
+    textView.setText(Html.fromHtml(createAttributionString(mapSnapshot, shortText)));
+    textView.measure(widthMeasureSpec, heightMeasureSpec);
+    textView.layout(0, 0, textView.getMeasuredWidth(), textView.getMeasuredHeight());
+    return textView;
   }
 
   /**
-   * Draw a logo on the canvas created from the map snapshot.
+   * Create the attribution string.
    *
-   * @param canvas   the canvas to draw the bitmap on
-   * @param original the map snapshot image
+   * @param mapSnapshot the map snapshot to create the attribution for
+   * @param shortText   indicates if the short variant of the string should be parsed
+   * @return the parsed attribution string
    */
-  private void addLogo(Canvas canvas, Bitmap original) {
-    DisplayMetrics displayMetrics = context.getResources().getDisplayMetrics();
-    float margin = displayMetrics.density * LOGO_MARGIN_DP;
-    Bitmap logo = createScaledLogo(original);
-    canvas.drawBitmap(logo, margin, original.getHeight() - logo.getHeight() - margin, null);
+  private String createAttributionString(MapSnapshot mapSnapshot, boolean shortText) {
+    AttributionParser attributionParser = new AttributionParser.Options()
+      .withAttributionData(mapSnapshot.getAttributions())
+      .withCopyrightSign(false)
+      .withImproveMap(false)
+      .build();
+
+    return attributionParser.createAttributionString(shortText);
   }
 
   /**
    * Create a scaled logo for a map snapshot.
    *
    * @param snapshot the map snapshot where the logo should be placed on
-   * @return the scaled bitmap logo
+   * @return the scaled large logo
    */
-  private Bitmap createScaledLogo(Bitmap snapshot) {
+  private Logo createScaledLogo(@NonNull Bitmap snapshot) {
     Bitmap logo = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_icon, null);
     float scale = calculateLogoScale(snapshot, logo);
     Matrix matrix = new Matrix();
     matrix.postScale(scale, scale);
-    return Bitmap.createBitmap(logo, 0, 0, logo.getWidth(), logo.getHeight(), matrix, true);
+    Bitmap helmet = BitmapFactory.decodeResource(context.getResources(), R.drawable.mapbox_logo_helmet, null);
+    Bitmap large = Bitmap.createBitmap(logo, 0, 0, logo.getWidth(), logo.getHeight(), matrix, true);
+    Bitmap small = Bitmap.createBitmap(helmet, 0, 0, helmet.getWidth(), helmet.getHeight(), matrix, true);
+    return new Logo(large, small, scale);
   }
 
   /**
    * Calculates the scale of the logo, only allow downscaling.
    *
-   * @param snapshot the bitmap of the map snapshot
-   * @param logo     the bitmap of the mapbox logo
+   * @param snapshot the large of the map snapshot
+   * @param logo     the large of the mapbox logo
    * @return the scale value
    */
   private float calculateLogoScale(Bitmap snapshot, Bitmap logo) {
@@ -315,7 +410,14 @@ public class MapSnapshotter {
     float prefWidth = logo.getWidth() / widthRatio;
     float prefHeight = logo.getHeight() / heightRatio;
     float calculatedScale = Math.min(prefWidth / logo.getWidth(), prefHeight / logo.getHeight()) * 2;
-    return calculatedScale < 1 ? calculatedScale : 1.0f;
+    if (calculatedScale > 1) {
+      // don't allow over-scaling
+      calculatedScale = 1.0f;
+    } else if (calculatedScale < 0.60f) {
+      // don't scale to low either
+      calculatedScale = 0.60f;
+    }
+    return calculatedScale;
   }
 
   /**
@@ -324,14 +426,17 @@ public class MapSnapshotter {
    *
    * @param snapshot the generated snapshot
    */
-  protected void onSnapshotReady(MapSnapshot snapshot) {
-    if (callback != null) {
-      if (snapshot.isShowLogo()) {
-        addOverlay(snapshot);
+  protected void onSnapshotReady(final MapSnapshot snapshot) {
+    new Handler().post(new Runnable() {
+      @Override
+      public void run() {
+        if (callback != null) {
+          addOverlay(snapshot);
+          callback.onSnapshotReady(snapshot);
+          reset();
+        }
       }
-      callback.onSnapshotReady(snapshot);
-      reset();
-    }
+    });
   }
 
   /**
@@ -364,4 +469,28 @@ public class MapSnapshotter {
 
   @Override
   protected native void finalize() throws Throwable;
+
+  private class Logo {
+    private Bitmap large;
+    private Bitmap small;
+    private float scale;
+
+    public Logo(Bitmap large, Bitmap small, float scale) {
+      this.large = large;
+      this.small = small;
+      this.scale = scale;
+    }
+
+    public Bitmap getLarge() {
+      return large;
+    }
+
+    public Bitmap getSmall() {
+      return small;
+    }
+
+    public float getScale() {
+      return scale;
+    }
+  }
 }

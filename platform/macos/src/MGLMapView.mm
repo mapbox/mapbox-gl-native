@@ -371,7 +371,7 @@ public:
     NSImage *logoImage = [[NSImage alloc] initWithContentsOfFile:
                           [[NSBundle mgl_frameworkBundle] pathForResource:@"mapbox" ofType:@"pdf"]];
     // Account for the image’s built-in padding when aligning other controls to the logo.
-    logoImage.alignmentRect = NSInsetRect(logoImage.alignmentRect, 0, 3);
+    logoImage.alignmentRect = NSOffsetRect(logoImage.alignmentRect, 0, 3);
     _logoView.image = logoImage;
     _logoView.translatesAutoresizingMaskIntoConstraints = NO;
     _logoView.accessibilityTitle = NSLocalizedStringWithDefaultValue(@"MAP_A11Y_TITLE", nil, nil, @"Mapbox", @"Accessibility title");
@@ -2077,7 +2077,7 @@ public:
                 return true;
             }
             
-            if ([annotation isKindOfClass:[MGLShape class]])
+            if ([annotation isKindOfClass:[MGLMultiPoint class]])
             {
                 return false;
             }

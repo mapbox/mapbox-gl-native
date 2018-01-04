@@ -64,6 +64,9 @@
 /* User-friendly error description */
 "PARSE_STYLE_FAILED_DESC" = "The map failed to load because the style is corrupted.";
 
+/* String format for accessibility value for road feature; {starting compass direction}, {ending compass direction} */
+"ROAD_DIRECTION_A11Y_FMT" = "%1$@ to %2$@";
+
 /* Accessibility value indicating that a road is a divided road (dual carriageway) */
 "ROAD_DIVIDED_A11Y_VALUE" = "Divided road";
 

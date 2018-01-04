@@ -54,7 +54,7 @@ function verifyFramework() {
 
 	# Verify the static lib at least has simulator and the two common ARM architectures
 	local PRESENT_ARCHITECTURES=$( xcrun lipo -info "${BINARY_PATH}" )
-	for arch in "armv7" "arm64" "i386" "x86_64"; do
+	for arch in "armv7" "arm64" "x86_64"; do
 		if [[ ! $PRESENT_ARCHITECTURES == *$arch* ]]; then
 			printf "ERROR: Architecture ${arch} not found in ${FRAMEWORK_NAME}\n";
 			exit 6;

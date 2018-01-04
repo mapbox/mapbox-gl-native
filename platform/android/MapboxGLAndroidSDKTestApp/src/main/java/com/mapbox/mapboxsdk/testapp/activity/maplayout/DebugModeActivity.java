@@ -16,6 +16,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.constants.Style;
+import com.mapbox.mapboxsdk.http.HttpRequestUtil;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -54,6 +55,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    HttpRequestUtil.setLogEnabled(false);
     setContentView(R.layout.activity_debug_mode);
     setupToolbar();
     setupMapView(savedInstanceState);
@@ -204,6 +206,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
+    HttpRequestUtil.setLogEnabled(true);
   }
 
   @Override

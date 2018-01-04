@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <color name="mapbox_gray_dark">#5F5F5F</color>
     <color name="mapbox_gray">#7D7F80</color>
     <color name="mapbox_blue">#1E8CAB</color>
 </resources>

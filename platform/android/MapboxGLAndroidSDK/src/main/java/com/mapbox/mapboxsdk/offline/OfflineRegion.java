@@ -400,9 +400,6 @@ public class OfflineRegion {
    * When the operation is complete or encounters an error, the given callback will be
    * executed on the main thread.
    * </p>
-   * <p>
-   * After you call this method, you may not call any additional methods on this object.
-   * </p>
    *
    * @param bytes    the metadata in bytes
    * @param callback the callback to be invoked

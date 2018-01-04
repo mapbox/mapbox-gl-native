@@ -14,14 +14,14 @@ public class LocalGlyphRasterizer {
 
   /***
    * Uses Android-native drawing code to rasterize a single glyph
-   * to a square @{link Bitmap} which can be returned to portable
+   * to a square {@link Bitmap} which can be returned to portable
    * code for transformation into a Signed Distance Field glyph.
    *
    * @param fontFamily Font family string to pass to Typeface.create
    * @param bold If true, use Typeface.BOLD option
    * @param glyphID 16-bit Unicode BMP codepoint to draw
    *
-   * @return Return a @{link Bitmap} to be displayed in the requested tile.
+   * @return Return a {@link Bitmap} to be displayed in the requested tile.
    */
   @WorkerThread
   protected static Bitmap drawGlyphBitmap(String fontFamily, boolean bold, char glyphID) {

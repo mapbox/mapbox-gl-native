@@ -8,6 +8,24 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
+ The attribution info is represented in the longest format available.
+ */
+typedef NS_ENUM(NSUInteger, MGLAttributionInfoStyle) {
+    /**
+     Specifies a short attribution info style.
+     */
+    MGLAttributionInfoStyleShort = 1,
+    /**
+     Specifies a medium attribution info style.
+     */
+    MGLAttributionInfoStyleMedium,
+    /**
+     Specifies a long attribution info style.
+     */
+    MGLAttributionInfoStyleLong
+};
+
+/**
  Information about an attribution statement, usually a copyright or trademark
  statement, associated with a map content source.
  */
@@ -58,6 +76,18 @@ MGL_EXPORT
     `nil`.
  */
 - (nullable NSURL *)feedbackURLAtCenterCoordinate:(CLLocationCoordinate2D)centerCoordinate zoomLevel:(double)zoomLevel;
+
+/**
+ Returns a copy of the current `title` formatted accordingly to `style`.
+ 
+ Example: If the `style` property is set to `MGLAttributionInfoStyleShort` and the
+ `title` property is set to `OpenStreetMap`, then this method returns `OSM`.
+ 
+ @param style The attribution info style.
+ 
+ @return The `NSAttributedString` styled title.
+ */
+- (NSAttributedString *)titleWithStyle:(MGLAttributionInfoStyle)style;
 
 @end
 

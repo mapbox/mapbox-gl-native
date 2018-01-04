@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.PointF;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -82,8 +83,15 @@ final class Transform implements MapView.OnMapChangedListener {
     if (change == REGION_DID_CHANGE_ANIMATED) {
       updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
-        cameraCancelableCallback.onFinish();
-        cameraCancelableCallback = null;
+        new Handler().post(new Runnable() {
+          @Override
+          public void run() {
+            if (cameraCancelableCallback != null) {
+              cameraCancelableCallback.onFinish();
+              cameraCancelableCallback = null;
+            }
+          }
+        });
       }
       cameraChangeDispatcher.onCameraIdle();
       mapView.removeOnMapChangedListener(this);
@@ -175,8 +183,15 @@ final class Transform implements MapView.OnMapChangedListener {
     // notify animateCamera and easeCamera about cancelling
     if (cameraCancelableCallback != null) {
       cameraChangeDispatcher.onCameraIdle();
-      cameraCancelableCallback.onCancel();
-      cameraCancelableCallback = null;
+      new Handler().post(new Runnable() {
+        @Override
+        public void run() {
+          if (cameraCancelableCallback != null) {
+            cameraCancelableCallback.onCancel();
+            cameraCancelableCallback = null;
+          }
+        }
+      });
     }
 
     // cancel ongoing transitions

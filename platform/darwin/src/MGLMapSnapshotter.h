@@ -14,9 +14,10 @@ MGL_EXPORT
 /**
  Creates a set of options with the minimum required information.
  
- @param styleURL URL of the map style to snapshot. The URL may be a full HTTP or HTTPS URL,
- a Mapbox URL indicating the style’s map ID (`mapbox://styles/{user}/{style`}), or a path
- to a local file relative to the application’s resource path. Specify `nil` for the default style.
+ @param styleURL URL of the map style to snapshot. The URL may be a full HTTP or
+    HTTPS URL, a Mapbox URL indicating the style’s map ID
+    (`mapbox://styles/{user}/{style}`), or a path to a local file relative to
+    the application’s resource path. Specify `nil` for the default style.
  @param size The image size.
  */
 - (instancetype)initWithStyleURL:(nullable NSURL *)styleURL camera:(MGLMapCamera *)camera size:(CGSize)size;
@@ -31,17 +32,18 @@ MGL_EXPORT
 /**
  The zoom level.
  
- The default zoom level is 0. If this property is non-zero and the camera property
- is non-nil, the camera’s altitude is ignored in favor of this property’s value.
+ The default zoom level is 0. If this property is non-zero and the camera
+ property is non-nil, the camera’s altitude is ignored in favor of this
+ property’s value.
  */
 @property (nonatomic) double zoomLevel;
 
 /**
  A camera representing the viewport visible in the snapshot.
  
- If this property is non-nil and the `coordinateBounds` property is set to a non-empty
- coordinate bounds, the camera’s center coordinate and altitude are ignored in favor
- of the `coordinateBounds` property.
+ If this property is non-nil and the `coordinateBounds` property is set to a
+ non-empty coordinate bounds, the camera’s center coordinate and altitude are
+ ignored in favor of the `coordinateBounds` property.
  */
 @property (nonatomic) MGLMapCamera *camera;
 
@@ -78,24 +80,26 @@ MGL_EXPORT
 
 #if TARGET_OS_IPHONE
 /**
- Converts the specified map coordinate to a point in the coordinate space of the image.
+ Converts the specified map coordinate to a point in the coordinate space of the
+ image.
  */
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
 
 /**
  The image of the map’s content.
  */
-@property(nonatomic, readonly) UIImage *image;
+@property (nonatomic, readonly) UIImage *image;
 #else
 /**
- Converts the specified map coordinate to a point in the coordinate space of the image.
+ Converts the specified map coordinate to a point in the coordinate space of the
+ image.
  */
 - (NSPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate;
 
 /**
  The image of the map’s content.
  */
-@property(nonatomic, readonly) NSImage *image;
+@property (nonatomic, readonly) NSImage *image;
 #endif
 
 @end
@@ -103,13 +107,33 @@ MGL_EXPORT
 /**
  A block to processes the result or error of a snapshot request.
  
- @param snapshot The `MGLMapSnapshot` that was generated or `nil` if an error occurred.
+ @param snapshot The `MGLMapSnapshot` that was generated or `nil` if an error
+    occurred.
  @param error The error that occured or `nil` when successful.
  */
 typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapshot, NSError* _Nullable error);
 
 /**
- An immutable utility object for capturing map-based images.
+ An `MGLMapSnapshotter` generates static raster images of the map. Each snapshot
+ image depicts a portion of a map defined by an `MGLMapSnapshotOptions` object
+ you provide. The snapshotter generates an `MGLMapSnapshot` object
+ asynchronously, passing it into a completion handler once tiles and other
+ resources needed for the snapshot are finished loading.
+ 
+ You can change the snapshotter’s options at any time and reuse the snapshotter
+ for multiple distinct snapshots; however, the snapshotter can only generate one
+ snapshot at a time. If you need to generate multiple snapshots concurrently,
+ create multiple snapshotter objects.
+ 
+ For an interactive map, use the `MGLMapView` class. Both `MGLMapSnapshotter`
+ and `MGLMapView` are compatible with offline packs managed by the
+ `MGLOfflineStorage` class.
+ 
+ From a snapshot, you can obtain an image and convert geographic coordinates to
+ the image’s coordinate space in order to superimpose markers and overlays. If
+ you do not need offline map functionality, you can use the `Snapshot` class in
+ [MapboxStatic.swift](https://github.com/mapbox/MapboxStatic.swift/) to generate
+ static map images with overlays.
  
  ### Example
  
@@ -121,18 +145,25 @@ typedef void (^MGLMapSnapshotCompletionHandler)(MGLMapSnapshot* _Nullable snapsh
  
  let snapshotter = MGLMapSnapshotter(options: options)
  snapshotter.start { (snapshot, error) in
-     if error != nil {
-         // error handler
-     } else {
-         // image handler
+     if let error = error {
+         fatalError(error.localizedDescription)
      }
+     
+     image = snapshot?.image
  }
  ```
  */
 MGL_EXPORT
 @interface MGLMapSnapshotter : NSObject
 
-- (instancetype)initWithOptions:(MGLMapSnapshotOptions*)options;
+/**
+ Initializes and returns a map snapshotter object that produces snapshots
+ according to the given options.
+ 
+ @param options The options to use when generating a map snapshot.
+ @return An initialized map snapshotter.
+ */
+- (instancetype)initWithOptions:(MGLMapSnapshotOptions *)options;
 
 /**
  Starts the snapshot creation and executes the specified block with the result.
@@ -142,7 +173,8 @@ MGL_EXPORT
 - (void)startWithCompletionHandler:(MGLMapSnapshotCompletionHandler)completionHandler;
 
 /**
- Starts the snapshot creation and executes the specified block with the result on the specified queue.
+ Starts the snapshot creation and executes the specified block with the result
+ on the specified queue.
  
  @param queue The queue to handle the result on.
  @param completionHandler The block to handle the result in.
@@ -152,49 +184,15 @@ MGL_EXPORT
 /**
  Cancels the snapshot creation request, if any.
  
- Once you call this method, you cannot resume the snapshot. In order to obtain the
- snapshot, create a new `MGLMapSnapshotter` object.
+ Once you call this method, you cannot resume the snapshot. In order to obtain
+ the snapshot, create a new `MGLMapSnapshotter` object.
  */
 - (void)cancel;
 
 /**
- The zoom level.
- 
- The default zoom level is 0. If this property is non-zero and the camera property
- is non-nil, the camera’s altitude is ignored in favor of this property’s value. 
+ The options to use when generating a map snapshot.
  */
-@property (nonatomic) double zoomLevel;
-
-/**
- A camera representing the viewport visible in the snapshot.
- 
- If this property is non-nil and the `coordinateBounds` property is set to a non-empty
- coordinate bounds, the camera’s center coordinate and altitude are ignored in favor
- of the `coordinateBounds` property.
- */
-@property (nonatomic) MGLMapCamera *camera;
-
-/**
- The coordinate rectangle that encompasses the bounds to capture.
- 
- If this property is non-empty and the camera property is non-nil, the camera’s
- center coordinate and altitude are ignored in favor of this property’s value.
- */
-@property (nonatomic) MGLCoordinateBounds coordinateBounds;
-
-/**
- URL of the map style to snapshot.
- 
- The URL may be a full HTTP or HTTPS URL, a Mapbox URL indicating the style’s
- map ID (`mapbox://styles/{user}/{style`}), or a path to a local file relative
- to the application’s resource path. Specify `nil` for the default style.
- */
-@property (nonatomic, nullable) NSURL *styleURL;
-
-/**
- The size of the output image, measured in points.
- */
-@property (nonatomic) CGSize size;
+@property (nonatomic) MGLMapSnapshotOptions *options;
 
 /**
  Indicates whether a snapshot is currently being generated.

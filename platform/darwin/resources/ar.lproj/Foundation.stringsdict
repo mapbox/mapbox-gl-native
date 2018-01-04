@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>COORD_DEG_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@degrees@</string>
+		<key>degrees</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>zero</key>
+			<string>0 درجة</string>
+			<key>one</key>
+			<string>درجة واحدة</string>
+			<key>two</key>
+			<string>درجتان</string>
+			<key>few</key>
+			<string>%d درجات</string>
+			<key>many</key>
+			<string>%d درجة</string>
+			<key>other</key>
+			<string>%d درجة</string>
+		</dict>
+	</dict>
+	<key>COORD_MIN_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@minutes@</string>
+		<key>minutes</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>zero</key>
+			<string>أقل من دقيقة</string>
+			<key>one</key>
+			<string>دقيقة واحدة</string>
+			<key>two</key>
+			<string>دقيقتان</string>
+			<key>few</key>
+			<string>%d دقائق</string>
+			<key>many</key>
+			<string>%d دقيقة</string>
+			<key>other</key>
+			<string>%d دقيقة</string>
+		</dict>
+	</dict>
+	<key>COORD_SEC_LONG</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@seconds@</string>
+		<key>seconds</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>zero</key>
+			<string>أقل من ثانية</string>
+			<key>one</key>
+			<string>ثانية واحدة</string>
+			<key>two</key>
+			<string>ثانيتان</string>
+			<key>few</key>
+			<string>%d ثوان</string>
+			<key>many</key>
+			<string>%d ثانية</string>
+			<key>other</key>
+			<string>%d ثانية</string>
+		</dict>
+	</dict>
+</dict>
+</plist>
