@@ -32,7 +32,7 @@ import com.mapzen.android.lost.api.LostApiClient;
  * @deprecated Use a {@link Mapbox#getLocationEngine()} instead.
  */
 @Deprecated
-public class LocationSource extends LocationEngine implements LocationListener {
+public class LocationSource extends LocationEngine implements LostApiClient.ConnectionCallbacks, LocationListener {
 
   private Context context;
   private LostApiClient lostApiClient;
@@ -45,7 +45,9 @@ public class LocationSource extends LocationEngine implements LocationListener {
   public LocationSource(Context context) {
     super();
     this.context = context.getApplicationContext();
-    lostApiClient = new LostApiClient.Builder(this.context).build();
+    lostApiClient = new LostApiClient.Builder(this.context)
+      .addConnectionCallbacks(this)
+      .build();
   }
 
   /**
@@ -61,12 +63,7 @@ public class LocationSource extends LocationEngine implements LocationListener {
    */
   @Override
   public void activate() {
-    if (!lostApiClient.isConnected()) {
-      lostApiClient.connect();
-    }
-    for (LocationEngineListener listener : locationListeners) {
-      listener.onConnected();
-    }
+    connect();
   }
 
   /**
@@ -76,7 +73,7 @@ public class LocationSource extends LocationEngine implements LocationListener {
    */
   @Override
   public void deactivate() {
-    if (lostApiClient.isConnected()) {
+    if (lostApiClient != null && lostApiClient.isConnected()) {
       lostApiClient.disconnect();
     }
   }
@@ -93,6 +90,24 @@ public class LocationSource extends LocationEngine implements LocationListener {
   }
 
   /**
+   * Invoked when the location provider has connected.
+   */
+  @Override
+  public void onConnected() {
+    for (LocationEngineListener listener : locationListeners) {
+      listener.onConnected();
+    }
+  }
+
+  /**
+   * Invoked when the location provider connection has been suspended.
+   */
+  @Override
+  public void onConnectionSuspended() {
+    // Empty
+  }
+
+  /**
    * Returns the Last known location is the location provider is connected and location permissions are granted.
    *
    * @return the last known location
@@ -102,7 +117,7 @@ public class LocationSource extends LocationEngine implements LocationListener {
   public Location getLastLocation() {
     if (lostApiClient.isConnected()) {
       //noinspection MissingPermission
-      return LocationServices.FusedLocationApi.getLastLocation();
+      return LocationServices.FusedLocationApi.getLastLocation(lostApiClient);
     }
     return null;
   }
@@ -136,7 +151,7 @@ public class LocationSource extends LocationEngine implements LocationListener {
 
     if (lostApiClient.isConnected()) {
       //noinspection MissingPermission
-      LocationServices.FusedLocationApi.requestLocationUpdates(request, this);
+      LocationServices.FusedLocationApi.requestLocationUpdates(lostApiClient, request, this);
     }
   }
 
@@ -146,7 +161,7 @@ public class LocationSource extends LocationEngine implements LocationListener {
   @Override
   public void removeLocationUpdates() {
     if (lostApiClient.isConnected()) {
-      LocationServices.FusedLocationApi.removeLocationUpdates(this);
+      LocationServices.FusedLocationApi.removeLocationUpdates(lostApiClient, this);
     }
   }
 
@@ -169,6 +184,16 @@ public class LocationSource extends LocationEngine implements LocationListener {
   public void onLocationChanged(Location location) {
     for (LocationEngineListener listener : locationListeners) {
       listener.onLocationChanged(location);
+    }
+  }
+
+  private void connect() {
+    if (lostApiClient != null) {
+      if (lostApiClient.isConnected()) {
+        onConnected();
+      } else {
+        lostApiClient.connect();
+      }
     }
   }
 }

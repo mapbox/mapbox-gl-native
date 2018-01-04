@@ -848,6 +848,8 @@
 		DA737AE91E5917C300AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DA737AEA1E5917EF00AD2CDE /* uk */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.strings; name = uk; path = uk.lproj/Root.strings; sourceTree = "<group>"; };
 		DA737EE01D056A4E005BDA16 /* MGLMapViewDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapViewDelegate.h; sourceTree = "<group>"; };
+		DA80E9601FE84AD90065FC9B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ar; path = ar.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DA80E9611FE84AEF0065FC9B /* ar */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = ar; path = ar.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DA821D041CCC6D59007508D4 /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = LaunchScreen.storyboard; sourceTree = "<group>"; };
 		DA821D051CCC6D59007508D4 /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
 		DA8847D21CBAF91600AB86E3 /* Mapbox.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Mapbox.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -2142,6 +2144,7 @@
 				nl,
 				hu,
 				bg,
+				ar,
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2558,6 +2561,7 @@
 				DAE8CCAD1E6E8C70009B5CB0 /* nl */,
 				DA5C09BA1EFC48550056B178 /* hu */,
 				DA3389651FA3EE1B001EA329 /* bg */,
+				DA80E9601FE84AD90065FC9B /* ar */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2648,6 +2652,7 @@
 				DACFE7981F66EA2100630DA8 /* vi */,
 				DA3389671FA3EE2F001EA329 /* bg */,
 				DA33896B1FA3EF4A001EA329 /* hu */,
+				DA80E9611FE84AEF0065FC9B /* ar */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";

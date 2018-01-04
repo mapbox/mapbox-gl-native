@@ -712,19 +712,21 @@ public final class MapboxMap {
    * @param callback the callback to be invoked when an animation finishes or is canceled
    */
   public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback) {
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        transform.moveCamera(MapboxMap.this, update, callback);
-        // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
-        // invalidate camera position to provide OnCameraChange event.
-        invalidateCameraPosition();
+    transform.moveCamera(MapboxMap.this, update, callback);
+    // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
+    // invalidate camera position to provide OnCameraChange event.
+    invalidateCameraPosition();
 
-        if (callback != null) {
-          callback.onFinish();
+    if (callback != null) {
+      new Handler().post(new Runnable() {
+        @Override
+        public void run() {
+          if (callback != null) {
+            callback.onFinish();
+          }
         }
-      }
-    });
+      });
+    }
   }
 
   /**
@@ -848,12 +850,7 @@ public final class MapboxMap {
     if (durationMs <= 0) {
       throw new IllegalArgumentException("Null duration passed into easeCamera");
     }
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback, isDismissable);
-      }
-    });
+    transform.easeCamera(MapboxMap.this, update, durationMs, easingInterpolator, callback, isDismissable);
   }
 
   /**
@@ -923,12 +920,8 @@ public final class MapboxMap {
     if (durationMs <= 0) {
       throw new IllegalArgumentException("Null duration passed into animageCamera");
     }
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        transform.animateCamera(MapboxMap.this, update, durationMs, callback);
-      }
-    });
+
+    transform.animateCamera(MapboxMap.this, update, durationMs, callback);
   }
 
   /**

@@ -396,12 +396,24 @@ MGL_EXPORT IB_DESIGNABLE
  Changing the value of this property updates the receiver immediately. If you
  want to animate the change, use the `-setVisibleCoordinateBounds:animated:`
  method instead.
+ 
+ If a longitude is less than −180 degrees or greater than 180 degrees, the visible
+ bounds straddles the antimeridian or international date line.
+ 
+ For example, a visible bounds that stretches from Tokyo to San Francisco would have
+ coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
  */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds, optionally
  animating the change.
+ 
+ To make the visible bounds go across the antimeridian or international date line,
+ specify some longitudes less than −180 degrees or greater than 180 degrees.
+ 
+ For example, a visible bounds that stretches from Tokyo to San Francisco would have
+ coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling and

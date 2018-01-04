@@ -2,20 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>MAP_A11Y_VALUE</key>
+	<key>MAP_A11Y_VALUE_ANNOTATIONS</key>
 	<dict>
 		<key>NSStringLocalizedFormatKey</key>
-		<string>%#@level@
-%#@count@</string>
-		<key>level</key>
-		<dict>
-			<key>NSStringFormatSpecTypeKey</key>
-			<string>NSStringPluralRuleType</string>
-			<key>NSStringFormatValueTypeKey</key>
-			<string>d</string>
-			<key>other</key>
-			<string>Thu phóng gấp %d lần</string>
-		</dict>
+		<string>%#@count@</string>
 		<key>count</key>
 		<dict>
 			<key>NSStringFormatSpecTypeKey</key>
@@ -24,6 +14,34 @@
 			<string>ld</string>
 			<key>other</key>
 			<string>%d chú thích đang xuất hiện</string>
+		</dict>
+	</dict>
+	<key>MAP_A11Y_VALUE_ROADS</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@count@</string>
+		<key>count</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>ld</string>
+			<key>other</key>
+			<string>%d con đường đang xuất hiện</string>
+		</dict>
+	</dict>
+	<key>MAP_A11Y_VALUE_ZOOM</key>
+	<dict>
+		<key>NSStringLocalizedFormatKey</key>
+		<string>%#@level@</string>
+		<key>level</key>
+		<dict>
+			<key>NSStringFormatSpecTypeKey</key>
+			<string>NSStringPluralRuleType</string>
+			<key>NSStringFormatValueTypeKey</key>
+			<string>d</string>
+			<key>other</key>
+			<string>Thu phóng gấp %d lần</string>
 		</dict>
 	</dict>
 </dict>

@@ -14,6 +14,7 @@ dependencies {
     testImplementation rootProject.ext.dep.lost
     testImplementation rootProject.ext.dep.junit
     testImplementation rootProject.ext.dep.mockito
+    testImplementation rootProject.ext.dep.robolectric
 }
 
 android {
@@ -119,7 +120,9 @@ android {
     }
 
     testOptions {
-        unitTests.returnDefaultValues = true
+        unitTests{
+            returnDefaultValues = true
+        }
     }
 
     buildTypes {

@@ -46,6 +46,19 @@ buildPackageStyle() {
             --name ${file_name} \
             --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
     fi
+    if [[ ${DEPLOY_APP} == true ]]; then
+        cd build/macos/app
+        rm -f 'Mapbox GL.app.zip'
+        zip -yr '../deploy/Mapbox GL.app.zip' 'Mapbox GL.app'
+        cd -
+        if [[ "${GITHUB_RELEASE}" == true ]]; then
+            echo "Uploading ${file_name} to GitHub"
+            github-release upload \
+                --tag "macos-v${PUBLISH_VERSION}" \
+                --name ${file_name} \
+                --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
+        fi
+    fi
 }
 
 export TRAVIS_REPO_SLUG=mapbox-gl-native
@@ -114,6 +127,6 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
 fi
 
 buildPackageStyle "xpackage" "symbols"
-buildPackageStyle "xpackage SYMBOLS=NO"
+DEPLOY_APP=true buildPackageStyle "xpackage SYMBOLS=NO"
 
 step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"
