@@ -57,7 +57,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    HttpRequestUtil.setLogEnabled(false);
+    HttpRequestUtil.setPrintRequestUrlOnFaillure(true);
     setContentView(R.layout.activity_debug_mode);
     setupToolbar();
     setupMapView(savedInstanceState);
@@ -231,7 +231,7 @@ public class DebugModeActivity extends AppCompatActivity implements OnMapReadyCa
   protected void onDestroy() {
     super.onDestroy();
     mapView.onDestroy();
-    HttpRequestUtil.setLogEnabled(true);
+    HttpRequestUtil.setPrintRequestUrlOnFaillure(false);
   }
 
   @Override
