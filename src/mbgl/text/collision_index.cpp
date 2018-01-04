@@ -78,10 +78,10 @@ std::pair<bool,bool> CollisionIndex::placeFeature(CollisionFeature& feature,
         CollisionBox& box = feature.boxes.front();
         const auto projectedPoint = projectAndGetPerspectiveRatio(posMatrix, box.anchor);
         const float tileToViewport = textPixelRatio * projectedPoint.second;
-        box.px1 = box.x1 / tileToViewport + projectedPoint.first.x;
-        box.py1 = box.y1 / tileToViewport + projectedPoint.first.y;
-        box.px2 = box.x2 / tileToViewport + projectedPoint.first.x;
-        box.py2 = box.y2 / tileToViewport + projectedPoint.first.y;
+        box.px1 = box.x1 * tileToViewport + projectedPoint.first.x;
+        box.py1 = box.y1 * tileToViewport + projectedPoint.first.y;
+        box.px2 = box.x2 * tileToViewport + projectedPoint.first.x;
+        box.py2 = box.y2 * tileToViewport + projectedPoint.first.y;
 
         if (!isInsideGrid(box) ||
             (!allowOverlap && collisionGrid.hitTest({{ box.px1, box.py1 }, { box.px2, box.py2 }}))) {
@@ -130,8 +130,10 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
     bool entirelyOffscreen = true;
 
     const auto tileToViewport = projectedAnchor.first * textPixelRatio;
+    // pixelsToTileUnits is used for translating line geometry to tile units
+    // ... so we care about 'scale' but not 'perspectiveRatio'
     // equivalent to pixel_to_tile_units
-    const auto pixelsToTileUnits = tileToViewport / scale;
+    const auto pixelsToTileUnits = 1 / (textPixelRatio * scale);
 
     float firstTileDistance = 0, lastTileDistance = 0;
     if (firstAndLastGlyph) {
@@ -155,7 +157,7 @@ std::pair<bool,bool> CollisionIndex::placeLineFeature(CollisionFeature& feature,
 
         const auto projectedPoint = projectPoint(posMatrix, circle.anchor);
         const float tileUnitRadius = (circle.x2 - circle.x1) / 2;
-        const float radius = tileUnitRadius / tileToViewport;
+        const float radius = tileUnitRadius * tileToViewport;
 
         if (atLeastOneCirclePlaced) {
             const CollisionBox& previousCircle = feature.boxes[i - 1];
@@ -330,7 +332,7 @@ std::pair<float,float> CollisionIndex::projectAnchor(const mat4& posMatrix, cons
     vec4 p = {{ point.x, point.y, 0, 1 }};
     matrix::transformMat4(p, p, posMatrix);
     return std::make_pair(
-        0.5 + 0.5 * (p[3] / transformState.getCameraToCenterDistance()),
+        0.5 + 0.5 * (transformState.getCameraToCenterDistance() / p[3]),
         p[3]
     );
 }
@@ -343,7 +345,10 @@ std::pair<Point<float>,float> CollisionIndex::projectAndGetPerspectiveRatio(cons
             (((p[0]  / p[3] + 1) / 2) * transformState.getSize().width) + viewportPadding,
             (((-p[1] / p[3] + 1) / 2) * transformState.getSize().height) + viewportPadding
         ),
-        0.5 + 0.5 * (p[3] / transformState.getCameraToCenterDistance())
+        // See perspective ratio comment in symbol_sdf.vertex
+        // We're doing collision detection in viewport space so we need
+        // to scale down boxes in the distance
+        0.5 + 0.5 * (transformState.getCameraToCenterDistance() / p[3])
     );
 }
 
