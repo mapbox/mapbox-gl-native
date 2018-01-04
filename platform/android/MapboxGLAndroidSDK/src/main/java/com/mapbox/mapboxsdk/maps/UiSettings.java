@@ -6,6 +6,7 @@ import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
@@ -925,7 +926,7 @@ public final class UiSettings {
     initMargins[2] = right;
     initMargins[3] = bottom;
 
-    // convert inital margins with padding
+    // convert initial margins with padding
     int[] contentPadding = projection.getContentPadding();
     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
     left += contentPadding[0];
@@ -933,6 +934,13 @@ public final class UiSettings {
     right += contentPadding[2];
     bottom += contentPadding[3];
     layoutParams.setMargins(left, top, right, bottom);
+
+    // support RTL
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      layoutParams.setMarginStart(left);
+      layoutParams.setMarginEnd(right);
+    }
+
     view.setLayoutParams(layoutParams);
   }
 }
