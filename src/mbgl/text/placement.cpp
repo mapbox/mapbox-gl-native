@@ -59,7 +59,7 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
 
         const float scale = std::pow(2, state.getZoom() - renderTile.tile.id.overscaledZ);
-        const float textPixelRatio = util::EXTENT / (util::tileSize * renderTile.tile.id.overscaleFactor());
+        const float textPixelRatio = (util::tileSize * renderTile.tile.id.overscaleFactor()) / util::EXTENT;
 
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
