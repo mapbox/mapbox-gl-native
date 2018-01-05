@@ -77,8 +77,6 @@
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 @property (readonly, copy, nullable) NSURL *URL;
-//TODO: AK: remove once failing test established
-@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
 
 @end
@@ -170,8 +168,6 @@ static NSURL *MGLStyleURL_trafficNight;
     if (self = [super init]) {
         _mapView = mapView;
         _rawStyle = rawStyle;
-        //TODO: AK: remove once failing test established
-        _openGLLayers = [NSMutableDictionary dictionary];
         _localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
     return self;
