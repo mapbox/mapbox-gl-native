@@ -228,6 +228,7 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
@@ -524,6 +525,8 @@ public:
     [_twoFingerTap requireGestureRecognizerToFail:_rotate];
     [_twoFingerTap requireGestureRecognizerToFail:_twoFingerDrag];
     [self addGestureRecognizer:_twoFingerTap];
+
+    _hapticFeedbackEnabled = YES;
 
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
@@ -1513,6 +1516,8 @@ public:
             self.userTrackingMode = MGLUserTrackingModeFollow;
         }
 
+        self.shouldTriggerHapticFeedbackForCompass = NO;
+
         [self notifyGestureDidBegin];
     }
     else if (rotate.state == UIGestureRecognizerStateChanged)
@@ -1535,6 +1540,22 @@ public:
         }
 
         [self cameraIsChanging];
+
+        // Trigger a light haptic feedback event when the user rotates to due north.
+        if (@available(iOS 10.0, *))
+        {
+            if (self.isHapticFeedbackEnabled && fabs(newDegrees) <= 1 && self.shouldTriggerHapticFeedbackForCompass)
+            {
+                UIImpactFeedbackGenerator *hapticFeedback = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+                [hapticFeedback impactOccurred];
+
+                self.shouldTriggerHapticFeedbackForCompass = NO;
+            }
+            else if (fabs(newDegrees) > 1)
+            {
+                self.shouldTriggerHapticFeedbackForCompass = YES;
+            }
+        }
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {

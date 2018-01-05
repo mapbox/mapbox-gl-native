@@ -484,6 +484,19 @@ MGL_EXPORT IB_DESIGNABLE
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
 /**
+ A Boolean value that determines whether the user will receive haptic feedback
+ for certain interactions with the map.
+
+ When this property is set to `YES`, the default, a `UIImpactFeedbackStyleLight`
+ haptic feedback event be played when the user rotates the map to due north
+ (0°).
+
+ This feature requires a device that supports haptic feedback, running iOS 10 or
+ newer.
+ */
+@property(nonatomic, getter=isHapticFeedbackEnabled) BOOL hapticFeedbackEnabled;
+
+/**
  A floating-point value that determines the rate of deceleration after the user
  lifts their finger.
 
