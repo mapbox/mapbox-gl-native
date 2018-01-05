@@ -4,15 +4,14 @@
 #import "MGLAccountManager.h"
 
 
-@interface MGLMapViewLayoutTests : XCTestCase <MGLMapViewDelegate>
+@interface MGLMapViewLayoutTests : XCTestCase<MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
+@property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 
 @end
 
-@implementation MGLMapViewLayoutTests {
-    XCTestExpectation *_styleLoadingExpectation;
-}
+@implementation MGLMapViewLayoutTests
 
 - (void)setUp {
     [super setUp];
@@ -21,48 +20,77 @@
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
     self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
-    if (!self.mapView.style) {
-        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:1 handler:nil];
-    }
+
+    self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+    [self waitForExpectationsWithTimeout:1 handler:nil];
+
+    //set zoom and heading so that scale bar and compass will be shown
+    [self.mapView setZoomLevel:4.5 animated:NO];
+    [self.mapView.camera setHeading:12.0];
+
+    //invoke layout
+    [self.mapView setNeedsLayout];
+    [self.mapView layoutIfNeeded];
 }
 
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
     XCTAssertNotNil(mapView.style);
     XCTAssertEqual(mapView.style, style);
 
-    [_styleLoadingExpectation fulfill];
+    [self.styleLoadingExpectation fulfill];
 }
 
 - (void)tearDown {
-    _styleLoadingExpectation = nil;
+    self.styleLoadingExpectation = nil;
     self.mapView = nil;
 
     [super tearDown];
 }
 
+// TODO: check constraining to superview vs. constraining to safeAreaLayoutGuide.bottomAnchor
+
 - (void)testOrnamentPlacement {
 
-    // TODO: check constraining to superview vs. constraining to safeAreaLayoutGuide.bottomAnchor
-    // what about iOS 8??
-
-    [self.mapView setZoomLevel:4.5 animated:NO];
-    [self.mapView.camera setHeading:12.0];
-    
-    [self.mapView setNeedsLayout];
-    [self.mapView layoutIfNeeded];
+    CGFloat margin = 8.0;
+    double accuracy = 0.01;
 
     //compass
-    NSLog(@"================> %@", self.mapView.compassView);
+    UIImageView *compassView = self.mapView.compassView;
+    NSLog(@"================> %@", compassView);
+
+    CGFloat expectedCompassOriginX = CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(compassView.frame);
+    CGFloat expectedCompassOriginY = margin;
+    // what about width/height? maybe we don't care as much at the moment?
+
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(compassView.frame), expectedCompassOriginX, accuracy);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(compassView.frame), expectedCompassOriginY, accuracy);
 
     //scale bar
-    NSLog(@"================> %@", self.mapView.scaleBar);
+    UIView *scaleBar = self.mapView.scaleBar;
+    NSLog(@"================> %@", scaleBar);
 
-    //info button
-    NSLog(@"================> %@", self.mapView.attributionButton);
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(scaleBar.frame), margin, accuracy);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(scaleBar.frame), margin, accuracy);
+
+    //attribution button
+    UIButton *attributionButton = self.mapView.attributionButton;
+    NSLog(@"================> %@", attributionButton);
+
+    CGFloat expectedButtonOriginX = CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(attributionButton.frame);
+    CGFloat expectedButtonOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - CGRectGetHeight(attributionButton.frame);
+
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(attributionButton.frame), expectedButtonOriginX, accuracy);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(attributionButton.frame), expectedButtonOriginY, accuracy);
 
     //mapbox logo
-    NSLog(@"================> %@", self.mapView.logoView);
+    UIImageView *logoView = self.mapView.logoView;
+    NSLog(@"================> %@", logoView);
+
+    CGFloat expectedLogoOriginX = margin;
+    CGFloat expectedLogoOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - CGRectGetHeight(logoView.frame);
+
+    XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.frame), expectedLogoOriginX, accuracy);
+    XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), expectedLogoOriginY, accuracy);
 }
 
 @end
