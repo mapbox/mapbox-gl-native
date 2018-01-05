@@ -96,7 +96,7 @@ void nativeContextLost(void */*context*/) {
     mbgl::Log::Info(mbgl::Event::General, "nativeContextLost");
 }
 
-void nativeDenitialize(void *context) {
+void nativeDeinitialize(void *context) {
     mbgl::Log::Info(mbgl::Event::General, "nativeDeinitialize");
     delete reinterpret_cast<ExampleCustomLayer*>(context);
 }
@@ -132,7 +132,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
 
     env->SetStaticLongField(customLayerClass,
         env->GetStaticFieldID(customLayerClass, "DeinitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeDenitialize));
+        reinterpret_cast<jlong>(nativeDeinitialize));
 
     return JNI_VERSION_1_6;
 }
