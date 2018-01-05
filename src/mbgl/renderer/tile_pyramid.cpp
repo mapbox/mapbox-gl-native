@@ -8,6 +8,7 @@
 #include <mbgl/text/placement_config.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/tile_range.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/logging.hpp>
 
@@ -15,6 +16,7 @@
 
 #include <mapbox/geometry/envelope.hpp>
 
+#include <cmath>
 #include <algorithm>
 
 namespace mbgl {
@@ -62,6 +64,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                          const SourceType type,
                          const uint16_t tileSize,
                          const Range<uint8_t> zoomRange,
+                         optional<LatLngBounds> bounds,
                          std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
     // If we need a relayout, abandon any cached tiles; they're now stale.
     if (needsRelayout) {
@@ -134,7 +137,15 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         auto it = tiles.find(tileID);
         return it == tiles.end() ? nullptr : it->second.get();
     };
+    
+    optional<util::TileRange> tileRange = {};
+    if (bounds) {
+        tileRange = util::TileRange::fromLatLngBounds(*bounds, std::min(tileZoom, (int32_t)zoomRange.max));
+    }
     auto createTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
+        if (tileRange && !tileRange->contains(tileID.canonical)) {
+            return nullptr;
+        }
         std::unique_ptr<Tile> tile = cache.get(tileID);
         if (!tile) {
             tile = createTile(tileID);

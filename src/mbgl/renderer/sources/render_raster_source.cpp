@@ -52,6 +52,7 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
                        SourceType::Raster,
                        impl().getTileSize(),
                        tileset->zoomRange,
+                       tileset->bounds,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<RasterTile>(tileID, parameters, *tileset);
                        });

@@ -10,6 +10,11 @@ namespace conversion {
 template <>
 struct Converter<Tileset> {
 public:
+
+    bool validateLatitude(const double lat) const {
+        return lat < 90 && lat > -90;
+    }
+
     template <class V>
     optional<Tileset> operator()(const V& value, Error& error) const {
         Tileset result;
@@ -70,6 +75,32 @@ public:
                 return {};
             }
             result.attribution = std::move(*attribution);
+        }
+
+        auto boundsValue = objectMember(value, "bounds");
+        if (boundsValue) {
+            if (!isArray(*boundsValue) || arrayLength(*boundsValue) != 4) {
+                error = { "bounds must be an array with left, bottom, top, and right values" };
+                return {};
+            }
+            optional<double> left = toDouble(arrayMember(*boundsValue, 0));
+            optional<double> bottom = toDouble(arrayMember(*boundsValue, 1));
+            optional<double> right = toDouble(arrayMember(*boundsValue, 2));
+            optional<double> top = toDouble(arrayMember(*boundsValue, 3));
+
+            if (!left || !right || !bottom || !top) {
+                error = { "bounds array must contain numeric longitude and latitude values" };
+                return {};
+            }
+            if (!validateLatitude(*bottom) || !validateLatitude(*top) || top <= bottom){
+                error = { "bounds latitude values must be between -90 and 90 with bottom less than top" };
+                return {};
+            }
+            if(*left >= *right) {
+                error = { "bounds left longitude should be less than right longitude" };
+                return {};
+            }
+            result.bounds = LatLngBounds::hull({ *bottom, *left }, { *top, *right });
         }
 
         return result;
