@@ -87,6 +87,7 @@ set(MBGL_TEST_FILES
     test/style/conversion/layer.test.cpp
     test/style/conversion/light.test.cpp
     test/style/conversion/stringify.test.cpp
+    test/style/conversion/tileset.test.cpp
 
     # style
     test/style/filter.test.cpp
@@ -138,6 +139,7 @@ set(MBGL_TEST_FILES
     test/util/thread.test.cpp
     test/util/thread_local.test.cpp
     test/util/tile_cover.test.cpp
+    test/util/tile_range.test.cpp
     test/util/timer.test.cpp
     test/util/token.test.cpp
     test/util/url.test.cpp

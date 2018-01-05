@@ -78,6 +78,10 @@ public:
         return project_(latLng, worldSize(scale));
     }
 
+    static Point<double> project(const LatLng& latLng, uint8_t zoom) {
+        return project_(latLng, std::pow(2.0, zoom));
+    }
+
     static LatLng unproject(const Point<double>& p, double scale, LatLng::WrapMode wrapMode = LatLng::Unwrapped) {
         auto p2 = p * util::DEGREES_MAX / worldSize(scale);
         return LatLng {
