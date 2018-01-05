@@ -175,24 +175,6 @@
     return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
 }
 
-- (void)setRasterFadeDurationTransition:(MGLTransition )transition {
-    MGLAssertStyleLayerIsValid();
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setRasterFadeDurationTransition(options);
-}
-
-- (MGLTransition)rasterFadeDurationTransition {
-    MGLAssertStyleLayerIsValid();
-
-    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getRasterFadeDurationTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
-
-    return transition;
-}
-
 - (void)setRasterHueRotation:(MGLStyleValue<NSNumber *> *)rasterHueRotation {
     MGLAssertStyleLayerIsValid();
 
