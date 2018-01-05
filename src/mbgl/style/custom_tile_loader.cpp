@@ -1,5 +1,6 @@
 #include <mbgl/style/custom_tile_loader.hpp>
 #include <mbgl/tile/custom_geometry_tile.hpp>
+#include <mbgl/util/tile_range.hpp>
 
 namespace mbgl {
 namespace style {
@@ -79,9 +80,15 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
 }
 
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
+    std::map<uint8_t, util::TileRange> tileRanges;
+
     for (auto idtuple= tileCallbackMap.begin(); idtuple != tileCallbackMap.end(); idtuple++) {
-        const LatLngBounds tileBounds(idtuple->first);
-        if (tileBounds.intersects(bounds, LatLng::Wrapped) || bounds.contains(tileBounds, LatLng::Wrapped) || tileBounds.contains(bounds, LatLng::Wrapped)) {
+        auto zoom = idtuple->first.z;
+        auto tileRange = tileRanges.find(zoom);
+        if(tileRange == tileRanges.end()) {
+            tileRange = tileRanges.emplace(std::make_pair(zoom, util::TileRange::fromLatLngBounds(bounds, zoom))).first;
+        }
+        if (tileRange->second.contains(idtuple->first)) {
             for (auto iter = idtuple->second.begin(); iter != idtuple->second.end(); iter++) {
                 auto actor = std::get<2>(*iter);
                 actor.invoke(&CustomGeometryTile::invalidateTileData);

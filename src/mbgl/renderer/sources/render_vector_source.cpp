@@ -55,6 +55,7 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
                        SourceType::Vector,
                        util::tileSize,
                        tileset->zoomRange,
+                       tileset->bounds,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<VectorTile>(tileID, impl().id, parameters, *tileset);
                        });
