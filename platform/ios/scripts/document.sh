@@ -4,9 +4,13 @@ set -e
 set -o pipefail
 set -u
 
-# Install jazzy (and other dependencies), if not already installed.
-if [ ! -d "./gems" ]; then
-    bundle install --path=./gems
+if [ -z `which jazzy` ]; then
+    echo "Installing jazzy…"
+    gem install jazzy --no-rdoc --no-ri
+    if [ -z `which jazzy` ]; then
+        echo "Unable to install jazzy. See https://github.com/mapbox/mapbox-gl-native/blob/master/platform/ios/INSTALL.md"
+        exit 1
+    fi
 fi
 
 OUTPUT=${OUTPUT:-documentation}
@@ -32,7 +36,7 @@ cp -r platform/ios/docs/img "${OUTPUT}"
 DEFAULT_THEME="platform/darwin/docs/theme"
 THEME=${JAZZY_THEME:-$DEFAULT_THEME}
 
-bundle exec jazzy \
+jazzy \
     --config platform/ios/jazzy.yml \
     --sdk iphonesimulator \
     --github-file-prefix https://github.com/mapbox/mapbox-gl-native/tree/${BRANCH} \
