@@ -55,6 +55,51 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<RasterDEMTile>(tileID, parameters, *tileset);
                        });
+    auto rendertiles = getRenderTiles();
+    std::sort(rendertiles.begin(), rendertiles.end(),
+              [](const RenderTile& a, const RenderTile& b) { return a.id < b.id; });
+
+    for (auto& rt : rendertiles) {
+        RasterDEMTile& demtile = static_cast<RasterDEMTile&>(rt.get().tile);
+        if (!demtile.isBackfilled()) {
+            bool lastBackfill = true;
+            for (auto& pair : demtile.neighboringTiles) {
+                // the current neighboring tile has not been backfilled yet
+                if (!pair.second) {
+                    const auto renderableNeighbor = std::find_if(rendertiles.begin(), rendertiles.end(), [&pair] (const RenderTile& rt){
+                        return rt.id.canonical == pair.first.canonical;
+                    });
+
+                    if (renderableNeighbor != rendertiles.end()) {
+                        const RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(renderableNeighbor->get().tile);
+                        int dx = borderTile.id.canonical.x - demtile.id.canonical.x;
+                        const int8_t dy = borderTile.id.canonical.y - demtile.id.canonical.y;
+                        const uint32_t dim = pow(2, demtile.id.canonical.z);
+                        if (dx == 0 && dy == 0) continue;
+                        if (std::abs(dy) > 1) continue;
+                        // neighbor is in another world wrap
+                        if (std::abs(dx) > 1) {
+                            if (std::abs(int(dx + dim)) == 1) {
+                                dx += dim;
+                            } else if (std::abs(int(dx - dim)) == 1) {
+                                dx -= dim;
+                            }
+                        }
+
+//                        HillshadeBucket* borderBucket = borderTile.getBucket(hillshadeLayer->baseImpl)
+//                        if (!borderTile.dem || !tile.dem) return;
+//                        tile.dem.backfillBorder(borderTile.dem, dx, dy);
+//                        if (tile.neighboringTiles && tile.neighboringTiles[borderId])
+//                            tile.neighboringTiles[borderId].backfilled = true;
+
+                        pair.second = true;
+                    } else {
+                        lastBackfill = false;
+                    }
+                }
+            }
+        }
+    }
 }
 
 void RenderRasterDEMSource::startRender(PaintParameters& parameters) {

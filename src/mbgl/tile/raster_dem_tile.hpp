@@ -40,6 +40,14 @@ public:
     void onParsed(std::unique_ptr<HillshadeBucket> result, uint64_t correlationID);
     void onError(std::exception_ptr, uint64_t correlationID);
 
+    bool isBackfilled() const {
+        return backfilled;
+    }
+
+    bool isPrepared() const {
+        return prepared;
+    }
+
 private:
     TileLoader<RasterDEMTile> loader;
 
@@ -47,7 +55,8 @@ private:
     Actor<RasterDEMTileWorker> worker;
     
     uint64_t correlationID = 0;
-
+    bool backfilled = false;
+    bool prepared = false;
     // Contains the Bucket object for the tile. Buckets are render
     // objects and they get added by tile parsing operations.
     std::unique_ptr<HillshadeBucket> bucket;

@@ -32,7 +32,7 @@ public:
 
     TileMask mask{ { 0, 0, 0 } };
     bool prepared = false;
-
+    DEMPyramid* getDEMPyramid();
 
     // Raster-DEM Tile Sources use the default buffers from Painter
     gl::VertexVector<HillshadeLayoutVertex> vertices;
