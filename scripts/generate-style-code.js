@@ -111,6 +111,10 @@ global.defaultValue = function (property) {
     return '{}';
   }
 
+  if (property.name === 'heatmap-color') {
+      return '{}';
+  }
+
   switch (property.type) {
   case 'number':
     return property.default;

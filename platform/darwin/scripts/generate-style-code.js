@@ -413,7 +413,11 @@ global.describeValue = function (value, property, layerType) {
 };
 
 global.propertyDefault = function (property, layerType) {
-    return 'an `MGLStyleValue` object containing ' + describeValue(property.default, property, layerType);
+    if (property.name === 'heatmap-color') {
+        return 'a rainbow color scale from blue to red';
+    } else {
+        return 'an `MGLStyleValue` object containing ' + describeValue(property.default, property, layerType);
+    }
 };
 
 global.originalPropertyName = function (property) {
