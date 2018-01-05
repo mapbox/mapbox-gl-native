@@ -1,7 +1,9 @@
 #pragma once
+
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -23,6 +25,8 @@ public:
     
     bool operator==(const Expression& e) const override;
 
+    std::vector<optional<Value>> possibleOutputs() const override;
+
 private:
     std::vector<std::unique_ptr<Expression>> inputs;
 };
@@ -30,4 +34,3 @@ private:
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

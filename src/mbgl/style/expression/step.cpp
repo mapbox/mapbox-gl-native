@@ -40,6 +40,16 @@ bool Step::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Step::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& stop : stops) {
+        for (auto& output : stop.second->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
+}
+
 Range<float> Step::getCoveringStops(const double lower, const double upper) const {
     return ::mbgl::style::expression::getCoveringStops(stops, lower, upper);
 }

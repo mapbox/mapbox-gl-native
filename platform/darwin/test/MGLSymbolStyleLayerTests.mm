@@ -1017,7 +1017,7 @@
 
         MGLStyleValue<NSArray<NSString *> *> *constantStyleValue = [MGLStyleValue<NSArray<NSString *> *> valueWithRawValue:@[@"Text Font", @"Tnof Txet"]];
         layer.textFontNames = constantStyleValue;
-        mbgl::style::PropertyValue<std::vector<std::string>> propertyValue = { { "Text Font", "Tnof Txet" } };
+        mbgl::style::DataDrivenPropertyValue<std::vector<std::string>> propertyValue = { { "Text Font", "Tnof Txet" } };
         XCTAssertEqual(rawLayer->getTextFont(), propertyValue,
                        @"Setting textFontNames to a constant value should update text-font.");
         XCTAssertEqualObjects(layer.textFontNames, constantStyleValue,
@@ -1041,11 +1041,6 @@
                       @"Unsetting textFontNames should return text-font to the default value.");
         XCTAssertEqualObjects(layer.textFontNames, defaultStyleValue,
                               @"textFontNames should return the default value after being unset.");
-
-        functionStyleValue = [MGLStyleValue<NSArray<NSString *> *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontNames = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSArray<NSString *> *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.textFontNames = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
     }
 
     // text-size

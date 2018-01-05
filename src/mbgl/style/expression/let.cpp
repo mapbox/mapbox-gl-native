@@ -17,6 +17,10 @@ void Let::eachChild(const std::function<void(const Expression&)>& visit) const {
     visit(*result);
 }
 
+std::vector<optional<Value>> Let::possibleOutputs() const {
+    return result->possibleOutputs();
+}
+
 using namespace mbgl::style::conversion;
 
 ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
@@ -66,6 +70,10 @@ EvaluationResult Var::evaluate(const EvaluationContext& params) const {
 }
 
 void Var::eachChild(const std::function<void(const Expression&)>&) const {}
+
+std::vector<optional<Value>> Var::possibleOutputs() const {
+    return { nullopt };
+}
 
 ParseResult Var::parse(const Convertible& value_, ParsingContext& ctx) {
     assert(isArray(value_));

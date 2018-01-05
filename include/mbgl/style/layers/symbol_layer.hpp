@@ -118,9 +118,9 @@ public:
     DataDrivenPropertyValue<std::string> getTextField() const;
     void setTextField(DataDrivenPropertyValue<std::string>);
 
-    static PropertyValue<std::vector<std::string>> getDefaultTextFont();
-    PropertyValue<std::vector<std::string>> getTextFont() const;
-    void setTextFont(PropertyValue<std::vector<std::string>>);
+    static DataDrivenPropertyValue<std::vector<std::string>> getDefaultTextFont();
+    DataDrivenPropertyValue<std::vector<std::string>> getTextFont() const;
+    void setTextFont(DataDrivenPropertyValue<std::vector<std::string>>);
 
     static DataDrivenPropertyValue<float> getDefaultTextSize();
     DataDrivenPropertyValue<float> getTextSize() const;

@@ -32,7 +32,7 @@ using namespace style;
 template <class Property>
 static bool has(const style::SymbolLayoutProperties::PossiblyEvaluated& layout) {
     return layout.get<Property>().match(
-        [&] (const std::string& s) { return !s.empty(); },
+        [&] (const typename Property::Type& t) { return !t.empty(); },
         [&] (const auto&) { return true; }
     );
 }
@@ -82,7 +82,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         layout.get<IconPitchAlignment>() = layout.get<IconRotationAlignment>();
     }
 
-    const bool hasText = has<TextField>(layout) && !layout.get<TextFont>().empty();
+    const bool hasText = has<TextField>(layout) && has<TextFont>(layout);
     const bool hasIcon = has<IconImage>(layout);
 
     if (!hasText && !hasIcon) {
@@ -143,12 +143,15 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                                          && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
                                          && util::i18n::allowsVerticalWritingMode(*ft.text);
 
+            FontStack fontStack = layout.evaluate<TextFont>(zoom, ft);
+            GlyphIDs& dependencies = glyphDependencies[fontStack];
+
             // Loop through all characters of this text and collect unique codepoints.
             for (char16_t chr : *ft.text) {
-                glyphDependencies[layout.get<TextFont>()].insert(chr);
+                dependencies.insert(chr);
                 if (canVerticalizeText) {
                     if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
-                        glyphDependencies[layout.get<TextFont>()].insert(verticalChr);
+                        dependencies.insert(verticalChr);
                     }
                 }
             }
@@ -183,17 +186,19 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
     const bool textAlongLine = layout.get<TextRotationAlignment>() == AlignmentType::Map &&
         layout.get<SymbolPlacement>() == SymbolPlacementType::Line;
 
-    auto glyphMapIt = glyphMap.find(layout.get<TextFont>());
-    const Glyphs& glyphs = glyphMapIt != glyphMap.end()
-        ? glyphMapIt->second : Glyphs();
-
-    auto glyphPositionsIt = glyphPositions.find(layout.get<TextFont>());
-    const GlyphPositionMap& glyphPositionMap = glyphPositionsIt != glyphPositions.end()
-        ? glyphPositionsIt->second : GlyphPositionMap();
-
     for (auto it = features.begin(); it != features.end(); ++it) {
         auto& feature = *it;
         if (feature.geometry.empty()) continue;
+
+        FontStack fontStack = layout.evaluate<TextFont>(zoom, feature);
+
+        auto glyphMapIt = glyphMap.find(fontStack);
+        const Glyphs& glyphs = glyphMapIt != glyphMap.end()
+            ? glyphMapIt->second : Glyphs();
+
+        auto glyphPositionsIt = glyphPositions.find(fontStack);
+        const GlyphPositionMap& glyphPositionMap = glyphPositionsIt != glyphPositions.end()
+            ? glyphPositionsIt->second : GlyphPositionMap();
 
         std::pair<Shaping, Shaping> shapedTextOrientations;
         optional<PositionedIcon> shapedIcon;

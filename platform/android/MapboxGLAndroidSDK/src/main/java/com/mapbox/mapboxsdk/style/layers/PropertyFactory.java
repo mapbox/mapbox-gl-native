@@ -2888,11 +2888,11 @@ public class PropertyFactory {
   /**
    * Font stack to use for displaying text.
    *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for String[]
+   * @param <T> the function input type
+   * @param function a wrapper function for String[]
    * @return property wrapper around a String[] function
    */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, String[]>> textFont(CameraFunction<Z, String[]> function) {
+  public static <T> PropertyValue<Function<T, String[]>> textFont(Function<T, String[]> function) {
     return new LayoutPropertyValue<>("text-font", function);
   }
 

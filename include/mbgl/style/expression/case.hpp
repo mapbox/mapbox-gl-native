@@ -26,6 +26,8 @@ public:
     
     bool operator==(const Expression& e) const override;
 
+    std::vector<optional<Value>> possibleOutputs() const override;
+
 private:
     std::vector<Branch> branches;
     std::unique_ptr<Expression> otherwise;

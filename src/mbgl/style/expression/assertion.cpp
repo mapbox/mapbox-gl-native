@@ -66,6 +66,16 @@ bool Assertion::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Assertion::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& input : inputs) {
+        for (auto& output : input->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

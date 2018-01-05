@@ -37,6 +37,10 @@ bool Equals::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Equals::possibleOutputs() const {
+    return {{ true }, { false }};
+}
+
 static bool isComparableType(const type::Type& type) {
     return type == type::String ||
         type == type::Number ||
