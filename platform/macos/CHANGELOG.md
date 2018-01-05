@@ -1,5 +1,10 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## v0.6.1
+
+* Fixed a crash while zooming while annotations are present on the map. ([#10791](https://github.com/mapbox/mapbox-gl-native/pull/10791))
+* CJK characters can be displayed in a locally installed font or a custom font bundled with the application, reducing map download times. Specify the font name using the `MGLIdeographicFontFamilyName` key in the application’s Info.plist file. ([#10522](https://github.com/mapbox/mapbox-gl-native/pull/10522))
+
 ## v0.6.0
 
 ### Packaging
