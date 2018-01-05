@@ -34,6 +34,7 @@ xcuserdata
 test/fixtures/api/assets.zip
 test/fixtures/storage/assets.zip
 /.circle-week
+/gems
 
 # Generated list files from code generation
 /scripts/generate-cmake-files.list

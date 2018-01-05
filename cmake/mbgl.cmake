@@ -70,6 +70,24 @@ if(WITH_NODEJS)
     )
 endif()
 
+# Run gem bundle install
+if(MBGL_PLATFORM STREQUAL "ios" OR MBGL_PLATFORM STREQUAL "macos")
+    SET(BUNDLE_INSTALL_FAILED FALSE)
+    SET(BUNDLE_INSTALL_PATH "./gems")
+    if("Gemfile" IS_NEWER_THAN "${BUNDLE_INSTALL_PATH}/.stamp")
+        message(STATUS "Running 'bundle install'...")
+        execute_process(
+            COMMAND bundle install --path=${BUNDLE_INSTALL_PATH}
+            WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+            RESULT_VARIABLE BUNDLE_INSTALL_FAILED)
+        if(NOT BUNDLE_INSTALL_FAILED)
+            execute_process(
+                COMMAND touch "${BUNDLE_INSTALL_PATH}/.stamp"
+                WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}")
+        endif()
+    endif()
+endif()
+
 # Generate source groups so the files are properly sorted in IDEs like Xcode.
 function(create_source_groups target)
     get_target_property(sources ${target} SOURCES)

@@ -45,7 +45,7 @@ ifeq ($(V), 1)
   export XCPRETTY
   NINJA_ARGS ?= -v
 else
-  export XCPRETTY ?= | tee '$(shell pwd)/build/xcodebuild-$(shell date +"%Y-%m-%d_%H%M%S").log' | xcpretty
+  export XCPRETTY ?= | tee '$(shell pwd)/build/xcodebuild-$(shell date +"%Y-%m-%d_%H%M%S").log' | bundle exec xcpretty
   NINJA_ARGS ?=
 endif
 
@@ -715,3 +715,4 @@ clean:
 distclean: clean
 	-rm -rf ./mason_packages
 	-rm -rf ./node_modules
+	-rm -rf ./gems
