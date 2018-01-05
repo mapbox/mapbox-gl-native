@@ -4,13 +4,13 @@
 #import "MGLAccountManager.h"
 
 
-@interface MGLMapViewTests : XCTestCase <MGLMapViewDelegate>
+@interface MGLMapViewLayoutTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
 
 @end
 
-@implementation MGLMapViewTests {
+@implementation MGLMapViewLayoutTests {
     XCTestExpectation *_styleLoadingExpectation;
 }
 
