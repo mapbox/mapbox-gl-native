@@ -166,7 +166,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     self.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     self.mapView.scaleBar.hidden = NO;
     self.mapView.showsUserHeadingIndicator = YES;
-    self.hudLabel.hidden = YES;
     if ([UIFont respondsToSelector:@selector(monospacedDigitSystemFontOfSize:weight:)]) {
         self.hudLabel.titleLabel.font = [UIFont monospacedDigitSystemFontOfSize:10 weight:UIFontWeightRegular];
     }
@@ -216,6 +215,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [defaults setInteger:self.mapView.userTrackingMode forKey:@"MBXUserTrackingMode"];
     [defaults setBool:self.mapView.showsUserLocation forKey:@"MBXShowsUserLocation"];
     [defaults setInteger:self.mapView.debugMask forKey:@"MBXDebugMask"];
+    [defaults setBool:self.showZoomLevelEnabled forKey:@"MBXShowsZoomLevelHUD"];
     [defaults synchronize];
 }
 
@@ -240,6 +240,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if (uncheckedDebugMask >= 0)
     {
         self.mapView.debugMask = (MGLMapDebugMaskOptions)uncheckedDebugMask;
+    }
+    if ([defaults boolForKey:@"MBXShowsZoomLevelHUD"])
+    {
+        self.showZoomLevelEnabled = YES;
+        [self updateHUD];
     }
 }
 
@@ -1897,6 +1902,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)updateHUD {
     if (!self.reuseQueueStatsEnabled && !self.showZoomLevelEnabled) return;
+
+    if (self.hudLabel.hidden) self.hudLabel.hidden = NO;
 
     NSString *hudString;
 
