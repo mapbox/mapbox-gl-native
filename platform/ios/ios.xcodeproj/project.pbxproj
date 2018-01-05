@@ -187,6 +187,10 @@
 		404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 404C26E11D89B877000AA13D /* MGLTileSource.mm */; };
 		404C26E71D89C55D000AA13D /* MGLTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSource_Private.h */; };
 		404C26E81D89C55D000AA13D /* MGLTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSource_Private.h */; };
+		406E99B91FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */; };
+		406E99BA1FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */; };
+		406E99BB1FFF006C00D9FFCC /* MMEUINavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */; };
+		406E99BC1FFF006D00D9FFCC /* MMEUINavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */; };
 		40834BE61FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */; };
 		40834BE71FE05E1800C1BD0D /* MMEAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */; };
 		40834BE81FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */; };
@@ -828,6 +832,10 @@
 		404C26E01D89B877000AA13D /* MGLTileSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource.h; sourceTree = "<group>"; };
 		404C26E11D89B877000AA13D /* MGLTileSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSource.mm; sourceTree = "<group>"; };
 		404C26E61D89C515000AA13D /* MGLTileSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource_Private.h; sourceTree = "<group>"; };
+		406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventLogReportViewController.m; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEEventLogReportViewController.m"; sourceTree = SOURCE_ROOT; };
+		406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEUINavigation.m; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEUINavigation.m"; sourceTree = SOURCE_ROOT; };
+		406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUINavigation.h; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEUINavigation.h"; sourceTree = SOURCE_ROOT; };
+		406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventLogReportViewController.h; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEEventLogReportViewController.h"; sourceTree = SOURCE_ROOT; };
 		40834AEF1FDF4F0100C1BD0D /* Mapbox-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Mapbox-Prefix.pch"; path = "src/Mapbox-Prefix.pch"; sourceTree = SOURCE_ROOT; };
 		40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsManager.h; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEEventsManager.h"; sourceTree = SOURCE_ROOT; };
 		40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsManager.m; path = "vendor/mapbox-mobile-events/MapboxMobileEvents/MMEEventsManager.m"; sourceTree = SOURCE_ROOT; };
@@ -1524,6 +1532,8 @@
 				40834BC71FE05D7000C1BD0D /* MMEEvent.m */,
 				40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */,
 				40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */,
+				406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */,
+				406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */,
 				40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */,
 				40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */,
 				40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */,
@@ -1542,6 +1552,8 @@
 				40834BBD1FE05D6E00C1BD0D /* MMETypes.m */,
 				40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */,
 				40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */,
+				406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */,
+				406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */,
 				40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */,
 				40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */,
 				40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */,
@@ -2872,9 +2884,11 @@
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				40834BF11FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
 				40834C461FE05F7500C1BD0D /* TSKPinFailureReport.m in Sources */,
+				406E99B91FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
 				40834BE61FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
 				DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				DA88482D1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.m in Sources */,
+				406E99BB1FFF006C00D9FFCC /* MMEUINavigation.m in Sources */,
 				966FCF541F3C323300F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */,
 				40834BE81FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */,
 				DA88485B1CBAFB9800AB86E3 /* MGLUserLocation.m in Sources */,
@@ -2997,9 +3011,11 @@
 				40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
 				40834C531FE05F7600C1BD0D /* TSKPinFailureReport.m in Sources */,
 				40834BFA1FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
+				406E99BA1FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
 				DAA4E4201CBB730400178DFB /* MGLOfflinePack.mm in Sources */,
 				966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */,
 				DAA4E4331CBB730400178DFB /* MGLUserLocation.m in Sources */,
+				406E99BC1FFF006D00D9FFCC /* MMEUINavigation.m in Sources */,
 				40834BFC1FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */,
 				927FBD021F4DB05500F8BF1F /* MGLMapSnapshotter.mm in Sources */,
 				350098BE1D480108004B2AF0 /* MGLVectorSource.mm in Sources */,
