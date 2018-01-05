@@ -1535,6 +1535,7 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("fill-extrusion-opacity", expression);
   }
 
+
   /**
    * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
    *
@@ -2544,7 +2545,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. A string with `{tokens}` replaced, referencing the data property to pull from. (`{token}` replacement is only supported for literal {@link PropertyFactory#iconImage} values; not for property functions.)
+   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2554,7 +2555,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. A string with `{tokens}` replaced, referencing the data property to pull from. (`{token}` replacement is only supported for literal {@link PropertyFactory#iconImage} values; not for property functions.)
+   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2565,7 +2566,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing an image background. A string with `{tokens}` replaced, referencing the data property to pull from. (`{token}` replacement is only supported for literal {@link PropertyFactory#iconImage} values; not for property functions.)
+   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
@@ -2672,7 +2673,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
+   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. Each component is multiplied by the value of {@link PropertyFactory#iconSize} to obtain the final offset in density-independent pixels. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -2682,7 +2683,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
+   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. Each component is multiplied by the value of {@link PropertyFactory#iconSize} to obtain the final offset in density-independent pixels. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -2693,7 +2694,7 @@ public class PropertyFactory {
 
 
   /**
-   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
+   * Offset distance of icon from its anchor. Positive values indicate right and down, while negative values indicate left and up. Each component is multiplied by the value of {@link PropertyFactory#iconSize} to obtain the final offset in density-independent pixels. When combined with {@link PropertyFactory#iconRotate} the offset will be as if the rotated direction was up.
    *
    * @param <T> the function input type
    * @param function a wrapper function for Float[]
@@ -2832,7 +2833,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like `{field_name}`. (`{token}` replacement is only supported for literal {@link PropertyFactory#textField} values; not for property functions.)
+   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2842,7 +2843,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like `{field_name}`. (`{token}` replacement is only supported for literal {@link PropertyFactory#textField} values; not for property functions.)
+   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2853,7 +2854,7 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Feature properties are specified using tokens like `{field_name}`. (`{token}` replacement is only supported for literal {@link PropertyFactory#textField} values; not for property functions.)
+   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
@@ -2887,11 +2888,11 @@ public class PropertyFactory {
   /**
    * Font stack to use for displaying text.
    *
-   * @param <T> the function input type
-   * @param function a wrapper function for String[]
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String[]
    * @return property wrapper around a String[] function
    */
-  public static <T> PropertyValue<Function<T, String[]>> textFont(Function<T, String[]> function) {
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String[]>> textFont(CameraFunction<Z, String[]> function) {
     return new LayoutPropertyValue<>("text-font", function);
   }
 

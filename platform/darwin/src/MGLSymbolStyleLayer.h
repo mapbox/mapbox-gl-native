@@ -68,14 +68,15 @@ typedef NS_ENUM(NSUInteger, MGLIconPitchAlignment) {
      */
     MGLIconPitchAlignmentViewport,
     /**
-     Automatically matches the value of `iconRotationAlignment`.
+     Automatically matches the value of
+     `MGLSymbolStyleLayer.iconRotationAlignment`.
      */
     MGLIconPitchAlignmentAuto,
 };
 
 /**
- In combination with `symbolPlacement`, determines the rotation behavior of
- icons.
+ In combination with `MGLSymbolStyleLayer.symbolPlacement`, determines the
+ rotation behavior of icons.
 
  Values of this type are used in the `MGLSymbolStyleLayer.iconRotationAlignment`
  property.
@@ -89,7 +90,7 @@ typedef NS_ENUM(NSUInteger, MGLIconRotationAlignment) {
     MGLIconRotationAlignmentMap,
     /**
      Produces icons whose x-axes are aligned with the x-axis of the viewport,
-     regardless of the value of `symbolPlacement`.
+     regardless of the value of `MGLSymbolStyleLayer.symbolPlacement`.
      */
     MGLIconRotationAlignmentViewport,
     /**
@@ -226,14 +227,15 @@ typedef NS_ENUM(NSUInteger, MGLTextPitchAlignment) {
      */
     MGLTextPitchAlignmentViewport,
     /**
-     Automatically matches the value of `textRotationAlignment`.
+     Automatically matches the value of
+     `MGLSymbolStyleLayer.textRotationAlignment`.
      */
     MGLTextPitchAlignmentAuto,
 };
 
 /**
- In combination with `symbolPlacement`, determines the rotation behavior of the
- individual glyphs forming the text.
+ In combination with `MGLSymbolStyleLayer.symbolPlacement`, determines the
+ rotation behavior of the individual glyphs forming the text.
 
  Values of this type are used in the `MGLSymbolStyleLayer.textRotationAlignment`
  property.
@@ -247,7 +249,7 @@ typedef NS_ENUM(NSUInteger, MGLTextRotationAlignment) {
     MGLTextRotationAlignmentMap,
     /**
      Produces glyphs whose x-axes are aligned with the x-axis of the viewport,
-     regardless of the value of `symbolPlacement`.
+     regardless of the value of `MGLSymbolStyleLayer.symbolPlacement`.
      */
     MGLTextRotationAlignmentViewport,
     /**
@@ -281,7 +283,7 @@ typedef NS_ENUM(NSUInteger, MGLTextTransform) {
 };
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `MGLSymbolStyleLayer.iconTranslation`.
 
  Values of this type are used in the `MGLSymbolStyleLayer.iconTranslationAnchor`
  property.
@@ -298,7 +300,7 @@ typedef NS_ENUM(NSUInteger, MGLIconTranslationAnchor) {
 };
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `MGLSymbolStyleLayer.textTranslation`.
 
  Values of this type are used in the `MGLSymbolStyleLayer.textTranslationAnchor`
  property.
@@ -443,8 +445,11 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
- Name of image in sprite to use for drawing an image background. A string with
- {tokens} replaced, referencing the data property to pull from.
+ Name of image in sprite to use for drawing an image background. Within literal
+ values, attribute names enclosed in curly brackets (e.g. `{token}`) are
+ replaced with the value of the named attribute. Expressions do not support this
+ syntax; for equivalent functionality in expressions, use
+ `stringByAppendingString:` and key path expressions.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
@@ -646,8 +651,8 @@ MGL_EXPORT
 
 /**
  Scales the original size of the icon by the provided factor. The new point size
- of the image will be the original point size multiplied by `iconSize`. 1 is the
- original size; 3 triples the size of the image.
+ of the image will be the original point size multiplied by `iconScale`. 1 is
+ the original size; 3 triples the size of the image.
  
  This property is measured in factor of the original icon sizes.
  
@@ -935,9 +940,10 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *symbolSpacing;
 
 /**
- Value to use for a text label. Feature properties are specified using tokens
- like {field_name}.  (Token replacement is only supported for literal
- `textField` values--not for property functions.)
+ Value to use for a text label. Within literal values, attribute names enclosed
+ in curly brackets (e.g. `{token}`) are replaced with the value of the named
+ attribute. Expressions do not support this syntax; for equivalent functionality
+ in expressions, use `stringByAppendingString:` and key path expressions.
  
  The default value of this property is an `MGLStyleValue` object containing the
  empty string. Set this property to `nil` to reset it to the default value.
@@ -1716,7 +1722,7 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *iconTranslate __attribute__((unavailable("Use iconTranslation instead.")));
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `iconTranslation`.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLIconTranslationAnchorMap`. Set this property to
@@ -2041,7 +2047,7 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *textTranslate __attribute__((unavailable("Use textTranslation instead.")));
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `textTranslation`.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLTextTranslationAnchorMap`. Set this property to
