@@ -6,6 +6,8 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 @interface MGLMapboxEvents ()
 
 @property (nonatomic) MMEEventsManager *eventsManager;
+@property (nonatomic) NSURL *baseURL;
+@property (nonatomic, copy) NSString *accessToken;
 
 @end
 @implementation MGLMapboxEvents
@@ -35,7 +37,16 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     if (self) {
         _eventsManager = [[MMEEventsManager alloc] init];
         _eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+        _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
         _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
+        
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
+            self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
+        }
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryBaseURL"]) {
+            self.baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryBaseURL"]];
+        }
+        
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDefaultsDidChange:) name:NSUserDefaultsDidChangeNotification object:nil];
     }
     return self;
@@ -47,8 +58,21 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 
 - (void)userDefaultsDidChange:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+        
+        // Default values
         self.eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
+        self.eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
+        self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];                
+        
+        // Optional values
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
+            self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
+        }
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryBaseURL"]) {
+            NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryBaseURL"]];
+            self.eventsManager.baseURL = baseURL;
+        }
+        
         [self.eventsManager pauseOrResumeMetricsCollectionIfRequired];
     });
 }
@@ -57,7 +81,13 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
     NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
     NSString *sdkVersion = semanticVersion ?: shortVersion;
-    [[[self sharedManager] eventsManager] initializeWithAccessToken:accessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
+    NSString *resolvedAccessToken = [MGLMapboxEvents sharedManager].accessToken ?: accessToken;
+    
+    [[[MGLMapboxEvents sharedManager] eventsManager] initializeWithAccessToken:resolvedAccessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
+    
+    if ([MGLMapboxEvents sharedManager].baseURL) {
+        [[MGLMapboxEvents sharedManager] eventsManager].baseURL = [MGLMapboxEvents sharedManager].baseURL;
+    }
 }
 
 + (void)pushTurnstileEvent {
