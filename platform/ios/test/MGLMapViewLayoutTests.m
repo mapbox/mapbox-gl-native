@@ -6,6 +6,7 @@
 
 @interface MGLMapViewLayoutTests : XCTestCase<MGLMapViewDelegate>
 
+@property (nonatomic) UIView *superView;
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic) XCTestExpectation *styleLoadingExpectation;
 
@@ -18,8 +19,21 @@
 
     [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    NSLog(@"================> Screen size: %@", NSStringFromCGRect(UIScreen.mainScreen.bounds));
+
+    self.superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+
     self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
     self.mapView.delegate = self;
+
+    [self.superView addSubview:self.mapView];
+
+    UIView *mapView = self.mapView;
+    NSDictionary *bindings = NSDictionaryOfVariableBindings(mapView);
+    NSArray *verticalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[mapView]-0-|" options:0 metrics:nil views:bindings];
+    NSArray *horizonatalConstraints = [NSLayoutConstraint constraintsWithVisualFormat:@"H:|-0-[mapView]-0-|" options:0 metrics:nil views:bindings];
+
+    [self.superView addConstraints:[verticalConstraints arrayByAddingObjectsFromArray:horizonatalConstraints]];
 
     self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self waitForExpectationsWithTimeout:1 handler:nil];
@@ -29,8 +43,10 @@
     [self.mapView.camera setHeading:12.0];
 
     //invoke layout
-    [self.mapView setNeedsLayout];
-    [self.mapView layoutIfNeeded];
+    [self.superView setNeedsLayout];
+    [self.superView layoutIfNeeded];
+    NSLog(@"================> self.mapView.frame: %@", NSStringFromCGRect(self.mapView.frame));
+    NSLog(@"================> self.mapView.safeAreaInsets: %@", NSStringFromUIEdgeInsets(self.mapView.safeAreaInsets));
 }
 
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
