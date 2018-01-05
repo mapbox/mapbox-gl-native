@@ -40,6 +40,7 @@ public:
                 style::SourceType type,
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
+                optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
     void startRender(PaintParameters&);

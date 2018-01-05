@@ -2,7 +2,8 @@
 
 #include <mbgl/util/range.hpp>
 #include <mbgl/util/constants.hpp>
-
+#include <mbgl/util/optional.hpp>
+#include <mbgl/util/geo.hpp>
 #include <tuple>
 #include <vector>
 #include <string>
@@ -18,6 +19,7 @@ public:
     Range<uint8_t> zoomRange;
     std::string attribution;
     Scheme scheme;
+    optional<LatLngBounds> bounds;
 
     Tileset(std::vector<std::string> tiles_ = std::vector<std::string>(),
             Range<uint8_t> zoomRange_ = { 0, util::DEFAULT_MAX_ZOOM },
@@ -26,13 +28,14 @@ public:
         : tiles(std::move(tiles_)),
           zoomRange(std::move(zoomRange_)),
           attribution(std::move(attribution_)),
-          scheme(scheme_) {}
+          scheme(scheme_),
+          bounds() {}
 
-    // TileJSON also includes center, zoom, and bounds, but they are not used by mbgl.
+    // TileJSON also includes center and zoom but they are not used by mbgl.
 
     friend bool operator==(const Tileset& lhs, const Tileset& rhs) {
-        return std::tie(lhs.tiles, lhs.zoomRange, lhs.attribution, lhs.scheme)
-            == std::tie(rhs.tiles, rhs.zoomRange, rhs.attribution, rhs.scheme);
+        return std::tie(lhs.tiles, lhs.zoomRange, lhs.attribution, lhs.scheme, lhs.bounds)
+            == std::tie(rhs.tiles, rhs.zoomRange, rhs.attribution, rhs.scheme, rhs.bounds);
     }
 };
 

@@ -690,6 +690,7 @@ set(MBGL_CORE_FILES
     src/mbgl/util/tile_coordinate.hpp
     src/mbgl/util/tile_cover.cpp
     src/mbgl/util/tile_cover.hpp
+    src/mbgl/util/tile_range.hpp
     src/mbgl/util/tiny_sdf.cpp
     src/mbgl/util/tiny_sdf.hpp
     src/mbgl/util/token.hpp
