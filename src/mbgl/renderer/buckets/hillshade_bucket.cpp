@@ -15,6 +15,10 @@ HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_) {
 HillshadeBucket::HillshadeBucket(DEMPyramid&& pyramid_) : pyramid(std::move(pyramid_)) {
 }
 
+DEMPyramid* HillshadeBucket::getDEMPyramid() {
+    return &pyramid;
+}
+
 void HillshadeBucket::upload(gl::Context& context) {
     if (!hasData()) {
         return;
