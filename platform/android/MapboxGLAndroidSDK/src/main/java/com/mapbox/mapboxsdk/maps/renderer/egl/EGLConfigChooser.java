@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps.renderer.egl;
 
 import android.opengl.GLSurfaceView;
+import android.os.Build;
 import android.support.annotation.NonNull;
 
 import java.util.ArrayList;
@@ -261,9 +262,8 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
     return attributevalue[0];
   }
 
-
   private int[] getConfigAttributes() {
-    boolean emulator = inEmulator();
+    boolean emulator = inEmulator() || inGenymotion();
     Timber.i("In emulator: %s", emulator);
 
     // Get all configs at least RGB 565 with 16 depth and 8 stencil
@@ -290,4 +290,12 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
   private boolean inEmulator() {
     return System.getProperty("ro.kernel.qemu") != null;
   }
+
+  /**
+   * Detect if we are in genymotion
+   */
+  private boolean inGenymotion() {
+    return Build.MANUFACTURER.contains("Genymotion");
+  }
+
 }
