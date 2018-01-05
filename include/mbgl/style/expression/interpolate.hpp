@@ -89,6 +89,8 @@ public:
         );
     }
 
+    std::vector<optional<Value>> possibleOutputs() const override;
+
 protected:
     const Interpolator interpolator;
     const std::unique_ptr<Expression> input;

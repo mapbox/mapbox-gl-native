@@ -632,7 +632,7 @@ namespace mbgl {
 - (void)setTextFontNames:(MGLStyleValue<NSArray<NSString *> *> *)textFontNames {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toPropertyValue(textFontNames);
+    auto mbglValue = MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toDataDrivenPropertyValue(textFontNames);
     self.rawLayer->setTextFont(mbglValue);
 }
 
@@ -641,9 +641,9 @@ namespace mbgl {
 
     auto propertyValue = self.rawLayer->getTextFont();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toStyleValue(self.rawLayer->getDefaultTextFont());
+        return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toDataDrivenStyleValue(self.rawLayer->getDefaultTextFont());
     }
-    return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::vector<std::string>, NSArray<NSString *> *, std::string>().toDataDrivenStyleValue(propertyValue);
 }
 
 - (void)setTextFont:(MGLStyleValue<NSArray<NSString *> *> *)textFont {

@@ -206,6 +206,16 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
     );
 }
 
+std::vector<optional<Value>> InterpolateBase::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& stop : stops) {
+        for (auto& output : stop.second->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

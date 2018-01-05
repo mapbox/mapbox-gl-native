@@ -26,6 +26,10 @@ bool Any::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Any::possibleOutputs() const {
+    return {{ true }, { false }};
+}
+
 
 EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
@@ -47,6 +51,10 @@ bool All::operator==(const Expression& e) const {
         return Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;
+}
+
+std::vector<optional<Value>> All::possibleOutputs() const {
+    return {{ true }, { false }};
 }
 
 using namespace mbgl::style::conversion;

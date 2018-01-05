@@ -148,6 +148,15 @@ struct ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >> {
     static optional<T> fromExpressionValue(const Value& value);
 };
 
+template <typename T>
+std::vector<optional<T>> fromExpressionValues(const std::vector<optional<Value>>& values) {
+    std::vector<optional<T>> result;
+    for (const auto& value : values) {
+        result.push_back(value ? fromExpressionValue<T>(*value) : nullopt);
+    }
+    return result;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

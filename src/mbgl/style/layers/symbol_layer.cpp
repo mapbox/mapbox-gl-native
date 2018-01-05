@@ -412,15 +412,15 @@ void SymbolLayer::setTextField(DataDrivenPropertyValue<std::string> value) {
     baseImpl = std::move(impl_);
     observer->onLayerChanged(*this);
 }
-PropertyValue<std::vector<std::string>> SymbolLayer::getDefaultTextFont() {
+DataDrivenPropertyValue<std::vector<std::string>> SymbolLayer::getDefaultTextFont() {
     return TextFont::defaultValue();
 }
 
-PropertyValue<std::vector<std::string>> SymbolLayer::getTextFont() const {
+DataDrivenPropertyValue<std::vector<std::string>> SymbolLayer::getTextFont() const {
     return impl().layout.get<TextFont>();
 }
 
-void SymbolLayer::setTextFont(PropertyValue<std::vector<std::string>> value) {
+void SymbolLayer::setTextFont(DataDrivenPropertyValue<std::vector<std::string>> value) {
     if (value == getTextFont())
         return;
     auto impl_ = mutableImpl();

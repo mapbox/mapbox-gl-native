@@ -102,6 +102,10 @@ public:
         );
     }
 
+    std::vector<optional<T>> possibleOutputs() const {
+        return expression::fromExpressionValues<T>(expression->possibleOutputs());
+    }
+
     friend bool operator==(const CompositeFunction& lhs,
                            const CompositeFunction& rhs) {
         return *lhs.expression == *rhs.expression;

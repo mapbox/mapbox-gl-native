@@ -33,6 +33,8 @@ public:
         return false;
     }
 
+    std::vector<optional<Value>> possibleOutputs() const override;
+
     Expression* getResult() const {
         return result.get();
     }
@@ -61,7 +63,9 @@ public:
         }
         return false;
     }
-    
+
+    std::vector<optional<Value>> possibleOutputs() const override;
+
 private:
     std::string name;
     std::shared_ptr<Expression> value;

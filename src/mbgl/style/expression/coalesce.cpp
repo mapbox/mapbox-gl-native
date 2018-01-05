@@ -27,6 +27,16 @@ bool Coalesce::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Coalesce::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& arg : args) {
+        for (auto& output : arg->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
+}
+
 using namespace mbgl::style::conversion;
 ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));

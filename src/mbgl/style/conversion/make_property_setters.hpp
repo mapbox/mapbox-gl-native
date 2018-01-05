@@ -49,7 +49,7 @@ inline auto makeLayoutPropertySetters() {
     result["text-pitch-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextPitchAlignment>;
     result["text-rotation-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
     result["text-field"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;
-    result["text-font"] = &setProperty<SymbolLayer, PropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
+    result["text-font"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
     result["text-size"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextSize>;
     result["text-max-width"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
     result["text-line-height"] = &setProperty<SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;

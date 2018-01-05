@@ -72,7 +72,11 @@ public:
             [&](const std::vector<type::Type>& p) -> optional<std::size_t> { return p.size(); }
         );
     }
-    
+
+    std::vector<optional<Value>> possibleOutputs() const override {
+        return { nullopt };
+    }
+
 private:
     std::string name;
     variant<std::vector<type::Type>, VarargsType> params;
@@ -107,7 +111,7 @@ public:
         }
         return false;
     }
-    
+
 private:
     Signature signature;
     typename Signature::Args args;

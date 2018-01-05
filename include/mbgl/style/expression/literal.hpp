@@ -28,7 +28,11 @@ public:
         }
         return false;
     }
-    
+
+    std::vector<optional<Value>> possibleOutputs() const override {
+        return {{ value }};
+    }
+
 private:
     Value value;
 };

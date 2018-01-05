@@ -26,6 +26,20 @@ bool Match<T>::operator==(const Expression& e) const {
     return false;
 }
 
+template <typename T>
+std::vector<optional<Value>> Match<T>::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& branch : branches) {
+        for (auto& output : branch.second->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    for (auto& output : otherwise->possibleOutputs()) {
+        result.push_back(std::move(output));
+    }
+    return result;
+}
+
 
 template<> EvaluationResult Match<std::string>::evaluate(const EvaluationContext& params) const {
     const EvaluationResult inputValue = input->evaluate(params);
