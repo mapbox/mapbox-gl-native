@@ -32,6 +32,7 @@ public:
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
+    HillshadeBucket* getBucket() const;
     
     std::unordered_map<OverscaledTileID, bool> neighboringTiles;
     
