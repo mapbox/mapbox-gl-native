@@ -9,11 +9,6 @@ NS_ASSUME_NONNULL_BEGIN
 @protocol MGLFeature;
 
 /**
- Options for `MGLShapeSource` objects.
- */
-typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
-
-/**
  `MGLShapeSource` is a map content source that supplies vector shapes to be
  shown on the map. The shapes may be instances of `MGLShape` or `MGLFeature`,
  or they may be defined by local or external
