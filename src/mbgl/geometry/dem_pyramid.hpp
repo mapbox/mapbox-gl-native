@@ -24,7 +24,6 @@ public:
             return reinterpret_cast<const int32_t*>(image.data.get())[idx(x, y)] - 65536;
         }
 
-        void resample(Level& target);
 
     private:
         size_t idx(const int32_t x, const int32_t y) const {
@@ -42,12 +41,15 @@ public:
         PremultipliedImage image;
     };
     
-    void buildLevels();
+
     void loadFromImage(PremultipliedImage& image);
     void backfillBorder(DEMPyramid& borderTileData, int8_t dx, int8_t dy);
-
+    bool isLoaded() {
+        return loaded;
+    };
     std::vector<Level> levels;
-
+    private:
+        bool loaded = false;
 
 };
 

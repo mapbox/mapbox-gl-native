@@ -3,26 +3,6 @@
 
 namespace mbgl {
 
-void DEMPyramid::buildLevels() {
-    while (true) {
-        auto& prev = levels.back();
-        const int32_t dim = std::ceil(prev.dim / 2);
-        const int32_t border = std::max<int32_t>(std::ceil(prev.border / 2), 1);
-
-        if (dim == 1) {
-            break;
-        }
-        Level next(dim, border);
-        prev.resample(next);
-        levels.emplace_back(std::move(next));
-    }
-
-    // Build remaining two levels. They aren't actually used in rendering, but we
-    // need them for OpenGL's mipmapping feature.
-    levels.emplace_back(2, 0);
-    levels.emplace_back(1, 0);
-}
-
 void DEMPyramid::loadFromImage(PremultipliedImage& image){
     assert(image.size.height == image.size.width);
     
@@ -64,6 +44,7 @@ void DEMPyramid::loadFromImage(PremultipliedImage& image){
     first.set(first.dim, first.dim, first.get(first.dim - 1, first.dim - 1));
     
     levels.emplace_back(std::move(first));
+    loaded = true;
 }
 
 void DEMPyramid::backfillBorder(mbgl::DEMPyramid &borderTileData, int8_t dx, int8_t dy) {
@@ -110,14 +91,5 @@ DEMPyramid::Level::Level(int32_t dim_, int32_t border_)
 
 
 
-void DEMPyramid::Level::resample(Level& target) {
-    for (int32_t y = 0; y < target.dim; y++) {
-        const int32_t fy = y * 2;
-        for (int32_t x = 0; x < target.dim; x++) {
-            const int32_t fx = x * 2;
-            target.set(x, y, (get(fx, fy) + get(fx + 1, fy) + get(fx, fy + 1) + get(fx + 1, fy + 1)) / 4);
-        }
-    }
-}
 
 } // namespace mbgl
