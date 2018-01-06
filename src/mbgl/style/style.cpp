@@ -130,5 +130,9 @@ std::unique_ptr<Layer> Style::removeLayer(const std::string& id) {
     return impl->removeLayer(id);
 }
 
+bool Style::isLoaded() const {
+  return impl->isLoaded();
+}
+
 } // namespace style
 } // namespace mbgl
