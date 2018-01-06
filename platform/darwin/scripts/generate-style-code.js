@@ -27,8 +27,10 @@ _.forOwn(cocoaConventions, function (properties, kind) {
         delete spec[kind][oldName];
         spec[kind][newName] = property;
 
-        // Update requirements in other properties.
-        let updateRequirements = function (property, name) {
+        // Update cross-references to this property in other properties'
+        // documentation and requirements.
+        let renameCrossReferences = function (property, name) {
+            property.doc = property.doc.replace(new RegExp('`' + oldName + '`', 'g'), '`' + newName + '`');
             let requires = property.requires || [];
             for (let i = 0; i < requires.length; i++) {
                 if (requires[i] === oldName) {
@@ -45,8 +47,8 @@ _.forOwn(cocoaConventions, function (properties, kind) {
                 }
             }
         };
-        _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], updateRequirements);
-        _.forOwn(spec[kind.replace(/^paint_/, 'layout_')], updateRequirements);
+        _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], renameCrossReferences);
+        _.forOwn(spec[kind.replace(/^paint_/, 'layout_')], renameCrossReferences);
     })
 });
 
