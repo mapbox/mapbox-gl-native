@@ -358,19 +358,19 @@ global.describeValue = function (value, property, layerType) {
         case 'enum':
             let displayValue;
             if (Array.isArray(value)) {
-              let separator = (value.length === 2) ? ' ' : ', ';
-              displayValue = value.map((possibleValue, i) => {
-                let conjunction = '';
-                if (value.length === 2 && i === 0) conjunction = 'either ';
-                if (i === value.length - 1) conjunction = 'or ';
-                let objCType = global.objCType(layerType, property.name);
-                return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
-              }).join(separator);
+                let separator = (value.length === 2) ? ' ' : ', ';
+                displayValue = value.map((possibleValue, i) => {
+                    let conjunction = '';
+                    if (value.length === 2 && i === 0) conjunction = 'either ';
+                    if (i === value.length - 1) conjunction = 'or ';
+                    let objCType = global.objCType(layerType, property.name);
+                    return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
+                }).join(separator);
             } else if (property['light-property']) {
-              displayValue = `\`${prefix}Light${camelize(property.name)}${camelize(value)}\``;
+                displayValue = `\`${prefix}Light${camelize(property.name)}${camelize(value)}\``;
             } else {
-              let objCType = global.objCType(layerType, property.name);
-              displayValue = `\`${objCType}${camelize(value)}\``;
+                let objCType = global.objCType(layerType, property.name);
+                displayValue = `\`${objCType}${camelize(value)}\``;
             }
             return `an \`NSValue\` object containing ${displayValue}`;
         case 'color':
