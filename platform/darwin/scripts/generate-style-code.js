@@ -247,6 +247,13 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Format everything else: our property name & its possible values.
     // Requires symbols to be surrounded by backticks.
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if (kind === 'enum') {
+            let layoutProperties = spec[`layout_${layerType}`] || [];
+            let paintProperties = spec[`paint_${layerType}`] || [];
+            if (symbol in layoutProperties || symbol in paintProperties) {
+                return '`MGL' + camelize(layerType) + 'StyleLayer.' + camelizeWithLeadingLowercase(symbol) + '`';
+            }
+        }
         if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
             let objCType = global.objCType(layerType, property.name);
             return '`' + `${objCType}${camelize(symbol)}` + '`';
