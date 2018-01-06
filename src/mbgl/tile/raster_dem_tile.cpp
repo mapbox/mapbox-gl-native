@@ -20,7 +20,7 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
              ActorRef<RasterDEMTile>(*this, mailbox)) {
-          
+
      const CanonicalTileID canonical = id_.canonical;
      const u_int32_t dim = pow(2, canonical.z);
      const u_int32_t px = (canonical.x - 1 + dim) % dim;
@@ -92,9 +92,15 @@ void RasterDEMTile::upload(gl::Context& context) {
     }
 }
 
+
 Bucket* RasterDEMTile::getBucket(const style::Layer::Impl&) const {
     return bucket.get();
 }
+
+HillshadeBucket* RasterDEMTile::getBucket() const {
+    return bucket.get();
+}
+
 
 void RasterDEMTile::setMask(TileMask&& mask) {
     if (bucket) {

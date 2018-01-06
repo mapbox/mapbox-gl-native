@@ -84,7 +84,7 @@ protected:
 
     bool enabled = false;
 
-    void onTileChanged(Tile&) final;
+    virtual void onTileChanged(Tile&);
     void onTileError(Tile&, std::exception_ptr) final;
 };
 

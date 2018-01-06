@@ -41,6 +41,9 @@ private:
 
     TilePyramid tilePyramid;
     optional<std::vector<std::string>> tileURLTemplates;
+
+protected:
+    void onTileChanged(Tile&);
 };
 
 template <>
