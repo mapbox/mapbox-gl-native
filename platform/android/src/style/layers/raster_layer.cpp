@@ -155,19 +155,6 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
-    jni::Object<TransitionOptions> RasterLayer::getRasterFadeDurationTransition(jni::JNIEnv& env) {
-        using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::RasterLayer>()->RasterLayer::getRasterFadeDurationTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
-    }
-
-    void RasterLayer::setRasterFadeDurationTransition(jni::JNIEnv&, jlong duration, jlong delay) {
-        mbgl::style::TransitionOptions options;
-        options.duration.emplace(mbgl::Milliseconds(duration));
-        options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::RasterLayer>()->RasterLayer::setRasterFadeDurationTransition(options);
-    }
-
 
     jni::Class<RasterLayer> RasterLayer::javaClass;
 
@@ -206,8 +193,6 @@ namespace android {
             METHOD(&RasterLayer::getRasterContrastTransition, "nativeGetRasterContrastTransition"),
             METHOD(&RasterLayer::setRasterContrastTransition, "nativeSetRasterContrastTransition"),
             METHOD(&RasterLayer::getRasterContrast, "nativeGetRasterContrast"),
-            METHOD(&RasterLayer::getRasterFadeDurationTransition, "nativeGetRasterFadeDurationTransition"),
-            METHOD(&RasterLayer::setRasterFadeDurationTransition, "nativeSetRasterFadeDurationTransition"),
             METHOD(&RasterLayer::getRasterFadeDuration, "nativeGetRasterFadeDuration"));
     }
 
