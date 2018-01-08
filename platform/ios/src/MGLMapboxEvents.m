@@ -40,6 +40,10 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
         _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
         _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
         
+        // Because we can get here [MGLAccountManaber +load] it is possible that values from user defaults will be read and
+        // applied here. These checks and local accessToken and baseURL assigns work around that fact. If user default value
+        // are set, they are stored on the local properties here and then only applied later on once MMEEventsManager is
+        // fully initialized (once -[MMEEventsManager initializeWithAccessToken:userAgentBase:hostSDKVersion:] is called.
         if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
             self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
         }
@@ -58,16 +62,21 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 
 - (void)userDefaultsDidChange:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
-        
-        // Default values
         self.eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
         self.eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
         self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];                
         
-        // Optional values
+
+        // It is possible that MGLTelemetryAccessToken is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
+        // In that case, setting the access token here will be a noop. In practice, that's fine because the access token value
+        // will be resolved when setupWithAccessToken: is called eventually
         if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
             self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
         }
+        
+        // It is possible that MGLTelemetryBaseURL is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
+        // In that case, setting baseURL here will be a noop. In practice, that's fine because the baseURL value
+        // will be resolved when setupWithAccessToken: is called eventually
         if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryBaseURL"]) {
             NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryBaseURL"]];
             self.eventsManager.baseURL = baseURL;
