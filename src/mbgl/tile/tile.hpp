@@ -109,8 +109,6 @@ public:
     // and will have time to finish by the second placement.
     virtual void performedFadePlacement() {}
     
-    virtual void resetCrossTileIDs() {};
-
     void dumpDebugLogs() const;
 
     const OverscaledTileID id;
