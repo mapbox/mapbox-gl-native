@@ -1,7 +1,4 @@
 {
-  "expression-tests/array/implicit-1": "https://github.com/mapbox/mapbox-gl-native/issues/10533",
-  "expression-tests/array/implicit-2": "https://github.com/mapbox/mapbox-gl-native/issues/10533",
-  "expression-tests/array/implicit-3": "https://github.com/mapbox/mapbox-gl-native/issues/10533",
   "expression-tests/coalesce/inference": "https://github.com/mapbox/mapbox-gl-native/issues/10588",
   "expression-tests/equal/array": "https://github.com/mapbox/mapbox-gl-native/issues/10678",
   "expression-tests/equal/color": "https://github.com/mapbox/mapbox-gl-native/issues/10678",

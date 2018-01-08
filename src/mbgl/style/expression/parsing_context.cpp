@@ -145,6 +145,8 @@ ParseResult ParsingContext::parse(const Convertible& value)
         const type::Type actual = (*parsed)->getType();
         if (*expected == type::Color && (actual == type::String || actual == type::Value)) {
             parsed = wrapForType(type::Color, std::move(*parsed));
+        } else if (expected->is<type::Array>() && actual == type::Value) {
+            parsed = { std::make_unique<ArrayAssertion>(expected->get<type::Array>(), std::move(*parsed)) };
         } else if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
             parsed = wrapForType(*expected, std::move(*parsed));
         }
