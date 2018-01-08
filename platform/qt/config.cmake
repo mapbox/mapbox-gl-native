@@ -1,6 +1,5 @@
 include(platform/qt/qt.cmake)
 
-mason_use(sqlite VERSION 3.14.2)
 mason_use(gtest VERSION 1.8.0${MASON_CXXABI_SUFFIX})
 
 if(NOT WITH_QT_DECODERS)
@@ -80,8 +79,6 @@ macro(mbgl_platform_test)
         platform/qt/test/main.cpp
         PROPERTIES COMPILE_FLAGS -DWORK_DIRECTORY="${CMAKE_SOURCE_DIR}"
     )
-
-    target_add_mason_package(mbgl-test PRIVATE sqlite)
 
     target_link_libraries(mbgl-test
         PRIVATE qmapboxgl
