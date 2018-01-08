@@ -1,8 +1,5 @@
 {
   "expression-tests/coalesce/inference": "https://github.com/mapbox/mapbox-gl-native/issues/10588",
-  "expression-tests/interpolate/linear-color": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
-  "expression-tests/to-rgba/alpha": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
-  "expression-tests/to-rgba/basic": "https://github.com/mapbox/mapbox-gl-native/issues/10604",
   "query-tests/circle-stroke-width/inside": "https://github.com/mapbox/mapbox-gl-native/issues/10307",
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
