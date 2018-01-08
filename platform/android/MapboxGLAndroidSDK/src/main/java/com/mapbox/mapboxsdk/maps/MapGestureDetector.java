@@ -344,12 +344,11 @@ final class MapGestureDetector {
             // Zoom in on gesture
             transform.zoom(true, new PointF(e.getX(), e.getY()));
           }
+          MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
+            getLocationFromGesture(e.getX(), e.getY()),
+            MapboxEvent.GESTURE_DOUBLETAP, transform));
           break;
       }
-
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapClickEvent(
-        getLocationFromGesture(e.getX(), e.getY()),
-        MapboxEvent.GESTURE_DOUBLETAP, transform));
 
       return true;
     }
