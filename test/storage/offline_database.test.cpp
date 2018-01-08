@@ -9,7 +9,6 @@
 
 #include <gtest/gtest.h>
 #include <sqlite3.hpp>
-#include <sqlite3.h>
 #include <thread>
 #include <random>
 
@@ -39,45 +38,6 @@ void writeFile(const char* name, const std::string& data) {
     mbgl::util::write_file(name, data);
 }
 
-class FileLock {
-public:
-    FileLock(const std::string& path) {
-        const int err = sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_CREATE | SQLITE_OPEN_READWRITE, nullptr);
-        if (err != SQLITE_OK) {
-            throw std::runtime_error("Could not open db");
-        }
-        lock();
-    }
-
-    void lock() {
-        assert(!locked);
-        const int err = sqlite3_exec(db, "begin exclusive transaction", nullptr, nullptr, nullptr);
-        if (err != SQLITE_OK) {
-            throw std::runtime_error("Could not lock db");
-        }
-        locked = true;
-    }
-
-    void unlock() {
-        assert(locked);
-        const int err = sqlite3_exec(db, "commit", nullptr, nullptr, nullptr);
-        if (err != SQLITE_OK) {
-            throw std::runtime_error("Could not unlock db");
-        }
-        locked = false;
-    }
-
-    ~FileLock() {
-        if (locked) {
-            unlock();
-        }
-    }
-
-private:
-    sqlite3* db = nullptr;
-    bool locked = false;
-};
-
 } // namespace
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
@@ -102,10 +62,8 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
     std::string path("test/fixtures/offline_database/offline.db");
 
     {
-        sqlite3* db = nullptr;
-        sqlite3_open_v2(path.c_str(), &db, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr);
-        sqlite3_exec(db, "PRAGMA user_version = 1", nullptr, nullptr, nullptr);
-        sqlite3_close_v2(db);
+        mapbox::sqlite::Database db(path, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+        db.exec("PRAGMA user_version = 1");
     }
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
