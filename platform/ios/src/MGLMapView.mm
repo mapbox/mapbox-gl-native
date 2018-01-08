@@ -894,7 +894,7 @@ public:
         [self.compassViewConstraints removeAllObjects];
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wpartial-availability"
-            [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
+        [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
 #pragma clang diagnostic pop
         [self.compassViewConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.compassView.rightAnchor
                                                                                           constant:8.0 + self.contentInset.right]];
@@ -914,8 +914,10 @@ public:
         // logo view
         [self removeConstraints:self.logoViewConstraints];
         [self.logoViewConstraints removeAllObjects];
-        [self.logoViewConstraints addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:self.logoView.bottomAnchor
-                                                                                             constant:8.0 + self.contentInset.bottom]];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        [NSLayoutConstraint activateConstraints:@[[safeAreaLayoutGuide.bottomAnchor constraintEqualToSystemSpacingBelowAnchor:self.logoView.bottomAnchor multiplier:1.0]]];
+#pragma clang diagnostic pop
         [self.logoViewConstraints addObject:[self.logoView.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
                                                                                      constant:8.0 + self.contentInset.left]];
         [self addConstraints:self.logoViewConstraints];
@@ -923,8 +925,10 @@ public:
         // attribution button
         [self removeConstraints:self.attributionButtonConstraints];
         [self.attributionButtonConstraints removeAllObjects];
-        [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.bottomAnchor constraintEqualToAnchor:self.attributionButton.bottomAnchor
-                                                                                                      constant:8.0 + self.contentInset.bottom]];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wpartial-availability"
+        [NSLayoutConstraint activateConstraints:@[[safeAreaLayoutGuide.bottomAnchor constraintEqualToSystemSpacingBelowAnchor:self.attributionButton.bottomAnchor multiplier:1.0]]];
+#pragma clang diagnostic pop
         [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.attributionButton.rightAnchor
                                                                                                constant:8.0 + self.contentInset.right]];
         [self addConstraints:self.attributionButtonConstraints];
