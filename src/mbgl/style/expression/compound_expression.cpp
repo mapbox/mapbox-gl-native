@@ -175,12 +175,6 @@ struct Signature<Lambda, std::enable_if_t<std::is_class<Lambda>::value>>
 
 using Definition = CompoundExpressionRegistry::Definition;
 
-template <typename T>
-Result<bool> equal(const T& lhs, const T& rhs) { return lhs == rhs; }
-
-template <typename T>
-Result<bool> notEqual(const T& lhs, const T& rhs) { return lhs != rhs; }
-
 template <typename Fn>
 static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction) {
     return std::make_unique<detail::Signature<Fn>>(evaluateFunction);
@@ -376,16 +370,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return result;
     });
     
-    define("==", equal<double>);
-    define("==", equal<const std::string&>);
-    define("==", equal<bool>);
-    define("==", equal<NullValue>);
-
-    define("!=", notEqual<double>);
-    define("!=", notEqual<const std::string&>);
-    define("!=", notEqual<bool>);
-    define("!=", notEqual<NullValue>);
-
     define(">", [](double lhs, double rhs) -> Result<bool> { return lhs > rhs; });
     define(">", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs > rhs; });
     define(">=", [](double lhs, double rhs) -> Result<bool> { return lhs >= rhs; });
