@@ -1,4 +1,5 @@
 #include <mbgl/style/expression/coalesce.hpp>
+#include <mbgl/style/expression/check_subtype.hpp>
 
 namespace mbgl {
 namespace style {
@@ -36,14 +37,15 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
     }
  
     optional<type::Type> outputType;
-    if (ctx.getExpected() && *ctx.getExpected() != type::Value) {
-        outputType = ctx.getExpected();
+    optional<type::Type> expectedType = ctx.getExpected();
+    if (expectedType && *expectedType != type::Value) {
+        outputType = expectedType;
     }
 
     Coalesce::Args args;
     args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        auto parsed = ctx.parse(arrayMember(value, i), i, outputType);
+        auto parsed = ctx.parse(arrayMember(value, i), i, outputType, ParsingContext::omitTypeAnnotations);
         if (!parsed) {
             return parsed;
         }
@@ -52,9 +54,19 @@ ParseResult Coalesce::parse(const Convertible& value, ParsingContext& ctx) {
         }
         args.push_back(std::move(*parsed));
     }
- 
     assert(outputType);
-    return ParseResult(std::make_unique<Coalesce>(*outputType, std::move(args)));
+
+    // Above, we parse arguments without inferred type annotation so that
+    // they don't produce a runtime error for `null` input, which would
+    // preempt the desired null-coalescing behavior.
+    // Thus, if any of our arguments would have needed an annotation, we
+    // need to wrap the enclosing coalesce expression with it instead.
+    bool needsAnnotation = expectedType &&
+        std::any_of(args.begin(), args.end(), [&] (const auto& arg) {
+            return type::checkSubtype(*expectedType, arg->getType());
+        });
+
+    return ParseResult(std::make_unique<Coalesce>(needsAnnotation ? type::Value : *outputType, std::move(args)));
 }
 
 } // namespace expression

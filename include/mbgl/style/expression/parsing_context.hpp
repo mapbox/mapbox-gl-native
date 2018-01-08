@@ -68,20 +68,27 @@ public:
     optional<type::Type> getExpected() const { return expected; }
     const std::vector<ParsingError>& getErrors() const { return *errors; }
 
+    enum TypeAnnotationOption {
+        includeTypeAnnotations,
+        omitTypeAnnotations
+    };
+
     /*
         Parse the given style-spec JSON value into an Expression object.
         Specifically, this function is responsible for determining the expression
         type (either Literal, or the one named in value[0]) and dispatching to the
         appropriate ParseXxxx::parse(const V&, ParsingContext) method.
     */
-    ParseResult parse(const mbgl::style::conversion::Convertible& value);
-    
+    ParseResult parse(const mbgl::style::conversion::Convertible& value,
+                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
+
     /*
         Parse a child expression.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t,
-                      optional<type::Type> = {});
+                      optional<type::Type> = {},
+                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
     
     /*
         Parse a child expression.
