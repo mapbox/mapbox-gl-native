@@ -23,13 +23,13 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     }
 }
 
-+ (nullable instancetype)sharedManager {
++ (nullable instancetype)sharedInstance {
     static dispatch_once_t onceToken;
-    static MGLMapboxEvents *_sharedManager;
+    static MGLMapboxEvents *_sharedInstance;
     dispatch_once(&onceToken, ^{
-        _sharedManager = [[self alloc] init];
+        _sharedInstance = [[self alloc] init];
     });
-    return _sharedManager;
+    return _sharedInstance;
 }
 
 - (instancetype)init {
@@ -81,25 +81,30 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     NSString *semanticVersion = [NSBundle mgl_frameworkInfoDictionary][@"MGLSemanticVersionString"];
     NSString *shortVersion = [NSBundle mgl_frameworkInfoDictionary][@"CFBundleShortVersionString"];
     NSString *sdkVersion = semanticVersion ?: shortVersion;
-    NSString *resolvedAccessToken = [MGLMapboxEvents sharedManager].accessToken ?: accessToken;
     
-    [[[MGLMapboxEvents sharedManager] eventsManager] initializeWithAccessToken:resolvedAccessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
+    // It is possible that an alternative access token was already set on this instance when the class was loaded
+    // Use it if it exists
+    NSString *resolvedAccessToken = [MGLMapboxEvents sharedInstance].accessToken ?: accessToken;
     
-    if ([MGLMapboxEvents sharedManager].baseURL) {
-        [[MGLMapboxEvents sharedManager] eventsManager].baseURL = [MGLMapboxEvents sharedManager].baseURL;
+    [[[self sharedInstance] eventsManager] initializeWithAccessToken:resolvedAccessToken userAgentBase:MGLAPIClientUserAgentBase hostSDKVersion:sdkVersion];
+    
+    // It is possible that an alternative base URL was set on this instance when the class was loaded
+    // Use it if it exists
+    if ([MGLMapboxEvents sharedInstance].baseURL) {
+        [[MGLMapboxEvents sharedInstance] eventsManager].baseURL = [MGLMapboxEvents sharedInstance].baseURL;
     }
 }
 
 + (void)pushTurnstileEvent {
-    [[[self sharedManager] eventsManager] sendTurnstileEvent];
+    [[[self sharedInstance] eventsManager] sendTurnstileEvent];
 }
 
 + (void)pushEvent:(NSString *)event withAttributes:(MMEMapboxEventAttributes *)attributeDictionary {
-    [[[self sharedManager] eventsManager] enqueueEventWithName:event attributes:attributeDictionary];
+    [[[self sharedInstance] eventsManager] enqueueEventWithName:event attributes:attributeDictionary];
 }
 
 + (void)flush {
-    [[[self sharedManager] eventsManager] flush];
+    [[[self sharedInstance] eventsManager] flush];
 }
 
 + (void)ensureMetricsOptoutExists {

@@ -5,7 +5,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface MGLMapboxEvents : NSObject
 
-+ (nullable instancetype)sharedManager;
++ (nullable instancetype)sharedInstance;
 
 + (void)setupWithAccessToken:(NSString *)accessToken;
 + (void)pushTurnstileEvent;
