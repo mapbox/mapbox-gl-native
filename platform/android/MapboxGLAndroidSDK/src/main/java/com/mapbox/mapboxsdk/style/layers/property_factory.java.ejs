@@ -6,12 +6,13 @@
 
 package com.mapbox.mapboxsdk.style.layers;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.ColorInt;
 
-import com.mapbox.mapboxsdk.style.functions.Function;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
+import com.mapbox.mapboxsdk.style.functions.Function;
+
+import java.util.Locale;
 
 /**
  * Constructs paint/layout properties for Layers
@@ -154,9 +155,9 @@ public class PropertyFactory {
 
 <% } -%>
 <% } -%>
-  @SuppressLint("DefaultLocale")
   public static String colorToRgbaString(@ColorInt int value) {
-    return String.format("rgba(%d, %d, %d, %d)", (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
+    return String.format(Locale.US,"rgba(%d, %d, %d, %d)",
+      (value >> 16) & 0xFF, (value >> 8) & 0xFF, value & 0xFF, (value >> 24) & 0xFF);
   }
 
 }
