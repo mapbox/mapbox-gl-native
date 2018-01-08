@@ -228,10 +228,15 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
+    JointOpacityState defaultOpacityState(
+            bucket.layout.get<style::TextAllowOverlap>(),
+            bucket.layout.get<style::IconAllowOverlap>(),
+            true);
+
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
         auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
             getOpacity(symbolInstance.crossTileID) :
-            JointOpacityState(false, false, false);
+            defaultOpacityState;
 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 

@@ -282,18 +282,6 @@ void GeometryTile::querySourceFeatures(
     }
 }
 
-void GeometryTile::resetCrossTileIDs() {
-    for (auto& bucket : symbolBuckets) {
-        auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
-        if (symbolBucket && symbolBucket->bucketInstanceId) {
-            symbolBucket->bucketInstanceId = 0;
-            for (auto& symbolInstance : symbolBucket->symbolInstances) {
-                symbolInstance.crossTileID = 0;
-            }
-        }
-    }
-}
-
 bool GeometryTile::holdForFade() const {
     return mode == MapMode::Continuous &&
            (fadeState == FadeState::NeedsFirstPlacement || fadeState == FadeState::NeedsSecondPlacement);

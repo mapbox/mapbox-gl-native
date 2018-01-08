@@ -18,6 +18,7 @@ SymbolInstance makeSymbolInstance(float x, float y, std::u16string key) {
 TEST(CrossTileSymbolLayerIndex, addBucket) {
 
     uint32_t maxCrossTileID = 0;
+    uint32_t maxBucketInstanceId = 0;
     CrossTileSymbolLayerIndex index;
 
     style::SymbolLayoutProperties::PossiblyEvaluated layout;
@@ -25,12 +26,12 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     bool iconsNeedLinear = false;
     bool sortFeaturesByY = false;
 
-
     OverscaledTileID mainID(6, 0, 6, 8, 8);
     std::vector<SymbolInstance> mainInstances;
     mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Detroit"));
     mainInstances.push_back(makeSymbolInstance(2000, 2000, u"Toronto"));
     SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(mainInstances) };
+    mainBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(mainID, mainBucket, maxCrossTileID);
 
     // Assigned new IDs
@@ -45,6 +46,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     childInstances.push_back(makeSymbolInstance(3000, 3000, u"Toronto"));
     childInstances.push_back(makeSymbolInstance(4001, 4001, u"Toronto"));
     SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(childInstances) };
+    childBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(childID, childBucket, maxCrossTileID);
 
     // matched parent tile
@@ -60,6 +62,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     std::vector<SymbolInstance> parentInstances;
     parentInstances.push_back(makeSymbolInstance(500, 500, u"Detroit"));
     SymbolBucket parentBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(parentInstances) };
+    parentBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(parentID, parentBucket, maxCrossTileID);
 
     // matched child tile
@@ -75,6 +78,7 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     grandchildInstances.push_back(makeSymbolInstance(4000, 4000, u"Detroit"));
     grandchildInstances.push_back(makeSymbolInstance(4000, 4000, u"Windsor"));
     SymbolBucket grandchildBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(grandchildInstances) };
+    grandchildBucket.bucketInstanceId = ++maxBucketInstanceId;
     index.addBucket(grandchildID, grandchildBucket, maxCrossTileID);
 
     // Matches the symbol in `mainBucket`
@@ -82,4 +86,44 @@ TEST(CrossTileSymbolLayerIndex, addBucket) {
     // Does not match the previous value for Windsor because that tile was removed
     ASSERT_EQ(grandchildBucket.symbolInstances.at(1).crossTileID, 5u);
 
+}
+
+TEST(CrossTileSymbolLayerIndex, resetIDs) {
+
+    uint32_t maxCrossTileID = 0;
+    uint32_t maxBucketInstanceId = 0;
+    CrossTileSymbolLayerIndex index;
+
+    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    bool sdfIcons = false;
+    bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
+
+    OverscaledTileID mainID(6, 0, 6, 8, 8);
+    std::vector<SymbolInstance> mainInstances;
+    mainInstances.push_back(makeSymbolInstance(1000, 1000, u"Detroit"));
+    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(mainInstances) };
+    mainBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    OverscaledTileID childID(7, 0, 7, 16, 16);
+    std::vector<SymbolInstance> childInstances;
+    childInstances.push_back(makeSymbolInstance(2000, 2000, u"Detroit"));
+    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(childInstances) };
+    childBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    // assigns a new id
+    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 1u);
+
+    // removes the tile
+    std::unordered_set<uint32_t> currentIDs;
+    index.removeStaleBuckets(currentIDs);
+
+    // assigns a new id
+    index.addBucket(childID, childBucket, maxCrossTileID);
+    ASSERT_EQ(childBucket.symbolInstances.at(0).crossTileID, 2u);
+
+    // overwrites the old id to match the already-added tile
+    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 2u);
 }
