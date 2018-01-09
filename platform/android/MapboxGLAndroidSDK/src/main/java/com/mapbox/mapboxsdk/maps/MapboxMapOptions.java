@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Bitmap;
@@ -32,11 +33,11 @@ import java.util.Arrays;
  * MapView(Context, MapboxMapOptions). If you add a map using XML, then you can apply these options
  * using custom XML tags.
  */
-public class MapboxMapOptions implements Parcelable {
+public class MapboxMapOptions implements Parcelable{
 
   private static final float FOUR_DP = 4f;
   private static final float NINETY_TWO_DP = 92f;
-  private static final int UNDEFINED_COLOR = -1;
+  public static final int UNDEFINED_COLOR = -1;
 
   private CameraPosition cameraPosition;
 

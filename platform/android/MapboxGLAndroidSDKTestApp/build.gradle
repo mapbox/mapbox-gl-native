@@ -78,6 +78,9 @@ dependencies {
     androidTestImplementation rootProject.ext.dep.testRules
     androidTestImplementation rootProject.ext.dep.testEspressoCore
     androidTestImplementation rootProject.ext.dep.testEspressoIntents
+
+    implementation rootProject.ext.dep.lifecycleRuntime
+    annotationProcessor rootProject.ext.dep.lifecycleProcessor
 }
 
 apply from: 'gradle-make.gradle'

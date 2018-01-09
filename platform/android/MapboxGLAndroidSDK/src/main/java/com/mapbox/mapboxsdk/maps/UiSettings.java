@@ -33,36 +33,18 @@ public final class UiSettings {
   private final FocalPointChangeListener focalPointChangeListener;
   private final Projection projection;
   private final CompassView compassView;
-  private final int[] compassMargins = new int[4];
 
   private final ImageView attributionsView;
-  private final int[] attributionsMargins = new int[4];
 
   private final View logoView;
-  private final int[] logoMargins = new int[4];
 
   private float pixelRatio;
 
-  private boolean rotateGesturesEnabled = true;
-  private boolean rotateGestureChangeAllowed = true;
-
-  private boolean tiltGesturesEnabled = true;
-  private boolean tiltGestureChangeAllowed = true;
-
-  private boolean zoomGesturesEnabled = true;
-  private boolean zoomGestureChangeAllowed = true;
-
-  private boolean scrollGesturesEnabled = true;
-  private boolean scrollGestureChangeAllowed = true;
-
-  private boolean zoomControlsEnabled;
-
-  private boolean doubleTapGesturesEnabled = true;
-  private boolean doubleTapGestureChangeAllowed = true;
-
-  private boolean deselectMarkersOnTap = true;
-
   private PointF userProvidedFocalPoint;
+
+  private boolean deselectMarkersOnTap;
+
+  private MapState mapState;
 
   UiSettings(@NonNull Projection projection, @NonNull FocalPointChangeListener listener,
              @NonNull CompassView compassView, @NonNull ImageView attributionsView, @NonNull View logoView) {
@@ -189,6 +171,7 @@ public final class UiSettings {
   }
 
   private void setLogoMargins(Resources resources, int[] logoMargins) {
+    mapState.setLogoMargins(logoMargins);
     if (logoMargins != null) {
       setLogoMargins(logoMargins[0], logoMargins[1], logoMargins[2], logoMargins[3]);
     } else {
@@ -282,6 +265,7 @@ public final class UiSettings {
    * @param compassEnabled True to enable the compass; false to disable the compass.
    */
   public void setCompassEnabled(boolean compassEnabled) {
+    mapState.setCompassEnabled(compassEnabled);
     compassView.setEnabled(compassEnabled);
   }
 
@@ -291,7 +275,7 @@ public final class UiSettings {
    * @return True if the compass is enabled; false if the compass is disabled.
    */
   public boolean isCompassEnabled() {
-    return compassView.isEnabled();
+    return mapState.isCompassEnabled();
   }
 
   /**
@@ -305,6 +289,7 @@ public final class UiSettings {
    */
   @UiThread
   public void setCompassGravity(int gravity) {
+    mapState.setCompassGravity(gravity);
     setWidgetGravity(compassView, gravity);
   }
 
@@ -317,6 +302,7 @@ public final class UiSettings {
    * @param compassFadeFacingNorth True to enable the fading animation; false to disable it
    */
   public void setCompassFadeFacingNorth(boolean compassFadeFacingNorth) {
+    mapState.setCompassFadingNorth(compassFadeFacingNorth);
     compassView.fadeCompassViewFacingNorth(compassFadeFacingNorth);
   }
 
@@ -329,6 +315,7 @@ public final class UiSettings {
    * @param compass the drawable to show as image compass
    */
   public void setCompassImage(Drawable compass) {
+    mapState.setCompassImage(compass);
     compassView.setCompassImage(compass);
   }
 
@@ -338,7 +325,7 @@ public final class UiSettings {
    * @return True if the compass will fade, false if it remains visible
    */
   public boolean isCompassFadeWhenFacingNorth() {
-    return compassView.isFadeCompassViewFacingNorth();
+    return mapState.isCompassFadingNorth();
   }
 
   /**
@@ -347,7 +334,7 @@ public final class UiSettings {
    * @return The gravity
    */
   public int getCompassGravity() {
-    return ((FrameLayout.LayoutParams) compassView.getLayoutParams()).gravity;
+    return mapState.getCompassGravity();
   }
 
   /**
@@ -361,7 +348,8 @@ public final class UiSettings {
    */
   @UiThread
   public void setCompassMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(compassView, compassMargins, left, top, right, bottom);
+    mapState.setCompassMargins(new int[] {left, top, right, bottom});
+    setWidgetMargins(compassView, mapState.getCompassMargins(), left, top, right, bottom);
   }
 
   /**
@@ -370,7 +358,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getCompassMarginLeft() {
-    return compassMargins[0];
+    return mapState.getCompassMargins()[0];
   }
 
   /**
@@ -379,7 +367,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getCompassMarginTop() {
-    return compassMargins[1];
+    return mapState.getCompassMargins()[1];
   }
 
   /**
@@ -388,7 +376,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getCompassMarginRight() {
-    return compassMargins[2];
+    return mapState.getCompassMargins()[2];
   }
 
   /**
@@ -397,7 +385,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getCompassMarginBottom() {
-    return compassMargins[3];
+    return mapState.getCompassMargins()[3];
   }
 
   /**
@@ -427,6 +415,7 @@ public final class UiSettings {
    * @param enabled True to enable the logo; false to disable the logo.
    */
   public void setLogoEnabled(boolean enabled) {
+    mapState.setLogoEnabled(enabled);
     logoView.setVisibility(enabled ? View.VISIBLE : View.GONE);
   }
 
@@ -436,7 +425,8 @@ public final class UiSettings {
    * @return True if the logo is enabled; false if the logo is disabled.
    */
   public boolean isLogoEnabled() {
-    return logoView.getVisibility() == View.VISIBLE;
+    return mapState.isLogoEnabled();
+//    return logoView.getVisibility() == View.VISIBLE;
   }
 
   /**
@@ -449,6 +439,7 @@ public final class UiSettings {
    * @param gravity Android SDK Gravity.
    */
   public void setLogoGravity(int gravity) {
+    mapState.setLogoGravity(gravity);
     setWidgetGravity(logoView, gravity);
   }
 
@@ -458,7 +449,7 @@ public final class UiSettings {
    * @return The gravity
    */
   public int getLogoGravity() {
-    return ((FrameLayout.LayoutParams) logoView.getLayoutParams()).gravity;
+    return mapState.getLogoGravity();
   }
 
   /**
@@ -471,7 +462,8 @@ public final class UiSettings {
    * @param bottom The bottom margin in pixels.
    */
   public void setLogoMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(logoView, logoMargins, left, top, right, bottom);
+    mapState.setLogoMargins(new int[] {left, top, right, bottom});
+    setWidgetMargins(logoView, mapState.getLogoMargins(), left, top, right, bottom);
   }
 
   /**
@@ -480,7 +472,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getLogoMarginLeft() {
-    return logoMargins[0];
+    return mapState.getLogoMargins()[0];
   }
 
   /**
@@ -489,7 +481,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getLogoMarginTop() {
-    return logoMargins[1];
+    return mapState.getLogoMargins()[1];
   }
 
   /**
@@ -498,7 +490,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getLogoMarginRight() {
-    return logoMargins[2];
+    return mapState.getLogoMargins()[2];
   }
 
   /**
@@ -507,7 +499,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getLogoMarginBottom() {
-    return logoMargins[3];
+    return mapState.getLogoMargins()[3];
   }
 
   /**
@@ -519,6 +511,7 @@ public final class UiSettings {
    * @param enabled True to enable the attribution; false to disable the attribution.
    */
   public void setAttributionEnabled(boolean enabled) {
+    mapState.setAttributionEnabled(enabled);
     attributionsView.setVisibility(enabled ? View.VISIBLE : View.GONE);
   }
 
@@ -528,7 +521,7 @@ public final class UiSettings {
    * @return True if the attribution is enabled; false if the attribution is disabled.
    */
   public boolean isAttributionEnabled() {
-    return attributionsView.getVisibility() == View.VISIBLE;
+    return mapState.isAttributionEnabled();
   }
 
   /**
@@ -540,6 +533,7 @@ public final class UiSettings {
    * @param gravity Android SDK Gravity.
    */
   public void setAttributionGravity(int gravity) {
+    mapState.setAttributionGravity(gravity);
     setWidgetGravity(attributionsView, gravity);
   }
 
@@ -549,7 +543,7 @@ public final class UiSettings {
    * @return The gravity
    */
   public int getAttributionGravity() {
-    return ((FrameLayout.LayoutParams) attributionsView.getLayoutParams()).gravity;
+    return mapState.getAttributionGravity();
   }
 
   /**
@@ -561,7 +555,8 @@ public final class UiSettings {
    * @param bottom The bottom margin in pixels.
    */
   public void setAttributionMargins(int left, int top, int right, int bottom) {
-    setWidgetMargins(attributionsView, attributionsMargins, left, top, right, bottom);
+    mapState.setAttributionMargins(new int[] {left, top, right, bottom});
+    setWidgetMargins(attributionsView, mapState.getAttributionMargins(), left, top, right, bottom);
   }
 
   /**
@@ -588,7 +583,7 @@ public final class UiSettings {
    * @return The left margin in pixels
    */
   public int getAttributionMarginLeft() {
-    return attributionsMargins[0];
+    return mapState.getAttributionMargins()[0];
   }
 
   /**
@@ -597,7 +592,7 @@ public final class UiSettings {
    * @return The top margin in pixels
    */
   public int getAttributionMarginTop() {
-    return attributionsMargins[1];
+    return mapState.getAttributionMargins()[1];
   }
 
   /**
@@ -606,7 +601,7 @@ public final class UiSettings {
    * @return The right margin in pixels
    */
   public int getAttributionMarginRight() {
-    return attributionsMargins[2];
+    return mapState.getAttributionMargins()[2];
   }
 
   /**
@@ -615,7 +610,7 @@ public final class UiSettings {
    * @return The bottom margin in pixels
    */
   public int getAttributionMarginBottom() {
-    return attributionsMargins[3];
+    return mapState.getAttributionMargins()[3];
   }
 
   /**
@@ -631,8 +626,8 @@ public final class UiSettings {
    * @param rotateGesturesEnabled If true, rotating is enabled.
    */
   public void setRotateGesturesEnabled(boolean rotateGesturesEnabled) {
-    if (rotateGestureChangeAllowed) {
-      this.rotateGesturesEnabled = rotateGesturesEnabled;
+    if (mapState.isRotateGesturesChangeAllowed()) {
+      mapState.setRotateGesturesEnabled(rotateGesturesEnabled);
     }
   }
 
@@ -642,15 +637,15 @@ public final class UiSettings {
    * @return If true, rotating is enabled.
    */
   public boolean isRotateGesturesEnabled() {
-    return rotateGesturesEnabled;
+    return mapState.isRotateGesturesEnabled();
   }
 
   void setRotateGestureChangeAllowed(boolean rotateGestureChangeAllowed) {
-    this.rotateGestureChangeAllowed = rotateGestureChangeAllowed;
+    mapState.setRotateGesturesChangeAllowed(rotateGestureChangeAllowed);
   }
 
   boolean isRotateGestureChangeAllowed() {
-    return rotateGestureChangeAllowed;
+    return mapState.isRotateGesturesChangeAllowed();
   }
 
   /**
@@ -666,8 +661,8 @@ public final class UiSettings {
    * @param tiltGesturesEnabled If true, tilting is enabled.
    */
   public void setTiltGesturesEnabled(boolean tiltGesturesEnabled) {
-    if (tiltGestureChangeAllowed) {
-      this.tiltGesturesEnabled = tiltGesturesEnabled;
+    if (mapState.isTiltGesturesChangeAllowed()) {
+      mapState.setTiltGesturesEnabled(tiltGesturesEnabled);
     }
   }
 
@@ -677,15 +672,15 @@ public final class UiSettings {
    * @return If true, tilting is enabled.
    */
   public boolean isTiltGesturesEnabled() {
-    return tiltGesturesEnabled;
+    return mapState.isTiltGesturesEnabled();
   }
 
   void setTiltGestureChangeAllowed(boolean tiltGestureChangeAllowed) {
-    this.tiltGestureChangeAllowed = tiltGestureChangeAllowed;
+    mapState.setTiltGesturesChangeAllowed(tiltGestureChangeAllowed);
   }
 
   boolean isTiltGestureChangeAllowed() {
-    return tiltGestureChangeAllowed;
+    return mapState.isTiltGesturesChangeAllowed();
   }
 
   /**
@@ -701,8 +696,8 @@ public final class UiSettings {
    * @param zoomGesturesEnabled If true, zooming is enabled.
    */
   public void setZoomGesturesEnabled(boolean zoomGesturesEnabled) {
-    if (zoomGestureChangeAllowed) {
-      this.zoomGesturesEnabled = zoomGesturesEnabled;
+    if (mapState.isZoomGesturesChangeAllowed()) {
+      mapState.setZoomGesturesEnabled(zoomGesturesEnabled);
     }
   }
 
@@ -712,15 +707,15 @@ public final class UiSettings {
    * @return If true, zooming is enabled.
    */
   public boolean isZoomGesturesEnabled() {
-    return zoomGesturesEnabled;
+    return mapState.isZoomGesturesEnabled();
   }
 
   void setZoomGestureChangeAllowed(boolean zoomGestureChangeAllowed) {
-    this.zoomGestureChangeAllowed = zoomGestureChangeAllowed;
+    mapState.setZoomGesturesChangeAllowed(zoomGestureChangeAllowed);
   }
 
   boolean isZoomGestureChangeAllowed() {
-    return zoomGestureChangeAllowed;
+    return mapState.isZoomGesturesChangeAllowed();
   }
 
   /**
@@ -736,7 +731,7 @@ public final class UiSettings {
    * @param zoomControlsEnabled If true, the zoom controls are enabled.
    */
   public void setZoomControlsEnabled(boolean zoomControlsEnabled) {
-    this.zoomControlsEnabled = zoomControlsEnabled;
+    mapState.setZoomControlsEnabled(zoomControlsEnabled);
   }
 
   /**
@@ -745,7 +740,7 @@ public final class UiSettings {
    * @return If true, the zoom controls are enabled.
    */
   public boolean isZoomControlsEnabled() {
-    return zoomControlsEnabled;
+    return mapState.isZoomControlsEnabled();
   }
 
   /**
@@ -761,8 +756,8 @@ public final class UiSettings {
    * @param doubleTapGesturesEnabled If true, zooming with a double tap is enabled.
    */
   public void setDoubleTapGesturesEnabled(boolean doubleTapGesturesEnabled) {
-    if (doubleTapGestureChangeAllowed) {
-      this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
+    if (mapState.isDoubleTapGesturesChangeAllowed()) {
+      mapState.setDoubleTapGesturesEnabled(doubleTapGesturesEnabled);
     }
   }
 
@@ -772,15 +767,15 @@ public final class UiSettings {
    * @return If true, zooming with a double tap is enabled.
    */
   public boolean isDoubleTapGesturesEnabled() {
-    return doubleTapGesturesEnabled;
+    return mapState.isDoubleTapGesturesEnabled();
   }
 
   void setDoubleTapGestureChangeAllowed(boolean doubleTapGestureChangeAllowed) {
-    this.doubleTapGestureChangeAllowed = doubleTapGestureChangeAllowed;
+    mapState.setDoubleTapGesturesChangeAllowed(doubleTapGestureChangeAllowed);
   }
 
   boolean isDoubleTapGestureChangeAllowed() {
-    return doubleTapGestureChangeAllowed;
+    return mapState.isDoubleTapGesturesChangeAllowed();
   }
 
   /**
@@ -816,8 +811,8 @@ public final class UiSettings {
    * @param scrollGesturesEnabled If true, scrolling is enabled.
    */
   public void setScrollGesturesEnabled(boolean scrollGesturesEnabled) {
-    if (scrollGestureChangeAllowed) {
-      this.scrollGesturesEnabled = scrollGesturesEnabled;
+    if (mapState.isScrollGesturesChangeAllowed()) {
+      mapState.setScrollGesturesEnabled(scrollGesturesEnabled);
     }
   }
 
@@ -827,15 +822,15 @@ public final class UiSettings {
    * @return If true, scrolling is enabled.
    */
   public boolean isScrollGesturesEnabled() {
-    return scrollGesturesEnabled;
+    return mapState.isScrollGesturesEnabled();
   }
 
   void setScrollGestureChangeAllowed(boolean scrollGestureChangeAllowed) {
-    this.scrollGestureChangeAllowed = scrollGestureChangeAllowed;
+    mapState.setScrollGesturesChangeAllowed(scrollGestureChangeAllowed);
   }
 
   boolean isScrollGestureChangeAllowed() {
-    return scrollGestureChangeAllowed;
+    return mapState.isScrollGesturesChangeAllowed();
   }
 
   /**

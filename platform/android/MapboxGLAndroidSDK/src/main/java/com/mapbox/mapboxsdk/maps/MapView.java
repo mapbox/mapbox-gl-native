@@ -1,5 +1,9 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.Lifecycle;
+import android.arch.lifecycle.LifecycleObserver;
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.OnLifecycleEvent;
 import android.content.Context;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
@@ -64,7 +68,7 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  */
-public class MapView extends FrameLayout {
+public class MapView extends FrameLayout implements LifecycleObserver {
 
   private final MapCallback mapCallback = new MapCallback();
   private MapboxMap mapboxMap;
@@ -116,14 +120,17 @@ public class MapView extends FrameLayout {
       // in IDE layout editor, just return
       return;
     }
+
+    ((LifecycleOwner) getContext()).getLifecycle().addObserver(this);
+
     mapboxMapOptions = options;
 
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
-    compassView = (CompassView) view.findViewById(R.id.compassView);
-    myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
-    attrView = (ImageView) view.findViewById(R.id.attributionView);
-    logoView = (ImageView) view.findViewById(R.id.logoView);
+    compassView = view.findViewById(R.id.compassView);
+    myLocationView = view.findViewById(R.id.userLocationView);
+    attrView = view.findViewById(R.id.attributionView);
+    logoView = view.findViewById(R.id.logoView);
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -280,6 +287,18 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
+    Timber.e("OnCreate");
+    if (savedInstanceState == null) {
+      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapLoadEvent());
+    } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
+      this.savedInstanceState = savedInstanceState;
+    }
+  }
+
+  @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_CREATE)
+  public void onCreate() {
+    Timber.e("OnCreate");
     if (savedInstanceState == null) {
       MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapLoadEvent());
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
@@ -348,7 +367,9 @@ public class MapView extends FrameLayout {
    * You must call this method from the parent's Activity#onStart() or Fragment#onStart()
    */
   @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_START)
   public void onStart() {
+    Timber.e("OnStart");
     ConnectivityReceiver.instance(getContext()).activate();
     FileSource.getInstance(getContext()).activate();
     if (mapboxMap != null) {
@@ -364,7 +385,9 @@ public class MapView extends FrameLayout {
    * You must call this method from the parent's Activity#onResume() or Fragment#onResume().
    */
   @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_RESUME)
   public void onResume() {
+    Timber.e("OnResume");
     if (mapRenderer != null) {
       mapRenderer.onResume();
     }
@@ -374,7 +397,9 @@ public class MapView extends FrameLayout {
    * You must call this method from the parent's Activity#onPause() or Fragment#onPause().
    */
   @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_PAUSE)
   public void onPause() {
+    Timber.e("OnPause");
     if (mapRenderer != null) {
       mapRenderer.onPause();
     }
@@ -384,7 +409,9 @@ public class MapView extends FrameLayout {
    * You must call this method from the parent's Activity#onStop() or Fragment#onStop().
    */
   @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
   public void onStop() {
+    Timber.e("OnStop");
     if (mapboxMap != null) {
       // map was destroyed before it was started
       mapboxMap.onStop();
@@ -402,7 +429,9 @@ public class MapView extends FrameLayout {
    * You must call this method from the parent's Activity#onDestroy() or Fragment#onDestroyView().
    */
   @UiThread
+  @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
   public void onDestroy() {
+    Timber.e("onDestroy");
     destroyed = true;
     mapCallback.clearOnMapReadyCallbacks();
 
@@ -415,6 +444,10 @@ public class MapView extends FrameLayout {
     if (mapRenderer != null) {
       mapRenderer.onDestroy();
     }
+
+    // when we destroy we also need to remove the observer
+    // https://medium.com/@BladeCoder/architecture-components-pitfalls-part-1-9300dd969808
+    ((LifecycleOwner) getContext()).getLifecycle().removeObserver(this);
   }
 
   @Override
