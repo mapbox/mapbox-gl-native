@@ -32,6 +32,7 @@ final class Transform implements MapView.OnMapChangedListener {
   private final MarkerViewManager markerViewManager;
   private final TrackingSettings trackingSettings;
   private final MyLocationView myLocationView;
+  private final Handler handler = new Handler();
 
   private CameraPosition cameraPosition;
   private MapboxMap.CancelableCallback cameraCancelableCallback;
@@ -83,7 +84,7 @@ final class Transform implements MapView.OnMapChangedListener {
     if (change == REGION_DID_CHANGE_ANIMATED) {
       updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
-        new Handler().post(new Runnable() {
+        handler.post(new Runnable() {
           @Override
           public void run() {
             if (cameraCancelableCallback != null) {
@@ -99,7 +100,7 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   @UiThread
-  final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, MapboxMap.CancelableCallback callback) {
+  final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
       trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
@@ -107,6 +108,15 @@ final class Transform implements MapView.OnMapChangedListener {
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
       cameraChangeDispatcher.onCameraIdle();
+      invalidateCameraPosition();
+      handler.post(new Runnable() {
+        @Override
+        public void run() {
+          if (callback != null) {
+            callback.onFinish();
+          }
+        }
+      });
     }
   }
 
@@ -182,16 +192,15 @@ final class Transform implements MapView.OnMapChangedListener {
 
     // notify animateCamera and easeCamera about cancelling
     if (cameraCancelableCallback != null) {
+      final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
       cameraChangeDispatcher.onCameraIdle();
-      new Handler().post(new Runnable() {
+      handler.post(new Runnable() {
         @Override
         public void run() {
-          if (cameraCancelableCallback != null) {
-            cameraCancelableCallback.onCancel();
-            cameraCancelableCallback = null;
-          }
+          callback.onCancel();
         }
       });
+      cameraCancelableCallback = null;
     }
 
     // cancel ongoing transitions

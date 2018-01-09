@@ -6,7 +6,6 @@ import android.graphics.PointF;
 import android.graphics.RectF;
 import android.location.Location;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -713,20 +712,6 @@ public final class MapboxMap {
    */
   public final void moveCamera(final CameraUpdate update, final MapboxMap.CancelableCallback callback) {
     transform.moveCamera(MapboxMap.this, update, callback);
-    // MapChange.REGION_DID_CHANGE_ANIMATED is not called for `jumpTo`
-    // invalidate camera position to provide OnCameraChange event.
-    invalidateCameraPosition();
-
-    if (callback != null) {
-      new Handler().post(new Runnable() {
-        @Override
-        public void run() {
-          if (callback != null) {
-            callback.onFinish();
-          }
-        }
-      });
-    }
   }
 
   /**
