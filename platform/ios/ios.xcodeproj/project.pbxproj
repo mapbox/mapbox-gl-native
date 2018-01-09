@@ -227,6 +227,11 @@
 		927FBD021F4DB05500F8BF1F /* MGLMapSnapshotter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */; };
 		929EFFAB1F56DCD4003A77D5 /* MGLAnnotationView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4018B1C41CDC277F00F666AF /* MGLAnnotationView.mm */; };
 		92F2C3ED1F0E3C3A00268EC0 /* MGLRendererFrontend.h in Headers */ = {isa = PBXBuildFile; fileRef = 92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */; };
+		96036A01200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 960369FF200565C700510F3D /* NSOrthography+MGLAdditions.h */; };
+		96036A02200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 960369FF200565C700510F3D /* NSOrthography+MGLAdditions.h */; };
+		96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96036A00200565C700510F3D /* NSOrthography+MGLAdditions.m */; };
+		96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = 96036A00200565C700510F3D /* NSOrthography+MGLAdditions.m */; };
+		96036A0620059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */; };
 		960D0C361ECF5AAF008E151F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 960D0C351ECF5AAF008E151F /* Images.xcassets */; };
 		960D0C371ECF5AAF008E151F /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 960D0C351ECF5AAF008E151F /* Images.xcassets */; };
 		9620BB381E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */; };
@@ -764,6 +769,9 @@
 		927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapSnapshotter.h; sourceTree = "<group>"; };
 		927FBCFE1F4DB05500F8BF1F /* MGLMapSnapshotter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapSnapshotter.mm; sourceTree = "<group>"; };
 		92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRendererFrontend.h; sourceTree = "<group>"; };
+		960369FF200565C700510F3D /* NSOrthography+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSOrthography+MGLAdditions.h"; sourceTree = "<group>"; };
+		96036A00200565C700510F3D /* NSOrthography+MGLAdditions.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "NSOrthography+MGLAdditions.m"; sourceTree = "<group>"; };
+		96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLNSOrthographyAdditionsTests.m; sourceTree = "<group>"; };
 		960D0C351ECF5AAF008E151F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSDKUpdateChecker.h; sourceTree = "<group>"; };
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
@@ -1231,6 +1239,8 @@
 			children = (
 				357FE2DB1E02D2B20068B753 /* NSCoder+MGLAdditions.h */,
 				357FE2DC1E02D2B20068B753 /* NSCoder+MGLAdditions.mm */,
+				960369FF200565C700510F3D /* NSOrthography+MGLAdditions.h */,
+				96036A00200565C700510F3D /* NSOrthography+MGLAdditions.m */,
 				35CE61801D4165D9004F2359 /* UIColor+MGLAdditions.h */,
 				35CE61811D4165D9004F2359 /* UIColor+MGLAdditions.mm */,
 				30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */,
@@ -1413,6 +1423,7 @@
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
 				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
+				96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */,
 				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */,
@@ -1871,6 +1882,7 @@
 				353933F21D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				DA8847F31CBAFA5100AB86E3 /* MGLMultiPoint.h in Headers */,
 				30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
+				96036A01200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */,
 				1F7454961ECD450D00021D39 /* MGLLight_Private.h in Headers */,
 				DAD1656C1CF41981001FF4B9 /* MGLFeature.h in Headers */,
 				40EDA1C01CFE0E0200D9EA68 /* MGLAnnotationContainerView.h in Headers */,
@@ -1925,6 +1937,7 @@
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */,
 				96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */,
+				96036A02200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */,
 				DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */,
@@ -2378,6 +2391,7 @@
 				40CFA6511D7875BB008103BD /* MGLShapeSourceTests.mm in Sources */,
 				DA35A2C51CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m in Sources */,
 				35B8E08C1D6C8B5100E768D2 /* MGLPredicateTests.mm in Sources */,
+				96036A0620059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m in Sources */,
 				1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
 				DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */,
 				3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm in Sources */,
@@ -2420,6 +2434,7 @@
 				DA6408DD1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */,
 				3566C7681D4A77BA008152BC /* MGLShapeSource.mm in Sources */,
 				400533021DB0862B0069F638 /* NSArray+MGLAdditions.mm in Sources */,
+				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
@@ -2508,6 +2523,7 @@
 				3566C7691D4A77BA008152BC /* MGLShapeSource.mm in Sources */,
 				400533031DB086490069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
+				96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC911D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				DAA4E4201CBB730400178DFB /* MGLOfflinePack.mm in Sources */,
