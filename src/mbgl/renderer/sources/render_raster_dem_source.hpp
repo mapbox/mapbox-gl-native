@@ -43,7 +43,7 @@ private:
     optional<std::vector<std::string>> tileURLTemplates;
 
 protected:
-    void onTileChanged(Tile&);
+    void onTileChanged(Tile&) override;
 };
 
 template <>
