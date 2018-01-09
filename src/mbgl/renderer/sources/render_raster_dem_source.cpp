@@ -4,6 +4,7 @@
 #include <mbgl/algorithm/update_tile_masks.hpp>
 #include <mbgl/geometry/dem_pyramid.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
+#include <iostream>
 
 namespace mbgl {
 
@@ -86,20 +87,45 @@ static void fillBorder(const RasterDEMTile& tile, const RasterDEMTile& borderTil
 }
 
 void RenderRasterDEMSource::onTileChanged(Tile& tile){
-    const RasterDEMTile& demtile = static_cast<RasterDEMTile&>(tile);
-    auto rendertiles = getRenderTiles();
+    RasterDEMTile& demtile = static_cast<RasterDEMTile&>(tile);
 
-    if (tile.isLoaded() && demtile.isBackfilled()) {
-        for (auto& pair: demtile.neighboringTiles) {
-            if (!pair.second) {
-                const auto renderableNeighbor = std::find_if(rendertiles.begin(), rendertiles.end(), [&pair] (const RenderTile& rt){
-                    return rt.id.canonical == pair.first.canonical;
-                });
+    if (tile.isRenderable() && demtile.neighboringTiles != 0b11111111) {
+        const CanonicalTileID canonical = tile.id.canonical;
+        const uint dim = std::pow(2, canonical.z);
+        const int px = (canonical.x - 1 + dim) % dim;
+        const int pxw = canonical.x == 0 ? tile.id.wrap - 1 : tile.id.wrap;
+        const int nx = (canonical.x + 1 + dim) % dim;
+        const int nxw = (canonical.x + 1 == dim) ? tile.id.wrap + 1 : tile.id.wrap;
 
-                if (renderableNeighbor != rendertiles.end()) {
-                    const RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(renderableNeighbor->get().tile);
+        std::vector<OverscaledTileID> neighbors = {
+            OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y),
+            OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y)
+        };
+        // upper neighboring tiles, if they exist
+        if (canonical.y > 0) {
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y - 1));
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x, canonical.y - 1));
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y - 1));
+        }
+        // lower neighboring tiles, if they exist
+        if (canonical.y + 1 < dim){
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, pxw, canonical.z, px, canonical.y + 1));
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, tile.id.wrap, canonical.z, canonical.x, canonical.y + 1));
+            neighbors.push_back(OverscaledTileID(tile.id.overscaledZ, nxw, canonical.z, nx, canonical.y + 1));
+        }
+        for (uint8_t i = 0; i < neighbors.size(); i++) {
+            unsigned char mask = std::pow(2, i);
+            if ((demtile.neighboringTiles & mask) != mask) {
+                OverscaledTileID neighborid = neighbors[i];
+                Tile* renderableNeighbor = tilePyramid.getTile(neighborid);
+                if (renderableNeighbor != nullptr && renderableNeighbor->isRenderable()) {
+                    RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(*renderableNeighbor);
                     fillBorder(demtile, borderTile);
                     fillBorder(borderTile, demtile);
+
+                    // update the bitmasks to indicate that these tiles have been backfilled by flipping the relevant bit
+                    demtile.neighboringTiles = demtile.neighboringTiles | mask;
+                    borderTile.neighboringTiles = borderTile.neighboringTiles | mask;
                 }
             }
         }

@@ -56,6 +56,11 @@ std::vector<std::reference_wrapper<RenderTile>> TilePyramid::getRenderTiles() {
     return { renderTiles.begin(), renderTiles.end() };
 }
 
+Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
+        auto it = tiles.find(tileID);
+        return it == tiles.end() ? nullptr : it->second.get();
+}
+
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
                          const bool needsRendering,
                          const bool needsRelayout,
