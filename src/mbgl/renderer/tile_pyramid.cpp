@@ -58,7 +58,7 @@ std::vector<std::reference_wrapper<RenderTile>> TilePyramid::getRenderTiles() {
 
 Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
         auto it = tiles.find(tileID);
-        return it == tiles.end() ? nullptr : it->second.get();
+        return it == tiles.end() ? cache.get(tileID) : it->second.get();
 }
 
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
@@ -152,7 +152,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         if (tileRange && !tileRange->contains(tileID.canonical)) {
             return nullptr;
         }
-        std::unique_ptr<Tile> tile = cache.get(tileID);
+        std::unique_ptr<Tile> tile = cache.pop(tileID);
         if (!tile) {
             tile = createTile(tileID);
             if (tile) {
