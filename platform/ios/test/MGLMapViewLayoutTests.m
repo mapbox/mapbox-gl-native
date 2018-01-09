@@ -46,7 +46,9 @@
     [self.superView setNeedsLayout];
     [self.superView layoutIfNeeded];
     NSLog(@"================> self.mapView.frame: %@", NSStringFromCGRect(self.mapView.frame));
-    NSLog(@"================> self.mapView.safeAreaInsets: %@", NSStringFromUIEdgeInsets(self.mapView.safeAreaInsets));
+    if ( [self.mapView respondsToSelector:@selector(safeAreaInsets)] ) {
+        NSLog(@"================> self.mapView.safeAreaInsets: %@", NSStringFromUIEdgeInsets(self.mapView.safeAreaInsets));
+    }
 }
 
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
@@ -68,8 +70,13 @@
 - (void)testOrnamentPlacement {
 
     CGFloat margin = 8.0;
+    CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
 
+    if ( [self.mapView respondsToSelector:@selector(safeAreaInsets)] ) {
+        bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
+    }
+    
     //compass
     UIImageView *compassView = self.mapView.compassView;
     NSLog(@"================> %@", compassView);
@@ -93,7 +100,7 @@
     NSLog(@"================> %@", attributionButton);
 
     CGFloat expectedButtonOriginX = CGRectGetMaxX(self.mapView.bounds) - margin - CGRectGetWidth(attributionButton.frame);
-    CGFloat expectedButtonOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - CGRectGetHeight(attributionButton.frame);
+    CGFloat expectedButtonOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(attributionButton.frame);
 
     XCTAssertEqualWithAccuracy(CGRectGetMinX(attributionButton.frame), expectedButtonOriginX, accuracy);
     XCTAssertEqualWithAccuracy(CGRectGetMinY(attributionButton.frame), expectedButtonOriginY, accuracy);
@@ -103,7 +110,7 @@
     NSLog(@"================> %@", logoView);
 
     CGFloat expectedLogoOriginX = margin;
-    CGFloat expectedLogoOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - CGRectGetHeight(logoView.frame);
+    CGFloat expectedLogoOriginY = CGRectGetMaxY(self.mapView.bounds) - margin - bottomSafeAreaInset - CGRectGetHeight(logoView.frame);
 
     XCTAssertEqualWithAccuracy(CGRectGetMinX(logoView.frame), expectedLogoOriginX, accuracy);
     XCTAssertEqualWithAccuracy(CGRectGetMinY(logoView.frame), expectedLogoOriginY, accuracy);
