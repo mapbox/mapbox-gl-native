@@ -37,7 +37,7 @@ const std::array<float, 2> RenderHillshadeLayer::getLatRange(const UnwrappedTile
 const std::array<float, 3> RenderHillshadeLayer::getLight(const PaintParameters& parameters){
     float azimuthal = evaluated.get<HillshadeIlluminationDirection>() * util::DEG2RAD;
     const float zenith = 30.0f * util::DEG2RAD;
-    if (evaluated.get<HillshadeIlluminationAnchor>() == Viewport) azimuthal = azimuthal - parameters.state.getAngle();
+    if (evaluated.get<HillshadeIlluminationAnchor>() == HillshadeIlluminationAnchorType::Viewport) azimuthal = azimuthal - parameters.state.getAngle();
     return {{evaluated.get<HillshadeExaggeration>(), azimuthal, zenith}};
 }
 
