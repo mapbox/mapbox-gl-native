@@ -31,21 +31,25 @@ install:
       Start-Process -FilePath '7z' -ArgumentList 'x','cmake-3.10.1-win64-x64.zip','-oC:\' -Wait
 
 before_build:
-  - set PATH=C:\LLVM-5.0.1\msbuild-bin;%PATH%
+  - set PATH=C:\LLVM-5.0.1\bin;%PATH%
   - set PATH=C:\cmake-3.10.1-win64-x64\bin;%PATH%
-  - set QT_CMAKE=C:\Qt\5.7\msvc2015_64\lib\cmake
+  - set CC=clang-cl
+  - set CXX=clang-cl
   - mkdir %APPVEYOR_BUILD_FOLDER%\build
   - cd %APPVEYOR_BUILD_FOLDER%\build
 
 build_script:
-  - cmake -G "Visual Studio 14 2015 Win64" -T LLVM-vs2014 -DMBGL_PLATFORM=qt -DWITH_QT_DECODERS=ON -DWITH_QT_I18N=ON -DWITH_NODEJS=OFF -DCMAKE_PREFIX_PATH=%QT_CMAKE% %APPVEYOR_BUILD_FOLDER% & exit 0
-  - cmake --build . --config Release --target qmapboxgl -- /m
+  - call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\vcvarsall.bat" amd64
+  - cmake -G "Ninja" -DMBGL_PLATFORM=qt -DWITH_QT_DECODERS=ON -DWITH_QT_I18N=ON -DWITH_NODEJS=OFF -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=C:\Qt\5.7\msvc2015_64\lib\cmake -DCMAKE_MAKE_PROGRAM="%APPVEYOR_BUILD_FOLDER%\platform\qt\ninja.exe" ..
+  - cmake --build . -- -j %NUMBER_OF_PROCESSORS%
 
 after_build:
   - mkdir qmapboxgl
   - mkdir qmapboxgl\lib
   - mkdir qmapboxgl\include
-  - copy Release\qmapboxgl.* qmapboxgl\lib
+  - copy qmapboxgl.dll qmapboxgl\lib
+  - copy qmapboxgl.exp qmapboxgl\lib
+  - copy qmapboxgl.lib qmapboxgl\lib
   - copy %APPVEYOR_BUILD_FOLDER%\platform\qt\include\* qmapboxgl\include
   - 7z a qmapboxgl-%APPVEYOR_REPO_COMMIT%.zip qmapboxgl
 
