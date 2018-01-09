@@ -753,7 +753,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0]];
+                                       constant:8.0]];
     }
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.compassView
@@ -762,7 +762,7 @@ public:
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1.0
-                                   constant:5.0 + self.contentInset.top]];
+                                   constant:8.0 + self.contentInset.top]];
     
     [self.compassViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -771,7 +771,7 @@ public:
                                      toItem:self.compassView
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1.0
-                                   constant:5.0 + self.contentInset.right]];
+                                   constant:8.0 + self.contentInset.right]];
     
     [containerView addConstraints:self.compassViewConstraints];
     
@@ -788,7 +788,7 @@ public:
                                          toItem:viewController.topLayoutGuide
                                       attribute:NSLayoutAttributeBottom
                                      multiplier:1.0
-                                       constant:5.0]];
+                                       constant:8.0]];
     }
     [self.scaleBarConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.scaleBar
@@ -797,7 +797,7 @@ public:
                                      toItem:self
                                   attribute:NSLayoutAttributeTop
                                  multiplier:1.0
-                                   constant:5.0 + self.contentInset.top]];
+                                   constant:8.0 + self.contentInset.top]];
     [self.scaleBarConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.scaleBar
                                   attribute:NSLayoutAttributeLeft
@@ -831,7 +831,7 @@ public:
                                      toItem:self.logoView
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8 + self.contentInset.bottom]];
+                                   constant:8.0 + self.contentInset.bottom]];
     [self.logoViewConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self.logoView
                                   attribute:NSLayoutAttributeLeading
@@ -855,7 +855,7 @@ public:
                                          toItem:self.attributionButton
                                       attribute:NSLayoutAttributeBaseline
                                      multiplier:1
-                                       constant:8 + self.contentInset.bottom]];
+                                       constant:8.0 + self.contentInset.bottom]];
     }
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -864,7 +864,7 @@ public:
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeBaseline
                                  multiplier:1
-                                   constant:8 + self.contentInset.bottom]];
+                                   constant:8.0 + self.contentInset.bottom]];
     
     [self.attributionButtonConstraints addObject:
      [NSLayoutConstraint constraintWithItem:self
@@ -873,7 +873,7 @@ public:
                                      toItem:self.attributionButton
                                   attribute:NSLayoutAttributeTrailing
                                  multiplier:1
-                                   constant:8 + self.contentInset.right]];
+                                   constant:8.0 + self.contentInset.right]];
     [containerView addConstraints:self.attributionButtonConstraints];
 }
 
