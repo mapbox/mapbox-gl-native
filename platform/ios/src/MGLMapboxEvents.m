@@ -1,5 +1,6 @@
 #import "MGLMapboxEvents.h"
 #import "NSBundle+MGLAdditions.h"
+#import "NSProcessInfo+MGLAdditions.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 
@@ -24,6 +25,10 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 }
 
 + (nullable instancetype)sharedInstance {
+    if (NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent) {
+        return nil;
+    }
+    
     static dispatch_once_t onceToken;
     static MGLMapboxEvents *_sharedInstance;
     dispatch_once(&onceToken, ^{
