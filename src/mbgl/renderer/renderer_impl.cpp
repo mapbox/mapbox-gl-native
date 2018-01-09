@@ -474,11 +474,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
-        static const style::FillPaintProperties::PossiblyEvaluated properties {};
-        static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+        static const Properties<>::PossiblyEvaluated properties {};
+        static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            parameters.staticData.programs.fill.get(properties).draw(
+            parameters.staticData.programs.clippingMask.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
@@ -491,14 +491,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
-                FillProgram::UniformValues {
+                ClippingMaskProgram::UniformValues {
                     uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
-                    uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
                 },
                 parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttibuteData,
+                paintAttributeData,
                 properties,
                 parameters.state.getZoom(),
                 "clipping"

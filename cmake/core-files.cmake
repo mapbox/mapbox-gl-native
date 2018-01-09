@@ -128,10 +128,13 @@ set(MBGL_CORE_FILES
 
     # programs
     src/mbgl/programs/attributes.hpp
+    src/mbgl/programs/background_program.cpp
+    src/mbgl/programs/background_program.hpp
     src/mbgl/programs/binary_program.cpp
     src/mbgl/programs/binary_program.hpp
     src/mbgl/programs/circle_program.cpp
     src/mbgl/programs/circle_program.hpp
+    src/mbgl/programs/clipping_mask_program.hpp
     src/mbgl/programs/collision_box_program.cpp
     src/mbgl/programs/collision_box_program.hpp
     src/mbgl/programs/debug_program.hpp
@@ -254,8 +257,14 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/sources/render_vector_source.hpp
 
     # shaders
+    src/mbgl/shaders/background.cpp
+    src/mbgl/shaders/background.hpp
+    src/mbgl/shaders/background_pattern.cpp
+    src/mbgl/shaders/background_pattern.hpp
     src/mbgl/shaders/circle.cpp
     src/mbgl/shaders/circle.hpp
+    src/mbgl/shaders/clipping_mask.cpp
+    src/mbgl/shaders/clipping_mask.hpp
     src/mbgl/shaders/collision_box.cpp
     src/mbgl/shaders/collision_box.hpp
     src/mbgl/shaders/collision_circle.cpp
@@ -630,6 +639,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/tileset.hpp
     include/mbgl/util/timer.hpp
     include/mbgl/util/traits.hpp
+    include/mbgl/util/tuple.hpp
     include/mbgl/util/type_list.hpp
     include/mbgl/util/unique_any.hpp
     include/mbgl/util/unitbezier.hpp

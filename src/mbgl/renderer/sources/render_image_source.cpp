@@ -56,7 +56,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     }
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     for (auto matrix : matrices) {
         parameters.programs.debug.draw(
@@ -72,7 +72,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileVertexBuffer,
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            paintAttibuteData,
+            paintAttributeData,
             properties,
             parameters.state.getZoom(),
             "debug"
