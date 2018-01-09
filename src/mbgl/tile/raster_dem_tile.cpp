@@ -20,31 +20,6 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
              ActorRef<RasterDEMTile>(*this, mailbox)) {
-
-     const CanonicalTileID canonical = id_.canonical;
-     const u_int32_t dim = pow(2, canonical.z);
-     const u_int32_t px = (canonical.x - 1 + dim) % dim;
-     const int16_t pxw = (canonical.x == 0) ? id_.wrap - 1 : id_.wrap;
-     const u_int32_t nx = (canonical.x + 1 + dim) % dim;
-     const int16_t nxw = (canonical.x + 1 == dim) ? id_.wrap + 1 : id_.wrap;
-     
-     // adjacent tiles
-     neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, pxw, canonical.z, px, canonical.y), false);
-     neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, nxw, canonical.z, nx, canonical.y), false);
-     
-     // upper bordering tiles
-     if (canonical.y > 0) {
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, pxw, canonical.z, px, canonical.y - 1), false);
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, id_.wrap, canonical.z, canonical.x, canonical.y - 1), false);
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, nxw, canonical.z, nx, canonical.y - 1), false);
-     }
-     
-     // lower bordering tiles
-     if (canonical.y + 1 < dim) {
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, pxw, canonical.z, px, canonical.y + 1), false);
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, id_.wrap, canonical.z, canonical.x, canonical.y + 1), false);
-         neighboringTiles.emplace(OverscaledTileID(id_.overscaledZ, nxw, canonical.z, nx, canonical.y + 1), false);
-     }
 }
 
 RasterDEMTile::~RasterDEMTile() = default;

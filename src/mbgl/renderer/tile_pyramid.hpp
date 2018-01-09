@@ -47,6 +47,7 @@ public:
     void finishRender(PaintParameters&);
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
+    Tile* getTile(const OverscaledTileID&);
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
