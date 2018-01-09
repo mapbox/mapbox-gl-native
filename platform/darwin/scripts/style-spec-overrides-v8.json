@@ -39,6 +39,12 @@
     "icon-offset": {
       "doc": "Offset distance of icon from its anchor."
     },
+    "icon-image": {
+      "doc": "Name of image in sprite to use for drawing an image background. Within literal values, attribute names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named attribute. Expressions do not support this syntax; for equivalent functionality in expressions, use `stringByAppendingString:` and key path expressions."
+    },
+    "text-field": {
+      "doc": "Value to use for a text label. Within literal values, attribute names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named attribute. Expressions do not support this syntax; for equivalent functionality in expressions, use `stringByAppendingString:` and key path expressions."
+    },
     "text-font": {
       "doc": "An array of font face names used to display the text.\n\nEach font name must be included in the `{fontstack}` portion of the JSON stylesheet’s <a href=\"https://www.mapbox.com/mapbox-gl-style-spec/#glyphs\"><code>glyphs</code></a> property. You can register a custom font when designing the style in Mapbox Studio. Fonts installed on the system are not used.\n\nThe first font named in the array is applied to the text. For each character in the text, if the first font lacks a glyph for the character, the next font is applied as a fallback, and so on."
     },
