@@ -72,7 +72,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||
@@ -98,7 +98,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             *tile.debugBucket->vertexBuffer,
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            paintAttibuteData,
+            paintAttributeData,
             properties,
             parameters.state.getZoom(),
             "debug"
@@ -117,7 +117,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             *tile.debugBucket->vertexBuffer,
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            paintAttibuteData,
+            paintAttributeData,
             properties,
             parameters.state.getZoom(),
             "debug"
@@ -138,7 +138,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             parameters.staticData.tileVertexBuffer,
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            paintAttibuteData,
+            paintAttributeData,
             properties,
             parameters.state.getZoom(),
             "debug"
