@@ -3,12 +3,12 @@
 
 namespace mbgl {
 
-static gl::VertexVector<FillLayoutVertex> tileVertices() {
-    gl::VertexVector<FillLayoutVertex> result;
-    result.emplace_back(FillProgram::layoutVertex({ 0,            0 }));
-    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, 0 }));
-    result.emplace_back(FillProgram::layoutVertex({ 0, util::EXTENT }));
-    result.emplace_back(FillProgram::layoutVertex({ util::EXTENT, util::EXTENT }));
+static gl::VertexVector<PositionOnlyLayoutAttributes::Vertex> tileVertices() {
+    gl::VertexVector<PositionOnlyLayoutAttributes::Vertex> result;
+    result.emplace_back(PositionOnlyLayoutAttributes::Vertex({{{ 0,            0 }}}));
+    result.emplace_back(PositionOnlyLayoutAttributes::Vertex({{{ util::EXTENT, 0 }}}));
+    result.emplace_back(PositionOnlyLayoutAttributes::Vertex({{{ 0, util::EXTENT }}}));
+    result.emplace_back(PositionOnlyLayoutAttributes::Vertex({{{ util::EXTENT, util::EXTENT }}}));
     return result;
 }
 

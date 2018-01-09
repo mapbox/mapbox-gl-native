@@ -5,7 +5,7 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
-#include <mbgl/programs/fill_program.hpp>
+#include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
 
 namespace mbgl {
@@ -46,12 +46,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // Note that for bottommost layers without a pattern, the background color is drawn with
     // glClear rather than this method.
 
-    style::FillPaintProperties::PossiblyEvaluated properties;
-    properties.get<FillPattern>() = evaluated.get<BackgroundPattern>();
-    properties.get<FillOpacity>() = { evaluated.get<BackgroundOpacity>() };
-    properties.get<FillColor>() = { evaluated.get<BackgroundColor>() };
-
-    const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+    const Properties<>::PossiblyEvaluated properties;
+    const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
         optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);
@@ -63,15 +59,15 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         parameters.imageManager.bind(parameters.context, 0);
 
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.fillPattern.get(properties).draw(
+            parameters.programs.backgroundPattern.draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                FillPatternUniforms::values(
+                BackgroundPatternUniforms::values(
                     parameters.matrixForTile(tileID),
-                    parameters.context.viewport.getCurrentValue().size,
+                    evaluated.get<BackgroundOpacity>(),
                     parameters.imageManager.getPixelSize(),
                     *imagePosA,
                     *imagePosB,
@@ -82,7 +78,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttibuteData,
+                paintAttributeData,
                 properties,
                 parameters.state.getZoom(),
                 getID()
@@ -90,20 +86,21 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
         }
     } else {
         for (const auto& tileID : util::tileCover(parameters.state, parameters.state.getIntegerZoom())) {
-            parameters.programs.fill.get(properties).draw(
+            parameters.programs.background.draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                FillProgram::UniformValues {
+                BackgroundProgram::UniformValues {
                     uniforms::u_matrix::Value{ parameters.matrixForTile(tileID) },
-                    uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
+                    uniforms::u_color::Value{ evaluated.get<BackgroundColor>() },
+                    uniforms::u_opacity::Value{ evaluated.get<BackgroundOpacity>() },
                 },
                 parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttibuteData,
+                paintAttributeData,
                 properties,
                 parameters.state.getZoom(),
                 getID()

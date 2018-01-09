@@ -13,14 +13,14 @@ class RenderStaticData {
 public:
     RenderStaticData(gl::Context&, float pixelRatio, const optional<std::string>& programCacheDir);
 
-    gl::VertexBuffer<FillLayoutVertex> tileVertexBuffer;
+    gl::VertexBuffer<PositionOnlyLayoutAttributes::Vertex> tileVertexBuffer;
     gl::VertexBuffer<RasterLayoutVertex> rasterVertexBuffer;
     gl::VertexBuffer<ExtrusionTextureLayoutVertex> extrusionTextureVertexBuffer;
 
     gl::IndexBuffer<gl::Triangles> quadTriangleIndexBuffer;
     gl::IndexBuffer<gl::LineStrip> tileBorderIndexBuffer;
 
-    SegmentVector<FillAttributes> tileTriangleSegments;
+    SegmentVector<BackgroundAttributes> tileTriangleSegments;
     SegmentVector<DebugAttributes> tileBorderSegments;
     SegmentVector<RasterAttributes> rasterSegments;
     SegmentVector<ExtrusionTextureAttributes> extrusionTextureSegments;

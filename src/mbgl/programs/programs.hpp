@@ -1,6 +1,8 @@
 #pragma once
 
+#include <mbgl/programs/background_program.hpp>
 #include <mbgl/programs/circle_program.hpp>
+#include <mbgl/programs/clipping_mask_program.hpp>
 #include <mbgl/programs/extrusion_texture_program.hpp>
 #include <mbgl/programs/fill_program.hpp>
 #include <mbgl/programs/fill_extrusion_program.hpp>
@@ -16,7 +18,9 @@ namespace mbgl {
 class Programs {
 public:
     Programs(gl::Context& context, const ProgramParameters& programParameters)
-        : circle(context, programParameters),
+        : background(context, programParameters),
+          backgroundPattern(context, programParameters),
+          circle(context, programParameters),
           extrusionTexture(context, programParameters),
           fill(context, programParameters),
           fillExtrusion(context, programParameters),
@@ -33,9 +37,12 @@ public:
           symbolGlyph(context, programParameters),
           debug(context, programParameters),
           collisionBox(context, programParameters),
-          collisionCircle(context, programParameters) {
+          collisionCircle(context, programParameters),
+          clippingMask(context, programParameters) {
     }
 
+    BackgroundProgram background;
+    BackgroundPatternProgram backgroundPattern;
     ProgramMap<CircleProgram> circle;
     ExtrusionTextureProgram extrusionTexture;
     ProgramMap<FillProgram> fill;
@@ -55,6 +62,7 @@ public:
     DebugProgram debug;
     CollisionBoxProgram collisionBox;
     CollisionCircleProgram collisionCircle;
+    ClippingMaskProgram clippingMask;
 };
 
 } // namespace mbgl

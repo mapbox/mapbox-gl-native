@@ -143,4 +143,9 @@ struct a_halo_blur {
 };
 
 } // namespace attributes
+
+struct PositionOnlyLayoutAttributes : gl::Attributes<
+    attributes::a_pos>
+{};
+
 } // namespace mbgl

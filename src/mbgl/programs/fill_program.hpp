@@ -21,9 +21,7 @@ class UnwrappedTileID;
 class TransformState;
 template <class> class Faded;
 
-struct FillLayoutAttributes : gl::Attributes<
-    attributes::a_pos>
-{};
+using FillLayoutAttributes = PositionOnlyLayoutAttributes;
 
 struct FillUniforms : gl::Uniforms<
     uniforms::u_matrix,
