@@ -2,7 +2,6 @@
 
 package com.mapbox.mapboxsdk.style.layers;
 
-import android.annotation.SuppressLint;
 import android.support.annotation.ColorInt;
 
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
@@ -1535,7 +1534,6 @@ public class PropertyFactory {
   public static PropertyValue<Expression> fillExtrusionOpacity(Expression expression) {
     return new PaintPropertyValue<>("fill-extrusion-opacity", expression);
   }
-
 
   /**
    * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
@@ -3364,6 +3362,7 @@ public class PropertyFactory {
   public static PropertyValue<Expression> textOptional(Expression value) {
     return new LayoutPropertyValue<>("text-optional", value);
   }
+
 
   /**
    * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.

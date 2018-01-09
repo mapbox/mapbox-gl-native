@@ -54,8 +54,6 @@ public:
     jni::Object<TransitionOptions> getRasterContrastTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getRasterFadeDuration(jni::JNIEnv&);
-    void setRasterFadeDurationTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getRasterFadeDurationTransition(jni::JNIEnv&);
     jni::jobject* createJavaPeer(jni::JNIEnv&);
 
 }; // class RasterLayer
