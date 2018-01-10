@@ -42,7 +42,7 @@ void TileCache::add(const OverscaledTileID& key, std::unique_ptr<Tile> tile) {
 Tile* TileCache::get(const OverscaledTileID& key) {
     auto it = tiles.find(key);
     if (it != tiles.end()) {
-        return std::move(it->second.get());
+        return it->second.get();
     } else {
         return nullptr;
     }
