@@ -206,6 +206,20 @@ namespace conversion {
         }
     }
 
+    // hillshade-illumination-anchor
+    inline std::string toString(mbgl::style::HillshadeIlluminationAnchorType value) {
+        switch (value) {
+          case mbgl::style::HillshadeIlluminationAnchorType::Map:
+            return "map";
+            break;
+          case mbgl::style::HillshadeIlluminationAnchorType::Viewport:
+            return "viewport";
+            break;
+          default:
+            throw std::runtime_error("Not implemented");
+        }
+    }
+
     // anchor
     inline std::string toString(mbgl::style::LightAnchorType value) {
         switch (value) {
