@@ -108,8 +108,9 @@ float CircleBucket::getQueryRadius(const RenderLayer& layer) const {
     auto circleLayer = layer.as<RenderCircleLayer>();
 
     float radius = get<CircleRadius>(*circleLayer, paintPropertyBinders);
+    float stroke = get<CircleStrokeWidth>(*circleLayer, paintPropertyBinders);
     auto translate = circleLayer->evaluated.get<CircleTranslate>();
-    return radius + util::length(translate[0], translate[1]);
+    return radius + stroke + util::length(translate[0], translate[1]);
 }
 
 } // namespace mbgl
