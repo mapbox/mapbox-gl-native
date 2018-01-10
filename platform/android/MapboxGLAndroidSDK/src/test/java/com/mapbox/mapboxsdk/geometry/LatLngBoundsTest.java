@@ -71,6 +71,82 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void dateLineSpanBuilder1() {
+    latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(10, -170))
+      .include(new LatLng(-10, 170))
+      .build();
+
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 20),
+      latLngSpan);
+  }
+
+  @Test
+  public void dateLineSpanBuilder2() {
+    latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(-10, -170))
+      .include(new LatLng(10, 170))
+      .build();
+
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 20),
+      latLngSpan);
+  }
+
+  @Test
+  public void dateLineSpanFrom1() {
+    latLngBounds = LatLngBounds.from(10, -170, -10, 170);
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 20),
+      latLngSpan);
+  }
+
+  @Test
+  public void dateLineSpanFrom2() {
+    latLngBounds = LatLngBounds.from(10, 170, -10, -170);
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 340),
+      latLngSpan);
+  }
+
+  @Test
+  public void nearDateLineCenter1() {
+    latLngBounds = LatLngBounds.from(10, -175, -10, 165);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, 175), center);
+  }
+
+  @Test
+  public void nearDateLineCenter2() {
+    latLngBounds = LatLngBounds.from(10, -165, -10, 175);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, -175), center);
+  }
+
+  @Test
+  public void nearDateLineCenter3() {
+    latLngBounds = LatLngBounds.from(10, -170, -10, 170);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, -180), center);
+  }
+
+  @Test
+  public void nearDateLineCenter4() {
+    latLngBounds = LatLngBounds.from(10, -180, -10, 0);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, 90), center);
+  }
+
+  @Test
+  public void nearDateLineCenter5() {
+    latLngBounds = LatLngBounds.from(10, 180, -10, 0);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, 90), center);
+  }
+
+
+  @Test
   public void center() {
     LatLng center = latLngBounds.getCenter();
     assertEquals("Center should match", new LatLng(1, 1), center);
@@ -121,6 +197,46 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void includesOverDateline1() {
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(10, -170))
+      .include(new LatLng(-10, -175))
+      .include(new LatLng(0, 170))
+      .build();
+
+    assertEquals("LatLngSpan should be the same",
+      new LatLngSpan(20, 20), latLngBounds.getSpan());
+  }
+
+  @Test
+  public void includesOverDateline2() {
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(10, 170))
+      .include(new LatLng(-10, 175))
+      .include(new LatLng(0, -170))
+      .build();
+
+    assertEquals("LatLngSpan should be the same",
+      new LatLngSpan(20, 20), latLngBounds.getSpan());
+  }
+
+  @Test
+  public void includesOverDateline3() {
+
+    LatLngBounds latLngBounds = new LatLngBounds.Builder()
+      .include(new LatLng(10, 170))
+      .include(new LatLng(-10, -170))
+      .include(new LatLng(0, -180))
+      .include(new LatLng(5, 180))
+      .build();
+
+    assertEquals("LatLngSpan should be the same",
+      new LatLngSpan(20, 20), latLngBounds.getSpan());
+  }
+
+  @Test
   public void containsNot() {
     assertFalse("LatLng should not be included", latLngBounds.contains(new LatLng(3, 1)));
   }
@@ -128,6 +244,21 @@ public class LatLngBoundsTest {
   @Test
   public void containsBoundsInWorld() {
     assertTrue("LatLngBounds should be contained in the world", LatLngBounds.world().contains(latLngBounds));
+  }
+
+  @Test
+  public void worldSpan() {
+    assertEquals("LatLngBounds world span should be 180, 360",
+      GeometryConstants.LATITUDE_SPAN, LatLngBounds.world().getLatitudeSpan(), DELTA);
+    assertEquals("LatLngBounds world span should be 180, 360",
+      GeometryConstants.LONGITUDE_SPAN, LatLngBounds.world().getLongitudeSpan(), DELTA);
+  }
+
+  @Test
+  public void emptySpan() {
+    LatLngBounds latLngBounds = LatLngBounds.from(GeometryConstants.MIN_LATITUDE, GeometryConstants.MAX_LONGITUDE,
+      GeometryConstants.MIN_LATITUDE, GeometryConstants.MAX_LONGITUDE);
+    assertTrue("LatLngBounds empty span", latLngBounds.isEmptySpan());
   }
 
   @Test
