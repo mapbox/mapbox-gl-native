@@ -108,13 +108,12 @@ bool RenderCircleLayer::queryIntersectsFeature(
             bearing,
             pixelsToTileUnits);
 
-    // Evaluate function
-    auto circleRadius = evaluated.get<style::CircleRadius>()
-                                .evaluate(feature, zoom, style::CircleRadius::defaultValue())
-                        * pixelsToTileUnits;
+    // Evaluate functions
+    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature) * pixelsToTileUnits;
+    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature) * pixelsToTileUnits;
 
     // Test intersection
-    return util::polygonIntersectsBufferedMultiPoint(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries(), circleRadius);
+    return util::polygonIntersectsBufferedMultiPoint(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries(), radius + stroke);
 }
 
 } // namespace mbgl
