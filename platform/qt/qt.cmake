@@ -70,6 +70,10 @@ target_include_directories(qmapboxgl
     PUBLIC platform/qt/include
 )
 
+target_compile_definitions(qmapboxgl
+    PRIVATE "-DQT_BUILD_MAPBOXGL_LIB"
+)
+
 target_link_libraries(qmapboxgl
     PRIVATE mbgl-core
     PRIVATE mbgl-filesource

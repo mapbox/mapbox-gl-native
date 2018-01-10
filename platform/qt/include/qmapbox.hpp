@@ -9,6 +9,12 @@
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
+#if defined(QT_BUILD_MAPBOXGL_LIB)
+    #define Q_MAPBOXGL_EXPORT Q_DECL_EXPORT
+#else
+    #define Q_MAPBOXGL_EXPORT Q_DECL_IMPORT
+#endif
+
 namespace QMapbox {
 
 typedef QPair<double, double> Coordinate;
@@ -20,7 +26,7 @@ typedef QList<Coordinates> CoordinatesCollection;
 
 typedef QList<CoordinatesCollection> CoordinatesCollections;
 
-struct Q_DECL_EXPORT Feature {
+struct Q_MAPBOXGL_EXPORT Feature {
     enum Type {
         PointType = 1,
         LineStringType,
@@ -38,7 +44,7 @@ struct Q_DECL_EXPORT Feature {
     QVariant id;
 };
 
-struct Q_DECL_EXPORT ShapeAnnotationGeometry {
+struct Q_MAPBOXGL_EXPORT ShapeAnnotationGeometry {
     enum Type {
         LineStringType = 1,
         PolygonType,
@@ -54,12 +60,12 @@ struct Q_DECL_EXPORT ShapeAnnotationGeometry {
     CoordinatesCollections geometry;
 };
 
-struct Q_DECL_EXPORT SymbolAnnotation {
+struct Q_MAPBOXGL_EXPORT SymbolAnnotation {
     Coordinate geometry;
     QString icon;
 };
 
-struct Q_DECL_EXPORT LineAnnotation {
+struct Q_MAPBOXGL_EXPORT LineAnnotation {
     /*! Class constructor. */
     LineAnnotation(const ShapeAnnotationGeometry& geometry_ = ShapeAnnotationGeometry(), float opacity_ = 1.0f,
             float width_ = 1.0f, const QColor& color_ = Qt::black)
@@ -71,7 +77,7 @@ struct Q_DECL_EXPORT LineAnnotation {
     QColor color;
 };
 
-struct Q_DECL_EXPORT FillAnnotation {
+struct Q_MAPBOXGL_EXPORT FillAnnotation {
     /*! Class constructor. */
     FillAnnotation(const ShapeAnnotationGeometry& geometry_ = ShapeAnnotationGeometry(), float opacity_ = 1.0f,
             const QColor& color_ = Qt::black, const QVariant& outlineColor_ = QVariant())
@@ -92,13 +98,13 @@ enum NetworkMode {
     Offline,
 };
 
-Q_DECL_EXPORT QList<QPair<QString, QString> >& defaultStyles();
+Q_MAPBOXGL_EXPORT QList<QPair<QString, QString> >& defaultStyles();
 
-Q_DECL_EXPORT NetworkMode networkMode();
-Q_DECL_EXPORT void setNetworkMode(NetworkMode);
+Q_MAPBOXGL_EXPORT NetworkMode networkMode();
+Q_MAPBOXGL_EXPORT void setNetworkMode(NetworkMode);
 
 // This struct is a 1:1 copy of mbgl::CustomLayerRenderParameters.
-struct Q_DECL_EXPORT CustomLayerRenderParameters {
+struct Q_MAPBOXGL_EXPORT CustomLayerRenderParameters {
     double width;
     double height;
     double latitude;
