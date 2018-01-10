@@ -13,7 +13,7 @@ namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(Color, u_shadow);
 MBGL_DEFINE_UNIFORM_SCALAR(Color, u_highlight);
 MBGL_DEFINE_UNIFORM_SCALAR(Color, u_accent);
-MBGL_DEFINE_UNIFORM_VECTOR(float, 3, u_light);
+MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_light);
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_latrange);
 } // namespace uniforms
 
