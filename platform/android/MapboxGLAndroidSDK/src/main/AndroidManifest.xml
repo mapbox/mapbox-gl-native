@@ -17,4 +17,9 @@
         <service android:name="com.mapbox.services.android.telemetry.service.TelemetryService"/>
     </application>
 
+    <!-- Enable the CN endpoint -->
+    <meta-data
+        android:name="com.mapbox.CnEventsServer"
+        android:value="true"/>
+
 </manifest>
