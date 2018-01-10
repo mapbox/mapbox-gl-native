@@ -1,4 +1,3 @@
-
 #include <mbgl/style/expression/util.hpp>
 #include <mbgl/style/expression/value.hpp>
 
@@ -30,10 +29,9 @@ Result<Color> rgba(double r, double g, double b, double a) {
             "]: 'a' must be between 0 and 1."
         };
     }
-    return Color(r / 255, g / 255, b / 255, a);
+    return Color(r / 255 * a, g / 255 * a, b / 255 * a, a);
 }
 
 } // namespace expression
 } // namespace style
 } // namespace mbgl
-

@@ -24,9 +24,9 @@ optional<Color> Color::parse(const std::string& s) {
 
 std::string Color::stringify() const {
     return "rgba(" +
-        util::toString(r * 255) + "," +
-        util::toString(g * 255) + "," +
-        util::toString(b * 255) + "," +
+        util::toString(r * 255 / a) + "," +
+        util::toString(g * 255 / a) + "," +
+        util::toString(b * 255 / a) + "," +
         util::toString(a) + ")";
 }
 
