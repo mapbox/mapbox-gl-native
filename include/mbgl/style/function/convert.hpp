@@ -45,6 +45,10 @@ public:
         return EvaluationError{message};
     }
 
+    std::vector<optional<Value>> possibleOutputs() const override {
+        return {};
+    }
+
 private:
     std::string message;
 };

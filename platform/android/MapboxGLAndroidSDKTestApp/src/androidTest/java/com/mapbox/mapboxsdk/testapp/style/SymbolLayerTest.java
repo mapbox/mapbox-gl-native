@@ -1616,6 +1616,63 @@ public class SymbolLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testTextFontAsIdentitySourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-font");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textFont(property("FeaturePropertyA", Stops.<String[]>identity()))
+        );
+
+        // Verify
+        assertNotNull(layer.getTextFont());
+        assertNotNull(layer.getTextFont().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextFont().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextFont().getFunction()).getProperty());
+        assertEquals(IdentityStops.class, layer.getTextFont().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
+  public void testTextFontAsIntervalSourceFunction() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("text-font");
+    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
+      @Override
+      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
+        assertNotNull(layer);
+
+        // Set
+        layer.setProperties(
+          textFont(
+            property(
+              "FeaturePropertyA",
+              interval(
+                stop(1, textFont(new String[]{"Open Sans Regular", "Arial Unicode MS Regular"}))
+              )
+            )
+          )
+        );
+
+        // Verify
+        assertNotNull(layer.getTextFont());
+        assertNotNull(layer.getTextFont().getFunction());
+        assertEquals(SourceFunction.class, layer.getTextFont().getFunction().getClass());
+        assertEquals("FeaturePropertyA", ((SourceFunction) layer.getTextFont().getFunction()).getProperty());
+        assertEquals(IntervalStops.class, layer.getTextFont().getFunction().getStops().getClass());
+      }
+    });
+  }
+
+  @Test
   public void testTextSizeAsConstant() {
     validateTestSetup();
     setupLayer();

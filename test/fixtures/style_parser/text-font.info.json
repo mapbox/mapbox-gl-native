@@ -1,0 +1,14 @@
+{
+  "default": {
+    "log": [
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - get' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - case' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - match' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - at' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - coalesce' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - step' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - let/var' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."],
+      [1, "WARNING", "ParseStyle", "Layer 'invalid expression - identity function' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression."]
+    ]
+  }
+}

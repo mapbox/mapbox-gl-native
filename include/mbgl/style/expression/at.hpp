@@ -28,6 +28,10 @@ public:
         return false;
     }
 
+    std::vector<optional<Value>> possibleOutputs() const override {
+        return { nullopt };
+    }
+
 private:
     std::unique_ptr<Expression> index;
     std::unique_ptr<Expression> input;

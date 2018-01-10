@@ -19,6 +19,7 @@ public:
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
     bool operator==(const Expression&) const override;
     EvaluationResult evaluate(const EvaluationContext&) const override;
+    std::vector<optional<Value>> possibleOutputs() const override;
 
 private:
     std::unique_ptr<Expression> lhs;

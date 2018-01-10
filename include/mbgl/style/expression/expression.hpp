@@ -1,14 +1,15 @@
 #pragma once
 
-#include <array>
-#include <vector>
-#include <memory>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/color.hpp>
 #include <mbgl/style/expression/type.hpp>
 #include <mbgl/style/expression/value.hpp>
 #include <mbgl/style/expression/parsing_context.hpp>
+
+#include <array>
+#include <vector>
+#include <memory>
 
 namespace mbgl {
 
@@ -38,7 +39,7 @@ public:
     optional<double> heatmapDensity;
 };
 
-template<typename T>
+template <typename T>
 class Result : private variant<EvaluationError, T> {
 public:
     using variant<EvaluationError, T>::variant;
@@ -128,6 +129,13 @@ public:
     
     EvaluationResult evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const;
 
+    /**
+     * Statically analyze the expression, attempting to enumerate possible outputs. Returns
+     * an array of values plus the sentinel null optional value, used to indicate that the
+     * complete set of outputs is statically undecidable.
+     */
+    virtual std::vector<optional<Value>> possibleOutputs() const = 0;
+
 protected:
     template <typename T>
     static bool childrenEqual(const T& lhs, const T& rhs) {
@@ -161,8 +169,6 @@ protected:
                            const std::pair<std::unique_ptr<Expression>, std::unique_ptr<Expression>>& rhs) {
         return *(lhs.first) == *(rhs.first) && *(lhs.second) == *(rhs.second);
     }
-    
-    
 
 private:
     type::Type type;

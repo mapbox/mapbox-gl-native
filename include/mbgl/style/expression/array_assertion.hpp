@@ -30,6 +30,10 @@ public:
         return false;
     }
 
+    std::vector<optional<Value>> possibleOutputs() const override {
+        return input->possibleOutputs();
+    }
+
 private:
     std::unique_ptr<Expression> input;
 };

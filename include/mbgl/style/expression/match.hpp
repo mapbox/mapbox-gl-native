@@ -25,14 +25,15 @@ public:
         otherwise(std::move(otherwise_))
     {}
 
+    EvaluationResult evaluate(const EvaluationContext& params) const override;
+
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
 
     bool operator==(const Expression& e) const override;
 
-    EvaluationResult evaluate(const EvaluationContext& params) const override;
-    
+    std::vector<optional<Value>> possibleOutputs() const override;
+
 private:
-    
     std::unique_ptr<Expression> input;
     Branches branches;
     std::unique_ptr<Expression> otherwise;
