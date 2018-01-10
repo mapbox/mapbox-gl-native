@@ -8,7 +8,8 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for
+ `MGLFillExtrusionStyleLayer.fillExtrusionTranslation`.
 
  Values of this type are used in the `MGLFillExtrusionStyleLayer.fillExtrusionTranslationAnchor`
  property.
@@ -313,7 +314,7 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *fillExtrusionTranslate __attribute__((unavailable("Use fillExtrusionTranslation instead.")));
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `fillExtrusionTranslation`.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLFillExtrusionTranslationAnchorMap`. Set this

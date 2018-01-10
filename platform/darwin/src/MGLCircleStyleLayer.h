@@ -42,7 +42,7 @@ typedef NS_ENUM(NSUInteger, MGLCircleScaleAlignment) {
 };
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `MGLCircleStyleLayer.circleTranslation`.
 
  Values of this type are used in the `MGLCircleStyleLayer.circleTranslationAnchor`
  property.
@@ -489,7 +489,7 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *circleTranslate __attribute__((unavailable("Use circleTranslation instead.")));
 
 /**
- Controls the translation reference point.
+ Controls the frame of reference for `circleTranslation`.
  
  The default value of this property is an `MGLStyleValue` object containing an
  `NSValue` object containing `MGLCircleTranslationAnchorMap`. Set this property

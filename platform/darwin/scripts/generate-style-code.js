@@ -27,8 +27,10 @@ _.forOwn(cocoaConventions, function (properties, kind) {
         delete spec[kind][oldName];
         spec[kind][newName] = property;
 
-        // Update requirements in other properties.
-        let updateRequirements = function (property, name) {
+        // Update cross-references to this property in other properties'
+        // documentation and requirements.
+        let renameCrossReferences = function (property, name) {
+            property.doc = property.doc.replace(new RegExp('`' + oldName + '`', 'g'), '`' + newName + '`');
             let requires = property.requires || [];
             for (let i = 0; i < requires.length; i++) {
                 if (requires[i] === oldName) {
@@ -45,8 +47,8 @@ _.forOwn(cocoaConventions, function (properties, kind) {
                 }
             }
         };
-        _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], updateRequirements);
-        _.forOwn(spec[kind.replace(/^paint_/, 'layout_')], updateRequirements);
+        _.forOwn(spec[kind.replace(/^layout_/, 'paint_')], renameCrossReferences);
+        _.forOwn(spec[kind.replace(/^paint_/, 'layout_')], renameCrossReferences);
     })
 });
 
@@ -245,6 +247,13 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
     // Format everything else: our property name & its possible values.
     // Requires symbols to be surrounded by backticks.
     doc = doc.replace(/`(.+?)`/g, function (m, symbol, offset, str) {
+        if (kind === 'enum') {
+            let layoutProperties = spec[`layout_${layerType}`] || [];
+            let paintProperties = spec[`paint_${layerType}`] || [];
+            if (symbol in layoutProperties || symbol in paintProperties) {
+                return '`MGL' + camelize(layerType) + 'StyleLayer.' + camelizeWithLeadingLowercase(symbol) + '`';
+            }
+        }
         if ('values' in property && Object.keys(property.values).indexOf(symbol) !== -1) {
             let objCType = global.objCType(layerType, property.name);
             return '`' + `${objCType}${camelize(symbol)}` + '`';
@@ -349,19 +358,19 @@ global.describeValue = function (value, property, layerType) {
         case 'enum':
             let displayValue;
             if (Array.isArray(value)) {
-              let separator = (value.length === 2) ? ' ' : ', ';
-              displayValue = value.map((possibleValue, i) => {
-                let conjunction = '';
-                if (value.length === 2 && i === 0) conjunction = 'either ';
-                if (i === value.length - 1) conjunction = 'or ';
-                let objCType = global.objCType(layerType, property.name);
-                return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
-              }).join(separator);
+                let separator = (value.length === 2) ? ' ' : ', ';
+                displayValue = value.map((possibleValue, i) => {
+                    let conjunction = '';
+                    if (value.length === 2 && i === 0) conjunction = 'either ';
+                    if (i === value.length - 1) conjunction = 'or ';
+                    let objCType = global.objCType(layerType, property.name);
+                    return `${conjunction}\`${objCType}${camelize(possibleValue)}\``;
+                }).join(separator);
             } else if (property['light-property']) {
-              displayValue = `\`${prefix}Light${camelize(property.name)}${camelize(value)}\``;
+                displayValue = `\`${prefix}Light${camelize(property.name)}${camelize(value)}\``;
             } else {
-              let objCType = global.objCType(layerType, property.name);
-              displayValue = `\`${objCType}${camelize(value)}\``;
+                let objCType = global.objCType(layerType, property.name);
+                displayValue = `\`${objCType}${camelize(value)}\``;
             }
             return `an \`NSValue\` object containing ${displayValue}`;
         case 'color':
@@ -404,7 +413,11 @@ global.describeValue = function (value, property, layerType) {
 };
 
 global.propertyDefault = function (property, layerType) {
-    return 'an `MGLStyleValue` object containing ' + describeValue(property.default, property, layerType);
+    if (property.name === 'heatmap-color') {
+        return 'a rainbow color scale from blue to red';
+    } else {
+        return 'an `MGLStyleValue` object containing ' + describeValue(property.default, property, layerType);
+    }
 };
 
 global.originalPropertyName = function (property) {

@@ -193,15 +193,6 @@
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
         functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
         XCTAssertThrowsSpecificNamed(layer.rasterFadeDuration = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        // Transition property test
-        layer.rasterFadeDurationTransition = transitionTest;
-        auto toptions = rawLayer->getRasterFadeDurationTransition();
-        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
-        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
-
-        MGLTransition rasterFadeDurationTransition = layer.rasterFadeDurationTransition;
-        XCTAssertEqual(rasterFadeDurationTransition.delay, transitionTest.delay);
-        XCTAssertEqual(rasterFadeDurationTransition.duration, transitionTest.duration);
     }
 
     // raster-hue-rotate

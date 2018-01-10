@@ -155,13 +155,6 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
 
 /**
- The transition affecting any changes to this layer’s `rasterFadeDuration` property.
-
- This property corresponds to the `raster-fade-duration-transition` property in the style JSON file format.
-*/
-@property (nonatomic) MGLTransition rasterFadeDurationTransition;
-
-/**
  Rotates hues around the color wheel.
  
  This property is measured in degrees.
