@@ -3,6 +3,11 @@
 #import "NSProcessInfo+MGLAdditions.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
+static NSString * const MGLMapboxAccountType = @"MGLMapboxAccountType";
+static NSString * const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
+static NSString * const MGLMapboxMetricsDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
+static NSString * const MGLTelemetryAccessToken = @"MGLTelemetryAccessToken";
+static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
 
 @interface MGLMapboxEvents ()
 
@@ -17,10 +22,10 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 + (void)initialize {
     if (self == [MGLMapboxEvents class]) {
         NSBundle *bundle = [NSBundle mainBundle];
-        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:@"MGLMapboxAccountType"];
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"MGLMapboxAccountType": accountTypeNumber ?: @0,
-                                                                  @"MGLMapboxMetricsEnabled": @YES,
-                                                                  @"MGLMapboxMetricsDebugLoggingEnabled": @NO}];
+        NSNumber *accountTypeNumber = [bundle objectForInfoDictionaryKey:MGLMapboxAccountType];
+        [[NSUserDefaults standardUserDefaults] registerDefaults:@{MGLMapboxAccountType: accountTypeNumber ?: @0,
+                                                                  MGLMapboxMetricsEnabled: @YES,
+                                                                  MGLMapboxMetricsDebugLoggingEnabled: @NO}];
     }
 }
 
@@ -41,19 +46,19 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     self = [super init];
     if (self) {
         _eventsManager = [[MMEEventsManager alloc] init];
-        _eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
-        _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
-        _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
+        _eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsDebugLoggingEnabled];
+        _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType];
+        _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabled];
         
         // Because we can get here [MGLAccountManaber +load] it is possible that values from user defaults will be read and
         // applied here. These checks and local accessToken and baseURL assigns work around that fact. If user default value
         // are set, they are stored on the local properties here and then only applied later on once MMEEventsManager is
         // fully initialized (once -[MMEEventsManager initializeWithAccessToken:userAgentBase:hostSDKVersion:] is called.
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
-            self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
+            self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
         }
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryBaseURL"]) {
-            self.baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryBaseURL"]];
+        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURL]) {
+            self.baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURL]];
         }
         
         [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(userDefaultsDidChange:) name:NSUserDefaultsDidChangeNotification object:nil];
@@ -67,28 +72,48 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 
 - (void)userDefaultsDidChange:(NSNotification *)notification {
     dispatch_async(dispatch_get_main_queue(), ^{
-        self.eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsEnabled"];
-        self.eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"];
-        self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];                
-        
-
-        // It is possible that MGLTelemetryAccessToken is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
-        // In that case, setting the access token here will be a noop. In practice, that's fine because the access token value
-        // will be resolved when setupWithAccessToken: is called eventually
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryAccessToken"]) {
-            self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryAccessToken"];
-        }
-        
-        // It is possible that MGLTelemetryBaseURL is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
-        // In that case, setting baseURL here will be a noop. In practice, that's fine because the baseURL value
-        // will be resolved when setupWithAccessToken: is called eventually
-        if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:@"MGLTelemetryBaseURL"]) {
-            NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:@"MGLTelemetryBaseURL"]];
-            self.eventsManager.baseURL = baseURL;
-        }
-        
-        [self.eventsManager pauseOrResumeMetricsCollectionIfRequired];
+        [self updateNonDisablingConfigurationValues];
+        [self updateDisablingConfigurationValuesWithNotification:notification];
     });
+}
+
+- (void)updateNonDisablingConfigurationValues {
+    self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
+    
+    // It is possible that MGLTelemetryAccessToken is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
+    // In that case, setting the access token here will be a noop. In practice, that's fine because the access token value
+    // will be resolved when setupWithAccessToken: is called eventually
+    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
+        self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
+    }
+    
+    // It is possible that MGLTelemetryBaseURL is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
+    // In that case, setting baseURL here will be a noop. In practice, that's fine because the baseURL value
+    // will be resolved when setupWithAccessToken: is called eventually
+    if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURL]) {
+        NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURL]];
+        self.eventsManager.baseURL = baseURL;
+    }
+}
+
+- (void)updateDisablingConfigurationValuesWithNotification:(NSNotification *)notification {
+    // Guard against over calling pause / resume if the values this implementation actually
+    // cares about have not changed. We guard becasue the pause and resume method checks CoreLocation's
+    // authorization status and that can drag on the main thread if done too many times (e.g. if the host
+    // app heavily uses the user defaults API and this method is called very frequently)
+    if ([[notification object] respondsToSelector:@selector(objectForKey:)]) {
+        NSUserDefaults *userDefaults = [notification object];
+        
+        NSInteger accountType = [userDefaults integerForKey:MGLMapboxAccountType];
+        BOOL metricsEnabled = [userDefaults boolForKey:MGLMapboxMetricsEnabled];
+        
+        if (accountType != self.eventsManager.accountType || metricsEnabled != self.eventsManager.metricsEnabled) {
+            self.eventsManager.accountType = accountType;
+            self.eventsManager.metricsEnabled = metricsEnabled;
+            
+            [self.eventsManager pauseOrResumeMetricsCollectionIfRequired];
+        }
+    }
 }
 
 + (void)setupWithAccessToken:(NSString *)accessToken {
@@ -126,7 +151,7 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
     BOOL metricsEnabledSettingShownInAppFlag = [shownInAppNumber boolValue];
     
     if (!metricsEnabledSettingShownInAppFlag &&
-        [[NSUserDefaults standardUserDefaults] integerForKey:@"MGLMapboxAccountType"] == 0) {
+        [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType] == 0) {
         // Opt-out is not configured in UI, so check for Settings.bundle
         id defaultEnabledValue;
         NSString *appSettingsBundle = [[NSBundle mainBundle] pathForResource:@"Settings" ofType:@"bundle"];
@@ -136,7 +161,7 @@ static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
             NSDictionary *settings = [NSDictionary dictionaryWithContentsOfFile:[appSettingsBundle stringByAppendingPathComponent:@"Root.plist"]];
             NSArray *preferences = settings[@"PreferenceSpecifiers"];
             for (NSDictionary *prefSpecification in preferences) {
-                if ([prefSpecification[@"Key"] isEqualToString:@"MGLMapboxMetricsEnabled"]) {
+                if ([prefSpecification[@"Key"] isEqualToString:MGLMapboxMetricsEnabled]) {
                     defaultEnabledValue = prefSpecification[@"DefaultValue"];
                 }
             }
