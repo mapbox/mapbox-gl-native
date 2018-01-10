@@ -2,6 +2,17 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.3.1 - January 10, 2018
+ - Blacklist binary program loading for Vivante GC4000 GPUs [#10862](https://github.com/mapbox/mapbox-gl-native/pull/10862)
+ - Support Genymotion [#10841](https://github.com/mapbox/mapbox-gl-native/pull/10841)
+ - Getting bitmap from drawable fix [#10763](https://github.com/mapbox/mapbox-gl-native/pull/10763)
+ - Use US locale when converting between int color and RGBA string [#10810](https://github.com/mapbox/mapbox-gl-native/pull/10810)
+ - Harden map destruction [#10811](https://github.com/mapbox/mapbox-gl-native/pull/10811)
+ - RTL support [#10828](https://github.com/mapbox/mapbox-gl-native/pull/10828)
+ - Allow configuring Http url logging when a request fails [#10830](https://github.com/mapbox/mapbox-gl-native/pull/10830)
+ - Don't send double tap event multiple times for telemetry [#10854](https://github.com/mapbox/mapbox-gl-native/pull/10854)
+ - Use the correct cancelable callback after posting cancel [#10871](https://github.com/mapbox/mapbox-gl-native/pull/10871) 
+  
 ## 5.3.0 - December 20, 2017
  - Add support for TinySDF [#10706](https://github.com/mapbox/mapbox-gl-native/pull/10706)
  - Save restore MyLocationViewSettings [#10746](https://github.com/mapbox/mapbox-gl-native/pull/10746) 
