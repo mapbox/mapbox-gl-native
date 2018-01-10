@@ -93,6 +93,8 @@ bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, Symbol
         }
     }
 
+
+    indexes[tileID.overscaledZ].erase(tileID);
     indexes[tileID.overscaledZ].emplace(tileID, TileLayerIndex(tileID, bucket.symbolInstances, bucket.bucketInstanceId));
     return true;
 }
