@@ -8,8 +8,8 @@
 
 namespace mbgl {
 
-OpacityState::OpacityState(bool placed_, bool offscreen)
-    : opacity((offscreen && placed_) ? 1 : 0)
+OpacityState::OpacityState(bool placed_, bool skipFade)
+    : opacity((skipFade && placed_) ? 1 : 0)
     , placed(placed_)
 {
 }
@@ -22,11 +22,11 @@ bool OpacityState::isHidden() const {
     return opacity == 0 && !placed;
 }
 
-JointOpacityState::JointOpacityState(bool placedIcon, bool placedText, bool offscreen) :
-    icon(OpacityState(placedIcon, offscreen)),
-    text(OpacityState(placedText, offscreen)) {}
+JointOpacityState::JointOpacityState(bool placedText, bool placedIcon, bool skipFade) :
+    icon(OpacityState(placedIcon, skipFade)),
+    text(OpacityState(placedText, skipFade)) {}
 
-JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText) :
+JointOpacityState::JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedText, bool placedIcon) :
     icon(OpacityState(prevOpacityState.icon, increment, placedIcon)),
     text(OpacityState(prevOpacityState.text, increment, placedText)) {}
 
@@ -165,10 +165,12 @@ void Placement::placeLayerBucket(
                 placements.erase(symbolInstance.crossTileID);
             }
             
-            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText, placeIcon, offscreen));
+            placements.emplace(symbolInstance.crossTileID, JointPlacement(placeText, placeIcon, offscreen || bucket.justReloaded));
             seenCrossTileIDs.insert(symbolInstance.crossTileID);
         }
     } 
+
+    bucket.justReloaded = false;
 }
 
 bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
@@ -184,12 +186,12 @@ bool Placement::commit(const Placement& prevPlacement, TimePoint now) {
     for (auto& jointPlacement : placements) {
         auto prevOpacity = prevPlacement.opacities.find(jointPlacement.first);
         if (prevOpacity != prevPlacement.opacities.end()) {
-            opacities.emplace(jointPlacement.first, JointOpacityState(prevOpacity->second, increment, jointPlacement.second.icon, jointPlacement.second.text));
+            opacities.emplace(jointPlacement.first, JointOpacityState(prevOpacity->second, increment, jointPlacement.second.text, jointPlacement.second.icon));
             placementChanged = placementChanged ||
                 jointPlacement.second.icon != prevOpacity->second.icon.placed ||
                 jointPlacement.second.text != prevOpacity->second.text.placed;
         } else {
-            opacities.emplace(jointPlacement.first, JointOpacityState(jointPlacement.second.icon, jointPlacement.second.text, jointPlacement.second.offscreen));
+            opacities.emplace(jointPlacement.first, JointOpacityState(jointPlacement.second.text, jointPlacement.second.icon, jointPlacement.second.skipFade));
             placementChanged = placementChanged || jointPlacement.second.icon || jointPlacement.second.text;
         }
     }
@@ -234,9 +236,16 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
             true);
 
     for (SymbolInstance& symbolInstance : bucket.symbolInstances) {
-        auto opacityState = seenCrossTileIDs.count(symbolInstance.crossTileID) == 0 ?
-            getOpacity(symbolInstance.crossTileID) :
+        bool isDuplicate = seenCrossTileIDs.count(symbolInstance.crossTileID) > 0;
+
+        auto it = opacities.find(symbolInstance.crossTileID);
+        auto opacityState = it != opacities.end() && !isDuplicate ?
+            it->second :
             defaultOpacityState;
+
+        if (it == opacities.end()) {
+            opacities.emplace(symbolInstance.crossTileID, defaultOpacityState);
+        }
 
         seenCrossTileIDs.insert(symbolInstance.crossTileID);
 
@@ -291,16 +300,6 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 
     bucket.updateOpacity();
     bucket.sortFeatures(state.getAngle());
-}
-
-JointOpacityState Placement::getOpacity(uint32_t crossTileSymbolID) const {
-    auto it = opacities.find(crossTileSymbolID);
-    if (it != opacities.end()) {
-        return it->second;
-    } else {
-        return JointOpacityState(false, false, false);
-    }
-
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
