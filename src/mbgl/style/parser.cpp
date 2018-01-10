@@ -119,6 +119,9 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    // Call for side effect of logging warnings for invalid values.
+    fontStacks();
+
     return nullptr;
 }
 
@@ -286,6 +289,9 @@ std::vector<FontStack> Parser::fontStacks() const {
                     for (const auto& value : function.possibleOutputs()) {
                         if (value) {
                             result.insert(*value);
+                        } else {
+                            Log::Warning(Event::ParseStyle, "Layer '%s' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression.", layer->getID().c_str());
+                            break;
                         }
                     }
                 }
