@@ -29,6 +29,7 @@
     "pixelmatch": "^4.0.2",
     "pngjs": "^3.0.0",
     "request": "^2.72.0",
+    "danger": "^3.0.3",
     "tape": "^4.5.1"
   },
   "engines": {
@@ -37,6 +38,7 @@
   "scripts": {
     "preinstall": "npm install node-pre-gyp",
     "install": "node-pre-gyp install --fallback-to-build=false || make node",
+    "danger-ci": "danger ci",
     "test": "tape platform/node/test/js/**/*.test.js",
     "test-memory": "node --expose-gc platform/node/test/memory.test.js",
     "test-suite": "run-s test-render test-query test-expressions",
