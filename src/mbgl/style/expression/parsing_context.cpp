@@ -13,6 +13,7 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/equals.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
@@ -75,6 +76,8 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
 
 const ExpressionRegistry& getExpressionRegistry() {
     static ExpressionRegistry registry {{
+        {"==", Equals::parse},
+        {"!=", Equals::parse},
         {"all", All::parse},
         {"any", Any::parse},
         {"array", ArrayAssertion::parse},
@@ -145,6 +148,8 @@ ParseResult ParsingContext::parse(const Convertible& value)
         const type::Type actual = (*parsed)->getType();
         if (*expected == type::Color && (actual == type::String || actual == type::Value)) {
             parsed = wrapForType(type::Color, std::move(*parsed));
+        } else if (expected->is<type::Array>() && actual == type::Value) {
+            parsed = { std::make_unique<ArrayAssertion>(expected->get<type::Array>(), std::move(*parsed)) };
         } else if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
             parsed = wrapForType(*expected, std::move(*parsed));
         }
