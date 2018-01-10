@@ -879,16 +879,10 @@ public:
 
 - (void)updateConstraints
 {
-    
-// If compiling with the iOS 11+ SDK
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
     // If safeAreaLayoutGuide API exists
-    if ( [self respondsToSelector:@selector(safeAreaLayoutGuide)] ) {
-        
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
+    if (@available(iOS 11.0, *)) {
         UILayoutGuide *safeAreaLayoutGuide = self.safeAreaLayoutGuide;
-#pragma clang diagnostic pop
+
         // compass view
         [self removeConstraints:self.compassViewConstraints];
         [self.compassViewConstraints removeAllObjects];
@@ -908,7 +902,6 @@ public:
         // logo view
         [self removeConstraints:self.logoViewConstraints];
         [self.logoViewConstraints removeAllObjects];
-//        [NSLayoutConstraint activateConstraints:@[[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.logoView.bottomAnchor]]];
         [self.logoViewConstraints addObject:[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.logoView.bottomAnchor]];
         [self.logoViewConstraints addObject:[self.logoView.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
                                                                                      constant:8.0 + self.contentInset.left]];
@@ -917,7 +910,6 @@ public:
         // attribution button
         [self removeConstraints:self.attributionButtonConstraints];
         [self.attributionButtonConstraints removeAllObjects];
-//        [NSLayoutConstraint activateConstraints:@[[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.attributionButton.bottomAnchor]]];
         [self.attributionButtonConstraints addObject:[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.attributionButton.bottomAnchor]];
         [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.attributionButton.rightAnchor
                                                                                                constant:8.0 + self.contentInset.right]];
@@ -925,9 +917,6 @@ public:
     } else {
         [self updateConstraintsPreiOS11];
     }
-#else
-    [self updateConstraintsPreiOS11];
-#endif
     
     [super updateConstraints];
 }
