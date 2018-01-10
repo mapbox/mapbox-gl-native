@@ -130,6 +130,7 @@ public:
     } collisionCircle;
 
     uint32_t bucketInstanceId = 0;
+    bool justReloaded = false;
 };
 
 } // namespace mbgl

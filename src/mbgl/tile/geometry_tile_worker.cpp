@@ -425,11 +425,16 @@ void GeometryTileWorker::attemptPlacement() {
             continue;
         }
 
-        std::shared_ptr<Bucket> bucket = symbolLayout->place(showCollisionBoxes);
+        std::shared_ptr<SymbolBucket> bucket = symbolLayout->place(showCollisionBoxes);
         for (const auto& pair : symbolLayout->layerPaintProperties) {
+            if (!firstLoad) {
+                bucket->justReloaded = true;
+            }
             buckets.emplace(pair.first, bucket);
         }
     }
+
+    firstLoad = false;
 
     parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
         std::move(buckets),
