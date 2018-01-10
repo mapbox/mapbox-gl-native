@@ -19,13 +19,17 @@
     };
     MGLFeatureAccessibilityElement *element = [[MGLFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
     XCTAssertEqualObjects(element.accessibilityLabel, @"English", @"Accessibility label should be localized.");
-    
+
     feature.attributes = @{
         @"name": @"Цинциннати",
         @"name_en": @"Цинциннати",
     };
     element = [[MGLFeatureAccessibilityElement alloc] initWithAccessibilityContainer:self feature:feature];
-    XCTAssertEqualObjects(element.accessibilityLabel, @"Cincinnati", @"Accessibility label should be romanized.");
+    if (@available(iOS 9.0, *)) {
+        XCTAssertEqualObjects(element.accessibilityLabel, @"Cincinnati", @"Accessibility label should be romanized.");
+    } else {
+        XCTAssertEqualObjects(element.accessibilityLabel, @"Цинциннати", @"Accessibility label should not be romanized.");
+    }
 }
 
 - (void)testPlaceFeatureValues {
