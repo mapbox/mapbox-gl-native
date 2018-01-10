@@ -108,13 +108,9 @@ Value ValueConverter<float>::toExpressionValue(const float value) {
 }
 
 optional<float> ValueConverter<float>::fromExpressionValue(const Value& value) {
-    if (value.template is<double>()) {
-        double v = value.template get<double>();
-        if (v <= std::numeric_limits<float>::max()) {
-            return static_cast<float>(v);
-        }
-    }
-    return optional<float>();
+    return value.template is<double>()
+        ? static_cast<float>(value.template get<double>())
+        : optional<float>();
 }
 
 
