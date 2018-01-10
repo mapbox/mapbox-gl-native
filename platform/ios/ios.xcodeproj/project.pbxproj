@@ -12,6 +12,7 @@
 		071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071BBB071EE77631001FB02A /* MGLImageSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */; };
+		16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
 		1F06668A1EC64F8E001C16D7 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F0666881EC64F8E001C16D7 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -580,6 +581,7 @@
 		071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLImageSource.h; sourceTree = "<group>"; };
 		071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLImageSource.mm; sourceTree = "<group>"; };
 		071BBB051EE7761A001FB02A /* MGLImageSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLImageSourceTests.m; path = ../../darwin/test/MGLImageSourceTests.m; sourceTree = "<group>"; };
+		16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewLayoutTests.m; sourceTree = "<group>"; };
 		1753ED411E53CE6F00A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
 		1F0666881EC64F8E001C16D7 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
 		1F0666891EC64F8E001C16D7 /* MGLLight.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLight.mm; sourceTree = "<group>"; };
@@ -1365,6 +1367,7 @@
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
+				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
 				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
@@ -2311,6 +2314,7 @@
 				DA0CD5901CF56F6A00A5F5A5 /* MGLFeatureTests.mm in Sources */,
 				556660D81E1D085500E2C41B /* MGLVersionNumber.m in Sources */,
 				4031ACFF1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift in Sources */,
+				16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
