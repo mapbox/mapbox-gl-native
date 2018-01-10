@@ -2,6 +2,7 @@
 #include <mbgl/style/expression/get_covering_stops.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -9,8 +10,14 @@ namespace expression {
 
 EvaluationResult Step::evaluate(const EvaluationContext& params) const {
     const EvaluationResult evaluatedInput = input->evaluate(params);
-    if (!evaluatedInput) { return evaluatedInput.error(); }
+    if (!evaluatedInput) {
+        return evaluatedInput.error();
+    }
+
     float x = *fromExpressionValue<float>(*evaluatedInput);
+    if (std::isnan(x)) {
+        return EvaluationError { "Input is not a number." };
+    }
 
     if (stops.empty()) {
         return EvaluationError { "No stops in step curve." };
