@@ -654,7 +654,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -672,7 +672,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -691,7 +691,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-sanitize-thread:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -710,7 +710,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -731,7 +731,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug-qt5:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -756,7 +756,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-release-node4:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -777,7 +777,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-release-node6:
     macos:
-      xcode: "9.0"
+      xcode: "9.2.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
