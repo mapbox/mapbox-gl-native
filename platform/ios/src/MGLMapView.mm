@@ -892,10 +892,7 @@ public:
         // compass view
         [self removeConstraints:self.compassViewConstraints];
         [self.compassViewConstraints removeAllObjects];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        [self.compassViewConstraints addObject:[self.compassView.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
-#pragma clang diagnostic pop
+        [self.compassViewConstraints addObject:[self constraintForYAxisAnchor:self.compassView.topAnchor belowAnchor:safeAreaLayoutGuide.topAnchor]];
         [self.compassViewConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.compassView.rightAnchor
                                                                                           constant:8.0 + self.contentInset.right]];
         [self addConstraints:self.compassViewConstraints];
@@ -903,10 +900,7 @@ public:
         // scale bar view
         [self removeConstraints:self.scaleBarConstraints];
         [self.scaleBarConstraints removeAllObjects];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        [self.scaleBarConstraints addObject:[self.scaleBar.topAnchor constraintEqualToSystemSpacingBelowAnchor:safeAreaLayoutGuide.topAnchor multiplier:1]];
-#pragma clang diagnostic pop
+        [self.scaleBarConstraints addObject:[self constraintForYAxisAnchor:self.scaleBar.topAnchor belowAnchor:safeAreaLayoutGuide.topAnchor]];
         [self.scaleBarConstraints addObject:[self.scaleBar.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
                                                                                      constant:8.0 + self.contentInset.left]];
         [self addConstraints:self.scaleBarConstraints];
@@ -914,10 +908,8 @@ public:
         // logo view
         [self removeConstraints:self.logoViewConstraints];
         [self.logoViewConstraints removeAllObjects];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        [NSLayoutConstraint activateConstraints:@[[safeAreaLayoutGuide.bottomAnchor constraintEqualToSystemSpacingBelowAnchor:self.logoView.bottomAnchor multiplier:1.0]]];
-#pragma clang diagnostic pop
+//        [NSLayoutConstraint activateConstraints:@[[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.logoView.bottomAnchor]]];
+        [self.logoViewConstraints addObject:[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.logoView.bottomAnchor]];
         [self.logoViewConstraints addObject:[self.logoView.leftAnchor constraintEqualToAnchor:safeAreaLayoutGuide.leftAnchor
                                                                                      constant:8.0 + self.contentInset.left]];
         [self addConstraints:self.logoViewConstraints];
@@ -925,10 +917,8 @@ public:
         // attribution button
         [self removeConstraints:self.attributionButtonConstraints];
         [self.attributionButtonConstraints removeAllObjects];
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wpartial-availability"
-        [NSLayoutConstraint activateConstraints:@[[safeAreaLayoutGuide.bottomAnchor constraintEqualToSystemSpacingBelowAnchor:self.attributionButton.bottomAnchor multiplier:1.0]]];
-#pragma clang diagnostic pop
+//        [NSLayoutConstraint activateConstraints:@[[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.attributionButton.bottomAnchor]]];
+        [self.attributionButtonConstraints addObject:[self constraintForYAxisAnchor:safeAreaLayoutGuide.bottomAnchor belowAnchor:self.attributionButton.bottomAnchor]];
         [self.attributionButtonConstraints addObject:[safeAreaLayoutGuide.rightAnchor constraintEqualToAnchor:self.attributionButton.rightAnchor
                                                                                                constant:8.0 + self.contentInset.right]];
         [self addConstraints:self.attributionButtonConstraints];
@@ -940,6 +930,15 @@ public:
 #endif
     
     [super updateConstraints];
+}
+
+- (NSLayoutConstraint *)constraintForYAxisAnchor:(NSLayoutYAxisAnchor *)yAxisAnchor belowAnchor:(NSLayoutYAxisAnchor *)anchor
+{
+    if (@available(iOS 11.0, *)) {
+        return [yAxisAnchor constraintEqualToSystemSpacingBelowAnchor:anchor multiplier:1];
+    } else {
+        return nil;
+    }
 }
 
 - (BOOL)isOpaque
