@@ -243,6 +243,47 @@
 		966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF511F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.m */; };
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
+		96E516DC2000547000A02306 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
+		96E516DD200054F200A02306 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
+		96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848011CBAFA6200AB86E3 /* MGLGeometry_Private.h */; };
+		96E516DF200054FB00A02306 /* MGLShape_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */; };
+		96E516E02000550C00A02306 /* MGLFeature_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAD1656A1CF41981001FF4B9 /* MGLFeature_Private.h */; };
+		96E516E12000551100A02306 /* MGLMultiPoint_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848041CBAFA6200AB86E3 /* MGLMultiPoint_Private.h */; };
+		96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4049C2AB1DB6E05500B3F799 /* MGLPointCollection_Private.h */; };
+		96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8847FF1CBAFA6200AB86E3 /* MGLAccountManager_Private.h */; };
+		96E516E42000560B00A02306 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */; };
+		96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848061CBAFA6200AB86E3 /* MGLOfflinePack_Private.h */; };
+		96E516E62000560B00A02306 /* MGLOfflineRegion_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848081CBAFA6200AB86E3 /* MGLOfflineRegion_Private.h */; };
+		96E516E72000560B00A02306 /* MGLOfflineStorage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848091CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h */; };
+		96E516E82000560B00A02306 /* MGLAnnotationContainerView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404326881D5B9B1A007111BD /* MGLAnnotationContainerView_Private.h */; };
+		96E516E92000560B00A02306 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848401CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h */; };
+		96E516EA2000560B00A02306 /* MGLAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4018B1C31CDC277F00F666AF /* MGLAnnotationView_Private.h */; };
+		96E516EB2000560B00A02306 /* MGLUserLocation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88484B1CBAFB9800AB86E3 /* MGLUserLocation_Private.h */; };
+		96E516EC2000560B00A02306 /* MGLUserLocationAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 359F57451D2FDBD5005217F1 /* MGLUserLocationAnnotationView_Private.h */; };
+		96E516ED200058A200A02306 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E516EE2000590900A02306 /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		96E516EF2000594F00A02306 /* NSArray+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 400532FF1DB0862B0069F638 /* NSArray+MGLAdditions.h */; };
+		96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848121CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h */; };
+		96E516F12000596800A02306 /* NSString+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848171CBAFA6200AB86E3 /* NSString+MGLAdditions.h */; };
+		96E516F22000596D00A02306 /* NSException+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848141CBAFA6200AB86E3 /* NSException+MGLAdditions.h */; };
+		96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA8551DAEDA0800022900 /* NSDictionary+MGLAdditions.h */; };
+		96E516F42000597D00A02306 /* NSData+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 35305D461D22AA450007D005 /* NSData+MGLAdditions.h */; };
+		96E516F5200059B100A02306 /* MGLNetworkConfiguration.h in Headers */ = {isa = PBXBuildFile; fileRef = DD0902A41DB18F1B00C5BDCE /* MGLNetworkConfiguration.h */; };
+		96E516F6200059EC00A02306 /* MGLRendererFrontend.h in Headers */ = {isa = PBXBuildFile; fileRef = 92F2C3EC1F0E3C3A00268EC0 /* MGLRendererFrontend.h */; };
+		96E516F720005A2700A02306 /* MGLAnnotationContainerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */; };
+		96E516F820005A3000A02306 /* MGLCompactCalloutView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848441CBAFB9800AB86E3 /* MGLCompactCalloutView.h */; };
+		96E516F920005A3500A02306 /* MGLFaux3DUserLocationAnnotationView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88484D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.h */; };
+		96E516FA20005A3D00A02306 /* MGLUserLocationHeadingArrowLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF501F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.h */; };
+		96E516FB20005A4000A02306 /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
+		96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
+		96E516FD20005A4700A02306 /* MGLAPIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */; };
+		96E516FE20005A4C00A02306 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */; };
+		96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; };
+		96E5170020005A6100A02306 /* Fabric.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848831CBB033F00AB86E3 /* Fabric.h */; };
+		96E5170120005A6400A02306 /* Fabric+FABKits.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848821CBB033F00AB86E3 /* Fabric+FABKits.h */; };
+		96E5170220005A6600A02306 /* FABAttributes.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848801CBB033F00AB86E3 /* FABAttributes.h */; };
+		96E5170320005A6800A02306 /* FABKitProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848811CBB033F00AB86E3 /* FABKitProtocol.h */; };
+		96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848891CBB037E00AB86E3 /* SMCalloutView.h */; };
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -650,7 +691,7 @@
 		357FE2DC1E02D2B20068B753 /* NSCoder+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "NSCoder+MGLAdditions.mm"; path = "../../darwin/src/NSCoder+MGLAdditions.mm"; sourceTree = "<group>"; };
 		3598544C1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLDistanceFormatterTests.m; path = ../../darwin/test/MGLDistanceFormatterTests.m; sourceTree = "<group>"; };
 		3599A3E51DF708BC00E77FB2 /* MGLStyleValueTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLStyleValueTests.m; path = ../../darwin/test/MGLStyleValueTests.m; sourceTree = "<group>"; };
-		359F57451D2FDBD5005217F1 /* MGLUserLocationAnnotationView_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationAnnotationView_Private.h; sourceTree = "<group>"; };
+		359F57451D2FDBD5005217F1 /* MGLUserLocationAnnotationView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationAnnotationView_Private.h; sourceTree = "<group>"; };
 		35B82BF61D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPredicate+MGLAdditions.h"; sourceTree = "<group>"; };
 		35B82BF71D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSPredicate+MGLAdditions.mm"; sourceTree = "<group>"; };
 		35B8E08B1D6C8B5100E768D2 /* MGLPredicateTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLPredicateTests.mm; path = ../../darwin/test/MGLPredicateTests.mm; sourceTree = "<group>"; };
@@ -677,13 +718,13 @@
 		4018B1C51CDC277F00F666AF /* MGLAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationView.h; sourceTree = "<group>"; };
 		402E9DE01CD2C76200FD4519 /* Mapbox.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = Mapbox.playground; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		4031ACFE1E9FD29F00A3EA26 /* MGLSDKTestHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLSDKTestHelpers.swift; path = ../../darwin/test/MGLSDKTestHelpers.swift; sourceTree = "<group>"; };
-		404326881D5B9B1A007111BD /* MGLAnnotationContainerView_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView_Private.h; sourceTree = "<group>"; };
+		404326881D5B9B1A007111BD /* MGLAnnotationContainerView_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView_Private.h; sourceTree = "<group>"; };
 		4049C29B1DB6CD6C00B3F799 /* MGLPointCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPointCollection.h; sourceTree = "<group>"; };
 		4049C29C1DB6CD6C00B3F799 /* MGLPointCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLPointCollection.mm; sourceTree = "<group>"; };
 		4049C2AB1DB6E05500B3F799 /* MGLPointCollection_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPointCollection_Private.h; sourceTree = "<group>"; };
 		404C26E01D89B877000AA13D /* MGLTileSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource.h; sourceTree = "<group>"; };
 		404C26E11D89B877000AA13D /* MGLTileSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSource.mm; sourceTree = "<group>"; };
-		404C26E61D89C515000AA13D /* MGLTileSource_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTileSource_Private.h; sourceTree = "<group>"; };
+		404C26E61D89C515000AA13D /* MGLTileSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource_Private.h; sourceTree = "<group>"; };
 		40599F001DEE1B2400182B5D /* api_mapbox_staging.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = api_mapbox_staging.der; sourceTree = "<group>"; };
 		40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-digicert_2016.der"; sourceTree = "<group>"; };
 		40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-geotrust_2016.der"; sourceTree = "<group>"; };
@@ -692,13 +733,13 @@
 		408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDictionary+MGLAdditions.mm"; sourceTree = "<group>"; };
 		409D0A0C1ED614CE00C95D0C /* MGLAnnotationViewIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLAnnotationViewIntegrationTests.swift; sourceTree = "<group>"; };
 		409F43FC1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLMapViewDelegateIntegrationTests.swift; sourceTree = "<group>"; };
-		40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLShape_Private.h; sourceTree = "<group>"; };
+		40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShape_Private.h; sourceTree = "<group>"; };
 		40CFA6501D787579008103BD /* MGLShapeSourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLShapeSourceTests.mm; path = ../../darwin/test/MGLShapeSourceTests.mm; sourceTree = "<group>"; };
 		40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-digicert_2017.der"; sourceTree = "<group>"; };
 		40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-geotrust_2017.der"; sourceTree = "<group>"; };
 		40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView.h; sourceTree = "<group>"; };
 		40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationContainerView.m; sourceTree = "<group>"; };
-		40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource_Private.h; sourceTree = "<group>"; };
+		40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource_Private.h; sourceTree = "<group>"; };
 		40FDA7691CCAAA6800442548 /* MBXAnnotationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXAnnotationView.h; sourceTree = "<group>"; };
 		40FDA76A1CCAAA6800442548 /* MBXAnnotationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXAnnotationView.m; sourceTree = "<group>"; };
 		554180411D2E97DE00012372 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -726,8 +767,8 @@
 		960D0C351ECF5AAF008E151F /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSDKUpdateChecker.h; sourceTree = "<group>"; };
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
-		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
-		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
+		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
+		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
 		9660916B1E5BBFD700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916C1E5BBFD900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916D1E5BBFDB00A9A03B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -1868,25 +1909,34 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				96E516FE20005A4C00A02306 /* MGLLocationManager.h in Headers */,
 				556660CA1E1BF3A900E2C41B /* MGLFoundation.h in Headers */,
+				96E516ED200058A200A02306 /* MGLComputedShapeSource.h in Headers */,
 				35B82BF91D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h in Headers */,
+				96E5170020005A6100A02306 /* Fabric.h in Headers */,
 				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */,
 				FA68F14B1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
+				96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				3566C76D1D4A8DFA008152BC /* MGLRasterSource.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
+				96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */,
+				96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */,
 				DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
 				3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */,
 				DA35A29F1CC9E94C00E826B2 /* MGLCoordinateFormatter.h in Headers */,
 				404C26E31D89B877000AA13D /* MGLTileSource.h in Headers */,
+				96E516F6200059EC00A02306 /* MGLRendererFrontend.h in Headers */,
 				071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
 				3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
 				35D3A1E71E9BE7EC002B38EE /* MGLScaleBar.h in Headers */,
+				96E516EF2000594F00A02306 /* NSArray+MGLAdditions.h in Headers */,
+				96E516F12000596800A02306 /* NSString+MGLAdditions.h in Headers */,
 				35E0CFE71D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				DABFB86D1CBE9A0F00D62B32 /* MGLAnnotationImage.h in Headers */,
 				DABFB8721CBE9A0F00D62B32 /* MGLUserLocation.h in Headers */,
@@ -1895,20 +1945,37 @@
 				353933FF1D3FB7DD003F57D7 /* MGLSymbolStyleLayer.h in Headers */,
 				DAAF722E1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
 				DABFB8661CBE99E500D62B32 /* MGLPointAnnotation.h in Headers */,
+				96E5170220005A6600A02306 /* FABAttributes.h in Headers */,
+				96E516E42000560B00A02306 /* MGLAbstractShapeSource_Private.h in Headers */,
+				96E516E92000560B00A02306 /* MGLAnnotationImage_Private.h in Headers */,
+				96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */,
 				DD9BE4F91EB263D20079A3AF /* UIViewController+MGLAdditions.h in Headers */,
 				DABFB8621CBE99E500D62B32 /* MGLOfflinePack.h in Headers */,
+				96E516FA20005A3D00A02306 /* MGLUserLocationHeadingArrowLayer.h in Headers */,
+				96E516E62000560B00A02306 /* MGLOfflineRegion_Private.h in Headers */,
 				DAD1656D1CF41981001FF4B9 /* MGLFeature.h in Headers */,
+				96E516E72000560B00A02306 /* MGLOfflineStorage_Private.h in Headers */,
 				DA17BE311CC4BDAA00402C41 /* MGLMapView_Private.h in Headers */,
 				DABFB86C1CBE99E500D62B32 /* MGLTypes.h in Headers */,
+				96E516F720005A2700A02306 /* MGLAnnotationContainerView.h in Headers */,
 				DABFB8691CBE99E500D62B32 /* MGLShape.h in Headers */,
 				9620BB391E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */,
 				3510FFEB1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				35E1A4D91D74336F007AA97F /* MGLValueEvaluator.h in Headers */,
 				DABFB8701CBE9A0F00D62B32 /* MGLMapView+IBAdditions.h in Headers */,
+				96E516EA2000560B00A02306 /* MGLAnnotationView_Private.h in Headers */,
+				96E516FB20005A4000A02306 /* MGLUserLocationHeadingBeamLayer.h in Headers */,
+				96E516DC2000547000A02306 /* MGLPolyline_Private.h in Headers */,
 				353AFA151D65AB17005A69F4 /* NSDate+MGLAdditions.h in Headers */,
 				3510FFFA1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
+				96E516EE2000590900A02306 /* MGLAbstractShapeSource.h in Headers */,
+				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
+				96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */,
+				96E516F920005A3500A02306 /* MGLFaux3DUserLocationAnnotationView.h in Headers */,
+				96E516F22000596D00A02306 /* NSException+MGLAdditions.h in Headers */,
+				96E516EC2000560B00A02306 /* MGLUserLocationAnnotationView_Private.h in Headers */,
 				DABFB8671CBE99E500D62B32 /* MGLPolygon.h in Headers */,
 				404C26E81D89C55D000AA13D /* MGLTileSource_Private.h in Headers */,
 				1F7454931ECBB43F00021D39 /* MGLLight.h in Headers */,
@@ -1917,10 +1984,13 @@
 				35E79F211D41266300957B9E /* MGLStyleLayer_Private.h in Headers */,
 				350098DD1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				DABFB8681CBE99E500D62B32 /* MGLPolyline.h in Headers */,
+				96E516DF200054FB00A02306 /* MGLShape_Private.h in Headers */,
 				DABFB86F1CBE9A0F00D62B32 /* MGLMapView.h in Headers */,
 				DA6408DC1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
 				353933F31D3FB753003F57D7 /* MGLCircleStyleLayer.h in Headers */,
 				558DE7A11E5615E400C7916D /* MGLFoundation_Private.h in Headers */,
+				96E516F820005A3000A02306 /* MGLCompactCalloutView.h in Headers */,
+				96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */,
 				3538AA1E1D542239008EC33D /* MGLForegroundStyleLayer.h in Headers */,
 				30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */,
 				DA704CC31F65A475004B3F28 /* MGLMapAccessibilityElement.h in Headers */,
@@ -1933,24 +2003,36 @@
 				1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */,
 				354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
 				DAF0D8111DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */,
+				96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */,
 				DABFB86B1CBE99E500D62B32 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */,
 				4018B1CB1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
 				DABFB85F1CBE99E500D62B32 /* MGLGeometry.h in Headers */,
+				96E516E02000550C00A02306 /* MGLFeature_Private.h in Headers */,
 				353933F61D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */,
 				DABFB85D1CBE99E500D62B32 /* MGLAccountManager.h in Headers */,
+				96E516F5200059B100A02306 /* MGLNetworkConfiguration.h in Headers */,
+				96E516F42000597D00A02306 /* NSData+MGLAdditions.h in Headers */,
+				96E516DD200054F200A02306 /* MGLPolygon_Private.h in Headers */,
 				353933F91D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
+				96E516EB2000560B00A02306 /* MGLUserLocation_Private.h in Headers */,
 				35D13AB81D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
 				35136D4D1D4277FC00C20EFD /* MGLSource.h in Headers */,
 				DA35A2BC1CCA9A6900E826B2 /* MGLClockDirectionFormatter.h in Headers */,
+				96E516E82000560B00A02306 /* MGLAnnotationContainerView_Private.h in Headers */,
 				35D13AC41D3D19DD00AFB4E0 /* MGLFillStyleLayer.h in Headers */,
+				96E5170120005A6400A02306 /* Fabric+FABKits.h in Headers */,
 				DABFB86E1CBE9A0F00D62B32 /* MGLCalloutView.h in Headers */,
+				96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */,
 				1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */,
 				DABFB8601CBE99E500D62B32 /* MGLMapCamera.h in Headers */,
 				DA737EE21D056A4E005BDA16 /* MGLMapViewDelegate.h in Headers */,
 				DAF0D8191DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */,
 				DABFB86A1CBE99E500D62B32 /* MGLStyle.h in Headers */,
 				DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */,
+				96E516FD20005A4700A02306 /* MGLAPIClient.h in Headers */,
+				96E5170320005A6800A02306 /* FABKitProtocol.h in Headers */,
+				96E516E12000551100A02306 /* MGLMultiPoint_Private.h in Headers */,
 				3EA934623AD0000B7D99C3FB /* MGLRendererConfiguration.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
