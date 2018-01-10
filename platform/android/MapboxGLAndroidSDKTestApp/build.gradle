@@ -80,9 +80,9 @@ dependencies {
     androidTestImplementation rootProject.ext.dep.testEspressoIntents
 }
 
-apply from: 'gradle-make.gradle'
-apply from: 'gradle-config.gradle'
-apply from: 'gradle-checkstyle.gradle'
-apply from: '../gradle-lint.gradle'
+apply from: "${rootDir}/gradle/gradle-make.gradle"
+apply from: "${rootDir}/gradle/gradle-config.gradle"
+apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
+apply from: "${rootDir}/gradle/gradle-lint.gradle"
 
 

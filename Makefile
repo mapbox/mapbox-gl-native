@@ -490,7 +490,7 @@ android-style-code:
 style-code: android-style-code
 
 # Configuration file for running CMake from Gradle within Android Studio.
-platform/android/configuration.gradle:
+platform/android/gradle/configuration.gradle:
 	@echo "ext {\n    node = '`command -v node || command -v nodejs`'\n    npm = '`command -v npm`'\n    ccache = '`command -v ccache`'\n}" > $@
 
 define ANDROID_RULES
@@ -498,17 +498,17 @@ define ANDROID_RULES
 # $2 = armeabi-v7a (internal arch)
 
 .PHONY: android-test-lib-$1
-android-test-lib-$1: platform/android/configuration.gradle
+android-test-lib-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 -Pmapbox.with_test=true :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
 # Build SDK for for specified abi
 .PHONY: android-lib-$1
-android-lib-$1: platform/android/configuration.gradle
+android-lib-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDK:assemble$(BUILDTYPE)
 
 # Build test app and SDK for for specified abi
 .PHONY: android-$1
-android-$1: platform/android/configuration.gradle
+android-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assemble$(BUILDTYPE)
 
 # Build the core test for specified abi
@@ -550,29 +550,29 @@ run-android-core-test-$1: run-android-core-test-$1-*
 
 # Run the test app on connected android device with specified abi
 .PHONY: run-android-$1
-run-android-$1: platform/android/configuration.gradle
+run-android-$1: platform/android/gradle/configuration.gradle
 	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:install$(BUILDTYPE) && adb shell am start -n com.mapbox.mapboxsdk.testapp/.activity.FeatureOverviewActivity
 
 # Build test app instrumentation tests apk and test app apk for specified abi
 .PHONY: android-ui-test-$1
-android-ui-test-$1: platform/android/configuration.gradle
+android-ui-test-$1: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
 # Run test app instrumentation tests on a connected android device or emulator with specified abi
 .PHONY: run-android-ui-test-$1
-run-android-ui-test-$1: platform/android/configuration.gradle
+run-android-ui-test-$1: platform/android/gradle/configuration.gradle
 	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest
 
 # Run Java Instrumentation tests on a connected android device or emulator with specified abi and test filter
-run-android-ui-test-$1-%: platform/android/configuration.gradle
+run-android-ui-test-$1-%: platform/android/gradle/configuration.gradle
 	-adb uninstall com.mapbox.mapboxsdk.testapp 2> /dev/null
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=$2 :MapboxGLAndroidSDKTestApp:connectedAndroidTest -Pandroid.testInstrumentationRunnerArguments.class="$$*"
 
 # Symbolicate native stack trace with the specified abi
 .PHONY: android-ndk-stack-$1
-android-ndk-stack-$1: platform/android/configuration.gradle
+android-ndk-stack-$1: platform/android/gradle/configuration.gradle
 	adb logcat | ndk-stack -sym platform/android/MapboxGLAndroidSDK/build/intermediates/cmake/debug/obj/$2/
 
 endef
@@ -603,30 +603,30 @@ run-android-ui-test-%: run-android-ui-test-arm-v7-%
 
 # Run Java Unit tests on the JVM of the development machine executing this
 .PHONY: run-android-unit-test
-run-android-unit-test: platform/android/configuration.gradle
+run-android-unit-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest
-run-android-unit-test-%: platform/android/configuration.gradle
+run-android-unit-test-%: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:testDebugUnitTest --tests "$*"
 
 # Builds a release package of the Android SDK
 .PHONY: apackage
-apackage: platform/android/configuration.gradle
+apackage: platform/android/gradle/configuration.gradle
 	make android-lib-arm-v5 && make android-lib-arm-v7 && make android-lib-arm-v8 && make android-lib-x86 && make android-lib-x86-64 && make android-lib-mips
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all assemble$(BUILDTYPE)
 
 # Build test app instrumentation tests apk and test app apk for all abi's
 .PHONY: android-ui-test
-android-ui-test: platform/android/configuration.gradle
+android-ui-test: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDKTestApp:assembleDebug :MapboxGLAndroidSDKTestApp:assembleAndroidTest
 
 # Uploads the compiled Android SDK to Maven
 .PHONY: run-android-upload-archives
-run-android-upload-archives: platform/android/configuration.gradle
+run-android-upload-archives: platform/android/gradle/configuration.gradle
 	cd platform/android && export IS_LOCAL_DEVELOPMENT=false && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
 
 # Uploads the compiled Android SDK to ~/.m2/repository/com/mapbox/mapboxsdk
 .PHONY: run-android-upload-archives-local
-run-android-upload-archives-local: platform/android/configuration.gradle
+run-android-upload-archives-local: platform/android/gradle/configuration.gradle
 	cd platform/android && export IS_LOCAL_DEVELOPMENT=true && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=all :MapboxGLAndroidSDK:uploadArchives
 
 # Dump system graphics information for the test app
@@ -645,22 +645,22 @@ android-check : android-checkstyle android-lint-sdk android-lint-test-app
 
 # Runs checkstyle on the Android code
 .PHONY: android-checkstyle
-android-checkstyle: platform/android/configuration.gradle
+android-checkstyle: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none checkstyle
 
 # Runs lint on the Android SDK code
 .PHONY: android-lint-sdk
-android-lint-sdk: platform/android/configuration.gradle
+android-lint-sdk: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:lint
 
 # Runs lint on the Android test app code
 .PHONY: android-lint-test-app
-android-lint-test-app: platform/android/configuration.gradle
+android-lint-test-app: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDKTestApp:lint
 
 # Generates javadoc from the Android SDK
 .PHONY: android-javadoc
-android-javadoc: platform/android/configuration.gradle
+android-javadoc: platform/android/gradle/configuration.gradle
 	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:javadocrelease
 
 # Symbolicate ndk stack traces for the arm-v7 abi
@@ -670,14 +670,14 @@ android-ndk-stack: android-ndk-stack-arm-v7
 # Open Android Studio if machine is macos
 ifeq ($(HOST_PLATFORM), macos)
 .PHONY: aproj
-aproj: platform/android/configuration.gradle
+aproj: platform/android/gradle/configuration.gradle
 	open -b com.google.android.studio platform/android
 endif
 
 # Creates the configuration needed to build with Android Studio
 .PHONY: android-configuration
-android-configuration: platform/android/configuration.gradle
-	cat platform/android/configuration.gradle
+android-configuration: platform/android/gradle/configuration.gradle
+	cat platform/android/gradle/configuration.gradle
 
 #### Miscellaneous targets #####################################################
 
@@ -693,7 +693,7 @@ codestyle:
 .PHONY: clean
 clean:
 	-rm -rf ./build \
-	        ./platform/android/configuration.gradle \
+	        ./platform/android/gradle/configuration.gradle \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
 	        ./platform/android/MapboxGLAndroidSDKTestApp/build \
