@@ -149,8 +149,8 @@ configurations {
     all*.exclude group: 'commons-collections', module: 'commons-collections'
 }
 
-apply from: 'gradle-javadoc.gradle'
-apply from: 'gradle-publish.gradle'
-apply from: 'gradle-checkstyle.gradle'
-apply from: 'gradle-tests-staticblockremover.gradle'
-apply from: '../gradle-lint.gradle'
+apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
+apply from: "${rootDir}/gradle/gradle-publish.gradle"
+apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
+apply from: "${rootDir}/gradle/gradle-tests-staticblockremover.gradle"
+apply from: "${rootDir}/gradle/gradle-lint.gradle"

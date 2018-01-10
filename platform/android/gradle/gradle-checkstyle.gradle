@@ -12,6 +12,8 @@ task checkstyle(type: Checkstyle) {
     source 'src'
     include '**/*.java'
     exclude '**/gen/**'
+    exclude '**/style/*LayerTest.java'
+    exclude '**/style/LightTest.java'
     exclude '**/style/layers/Property.java'
     exclude '**/style/layers/PropertyFactory.java'
     exclude '**/style/layers/*Layer.java'

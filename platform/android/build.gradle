@@ -20,8 +20,8 @@ task wrapper(type: Wrapper) {
     gradleVersion = '3.2.1'
 }
 
-apply from: rootProject.file('dependencies.gradle')
+apply from: "${rootDir}/gradle/dependencies.gradle"
 
 // Load build system information. If this file does not exist, run
-// `make platform/android/configuration.gradle`
-apply from: rootProject.file('configuration.gradle')
+// `make platform/android/gradle/configuration.gradle`
+apply from: "${rootDir}/gradle/configuration.gradle"

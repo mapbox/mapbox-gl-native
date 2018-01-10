@@ -66,10 +66,10 @@ step-library:
   - &restore-gradle-cache
       restore_cache:
         keys:
-          - 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+          - 'v3/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
   - &save-gradle-cache
       save_cache:
-        key: 'v3/{{ checksum "platform/android/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
+        key: 'v3/{{ checksum "platform/android/gradle/dependencies.gradle" }}/{{ checksum "platform/android/build.gradle" }}/{{ checksum "platform/android/gradle/wrapper/gradle-wrapper.properties" }}'
         paths: [ "/root/.gradle" ]
 
   - &reset-ccache-stats
