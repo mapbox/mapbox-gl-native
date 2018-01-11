@@ -206,6 +206,8 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	-destination 'platform=iOS Simulator,name=iPhone 7 Plus,OS=10.3.1' \
 	-destination 'platform=iOS Simulator,name=iPhone 7,OS=10.3.1' \
 	-destination 'platform=iOS Simulator,name=iPad Air 2,OS=10.3.1' \
+	-parallelizeTargets \
+	-jobs $(JOBS) \
 	-workspace $(IOS_WORK_PATH)
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
