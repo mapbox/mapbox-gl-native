@@ -23,25 +23,25 @@ void DEMPyramid::loadFromImage(PremultipliedImage& image){
     // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
     // DEMPyramid#backfillBorder
     
-    for (int32_t x = 0; x < first.dim; x++) {
-        // left vertical border
-        first.set(-1, x, first.get(0, x));
-        
-        // right vertical border
-        first.set(first.dim, x, first.get(first.dim - 1, x));
-        
-        //left horizontal border
-        first.set(x, -1, first.get(x, 0));
-        
-        // right horizontal border
-        first.set(x, first.dim, first.get(x, first.dim - 1));
-    }
-    
-    // corners
-    first.set(-1, -1, first.get(0, 0));
-    first.set(first.dim, -1, first.get(first.dim - 1, 0));
-    first.set( -1, first.dim, first.get(0, first.dim - 1));
-    first.set(first.dim, first.dim, first.get(first.dim - 1, first.dim - 1));
+//    for (int32_t x = 0; x < first.dim; x++) {
+//        // left vertical border
+//        first.set(-1, x, first.get(0, x));
+//
+//        // right vertical border
+//        first.set(first.dim, x, first.get(first.dim - 1, x));
+//
+//        //left horizontal border
+//        first.set(x, -1, first.get(x, 0));
+//
+//        // right horizontal border
+//        first.set(x, first.dim, first.get(x, first.dim - 1));
+//    }
+//
+//    // corners
+//    first.set(-1, -1, first.get(0, 0));
+//    first.set(first.dim, -1, first.get(first.dim - 1, 0));
+//    first.set( -1, first.dim, first.get(0, first.dim - 1));
+//    first.set(first.dim, first.dim, first.get(first.dim - 1, first.dim - 1));
     
     levels.emplace_back(std::move(first));
     loaded = true;

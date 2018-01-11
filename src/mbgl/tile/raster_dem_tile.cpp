@@ -20,6 +20,16 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
       mailbox(std::make_shared<Mailbox>(*Scheduler::GetCurrent())),
       worker(parameters.workerScheduler,
              ActorRef<RasterDEMTile>(*this, mailbox)) {
+
+    if ( id.canonical.y == 0 ){
+        // this tile doesn't have upper neighboring tiles so marked those as backfilled
+        neighboringTiles = neighboringTiles | 0b00011100;
+    }
+
+    if (id.canonical.y + 1 == std::pow(2, id.canonical.z)){
+        // this tile doesn't have lower neighboring tiles so marked those as backfilled
+        neighboringTiles = neighboringTiles | 0b11100000;
+    }
 }
 
 RasterDEMTile::~RasterDEMTile() = default;
