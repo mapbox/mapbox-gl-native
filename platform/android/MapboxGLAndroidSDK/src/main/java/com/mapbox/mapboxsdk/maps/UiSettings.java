@@ -91,6 +91,8 @@ public final class UiSettings {
     saveLogo(outState);
     saveAttribution(outState);
     saveZoomControl(outState);
+    saveDeselectMarkersOnTap(outState);
+    saveFocalPoint(outState);
   }
 
   void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
@@ -99,6 +101,8 @@ public final class UiSettings {
     restoreLogo(savedInstanceState);
     restoreAttribution(savedInstanceState);
     restoreZoomControl(savedInstanceState);
+    restoreDeselectMarkersOnTap(savedInstanceState);
+    restoreFocalPoint(savedInstanceState);
   }
 
   private void initialiseGestures(MapboxMapOptions options) {
@@ -783,6 +787,14 @@ public final class UiSettings {
     return doubleTapGestureChangeAllowed;
   }
 
+  private void restoreDeselectMarkersOnTap(Bundle savedInstanceState) {
+    setDeselectMarkersOnTap(savedInstanceState.getBoolean(MapboxConstants.STATE_DESELECT_MARKER_ON_TAP));
+  }
+
+  private void saveDeselectMarkersOnTap(Bundle outState) {
+    outState.putBoolean(MapboxConstants.STATE_DESELECT_MARKER_ON_TAP, isDeselectMarkersOnTap());
+  }
+
   /**
    * Gets whether the markers are automatically deselected (and therefore, their infowindows
    * closed) when a map tap is detected.
@@ -860,6 +872,17 @@ public final class UiSettings {
     setTiltGesturesEnabled(enabled);
     setZoomGesturesEnabled(enabled);
     setDoubleTapGesturesEnabled(enabled);
+  }
+
+  private void saveFocalPoint(Bundle outState) {
+    outState.putParcelable(MapboxConstants.STATE_USER_FOCAL_POINT, getFocalPoint());
+  }
+
+  private void restoreFocalPoint(Bundle savedInstanceState) {
+    PointF pointF = savedInstanceState.getParcelable(MapboxConstants.STATE_USER_FOCAL_POINT);
+    if (pointF != null) {
+      setFocalPoint(pointF);
+    }
   }
 
   /**
