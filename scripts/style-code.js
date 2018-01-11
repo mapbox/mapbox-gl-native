@@ -30,11 +30,13 @@ global.writeIfModified = function(filename, newContent) {
   try {
     const oldContent = fs.readFileSync(filename, 'utf8');
     if (oldContent == newContent) {
-      console.warn(`* Skipping current file '${filename}'`);
+      console.warn(`* Skipping file '${filename}' because it is up-to-date`);
       return;
     }
   } catch(err) {
   }
-  fs.writeFileSync(filename, newContent);
+  if (['0', 'false'].indexOf(process.env.DRY_RUN || '0') !== -1) {
+    fs.writeFileSync(filename, newContent);
+  }
   console.warn(`* Updating outdated file '${filename}'`);
 };
