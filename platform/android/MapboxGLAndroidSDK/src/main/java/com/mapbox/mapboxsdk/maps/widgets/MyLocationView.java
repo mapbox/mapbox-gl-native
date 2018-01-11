@@ -372,9 +372,6 @@ public class MyLocationView extends View {
    */
   public void setTilt(@FloatRange(from = 0, to = 60.0f) double tilt) {
     this.tilt = tilt;
-    if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
-      mapboxMap.getUiSettings().setFocalPoint(getCenter());
-    }
     invalidate();
   }
 
