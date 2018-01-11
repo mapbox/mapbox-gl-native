@@ -72,6 +72,7 @@ public class MapView extends FrameLayout {
   private NativeMapView nativeMapView;
   private MapboxMapOptions mapboxMapOptions;
   private boolean destroyed;
+  private boolean hasSurface;
 
   private MyLocationView myLocationView;
   private CompassView compassView;
@@ -318,6 +319,7 @@ public class MapView extends FrameLayout {
   }
 
   private void initRenderSurface() {
+    hasSurface = true;
     post(new Runnable() {
       @Override
       public void run() {
@@ -406,7 +408,7 @@ public class MapView extends FrameLayout {
     destroyed = true;
     mapCallback.clearOnMapReadyCallbacks();
 
-    if (nativeMapView != null) {
+    if (nativeMapView != null && hasSurface) {
       // null when destroying an activity programmatically mapbox-navigation-android/issues/503
       nativeMapView.destroy();
       nativeMapView = null;
