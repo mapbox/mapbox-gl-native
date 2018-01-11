@@ -1,12 +1,12 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
+import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
@@ -51,7 +51,7 @@ public class OfflineRegion {
   private byte[] metadata;
 
   // Makes sure callbacks come back to the main thread
-  private Handler handler;
+  private final Handler handler = new Handler();
 
   /**
    * A region can have a single observer, which gets notified whenever a change
@@ -239,14 +239,6 @@ public class OfflineRegion {
     return metadata;
   }
 
-  private Handler getHandler() {
-    if (handler == null) {
-      handler = new Handler(Looper.getMainLooper());
-    }
-
-    return handler;
-  }
-
   /**
    * Register an observer to be notified when the state of the region changes.
    *
@@ -257,7 +249,7 @@ public class OfflineRegion {
       @Override
       public void onStatusChanged(final OfflineRegionStatus status) {
         if (deliverMessages()) {
-          getHandler().post(new Runnable() {
+          handler.post(new Runnable() {
             @Override
             public void run() {
               if (observer != null) {
@@ -271,7 +263,7 @@ public class OfflineRegion {
       @Override
       public void onError(final OfflineRegionError error) {
         if (deliverMessages()) {
-          getHandler().post(new Runnable() {
+          handler.post(new Runnable() {
             @Override
             public void run() {
               if (observer != null) {
@@ -285,7 +277,7 @@ public class OfflineRegion {
       @Override
       public void mapboxTileCountLimitExceeded(final long limit) {
         if (deliverMessages()) {
-          getHandler().post(new Runnable() {
+          handler.post(new Runnable() {
             @Override
             public void run() {
               if (observer != null) {
@@ -325,23 +317,26 @@ public class OfflineRegion {
    * @param callback the callback to invoked.
    */
   public void getStatus(@NonNull final OfflineRegionStatusCallback callback) {
+    FileSource.getInstance(Mapbox.getApplicationContext()).activate();
     getOfflineRegionStatus(new OfflineRegionStatusCallback() {
       @Override
       public void onStatus(final OfflineRegionStatus status) {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
           @Override
           public void run() {
             callback.onStatus(status);
+            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
           }
         });
       }
 
       @Override
       public void onError(final String error) {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
           @Override
           public void run() {
             callback.onError(error);
+            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
           }
         });
       }
@@ -368,13 +363,15 @@ public class OfflineRegion {
   public void delete(@NonNull final OfflineRegionDeleteCallback callback) {
     if (!isDeleted) {
       isDeleted = true;
+      FileSource.getInstance(Mapbox.getApplicationContext()).activate();
       deleteOfflineRegion(new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
-          getHandler().post(new Runnable() {
+          handler.post(new Runnable() {
             @Override
             public void run() {
               callback.onDelete();
+              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
               OfflineRegion.this.finalize();
             }
           });
@@ -382,10 +379,11 @@ public class OfflineRegion {
 
         @Override
         public void onError(final String error) {
-          getHandler().post(new Runnable() {
+          handler.post(new Runnable() {
             @Override
             public void run() {
               isDeleted = false;
+              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
               callback.onError(error);
             }
           });
@@ -408,7 +406,7 @@ public class OfflineRegion {
     updateOfflineRegionMetadata(bytes, new OfflineRegionUpdateMetadataCallback() {
       @Override
       public void onUpdate(final byte[] metadata) {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
           @Override
           public void run() {
             OfflineRegion.this.metadata = metadata;
@@ -419,7 +417,7 @@ public class OfflineRegion {
 
       @Override
       public void onError(final String error) {
-        getHandler().post(new Runnable() {
+        handler.post(new Runnable() {
           @Override
           public void run() {
             callback.onError(error);
