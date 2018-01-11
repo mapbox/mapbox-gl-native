@@ -28,8 +28,6 @@ public:
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
     void setData(std::shared_ptr<const std::string> data);
 
-    void cancel() override;
-
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
     HillshadeBucket* getBucket() const;

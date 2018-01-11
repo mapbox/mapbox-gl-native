@@ -83,8 +83,8 @@ DEMPyramid::Level::Level(int32_t dim_, int32_t border_)
     : dim(dim_),
       border(border_),
       stride(dim + 2 * border),
-      image({ static_cast<uint32_t>(dim + 2 * border),
-              static_cast<uint32_t>(dim + 2 * border) }) {
+      image({ static_cast<uint32_t>(stride),
+              static_cast<uint32_t>(stride) }) {
     assert(dim > 0);
     std::memset(image.data.get(), 0, image.bytes());
 }
