@@ -11,7 +11,7 @@ const cocoaConventions = require('./style-spec-cocoa-conventions-v8.json');
 const prefix = 'MGL';
 const suffix = 'StyleLayer';
 
-let spec = _.merge(require('../../../mapbox-gl-js/src/style-spec/reference/v8'), require('./style-spec-overrides-v8.json'));
+let spec = _.merge(require('../../../scripts/style-spec'), require('./style-spec-overrides-v8.json'));
 
 // Temporarily ignore layer types defined in the style specification but not yet supported in mbgl.
 delete spec.layer.type.values.heatmap;
