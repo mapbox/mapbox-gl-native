@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
@@ -619,9 +620,9 @@ const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Til
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
 const lightM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.mm.ejs', 'utf8'), {strict: true});
 const testLight = ejs.compile(fs.readFileSync('platform/darwin/test/MGLLightTest.mm.ejs', 'utf8'), { strict: true});
-fs.writeFileSync(`platform/darwin/src/MGLLight.h`, duplicatePlatformDecls(lightH({ properties: lightProperties, doc: lightDoc, type: lightType })));
-fs.writeFileSync(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, doc: lightDoc, type: lightType }));
-fs.writeFileSync(`platform/darwin/test/MGLLightTest.mm`, testLight({ properties: lightProperties, doc: lightDoc, type: lightType }));
+writeIfModified(`platform/darwin/src/MGLLight.h`, duplicatePlatformDecls(lightH({ properties: lightProperties, doc: lightDoc, type: lightType })));
+writeIfModified(`platform/darwin/src/MGLLight.mm`, lightM({ properties: lightProperties, doc: lightDoc, type: lightType }));
+writeIfModified(`platform/darwin/test/MGLLightTest.mm`, testLight({ properties: lightProperties, doc: lightDoc, type: lightType }));
 
 
 const layers = _(spec.layer.type.values).map((value, layerType) => {
@@ -694,9 +695,9 @@ for (var layer of layers) {
         renamedPropertiesByLayerType[layer.type] = renamedProperties;
     }
 
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
-    fs.writeFileSync(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
-    fs.writeFileSync(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.h`, duplicatePlatformDecls(layerH(layer)));
+    writeIfModified(`platform/darwin/src/${prefix}${camelize(layer.type)}${suffix}.mm`, layerM(layer));
+    writeIfModified(`platform/darwin/test/${prefix}${camelize(layer.type)}${suffix}Tests.mm`, testLayers(layer));
 }
 
 // Extract examples for guides from unit tests.
@@ -734,25 +735,25 @@ global.guideExample = function (guide, exampleId, os) {
     return '```swift\n' + example + '\n```';
 };
 
-fs.writeFileSync(`platform/ios/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
+writeIfModified(`platform/ios/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'iOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-fs.writeFileSync(`platform/macos/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
+writeIfModified(`platform/macos/docs/guides/For Style Authors.md`, forStyleAuthorsMD({
     os: 'macOS',
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-fs.writeFileSync(`platform/ios/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/ios/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
     os: 'iOS',
 }));
-fs.writeFileSync(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
     os: 'macOS',
 }));
-fs.writeFileSync(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({
+writeIfModified(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({
     os: 'iOS',
 }));
-fs.writeFileSync(`platform/macos/docs/guides/Tile URL Templates.md`, templatesMD({
+writeIfModified(`platform/macos/docs/guides/Tile URL Templates.md`, templatesMD({
     os: 'macOS',
 }));

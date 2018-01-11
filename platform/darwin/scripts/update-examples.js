@@ -1,8 +1,11 @@
+#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
 const execFileSync = require('child_process').execFileSync;
 const _ = require('lodash');
+
+require('../../../scripts/style-code');
 
 const examplesSrc = fs.readFileSync('platform/darwin/test/MGLDocumentationExampleTests.swift', 'utf8');
 
@@ -124,14 +127,7 @@ function completeExamples(os) {
       }
 
       // Write out the modified file contents.
-      if (src === newSrc) {
-        console.log('Skipping', path);
-      } else {
-        console.log('Updating', path);
-        if (['0', 'false'].indexOf(process.env.DRY_RUN || '0') !== -1) {
-          fs.writeFileSync(path, newSrc);
-        }
-      }
+      writeIfModified(path, newSrc)
     });
   });
 }
