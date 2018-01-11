@@ -1,0 +1,13 @@
+<%
+  const name = locals.name;
+  const groups = locals.groups;
+-%>
+# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
+
+set(MBGL_<%- snakeCaseUpper(name) %>_FILES
+<% for (const key of Object.keys(groups).sort()) { -%>
+    # <%- key %>
+    <%- groups[key].sort().join('\n    ') %>
+
+<% } -%>
+)
