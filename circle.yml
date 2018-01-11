@@ -296,7 +296,7 @@ jobs:
             (gcloud firebase test android run --type instrumentation \
               --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
               --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-              --device-ids shamu --os-version-ids 22 --locales en --orientations portrait --timeout 20m \
+              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m \
               2>&1 | tee firebase.log) || EXIT_CODE=$?
 
             FIREBASE_TEST_BUCKET=$(sed -n 's|^.*\[https://console.developers.google.com/storage/browser/\([^]]*\).*|gs://\1|p' firebase.log)
