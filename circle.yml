@@ -241,6 +241,22 @@ jobs:
           name: Verify submodule pin
           command: scripts/nitpick/submodule-pin.js
           when: always
+      - run:
+          name: CMake file list generation
+          command: scripts/nitpick/generated-code.js cmake
+          when: always
+      - run:
+          name: Shader code generation
+          command: scripts/nitpick/generated-code.js shader
+          when: always
+      - run:
+          name: Style code generation
+          command: scripts/nitpick/generated-code.js style
+          when: always
+      - run:
+          name: Android code generation
+          command: scripts/nitpick/generated-code.js android
+          when: always
 
 
 # ------------------------------------------------------------------------------
@@ -711,6 +727,9 @@ jobs:
       - run:
           name: Lint plist files
           command: make ios-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
 
@@ -770,6 +789,9 @@ jobs:
       - run:
           name: Lint plist files
           command: make macos-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
       - store_artifacts:
