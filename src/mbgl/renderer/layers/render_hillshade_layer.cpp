@@ -94,7 +94,6 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(dynamic_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl)));
         HillshadeBucket& bucket = *reinterpret_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl));
 
-
         if (!bucket.hasData())
             continue;
         if (!bucket.prepared && parameters.pass == RenderPass::Pass3D) {

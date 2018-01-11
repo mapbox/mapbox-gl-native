@@ -24,9 +24,6 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
 
 RasterDEMTile::~RasterDEMTile() = default;
 
-void RasterDEMTile::cancel() {
-}
-
 void RasterDEMTile::setError(std::exception_ptr err) {
     loaded = true;
     observer->onTileError(*this, err);
