@@ -4,6 +4,7 @@ workflows:
   version: 2
   default:
     jobs:
+      - nitpick
       - clang-tidy:
           filters:
             branches:
@@ -217,6 +218,31 @@ step-library:
         destination: render-tests
 
 jobs:
+  nitpick:
+    docker:
+      - image: mbgl/7d2403f42e:base
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Debug
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - run:
+          name: Initialize submodule
+          command: git submodule update --init mapbox-gl-js
+      - run:
+          name: npm install
+          command: npm install --ignore-scripts
+      - *save-cache
+      - run:
+          name: Verify submodule pin
+          command: scripts/nitpick/submodule-pin.js
+          when: always
+
+
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
