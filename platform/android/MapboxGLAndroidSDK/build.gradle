@@ -7,6 +7,8 @@ dependencies {
     implementation rootProject.ext.dep.supportFragmentV4
     implementation rootProject.ext.dep.timber
     implementation rootProject.ext.dep.okhttp3
+    implementation rootProject.ext.dep.lifecycleRuntime
+    annotationProcessor rootProject.ext.dep.lifecycleProcessor
     compileOnly(rootProject.ext.dep.lost) {
         exclude group: 'com.google.guava'
         exclude group: 'com.android.support'
