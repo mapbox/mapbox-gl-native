@@ -146,4 +146,7 @@ public class MapboxConstants {
   public static final String STATE_LOCATION_VIEW_ACCURACY_TINT_COLOR = "mapbox_locViewAccuracyTintColor";
   public static final String STATE_LOCATION_VIEW_ACCURACY_THRESHOLD = "mapbox_locViewAccuracyThreshold";
   public static final String STATE_LOCATION_VIEW_PADDING = "mapbox_locViewPadding";
+  public static final String STATE_DESELECT_MARKER_ON_TAP = "mapbox_deselectMarkerOnTap";
+  public static final String STATE_USER_FOCAL_POINT = "mapbox_userFocalPoint";
+
 }
