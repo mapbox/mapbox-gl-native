@@ -172,7 +172,7 @@ inline auto makePaintPropertySetters() {
     result["heatmap-weight-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapWeightTransition>;
     result["heatmap-intensity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapIntensity>;
     result["heatmap-intensity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapIntensityTransition>;
-    result["heatmap-color"] = &setProperty<HeatmapLayer, PropertyValue<Color>, &HeatmapLayer::setHeatmapColor>;
+    result["heatmap-color"] = &setProperty<HeatmapLayer, HeatmapColorPropertyValue, &HeatmapLayer::setHeatmapColor>;
     result["heatmap-color-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapColorTransition>;
     result["heatmap-opacity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapOpacity>;
     result["heatmap-opacity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapOpacityTransition>;

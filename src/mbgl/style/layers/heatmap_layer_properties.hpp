@@ -24,10 +24,6 @@ struct HeatmapIntensity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
 
-struct HeatmapColor : PaintProperty<Color> {
-    static Color defaultValue() { return Color::red(); }
-};
-
 struct HeatmapOpacity : PaintProperty<float> {
     static float defaultValue() { return 1; }
 };
