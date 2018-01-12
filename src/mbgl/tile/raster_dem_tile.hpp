@@ -15,9 +15,6 @@ enum class DEMTileNeighbors : unsigned char {
   // 0b00000000
   Empty = 0 << 1,
 
-  // the order of the neighbors in this enum (or rather the order of their flipped bits
-  // must stay the same as
-
   // 0b00000001
   Left = 1 << 0,
   // 0b00000010

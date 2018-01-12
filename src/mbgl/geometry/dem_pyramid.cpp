@@ -8,13 +8,13 @@ void DEMPyramid::loadFromImage(PremultipliedImage& image){
     
     const int32_t border = std::max<int32_t>(std::ceil(image.size.height / 2), 1);
     
-    Level first(image.size.height, border);
+    level = std::make_unique<Level>(image.size.height, border);
     
-    for (int32_t y = 0; y < first.dim; y++) {
-        for (int32_t x = 0; x < first.dim; x++) {
-            const int32_t i = y * first.dim + x;
+    for (int32_t y = 0; y < level->dim; y++) {
+        for (int32_t x = 0; x < level->dim; x++) {
+            const int32_t i = y * level->dim + x;
             const int32_t j = i * 4;
-            first.set(x, y, (image.data[j] * 256 * 256 + image.data[j+1] * 256 + image.data[j+2])/10 - 10000);
+            level->set(x, y, (image.data[j] * 256 * 256 + image.data[j+1] * 256 + image.data[j+2])/10 - 10000);
         }
     }
     
@@ -43,19 +43,19 @@ void DEMPyramid::loadFromImage(PremultipliedImage& image){
 //    first.set( -1, first.dim, first.get(0, first.dim - 1));
 //    first.set(first.dim, first.dim, first.get(first.dim - 1, first.dim - 1));
     
-    levels.emplace_back(std::move(first));
+    
     loaded = true;
 }
 
 void DEMPyramid::backfillBorder(mbgl::DEMPyramid &borderTileData, int8_t dx, int8_t dy) {
-    auto& t = levels.front();
-    auto& o = borderTileData.levels.front();
-    assert(t.dim == o.dim);
+    auto& t = level;
+    auto& o = borderTileData.level;
+    assert(t->dim == o->dim);
 
-    int32_t _xMin = dx * t.dim;
-    int32_t _xMax = dx * t.dim + t.dim;
-    int32_t _yMin = dy * t.dim;
-    int32_t _yMax = dy * t.dim + t.dim;
+    int32_t _xMin = dx * t->dim;
+    int32_t _xMax = dx * t->dim + t->dim;
+    int32_t _yMin = dy * t->dim;
+    int32_t _yMax = dy * t->dim + t->dim;
     
     if (dx == -1) _xMin = _xMax - 1;
     else if (dx == 1) _xMax = _xMin + 1;
@@ -63,18 +63,18 @@ void DEMPyramid::backfillBorder(mbgl::DEMPyramid &borderTileData, int8_t dx, int
     if (dy == -1) _yMin = _yMax - 1;
     else if (dy == 1) _yMax = _yMin + 1;
     
-    int32_t xMin = util::clamp(_xMin, -t.border, t.dim + t.border);
-    int32_t xMax = util::clamp(_xMax, -t.border, t.dim + t.border);
+    int32_t xMin = util::clamp(_xMin, -t->border, t->dim + t->border);
+    int32_t xMax = util::clamp(_xMax, -t->border, t->dim + t->border);
     
-    int32_t yMin = util::clamp(_yMin, -t.border, t.dim + t.border);
-    int32_t yMax = util::clamp(_yMax, -t.border, t.dim + t.border);
+    int32_t yMin = util::clamp(_yMin, -t->border, t->dim + t->border);
+    int32_t yMax = util::clamp(_yMax, -t->border, t->dim + t->border);
     
-    int32_t ox = -dx * t.dim;
-    int32_t oy = -dy * t.dim;
+    int32_t ox = -dx * t->dim;
+    int32_t oy = -dy * t->dim;
     
     for (int32_t y = yMin; y < yMax; y++) {
         for (int32_t x = xMin; x < xMax; x++) {
-            t.set(x, y, o.get(x + ox, y + oy));
+            t->set(x, y, o->get(x + ox, y + oy));
         }
     }
 }
@@ -88,8 +88,5 @@ DEMPyramid::Level::Level(int32_t dim_, int32_t border_)
     assert(dim > 0);
     std::memset(image.data.get(), 0, image.bytes());
 }
-
-
-
 
 } // namespace mbgl
