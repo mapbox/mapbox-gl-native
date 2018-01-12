@@ -24,13 +24,9 @@ void HillshadeBucket::upload(gl::Context& context) {
         return;
     }
 
-    if (!pyramid.levels.empty()) {
-        dem = context.createTexture(pyramid.levels.front().image);
-        for (size_t l = 1; l < pyramid.levels.size(); l++) {
-            auto& image = pyramid.levels[l].image;
-            context.updateTexture(*dem, image);
-        }
-    }
+    dem = context.createTexture(pyramid.level->image);
+    auto& image = pyramid.level->image;
+    context.updateTexture(*dem, image);
 
     if (!segments.empty()) {
         vertexBuffer = context.createVertexBuffer(std::move(vertices));
@@ -108,7 +104,7 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 }
 
 bool HillshadeBucket::hasData() const {
-    return !pyramid.levels.empty();
+    return pyramid.level->image.valid();
 }
 
 } // namespace mbgl
