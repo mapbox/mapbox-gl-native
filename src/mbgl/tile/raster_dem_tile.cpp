@@ -23,12 +23,12 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
 
     if ( id.canonical.y == 0 ){
         // this tile doesn't have upper neighboring tiles so marked those as backfilled
-        neighboringTiles = neighboringTiles | 0b00011100;
+        neighboringTiles = neighboringTiles | DEMTileNeighbors::NoUpper;
     }
 
     if (id.canonical.y + 1 == std::pow(2, id.canonical.z)){
         // this tile doesn't have lower neighboring tiles so marked those as backfilled
-        neighboringTiles = neighboringTiles | 0b11100000;
+        neighboringTiles = neighboringTiles | DEMTileNeighbors::NoLower;
     }
 }
 

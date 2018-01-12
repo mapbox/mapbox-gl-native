@@ -6,38 +6,6 @@
 
 namespace mbgl {
 
-enum class DEMTileNeighbors {
-  // 0b00000001
-  Left = 1 << 0,
-  // 0b00000010
-  Right = 1 << 1,
-  // 0b00000100
-  TopLeft = 1 << 2,
-  // 0b00001000
-  TopCenter = 1 << 3,
-  // 0b00010000
-  TopRight = 1 << 4,
-  // 0b00100000
-  BottomLeft = 1 << 5,
-  // 0b01000000
-  BottomCenter = 1 << 6,
-  // 0b10000000
-  BottomRight = 1 << 7
-};
-
-inline unsigned char operator|(unsigned char a, DEMTileNeighbors b) {
-    return static_cast<unsigned char>(a | int(b));
-};
-
-inline unsigned char operator&(unsigned char a, DEMTileNeighbors b) {
-    return static_cast<unsigned char>(a & int(b));
-}
-
-inline bool operator!=(unsigned char a, DEMTileNeighbors b) {
-    return a != static_cast<unsigned char>(b);
-}
-
-
 class RenderRasterDEMSource : public RenderSource {
 public:
     RenderRasterDEMSource(Immutable<style::RasterDEMSource::Impl>);

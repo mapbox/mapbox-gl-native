@@ -11,6 +11,53 @@ class Tileset;
 class TileParameters;
 class HillshadeBucket;
 
+enum class DEMTileNeighbors : unsigned char {
+  // 0b00000000
+  Empty = 0 << 1,
+
+  // the order of the neighbors in this enum (or rather the order of their flipped bits
+  // must stay the same as
+
+  // 0b00000001
+  Left = 1 << 0,
+  // 0b00000010
+  Right = 1 << 1,
+  // 0b00000100
+  TopLeft = 1 << 2,
+  // 0b00001000
+  TopCenter = 1 << 3,
+  // 0b00010000
+  TopRight = 1 << 4,
+  // 0b00100000
+  BottomLeft = 1 << 5,
+  // 0b01000000
+  BottomCenter = 1 << 6,
+  // 0b10000000
+  BottomRight = 1 << 7,
+
+  // helper enums for tiles with no upper/lower neighbors
+  // and completely backfilled tiles
+
+  // 0b00011100
+  NoUpper = 0b00011100,
+  // 0b11100000
+  NoLower = 0b11100000,
+  // 0b11111111
+  Complete = 0b11111111
+};
+
+inline DEMTileNeighbors operator|(DEMTileNeighbors a, DEMTileNeighbors b) {
+    return static_cast<DEMTileNeighbors>(int(a) | int(b));
+};
+
+inline DEMTileNeighbors operator&(DEMTileNeighbors a, DEMTileNeighbors b) {
+    return static_cast<DEMTileNeighbors>(int(a) & int(b));
+}
+
+inline bool operator!=(DEMTileNeighbors a, DEMTileNeighbors b) {
+    return static_cast<unsigned char>(a) != static_cast<unsigned char>(b);
+}
+
 namespace style {
 class Layer;
 } // namespace style
@@ -34,7 +81,7 @@ public:
     
     // neighboringTiles is a bitmask for which neighboring tiles have been backfilled
     // there are max 8 possible neighboring tiles, so each bit represents one neighbor
-    unsigned char neighboringTiles = 0b00000000;
+    DEMTileNeighbors neighboringTiles = DEMTileNeighbors::Empty;
     
     void setMask(TileMask&&) override;
 
