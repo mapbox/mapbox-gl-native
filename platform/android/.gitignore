@@ -16,7 +16,7 @@ MapboxGLAndroidSDK/src/main/assets/
 
 # Local settings
 local.properties
-/configuration.gradle
+gradle/configuration.gradle
 
 # Token file
 MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml

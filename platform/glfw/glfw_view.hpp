@@ -78,12 +78,17 @@ private:
     void addRandomLineAnnotations(int count);
     void addRandomShapeAnnotations(int count);
     void addRandomCustomPointAnnotations(int count);
+    void addAnimatedAnnotation();
+    void updateAnimatedAnnotations();
 
     void clearAnnotations();
     void popAnnotation();
 
     mbgl::AnnotationIDs annotationIDs;
     std::vector<std::string> spriteIDs;
+
+    mbgl::AnnotationIDs animatedAnnotationIDs;
+    std::vector<double> animatedAnnotationAddedTimes;
 
 private:
     void toggle3DExtrusions(bool visible);

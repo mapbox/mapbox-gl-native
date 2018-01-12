@@ -86,6 +86,7 @@ private:
     ImageMap imageMap;
     
     bool showCollisionBoxes;
+    bool firstLoad = true;
 };
 
 } // namespace mbgl
