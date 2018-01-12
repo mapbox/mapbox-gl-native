@@ -119,6 +119,7 @@
 		357579871D502AFE000B822E /* MGLLineStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 357579861D502AFE000B822E /* MGLLineStyleLayerTests.mm */; };
 		357579891D502B06000B822E /* MGLCircleStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 357579881D502B06000B822E /* MGLCircleStyleLayerTests.mm */; };
 		3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3575798A1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm */; };
+		357FB1FC1F7A564700E9A22E /* Root.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5BF1CCD9F8400607828 /* Root.plist */; };
 		357FE2DD1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 357FE2DB1E02D2B20068B753 /* NSCoder+MGLAdditions.h */; };
 		357FE2DE1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 357FE2DB1E02D2B20068B753 /* NSCoder+MGLAdditions.h */; };
 		357FE2DF1E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 357FE2DC1E02D2B20068B753 /* NSCoder+MGLAdditions.mm */; };
@@ -308,7 +309,6 @@
 		DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC99E1CB6E088006E619F /* Assets.xcassets */; };
 		DA1F8F3D1EBD287B00367E42 /* MGLDocumentationGuideTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA1F8F3C1EBD287B00367E42 /* MGLDocumentationGuideTests.swift */; };
 		DA2207BF1DC0805F0002F84D /* MGLStyleValueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA2207BE1DC0805F0002F84D /* MGLStyleValueTests.swift */; };
-		DA25D5C01CCD9F8400607828 /* Root.plist in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5BF1CCD9F8400607828 /* Root.plist */; };
 		DA25D5C61CCDA06800607828 /* Root.strings in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5C41CCDA06800607828 /* Root.strings */; };
 		DA25D5CD1CCDA11500607828 /* Settings.bundle in Resources */ = {isa = PBXBuildFile; fileRef = DA25D5B91CCD9EDE00607828 /* Settings.bundle */; };
 		DA2784FC1DF02FF4001D5B8D /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = DA2784FB1DF02FF4001D5B8D /* Media.xcassets */; };
@@ -2281,8 +2281,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				357FB1FC1F7A564700E9A22E /* Root.plist in Resources */,
 				DA25D5C61CCDA06800607828 /* Root.strings in Resources */,
-				DA25D5C01CCD9F8400607828 /* Root.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2930,7 +2930,7 @@
 		DA25D5BC1CCD9EDE00607828 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = framework/Settings.bundle/Root.plist;
+				INFOPLIST_FILE = framework/Info.plist;
 				PRODUCT_NAME = Settings;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
@@ -2940,7 +2940,7 @@
 		DA25D5BD1CCD9EDE00607828 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				INFOPLIST_FILE = framework/Settings.bundle/Root.plist;
+				INFOPLIST_FILE = framework/Info.plist;
 				PRODUCT_NAME = Settings;
 				SKIP_INSTALL = YES;
 				WRAPPER_EXTENSION = bundle;
