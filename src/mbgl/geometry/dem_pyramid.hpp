@@ -15,7 +15,6 @@ public:
     class Level {
     public:
         Level(int32_t dim, int32_t border);
-        Level(const Level&& level);
 
         void set(const int32_t x, const int32_t y, const int32_t value) {
             reinterpret_cast<int32_t*>(image.data.get())[idx(x, y)] = value + 65536;
@@ -42,13 +41,12 @@ public:
         PremultipliedImage image;
     };
     
-
-    void loadFromImage(PremultipliedImage& image);
+    DEMPyramid(PremultipliedImage& image);
     void backfillBorder(DEMPyramid& borderTileData, int8_t dx, int8_t dy);
     bool isLoaded() {
         return loaded;
     };
-    std::unique_ptr<Level> level;
+    Level level;
     private:
         bool loaded = false;
 
