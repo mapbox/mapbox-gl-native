@@ -15,34 +15,34 @@ DEMPyramid::DEMPyramid(PremultipliedImage& image):
         }
     }
     
-    //    // in order to avoid flashing seams between tiles, here we are initially populating a 1px border of
-    //    // pixels around the image with the data of the nearest pixel from the image. this data is eventually
-    //    // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
-    //    // DEMPyramid#backfillBorder
-    //
-    ////    for (int32_t x = 0; x < first.dim; x++) {
-    ////        // left vertical border
-    ////        first.set(-1, x, first.get(0, x));
-    ////
-    ////        // right vertical border
-    ////        first.set(first.dim, x, first.get(first.dim - 1, x));
-    ////
-    ////        //left horizontal border
-    ////        first.set(x, -1, first.get(x, 0));
-    ////
-    ////        // right horizontal border
-    ////        first.set(x, first.dim, first.get(x, first.dim - 1));
-    ////    }
-    ////
-    ////    // corners
-    ////    first.set(-1, -1, first.get(0, 0));
-    ////    first.set(first.dim, -1, first.get(first.dim - 1, 0));
-    ////    first.set( -1, first.dim, first.get(0, first.dim - 1));
-    ////    first.set(first.dim, first.dim, first.get(first.dim - 1, first.dim - 1));
+    // in order to avoid flashing seams between tiles, here we are initially populating a 1px border of
+    // pixels around the image with the data of the nearest pixel from the image. this data is eventually
+    // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
+    // DEMPyramid#backfillBorder
+
+    for (int32_t x = 0; x < level.dim; x++) {
+        // left vertical border
+        level.set(-1, x, level.get(0, x));
+
+        // right vertical border
+        level.set(level.dim, x, level.get(level.dim - 1, x));
+
+        //left horizontal border
+        level.set(x, -1, level.get(x, 0));
+
+        // right horizontal border
+        level.set(x, level.dim, level.get(x, level.dim - 1));
+    }
+
+    // corners
+    level.set(-1, -1, level.get(0, 0));
+    level.set(level.dim, -1, level.get(level.dim - 1, 0));
+    level.set( -1, level.dim, level.get(0, level.dim - 1));
+    level.set(level.dim, level.dim, level.get(level.dim - 1, level.dim - 1));
     loaded = true;
 }
 
-void DEMPyramid::backfillBorder(mbgl::DEMPyramid &borderTileData, int8_t dx, int8_t dy) {
+void DEMPyramid::backfillBorder(mbgl::DEMPyramid& borderTileData, int8_t dx, int8_t dy) {
     auto& t = level;
     auto& o = borderTileData.level;
     assert(t.dim == o.dim);

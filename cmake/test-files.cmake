@@ -21,6 +21,9 @@ set(MBGL_TEST_FILES
     test/api/recycle_map.cpp
     test/api/zoom_history.cpp
 
+    # geometry
+    test/geometry/dem_pyramid.test.cpp
+
     # gl
     test/gl/bucket.test.cpp
     test/gl/context.test.cpp
