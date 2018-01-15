@@ -34,6 +34,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   private final Runnable onCameraMoveStartedRunnable = new Runnable() {
     @Override
     public void run() {
+      if (!idle) {
+        return;
+      }
+      idle = false;
+
       // deprecated API
       if (onCameraMoveStartedListener != null) {
         onCameraMoveStartedListener.onCameraMoveStarted(moveStartedReason);
@@ -85,6 +90,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   private final Runnable onCameraIdleRunnable = new Runnable() {
     @Override
     public void run() {
+      if (idle) {
+        return;
+      }
+      idle = true;
+
       // deprecated API
       if (onCameraIdleListener != null) {
         onCameraIdleListener.onCameraIdle();
@@ -121,10 +131,6 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
 
   @Override
   public void onCameraMoveStarted(final int reason) {
-    if (!idle) {
-      return;
-    }
-    idle = false;
     moveStartedReason = reason;
     handler.post(onCameraMoveStartedRunnable);
   }
@@ -141,10 +147,7 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
 
   @Override
   public void onCameraIdle() {
-    if (!idle) {
-      idle = true;
-      handler.post(onCameraIdleRunnable);
-    }
+    handler.post(onCameraIdleRunnable);
   }
 
   void addOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
