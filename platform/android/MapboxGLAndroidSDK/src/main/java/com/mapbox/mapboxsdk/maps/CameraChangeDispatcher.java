@@ -34,6 +34,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   private final Runnable onCameraMoveStartedRunnable = new Runnable() {
     @Override
     public void run() {
+      if (!idle) {
+        return;
+      }
+      idle = false;
+
       // deprecated API
       if (onCameraMoveStartedListener != null) {
         onCameraMoveStartedListener.onCameraMoveStarted(moveStartedReason);
@@ -85,6 +90,11 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
   private final Runnable onCameraIdleRunnable = new Runnable() {
     @Override
     public void run() {
+      if (idle) {
+        return;
+      }
+      idle = true;
+
       // deprecated API
       if (onCameraIdleListener != null) {
         onCameraIdleListener.onCameraIdle();
@@ -121,67 +131,23 @@ class CameraChangeDispatcher implements MapboxMap.OnCameraMoveStartedListener, M
 
   @Override
   public void onCameraMoveStarted(final int reason) {
-    if (!idle) {
-      return;
-    }
-    idle = false;
     moveStartedReason = reason;
     handler.post(onCameraMoveStartedRunnable);
-
-    // new API
-    if (!onCameraMoveStarted.isEmpty()) {
-      for (OnCameraMoveStartedListener cameraMoveStartedListener : onCameraMoveStarted) {
-        cameraMoveStartedListener.onCameraMoveStarted(reason);
-      }
-    }
   }
 
   @Override
   public void onCameraMove() {
     handler.post(onCameraMoveRunnable);
-    if (onCameraMoveListener != null && !idle) {
-      onCameraMoveListener.onCameraMove();
-    }
-
-    // new API
-    if (!onCameraMove.isEmpty() && !idle) {
-      for (OnCameraMoveListener cameraMoveListener : onCameraMove) {
-        cameraMoveListener.onCameraMove();
-      }
-    }
   }
 
   @Override
   public void onCameraMoveCanceled() {
     handler.post(onCameraMoveCancelRunnable);
-    if (onCameraMoveCanceledListener != null && !idle) {
-      onCameraMoveCanceledListener.onCameraMoveCanceled();
-    }
-
-    // new API
-    if (!onCameraMoveCanceled.isEmpty() && !idle) {
-      for (OnCameraMoveCanceledListener cameraMoveCanceledListener : onCameraMoveCanceled) {
-        cameraMoveCanceledListener.onCameraMoveCanceled();
-      }
-    }
   }
 
   @Override
   public void onCameraIdle() {
-    if (!idle) {
-      idle = true;
-      handler.post(onCameraIdleRunnable);
-      if (onCameraIdleListener != null) {
-        onCameraIdleListener.onCameraIdle();
-      }
-
-      // new API
-      if (!onCameraIdle.isEmpty()) {
-        for (OnCameraIdleListener cameraIdleListener : onCameraIdle) {
-          cameraIdleListener.onCameraIdle();
-        }
-      }
-    }
+    handler.post(onCameraIdleRunnable);
   }
 
   void addOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {

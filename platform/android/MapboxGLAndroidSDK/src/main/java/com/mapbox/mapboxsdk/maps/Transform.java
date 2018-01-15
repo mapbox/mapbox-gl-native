@@ -239,7 +239,7 @@ final class Transform implements MapView.OnMapChangedListener {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
       int newZoom = (int) Math.round(cameraPosition.zoom + (zoomIn ? 1 : -1));
-      setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION);
+      setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION, false);
     } else {
       // we are not transforming, notify about being idle
       cameraChangeDispatcher.onCameraIdle();
@@ -250,7 +250,7 @@ final class Transform implements MapView.OnMapChangedListener {
     CameraPosition cameraPosition = invalidateCameraPosition();
     if (cameraPosition != null) {
       int newZoom = (int) Math.round(cameraPosition.zoom + zoomAddition);
-      setZoom(newZoom, focalPoint, duration);
+      setZoom(newZoom, focalPoint, duration, false);
     } else {
       // we are not transforming, notify about being idle
       cameraChangeDispatcher.onCameraIdle();
@@ -258,16 +258,18 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setZoom(double zoom, @NonNull PointF focalPoint) {
-    setZoom(zoom, focalPoint, 0);
+    setZoom(zoom, focalPoint, 0, false);
   }
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
+  void setZoom(double zoom, @NonNull PointF focalPoint, long duration, boolean isAnimator) {
     if (mapView != null) {
       mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override
         public void onMapChanged(int change) {
           if (change == MapView.REGION_DID_CHANGE_ANIMATED) {
-            cameraChangeDispatcher.onCameraIdle();
+            if (!isAnimator) {
+              cameraChangeDispatcher.onCameraIdle();
+            }
             mapView.removeOnMapChangedListener(this);
           }
         }

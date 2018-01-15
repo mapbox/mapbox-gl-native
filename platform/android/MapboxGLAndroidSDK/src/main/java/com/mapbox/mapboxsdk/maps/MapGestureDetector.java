@@ -28,6 +28,7 @@ import com.mapbox.services.android.telemetry.utils.TelemetryUtils;
 
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
 /**
@@ -78,8 +79,10 @@ final class MapGestureDetector {
 
   private boolean scaleGestureOccurred;
   private boolean recentScaleGestureOccurred;
-  private boolean scaleAnimating;
   private long scaleBeginTime;
+
+  private boolean scaleAnimating;
+  private boolean rotateAnimating;
 
   private VelocityTracker velocityTracker;
   private boolean wasZoomingIn;
@@ -233,7 +236,10 @@ final class MapGestureDetector {
           MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapDragEndEvent(
             getLocationFromGesture(event.getX(), event.getY()), transform));
           scrollGestureOccurred = false;
-          cameraChangeDispatcher.onCameraIdle();
+
+          if (!scaleAnimating && !rotateAnimating) {
+            cameraChangeDispatcher.onCameraIdle();
+          }
         }
 
         twoTap = false;
@@ -615,7 +621,6 @@ final class MapGestureDetector {
         return;
       }
 
-
       if (rotateGestureOccurred || quickZoom) {
         reset();
         return;
@@ -657,13 +662,23 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setZoom((Float) animation.getAnimatedValue(), scalePointBegin);
+          transform.setZoom((Float) animation.getAnimatedValue(), scalePointBegin, 0, true);
         }
       });
       animator.addListener(new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+          reset();
+        }
+
         @Override
         public void onAnimationEnd(Animator animation) {
-          super.onAnimationEnd(animation);
           reset();
         }
       });
@@ -682,7 +697,6 @@ final class MapGestureDetector {
 
     private long beginTime = 0;
     private boolean started = false;
-    private boolean animating = false;
 
     // Called when two fingers first touch the screen
     @Override
@@ -753,9 +767,9 @@ final class MapGestureDetector {
       }
 
       double angularVelocity = calculateVelocityVector(detector);
-      if (Math.abs(angularVelocity) > 0.001 && rotateGestureOccurred && !animating) {
+      if (Math.abs(angularVelocity) > 0.001 && rotateGestureOccurred && !rotateAnimating) {
         animateRotateVelocity();
-      } else if (!animating) {
+      } else if (!rotateAnimating) {
         reset();
       }
     }
@@ -763,12 +777,16 @@ final class MapGestureDetector {
     private void reset() {
       beginTime = 0;
       started = false;
-      animating = false;
+      rotateAnimating = false;
       rotateGestureOccurred = false;
+
+      if (!twoTap) {
+        cameraChangeDispatcher.onCameraIdle();
+      }
     }
 
     private void animateRotateVelocity() {
-      animating = true;
+      rotateAnimating = true;
       double currentRotation = transform.getRawBearing();
       double rotateAdditionDegrees = calculateVelocityInDegrees();
       createAnimator(currentRotation, rotateAdditionDegrees).start();
@@ -811,9 +829,19 @@ final class MapGestureDetector {
         }
       });
       animator.addListener(new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+          reset();
+        }
+
         @Override
         public void onAnimationEnd(Animator animation) {
-          super.onAnimationEnd(animation);
           reset();
         }
       });
