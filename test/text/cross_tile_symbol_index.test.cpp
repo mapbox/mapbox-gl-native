@@ -127,3 +127,77 @@ TEST(CrossTileSymbolLayerIndex, resetIDs) {
     index.addBucket(mainID, mainBucket, maxCrossTileID);
     ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 2u);
 }
+
+TEST(CrossTileSymbolLayerIndex, noDuplicatesWithinZoomLevel) {
+    uint32_t maxCrossTileID = 0;
+    uint32_t maxBucketInstanceId = 0;
+    CrossTileSymbolLayerIndex index;
+
+    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    bool sdfIcons = false;
+    bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
+
+    OverscaledTileID mainID(6, 0, 6, 8, 8);
+    std::vector<SymbolInstance> mainInstances;
+    mainInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A
+    mainInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B
+    SymbolBucket mainBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(mainInstances) };
+    mainBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    OverscaledTileID childID(7, 0, 7, 16, 16);
+    std::vector<SymbolInstance> childInstances;
+    childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // A'
+    childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // B'
+    childInstances.push_back(makeSymbolInstance(2000, 2000, u"")); // C'
+    SymbolBucket childBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(childInstances) };
+    childBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    // assigns new ids
+    index.addBucket(mainID, mainBucket, maxCrossTileID);
+    ASSERT_EQ(mainBucket.symbolInstances.at(0).crossTileID, 1u);
+    ASSERT_EQ(mainBucket.symbolInstances.at(1).crossTileID, 2u);
+
+    // copies parent ids without duplicate ids in this tile
+    index.addBucket(childID, childBucket, maxCrossTileID);
+    ASSERT_EQ(childBucket.symbolInstances.at(0).crossTileID, 1u); // A' copies from A
+    ASSERT_EQ(childBucket.symbolInstances.at(1).crossTileID, 2u); // B' copies from B
+    ASSERT_EQ(childBucket.symbolInstances.at(2).crossTileID, 3u); // C' gets new ID
+}
+
+TEST(CrossTileSymbolLayerIndex, bucketReplacement) {
+    uint32_t maxCrossTileID = 0;
+    uint32_t maxBucketInstanceId = 0;
+    CrossTileSymbolLayerIndex index;
+
+    style::SymbolLayoutProperties::PossiblyEvaluated layout;
+    bool sdfIcons = false;
+    bool iconsNeedLinear = false;
+    bool sortFeaturesByY = false;
+
+    OverscaledTileID tileID(6, 0, 6, 8, 8);
+    std::vector<SymbolInstance> firstInstances;
+    firstInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A
+    firstInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B
+    SymbolBucket firstBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(firstInstances) };
+    firstBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    std::vector<SymbolInstance> secondInstances;
+    secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // A'
+    secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // B'
+    secondInstances.push_back(makeSymbolInstance(1000, 1000, u"")); // C'
+    SymbolBucket secondBucket { layout, {}, 16.0f, 1.0f, 0, sdfIcons, iconsNeedLinear, sortFeaturesByY, std::move(secondInstances) };
+    secondBucket.bucketInstanceId = ++maxBucketInstanceId;
+
+    // assigns new ids
+    index.addBucket(tileID, firstBucket, maxCrossTileID);
+    ASSERT_EQ(firstBucket.symbolInstances.at(0).crossTileID, 1u);
+    ASSERT_EQ(firstBucket.symbolInstances.at(1).crossTileID, 2u);
+
+    // copies parent ids without duplicate ids in this tile
+    index.addBucket(tileID, secondBucket, maxCrossTileID);
+    ASSERT_EQ(secondBucket.symbolInstances.at(0).crossTileID, 1u); // A' copies from A
+    ASSERT_EQ(secondBucket.symbolInstances.at(1).crossTileID, 2u); // B' copies from B
+    ASSERT_EQ(secondBucket.symbolInstances.at(2).crossTileID, 3u); // C' gets new ID
+}
+
