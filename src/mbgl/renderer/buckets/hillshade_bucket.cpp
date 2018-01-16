@@ -8,14 +8,14 @@ namespace mbgl {
 
 using namespace style;
 
-HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_): pyramid(image_) {
+HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_): demdata(image_) {
 }
 
-HillshadeBucket::HillshadeBucket(DEMPyramid&& pyramid_) : pyramid(std::move(pyramid_)) {
+HillshadeBucket::HillshadeBucket(DEMData&& demdata_) : demdata(std::move(demdata_)) {
 }
 
-DEMPyramid* HillshadeBucket::getDEMPyramid() {
-    return &pyramid;
+DEMData* HillshadeBucket::getDEMData() {
+    return &demdata;
 }
 
 void HillshadeBucket::upload(gl::Context& context) {
@@ -23,9 +23,9 @@ void HillshadeBucket::upload(gl::Context& context) {
         return;
     }
 
-    dem = context.createTexture(pyramid.level.image);
-    auto& image = pyramid.level.image;
-    context.updateTexture(*dem, image);
+
+    const PremultipliedImage* image = demdata.level.getImage();
+    dem = context.createTexture(*image);
 
     if (!segments.empty()) {
         vertexBuffer = context.createVertexBuffer(std::move(vertices));
@@ -103,7 +103,7 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 }
 
 bool HillshadeBucket::hasData() const {
-    return pyramid.level.image.valid();
+    return demdata.level.image.valid();
 }
 
 } // namespace mbgl

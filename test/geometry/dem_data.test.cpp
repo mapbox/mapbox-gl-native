@@ -1,7 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/image.hpp>
-#include <mbgl/geometry/dem_pyramid.hpp>
+#include <mbgl/geometry/dem_data.hpp>
 
 using namespace mbgl;
 
@@ -15,7 +15,7 @@ auto fakeImage = [](Size s) {
 };
 
 TEST(Level, Constructor) {
-    DEMPyramid::Level level(4, 2);
+    DEMData::Level level(4, 2);
     EXPECT_EQ(level.dim, 4);
     EXPECT_EQ(level.border, 2);
     EXPECT_EQ(level.stride, 8);
@@ -23,24 +23,24 @@ TEST(Level, Constructor) {
 }
 
 TEST(Level, RoundTrip) {
-    DEMPyramid::Level level(4, 2);
+    DEMData::Level level(4, 2);
     level.set(0, 0, 255);
     EXPECT_EQ(level.get(0,0), 255);
 }
 
-TEST(DEMPyramid, Constructor) {
+TEST(DEMData, Constructor) {
     PremultipliedImage image = fakeImage({16, 16});
-    DEMPyramid pyramid(image);
+    DEMData pyramid(image);
 
     EXPECT_TRUE(pyramid.isLoaded());
     EXPECT_EQ(pyramid.level.dim, 16);
     EXPECT_EQ(pyramid.level.border, 8);
 };
 
-TEST(DEMPyramid, InitialBackfill) {
+TEST(DEMData, InitialBackfill) {
 
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMPyramid dem1(image1);
+    DEMData dem1(image1);
 
     bool nonempty = true;
     // checking that a 1 px border around the fake image has been populated
@@ -92,12 +92,12 @@ TEST(DEMPyramid, InitialBackfill) {
     EXPECT_TRUE(dem1.level.get(4, -1) == dem1.level.get(3, 0));
 };
 
-TEST(DEMPyramid, BackfillNeighbor) {
+TEST(DEMData, BackfillNeighbor) {
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMPyramid dem0(image1);
+    DEMData dem0(image1);
 
     PremultipliedImage image2 = fakeImage({4, 4});
-    DEMPyramid dem1(image2);
+    DEMData dem1(image2);
 
     dem0.backfillBorder(dem1, -1, 0);
     for (int y = 0; y < 4; y++) {
