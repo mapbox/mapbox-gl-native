@@ -47,7 +47,7 @@ public:
     
     DEMData(PremultipliedImage& image);
     void backfillBorder(DEMData& borderTileData, int8_t dx, int8_t dy);
-    bool isLoaded() {
+    bool isLoaded() const {
         return loaded;
     };
     Level level;

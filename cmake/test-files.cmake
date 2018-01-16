@@ -22,7 +22,7 @@ set(MBGL_TEST_FILES
     test/api/zoom_history.cpp
 
     # geometry
-    test/geometry/dem_pyramid.test.cpp
+    test/geometry/dem_data.test.cpp
 
     # gl
     test/gl/bucket.test.cpp

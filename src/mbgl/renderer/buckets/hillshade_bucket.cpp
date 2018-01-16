@@ -14,8 +14,8 @@ HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_): demdata(image_) {
 HillshadeBucket::HillshadeBucket(DEMData&& demdata_) : demdata(std::move(demdata_)) {
 }
 
-DEMData* HillshadeBucket::getDEMData() {
-    return &demdata;
+DEMData& HillshadeBucket::getDEMData() {
+    return demdata;
 }
 
 void HillshadeBucket::upload(gl::Context& context) {
