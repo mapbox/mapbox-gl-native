@@ -77,11 +77,11 @@ static void fillBorder(RasterDEMTile& tile, const RasterDEMTile& borderTile, con
     }
     HillshadeBucket* borderBucket = borderTile.getBucket();
     HillshadeBucket* tileBucket = tile.getBucket();
-    DEMData* tileDEM = tileBucket->getDEMData();
-    DEMData* borderDEM = borderBucket->getDEMData();
+    DEMData& tileDEM = tileBucket->getDEMData();
+    DEMData& borderDEM = borderBucket->getDEMData();
 
-    if (tileDEM->isLoaded() && borderDEM->isLoaded()){
-        tileDEM->backfillBorder(*borderDEM, dx, dy);
+    if (tileDEM.isLoaded() && borderDEM.isLoaded()){
+        tileDEM.backfillBorder(borderDEM, dx, dy);
         // update the bitmask to indicate that this tiles have been backfilled by flipping the relevant bit
         tile.neighboringTiles = tile.neighboringTiles | mask;
         // mark HillshadeBucket.prepared as false so it runs through the prepare render pass
