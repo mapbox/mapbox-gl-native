@@ -464,14 +464,23 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
   private void addCustomTileSource() {
     // Add a source
-    Source source = new VectorSource("custom-tile-source", new TileSet("2.1.0", "https://vector.mapzen.com/osm/all/{z}/{x}/{y}.mvt?api_key=vector-tiles-LM25tq4"));
+    TileSet tileSet = new TileSet("2.1.0", "https://d25uarhxywzl1j.cloudfront.net/v0.1/{z}/{x}/{y}.mvt");
+    tileSet.setMinZoom(0);
+    tileSet.setMaxZoom(14);
+    Source source = new VectorSource("custom-tile-source", tileSet);
     mapboxMap.addSource(source);
 
     // Add a layer
-    mapboxMap.addLayer(
-      new FillLayer("custom-tile-layers", "custom-tile-source")
-        .withSourceLayer("water")
+    LineLayer lineLayer = new LineLayer("custom-tile-layers", "custom-tile-source");
+    lineLayer.setSourceLayer("mapillary-sequences");
+    lineLayer.setProperties(
+      lineCap(Property.LINE_CAP_ROUND),
+      lineJoin(Property.LINE_JOIN_ROUND),
+      lineOpacity(0.6f),
+      lineWidth(2.0f),
+      lineColor(Color.GREEN)
     );
+    mapboxMap.addLayer(lineLayer);
   }
 
   private void styleFillFilterLayer() {
