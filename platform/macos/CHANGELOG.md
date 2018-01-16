@@ -1,11 +1,15 @@
 # Changelog for Mapbox Maps SDK for macOS
 
-## v0.6.1
+## v0.6.1 - January 16, 2018
+
+This version of the Mapbox macOS SDK corresponds to version 3.7.3 of the Mapbox Maps SDK for iOS.
 
 * Fixed a crash while zooming while annotations are present on the map. ([#10791](https://github.com/mapbox/mapbox-gl-native/pull/10791))
 * CJK characters can be displayed in a locally installed font or a custom font bundled with the application, reducing map download times. Specify the font name using the `MGLIdeographicFontFamilyName` key in the application’s Info.plist file. ([#10522](https://github.com/mapbox/mapbox-gl-native/pull/10522))
 
-## v0.6.0
+## v0.6.0 - December 23, 2017
+
+This version of the Mapbox macOS SDK corresponds to version 3.7.2 of the Mapbox Maps SDK for iOS.
 
 ### Packaging
 
@@ -50,7 +54,7 @@
 * Added documentation for usage of coordinate bounds that cross the anti-meridian. ([#10783](https://github.com/mapbox/mapbox-gl-native/pull/10783))
 * Removed duplicated variables in `MGLMapSnapshotter`. ([#10702](https://github.com/mapbox/mapbox-gl-native/pull/10702))
 
-## 0.5.1
+## 0.5.1 - September 26, 2017
 
 This version of the Mapbox macOS SDK corresponds to version 3.6.4 of the Mapbox iOS SDK.
 
@@ -61,7 +65,7 @@ This version of the Mapbox macOS SDK corresponds to version 3.6.4 of the Mapbox 
 * Deprecated `+[MGLStyle trafficDayStyleURL]` and `+[MGLStyle trafficNightStyleURL]` with no replacement method. To use the Traffic Day and Traffic Night styles going forward, we recommend that you use the underlying URL. ([#9918](https://github.com/mapbox/mapbox-gl-native/pull/9918))
 * Fixed an issue where stale (but still valid) map data could be ignored in offline mode. ([#10012](https://github.com/mapbox/mapbox-gl-native/pull/10012))
 
-## 0.5.0
+## 0.5.0 - June 30, 2017
 
 This version of the Mapbox macOS SDK corresponds to version 3.6.0 of the Mapbox iOS SDK.
 
