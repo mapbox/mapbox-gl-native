@@ -1,9 +1,9 @@
-#include <mbgl/geometry/dem_pyramid.hpp>
+#include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/math/clamp.hpp>
 
 namespace mbgl {
 
-DEMPyramid::DEMPyramid(PremultipliedImage& image):
+DEMData::DEMData(PremultipliedImage& image):
     level(image.size.height, std::max<int32_t>(std::ceil(image.size.height / 2), 1)){
     assert(image.size.height == image.size.width);
 
@@ -18,7 +18,7 @@ DEMPyramid::DEMPyramid(PremultipliedImage& image):
     // in order to avoid flashing seams between tiles, here we are initially populating a 1px border of
     // pixels around the image with the data of the nearest pixel from the image. this data is eventually
     // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
-    // DEMPyramid#backfillBorder
+    // DEMData#backfillBorder
 
     for (int32_t x = 0; x < level.dim; x++) {
         // left vertical border
@@ -42,7 +42,7 @@ DEMPyramid::DEMPyramid(PremultipliedImage& image):
     loaded = true;
 }
 
-void DEMPyramid::backfillBorder(mbgl::DEMPyramid& borderTileData, int8_t dx, int8_t dy) {
+void DEMData::backfillBorder(mbgl::DEMData& borderTileData, int8_t dx, int8_t dy) {
     auto& t = level;
     auto& o = borderTileData.level;
     assert(t.dim == o.dim);
@@ -74,7 +74,7 @@ void DEMPyramid::backfillBorder(mbgl::DEMPyramid& borderTileData, int8_t dx, int
     }
 }
 
-DEMPyramid::Level::Level(int32_t dim_, int32_t border_)
+DEMData::Level::Level(int32_t dim_, int32_t border_)
     : dim(dim_),
       border(border_),
       stride(dim + 2 * border),

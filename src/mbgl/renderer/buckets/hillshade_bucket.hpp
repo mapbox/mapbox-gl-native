@@ -7,7 +7,7 @@
 #include <mbgl/programs/hillshade_prepare_program.hpp>
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
-#include <mbgl/geometry/dem_pyramid.hpp>
+#include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
@@ -18,7 +18,7 @@ class HillshadeBucket : public Bucket {
 public:
     HillshadeBucket(PremultipliedImage&&);
     HillshadeBucket(std::shared_ptr<PremultipliedImage>);
-    HillshadeBucket(DEMPyramid&&);
+    HillshadeBucket(DEMData&&);
 
 
     void upload(gl::Context&) override;
@@ -32,7 +32,7 @@ public:
 
     TileMask mask{ { 0, 0, 0 } };
     bool prepared = false;
-    DEMPyramid* getDEMPyramid();
+    DEMData* getDEMData();
 
     // Raster-DEM Tile Sources use the default buffers from Painter
     gl::VertexVector<HillshadeLayoutVertex> vertices;
@@ -42,7 +42,7 @@ public:
     optional<gl::VertexBuffer<HillshadeLayoutVertex>> vertexBuffer;
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 private: 
-    DEMPyramid pyramid;
+    DEMData demdata;
 };
 
 } // namespace mbgl

@@ -10,7 +10,7 @@
 
 namespace mbgl {
 
-class DEMPyramid {
+class DEMData {
 public:
     class Level {
     public:
@@ -22,6 +22,10 @@ public:
 
         int32_t get(const int32_t x, const int32_t y) const {
             return reinterpret_cast<const int32_t*>(image.data.get())[idx(x, y)] - 65536;
+        }
+
+        const PremultipliedImage* getImage() {
+            return &image;
         }
 
 
@@ -41,8 +45,8 @@ public:
         PremultipliedImage image;
     };
     
-    DEMPyramid(PremultipliedImage& image);
-    void backfillBorder(DEMPyramid& borderTileData, int8_t dx, int8_t dy);
+    DEMData(PremultipliedImage& image);
+    void backfillBorder(DEMData& borderTileData, int8_t dx, int8_t dy);
     bool isLoaded() {
         return loaded;
     };

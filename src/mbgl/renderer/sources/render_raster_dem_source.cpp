@@ -2,7 +2,7 @@
 #include <mbgl/renderer/render_tile.hpp>
 #include <mbgl/tile/raster_dem_tile.hpp>
 #include <mbgl/algorithm/update_tile_masks.hpp>
-#include <mbgl/geometry/dem_pyramid.hpp>
+#include <mbgl/geometry/dem_data.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <iostream>
 
@@ -77,8 +77,8 @@ static void fillBorder(RasterDEMTile& tile, const RasterDEMTile& borderTile, con
     }
     HillshadeBucket* borderBucket = borderTile.getBucket();
     HillshadeBucket* tileBucket = tile.getBucket();
-    DEMPyramid* tileDEM = tileBucket->getDEMPyramid();
-    DEMPyramid* borderDEM = borderBucket->getDEMPyramid();
+    DEMData* tileDEM = tileBucket->getDEMData();
+    DEMData* borderDEM = borderBucket->getDEMData();
 
     if (tileDEM->isLoaded() && borderDEM->isLoaded()){
         tileDEM->backfillBorder(*borderDEM, dx, dy);
