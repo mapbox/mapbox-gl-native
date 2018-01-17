@@ -6,18 +6,19 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.test.espresso.Espresso;
 import android.support.test.espresso.IdlingResourceTimeoutException;
-import android.support.test.espresso.UiController;
-import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
-import android.view.View;
+
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.action.WaitAction;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
+
 import junit.framework.Assert;
-import org.hamcrest.Matcher;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
+
 import timber.log.Timber;
 
 import static android.support.test.espresso.Espresso.onView;
@@ -67,12 +68,12 @@ public abstract class BaseActivityTest {
     onView(withId(id)).check(matches(isDisplayed()));
   }
 
-  protected void waitLoop() {
-    waitLoop(500);
+  protected void waitAction() {
+    waitAction(500);
   }
 
-  protected void waitLoop(long waitTime) {
-    onView(withId(R.id.mapView)).perform(new LoopAction(waitTime));
+  protected void waitAction(long waitTime) {
+    onView(withId(R.id.mapView)).perform(new WaitAction(waitTime));
   }
 
   static boolean isConnected(Context context) {
@@ -86,30 +87,6 @@ public abstract class BaseActivityTest {
   public void afterTest() {
     Timber.e("@After test: unregister idle resource");
     Espresso.unregisterIdlingResources(idlingResource);
-  }
-
-  private class LoopAction implements ViewAction {
-
-    private long loopTime;
-
-    public LoopAction(long loopTime) {
-      this.loopTime = loopTime;
-    }
-
-    @Override
-    public Matcher<View> getConstraints() {
-      return isDisplayed();
-    }
-
-    @Override
-    public String getDescription() {
-      return getClass().getSimpleName();
-    }
-
-    @Override
-    public void perform(UiController uiController, View view) {
-      uiController.loopMainThreadForAtLeast(loopTime);
-    }
   }
 }
 

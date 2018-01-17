@@ -62,7 +62,7 @@ public class CompassViewTest extends BaseActivityTest {
         .build()
     )));
     onView(withId(R.id.compassView)).perform(click());
-    waitLoop();
+    waitAction();
     onView(withId(R.id.compassView)).check(matches(not(isDisplayed())));
     invoke(mapboxMap, (uiController, mapboxMap) -> {
       CameraPosition cameraPosition = mapboxMap.getCameraPosition();

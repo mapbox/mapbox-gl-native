@@ -38,6 +38,7 @@ ext {
             testRules             : "com.android.support.test:rules:${versions.testRunner}",
             testEspressoCore      : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
             testEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
+            testEspressoContrib   : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
 
             supportAnnotations    : "com.android.support:support-annotations:${versions.supportLib}",
             supportAppcompatV7    : "com.android.support:appcompat-v7:${versions.supportLib}",
