@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.http;
 
+import okhttp3.OkHttpClient;
+
 /**
  * Utility class for setting HttpRequest configurations
  */
@@ -28,8 +30,17 @@ public class HttpRequestUtil {
    *
    * @param enabled True will print urls, false will disable
    */
-  public static void setPrintRequestUrlOnFaillure(boolean enabled) {
+  public static void setPrintRequestUrlOnFailure(boolean enabled) {
     HTTPRequest.enablePrintRequestUrlOnFailure(enabled);
+  }
+
+  /**
+   * Set the OkHttpClient used for requesting map resources.
+   *
+   * @param client the OkHttpClient
+   */
+  public static void setOkHttpClient(OkHttpClient client) {
+    HTTPRequest.setOKHttpClient(client);
   }
 
 }
