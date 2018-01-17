@@ -100,6 +100,8 @@ public:
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
     
+    void commitFeatureIndex() override;
+    
 protected:
     const GeometryTileData* getData() {
         return data.get();
@@ -123,6 +125,7 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
+    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
     std::unique_ptr<const GeometryTileData> data;
 
     optional<AlphaImage> glyphAtlasImage;
