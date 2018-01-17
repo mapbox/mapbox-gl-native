@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
@@ -30,7 +31,7 @@ import java.util.Set;
  * Additionally an telemetry option item is shown to configure telemetry settings.
  * </p>
  */
-class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
+public class AttributionDialogManager implements View.OnClickListener, DialogInterface.OnClickListener {
 
   private static final String MAP_FEEDBACK_URL = "https://www.mapbox.com/map-feedback";
   private static final String MAP_FEEDBACK_LOCATION_FORMAT = MAP_FEEDBACK_URL + "/#/%f/%f/%d";
@@ -40,7 +41,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   private String[] attributionTitles;
   private Set<Attribution> attributionSet;
 
-  AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
+  public AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
     this.context = context;
     this.mapboxMap = mapboxMap;
   }
@@ -52,7 +53,7 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
     showAttributionDialog();
   }
 
-  private void showAttributionDialog() {
+  protected void showAttributionDialog() {
     attributionTitles = getAttributionTitles();
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
