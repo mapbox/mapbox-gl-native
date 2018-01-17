@@ -100,7 +100,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             OffscreenTexture view(parameters.context, { 256, 256 });
             view.bind();
             
-            parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Linear, gl::TextureMipMap::No);
+            parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
             const Properties<>::PossiblyEvaluated properties;
 
             mat4 mat;
@@ -131,7 +131,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             bucket.setPrepared(true);
         } else if (parameters.pass == RenderPass::Translucent) {
             assert(bucket.texture);
-            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
+            parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
 
             if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.
