@@ -97,7 +97,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
         if (!bucket.hasData())
             continue;
         if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
-            OffscreenTexture view(parameters.context, { 256, 256 });
+            const uint16_t tilesize = bucket.getDEMData().level.dim;
+            OffscreenTexture view(parameters.context, { tilesize, tilesize });
             view.bind();
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
@@ -115,7 +116,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
                 parameters.colorModeForRenderPass(),
                 HillshadePrepareProgram::UniformValues {
                     uniforms::u_matrix::Value { mat },
-                    uniforms::u_dimension::Value { {{512, 512 }} },
+                    uniforms::u_dimension::Value { {{uint16_t(tilesize * 2), uint16_t(tilesize * 2) }} },
                     uniforms::u_zoom::Value{ float(tile.id.canonical.z) },
                     uniforms::u_image::Value{ 0 }
                 },

@@ -9,7 +9,7 @@
 namespace mbgl {
 
 namespace uniforms {
-MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_dimension);
+MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_dimension);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
