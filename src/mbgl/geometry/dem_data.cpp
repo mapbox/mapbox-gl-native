@@ -42,7 +42,7 @@ DEMData::DEMData(PremultipliedImage& image):
     loaded = true;
 }
 
-void DEMData::backfillBorder(DEMData& borderTileData, int8_t dx, int8_t dy) {
+void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy) {
     auto& t = level;
     auto& o = borderTileData.level;
     assert(t.dim == o.dim);

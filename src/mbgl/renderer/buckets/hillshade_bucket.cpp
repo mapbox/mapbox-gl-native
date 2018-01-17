@@ -14,6 +14,10 @@ HillshadeBucket::HillshadeBucket(PremultipliedImage&& image_): demdata(image_) {
 HillshadeBucket::HillshadeBucket(DEMData&& demdata_) : demdata(std::move(demdata_)) {
 }
 
+const DEMData& HillshadeBucket::getDEMData() const {
+    return demdata;
+}
+
 DEMData& HillshadeBucket::getDEMData() {
     return demdata;
 }

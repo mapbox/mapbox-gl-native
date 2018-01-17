@@ -61,35 +61,6 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
                        });
 }
 
-static void fillBorder(RasterDEMTile& tile, const RasterDEMTile& borderTile, const DEMTileNeighbors mask ){
-    int dx = borderTile.id.canonical.x - tile.id.canonical.x;
-    const int8_t dy = borderTile.id.canonical.y - tile.id.canonical.y;
-    const uint32_t dim = pow(2, tile.id.canonical.z);
-    if (dx == 0 && dy == 0) return;
-    if (std::abs(dy) > 1) return;
-    // neighbor is in another world wrap
-    if (std::abs(dx) > 1) {
-        if (std::abs(int(dx + dim)) == 1) {
-            dx += dim;
-        } else if (std::abs(int(dx - dim)) == 1) {
-            dx -= dim;
-        }
-    }
-    HillshadeBucket* borderBucket = borderTile.getBucket();
-    HillshadeBucket* tileBucket = tile.getBucket();
-    DEMData& tileDEM = tileBucket->getDEMData();
-    DEMData& borderDEM = borderBucket->getDEMData();
-
-    if (tileDEM.isLoaded() && borderDEM.isLoaded()){
-        tileDEM.backfillBorder(borderDEM, dx, dy);
-        // update the bitmask to indicate that this tiles have been backfilled by flipping the relevant bit
-        tile.neighboringTiles = tile.neighboringTiles | mask;
-        // mark HillshadeBucket.prepared as false so it runs through the prepare render pass
-        // with the new texture data we just backfilled
-        tileBucket->prepared = false;
-    }
-}
-
 void RenderRasterDEMSource::onTileChanged(Tile& tile){
     RasterDEMTile& demtile = static_cast<RasterDEMTile&>(tile);
 
@@ -142,8 +113,8 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
                 Tile* renderableNeighbor = tilePyramid.getTile(neighborid);
                 if (renderableNeighbor != nullptr && renderableNeighbor->isRenderable()) {
                     RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(*renderableNeighbor);
-                    fillBorder(demtile, borderTile, mask);
-                    fillBorder(borderTile, demtile, opposites[mask]);
+                    demtile.backfillBorder(borderTile, mask);
+                    borderTile.backfillBorder(demtile, opposites[mask]);
                 }
             }
         }
