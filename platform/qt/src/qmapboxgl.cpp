@@ -1,6 +1,7 @@
 #include "qmapboxgl.hpp"
 #include "qmapboxgl_p.hpp"
-#include "qmapboxgl_renderer_frontend_p.hpp"
+
+#include "qmapboxgl_map_observer.hpp"
 
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
@@ -43,11 +44,8 @@
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
-#include <QWindow>
-#include <QOpenGLContext>
 #else
 #include <QCoreApplication>
-#include <QGLContext>
 #endif
 
 #include <QDebug>
@@ -1058,22 +1056,24 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
         map->resize(size / 2, size);
     \endcode
 */
-void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
+void QMapboxGL::resize(const QSize& size_, const QSize& framebufferSize)
 {
-    if (d_ptr->size == size && d_ptr->fbSize == framebufferSize) return;
+    auto size = sanitizedSize(size_);
 
-    d_ptr->size = size;
-    d_ptr->fbSize = framebufferSize;
+    if (d_ptr->mapObj->getSize() == size)
+        return;
 
-    d_ptr->mapObj->setSize(sanitizedSize(size));
+    d_ptr->mapRenderer->updateFramebufferSize(sanitizedSize(framebufferSize));
+    d_ptr->mapObj->setSize(size);
 }
 
 /*!
     If Mapbox GL needs to rebind the default \a fbo, it will use the
     ID supplied here.
 */
-void QMapboxGL::setFramebufferObject(quint32 fbo) {
-    d_ptr->fbObject = fbo;
+void QMapboxGL::setFramebufferObject(quint32)
+{
+    // FIXME: No-op, implicit.
 }
 
 /*!
@@ -1486,8 +1486,7 @@ void QMapboxGL::render()
     }
 #endif
 
-    d_ptr->dirty = false;
-    d_ptr->render();
+    d_ptr->mapRenderer->render();
 }
 
 /*!
@@ -1496,7 +1495,7 @@ void QMapboxGL::render()
 */
 void QMapboxGL::connectionEstablished()
 {
-    d_ptr->connectionEstablished();
+    mbgl::NetworkStatus::Reachable();
 }
 
 /*!
@@ -1526,11 +1525,8 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
-class QMapboxGLRendererFrontend;
-
-QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size_, qreal pixelRatio)
+QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio)
     : QObject(q)
-    , size(size_)
     , q_ptr(q)
     , fileSourceObj(sharedDefaultFileSource(
         settings.cacheDatabasePath().toStdString(),
@@ -1538,174 +1534,48 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.cacheDatabaseMaximumSize()))
     , threadPool(mbgl::sharedThreadPool())
 {
-    // Setup resource transform if needed
+    // Setup the FileSource
+    fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+
     if (settings.resourceTransform()) {
-      m_resourceTransform =
-        std::make_unique< mbgl::Actor<mbgl::ResourceTransform> >( *mbgl::Scheduler::GetCurrent(),
-                                                                  [callback = settings.resourceTransform()]
-                                                                  (mbgl::Resource::Kind , const std::string&& url_)  -> std::string {
-                                                                    return callback(std::move(url_));
-                                                                  }
-                                                                  );
-      fileSourceObj->setResourceTransform(m_resourceTransform->self());
+        m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
+            [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
+                return callback(std::move(url_));
+            });
+       fileSourceObj->setResourceTransform(m_resourceTransform->self());
     }
 
-    // Setup and connect the renderer frontend
-    frontend = std::make_unique<QMapboxGLRendererFrontend>(
-            std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
-                                             static_cast<mbgl::GLContextMode>(settings.contextMode())),
-            *this);
-    connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
+    // Setup MapObserver
+    mapObserver = std::make_unique<QMapboxGLMapObserver>(this);
 
+    qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
+
+    connect(mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)));
+
+    // Setup RendererBackend
+    mapRenderer = std::make_unique<QMapboxGLMapRenderer>(pixelRatio, *fileSourceObj, *threadPool, settings.contextMode());
+
+    // Setup the Map object
     mapObj = std::make_unique<mbgl::Map>(
-            *frontend,
-            *this, sanitizedSize(size),
+            *this, // RendererFrontend
+            *mapObserver,
+            sanitizedSize(size),
             pixelRatio, *fileSourceObj, *threadPool,
             mbgl::MapMode::Continuous,
             static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
             static_cast<mbgl::ViewportMode>(settings.viewportMode()));
 
-    qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
-
-    fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
-
-    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
-    connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
-    connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
+    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()));
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-mbgl::Size QMapboxGLPrivate::getFramebufferSize() const {
-    return sanitizedSize(fbSize);
-}
-
-void QMapboxGLPrivate::updateAssumedState() {
-    assumeFramebufferBinding(fbObject);
-#if QT_VERSION >= 0x050600
-    assumeViewport(0, 0, getFramebufferSize());
-#endif
-}
-
-void QMapboxGLPrivate::bind() {
-    setFramebufferBinding(fbObject);
-    setViewport(0, 0, getFramebufferSize());
-}
-
-void QMapboxGLPrivate::invalidate()
+void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters)
 {
-    if (!dirty) {
-        emit needsRendering();
-        dirty = true;
-    }
-}
-
-void QMapboxGLPrivate::render()
-{
-    frontend->render();
-}
-
-void QMapboxGLPrivate::onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode)
-{
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChangeAnimated);
-    }
-}
-
-void QMapboxGLPrivate::onCameraIsChanging()
-{
-    emit mapChanged(QMapboxGL::MapChangeRegionIsChanging);
-}
-
-void QMapboxGLPrivate::onCameraDidChange(mbgl::MapObserver::CameraChangeMode mode)
-{
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChangeAnimated);
-    }
-}
-
-void QMapboxGLPrivate::onWillStartLoadingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFinishLoadingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFailLoadingMap(std::exception_ptr)
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
-}
-
-void QMapboxGLPrivate::onWillStartRenderingFrame()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
-}
-
-void QMapboxGLPrivate::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
-{
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);
-    }
-}
-
-void QMapboxGLPrivate::onWillStartRenderingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode)
-{
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMap);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered);
-    }
-}
-
-void QMapboxGLPrivate::onDidFinishLoadingStyle()
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingStyle);
-}
-
-void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
-{
-    std::string attribution;
-    for (const auto& source : mapObj->getStyle().getSources()) {
-        // Avoid duplicates by using the most complete attribution HTML snippet.
-        if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
-            attribution = *source->getAttribution();
-    }
-    emit copyrightsChanged(QString::fromStdString(attribution));
-    emit mapChanged(QMapboxGL::MapChangeSourceDidChange);
-}
-
-/*!
-    Initializes an OpenGL extension function such as Vertex Array Objects (VAOs),
-    required by Mapbox GL Native engine.
-*/
-mbgl::gl::ProcAddress QMapboxGLPrivate::getExtensionFunctionPointer(const char* name) {
-#if QT_VERSION >= 0x050000
-    QOpenGLContext* thisContext = QOpenGLContext::currentContext();
-    return thisContext->getProcAddress(name);
-#else
-    const QGLContext* thisContext = QGLContext::currentContext();
-    return reinterpret_cast<mbgl::gl::ProcAddress>(thisContext->getProcAddress(name));
-#endif
-}
-
-void QMapboxGLPrivate::connectionEstablished()
-{
-    mbgl::NetworkStatus::Reachable();
+    mapRenderer->updateParameters(std::move(parameters));
+    emit needsRendering();
 }
