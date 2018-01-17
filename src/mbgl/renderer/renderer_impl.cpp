@@ -389,6 +389,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         }
 
         placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+        // commitFeatureIndexes depends on the assumption that no new FeatureIndex has been loaded since placement
+        // started. If we violate this assumption, then we need to either make CollisionIndex completely independendent of
+        // FeatureIndex, or find a way for its entries to point to multiple FeatureIndexes.
+        commitFeatureIndexes();
         if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
@@ -766,6 +770,15 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     }
 
     return false;
+}
+
+void Renderer::Impl::commitFeatureIndexes() {
+    for (auto& source : renderSources) {
+        for (auto& renderTile : source.second->getRenderTiles()) {
+            Tile& tile = renderTile.get().tile;
+            tile.commitFeatureIndex();
+        }
+    }
 }
 
 void Renderer::Impl::updateFadingTiles() {
