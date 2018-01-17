@@ -1645,16 +1645,6 @@
 			path = ../vendor/SMCalloutView;
 			sourceTree = "<group>";
 		};
-		DA8848911CBB049300AB86E3 /* reachability */ = {
-			isa = PBXGroup;
-			children = (
-				DA88488D1CBB047F00AB86E3 /* reachability.h */,
-				DA88488F1CBB048E00AB86E3 /* reachability.m */,
-			);
-			name = reachability;
-			path = ..;
-			sourceTree = "<group>";
-		};
 		DA8933B91CCD2C6700E68420 /* Foundation Resources */ = {
 			isa = PBXGroup;
 			children = (
