@@ -1,49 +1,50 @@
 ext {
-    minSdkVersion = 14
-    targetSdkVersion = 25
-    compileSdkVersion = 25
-    buildToolsVersion = "26.0.3"
 
-    versionCode = 12
-    versionName = "6.0.0"
+    androidVersions = [
+            minSdkVersion    : 14,
+            targetSdkVersion : 25,
+            compileSdkVersion: 25,
+            buildToolsVersion: '26.0.3'
+    ]
 
-    mapboxServicesVersion = "2.2.9"
-    supportLibVersion = "25.4.0"
-    espressoVersion = '3.0.1'
-    testRunnerVersion = '1.0.1'
-    leakCanaryVersion = '1.5.1'
+    versions = [
+            mapboxServices: '2.2.9',
+            supportLib    : '25.4.0',
+            espresso      : '3.0.1',
+            testRunner    : '1.0.1',
+            leakCanary    : '1.5.1',
+            lost          : '3.0.4',
+            junit         : '4.12',
+            mockito       : '2.10.0',
+            robolectric   : '3.5.1',
+            timber        : '4.5.1',
+            okhttp        : '3.9.1'
+    ]
 
-    dep = [
-            // mapbox
-            mapboxJavaServices     : "com.mapbox.mapboxsdk:mapbox-java-services:${mapboxServicesVersion}@jar",
-            mapboxJavaGeoJSON      : "com.mapbox.mapboxsdk:mapbox-java-geojson:${mapboxServicesVersion}@jar",
-            mapboxAndroidTelemetry : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${mapboxServicesVersion}@aar",
+    dependenciesList = [
+            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-java-services:${versions.mapboxServices}@jar",
+            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-java-geojson:${versions.mapboxServices}@jar",
+            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxServices}@aar",
 
-            // mapzen lost
-            lost                   : 'com.mapzen.android:lost:3.0.4',
+            junit                 : "junit:junit:${versions.junit}",
+            mockito               : "org.mockito:mockito-core:${versions.mockito}",
+            robolectric           : "org.robolectric:robolectric:${versions.robolectric}",
 
-            // unit test
-            junit                  : 'junit:junit:4.12',
-            mockito                : 'org.mockito:mockito-core:2.10.0',
-            robolectric            : 'org.robolectric:robolectric:3.5.1',
+            testRunner            : "com.android.support.test:runner:${versions.testRunner}",
+            testRules             : "com.android.support.test:rules:${versions.testRunner}",
+            testEspressoCore      : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
+            testEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
 
-            // instrumentation test
-            testRunner             : "com.android.support.test:runner:${testRunnerVersion}",
-            testRules              : "com.android.support.test:rules:${testRunnerVersion}",
-            testEspressoCore       : "com.android.support.test.espresso:espresso-core:${espressoVersion}",
-            testEspressoIntents    : "com.android.support.test.espresso:espresso-intents:${espressoVersion}",
+            supportAnnotations    : "com.android.support:support-annotations:${versions.supportLib}",
+            supportAppcompatV7    : "com.android.support:appcompat-v7:${versions.supportLib}",
+            supportFragmentV4     : "com.android.support:support-fragment:${versions.supportLib}",
+            supportDesign         : "com.android.support:design:${versions.supportLib}",
+            supportRecyclerView   : "com.android.support:recyclerview-v7:${versions.supportLib}",
 
-            // support
-            supportAnnotations     : "com.android.support:support-annotations:${supportLibVersion}",
-            supportAppcompatV7     : "com.android.support:appcompat-v7:${supportLibVersion}",
-            supportFragmentV4      : "com.android.support:support-fragment:${supportLibVersion}",
-            supportDesign          : "com.android.support:design:${supportLibVersion}",
-            supportRecyclerView    : "com.android.support:recyclerview-v7:${supportLibVersion}",
-
-            // square crew
-            timber                 : 'com.jakewharton.timber:timber:4.5.1',
-            okhttp3                : 'com.squareup.okhttp3:okhttp:3.9.1',
-            leakCanaryDebug        : "com.squareup.leakcanary:leakcanary-android:${leakCanaryVersion}",
-            leakCanaryRelease      : "com.squareup.leakcanary:leakcanary-android-no-op:${leakCanaryVersion}"
+            lost                  : "com.mapzen.android:lost:${versions.lost}",
+            timber                : "com.jakewharton.timber:timber:${versions.timber}",
+            okhttp3               : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
+            leakCanaryDebug       : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
+            leakCanaryRelease     : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}"
     ]
 }

@@ -1,15 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion androidVersions.compileSdkVersion
+    buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
         applicationId "com.mapbox.mapboxsdk.testapp"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
+        versionCode 12
+        versionName "6.0.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -53,31 +53,24 @@ android {
 
 dependencies {
     implementation(project(':MapboxGLAndroidSDK'))
-
-    // Support libraries
-    implementation rootProject.ext.dep.supportAppcompatV7
-    implementation rootProject.ext.dep.supportRecyclerView
-    implementation rootProject.ext.dep.supportDesign
-
-    // Leak Canary
-    debugImplementation rootProject.ext.dep.leakCanaryDebug
-    releaseImplementation rootProject.ext.dep.leakCanaryRelease
-
-    // Timber
-    implementation rootProject.ext.dep.timber
-
-    // Mapbox Android Services (Java component)
-    implementation(rootProject.ext.dep.mapboxJavaServices) {
+    implementation(dependenciesList.mapboxJavaServices) {
         transitive = true
     }
-    implementation rootProject.ext.dep.lost
 
-    // Testing dependencies
-    androidTestImplementation rootProject.ext.dep.supportAnnotations
-    androidTestImplementation rootProject.ext.dep.testRunner
-    androidTestImplementation rootProject.ext.dep.testRules
-    androidTestImplementation rootProject.ext.dep.testEspressoCore
-    androidTestImplementation rootProject.ext.dep.testEspressoIntents
+    implementation dependenciesList.supportAppcompatV7
+    implementation dependenciesList.supportRecyclerView
+    implementation dependenciesList.supportDesign
+
+    implementation dependenciesList.lost
+    implementation dependenciesList.timber
+    debugImplementation dependenciesList.leakCanaryDebug
+    releaseImplementation dependenciesList.leakCanaryRelease
+
+    androidTestImplementation dependenciesList.supportAnnotations
+    androidTestImplementation dependenciesList.testRunner
+    androidTestImplementation dependenciesList.testRules
+    androidTestImplementation dependenciesList.testEspressoCore
+    androidTestImplementation dependenciesList.testEspressoIntents
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"
