@@ -3364,7 +3364,6 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("text-optional", value);
   }
 
-
   /**
    * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
    *
