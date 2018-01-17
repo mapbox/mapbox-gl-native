@@ -261,7 +261,7 @@ final class Transform implements MapView.OnMapChangedListener {
     setZoom(zoom, focalPoint, 0, false);
   }
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration, boolean isAnimator) {
+  void setZoom(double zoom, @NonNull PointF focalPoint, long duration, final boolean isAnimator) {
     if (mapView != null) {
       mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override

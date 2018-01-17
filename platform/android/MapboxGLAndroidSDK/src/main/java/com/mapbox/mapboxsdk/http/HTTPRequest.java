@@ -234,4 +234,8 @@ class HTTPRequest implements Callback {
   static void enablePrintRequestUrlOnFailure(boolean enabled) {
     logRequestUrl = enabled;
   }
+
+  static void setOKHttpClient(OkHttpClient client) {
+    mClient = client;
+  }
 }
