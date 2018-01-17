@@ -5,7 +5,7 @@
 #import <string>
 
 #import "MGLTypes.h"
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 #import "NSValue+MGLAdditions.h"
 #if TARGET_OS_IPHONE
 #import "UIColor+MGLAdditions.h"

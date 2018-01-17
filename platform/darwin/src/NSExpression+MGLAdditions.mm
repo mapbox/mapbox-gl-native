@@ -1,4 +1,4 @@
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 
 #import "MGLTypes.h"
 #if TARGET_OS_IPHONE
@@ -13,7 +13,7 @@
 
 #import <mbgl/style/expression/expression.hpp>
 
-@implementation NSExpression (MGLAdditions)
+@implementation NSExpression (MGLPrivateAdditions)
 
 - (std::vector<mbgl::Value>)mgl_aggregateMBGLValue {
     if ([self.constantValue isKindOfClass:[NSArray class]] || [self.constantValue isKindOfClass:[NSSet class]]) {
@@ -274,6 +274,16 @@
 @end
 
 @implementation NSExpression (MGLExpressionAdditions)
+
+- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
+    [NSException raise:NSInternalInconsistencyException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return self;
+}
+
+@end
+
+@implementation NSExpression (MGLAdditions)
 
 static NSDictionary<NSString *, NSString *> *MGLFunctionNamesByExpressionOperator;
 static NSDictionary<NSString *, NSString *> *MGLExpressionOperatorsByFunctionNames;
@@ -722,12 +732,6 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     }
     
     return nil;
-}
-
-- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
-    [NSException raise:NSInternalInconsistencyException
-                format:@"Assignment expressions lack underlying Objective-C implementations."];
-    return self;
 }
 
 @end

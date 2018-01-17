@@ -1,7 +1,6 @@
 #import <Foundation/Foundation.h>
 
-#import "NSExpression+MGLAdditions.h"
-#include <mbgl/style/filter.hpp>
+#import "NSExpression+MGLPrivateAdditions.h"
 
 @interface NSPredicate (MGLAdditions)
 

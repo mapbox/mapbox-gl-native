@@ -1,6 +1,6 @@
 #import "NSDictionary+MGLAdditions.h"
 
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 #import "NSArray+MGLAdditions.h"
 
 @implementation NSDictionary (MGLAdditions)

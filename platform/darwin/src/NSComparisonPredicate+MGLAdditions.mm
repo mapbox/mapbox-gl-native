@@ -1,7 +1,7 @@
 #import "NSComparisonPredicate+MGLAdditions.h"
 
 #import "NSPredicate+MGLAdditions.h"
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 
 @implementation NSComparisonPredicate (MGLAdditions)
 

@@ -4,7 +4,7 @@
 
 #import "NSValue+MGLStyleAttributeAdditions.h"
 #import "NSValue+MGLAdditions.h"
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 #import "MGLTypes.h"
 
 #import "MGLConversion.h"
