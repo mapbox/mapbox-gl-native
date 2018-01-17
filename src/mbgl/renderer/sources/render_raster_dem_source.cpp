@@ -77,7 +77,7 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
 
     if (tile.isRenderable() && demtile.neighboringTiles != DEMTileNeighbors::Complete) {
         const CanonicalTileID canonical = tile.id.canonical;
-        const uint dim = std::pow(2, canonical.z);
+        const uint16_t dim = std::pow(2, canonical.z);
         const uint32_t px = (canonical.x - 1 + dim) % dim;
         const int pxw = canonical.x == 0 ? tile.id.wrap - 1 : tile.id.wrap;
         const uint32_t nx = (canonical.x + 1 + dim) % dim;
