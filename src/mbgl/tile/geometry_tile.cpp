@@ -131,7 +131,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     pendingFeatureIndex = std::move(result.featureIndex);
-    data = std::move(result.tileData);
+    pendingData = std::move(result.tileData);
     observer->onTileChanged(*this);
 }
 
@@ -216,6 +216,9 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 void GeometryTile::commitFeatureIndex() {
     if (pendingFeatureIndex) {
         featureIndex = std::move(pendingFeatureIndex);
+    }
+    if (pendingData) {
+        data = std::move(pendingData);
     }
 }
 
