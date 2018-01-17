@@ -8,10 +8,10 @@ NAME=Mapbox
 OUTPUT=build/macos/pkg
 APP_OUTPUT=build/macos/app
 DERIVED_DATA=build/macos
-PRODUCTS=${DERIVED_DATA}
 
 BUILDTYPE=${BUILDTYPE:-Release}
 SYMBOLS=${SYMBOLS:-YES}
+PRODUCTS=${DERIVED_DATA}/${BUILDTYPE}
 
 function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
@@ -24,15 +24,7 @@ PROJ_VERSION=$(git rev-list --count HEAD)
 SEM_VERSION=$( git describe --tags --match=macos-v*.*.* --abbrev=0 | sed 's/^macos-v//' )
 SHORT_VERSION=${SEM_VERSION%-*}
 
-XCODEBUILD_SCHEME=dynamic
-XCODEBUILD_ACTION=build
-if [[ ${BUILDTYPE} == Release ]]; then
-    XCODEBUILD_SCHEME=macosapp
-    XCODEBUILD_ACTION=archive
-    mkdir -p ${APP_OUTPUT}
-fi
-
-step "Building targets (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
+step "Building dynamic framework (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
 xcodebuild \
     CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
@@ -41,16 +33,33 @@ xcodebuild \
     -derivedDataPath ${DERIVED_DATA} \
     -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
     -workspace ./platform/macos/macos.xcworkspace \
-    -scheme ${XCODEBUILD_SCHEME} \
+    -scheme dynamic \
     -configuration ${BUILDTYPE} \
     -jobs ${JOBS} \
-    ${XCODEBUILD_ACTION} | xcpretty
+    build | xcpretty
 
 step "Copying dynamic framework into place"
 mkdir -p "${OUTPUT}/${NAME}.framework"
-ditto ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework "${OUTPUT}/${NAME}.framework"
-if [[ -e ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM ]]; then
-    cp -r ${PRODUCTS}/${BUILDTYPE}/${NAME}.framework.dSYM "${OUTPUT}"
+ditto ${PRODUCTS}/${NAME}.framework "${OUTPUT}/${NAME}.framework"
+if [[ -e ${PRODUCTS}/${NAME}.framework.dSYM ]]; then
+    cp -r ${PRODUCTS}/${NAME}.framework.dSYM "${OUTPUT}"
+fi
+
+step "Building and archiving Mapbox GL.app (build ${PROJ_VERSION}, version ${SEM_VERSION})…"
+if [[ ${BUILDTYPE} == Release ]]; then
+    mkdir -p ${APP_OUTPUT}
+    xcodebuild \
+        CURRENT_PROJECT_VERSION=${PROJ_VERSION} \
+        CURRENT_SHORT_VERSION=${SHORT_VERSION} \
+        CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
+        CURRENT_COMMIT_HASH=${HASH} \
+        -derivedDataPath ${DERIVED_DATA} \
+        -archivePath "${APP_OUTPUT}/macosapp.xcarchive" \
+        -workspace ./platform/macos/macos.xcworkspace \
+        -scheme macosapp \
+        -configuration ${BUILDTYPE} \
+        -jobs ${JOBS} \
+        archive | xcpretty
 fi
 
 if [[ ${SYMBOLS} = NO ]]; then

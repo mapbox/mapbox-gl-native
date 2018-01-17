@@ -19,20 +19,31 @@ function step { >&2 echo -e "\033[1m\033[36m* $@\033[0m"; }
 function finish { >&2 echo -en "\033[0m"; }
 trap finish EXIT
 
-buildPackageStyle() {
-    local package=$1 style=""
-    if [[ ${#} -eq 2 ]]; then
-        style="$2"
-    fi
-    step "Building: make ${package} ${style}"
-    make ${package}
-    step "Publishing ${package} with ${style}"
+publish() {
+    OPTRESET=1
+    OPTIND=
+    local arg
+    local rule=
+    local suffix=
+    local app=
+    while getopts 'r:s:a:' arg; do
+        case ${arg} in
+            r) rule=${OPTARG};;
+            s) suffix=${OPTARG};;
+            a) app=${OPTARG};;
+            *) "Usage: [-r rule] [-s suffix] [-a app]"; return
+        esac
+    done
+    
+    step "Building: make ${rule} ${suffix}"
+    make ${rule}
+    step "Publishing ${rule} with ${suffix}"
     local file_name=""
-    if [ -z ${style} ]
+    if [ -z ${suffix} ]
     then
         file_name=mapbox-macos-sdk-${PUBLISH_VERSION}.zip
     else
-        file_name=mapbox-macos-sdk-${PUBLISH_VERSION}-${style}.zip
+        file_name=mapbox-macos-sdk-${PUBLISH_VERSION}-${suffix}.zip
     fi
     step "Compressing ${file_name}…"
     cd build/macos/pkg
@@ -46,16 +57,18 @@ buildPackageStyle() {
             --name ${file_name} \
             --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
     fi
-    if [[ ${DEPLOY_APP} == true ]]; then
+    if [ ${app} ]; then
+        file_name="Mapbox GL.app.zip"
+        step "Compressing ${file_name}…"
         cd build/macos/app
-        rm -f 'Mapbox GL.app.zip'
-        zip -yr '../deploy/Mapbox GL.app.zip' 'Mapbox GL.app'
+        rm -f "${file_name}"
+        zip -yr "../deploy/${file_name}" 'Mapbox GL.app'
         cd -
         if [[ "${GITHUB_RELEASE}" == true ]]; then
             echo "Uploading ${file_name} to GitHub"
             github-release upload \
                 --tag "macos-v${PUBLISH_VERSION}" \
-                --name ${file_name} \
+                --name "${file_name}" \
                 --file "${BINARY_DIRECTORY}/${file_name}" > /dev/null
         fi
     fi
@@ -126,7 +139,7 @@ if [[ "${GITHUB_RELEASE}" == true ]]; then
         --draft ${PUBLISH_PRE_FLAG}
 fi
 
-buildPackageStyle "xpackage" "symbols"
-DEPLOY_APP=true buildPackageStyle "xpackage SYMBOLS=NO"
+publish -r xpackage -s symbols
+publish -r "xpackage SYMBOLS=NO" -a true
 
 step "Finished deploying ${PUBLISH_VERSION} in $(($SECONDS / 60)) minutes and $(($SECONDS % 60)) seconds"
