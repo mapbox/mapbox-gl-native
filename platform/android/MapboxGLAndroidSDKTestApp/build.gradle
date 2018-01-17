@@ -72,6 +72,7 @@ dependencies {
     androidTestImplementation dependenciesList.testRules
     androidTestImplementation dependenciesList.testEspressoCore
     androidTestImplementation dependenciesList.testEspressoIntents
+    androidTestImplementation dependenciesList.testEspressoContrib
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"
