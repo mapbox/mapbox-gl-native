@@ -74,7 +74,9 @@ public:
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;
+
     HillshadeBucket* getBucket() const;
+    void backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask);
     
     // neighboringTiles is a bitmask for which neighboring tiles have been backfilled
     // there are max 8 possible neighboring tiles, so each bit represents one neighbor

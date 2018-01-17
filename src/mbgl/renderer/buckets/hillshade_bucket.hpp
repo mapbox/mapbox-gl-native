@@ -31,8 +31,17 @@ public:
     optional<gl::Texture> texture;
 
     TileMask mask{ { 0, 0, 0 } };
-    bool prepared = false;
+
+    const DEMData& getDEMData() const;
     DEMData& getDEMData();
+
+    bool isPrepared() const {
+        return prepared;
+    }
+
+    void setPrepared (bool preparedState) {
+        prepared = preparedState;
+    }
 
     // Raster-DEM Tile Sources use the default buffers from Painter
     gl::VertexVector<HillshadeLayoutVertex> vertices;
@@ -43,6 +52,7 @@ public:
     optional<gl::IndexBuffer<gl::Triangles>> indexBuffer;
 private: 
     DEMData demdata;
+    bool prepared = false;
 };
 
 } // namespace mbgl

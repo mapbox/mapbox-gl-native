@@ -83,6 +83,33 @@ HillshadeBucket* RasterDEMTile::getBucket() const {
     return bucket.get();
 }
 
+void RasterDEMTile::backfillBorder(const RasterDEMTile& borderTile, const DEMTileNeighbors mask) {
+    int32_t dx = borderTile.id.canonical.x - id.canonical.x;
+    const int8_t dy = borderTile.id.canonical.y - id.canonical.y;
+    const uint32_t dim = pow(2, id.canonical.z);
+    if (dx == 0 && dy == 0) return;
+    if (std::abs(dy) > 1) return;
+    // neighbor is in another world wrap
+    if (std::abs(dx) > 1) {
+        if (std::abs(int(dx + dim)) == 1) {
+            dx += dim;
+        } else if (std::abs(int(dx - dim)) == 1) {
+            dx -= dim;
+        }
+    }
+    const HillshadeBucket* borderBucket = borderTile.getBucket();
+    const DEMData& borderDEM = borderBucket->getDEMData();
+    DEMData& tileDEM = bucket->getDEMData();
+
+    if (tileDEM.isLoaded() && borderDEM.isLoaded()){
+        tileDEM.backfillBorder(borderDEM, dx, dy);
+        // update the bitmask to indicate that this tiles have been backfilled by flipping the relevant bit
+        this->neighboringTiles = this->neighboringTiles | mask;
+        // mark HillshadeBucket.prepared as false so it runs through the prepare render pass
+        // with the new texture data we just backfilled
+        bucket->setPrepared(false);
+    }
+}
 
 void RasterDEMTile::setMask(TileMask&& mask) {
     if (bucket) {

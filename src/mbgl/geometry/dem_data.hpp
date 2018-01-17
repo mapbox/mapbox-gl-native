@@ -46,7 +46,7 @@ public:
     };
     
     DEMData(PremultipliedImage& image);
-    void backfillBorder(DEMData& borderTileData, int8_t dx, int8_t dy);
+    void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
     bool isLoaded() const {
         return loaded;
     };

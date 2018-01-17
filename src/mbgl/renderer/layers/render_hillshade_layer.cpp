@@ -96,7 +96,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!bucket.hasData())
             continue;
-        if (!bucket.prepared && parameters.pass == RenderPass::Pass3D) {
+        if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
             OffscreenTexture view(parameters.context, { 256, 256 });
             view.bind();
             
@@ -128,7 +128,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
                 getID()
             );
             bucket.texture = std::move(view.getTexture());
-            bucket.prepared = true;
+            bucket.setPrepared(true);
         } else if (parameters.pass == RenderPass::Translucent) {
             assert(bucket.texture);
             parameters.context.bindTexture(*bucket.texture, 0, gl::TextureFilter::Linear);
