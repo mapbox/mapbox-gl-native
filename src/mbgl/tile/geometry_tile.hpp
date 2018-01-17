@@ -127,6 +127,7 @@ private:
     std::unique_ptr<FeatureIndex> featureIndex;
     std::unique_ptr<FeatureIndex> pendingFeatureIndex;
     std::unique_ptr<const GeometryTileData> data;
+    std::unique_ptr<const GeometryTileData> pendingData;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
