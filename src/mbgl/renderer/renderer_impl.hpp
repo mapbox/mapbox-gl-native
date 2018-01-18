@@ -74,6 +74,7 @@ private:
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
+    void commitFeatureIndexes();
     void updateFadingTiles();
 
     friend class Renderer;
