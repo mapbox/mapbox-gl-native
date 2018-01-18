@@ -38,7 +38,6 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
   private final Context context;
   private final MapboxMap mapboxMap;
-  private String[] attributionTitles;
   private Set<Attribution> attributionSet;
 
   public AttributionDialogManager(@NonNull Context context, @NonNull MapboxMap mapboxMap) {
@@ -50,11 +49,10 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   @Override
   public void onClick(View view) {
     attributionSet = new AttributionBuilder(mapboxMap).build();
-    showAttributionDialog();
+    showAttributionDialog(getAttributionTitles());
   }
 
-  protected void showAttributionDialog() {
-    attributionTitles = getAttributionTitles();
+  protected void showAttributionDialog(String[] attributionTitles) {
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionsDialogTitle);
     builder.setAdapter(new ArrayAdapter<>(context, R.layout.mapbox_attribution_list_item, attributionTitles), this);
@@ -80,7 +78,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   }
 
   private boolean isLatestEntry(int attributionKeyIndex) {
-    return attributionKeyIndex == attributionTitles.length - 1;
+    return attributionKeyIndex == getAttributionTitles().length - 1;
   }
 
   private void showTelemetryDialog() {
