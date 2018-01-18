@@ -560,8 +560,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/sources/image_source_impl.cpp
     src/mbgl/style/sources/image_source_impl.hpp
     src/mbgl/style/sources/raster_dem_source.cpp
-    src/mbgl/style/sources/raster_dem_source_impl.cpp
-    src/mbgl/style/sources/raster_dem_source_impl.hpp
     src/mbgl/style/sources/raster_source.cpp
     src/mbgl/style/sources/raster_source_impl.cpp
     src/mbgl/style/sources/raster_source_impl.hpp

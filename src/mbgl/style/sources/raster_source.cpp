@@ -9,8 +9,8 @@
 namespace mbgl {
 namespace style {
 
-RasterSource::RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset_, uint16_t tileSize)
-    : Source(makeMutable<Impl>(std::move(id), tileSize)),
+RasterSource::RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset_, uint16_t tileSize, SourceType sourceType)
+    : Source(makeMutable<Impl>(sourceType, std::move(id), tileSize)),
       urlOrTileset(std::move(urlOrTileset_)) {
 }
 

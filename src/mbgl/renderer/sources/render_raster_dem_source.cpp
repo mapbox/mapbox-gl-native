@@ -10,13 +10,13 @@ namespace mbgl {
 
 using namespace style;
 
-RenderRasterDEMSource::RenderRasterDEMSource(Immutable<style::RasterDEMSource::Impl> impl_)
+RenderRasterDEMSource::RenderRasterDEMSource(Immutable<style::RasterSource::Impl> impl_)
     : RenderSource(impl_) {
     tilePyramid.setObserver(this);
 }
 
-const style::RasterDEMSource::Impl& RenderRasterDEMSource::impl() const {
-    return static_cast<const style::RasterDEMSource::Impl&>(*baseImpl);
+const style::RasterSource::Impl& RenderRasterDEMSource::impl() const {
+    return static_cast<const style::RasterSource::Impl&>(*baseImpl);
 }
 
 bool RenderRasterDEMSource::isLoaded() const {
