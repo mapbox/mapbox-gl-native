@@ -153,4 +153,3 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 }
 
 } // namespace mbgl
-

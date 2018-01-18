@@ -89,13 +89,18 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
         );
     };
 
+    mat4 mat;
+    matrix::ortho(mat, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
+    matrix::translate(mat, mat, 0, -util::EXTENT, 0);
 
     for (const RenderTile& tile : renderTiles) {
         assert(dynamic_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl)));
         HillshadeBucket& bucket = *reinterpret_cast<HillshadeBucket*>(tile.tile.getBucket(*baseImpl));
 
-        if (!bucket.hasData())
+        if (!bucket.hasData()){
             continue;
+        }
+
         if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
             const uint16_t tilesize = bucket.getDEMData().level.dim;
             OffscreenTexture view(parameters.context, { tilesize, tilesize });
@@ -103,10 +108,6 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
             
             parameters.context.bindTexture(*bucket.dem, 0, gl::TextureFilter::Nearest, gl::TextureMipMap::No, gl::TextureWrap::Clamp, gl::TextureWrap::Clamp);
             const Properties<>::PossiblyEvaluated properties;
-
-            mat4 mat;
-            matrix::ortho(mat, 0, util::EXTENT, -util::EXTENT, 0, 0, 1);
-            matrix::translate(mat, mat, 0, -util::EXTENT, 0);
             
             parameters.programs.hillshadePrepare.draw(
                 parameters.context,

@@ -11,7 +11,7 @@ class Tileset;
 class TileParameters;
 class HillshadeBucket;
 
-enum class DEMTileNeighbors : unsigned char {
+enum class DEMTileNeighbors : uint8_t {
   // 0b00000000
   Empty = 0 << 1,
 

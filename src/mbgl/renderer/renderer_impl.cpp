@@ -290,7 +290,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if ((!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) || (!parameters.staticData.has3D && layer->is<RenderHillshadeLayer>())) {
+        if (!parameters.staticData.has3D && (layer->is<RenderFillExtrusionLayer>() || layer->is<RenderHillshadeLayer>())) {
             parameters.staticData.has3D = true;
         }
 

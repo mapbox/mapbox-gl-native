@@ -3,9 +3,11 @@
 
 namespace mbgl {
 
-DEMData::DEMData(PremultipliedImage& image):
+DEMData::DEMData(const PremultipliedImage& image):
     level(image.size.height, std::max<int32_t>(std::ceil(image.size.height / 2), 1)){
-    assert(image.size.height == image.size.width);
+    if (image.size.height != image.size.width){
+        throw std::runtime_error("raster-dem tiles must be square.");
+    }
 
     for (int32_t y = 0; y < level.dim; y++) {
         for (int32_t x = 0; x < level.dim; x++) {

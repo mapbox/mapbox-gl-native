@@ -45,11 +45,11 @@ public:
         PremultipliedImage image;
     };
     
-    DEMData(PremultipliedImage& image);
+    DEMData(const PremultipliedImage& image);
     void backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy);
     bool isLoaded() const {
         return loaded;
-    };
+    }
     Level level;
     private:
         bool loaded = false;
