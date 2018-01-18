@@ -114,7 +114,13 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
                 if (renderableNeighbor != nullptr && renderableNeighbor->isRenderable()) {
                     RasterDEMTile& borderTile = static_cast<RasterDEMTile&>(*renderableNeighbor);
                     demtile.backfillBorder(borderTile, mask);
-                    borderTile.backfillBorder(demtile, opposites[mask]);
+
+                    // if the border tile has not been backfilled by a previous instance of the main
+                    // tile, backfill its corresponding neighbor as well.
+                    const DEMTileNeighbors& borderMask = opposites[mask];
+                    if ((borderTile.neighboringTiles & borderMask) != borderMask){
+                        borderTile.backfillBorder(demtile, borderMask);
+                     }
                 }
             }
         }
