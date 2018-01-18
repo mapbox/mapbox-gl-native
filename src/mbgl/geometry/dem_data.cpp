@@ -44,11 +44,22 @@ DEMData::DEMData(const PremultipliedImage& image):
     loaded = true;
 }
 
+// This function takes the DEMData from a neighboring tile and backfills the edge/corner
+// data in order to create a one pixel "buffer" of image data around the tile. This is
+// necessary because the hillshade formula calculates the dx/dz, dy/dz derivatives at each
+// pixel of the tile by querying the 8 surrounding pixels, and if we don't have the pixel
+// buffer we get seams at tile boundaries.
 void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy) {
     auto& t = level;
     auto& o = borderTileData.level;
+
+    // Tiles from the same source should always be of the same dimensions.
     assert(t.dim == o.dim);
 
+    // We determine the pixel range to backfill based which corner/edge `borderTileData`
+    // represents. For example, dx = -1, dy = -1 represents the upper left corner of the
+    // base tile, so we only need to backfill one pixel at coordinates (-1, -1) of the tile
+    // image.
     int32_t _xMin = dx * t.dim;
     int32_t _xMax = dx * t.dim + t.dim;
     int32_t _yMin = dy * t.dim;
