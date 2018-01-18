@@ -2,13 +2,13 @@
 
 #include <mbgl/renderer/render_source.hpp>
 #include <mbgl/renderer/tile_pyramid.hpp>
-#include <mbgl/style/sources/raster_dem_source_impl.hpp>
+#include <mbgl/style/sources/raster_source_impl.hpp>
 
 namespace mbgl {
 
 class RenderRasterDEMSource : public RenderSource {
 public:
-    RenderRasterDEMSource(Immutable<style::RasterDEMSource::Impl>);
+    RenderRasterDEMSource(Immutable<style::RasterSource::Impl>);
 
     bool isLoaded() const final;
 
@@ -37,7 +37,7 @@ public:
     void dumpDebugLogs() const final;
 
 private:
-    const style::RasterDEMSource::Impl& impl() const;
+    const style::RasterSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
     optional<std::vector<std::string>> tileURLTemplates;

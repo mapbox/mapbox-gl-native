@@ -8,7 +8,7 @@ namespace style {
 
 class RasterSource::Impl : public Source::Impl {
 public:
-    Impl(std::string id, uint16_t tileSize);
+    Impl(SourceType sourceType, std::string id, uint16_t tileSize);
     Impl(const Impl&, Tileset);
 
     optional<Tileset> getTileset() const;

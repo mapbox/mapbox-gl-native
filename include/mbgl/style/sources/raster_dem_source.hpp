@@ -1,6 +1,6 @@
 #pragma once
 
-#include <mbgl/style/source.hpp>
+#include <mbgl/style/sources/raster_source.hpp>
 #include <mbgl/util/tileset.hpp>
 #include <mbgl/util/variant.hpp>
 
@@ -10,24 +10,10 @@ class AsyncRequest;
 
 namespace style {
 
-class RasterDEMSource : public Source {
+class RasterDEMSource : public RasterSource {
 public:
     RasterDEMSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize);
-    ~RasterDEMSource() final;
 
-    const variant<std::string, Tileset>& getURLOrTileset() const;
-    optional<std::string> getURL() const;
-
-    uint16_t getTileSize() const;
-
-    class Impl;
-    const Impl& impl() const;
-
-    void loadDescription(FileSource&) final;
-
-private:
-    const variant<std::string, Tileset> urlOrTileset;
-    std::unique_ptr<AsyncRequest> req;
 };
 
 template <>
