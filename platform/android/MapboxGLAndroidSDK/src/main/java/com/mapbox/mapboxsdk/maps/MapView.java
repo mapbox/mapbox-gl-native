@@ -22,6 +22,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -36,16 +37,18 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.services.android.telemetry.MapboxTelemetry;
-import timber.log.Timber;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
+
+import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -201,7 +204,7 @@ public class MapView extends FrameLayout {
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
     // inject widgets with MapboxMap
     myLocationView.setMapboxMap(mapboxMap);
-    attrView.setOnClickListener(new AttributionDialogManager(context, mapboxMap));
+    attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));
 
     // Ensure this view is interactable
     setClickable(true);
@@ -1070,6 +1073,30 @@ public class MapView extends FrameLayout {
 
     void clearOnMapReadyCallbacks() {
       onMapReadyCallbackList.clear();
+    }
+  }
+
+  /**
+   * Click event hook for providing a custom attribution dialog manager.
+   */
+  private static class AttributionClickListener implements OnClickListener {
+
+    private final AttributionDialogManager defaultDialogManager;
+    private UiSettings uiSettings;
+
+    private AttributionClickListener(Context context, MapboxMap mapboxMap) {
+      this.defaultDialogManager = new AttributionDialogManager(context, mapboxMap);
+      this.uiSettings = mapboxMap.getUiSettings();
+    }
+
+    @Override
+    public void onClick(View v) {
+      AttributionDialogManager customDialogManager = uiSettings.getAttributionDialogManager();
+      if (customDialogManager != null) {
+        uiSettings.getAttributionDialogManager().onClick(v);
+      } else {
+        defaultDialogManager.onClick(v);
+      }
     }
   }
 }

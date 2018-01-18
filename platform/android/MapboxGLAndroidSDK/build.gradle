@@ -1,29 +1,29 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    api rootProject.ext.dep.mapboxAndroidTelemetry
-    api rootProject.ext.dep.mapboxJavaGeoJSON
-    implementation rootProject.ext.dep.supportAnnotations
-    implementation rootProject.ext.dep.supportFragmentV4
-    implementation rootProject.ext.dep.timber
-    implementation rootProject.ext.dep.okhttp3
-    compileOnly(rootProject.ext.dep.lost) {
+    api dependenciesList.mapboxAndroidTelemetry
+    api dependenciesList.mapboxJavaGeoJSON
+    implementation dependenciesList.supportAnnotations
+    implementation dependenciesList.supportFragmentV4
+    implementation dependenciesList.timber
+    implementation dependenciesList.okhttp3
+    compileOnly(dependenciesList.lost) {
         exclude group: 'com.google.guava'
         exclude group: 'com.android.support'
     }
-    testImplementation rootProject.ext.dep.lost
-    testImplementation rootProject.ext.dep.junit
-    testImplementation rootProject.ext.dep.mockito
-    testImplementation rootProject.ext.dep.robolectric
+    testImplementation dependenciesList.lost
+    testImplementation dependenciesList.junit
+    testImplementation dependenciesList.mockito
+    testImplementation dependenciesList.robolectric
 }
 
 android {
-    compileSdkVersion rootProject.ext.compileSdkVersion
-    buildToolsVersion rootProject.ext.buildToolsVersion
+    compileSdkVersion androidVersions.compileSdkVersion
+    buildToolsVersion androidVersions.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdkVersion androidVersions.minSdkVersion
+        targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
         buildConfigField "String", "MAPBOX_VERSION_STRING", String.format("\"Mapbox/%s\"", project.VERSION_NAME)
         buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
@@ -64,12 +64,12 @@ android {
                     arguments "-DANDROID_CPP_FEATURES=rtti;exceptions"
                     arguments "-DMBGL_PLATFORM=android"
                     arguments "-DMASON_PLATFORM=android"
-                    arguments "-DNodeJS_EXECUTABLE=" + rootProject.ext.node
-                    arguments "-Dnpm_EXECUTABLE=" + rootProject.ext.npm
+                    arguments "-DNodeJS_EXECUTABLE=" + node
+                    arguments "-Dnpm_EXECUTABLE=" + npm
 
                     // Enable ccache if the user has installed it.
-                    if (rootProject.ext.ccache?.trim()) {
-                        arguments "-DANDROID_CCACHE=" + rootProject.ext.ccache
+                    if (ccache?.trim()) {
+                        arguments "-DANDROID_CCACHE=" + ccache
                         // ccache splits up the compile command until multiple invocations and uses -E
                         // with one of them, and clang doesn't like unused arguments in that case.
                         cFlags "-Qunused-arguments"
@@ -121,7 +121,7 @@ android {
 
     testOptions {
         unitTests {
-            returnDefaultValues = true
+            returnDefaultValues true
         }
     }
 
@@ -129,15 +129,10 @@ android {
         debug {
             jniDebuggable true
         }
-
-        release {
-            // aar proguard configuration
-            jniDebuggable false
-        }
     }
 }
 
-def getGitRevision() {
+def static getGitRevision() {
     def cmd = "git rev-parse --short HEAD"
     def proc = cmd.execute()
     def ref = proc.text.trim()

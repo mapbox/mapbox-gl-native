@@ -1,4 +1,5 @@
 buildscript {
+
     repositories {
         jcenter()
         google()
@@ -16,8 +17,8 @@ allprojects {
     }
 }
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '3.2.1'
+subprojects {
+    apply from: "${rootDir}/gradle/dependencies.gradle"
 }
 
 apply from: "${rootDir}/gradle/dependencies.gradle"

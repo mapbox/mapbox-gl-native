@@ -37,6 +37,7 @@ public final class UiSettings {
 
   private final ImageView attributionsView;
   private final int[] attributionsMargins = new int[4];
+  private AttributionDialogManager attributionDialogManager;
 
   private final View logoView;
   private final int[] logoMargins = new int[4];
@@ -533,6 +534,28 @@ public final class UiSettings {
    */
   public boolean isAttributionEnabled() {
     return attributionsView.getVisibility() == View.VISIBLE;
+  }
+
+
+  /**
+   * Set a custom attribution dialog manager.
+   * <p>
+   * Set to null to reset to default behaviour.
+   * </p>
+   *
+   * @param attributionDialogManager the manager class used for showing attribution
+   */
+  public void setAttributionDialogManager(AttributionDialogManager attributionDialogManager) {
+    this.attributionDialogManager = attributionDialogManager;
+  }
+
+  /**
+   * Get the custom attribution dialog manager.
+   *
+   * @return the active manager class used for showing attribution
+   */
+  public AttributionDialogManager getAttributionDialogManager() {
+    return attributionDialogManager;
   }
 
   /**
