@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
+### Packaging
+
+* Removed support for 32-bit simulators. ([#10962](https://github.com/mapbox/mapbox-gl-native/pull/10962))
+
 ### Styles and rendering
 
 * Added `MGLComputedShapeSource` source class that allows applications to supply vector data on a per-tile basis.
