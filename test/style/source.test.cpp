@@ -6,14 +6,17 @@
 #include <mbgl/style/style.hpp>
 #include <mbgl/style/source_impl.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
+#include <mbgl/style/layers/hillshade_layer.cpp>
 #include <mbgl/style/layers/raster_layer.cpp>
 #include <mbgl/style/layers/line_layer.hpp>
 
 #include <mbgl/renderer/sources/render_raster_source.hpp>
+#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
 #include <mbgl/renderer/sources/render_vector_source.hpp>
 #include <mbgl/renderer/sources/render_geojson_source.hpp>
 #include <mbgl/renderer/tile_parameters.hpp>
@@ -173,6 +176,44 @@ TEST(Source, RasterTileEmpty) {
     test.run();
 }
 
+TEST(Source, RasterDEMTileEmpty) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    HillshadeLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
+
+    RasterDEMSource source("source", tileset, 512);
+    source.loadDescription(test.fileSource);
+
+    test.renderSourceObserver.tileChanged = [&] (RenderSource& source_, const OverscaledTileID&) {
+        EXPECT_EQ("source", source_.baseImpl->id);
+        test.end();
+    };
+
+    test.renderSourceObserver.tileError = [&] (RenderSource&, const OverscaledTileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.run();
+}
+
 TEST(Source, VectorTileEmpty) {
     SourceTest test;
 
@@ -235,6 +276,44 @@ TEST(Source, RasterTileFail) {
 
     test.renderSourceObserver.tileError = [&] (RenderSource& source_, const OverscaledTileID& tileID, std::exception_ptr error) {
         EXPECT_EQ(SourceType::Raster, source_.baseImpl->type);
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
+        EXPECT_EQ("Failed by the test case", util::toString(error));
+        test.end();
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.run();
+}
+
+TEST(Source, RasterDEMTileFail) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.error = std::make_unique<Response::Error>(
+            Response::Error::Reason::Other,
+            "Failed by the test case");
+        return response;
+    };
+
+    HillshadeLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
+
+    RasterDEMSource source("source", tileset, 512);
+    source.loadDescription(test.fileSource);
+
+    test.renderSourceObserver.tileError = [&] (RenderSource& source_, const OverscaledTileID& tileID, std::exception_ptr error) {
+        EXPECT_EQ(SourceType::RasterDEM, source_.baseImpl->type);
         EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
         EXPECT_EQ("Failed by the test case", util::toString(error));
         test.end();
@@ -328,6 +407,43 @@ TEST(Source, RasterTileCorrupt) {
     test.run();
 }
 
+TEST(Source, RasterDEMTileCorrupt) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.data = std::make_unique<std::string>("CORRUPTED");
+        return response;
+    };
+
+    HillshadeLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
+
+    RasterDEMSource source("source", tileset, 512);
+    source.loadDescription(test.fileSource);
+
+    test.renderSourceObserver.tileError = [&] (RenderSource& source_, const OverscaledTileID& tileID, std::exception_ptr error) {
+        EXPECT_EQ(source_.baseImpl->type, SourceType::RasterDEM);
+        EXPECT_EQ(OverscaledTileID(0, 0, 0), tileID);
+        EXPECT_TRUE(bool(error));
+        // Not asserting on platform-specific error text.
+        test.end();
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.run();
+}
+
 TEST(Source, VectorTileCorrupt) {
     SourceTest test;
 
@@ -381,6 +497,42 @@ TEST(Source, RasterTileCancel) {
     tileset.tiles = { "tiles" };
 
     RasterSource source("source", tileset, 512);
+    source.loadDescription(test.fileSource);
+
+    test.renderSourceObserver.tileChanged = [&] (RenderSource&, const OverscaledTileID&) {
+        FAIL() << "Should never be called";
+    };
+
+    test.renderSourceObserver.tileError = [&] (RenderSource&, const OverscaledTileID&, std::exception_ptr) {
+        FAIL() << "Should never be called";
+    };
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->setObserver(&test.renderSourceObserver);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.run();
+}
+
+TEST(Source, RasterDEMTileCancel) {
+    SourceTest test;
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        test.end();
+        return optional<Response>();
+    };
+
+    HillshadeLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    Tileset tileset;
+    tileset.tiles = { "tiles" };
+
+    RasterDEMSource source("source", tileset, 512);
     source.loadDescription(test.fileSource);
 
     test.renderSourceObserver.tileChanged = [&] (RenderSource&, const OverscaledTileID&) {
@@ -471,6 +623,48 @@ TEST(Source, RasterTileAttribution) {
     };
 
     RasterSource source("source", "url", 512);
+    source.setObserver(&test.styleObserver);
+    source.loadDescription(test.fileSource);
+
+    auto renderSource = RenderSource::create(source.baseImpl);
+    renderSource->update(source.baseImpl,
+                         layers,
+                         true,
+                         true,
+                         test.tileParameters);
+
+    test.run();
+}
+
+TEST(Source, RasterDEMTileAttribution) {
+    SourceTest test;
+
+    HillshadeLayer layer("id", "source");
+    std::vector<Immutable<Layer::Impl>> layers {{ layer.baseImpl }};
+
+    std::string mapbox = ("<a href='https://www.mapbox.com/about/maps/' target='_blank'>&copy; Mapbox</a> ");
+
+    test.fileSource.tileResponse = [&] (const Resource&) {
+        Response response;
+        response.noContent = true;
+        return response;
+    };
+
+    test.fileSource.sourceResponse = [&] (const Resource& resource) {
+        EXPECT_EQ("url", resource.url);
+        Response response;
+        response.data = std::make_unique<std::string>(R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" +
+                                                      mapbox +
+                                                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON");
+        return response;
+    };
+
+    test.styleObserver.sourceChanged = [&] (Source& source) {
+        EXPECT_EQ(mapbox, source.getAttribution());
+        test.end();
+    };
+
+    RasterDEMSource source("source", "url", 512);
     source.setObserver(&test.styleObserver);
     source.loadDescription(test.fileSource);
 
