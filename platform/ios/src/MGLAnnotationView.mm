@@ -12,6 +12,7 @@
 @property (nonatomic, readwrite, nullable) NSString *reuseIdentifier;
 @property (nonatomic, readwrite) CATransform3D lastAppliedScaleTransform;
 @property (nonatomic, readwrite) CATransform3D lastAppliedRotateTransform;
+@property (nonatomic, readwrite) CGFloat lastPitch;
 @property (nonatomic, weak) UIPanGestureRecognizer *panGestureRecognizer;
 @property (nonatomic, weak) UILongPressGestureRecognizer *longPressRecognizer;
 @property (nonatomic, weak) MGLMapView *mapView;
@@ -137,12 +138,18 @@
         // along the y axis of its superview.
         CGFloat maxScaleReduction = 1.0 - self.center.y / superviewHeight;
 
+        // Since it is possible for the map view to report a pitch less than 0 due to the nature of
+        // how the gesture information is captured, the value is guarded with MAX.
+        CGFloat pitch = MAX(self.mapView.camera.pitch, 0);
+
+        // Return early if the map view currently has no pitch and was not previously pitched.
+        if (!pitch && !_lastPitch) return;
+        _lastPitch = pitch;
+
         // The pitch intensity represents how much the map view is actually pitched compared to
         // what is possible. The value will range from 0% (not pitched at all) to 100% (pitched as much
         // as the map view will allow). The map view's maximum pitch is defined in `mbgl::util::PITCH_MAX`.
-        // Since it is possible for the map view to report a pitch less than 0 due to the nature of
-        // how the gesture information is captured, the value is guarded with MAX.
-        CGFloat pitchIntensity = MAX(self.mapView.camera.pitch, 0) / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
+        CGFloat pitchIntensity = pitch / MGLDegreesFromRadians(mbgl::util::PITCH_MAX);
 
         // The pitch adjusted scale is the inverse proportion of the maximum possible scale reduction
         // multiplied by the pitch intensity. For example, if the maximum scale reduction is 75% and the

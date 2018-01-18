@@ -171,6 +171,10 @@ MGL_EXPORT
 
  The default value of this property is `YES`. Set this property to `NO` if the
  view’s legibility is important.
+
+ @note Scaling many on-screen annotation views can contribute to poor map
+    performance. Consider disabling this property if your use case involves
+    hundreds or thousands of annotation views.
  */
 @property (nonatomic, assign) BOOL scalesWithViewingDistance;
 
