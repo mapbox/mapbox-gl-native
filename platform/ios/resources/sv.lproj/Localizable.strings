@@ -2,7 +2,7 @@
 "ANNOTATION_A11Y_HINT" = "Visa mer information";
 
 /* No comment provided by engineer. */
-"API_CLIENT_400_DESC" = "Sessionens anrop misslyckades. Originalanropet var: %@";
+"API_CLIENT_400_DESC" = "Förfrågan misslyckades. Originalförfrågan var: %@";
 
 /* No comment provided by engineer. */
 "API_CLIENT_400_REASON" = "Statuskoden var %ld";
@@ -23,22 +23,25 @@
 "COMPASS_NORTH" = "N";
 
 /* Instructions in Interface Builder designable; {key}, {plist file name} */
-"DESIGNABLE" = "Sätt %1$@ till din access token i %2$@ för att visa kartan som Mapbox levererar.";
+"DESIGNABLE" = "För att visa Mapbox-karta här, fyll i %1$@ till din access token i %2$@\n\nFör detaljerad information, se:";
 
 /* Setup documentation URL display string; keep as short as possible */
 "FIRST_STEPS_URL" = "mapbox.com/help/first-steps-ios-sdk";
 
 /* Accessibility hint */
-"INFO_A11Y_HINT" = "Visa medverkande, återkopplingsformulär och mer.";
+"INFO_A11Y_HINT" = "Visa mer";
 
 /* Accessibility label */
 "INFO_A11Y_LABEL" = "Om den här kartan";
 
-/* User-friendly error description */
-"LOAD_MAP_FAILED_DESC" = "Kartan kunde inte laddas på grund av att ett okänt fel inträffade.";
+/* List separator */
+"LIST_SEPARATOR" = ", ";
 
 /* User-friendly error description */
-"LOAD_STYLE_FAILED_DESC" = "Kartan kunde inte laddas på grund av att stilen är skadad.";
+"LOAD_MAP_FAILED_DESC" = "Misslyckades med att ladda kartan på grund av ett okänt fel.";
+
+/* User-friendly error description */
+"LOAD_STYLE_FAILED_DESC" = "Misslyckades med att ladda kartan på grund av att kartstilen kunde inte laddas.";
 
 /* Accessibility label */
 "LOGO_A11Y_LABEL" = "Mapbox";
@@ -46,47 +49,68 @@
 /* Accessibility label */
 "MAP_A11Y_LABEL" = "Karta";
 
-/* Map accessibility value */
-"MAP_A11Y_VALUE" = "Zoom %1$dx\n%2$ld annotering(ar) synliga";
+/* Map accessibility value; {number of visible annotations} */
+"MAP_A11Y_VALUE_ANNOTATIONS" = "%ld annotering(ar) synliga.";
+
+/* Map accessibility value; {list of visible places} */
+"MAP_A11Y_VALUE_PLACES" = "Synliga platser: %@.";
+
+/* Map accessibility value; {number of visible roads} */
+"MAP_A11Y_VALUE_ROADS" = "%ld väg(ar) synliga.";
+
+/* Map accessibility value; {zoom level} */
+"MAP_A11Y_VALUE_ZOOM" = "Zoom %dx.";
 
 /* User-friendly error description */
-"PARSE_STYLE_FAILED_DESC" = "Kartan kunde inte laddas på grund av att stilen är skadad.";
+"PARSE_STYLE_FAILED_DESC" = "Misslyckades med att ladda kartan för att kartstilen är korrupt.";
+
+/* String format for accessibility value for road feature; {starting compass direction}, {ending compass direction} */
+"ROAD_DIRECTION_A11Y_FMT" = "%1$@ till %2$@";
+
+/* Accessibility value indicating that a road is a divided road (dual carriageway) */
+"ROAD_DIVIDED_A11Y_VALUE" = "Delad väg";
+
+/* Accessibility value indicating that a road is a one-way road */
+"ROAD_ONEWAY_A11Y_VALUE" = "Enkelriktad väg";
+
+/* String format for accessibility value for road feature; {route number} */
+"ROAD_REF_A11Y_FMT" = "Rutt %@";
 
 /* Action sheet title */
 "SDK_NAME" = "Mapbox Maps SDK for iOS";
 
 /* Developer-only SDK update notification; {latest version, in format x.x.x} */
-"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS version %@ är nu tillgängligt:";
+"SDK_UPDATE_AVAILABLE" = "Mapbox Maps SDK for iOS version %@ är nu tillgänglig:";
 
 /* User-friendly error description */
-"STYLE_NOT_FOUND_DESC" = "Kartan kunde inte laddas på grund av ett okänt fel.";
+"STYLE_NOT_FOUND_DESC" = "Kartan kunde inte laddas för att kartstilen kunde inte hittas eller för att den är inkompatibel.";
 
 /* Telemetry prompt message */
-"TELEMETRY_DISABLED_MSG" = "Du kan hjälpa till att göra OpenStreetMap och Mapbox karttjänster bättre genom att bidra med anonymiserad användningsdata.";
+"TELEMETRY_DISABLED_MSG" = "Du kan göra OpenStreetMap och Mapbox kartor bättre genom att bidra med anonym data.";
 
 /* Telemetry prompt button */
-"TELEMETRY_DISABLED_OFF" = "Avstå";
+"TELEMETRY_DISABLED_OFF" = "Delta Inte";
 
 /* Telemetry prompt button */
 "TELEMETRY_DISABLED_ON" = "Delta";
 
 /* Telemetry prompt message */
-"TELEMETRY_ENABLED_MSG" = "Du hjälper till att göra OpenStreetMap och Mapbox karttjänster bättre genom att bidra med anonymiserad användningsdata.";
+"TELEMETRY_ENABLED_MSG" = "Du kan göra OpenStreetMap och Mapbox kartor bättre genom att bidra med anonym data.";
 
 /* Telemetry prompt button */
-"TELEMETRY_ENABLED_OFF" = "Avsluta deltagandet";
+"TELEMETRY_ENABLED_OFF" = "Sluta delta";
 
 /* Telemetry prompt button */
-"TELEMETRY_ENABLED_ON" = "Fortsätt deltagandet";
+"TELEMETRY_ENABLED_ON" = "Fortsätt delta";
 
 /* Telemetry prompt button */
-"TELEMETRY_MORE" = "Visa mer";
+"TELEMETRY_MORE" = "Berätta mer";
 
 /* Action in attribution sheet */
 "TELEMETRY_NAME" = "Mapbox Telemetri";
 
 /* Telemetry prompt title */
-"TELEMETRY_TITLE" = "Gör Mapbox kartor bättre";
+"TELEMETRY_TITLE" = "Gör Mapbox Kartor Bättre";
 
 /* Default user location annotation title */
 "USER_DOT_TITLE" = "Du är här";
