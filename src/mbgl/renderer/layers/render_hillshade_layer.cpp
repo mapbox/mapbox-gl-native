@@ -102,7 +102,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (!bucket.isPrepared() && parameters.pass == RenderPass::Pass3D) {
-            const uint16_t tilesize = bucket.getDEMData().level.dim;
+            const uint16_t tilesize = bucket.getDEMData().dim;
             OffscreenTexture view(parameters.context, { tilesize, tilesize });
             view.bind();
             

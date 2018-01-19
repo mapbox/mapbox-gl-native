@@ -14,28 +14,25 @@ auto fakeImage = [](Size s) {
     return img;
 };
 
-TEST(Level, Constructor) {
-    DEMData::Level level(4, 2);
-    EXPECT_EQ(level.dim, 4);
-    EXPECT_EQ(level.border, 2);
-    EXPECT_EQ(level.stride, 8);
-    EXPECT_EQ(level.image.bytes(), size_t(8*8*4));
-}
-
-TEST(Level, RoundTrip) {
-    DEMData::Level level(4, 2);
-    level.set(0, 0, 255);
-    EXPECT_EQ(level.get(0,0), 255);
-}
-
 TEST(DEMData, Constructor) {
     PremultipliedImage image = fakeImage({16, 16});
     DEMData pyramid(image);
 
-    EXPECT_TRUE(pyramid.isLoaded());
-    EXPECT_EQ(pyramid.level.dim, 16);
-    EXPECT_EQ(pyramid.level.border, 8);
+    EXPECT_EQ(pyramid.dim, 16);
+    EXPECT_EQ(pyramid.border, 8);
+    EXPECT_EQ(pyramid.stride, 32);
+    EXPECT_EQ(pyramid.getImage()->bytes(), size_t(32*32*4));
+    EXPECT_EQ(pyramid.dim, 16);
+    EXPECT_EQ(pyramid.border, 8);
 };
+
+TEST(DEMData, RoundTrip) {
+    PremultipliedImage image = fakeImage({16, 16});
+    DEMData pyramid(image);
+
+    pyramid.set(4, 6, 255);
+    EXPECT_EQ(pyramid.get(4, 6), 255);
+}
 
 TEST(DEMData, InitialBackfill) {
 
@@ -47,7 +44,7 @@ TEST(DEMData, InitialBackfill) {
     // with a non-empty pixel value
     for (int x = -1; x < 5; x++){
         for (int y = -1; y < 5; y ++) {
-            if (dem1.level.get(x, y) == -65536) {
+            if (dem1.get(x, y) == -65536) {
                 nonempty = false;
                 break;
             }
@@ -59,7 +56,7 @@ TEST(DEMData, InitialBackfill) {
     int vertx[] = {-1, 4};
     for (int x : vertx) {
         for (int y = 0; y < 4; y++) {
-            if (dem1.level.get(x, y) != dem1.level.get(x < 0 ? x + 1 : x - 1, y)) {
+            if (dem1.get(x, y) != dem1.get(x < 0 ? x + 1 : x - 1, y)) {
                 verticalBorderMatch = false;
                 break;
             }
@@ -73,7 +70,7 @@ TEST(DEMData, InitialBackfill) {
     int horiz[] = {-1, 4};
     for (int y : horiz) {
         for (int x = 0; x < 4; x++) {
-            if (dem1.level.get(x, y) != dem1.level.get(x, y < 0 ? y + 1 : y - 1)) {
+            if (dem1.get(x, y) != dem1.get(x, y < 0 ? y + 1 : y - 1)) {
                 horizontalBorderMatch = false;
                 break;
             }
@@ -83,13 +80,13 @@ TEST(DEMData, InitialBackfill) {
 
     EXPECT_TRUE(horizontalBorderMatch);
     // -1, 1 corner initially equal to closest corner data
-    EXPECT_TRUE(dem1.level.get(-1, 4) == dem1.level.get(0, 3));
+    EXPECT_TRUE(dem1.get(-1, 4) == dem1.get(0, 3));
     // 1, 1 corner initially equal to closest corner data
-    EXPECT_TRUE(dem1.level.get(4, 4) == dem1.level.get(3, 3));
+    EXPECT_TRUE(dem1.get(4, 4) == dem1.get(3, 3));
     // -1, -1 corner initially equal to closest corner data
-    EXPECT_TRUE(dem1.level.get(-1, -1) == dem1.level.get(0, 0));
+    EXPECT_TRUE(dem1.get(-1, -1) == dem1.get(0, 0));
     // -1, 1 corner initially equal to closest corner data
-    EXPECT_TRUE(dem1.level.get(4, -1) == dem1.level.get(3, 0));
+    EXPECT_TRUE(dem1.get(4, -1) == dem1.get(3, 0));
 };
 
 TEST(DEMData, BackfillNeighbor) {
@@ -103,41 +100,41 @@ TEST(DEMData, BackfillNeighbor) {
     for (int y = 0; y < 4; y++) {
         // dx = -1, dy = 0, so the left edge of dem1 should equal the right edge of dem0
         // backfills Left neighbor
-        EXPECT_TRUE(dem0.level.get(-1, y) == dem1.level.get(3, y));
+        EXPECT_TRUE(dem0.get(-1, y) == dem1.get(3, y));
 
     }
 
     dem0.backfillBorder(dem1, 0, -1);
     // backfills TopCenter neighbor
     for (int x = 0; x < 4; x++) {
-        EXPECT_TRUE(dem0.level.get(x, -1) == dem1.level.get(x, 3));
+        EXPECT_TRUE(dem0.get(x, -1) == dem1.get(x, 3));
     }
 
     dem0.backfillBorder(dem1, 1, 0);
-    // backfills Right neighb// backfulls TopRight neighboror
+    // backfills Right neighbor
     for (int y = 0; y < 4; y++) {
-        EXPECT_TRUE(dem0.level.get(4, y) == dem1.level.get(0, y));
+        EXPECT_TRUE(dem0.get(4, y) == dem1.get(0, y));
     }
 
     dem0.backfillBorder(dem1, 0, 1);
     // backfills BottomCenter neighbor
     for (int x = 0; x < 4; x++) {
-        EXPECT_TRUE(dem0.level.get(x, 4) == dem1.level.get(x, 0));
+        EXPECT_TRUE(dem0.get(x, 4) == dem1.get(x, 0));
     }
 
     dem0.backfillBorder(dem1, -1, 1);
     // backfulls TopRight neighbor
-    EXPECT_TRUE(dem0.level.get(-1, 4) == dem1.level.get(3, 0));
+    EXPECT_TRUE(dem0.get(-1, 4) == dem1.get(3, 0));
 
     dem0.backfillBorder(dem1, 1, 1);
     // backfulls BottomRight neighbor
-    EXPECT_TRUE(dem0.level.get(4, 4) == dem1.level.get(0, 0));
+    EXPECT_TRUE(dem0.get(4, 4) == dem1.get(0, 0));
 
     dem0.backfillBorder(dem1, -1, -1);
     // backfulls TopLeft neighbor
-    EXPECT_TRUE(dem0.level.get(-1, -1) == dem1.level.get(3, 3));
+    EXPECT_TRUE(dem0.get(-1, -1) == dem1.get(3, 3));
 
     dem0.backfillBorder(dem1, 1, -1);
     // backfulls BottomLeft neighbor
-    EXPECT_TRUE(dem0.level.get(4, -1) == dem1.level.get(0, 3));
+    EXPECT_TRUE(dem0.get(4, -1) == dem1.get(0, 3));
 };

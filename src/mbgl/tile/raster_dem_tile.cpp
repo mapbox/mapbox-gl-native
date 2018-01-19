@@ -101,14 +101,13 @@ void RasterDEMTile::backfillBorder(const RasterDEMTile& borderTile, const DEMTil
     const DEMData& borderDEM = borderBucket->getDEMData();
     DEMData& tileDEM = bucket->getDEMData();
 
-    if (tileDEM.isLoaded() && borderDEM.isLoaded()){
-        tileDEM.backfillBorder(borderDEM, dx, dy);
-        // update the bitmask to indicate that this tiles have been backfilled by flipping the relevant bit
-        this->neighboringTiles = this->neighboringTiles | mask;
-        // mark HillshadeBucket.prepared as false so it runs through the prepare render pass
-        // with the new texture data we just backfilled
-        bucket->setPrepared(false);
-    }
+    tileDEM.backfillBorder(borderDEM, dx, dy);
+    // update the bitmask to indicate that this tiles have been backfilled by flipping the relevant bit
+    this->neighboringTiles = this->neighboringTiles | mask;
+    // mark HillshadeBucket.prepared as false so it runs through the prepare render pass
+    // with the new texture data we just backfilled
+    bucket->setPrepared(false);
+
 }
 
 void RasterDEMTile::setMask(TileMask&& mask) {

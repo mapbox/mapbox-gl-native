@@ -3,17 +3,23 @@
 
 namespace mbgl {
 
-DEMData::DEMData(const PremultipliedImage& image):
-    level(image.size.height, std::max<int32_t>(std::ceil(image.size.height / 2), 1)){
-    if (image.size.height != image.size.width){
+DEMData::DEMData(const PremultipliedImage& _image):
+    dim(_image.size.height),
+    border(std::max<int32_t>(std::ceil(_image.size.height / 2), 1)),
+    stride(dim + 2 * border),
+    image({ static_cast<uint32_t>(stride), static_cast<uint32_t>(stride) }) {
+
+    if (_image.size.height != _image.size.width){
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
-    for (int32_t y = 0; y < level.dim; y++) {
-        for (int32_t x = 0; x < level.dim; x++) {
-            const int32_t i = y * level.dim + x;
+    std::memset(image.data.get(), 0, image.bytes());
+
+    for (int32_t y = 0; y < dim; y++) {
+        for (int32_t x = 0; x < dim; x++) {
+            const int32_t i = y * dim + x;
             const int32_t j = i * 4;
-            level.set(x, y, (image.data[j] * 256 * 256 + image.data[j+1] * 256 + image.data[j+2])/10 - 10000);
+            set(x, y, (_image.data[j] * 256 * 256 + _image.data[j+1] * 256 + _image.data[j+2])/10 - 10000);
         }
     }
     
@@ -22,26 +28,25 @@ DEMData::DEMData(const PremultipliedImage& image):
     // replaced when the tile's neighboring tiles are loaded and the accurate data can be backfilled using
     // DEMData#backfillBorder
 
-    for (int32_t x = 0; x < level.dim; x++) {
+    for (int32_t x = 0; x < dim; x++) {
         // left vertical border
-        level.set(-1, x, level.get(0, x));
+        set(-1, x, get(0, x));
 
         // right vertical border
-        level.set(level.dim, x, level.get(level.dim - 1, x));
+        set(dim, x, get(dim - 1, x));
 
         //left horizontal border
-        level.set(x, -1, level.get(x, 0));
+        set(x, -1, get(x, 0));
 
         // right horizontal border
-        level.set(x, level.dim, level.get(x, level.dim - 1));
+        set(x, dim, get(x, dim - 1));
     }
 
     // corners
-    level.set(-1, -1, level.get(0, 0));
-    level.set(level.dim, -1, level.get(level.dim - 1, 0));
-    level.set( -1, level.dim, level.get(0, level.dim - 1));
-    level.set(level.dim, level.dim, level.get(level.dim - 1, level.dim - 1));
-    loaded = true;
+    set(-1, -1, get(0, 0));
+    set(dim, -1, get(dim - 1, 0));
+    set( -1, dim, get(0, dim - 1));
+    set(dim, dim, get(dim - 1, dim - 1));
 }
 
 // This function takes the DEMData from a neighboring tile and backfills the edge/corner
@@ -50,20 +55,19 @@ DEMData::DEMData(const PremultipliedImage& image):
 // pixel of the tile by querying the 8 surrounding pixels, and if we don't have the pixel
 // buffer we get seams at tile boundaries.
 void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy) {
-    auto& t = level;
-    auto& o = borderTileData.level;
+    auto& o = borderTileData;
 
     // Tiles from the same source should always be of the same dimensions.
-    assert(t.dim == o.dim);
+    assert(dim == o.dim);
 
     // We determine the pixel range to backfill based which corner/edge `borderTileData`
     // represents. For example, dx = -1, dy = -1 represents the upper left corner of the
     // base tile, so we only need to backfill one pixel at coordinates (-1, -1) of the tile
     // image.
-    int32_t _xMin = dx * t.dim;
-    int32_t _xMax = dx * t.dim + t.dim;
-    int32_t _yMin = dy * t.dim;
-    int32_t _yMax = dy * t.dim + t.dim;
+    int32_t _xMin = dx * dim;
+    int32_t _xMax = dx * dim + dim;
+    int32_t _yMin = dy * dim;
+    int32_t _yMax = dy * dim + dim;
     
     if (dx == -1) _xMin = _xMax - 1;
     else if (dx == 1) _xMax = _xMin + 1;
@@ -71,30 +75,20 @@ void DEMData::backfillBorder(const DEMData& borderTileData, int8_t dx, int8_t dy
     if (dy == -1) _yMin = _yMax - 1;
     else if (dy == 1) _yMax = _yMin + 1;
     
-    int32_t xMin = util::clamp(_xMin, -t.border, t.dim + t.border);
-    int32_t xMax = util::clamp(_xMax, -t.border, t.dim + t.border);
+    int32_t xMin = util::clamp(_xMin, -border, dim + border);
+    int32_t xMax = util::clamp(_xMax, -border, dim + border);
     
-    int32_t yMin = util::clamp(_yMin, -t.border, t.dim + t.border);
-    int32_t yMax = util::clamp(_yMax, -t.border, t.dim + t.border);
+    int32_t yMin = util::clamp(_yMin, -border, dim + border);
+    int32_t yMax = util::clamp(_yMax, -border, dim + border);
     
-    int32_t ox = -dx * t.dim;
-    int32_t oy = -dy * t.dim;
+    int32_t ox = -dx * dim;
+    int32_t oy = -dy * dim;
     
     for (int32_t y = yMin; y < yMax; y++) {
         for (int32_t x = xMin; x < xMax; x++) {
-            t.set(x, y, o.get(x + ox, y + oy));
+            set(x, y, o.get(x + ox, y + oy));
         }
     }
-}
-
-DEMData::Level::Level(int32_t dim_, int32_t border_)
-    : dim(dim_),
-      border(border_),
-      stride(dim + 2 * border),
-      image({ static_cast<uint32_t>(stride),
-              static_cast<uint32_t>(stride) }) {
-    assert(dim > 0);
-    std::memset(image.data.get(), 0, image.bytes());
 }
 
 } // namespace mbgl

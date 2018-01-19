@@ -28,7 +28,7 @@ void HillshadeBucket::upload(gl::Context& context) {
     }
 
 
-    const PremultipliedImage* image = demdata.level.getImage();
+    const PremultipliedImage* image = demdata.getImage();
     dem = context.createTexture(*image);
 
     if (!segments.empty()) {
@@ -107,7 +107,7 @@ void HillshadeBucket::setMask(TileMask&& mask_) {
 }
 
 bool HillshadeBucket::hasData() const {
-    return demdata.level.image.valid();
+    return demdata.getImage()->valid();
 }
 
 } // namespace mbgl
