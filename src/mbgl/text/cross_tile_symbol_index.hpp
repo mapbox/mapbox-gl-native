@@ -57,6 +57,7 @@ public:
     CrossTileSymbolIndex();
 
     bool addLayer(RenderSymbolLayer&);
+    void pruneUnusedLayers(const std::set<std::string>&);
 
     void reset();
 private:
