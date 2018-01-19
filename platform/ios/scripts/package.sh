@@ -70,7 +70,7 @@ xcodebuild \
     CURRENT_SHORT_VERSION=${SHORT_VERSION} \
     CURRENT_SEMANTIC_VERSION=${SEM_VERSION} \
     CURRENT_COMMIT_HASH=${HASH} \
-    ONLY_ACTIVE_ARCH=NO \
+    ARCHS="x86_64" \
     -derivedDataPath ${DERIVED_DATA} \
     -workspace ./platform/ios/ios.xcworkspace \
     -scheme ${SCHEME} \
@@ -194,11 +194,6 @@ if [[ ${BUILD_DYNAMIC} == true && ${BUILDTYPE} == Release ]]; then
     validate_dsym \
         "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" \
         "${OUTPUT}/dynamic/${NAME}.framework/${NAME}"
-
-        # To-do: remove this in 4.0.0, as we intend to remove support for i386 entirely.
-        step "Removing i386 slice from dSYM"
-        lipo -remove i386 "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}" -o "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}"
-        lipo -info "${OUTPUT}/dynamic/${NAME}.framework.dSYM/Contents/Resources/DWARF/${NAME}"
 fi
 
 function create_podspec {
