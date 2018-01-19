@@ -382,8 +382,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     bool placementChanged = false;
     if (!placement->stillRecent(parameters.timePoint)) {
         auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
+        std::set<std::string> usedSymbolLayers;
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
             if (it->layer.is<RenderSymbolLayer>()) {
+                usedSymbolLayers.insert(it->layer.getID());
                 newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
@@ -393,6 +395,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // started. If we violate this assumption, then we need to either make CollisionIndex completely independendent of
         // FeatureIndex, or find a way for its entries to point to multiple FeatureIndexes.
         commitFeatureIndexes();
+        crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
         if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
