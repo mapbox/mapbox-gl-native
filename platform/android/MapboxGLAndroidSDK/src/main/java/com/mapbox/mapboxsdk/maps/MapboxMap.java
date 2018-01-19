@@ -7,7 +7,6 @@ import android.graphics.RectF;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
-import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
@@ -33,20 +32,15 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
-import com.mapbox.mapboxsdk.style.layers.Layer;
-import com.mapbox.mapboxsdk.style.light.Light;
-import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Geometry;
 
 import java.lang.reflect.ParameterizedType;
-import java.util.HashMap;
 import java.util.List;
 
 import timber.log.Timber;
@@ -75,6 +69,7 @@ public final class MapboxMap {
 
   private final OnRegisterTouchListener onRegisterTouchListener;
 
+  private Style style;
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
   private PointF focalPoint;
 
@@ -101,7 +96,7 @@ public final class MapboxMap {
     // Map configuration
     setDebugActive(options.getDebugActive());
     setApiBaseUrl(options);
-    setStyleUrl(options);
+    setStyle(options);
     setPrefetchesTiles(options);
   }
 
@@ -201,50 +196,6 @@ public final class MapboxMap {
     }
   }
 
-  // Style
-
-  /**
-   * <p>
-   * Get the animation duration for style changes.
-   * </p>
-   * The default value is zero, so any changes take effect without animation.
-   *
-   * @return Duration in milliseconds
-   */
-  public long getTransitionDuration() {
-    return nativeMapView.getTransitionDuration();
-  }
-
-  /**
-   * Set the animation duration for style changes.
-   *
-   * @param durationMs Duration in milliseconds
-   */
-  public void setTransitionDuration(long durationMs) {
-    nativeMapView.setTransitionDuration(durationMs);
-  }
-
-  /**
-   * <p>
-   * Get the animation delay for style changes.
-   * </p>
-   * The default value is zero, so any changes begin to animate immediately.
-   *
-   * @return Delay in milliseconds
-   */
-  public long getTransitionDelay() {
-    return nativeMapView.getTransitionDelay();
-  }
-
-  /**
-   * Set the animation delay for style changes.
-   *
-   * @param delayMs Delay in milliseconds
-   */
-  public void setTransitionDelay(long delayMs) {
-    nativeMapView.setTransitionDelay(delayMs);
-  }
-
   /**
    * Sets tile pre-fetching from MapboxOptions.
    *
@@ -272,216 +223,6 @@ public final class MapboxMap {
    */
   public boolean getPrefetchesTiles() {
     return nativeMapView.getPrefetchesTiles();
-  }
-
-  /**
-   * Retrieve all the layers in the style
-   *
-   * @return all the layers in the current style
-   */
-  public List<Layer> getLayers() {
-    return nativeMapView.getLayers();
-  }
-
-  /**
-   * Get the layer by id
-   *
-   * @param layerId the layer's id
-   * @return the layer, if present in the style
-   */
-  @Nullable
-  public Layer getLayer(@NonNull String layerId) {
-    return nativeMapView.getLayer(layerId);
-  }
-
-  /**
-   * Tries to cast the Layer to T, returns null if it's another type.
-   *
-   * @param layerId the layer id used to look up a layer
-   * @param <T>     the generic attribute of a Layer
-   * @return the casted Layer, null if another type
-   */
-  @Nullable
-  public <T extends Layer> T getLayerAs(@NonNull String layerId) {
-    try {
-      // noinspection unchecked
-      return (T) nativeMapView.getLayer(layerId);
-    } catch (ClassCastException exception) {
-      Timber.e(exception, "Layer: %s is a different type: ", layerId);
-      return null;
-    }
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   */
-  public void addLayer(@NonNull Layer layer) {
-    nativeMapView.addLayer(layer);
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param below the layer id to add this layer before
-   */
-  public void addLayerBelow(@NonNull Layer layer, @NonNull String below) {
-    nativeMapView.addLayerBelow(layer, below);
-  }
-
-  /**
-   * Adds the layer to the map. The layer must be newly created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param above the layer id to add this layer above
-   */
-  public void addLayerAbove(@NonNull Layer layer, @NonNull String above) {
-    nativeMapView.addLayerAbove(layer, above);
-  }
-
-  /**
-   * Adds the layer to the map at the specified index. The layer must be newly
-   * created and not added to the map before
-   *
-   * @param layer the layer to add
-   * @param index the index to insert the layer at
-   */
-  public void addLayerAt(@NonNull Layer layer, @IntRange(from = 0) int index) {
-    nativeMapView.addLayerAt(layer, index);
-  }
-
-  /**
-   * Removes the layer. Any references to the layer become invalid and should not be used anymore
-   *
-   * @param layerId the layer to remove
-   * @return the removed layer or null if not found
-   */
-  @Nullable
-  public Layer removeLayer(@NonNull String layerId) {
-    return nativeMapView.removeLayer(layerId);
-  }
-
-  /**
-   * Removes the layer. The reference is re-usable after this and can be re-added
-   *
-   * @param layer the layer to remove
-   * @return the layer
-   */
-  @Nullable
-  public Layer removeLayer(@NonNull Layer layer) {
-    return nativeMapView.removeLayer(layer);
-  }
-
-  /**
-   * Removes the layer. Any other references to the layer become invalid and should not be used anymore
-   *
-   * @param index the layer index
-   * @return the removed layer or null if not found
-   */
-  @Nullable
-  public Layer removeLayerAt(@IntRange(from = 0) int index) {
-    return nativeMapView.removeLayerAt(index);
-  }
-
-  /**
-   * Retrieve all the sources in the style
-   *
-   * @return all the sources in the current style
-   */
-  public List<Source> getSources() {
-    return nativeMapView.getSources();
-  }
-
-  /**
-   * Retrieve a source by id
-   *
-   * @param sourceId the source's id
-   * @return the source if present in the current style
-   */
-  @Nullable
-  public Source getSource(@NonNull String sourceId) {
-    return nativeMapView.getSource(sourceId);
-  }
-
-  /**
-   * Tries to cast the Source to T, returns null if it's another type.
-   *
-   * @param sourceId the id used to look up a layer
-   * @param <T>      the generic type of a Source
-   * @return the casted Source, null if another type
-   */
-  @Nullable
-  public <T extends Source> T getSourceAs(@NonNull String sourceId) {
-    try {
-      // noinspection unchecked
-      return (T) nativeMapView.getSource(sourceId);
-    } catch (ClassCastException exception) {
-      Timber.e(exception, "Source: %s is a different type: ", sourceId);
-      return null;
-    }
-  }
-
-  /**
-   * Adds the source to the map. The source must be newly created and not added to the map before
-   *
-   * @param source the source to add
-   */
-  public void addSource(@NonNull Source source) {
-    nativeMapView.addSource(source);
-  }
-
-  /**
-   * Removes the source. Any references to the source become invalid and should not be used anymore
-   *
-   * @param sourceId the source to remove
-   * @return the source handle or null if the source was not present
-   */
-  @Nullable
-  public Source removeSource(@NonNull String sourceId) {
-    return nativeMapView.removeSource(sourceId);
-  }
-
-  /**
-   * Removes the source, preserving the reverence for re-use
-   *
-   * @param source the source to remove
-   * @return the source
-   */
-  @Nullable
-  public Source removeSource(@NonNull Source source) {
-    return nativeMapView.removeSource(source);
-  }
-
-  /**
-   * Adds an image to be used in the map's style
-   *
-   * @param name  the name of the image
-   * @param image the pre-multiplied Bitmap
-   */
-  public void addImage(@NonNull String name, @NonNull Bitmap image) {
-    nativeMapView.addImage(name, image);
-  }
-
-  /**
-   * Adds an images to be used in the map's style
-   */
-  public void addImages(@NonNull HashMap<String, Bitmap> images) {
-    nativeMapView.addImages(images);
-  }
-
-  /**
-   * Removes an image from the map's style
-   *
-   * @param name the name of the image to remove
-   */
-  public void removeImage(String name) {
-    nativeMapView.removeImage(name);
-  }
-
-  public Bitmap getImage(@NonNull String name) {
-    return nativeMapView.getImage(name);
   }
 
   //
@@ -598,20 +339,6 @@ public final class MapboxMap {
    */
   public Projection getProjection() {
     return projection;
-  }
-
-  //
-  //
-  //
-
-  /**
-   * Get the global light source used to change lighting conditions on extruded fill layers.
-   *
-   * @return the global light source
-   */
-  @Nullable
-  public Light getLight() {
-    return nativeMapView.getLight();
   }
 
   //
@@ -1013,158 +740,51 @@ public final class MapboxMap {
   // Styling
   //
 
-  /**
-   * <p>
-   * Loads a new map style asynchronous from the specified URL.
-   * </p>
-   * {@code url} can take the following forms:
-   * <ul>
-   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-   * <li>{@code mapbox://styles/<user>/<style>}:
-   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-   * {@code user} is your username. {@code style} is the ID of your custom
-   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-   * <li>{@code http://...} or {@code https://...}:
-   * loads the style over the Internet from any web server.</li>
-   * <li>{@code asset://...}:
-   * loads the style from the APK {@code assets/} directory.
-   * This is used to load a style bundled with your app.</li>
-   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-   * </ul>
-   * <p>
-   * This method is asynchronous and will return before the style finishes loading.
-   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
-   * or use the {@link #setStyleUrl(String, OnStyleLoadedListener)} method instead.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * emitted.
-   *
-   * @param url The URL of the map style
-   * @see Style
-   */
-  public void setStyleUrl(@NonNull String url) {
-    setStyleUrl(url, null);
+  public void setStyle(Style style) {
+    style.bind(nativeMapView);
+    this.style = style.load();
   }
 
-  /**
-   * <p>
-   * Loads a new map style asynchronous from the specified URL.
-   * </p>
-   * {@code url} can take the following forms:
-   * <ul>
-   * <li>{@code Style.*}: load one of the bundled styles in {@link Style}.</li>
-   * <li>{@code mapbox://styles/<user>/<style>}:
-   * loads the style from a <a href="https://www.mapbox.com/account/">Mapbox account.</a>
-   * {@code user} is your username. {@code style} is the ID of your custom
-   * style created in <a href="https://www.mapbox.com/studio">Mapbox Studio</a>.</li>
-   * <li>{@code http://...} or {@code https://...}:
-   * loads the style over the Internet from any web server.</li>
-   * <li>{@code asset://...}:
-   * loads the style from the APK {@code assets/} directory.
-   * This is used to load a style bundled with your app.</li>
-   * <li>{@code null}: loads the default {@link Style#MAPBOX_STREETS} style.</li>
-   * </ul>
-   * <p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * emitted.
-   * <p>
-   *
-   * @param url      The URL of the map style
-   * @param callback The callback that is invoked when the style has loaded.
-   * @see Style
-   */
-  public void setStyleUrl(@NonNull final String url, @Nullable final OnStyleLoadedListener callback) {
+  private void setStyle(@NonNull MapboxMapOptions options) {
+    String style = options.getStyle();
+    if (!TextUtils.isEmpty(style)) {
+      setStyle(Style.fromUrl(style));
+    }
+  }
+
+  public Style getStyle() {
+    if (style == null) {
+      style = new Style();
+      style.bind(nativeMapView);
+    }
+    return style;
+  }
+
+  public void setStyle(@NonNull final Style style, @Nullable final OnStyleLoadedListener callback) {
     if (callback != null) {
       nativeMapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override
         public void onMapChanged(@MapView.MapChange int change) {
           if (change == MapView.DID_FINISH_LOADING_STYLE) {
-            callback.onStyleLoaded(url);
+            callback.onStyleLoaded(style);
             nativeMapView.removeOnMapChangedListener(this);
           }
         }
       });
     }
-    nativeMapView.setStyleUrl(url);
+    setStyle(style);
   }
 
-  /**
-   * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * <p>
-   * This method is asynchronous and will return before the style finishes loading.
-   * If you wish to wait for the map to finish loading, listen for the {@link MapView#DID_FINISH_LOADING_MAP} event
-   * or use the {@link #setStyle(String, OnStyleLoadedListener)} method instead.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
-   *
-   * @param style The bundled style.
-   * @see Style
-   */
-  public void setStyle(@Style.StyleUrl String style) {
-    setStyleUrl(style);
-  }
-
-  /**
-   * <p>
-   * Loads a new map style from the specified bundled style.
-   * </p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
-   *
-   * @param style    The bundled style.
-   * @param callback The callback to be invoked when the style has finished loading
-   * @see Style
-   */
-  public void setStyle(@Style.StyleUrl String style, @Nullable OnStyleLoadedListener callback) {
-    setStyleUrl(style, callback);
-  }
-
-  /**
-   * Loads a new map style from MapboxMapOptions if available.
-   *
-   * @param options the object containing the style url
-   */
-  private void setStyleUrl(@NonNull MapboxMapOptions options) {
-    String style = options.getStyle();
-    if (!TextUtils.isEmpty(style)) {
-      setStyleUrl(style, null);
-    }
-  }
-
-  /**
-   * Returns the map style url currently displayed in the map view.
-   *
-   * @return The URL of the map style
-   */
   @Nullable
   public String getStyleUrl() {
     return nativeMapView.getStyleUrl();
   }
 
-  /**
-   * Loads a new map style from a json string.
-   * <p>
-   * If the style fails to load or an invalid style URL is set, the map view will become blank.
-   * An error message will be logged in the Android logcat and {@link MapView#DID_FAIL_LOADING_MAP} event will be
-   * sent.
-   * </p>
-   */
   public void setStyleJson(@NonNull String styleJson) {
     nativeMapView.setStyleJson(styleJson);
   }
 
-  /**
-   * Returns the map style json currently displayed in the map view.
-   *
-   * @return The json of the map style
-   */
+
   public String getStyleJson() {
     return nativeMapView.getStyleJson();
   }
@@ -1882,7 +1502,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnScrollListener(OnScrollListener)} instead.
    */
   @Deprecated
@@ -1895,7 +1514,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void addOnScrollListener(@Nullable OnScrollListener listener) {
     onRegisterTouchListener.onAddScrollListener(listener);
@@ -1906,7 +1524,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void removeOnScrollListener(@Nullable OnScrollListener listener) {
     onRegisterTouchListener.onRemoveScrollListener(listener);
@@ -1917,7 +1534,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is flinged.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnFlingListener(OnFlingListener)} instead.
    */
   @Deprecated
@@ -1950,7 +1566,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapClickListener(OnMapClickListener)} instead.
    */
   @Deprecated
@@ -1983,7 +1598,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapLongClickListener(OnMapLongClickListener)} instead.
    */
   @Deprecated
@@ -2753,7 +2367,7 @@ public final class MapboxMap {
      *
      * @param style the style that has been loaded
      */
-    void onStyleLoaded(String style);
+    void onStyleLoaded(Style style);
   }
 
   //

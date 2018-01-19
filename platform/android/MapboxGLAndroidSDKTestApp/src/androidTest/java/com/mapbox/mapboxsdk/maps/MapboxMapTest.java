@@ -70,9 +70,10 @@ public class MapboxMapTest extends BaseActivityTest {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
       long transitionDuration = 600;
-      mapboxMap.setTransitionDuration(transitionDuration);
+      Style style = mapboxMap.getStyle();
+      style.setTransitionDuration(transitionDuration);
       assertEquals(
-        "TransitionDuration should match", transitionDuration, mapboxMap.getTransitionDuration(), 0
+        "TransitionDuration should match", transitionDuration, style.getTransitionDuration(), 0
       );
     }));
   }
@@ -82,9 +83,10 @@ public class MapboxMapTest extends BaseActivityTest {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
       long transitionDelay = 50;
-      mapboxMap.setTransitionDelay(transitionDelay);
+      Style style = mapboxMap.getStyle();
+      style.setTransitionDelay(transitionDelay);
       assertEquals(
-        "TransitionDelay should match", transitionDelay, mapboxMap.getTransitionDelay(), 0
+        "TransitionDelay should match", transitionDelay, style.getTransitionDelay(), 0
       );
     }));
   }

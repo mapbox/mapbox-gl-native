@@ -145,7 +145,7 @@ final class NativeMapView {
   }
 
   public void setStyleUrl(String url) {
-    if (isDestroyedOn("setStyleUrl")) {
+    if (isDestroyedOn("setStyle")) {
       return;
     }
     nativeSetStyleUrl(url);

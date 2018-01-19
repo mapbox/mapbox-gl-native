@@ -12,9 +12,9 @@ import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -48,7 +48,7 @@ public class DoubleMapActivity extends AppCompatActivity {
     // we need to set mapboxmap on the parent activity,
     // for auto-generated ui tests
     mapboxMap = map;
-    mapboxMap.setStyleUrl(Style.DARK);
+    mapboxMap.setStyle(Style.fromUrl(Style.DARK));
     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
     try {
       mapboxMap.setMyLocationEnabled(true);
@@ -97,7 +97,7 @@ public class DoubleMapActivity extends AppCompatActivity {
       mapViewMini = (MapView) view.findViewById(R.id.mini_map);
       mapViewMini.onCreate(savedInstanceState);
       mapViewMini.getMapAsync(mapboxMap -> {
-        mapboxMap.setStyleUrl(Style.LIGHT);
+        mapboxMap.setStyle(Style.fromUrl(Style.LIGHT));
         mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(4));
 
         UiSettings uiSettings = mapboxMap.getUiSettings();

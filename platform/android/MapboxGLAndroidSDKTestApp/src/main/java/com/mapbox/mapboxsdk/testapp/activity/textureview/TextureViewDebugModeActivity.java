@@ -15,10 +15,10 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -82,8 +82,8 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.addOnMapChangedListener(change -> {
       if (change == MapView.DID_FINISH_LOADING_STYLE && mapboxMap != null) {
-        Timber.v("New style loaded with JSON: %s", mapboxMap.getStyleJson());
-        setupNavigationView(mapboxMap.getLayers());
+        Timber.v("New style loaded with JSON: %s", mapboxMap.getStyle().getJson());
+        setupNavigationView(mapboxMap.getStyle().getLayers());
       }
     });
 
@@ -98,7 +98,7 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
     mapboxMap = map;
     mapboxMap.getUiSettings().setZoomControlsEnabled(true);
 
-    setupNavigationView(mapboxMap.getLayers());
+    setupNavigationView(mapboxMap.getStyle().getLayers());
     setupZoomView();
     setFpsView();
   }
@@ -157,7 +157,9 @@ public class TextureViewDebugModeActivity extends AppCompatActivity implements O
         if (currentStyleIndex == STYLES.length) {
           currentStyleIndex = 0;
         }
-        mapboxMap.setStyleUrl(STYLES[currentStyleIndex], style -> Timber.d("Style loaded %s", style));
+
+        Style style = Style.fromUrl(STYLES[currentStyleIndex]);
+        mapboxMap.setStyle(style, style1 -> Timber.d("Style loaded %s", style1.getUrl()));
       }
     });
   }

@@ -34,7 +34,7 @@ public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
     mapView.getMapAsync(mapboxMap -> {
       RuntimeStyleTimingTestActivity.this.mapboxMap = mapboxMap;
       VectorSource museums = new VectorSource("museums_source", "mapbox://mapbox.2opop9hr");
-      mapboxMap.addSource(museums);
+      mapboxMap.getStyle().addSource(museums);
 
       CircleLayer museumsLayer = new CircleLayer("museums", "museums_source");
       museumsLayer.setSourceLayer("museum-cusco");
@@ -44,7 +44,7 @@ public class RuntimeStyleTimingTestActivity extends AppCompatActivity {
         circleColor(Color.argb(1, 55, 148, 179))
       );
 
-      mapboxMap.addLayer(museumsLayer);
+      mapboxMap.getStyle().addLayer(museumsLayer);
     });
   }
 

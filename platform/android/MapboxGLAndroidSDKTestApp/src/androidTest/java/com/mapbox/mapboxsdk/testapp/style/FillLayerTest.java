@@ -9,6 +9,7 @@ import android.support.test.runner.AndroidJUnit4;
 import timber.log.Timber;
 
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.functions.CompositeFunction;
 import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.functions.SourceFunction;
@@ -54,13 +55,14 @@ public class FillLayerTest extends BaseActivityTest {
     invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
       @Override
       public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+        Style style = mapboxMap.getStyle();
+        if ((layer = style.getLayerAs("my-layer")) == null) {
           Timber.i("Adding layer");
           layer = new FillLayer("my-layer", "composite");
           layer.setSourceLayer("composite");
-          mapboxMap.addLayer(layer);
+          style.addLayer(layer);
           // Layer reference is now stale, get new reference
-          layer = mapboxMap.getLayerAs("my-layer");
+          layer = style.getLayerAs("my-layer");
         }
       }
     });

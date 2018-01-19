@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.FillLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -46,6 +47,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
   public static final String AMSTERDAM_PARKS_LAYER = "amsterdam-parks-layer";
   private MapView mapView;
   private MapboxMap mapboxMap;
+  private Style style;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +61,9 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     mapView.getMapAsync(map -> {
       // Store for later
       mapboxMap = map;
+
+      // Store for later
+      style = map.getStyle();
 
       // Add a parks layer
       addParksLayer();
@@ -168,7 +173,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addExponentialZoomFunction() {
     Timber.i("Add exponential zoom function");
-    FillLayer layer = mapboxMap.getLayerAs("water");
+    FillLayer layer = style.getLayerAs("water");
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -186,7 +191,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addIntervalZoomFunction() {
     Timber.i("Add interval zoom function");
-    FillLayer layer = mapboxMap.getLayerAs("water");
+    FillLayer layer = style.getLayerAs("water");
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -204,7 +209,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addExponentialSourceFunction() {
     Timber.i("Add exponential source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -223,7 +228,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addCategoricalSourceFunction() {
     Timber.i("Add categorical source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -242,7 +247,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addIdentitySourceFunction() {
     Timber.i("Add identity source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillOpacity(
@@ -255,7 +260,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addIntervalSourceFunction() {
     Timber.i("Add interval source function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -274,7 +279,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addCompositeExponentialFunction() {
     Timber.i("Add composite exponential function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -311,7 +316,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addCompositeIntervalFunction() {
     Timber.i("Add composite interval function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -348,7 +353,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void addCompositeCategoricalFunction() {
     Timber.i("Add composite categorical function");
-    FillLayer layer = mapboxMap.getLayerAs(AMSTERDAM_PARKS_LAYER);
+    FillLayer layer = style.getLayerAs(AMSTERDAM_PARKS_LAYER);
     assert layer != null;
     layer.setProperties(
       fillColor(
@@ -449,7 +454,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     Source source;
     try {
       source = new GeoJsonSource("amsterdam-parks-source", ResourceUtils.readRawResource(this, R.raw.amsterdam));
-      mapboxMap.addSource(source);
+      style.addSource(source);
     } catch (IOException ioException) {
       Toast.makeText(
         DataDrivenStyleActivity.this,
@@ -459,7 +464,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     }
 
     // Add a fill layer
-    mapboxMap.addLayer(new FillLayer(AMSTERDAM_PARKS_LAYER, source.getId())
+    style.addLayer(new FillLayer(AMSTERDAM_PARKS_LAYER, source.getId())
       .withProperties(
         fillColor(Color.BLACK),
         fillOutlineColor(Color.BLUE),

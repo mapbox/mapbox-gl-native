@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -44,21 +45,22 @@ public class QueryRenderedFeaturesBoxSymbolCountActivity extends AppCompatActivi
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       QueryRenderedFeaturesBoxSymbolCountActivity.this.mapboxMap = mapboxMap;
+      Style  style = mapboxMap.getStyle();
 
       // Add a symbol layer (also works with annotations)
       try {
-        mapboxMap.addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
+        style.addSource(new GeoJsonSource("symbols-source", ResourceUtils.readRawResource(
           QueryRenderedFeaturesBoxSymbolCountActivity.this, R.raw.test_points_utrecht)));
       } catch (IOException ioException) {
         Timber.e(ioException, "Could not load geojson");
         return;
       }
-      mapboxMap.addImage(
+      style.addImage(
         "test-icon",
         BitmapFactory.decodeResource(getResources(),
           R.drawable.mapbox_marker_icon_default)
       );
-      mapboxMap.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
+      style.addLayer(new SymbolLayer("symbols-layer", "symbols-source").withProperties(iconImage("test-icon")));
 
       selectionBox.setOnClickListener(view -> {
         // Query

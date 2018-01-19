@@ -45,8 +45,8 @@ public class QueryRenderedFeaturesBoxHighlightActivity extends AppCompatActivity
 
       // Add layer / source
       final GeoJsonSource source = new GeoJsonSource("highlighted-shapes-source");
-      mapboxMap.addSource(source);
-      mapboxMap.addLayer(
+      mapboxMap.getStyle().addSource(source);
+      mapboxMap.getStyle().addLayer(
         new FillLayer("highlighted-shapes-layer", "highlighted-shapes-source")
           .withProperties(fillColor(Color.RED))
       );

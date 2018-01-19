@@ -53,7 +53,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
 
     // add source
     try {
-      mapboxMap.addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
+      mapboxMap.getStyle().addSource(new GeoJsonSource(ID_GEOJSON_SOURCE, new URL(URL_GEOJSON_SOURCE)));
     } catch (MalformedURLException malformedUrlException) {
       Timber.e(malformedUrlException, "Invalid URL");
     }
@@ -61,7 +61,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
     // add layer
     SymbolLayer layer = new SymbolLayer(ID_GEOJSON_LAYER, ID_GEOJSON_SOURCE);
     layer.setProperties(iconImage("rocket-15"));
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
 
     // loop refresh geojson
     handler = new Handler();
@@ -118,7 +118,7 @@ public class RealTimeGeoJsonActivity extends AppCompatActivity implements OnMapR
 
     @Override
     public void run() {
-      ((GeoJsonSource) mapboxMap.getSource(ID_GEOJSON_SOURCE)).setUrl(URL_GEOJSON_SOURCE);
+      ((GeoJsonSource) mapboxMap.getStyle().getSource(ID_GEOJSON_SOURCE)).setUrl(URL_GEOJSON_SOURCE);
       handler.postDelayed(this, 2000);
     }
   }
