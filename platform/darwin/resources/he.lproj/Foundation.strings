@@ -1,0 +1,297 @@
+/* Clock position format, long: {hours} o’clock */
+"CLOCK_FMT_LONG" = "שעה %@";
+
+/* Clock position format, medium: {hours} o’clock */
+"CLOCK_FMT_MEDIUM" = "שעה %@";
+
+/* Clock position format, short: {hours}:00 */
+"CLOCK_FMT_SHORT" = "%@:00";
+
+/* East, long */
+"COMPASS_E_LONG" = "מזרח";
+
+/* East, short */
+"COMPASS_E_SHORT" = "מז";
+
+/* East by north, long */
+"COMPASS_EbN_LONG" = "east by north";
+
+/* East by north, short */
+"COMPASS_EbN_SHORT" = "EbN";
+
+/* East by south, long */
+"COMPASS_EbS_LONG" = "east by south";
+
+/* East by south, short */
+"COMPASS_EbS_SHORT" = "EbS";
+
+/* East-northeast, long */
+"COMPASS_ENE_LONG" = "מזרח-צפון מזרח";
+
+/* East-northeast, short */
+"COMPASS_ENE_SHORT" = "מז-צ-מז";
+
+/* East-southeast, long */
+"COMPASS_ESE_LONG" = "מזרח-דרום מזרח";
+
+/* East-southeast, short */
+"COMPASS_ESE_SHORT" = "מז-ד-מז";
+
+/* North, long */
+"COMPASS_N_LONG" = "צפון";
+
+/* North, short */
+"COMPASS_N_SHORT" = "צ";
+
+/* North by east, long */
+"COMPASS_NbE_LONG" = "north by east";
+
+/* North by east, short */
+"COMPASS_NbE_SHORT" = "NbE";
+
+/* North by west, long */
+"COMPASS_NbW_LONG" = "north by west";
+
+/* North by west, short */
+"COMPASS_NbW_SHORT" = "NbW";
+
+/* Northeast, long */
+"COMPASS_NE_LONG" = "צפון מזרח";
+
+/* Northeast, short */
+"COMPASS_NE_SHORT" = "צ-מז";
+
+/* Northeast by east, long */
+"COMPASS_NEbE_LONG" = "northeast by east";
+
+/* Northeast by east, short */
+"COMPASS_NEbE_SHORT" = "NEbE";
+
+/* Northeast by north, long */
+"COMPASS_NEbN_LONG" = "northeast by north";
+
+/* Northeast by north, short */
+"COMPASS_NEbN_SHORT" = "NEbN";
+
+/* North-northeast, long */
+"COMPASS_NNE_LONG" = "צפון-צפון מזרח";
+
+/* North-northeast, short */
+"COMPASS_NNE_SHORT" = "צ-צ-מז";
+
+/* North-northwest, long */
+"COMPASS_NNW_LONG" = "צפון-צפון מערב";
+
+/* North-northwest, short */
+"COMPASS_NNW_SHORT" = "צ-צ-מע";
+
+/* Northwest, long */
+"COMPASS_NW_LONG" = "צפון מערב";
+
+/* Northwest, short */
+"COMPASS_NW_SHORT" = "צ-מע";
+
+/* Northwest by north, long */
+"COMPASS_NWbN_LONG" = "northwest by north";
+
+/* Northwest by north, short */
+"COMPASS_NWbN_SHORT" = "NWbN";
+
+/* Northwest by west, long */
+"COMPASS_NWbW_LONG" = "northwest by west";
+
+/* Northwest by west, short */
+"COMPASS_NWbW_SHORT" = "NWbW";
+
+/* South, long */
+"COMPASS_S_LONG" = "דרום";
+
+/* South, short */
+"COMPASS_S_SHORT" = "ד";
+
+/* South by east, long */
+"COMPASS_SbE_LONG" = "south by east";
+
+/* South by east, short */
+"COMPASS_SbE_SHORT" = "SbE";
+
+/* South by west, long */
+"COMPASS_SbW_LONG" = "south by west";
+
+/* South by west, short */
+"COMPASS_SbW_SHORT" = "SbW";
+
+/* Southeast, long */
+"COMPASS_SE_LONG" = "דרום מזרח";
+
+/* Southeast, short */
+"COMPASS_SE_SHORT" = "ד-מז";
+
+/* Southeast by east, long */
+"COMPASS_SEbE_LONG" = "southeast by east";
+
+/* Southeast by east, short */
+"COMPASS_SEbE_SHORT" = "SEbE";
+
+/* Southeast by south, long */
+"COMPASS_SEbS_LONG" = "southeast by south";
+
+/* Southeast by south, short */
+"COMPASS_SEbS_SHORT" = "SEbS";
+
+/* South-southeast, long */
+"COMPASS_SSE_LONG" = "דרום-דרום מזרח";
+
+/* South-southeast, short */
+"COMPASS_SSE_SHORT" = "ד-ד-מז";
+
+/* South-southwest, long */
+"COMPASS_SSW_LONG" = "דרום-דרום מערב";
+
+/* South-southwest, short */
+"COMPASS_SSW_SHORT" = "ד-ד-מע";
+
+/* Southwest, long */
+"COMPASS_SW_LONG" = "דרום מערב";
+
+/* Southwest, short */
+"COMPASS_SW_SHORT" = "ד-מע";
+
+/* Southwest by south, long */
+"COMPASS_SWbS_LONG" = "southwest by south";
+
+/* Southwest by south, short */
+"COMPASS_SWbS_SHORT" = "SWbS";
+
+/* Southwest by west, long */
+"COMPASS_SWbW_LONG" = "southwest by west";
+
+/* Southwest by west, short */
+"COMPASS_SWbW_SHORT" = "SWbW";
+
+/* West, long */
+"COMPASS_W_LONG" = "מערב";
+
+/* West, short */
+"COMPASS_W_SHORT" = "מע";
+
+/* West by north, long */
+"COMPASS_WbN_LONG" = "west by north";
+
+/* West by north, short */
+"COMPASS_WbN_SHORT" = "WbN";
+
+/* West by south, long */
+"COMPASS_WbS_LONG" = "west by south";
+
+/* West by south, short */
+"COMPASS_WbS_SHORT" = "WbS";
+
+/* West-northwest, long */
+"COMPASS_WNW_LONG" = "מערב-צפון מערב";
+
+/* West-northwest, short */
+"COMPASS_WNW_SHORT" = "מע-צ-מע";
+
+/* West-southwest, long */
+"COMPASS_WSW_LONG" = "מערב-דרום מערב";
+
+/* West-southwest, short */
+"COMPASS_WSW_SHORT" = "מע-ד-מע";
+
+/* Degrees format, long */
+"COORD_DEG_LONG" = "%d מעלה(ות)";
+
+/* Degrees format, medium: {degrees} */
+"COORD_DEG_MEDIUM" = "%d°";
+
+/* Degrees format, short: {degrees} */
+"COORD_DEG_SHORT" = "%d°";
+
+/* Coordinate format, long: {degrees}{minutes} */
+"COORD_DM_LONG" = "%1$@ ו %2$@";
+
+/* Coordinate format, medium: {degrees}{minutes} */
+"COORD_DM_MEDIUM" = "%1$@%2$@";
+
+/* Coordinate format, short: {degrees}{minutes} */
+"COORD_DM_SHORT" = "%1$@%2$@";
+
+/* Coordinate format, long: {degrees}{minutes}{seconds} */
+"COORD_DMS_LONG" = "%1$@, %2$@, ו %3$@";
+
+/* Coordinate format, medium: {degrees}{minutes}{seconds} */
+"COORD_DMS_MEDIUM" = "%1$@%2$@%3$@";
+
+/* Coordinate format, short: {degrees}{minutes}{seconds} */
+"COORD_DMS_SHORT" = "%1$@%2$@%3$@";
+
+/* East longitude format, long: {longitude} */
+"COORD_E_LONG" = "%@ מזרחה";
+
+/* East longitude format, medium: {longitude} */
+"COORD_E_MEDIUM" = "%@ מזרחה";
+
+/* East longitude format, short: {longitude} */
+"COORD_E_SHORT" = "%@מז";
+
+/* Coordinate pair format, long: {latitude}, {longitude} */
+"COORD_FMT_LONG" = "%1$@ על %2$@";
+
+/* Coordinate pair format, medium: {latitude}, {longitude} */
+"COORD_FMT_MEDIUM" = "%1$@, %2$@";
+
+/* Coordinate pair format, short: {latitude}, {longitude} */
+"COORD_FMT_SHORT" = "%1$@, %2$@";
+
+/* Minutes format, long */
+"COORD_MIN_LONG" = "%d דקה(ות)";
+
+/* Minutes format, medium: {minutes} */
+"COORD_MIN_MEDIUM" = "%d′";
+
+/* Minutes format, short: {minutes} */
+"COORD_MIN_SHORT" = "%d′";
+
+/* North latitude format, long: {latitude} */
+"COORD_N_LONG" = "%@ צפונה";
+
+/* North latitude format, medium: {latitude} */
+"COORD_N_MEDIUM" = "%@ צפונה";
+
+/* North latitude format, short: {latitude} */
+"COORD_N_SHORT" = "%@צ";
+
+/* South latitude format, long: {latitude} */
+"COORD_S_LONG" = "%@ דרומה";
+
+/* South latitude format, medium: {latitude} */
+"COORD_S_MEDIUM" = "%@ דרומה";
+
+/* South latitude format, short: {latitude} */
+"COORD_S_SHORT" = "%@ד";
+
+/* Seconds format, long */
+"COORD_SEC_LONG" = "%d שניה(ות)";
+
+/* Seconds format, medium: {seconds} */
+"COORD_SEC_MEDIUM" = "%d″";
+
+/* Seconds format, short: {seconds} */
+"COORD_SEC_SHORT" = "%d″";
+
+/* West longitude format, long: {longitude} */
+"COORD_W_LONG" = "%@ מערב";
+
+/* West longitude format, medium: {longitude} */
+"COORD_W_MEDIUM" = "%@ מערב";
+
+/* West longitude format, short: {longitude} */
+"COORD_W_SHORT" = "%@מע";
+
+/* OpenStreetMap full name attribution */
+"OSM_FULL_NAME" = "OpenStreetMap";
+
+/* OpenStreetMap short name attribution */
+"OSM_SHORT_NAME" = "OSM";
+

@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+
+ - Add Hebrew localization [#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967)
+
 ## 5.3.1 - January 10, 2018
  - Blacklist binary program loading for Vivante GC4000 GPUs [#10862](https://github.com/mapbox/mapbox-gl-native/pull/10862)
  - Support Genymotion [#10841](https://github.com/mapbox/mapbox-gl-native/pull/10841)
