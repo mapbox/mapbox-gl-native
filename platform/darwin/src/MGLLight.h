@@ -27,7 +27,7 @@ typedef NS_ENUM(NSUInteger, MGLLightAnchor) {
  A structure containing information about the position of the light source
  relative to lit geometries.
  */
-typedef struct MGLSphericalPosition {
+typedef struct __attribute__((objc_boxable)) MGLSphericalPosition {
     /** Distance from the center of the base of an object to its light. */
     CGFloat radial;
     /** Position of the light relative to 0° (0° when `MGLLight.anchor` is set to viewport corresponds
