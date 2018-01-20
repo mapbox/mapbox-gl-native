@@ -276,7 +276,8 @@ but you create the former using a very different syntax. `NSExpression`’s form
 string syntax is reminiscent of a spreadsheet formula or an expression in a
 database query. See the
 “[Predicates and Expressions](Predicates and Expressions.md)” guide for an
-overview of the expression support in this SDK.
+overview of the expression support in this SDK. This SDK no longer supports
+style functions; use expressions instead.
 
 ### Constant values in expressions
 
@@ -371,39 +372,6 @@ In style specification | Method, function, or predicate type | Format string syn
 `tan`                  | |
 `zoom`                 | | `$zoom`
 `heatmap-density`      | | `$heatmapDensity`
-
-### Style functions
-
-A _style function_ allows you to vary the value of a layout or paint attribute
-based on the zoom level, data provided by content sources, or both. For more
-information about style functions, see “[Using Style Functions at Runtime](using-style-functions-at-runtime.html)”.
-
-Each kind of style function is represented by a distinct class, but you
-typically create style functions as you create any other style value, using
-class methods on `MGLStyleValue`:
-
-In style specification     | SDK class                   | SDK factory method
----------------------------|-----------------------------|-------------------
-zoom function              | `MGLCameraStyleFunction`    | `+[MGLStyleValue valueWithInterpolationMode:cameraStops:options:]`
-property function          | `MGLSourceStyleFunction`    | `+[MGLStyleValue valueWithInterpolationMode:sourceStops:attributeName:options:]`
-zoom-and-property function | `MGLCompositeStyleFunction` | `+[MGLStyleValue valueWithInterpolationMode:compositeStops:attributeName:options:]`
-
-The documentation for each individual style layer property indicates the kinds
-of style functions that are enabled for that property.
-
-When you create a style function, you specify an _interpolation mode_ and a
-series of _stops_. Each stop determines the effective value displayed at a
-particular zoom level (for camera functions) or the effective value on features
-with a particular attribute value in the content source (for source functions).
-The interpolation mode tells the SDK how to calculate the effective value
-between any two stops:
-
-In style specification       | In the SDK
------------------------------|-----------
-`exponential`                | `MGLInterpolationModeExponential`
-`interval`                   | `MGLInterpolationModeInterval`
-`categorical`                | `MGLInterpolationModeCategorical`
-`identity`                   | `MGLInterpolationModeIdentity`
 
 ## Filtering sources
 

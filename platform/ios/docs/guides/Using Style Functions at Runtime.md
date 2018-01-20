@@ -27,15 +27,15 @@ The documentation for each individual style layer property notes which style fun
 
 ## Stops
 
-Stops are key-value pairs that that determine a style value. With a `MGLCameraSourceFunction` stop, you can use a dictionary with a zoom level for a key and a `MGLStyleValue` for the value. For example, you can use a stops dictionary with zoom levels 0, 10, and 20 as keys, and yellow, orange, and red as the values. A `MGLSourceStyleFunction` uses the relevant attribute value as the key.
+Stops are dictionary keys that are associated with layer attribute values. With feature attribute values as stops, you can use a dictionary with a zoom level for a key and an expression or constant value for the value. For example, you can use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors yellow, orange, and red as the values. Alternatively, attribute values can be the keys.
 
 ```swift
-let stops = [
-    0: MGLStyleValue<UIColor>(rawValue: .yellow),
-    2.5: MGLStyleValue(rawValue: .orange),
-    5: MGLStyleValue(rawValue: .red),
-    7.5: MGLStyleValue(rawValue: .blue),
-    10: MGLStyleValue(rawValue: .white),
+let stops: [Float: UIColor] = [
+    0: .yellow,
+    2.5: .orange,
+    5: .red,
+    7.5: .blue,
+    10: .white,
 ]
 ```
 

@@ -1,3 +1,4 @@
+import XCTest
 import Foundation
 import Mapbox
 #if os(iOS)
@@ -52,25 +53,26 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
     func testUsingStyleFunctionsAtRuntime$Stops() {
         //#-example-code
         #if os(macOS)
-            let stops = [
-                0: MGLStyleValue<NSColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: NSColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
         #else
-            let stops = [
-                0: MGLStyleValue<UIColor>(rawValue: .yellow),
-                2.5: MGLStyleValue(rawValue: .orange),
-                5: MGLStyleValue(rawValue: .red),
-                7.5: MGLStyleValue(rawValue: .blue),
-                10: MGLStyleValue(rawValue: .white),
+            let stops: [Float: UIColor] = [
+                0: .yellow,
+                2.5: .orange,
+                5: .red,
+                7.5: .blue,
+                10: .white,
             ]
         #endif
         //#-end-example-code
         
-        let _ = MGLStyleValue(interpolationMode: .exponential, cameraStops: stops, options: nil)
+        let _ = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+                             stops[0]!, stops)
     }
     
     func testUsingStyleFunctionsAtRuntime$Linear() {

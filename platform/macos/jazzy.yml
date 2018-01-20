@@ -49,7 +49,6 @@ custom_categories:
   - name: Styling the Map
     children:
       - MGLStyle
-      - MGLStyleValue
       - MGLLight
   - name: Content Primitives
     children:
