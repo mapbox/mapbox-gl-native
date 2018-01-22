@@ -27,7 +27,7 @@ void TransformState::matrixFor(mat4& matrix, const UnwrappedTileID& tileID) cons
     matrix::scale(matrix, matrix, s / util::EXTENT, s / util::EXTENT, 1);
 }
 
-void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
+void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ, bool aligned) const {
     if (size.isEmpty()) {
         return;
     }
@@ -63,8 +63,8 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
 
     matrix::rotate_z(projMatrix, projMatrix, getAngle() + getNorthOrientationAngle());
 
-    matrix::translate(projMatrix, projMatrix, pixel_x() - size.width / 2.0f,
-                      pixel_y() - size.height / 2.0f, 0);
+    const double dx = pixel_x() - size.width / 2.0f, dy = pixel_y() - size.height / 2.0f;
+    matrix::translate(projMatrix, projMatrix, dx, dy, 0);
 
     if (axonometric) {
         // mat[11] controls perspective
@@ -77,6 +77,21 @@ void TransformState::getProjMatrix(mat4& projMatrix, uint16_t nearZ) const {
 
     matrix::scale(projMatrix, projMatrix, 1, 1,
                   1.0 / Projection::getMetersPerPixelAtLatitude(getLatLng(LatLng::Unwrapped).latitude(), getZoom()));
+
+    // Make a second projection matrix that is aligned to a pixel grid for rendering raster tiles.
+    // We're rounding the (floating point) x/y values to achieve to avoid rendering raster images to fractional
+    // coordinates. Additionally, we adjust by half a pixel in either direction in case that viewport dimension
+    // is an odd integer to preserve rendering to the pixel grid. We're rotating this shift based on the angle
+    // of the transformation so that 0°, 90°, 180°, and 270° rasters are crisp, and adjust the shift so that
+    // it is always <= 0.5 pixels.
+    if (aligned) {
+        const float xShift = float(size.width % 2) / 2, yShift = float(size.height % 2) / 2;
+        const double angleCos = std::cos(angle), angleSin = std::sin(angle);
+        double devNull;
+        const float dxa = -std::modf(dx, &devNull) + angleCos * xShift + angleSin * yShift;
+        const float dya = -std::modf(dy, &devNull) + angleCos * yShift + angleSin * xShift;
+        matrix::translate(projMatrix, projMatrix, dxa > 0.5 ? dxa - 1 : dxa, dya > 0.5 ? dya - 1 : dya, 0);
+    }
 }
 
 #pragma mark - Dimensions
