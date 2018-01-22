@@ -4,10 +4,10 @@ import android.content.Context;
 import android.location.Location;
 import android.support.annotation.Nullable;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.mapboxsdk.Mapbox;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
-import com.mapbox.services.android.core.location.LocationEnginePriority;
 import com.mapzen.android.lost.api.LocationListener;
 import com.mapzen.android.lost.api.LocationRequest;
 import com.mapzen.android.lost.api.LocationServices;

@@ -6,15 +6,15 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.MyBearingTracking;
 import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
-import com.mapbox.services.android.core.permissions.PermissionsManager;
 
 import timber.log.Timber;
 
@@ -392,7 +392,8 @@ public final class TrackingSettings {
 
     this.isCustomLocationSource = locationSource != null;
     if (locationSource == null) {
-      locationSource = Mapbox.getLocationEngine();
+      locationSource = new LocationEngine() {
+      };
     }
     this.locationSource = locationSource;
     myLocationView.setLocationSource(locationSource);

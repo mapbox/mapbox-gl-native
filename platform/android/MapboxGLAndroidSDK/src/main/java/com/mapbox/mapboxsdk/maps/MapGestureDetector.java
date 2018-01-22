@@ -19,13 +19,13 @@ import android.view.ViewConfiguration;
 import com.almeros.android.multitouch.gesturedetectors.RotateGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.ShoveGestureDetector;
 import com.almeros.android.multitouch.gesturedetectors.TwoFingerGestureDetector;
+import com.mapbox.android.telemetry.Event;
+import com.mapbox.android.telemetry.MapEventFactory;
+import com.mapbox.android.telemetry.MapState;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
-import com.mapbox.services.android.telemetry.Event;
-import com.mapbox.services.android.telemetry.MapEventFactory;
-import com.mapbox.services.android.telemetry.MapState;
 
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 

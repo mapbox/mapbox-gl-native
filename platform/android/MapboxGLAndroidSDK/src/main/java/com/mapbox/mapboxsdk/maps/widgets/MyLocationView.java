@@ -27,6 +27,9 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
@@ -35,9 +38,6 @@ import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.Projection;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
-import com.mapbox.services.android.core.location.LocationEnginePriority;
 
 import java.lang.ref.WeakReference;
 

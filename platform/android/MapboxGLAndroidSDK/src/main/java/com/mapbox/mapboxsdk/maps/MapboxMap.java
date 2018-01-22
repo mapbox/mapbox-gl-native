@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -42,7 +43,7 @@ import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.services.android.core.location.LocationEngine;
+//import com.mapbox.services.android.core.location.LocationEngine;
 import com.mapbox.services.commons.geojson.Feature;
 import com.mapbox.services.commons.geojson.Geometry;
 
@@ -2049,17 +2050,17 @@ public final class MapboxMap {
     trackingSettings.setOnMyLocationChangeListener(listener);
   }
 
-  /**
-   * Replaces the location source of the my-location layer.
-   *
-   * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
-   */
-  @Deprecated
-  public void setLocationSource(@Nullable LocationEngine locationSource) {
-    trackingSettings.setLocationSource(locationSource);
-  }
+//  /**
+//   * Replaces the location source of the my-location layer.
+//   *
+//   * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
+//   * @deprecated use location layer plugin from
+//   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
+//   */
+//  @Deprecated
+//  public void setLocationSource(@Nullable LocationEngine locationSource) {
+//    trackingSettings.setLocationSource(locationSource);
+//  }
 
   /**
    * Sets a callback that's invoked when the location tracking mode changes.

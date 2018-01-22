@@ -4,15 +4,14 @@ package com.mapbox.mapboxsdk;
 import android.location.Location;
 import android.support.annotation.Nullable;
 
+import com.mapbox.android.core.location.LocationEngineListener;
 import com.mapbox.mapboxsdk.location.LocationSource;
-import com.mapbox.services.android.core.location.LocationEngine;
-import com.mapbox.services.android.core.location.LocationEngineListener;
 
 class EmptyLocationSource extends LocationSource {
 
   /**
    * Activate the location engine which will connect whichever location provider you are using. You'll need to call
-   * this before requesting user location updates using {@link LocationEngine#requestLocationUpdates()}.
+   * this before requesting user location updates using {@link com.mapbox.android.core.location.LocationEngine#requestLocationUpdates()}.
    */
   @Override
   public void activate() {
@@ -21,8 +20,8 @@ class EmptyLocationSource extends LocationSource {
 
   /**
    * Disconnect the location engine which is useful when you no longer need location updates or requesting the users
-   * {@link LocationEngine#getLastLocation()}. Before deactivating, you'll need to stop request user location updates
-   * using {@link LocationEngine#removeLocationUpdates()}.
+   * {@link com.mapbox.android.core.location.LocationEngine#getLastLocation()}. Before deactivating, you'll need to stop request user location updates
+   * using {@link com.mapbox.android.core.location.LocationEngine#removeLocationUpdates()}.
    */
   @Override
   public void deactivate() {
@@ -80,7 +79,7 @@ class EmptyLocationSource extends LocationSource {
   /**
    * Useful when you'd like to add a location listener to handle location connections and update events. It is important
    * to note, that the callback will continue getting called even when your application isn't in the foreground.
-   * Therefore, it is a good idea to use {@link LocationEngine#removeLocationEngineListener(LocationEngineListener)}
+   * Therefore, it is a good idea to use {@link com.mapbox.android.core.location.LocationEngine#removeLocationEngineListener(LocationEngineListener)}
    * inside your activities {@code onStop()} method.
    *
    * @param listener A {@link LocationEngineListener} which you'd like to add to your location engine.
@@ -96,7 +95,7 @@ class EmptyLocationSource extends LocationSource {
    * method to remove it. It's also important to remove your listeners before the activity is destroyed to prevent any
    * potential memory leaks.
    *
-   * @param listener the {@link LocationEngineListener} you'd like to remove from this {@link LocationEngine}.
+   * @param listener the {@link LocationEngineListener} you'd like to remove from this {@link com.mapbox.android.core.location.LocationEngine}.
    * @return true.
    * @since 2.0.0
    */
