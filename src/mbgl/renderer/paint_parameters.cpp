@@ -35,6 +35,10 @@ PaintParameters::PaintParameters(gl::Context& context_,
     // Update the default matrices to the current viewport dimensions.
     state.getProjMatrix(projMatrix);
 
+    // Also compute a projection matrix that aligns with the current pixel grid, taking into account
+    // odd viewport sizes.
+    state.getProjMatrix(alignedProjMatrix, 1, true);
+
     // Calculate a second projection matrix with the near plane clipped to 100 so as
     // not to waste lots of depth buffer precision on very close empty space, for layer
     // types (fill-extrusion) that use the depth buffer to emulate real-world space.
@@ -47,10 +51,10 @@ PaintParameters::PaintParameters(gl::Context& context_,
     }
 }
 
-mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID) {
+mat4 PaintParameters::matrixForTile(const UnwrappedTileID& tileID, bool aligned) const {
     mat4 matrix;
     state.matrixFor(matrix, tileID);
-    matrix::multiply(matrix, projMatrix, matrix);
+    matrix::multiply(matrix, aligned ? alignedProjMatrix : projMatrix, matrix);
     return matrix;
 }
 
