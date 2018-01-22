@@ -4,6 +4,7 @@ import android.location.Location;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.services.android.telemetry.MapboxEvent;
 
 import java.util.Hashtable;
@@ -21,24 +22,32 @@ class MapboxEventWrapper {
   static Hashtable<String, Object> buildMapClickEvent(
     @NonNull Location location, @NonNull String gestureId, Transform transform) {
     try {
-      return MapboxEvent.buildMapClickEvent(location, gestureId, transform.getZoom());
+      double mapZoom = transform.getZoom();
+      if (mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM) {
+        // validate zoom #8057
+        return MapboxEvent.buildMapClickEvent(location, gestureId, transform.getZoom());
+      }
     } catch (NullPointerException exception) {
       // Map/Transform is not ready yet #8650
       // returning null is valid, event is ignored.
-      return null;
     }
+    return null;
   }
 
   @Nullable
   static Hashtable<String, Object> buildMapDragEndEvent(
     @NonNull Location location, Transform transform) {
     try {
-      return MapboxEvent.buildMapDragEndEvent(location, transform.getZoom());
+      double mapZoom = transform.getZoom();
+      if (mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM) {
+        // validate zoom #8057
+        return MapboxEvent.buildMapDragEndEvent(location, transform.getZoom());
+      }
     } catch (NullPointerException exception) {
       // Map/Transform is not ready yet #8650
       // returning null is valid, event is ignored.
-      return null;
     }
+    return null;
   }
 
   @Nullable
