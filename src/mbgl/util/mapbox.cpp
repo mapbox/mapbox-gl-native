@@ -133,7 +133,7 @@ canonicalizeTileURL(const std::string& str, const style::SourceType type, const 
     std::string result = "mapbox://tiles/";
     result.append(str, path.directory.first + versionLen, path.directory.second - versionLen);
     result.append(str, path.filename.first, path.filename.second);
-    if (type == style::SourceType::Raster) {
+    if (type == style::SourceType::Raster || type == style::SourceType::RasterDEM) {
         result += tileSize == util::tileSize ? "@2x" : "{ratio}";
     }
 

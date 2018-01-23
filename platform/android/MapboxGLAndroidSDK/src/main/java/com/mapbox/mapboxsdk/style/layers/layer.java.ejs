@@ -78,7 +78,7 @@ public class <%- camelize(type) %>Layer extends Layer {
   }
 
 <% } -%>
-<% if (type !== 'background' && type !== 'raster') { -%>
+<% if (type !== 'background' && type !== 'raster' && type !== 'hillshade') { -%>
   /**
    * Get the source layer.
    *

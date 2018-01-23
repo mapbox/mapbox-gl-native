@@ -17,6 +17,7 @@ namespace style {
 
 class VectorSource;
 class RasterSource;
+class RasterDEMSource;
 class GeoJSONSource;
 class SourceObserver;
 

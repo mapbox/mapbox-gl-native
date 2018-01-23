@@ -24,9 +24,6 @@ RasterTile::RasterTile(const OverscaledTileID& id_,
 
 RasterTile::~RasterTile() = default;
 
-void RasterTile::cancel() {
-}
-
 void RasterTile::setError(std::exception_ptr err) {
     loaded = true;
     observer->onTileError(*this, err);

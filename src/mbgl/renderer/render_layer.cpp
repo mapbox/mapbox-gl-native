@@ -4,6 +4,7 @@
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_layer.hpp>
+#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/layers/render_line_layer.hpp>
 #include <mbgl/renderer/layers/render_raster_layer.hpp>
 #include <mbgl/renderer/layers/render_symbol_layer.hpp>
@@ -26,6 +27,8 @@ std::unique_ptr<RenderLayer> RenderLayer::create(Immutable<Layer::Impl> impl) {
         return std::make_unique<RenderSymbolLayer>(staticImmutableCast<SymbolLayer::Impl>(impl));
     case LayerType::Raster:
         return std::make_unique<RenderRasterLayer>(staticImmutableCast<RasterLayer::Impl>(impl));
+    case LayerType::Hillshade:
+        return std::make_unique<RenderHillshadeLayer>(staticImmutableCast<HillshadeLayer::Impl>(impl));
     case LayerType::Background:
         return std::make_unique<RenderBackgroundLayer>(staticImmutableCast<BackgroundLayer::Impl>(impl));
     case LayerType::Custom:

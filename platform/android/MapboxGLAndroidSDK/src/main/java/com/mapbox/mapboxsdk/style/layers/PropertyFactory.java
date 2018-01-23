@@ -1988,6 +1988,234 @@ public class PropertyFactory {
   }
 
   /**
+   * The direction of the light source used to generate the hillshading with 0 as the top of the viewport if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `viewport` and due north if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `map`.
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> hillshadeIlluminationDirection(Float value) {
+    return new PaintPropertyValue<>("hillshade-illumination-direction", value);
+  }
+
+  /**
+   * The direction of the light source used to generate the hillshading with 0 as the top of the viewport if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `viewport` and due north if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `map`.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeIlluminationDirection(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-illumination-direction", expression);
+  }
+
+
+  /**
+   * The direction of the light source used to generate the hillshading with 0 as the top of the viewport if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `viewport` and due north if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `map`.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> hillshadeIlluminationDirection(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("hillshade-illumination-direction", function);
+  }
+
+  /**
+   * Direction of light source when map is rotated.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> hillshadeIlluminationAnchor(@Property.HILLSHADE_ILLUMINATION_ANCHOR String value) {
+    return new PaintPropertyValue<>("hillshade-illumination-anchor", value);
+  }
+
+  /**
+   * Direction of light source when map is rotated.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeIlluminationAnchor(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-illumination-anchor", expression);
+  }
+
+
+  /**
+   * Direction of light source when map is rotated.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> hillshadeIlluminationAnchor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("hillshade-illumination-anchor", function);
+  }
+
+  /**
+   * Intensity of the hillshade
+   *
+   * @param value a Float value
+   * @return property wrapper around Float
+   */
+  public static PropertyValue<Float> hillshadeExaggeration(Float value) {
+    return new PaintPropertyValue<>("hillshade-exaggeration", value);
+  }
+
+  /**
+   * Intensity of the hillshade
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeExaggeration(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-exaggeration", expression);
+  }
+
+
+  /**
+   * Intensity of the hillshade
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for Float
+   * @return property wrapper around a Float function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, Float>> hillshadeExaggeration(CameraFunction<Z, Float> function) {
+    return new PaintPropertyValue<>("hillshade-exaggeration", function);
+  }
+
+  /**
+   * The shading color of areas that face away from the light source.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> hillshadeShadowColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("hillshade-shadow-color", colorToRgbaString(value));
+  }
+
+  /**
+   * The shading color of areas that face away from the light source.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> hillshadeShadowColor(String value) {
+    return new PaintPropertyValue<>("hillshade-shadow-color", value);
+  }
+
+  /**
+   * The shading color of areas that face away from the light source.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeShadowColor(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-shadow-color", expression);
+  }
+
+
+  /**
+   * The shading color of areas that face away from the light source.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> hillshadeShadowColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("hillshade-shadow-color", function);
+  }
+
+  /**
+   * The shading color of areas that faces towards the light source.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> hillshadeHighlightColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("hillshade-highlight-color", colorToRgbaString(value));
+  }
+
+  /**
+   * The shading color of areas that faces towards the light source.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> hillshadeHighlightColor(String value) {
+    return new PaintPropertyValue<>("hillshade-highlight-color", value);
+  }
+
+  /**
+   * The shading color of areas that faces towards the light source.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeHighlightColor(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-highlight-color", expression);
+  }
+
+
+  /**
+   * The shading color of areas that faces towards the light source.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> hillshadeHighlightColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("hillshade-highlight-color", function);
+  }
+
+  /**
+   * The shading color used to accentuate rugged terrain like sharp cliffs and gorges.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> hillshadeAccentColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("hillshade-accent-color", colorToRgbaString(value));
+  }
+
+  /**
+   * The shading color used to accentuate rugged terrain like sharp cliffs and gorges.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> hillshadeAccentColor(String value) {
+    return new PaintPropertyValue<>("hillshade-accent-color", value);
+  }
+
+  /**
+   * The shading color used to accentuate rugged terrain like sharp cliffs and gorges.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> hillshadeAccentColor(Expression expression) {
+    return new PaintPropertyValue<>("hillshade-accent-color", expression);
+  }
+
+
+  /**
+   * The shading color used to accentuate rugged terrain like sharp cliffs and gorges.
+   *
+   * @param <Z> the zoom parameter type
+   * @param function a wrapper {@link CameraFunction} for String
+   * @return property wrapper around a String function
+   */
+  @Deprecated
+  public static <Z extends Number> PropertyValue<CameraFunction<Z, String>> hillshadeAccentColor(CameraFunction<Z, String> function) {
+    return new PaintPropertyValue<>("hillshade-accent-color", function);
+  }
+
+  /**
    * The color with which the background will be drawn.
    *
    * @param value a int color value

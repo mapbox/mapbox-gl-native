@@ -12,8 +12,8 @@ namespace style {
 
 class RasterSource : public Source {
 public:
-    RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize);
-    ~RasterSource() final;
+    RasterSource(std::string id, variant<std::string, Tileset> urlOrTileset, uint16_t tileSize, SourceType sourceType = SourceType::Raster);
+    ~RasterSource() override;
 
     const variant<std::string, Tileset>& getURLOrTileset() const;
     optional<std::string> getURL() const;

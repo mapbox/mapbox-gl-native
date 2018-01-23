@@ -3,8 +3,8 @@
 namespace mbgl {
 namespace style {
 
-RasterSource::Impl::Impl(std::string id_, uint16_t tileSize_)
-    : Source::Impl(SourceType::Raster, std::move(id_)),
+RasterSource::Impl::Impl(SourceType sourceType, std::string id_, uint16_t tileSize_)
+    : Source::Impl(sourceType, std::move(id_)),
       tileSize(tileSize_) {
 }
 

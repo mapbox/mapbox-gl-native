@@ -14,6 +14,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -797,6 +798,10 @@ struct SetFilterVisitor {
     }
 
     void operator()(mbgl::style::RasterLayer&) {
+        Nan::ThrowTypeError("layer doesn't support filters");
+    }
+
+    void operator()(mbgl::style::HillshadeLayer&) {
         Nan::ThrowTypeError("layer doesn't support filters");
     }
 
