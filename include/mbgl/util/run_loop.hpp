@@ -88,12 +88,13 @@ private:
 
     void process() {
         std::unique_lock<std::mutex> lock(mutex);
-        Queue queue_;
-        lock.unlock();
-
-        while (!queue_.empty()) {
-            (*(queue_.front()))();
-            queue_.pop();
+        std::shared_ptr<WorkTask> task;
+        while (!queue.empty()) {
+            task = std::move(queue.front());
+            queue.pop();
+            lock.unlock();
+            (*task)();
+            lock.lock();
         }
     }
 
