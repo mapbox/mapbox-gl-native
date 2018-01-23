@@ -893,16 +893,9 @@ void NativeMapView::removeSource(JNIEnv& env, jni::Object<Source> obj, jlong sou
     source->removeFromMap(env, obj, *map);
 }
 
-void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::jint h, jni::jfloat scale, jni::Array<jbyte> pixels) {
-    jni::NullCheck(env, &pixels);
-    std::size_t size = pixels.Length(env);
-
-    mbgl::PremultipliedImage premultipliedImage({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
-    if (premultipliedImage.bytes() != uint32_t(size)) {
-        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
-    }
-
-    jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::Object<Bitmap> bitmap, jni::jfloat scale) {
+    jni::NullCheck(env, &bitmap);
+    mbgl::PremultipliedImage premultipliedImage = Bitmap::GetImage(env, bitmap);
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         jni::Make<std::string>(env, name),
