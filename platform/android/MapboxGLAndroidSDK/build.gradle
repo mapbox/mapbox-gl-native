@@ -114,7 +114,6 @@ android {
 
     lintOptions {
         disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
-        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false
     }

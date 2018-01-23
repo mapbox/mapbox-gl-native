@@ -9,6 +9,7 @@ ext {
 
     versions = [
             mapboxServices: '2.2.9',
+            mapboxTelemetryVersion: '3.0.0-SNAPSHOT',
             supportLib    : '25.4.0',
             espresso      : '3.0.1',
             testRunner    : '1.0.1',
@@ -24,7 +25,7 @@ ext {
     dependenciesList = [
             mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-java-services:${versions.mapboxServices}@jar",
             mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-java-geojson:${versions.mapboxServices}@jar",
-            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxServices}@aar",
+            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetryVersion}",
 
             junit                 : "junit:junit:${versions.junit}",
             mockito               : "org.mockito:mockito-core:${versions.mockito}",
@@ -42,6 +43,7 @@ ext {
             supportRecyclerView   : "com.android.support:recyclerview-v7:${versions.supportLib}",
 
             lost                  : "com.mapzen.android:lost:${versions.lost}",
+            gmsLocation           : 'com.google.android.gms:play-services-location:11.0.4',
             timber                : "com.jakewharton.timber:timber:${versions.timber}",
             okhttp3               : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
             leakCanaryDebug       : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
