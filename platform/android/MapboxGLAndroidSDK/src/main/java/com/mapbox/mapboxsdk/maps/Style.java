@@ -20,6 +20,8 @@ import timber.log.Timber;
 
 public class Style {
 
+  private long nativePtr;
+
   // todo remove NativeMapView facade
   private NativeMapView nativeMapView;
 
@@ -28,7 +30,7 @@ public class Style {
 
   // todo make private
   Style() {
-
+    initialize();
   }
 
   // todo remove
@@ -397,6 +399,15 @@ public class Style {
   public String getJson() {
     return json;
   }
+
+  //
+  // Native methods
+  //
+
+  private native void initialize();
+
+  @Override
+  protected native void finalize() throws Throwable;
 
   //
   // Constants

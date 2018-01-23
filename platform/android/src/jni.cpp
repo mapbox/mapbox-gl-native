@@ -49,6 +49,7 @@
 #include "style/layers/layers.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
+#include "style/style.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
@@ -170,6 +171,7 @@ void registerNatives(JavaVM *vm) {
     ExponentialStops::registerNative(env);
     IdentityStops::registerNative(env);
     IntervalStops::registerNative(env);
+    Style::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);
