@@ -76,16 +76,20 @@ private:
 
     using Queue = std::queue<std::shared_ptr<WorkTask>>;
 
-    void push(std::shared_ptr<WorkTask>);
+    // Wakes up the RunLoop so that it starts processing items in the queue.
+    void wake();
 
-    void withMutex(std::function<void()>&& fn) {
+    // Adds a WorkTask to the queue, and wakes it up.
+    void push(std::shared_ptr<WorkTask> task) {
         std::lock_guard<std::mutex> lock(mutex);
-        fn();
+        queue.push(std::move(task));
+        wake();
     }
 
     void process() {
+        std::unique_lock<std::mutex> lock(mutex);
         Queue queue_;
-        withMutex([&] { queue_.swap(queue); });
+        lock.unlock();
 
         while (!queue_.empty()) {
             (*(queue_.front()))();
