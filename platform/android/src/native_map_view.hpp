@@ -236,7 +236,7 @@ public:
 
     void removeSource(JNIEnv&, jni::Object<Source>, jlong nativePtr);
 
-    void addImage(JNIEnv&, jni::String, jni::jint, jni::jint, jni::jfloat, jni::Array<jbyte>);
+    void addImage(JNIEnv&, jni::String, jni::Object<Bitmap> bitmap, jni::jfloat);
 
     void addImages(JNIEnv&, jni::Array<jni::Object<mbgl::android::Image>>);
 
