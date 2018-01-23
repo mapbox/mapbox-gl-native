@@ -99,7 +99,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       }
     });
   }
-<% if (!(type === 'background' || type === 'raster')) { -%>
+<% if (!(type === 'background' || type === 'raster' || type === 'hillshade')) { -%>
 
   @Test
   public void testSourceLayer() {

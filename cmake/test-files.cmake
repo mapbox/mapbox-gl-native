@@ -21,6 +21,9 @@ set(MBGL_TEST_FILES
     test/api/recycle_map.cpp
     test/api/zoom_history.cpp
 
+    # geometry
+    test/geometry/dem_data.test.cpp
+
     # gl
     test/gl/bucket.test.cpp
     test/gl/context.test.cpp
@@ -123,6 +126,7 @@ set(MBGL_TEST_FILES
     test/tile/custom_geometry_tile.test.cpp
     test/tile/geojson_tile.test.cpp
     test/tile/geometry_tile_data.test.cpp
+    test/tile/raster_dem_tile.test.cpp
     test/tile/raster_tile.test.cpp
     test/tile/tile_coordinate.test.cpp
     test/tile/tile_id.test.cpp

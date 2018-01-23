@@ -570,6 +570,27 @@ public final class Property {
   @Retention(RetentionPolicy.SOURCE)
   public @interface FILL_EXTRUSION_TRANSLATE_ANCHOR {}
 
+  // HILLSHADE_ILLUMINATION_ANCHOR: Direction of light source when map is rotated.
+
+  /**
+   * The hillshade illumination is relative to the north direction.
+   */
+  public static final String HILLSHADE_ILLUMINATION_ANCHOR_MAP = "map";
+  /**
+   * The hillshade illumination is relative to the top of the viewport.
+   */
+  public static final String HILLSHADE_ILLUMINATION_ANCHOR_VIEWPORT = "viewport";
+
+  /**
+   * Direction of light source when map is rotated.
+   */
+  @StringDef({
+      HILLSHADE_ILLUMINATION_ANCHOR_MAP,
+      HILLSHADE_ILLUMINATION_ANCHOR_VIEWPORT,
+    })
+  @Retention(RetentionPolicy.SOURCE)
+  public @interface HILLSHADE_ILLUMINATION_ANCHOR {}
+
   // ANCHOR: Whether extruded geometries are lit relative to the map or viewport.
 
   /**

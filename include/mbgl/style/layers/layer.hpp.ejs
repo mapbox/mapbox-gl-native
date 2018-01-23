@@ -35,7 +35,7 @@ public:
 <% if (type !== 'background') { -%>
     // Source
     const std::string& getSourceID() const;
-<% if (type !== 'raster') { -%>
+<% if (type !== 'raster' && type !== 'hillshade') { -%>
     const std::string& getSourceLayer() const;
     void setSourceLayer(const std::string& sourceLayer);
 
