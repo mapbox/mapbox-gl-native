@@ -392,8 +392,7 @@ public final class TrackingSettings {
 
     this.isCustomLocationSource = locationSource != null;
     if (locationSource == null) {
-      locationSource = new LocationEngine() {
-      };
+      locationSource = generateLocationEngine();
     }
     this.locationSource = locationSource;
     myLocationView.setLocationSource(locationSource);
@@ -416,5 +415,46 @@ public final class TrackingSettings {
 
   interface CameraZoomInvalidator {
     void zoomTo(double zoomLevel);
+  }
+
+  private LocationEngine generateLocationEngine() {
+    LocationEngine locationEngine = new LocationEngine() {
+      @Override
+      public void activate() {
+
+      }
+
+      @Override
+      public void deactivate() {
+
+      }
+
+      @Override
+      public boolean isConnected() {
+        return false;
+      }
+
+      @Override
+      public Location getLastLocation() {
+        return null;
+      }
+
+      @Override
+      public void requestLocationUpdates() {
+
+      }
+
+      @Override
+      public void removeLocationUpdates() {
+
+      }
+
+      @Override
+      public Type obtainType() {
+        return null;
+      }
+    };
+
+    return locationEngine;
   }
 }

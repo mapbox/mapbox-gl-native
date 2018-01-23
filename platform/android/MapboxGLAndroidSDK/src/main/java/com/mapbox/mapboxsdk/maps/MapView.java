@@ -25,7 +25,6 @@ import android.widget.ZoomButtonsController;
 
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
-import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;

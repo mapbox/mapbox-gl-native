@@ -16,6 +16,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
+import com.mapbox.services.android.telemetry.TelemetryListener;
 
 import java.io.IOException;
 
@@ -64,18 +65,21 @@ public final class Mapbox {
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
       try {
-        telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT,
-          new Callback() {
-            @Override
-            public void onFailure(Call call, IOException exception) {
-              Timber.d(exception, "Mapbox telemetry request failed");
-            }
+        telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT);
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-              Timber.d("Mapbox telemetry response: %s", response.body().string());
-            }
-          });
+        TelemetryListener telemetryListener = new TelemetryListener() {
+          @Override
+          public void onHttpResponse(boolean b, int i) {
+
+          }
+
+          @Override
+          public void onHttpFailure(String s) {
+
+          }
+        };
+
+        telemetry.addTelemetryListener(telemetryListener);
         telemetry.enable();
       } catch (Exception exception) {
         Timber.e(exception, "Unable to instantiate Mapbox telemetry");
