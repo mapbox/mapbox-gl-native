@@ -25,7 +25,7 @@ import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEngineListener;
 
 import timber.log.Timber;
 

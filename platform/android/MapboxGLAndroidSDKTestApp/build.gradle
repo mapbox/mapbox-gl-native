@@ -63,7 +63,8 @@ dependencies {
     implementation dependenciesList.supportRecyclerView
     implementation dependenciesList.supportDesign
 
-    implementation dependenciesList.lost
+    // implementation dependenciesList.lost
+    implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug
     releaseImplementation dependenciesList.leakCanaryRelease
