@@ -18,7 +18,7 @@ namespace mbgl {
 namespace android {
 
     // This conversion is expected not to fail because it's used only in contexts where
-    // the value was originally a GeoJsonOptions object on the Java side. If it fails
+    // the value was originally a CustomGeometrySourceOptions object on the Java side. If it fails
     // to convert, it's a bug in our serialization or Java-side static typing.
     static style::CustomGeometrySource::Options convertCustomGeometrySourceOptions(jni::JNIEnv& env,
                                                                                    jni::Object<> options,

@@ -82,6 +82,24 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
+ An `NSNumber` object containing a boolean; specifies whether the geometry for a
+ `MGLComputedShapeSource` needs to be wrapped to accomodate coordinates with longitudes outside the [-180,180] extents. The default is `false.`
+ 
+ Setting this option to `true` affects performance.
+  */
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapCoordinates;
+
+/**
+ An `NSNumber` object containing a boolean; specifies whether the geometry for a
+ `MGLComputedShapeSource` needs to be clipped at the tile boundaries.
+ The default is `false.`
+
+ Setting this options to `true` affects performance. Use this option to clip
+ polygons and lines at tile boundaries without artefacts.
+ */
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipCoordinates;
+
+/**
  `MGLAbstractShapeSource` is an abstract base class for map content sources that
  supply vector shapes to be shown on the map. A shape source is added to an
  `MGLStyle` object along with an `MGLVectorStyleLayer` object. The vector style

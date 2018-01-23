@@ -39,7 +39,7 @@ void CustomGeometryTile::setTileData(const GeoJSON& geoJSON) {
         vtOptions.extent = util::EXTENT;
         vtOptions.buffer = ::round(scale * options.buffer);
         vtOptions.tolerance = scale * options.tolerance;
-        featureData = mapbox::geojsonvt::geoJSONToTile(geoJSON, id.canonical.z, id.canonical.x, id.canonical.y, vtOptions).features;
+        featureData = mapbox::geojsonvt::geoJSONToTile(geoJSON, id.canonical.z, id.canonical.x, id.canonical.y, vtOptions, options.wrap, options.clip).features;
     } else {
         setNecessity(TileNecessity::Optional);
     }

@@ -727,7 +727,11 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
 
     MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"graticule"
-                                                                                options:@{MGLShapeSourceOptionMaximumZoomLevel:@14}];
+     options:@{MGLShapeSourceOptionMaximumZoomLevel:@14
+            , MGLShapeSourceOptionWrapCoordinates: @YES
+            , MGLShapeSourceOptionClipCoordinates: @YES
+            }];
+
     source.dataSource = self;
     [self.mapView.style addSource:source];
     MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"graticule.lines"

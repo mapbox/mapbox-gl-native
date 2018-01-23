@@ -54,6 +54,26 @@ struct Converter<CustomGeometrySource::Options> {
             }
         }
 
+        const auto wrapValue = objectMember(value, "wrap");
+        if (wrapValue) {
+            if (toBool(*wrapValue)) {
+                options.tileOptions.wrap = static_cast<bool>(*toBool(*wrapValue));
+            } else {
+                error = { "CustomGeometrySource TileOptions wrap value must be a boolean" };
+                return {};
+            }
+        }
+
+        const auto clipValue = objectMember(value, "clip");
+        if (clipValue) {
+            if (toBool(*clipValue)) {
+                options.tileOptions.clip = static_cast<double>(*toBool(*clipValue));
+            } else {
+                error = { "CustomGeometrySource TileOptiosn clip value must be a boolean" };
+                return {};
+            }
+        }
+
         return { options };
     }
 
