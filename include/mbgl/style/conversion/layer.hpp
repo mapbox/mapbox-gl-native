@@ -43,6 +43,9 @@ optional<Error> setPaintProperties(Layer& layer, const V& value) {
     if (!paintValue) {
         return {};
     }
+    if (!isObject(*paintValue)) {
+        return { { "paint must be an object" } };
+    }
     return eachMember(*paintValue, [&] (const std::string& k, const V& v) {
         return setPaintProperty(layer, k, v);
     });
