@@ -293,15 +293,6 @@
         functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
         functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.hillshadeIlluminationDirection = functionExpression, NSException, NSInvalidArgumentException, @"MGLHillshadeLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        // Transition property test
-        layer.hillshadeIlluminationDirectionTransition = transitionTest;
-        auto toptions = rawLayer->getHillshadeIlluminationDirectionTransition();
-        XCTAssert(toptions.delay && MGLTimeIntervalFromDuration(*toptions.delay) == transitionTest.delay);
-        XCTAssert(toptions.duration && MGLTimeIntervalFromDuration(*toptions.duration) == transitionTest.duration);
-
-        MGLTransition hillshadeIlluminationDirectionTransition = layer.hillshadeIlluminationDirectionTransition;
-        XCTAssertEqual(hillshadeIlluminationDirectionTransition.delay, transitionTest.delay);
-        XCTAssertEqual(hillshadeIlluminationDirectionTransition.duration, transitionTest.duration);
     }
 
     // hillshade-shadow-color

@@ -83,24 +83,6 @@ public class HillshadeLayer extends Layer {
   }
 
   /**
-   * Get the HillshadeIlluminationDirection property transition options
-   *
-   * @return transition options for Float
-   */
-  public TransitionOptions getHillshadeIlluminationDirectionTransition() {
-    return nativeGetHillshadeIlluminationDirectionTransition();
-  }
-
-  /**
-   * Set the HillshadeIlluminationDirection property transition options
-   *
-   * @param options transition options for Float
-   */
-  public void setHillshadeIlluminationDirectionTransition(TransitionOptions options) {
-    nativeSetHillshadeIlluminationDirectionTransition(options.getDuration(), options.getDelay());
-  }
-
-  /**
    * Get the HillshadeIlluminationAnchor property
    *
    * @return property wrapper value around String
@@ -271,10 +253,6 @@ public class HillshadeLayer extends Layer {
   }
 
   private native Object nativeGetHillshadeIlluminationDirection();
-
-  private native TransitionOptions nativeGetHillshadeIlluminationDirectionTransition();
-
-  private native void nativeSetHillshadeIlluminationDirectionTransition(long duration, long delay);
 
   private native Object nativeGetHillshadeIlluminationAnchor();
 

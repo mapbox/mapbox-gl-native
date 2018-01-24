@@ -30,8 +30,6 @@ public:
     // Properties
 
     jni::Object<jni::ObjectTag> getHillshadeIlluminationDirection(jni::JNIEnv&);
-    void setHillshadeIlluminationDirectionTransition(jni::JNIEnv&, jlong duration, jlong delay);
-    jni::Object<TransitionOptions> getHillshadeIlluminationDirectionTransition(jni::JNIEnv&);
 
     jni::Object<jni::ObjectTag> getHillshadeIlluminationAnchor(jni::JNIEnv&);
 
