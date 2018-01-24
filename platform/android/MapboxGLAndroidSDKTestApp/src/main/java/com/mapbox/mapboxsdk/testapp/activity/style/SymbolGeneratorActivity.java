@@ -248,7 +248,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         iconImage(get(literal(FEATURE_ID))),
         iconAllowOverlap(false),
         iconSize(
-          division(get(literal(FEATURE_RANK)), literal(2))
+          division(get(literal(FEATURE_RANK)).asNumber(), literal(2))
         ),
         iconAnchor(ICON_ANCHOR_BOTTOM),
         iconOffset(new Float[] {0.0f, -5.0f}),
@@ -257,13 +257,13 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         textField(
           concat(
             upcase(literal("a ")),
-            get(literal(FEATURE_TYPE)),
+            get(FEATURE_TYPE).asString(),
             downcase(literal(" IN ")),
-            get(literal(FEATURE_REGION))
+            get(FEATURE_REGION).asString()
           )
         ),
         textSize(
-          product(get(literal(FEATURE_RANK)), pi())
+          product(get(FEATURE_RANK).asNumber(), pi())
         ),
         textAnchor(TEXT_ANCHOR_TOP)
       )
