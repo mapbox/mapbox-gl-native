@@ -87,24 +87,6 @@ public class HillshadeLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testHillshadeIlluminationDirectionTransition() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("hillshade-illumination-directionTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        layer.setHillshadeIlluminationDirectionTransition(options);
-        assertEquals(layer.getHillshadeIlluminationDirectionTransition(), options);
-      }
-    });
-  }
-
-  @Test
   public void testHillshadeIlluminationDirectionAsConstant() {
     validateTestSetup();
     setupLayer();

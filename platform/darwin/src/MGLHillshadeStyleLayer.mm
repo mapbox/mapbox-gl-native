@@ -216,24 +216,6 @@ namespace mbgl {
     return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
-- (void)setHillshadeIlluminationDirectionTransition:(MGLTransition )transition {
-    MGLAssertStyleLayerIsValid();
-
-    mbgl::style::TransitionOptions options { { MGLDurationFromTimeInterval(transition.duration) }, { MGLDurationFromTimeInterval(transition.delay) } };
-    self.rawLayer->setHillshadeIlluminationDirectionTransition(options);
-}
-
-- (MGLTransition)hillshadeIlluminationDirectionTransition {
-    MGLAssertStyleLayerIsValid();
-
-    mbgl::style::TransitionOptions transitionOptions = self.rawLayer->getHillshadeIlluminationDirectionTransition();
-    MGLTransition transition;
-    transition.duration = MGLTimeIntervalFromDuration(transitionOptions.duration.value_or(mbgl::Duration::zero()));
-    transition.delay = MGLTimeIntervalFromDuration(transitionOptions.delay.value_or(mbgl::Duration::zero()));
-
-    return transition;
-}
-
 - (void)setHillshadeShadowColor:(NSExpression *)hillshadeShadowColor {
     MGLAssertStyleLayerIsValid();
 

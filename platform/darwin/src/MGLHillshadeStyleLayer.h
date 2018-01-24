@@ -186,13 +186,6 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationDirection;
 
 /**
- The transition affecting any changes to this layer’s `hillshadeIlluminationDirection` property.
-
- This property corresponds to the `hillshade-illumination-direction-transition` property in the style JSON file format.
-*/
-@property (nonatomic) MGLTransition hillshadeIlluminationDirectionTransition;
-
-/**
  The shading color of areas that face away from the light source.
  
  The default value of this property is an expression that evaluates to
