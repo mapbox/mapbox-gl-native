@@ -163,11 +163,11 @@ MGL_EXPORT
  more extreme contrast.
  
  The default value of this property is an expression that evaluates to the float
- `0.5`.
+ 0.5.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
