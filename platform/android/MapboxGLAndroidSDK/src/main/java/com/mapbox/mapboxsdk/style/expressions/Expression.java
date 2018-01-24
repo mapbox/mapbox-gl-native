@@ -68,6 +68,7 @@ public class Expression<T> {
    * @param operator  the expression operator
    * @param arguments expressions input
    */
+  @SafeVarargs
   public Expression(@NonNull String operator, @Nullable Expression... arguments) {
     this.operator = operator;
     this.arguments = arguments;
@@ -157,7 +158,7 @@ public class Expression<T> {
    * Is used for first parameter of {@link #interpolate(Expression, Expression, Stop...)}.
    * </p>
    */
-  private static class Interpolator {
+  public static class Interpolator {
   }
 
   /**
@@ -587,6 +588,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Boolean> all(@NonNull Expression<Boolean>... input) {
     return new Expression<>("all", input);
   }
@@ -602,6 +604,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Boolean> any(@NonNull Expression<Boolean>... input) {
     return new Expression<>("any", input);
   }
@@ -632,6 +635,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
+  @SafeVarargs
   public static Expression switchCase(@NonNull @Size(min = 1) Expression... input) {
     return new Expression("case", input);
   }
@@ -782,7 +786,7 @@ public class Expression<T> {
    * @param object an expression object
    * @return expression
    */
-  public static Expression get(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
+  public static Expression<Object> get(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
     return new Expression<>("get", key, object);
   }
 
@@ -794,7 +798,7 @@ public class Expression<T> {
    * @param object an expression object
    * @return expression
    */
-  public static Expression get(@NonNull String key, @NonNull Expression<Object> object) {
+  public static Expression<Object> get(@NonNull String key, @NonNull Expression<Object> object) {
     return get(literal(key), object);
   }
 
@@ -897,6 +901,7 @@ public class Expression<T> {
    * @param numbers the numbers to calculate the sum for
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Number> sum(@Size(min = 2) Expression<Number>... numbers) {
     return new Expression<>("+", numbers);
   }
@@ -922,6 +927,7 @@ public class Expression<T> {
    * @param numbers the numbers to calculate the product for
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Number> product(@Size(min = 2) Expression<Number>... numbers) {
     return new Expression<>("*", numbers);
   }
@@ -990,6 +996,7 @@ public class Expression<T> {
    * @param second the second number
    * @return expression
    */
+  @SuppressWarnings("unchecked")
   public static Expression<Number> division(@NonNull Expression<Number> first, @NonNull Expression<Number> second) {
     return new Expression<>("/", first, second);
   }
@@ -1001,6 +1008,7 @@ public class Expression<T> {
    * @param second the second number
    * @return expression
    */
+  @SuppressWarnings("unchecked")
   public static Expression<Number> division(@NonNull Number first, @NonNull Number second) {
     return division(literal(first), literal(second));
   }
@@ -1255,6 +1263,7 @@ public class Expression<T> {
    * @param numbers varargs of numbers to get the minimum from
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Number> min(@Size(min = 1) Expression<Number>... numbers) {
     return new Expression<>("min", numbers);
   }
@@ -1280,6 +1289,7 @@ public class Expression<T> {
    * @param numbers varargs of numbers to get the maximum from
    * @return expression
    */
+  @SafeVarargs
   public static Expression<Number> max(@Size(min = 1) Expression<Number>... numbers) {
     return new Expression<>("max", numbers);
   }
@@ -1365,6 +1375,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
+  @SafeVarargs
   public static Expression<String> concat(@NonNull Expression<String>... input) {
     return new Expression<>("concat", input);
   }
@@ -1522,6 +1533,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
+  @SafeVarargs
   public static Expression let(@Size(min = 1) Expression... input) {
     return new Expression<>("let", input);
   }
@@ -1582,6 +1594,7 @@ public class Expression<T> {
    * @param stops pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression step(@NonNull Number input, @NonNull Expression expression, Expression... stops) {
     return step(literal(input), expression, stops);
   }
@@ -1597,6 +1610,7 @@ public class Expression<T> {
    * @param stops      pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression step(@NonNull Expression<Number> input, @NonNull Expression expression, Expression... stops) {
     return new Expression("step", join(new Expression[] {input, expression}, stops));
   }
@@ -1612,6 +1626,7 @@ public class Expression<T> {
    * @param stops pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression step(@NonNull Number input, @NonNull Expression expression, Stop... stops) {
     Expression[] expressions = new Expression[stops.length * 2];
     for (int i = 0; i < stops.length; i++) {
@@ -1632,6 +1647,7 @@ public class Expression<T> {
    * @param stops pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression step(@NonNull Expression<Number> input, @NonNull Expression expression, Stop... stops) {
     Expression[] expressions = new Expression[stops.length * 2];
     for (int i = 0; i < stops.length; i++) {
@@ -1652,6 +1668,7 @@ public class Expression<T> {
    * @param stops         pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression interpolate(@NonNull Expression<Interpolator> interpolation,
                                        @NonNull Expression<Number> number, Expression... stops) {
     return new Expression("interpolate", join(new Expression[] {interpolation, number}, stops));
@@ -1668,6 +1685,7 @@ public class Expression<T> {
    * @param stops         pair of input and output values
    * @return expression
    */
+  @SafeVarargs
   public static Expression interpolate(@NonNull Expression<Interpolator> interpolation,
                                        @NonNull Expression<Number> number, Stop... stops) {
     Expression[] expressions = new Expression[stops.length * 2];
