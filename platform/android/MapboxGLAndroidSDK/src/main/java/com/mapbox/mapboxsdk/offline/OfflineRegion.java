@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.offline;
 
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -51,7 +52,7 @@ public class OfflineRegion {
   private byte[] metadata;
 
   // Makes sure callbacks come back to the main thread
-  private final Handler handler = new Handler();
+  private final Handler handler = new Handler(Looper.getMainLooper());
 
   /**
    * A region can have a single observer, which gets notified whenever a change
