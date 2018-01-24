@@ -2,6 +2,7 @@
 #include "qmapboxgl_p.hpp"
 
 #include "qmapboxgl_map_observer.hpp"
+#include "qmapboxgl_renderer_observer.hpp"
 
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
@@ -1486,6 +1487,7 @@ void QMapboxGL::render()
     }
 #endif
 
+    d_ptr->renderQueued.clear();
     d_ptr->mapRenderer->render();
 }
 
@@ -1567,7 +1569,8 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
             static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
             static_cast<mbgl::ViewportMode>(settings.viewportMode()));
 
-    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()));
+    // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
+    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
@@ -1577,5 +1580,16 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters)
 {
     mapRenderer->updateParameters(std::move(parameters));
-    emit needsRendering();
+
+    if (!renderQueued.test_and_set()) {
+        emit needsRendering();
+    }
+}
+
+void QMapboxGLPrivate::setObserver(mbgl::RendererObserver &observer)
+{
+    m_rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
+            *mbgl::util::RunLoop::Get(), observer);
+
+    mapRenderer->setObserver(m_rendererObserver);
 }

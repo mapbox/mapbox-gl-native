@@ -41,3 +41,8 @@ void QMapboxGLMapRenderer::render()
 
     m_renderer->render(*params);
 }
+
+void QMapboxGLMapRenderer::setObserver(std::shared_ptr<mbgl::RendererObserver> observer)
+{
+    m_renderer->setObserver(observer.get());
+}

@@ -5,6 +5,7 @@
 
 #include <mbgl/renderer/renderer.hpp>
 #include <mbgl/renderer/renderer_backend.hpp>
+#include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 
@@ -26,6 +27,7 @@ public:
     virtual ~QMapboxGLMapRenderer();
 
     void render();
+    void setObserver(std::shared_ptr<mbgl::RendererObserver>);
 
     // Thread-safe, called by the Frontend
     void updateParameters(std::shared_ptr<mbgl::UpdateParameters>);

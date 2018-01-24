@@ -15,6 +15,7 @@
 #include <QObject>
 #include <QSize>
 
+#include <atomic>
 #include <memory>
 
 class QMapboxGLPrivate : public QObject, public mbgl::RendererFrontend
@@ -27,7 +28,7 @@ public:
 
     // mbgl::RendererFrontend implementation.
     void reset() final {}
-    void setObserver(mbgl::RendererObserver &) final {}
+    void setObserver(mbgl::RendererObserver &) final;
     void update(std::shared_ptr<mbgl::UpdateParameters>) final;
 
     mbgl::EdgeInsets margins;
@@ -40,7 +41,12 @@ public:
 
     std::unique_ptr<QMapboxGLMapObserver> mapObserver;
     std::unique_ptr<QMapboxGLMapRenderer> mapRenderer;
+    std::shared_ptr<mbgl::RendererObserver> rendererObserver;
 
+    QMapboxGLSettings::GLContextMode mode;
+    qreal pixelRatio;
+
+    std::atomic_flag renderQueued = ATOMIC_FLAG_INIT;
 signals:
     void needsRendering();
 
