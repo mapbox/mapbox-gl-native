@@ -758,7 +758,7 @@ public class Expression<T> {
    * @param input expression input
    * @return expression
    */
-  public static Expression get(@NonNull Expression<String> input) {
+  public static Expression<?> get(@NonNull Expression<String> input) {
     return new Expression<>("get", input);
   }
 
@@ -770,7 +770,7 @@ public class Expression<T> {
    * @param input string input
    * @return expression
    */
-  public static Expression get(@NonNull String input) {
+  public static Expression<?> get(@NonNull String input) {
     return get(literal(input));
   }
 
@@ -782,7 +782,7 @@ public class Expression<T> {
    * @param object an expression object
    * @return expression
    */
-  public static Expression get(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
+  public static Expression<?> get(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
     return new Expression<>("get", key, object);
   }
 
@@ -794,7 +794,7 @@ public class Expression<T> {
    * @param object an expression object
    * @return expression
    */
-  public static Expression get(@NonNull String key, @NonNull Expression<Object> object) {
+  public static Expression<?> get(@NonNull String key, @NonNull Expression<Object> object) {
     return get(literal(key), object);
   }
 
@@ -1758,4 +1758,37 @@ public class Expression<T> {
     return output;
   }
 
+  //
+  // asType
+  //
+
+  @SuppressWarnings("unchecked")
+  public Expression<Number> asNumber(){
+    return (Expression<Number>) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Expression<String> asString(){
+    return (Expression<String>) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Expression<Color> asColor(){
+    return (Expression<Color>) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Expression<Boolean> asBoolean(){
+    return (Expression<Boolean>) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Expression<Object> asObject(){
+    return (Expression<Object>) this;
+  }
+
+  @SuppressWarnings("unchecked")
+  public Expression<Array> asArray(){
+    return (Expression<Array>) this;
+  }
 }

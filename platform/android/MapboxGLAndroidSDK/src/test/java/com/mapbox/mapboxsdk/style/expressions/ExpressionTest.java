@@ -408,14 +408,14 @@ public class ExpressionTest {
   @Test
   public void testHasExpression() throws Exception {
     Object[] expected = new Object[] {"has", new Object[] {"get", "key"}, new Object[] {"properties"}};
-    Object[] actual = has(get(literal("key")), properties()).toArray();
+    Object[] actual = has(get(literal("key")).asString(), properties()).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
   @Test
   public void testHasExpressionLiteral() throws Exception {
     Object[] expected = new Object[] {"has", new Object[] {"get", "key"}, new Object[] {"properties"}};
-    Object[] actual = has(get("key"), properties()).toArray();
+    Object[] actual = has(get("key").asString(), properties()).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -521,7 +521,7 @@ public class ExpressionTest {
   public void testDivisionWithNestedGet() throws Exception {
     Object nestedGet = new Object[] {"get", "key"};
     Object[] expected = new Object[] {"/", 2, nestedGet};
-    Object[] actual = division(literal(2), get(literal("key"))).toArray();
+    Object[] actual = division(literal(2), get(literal("key")).asNumber()).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -895,7 +895,7 @@ public class ExpressionTest {
   @Test
   public void testStepBasicLiteral() throws Exception {
     Object[] expected = new Object[] {"step", new Object[] {"get", "line-width"}, 11, 0, 111, 1, 1111};
-    Object[] actual = step(get("line-width"), literal(11), stop(0, 111), stop(1, 1111)).toArray();
+    Object[] actual = step(get("line-width").asNumber(), literal(11), stop(0, 111), stop(1, 1111)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -942,7 +942,7 @@ public class ExpressionTest {
     Object[] get = new Object[] {"get", "x"};
     Object[] expected = new Object[] {"interpolate", exponential, get, 0, 100, 200};
     Object[] actual = interpolate(exponential(literal(12)),
-      get(literal("x")), literal(0), literal(100), literal(200)).toArray();
+      get(literal("x")).asNumber(), literal(0), literal(100), literal(200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -951,7 +951,7 @@ public class ExpressionTest {
     Object[] exponential = new Object[] {"exponential", 12};
     Object[] get = new Object[] {"get", "x"};
     Object[] expected = new Object[] {"interpolate", exponential, get, 0, 100, 100, 200};
-    Object[] actual = interpolate(exponential(12), get("x"), stop(0, 100), stop(100, 200)).toArray();
+    Object[] actual = interpolate(exponential(12), get("x").asNumber(), stop(0, 100), stop(100, 200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -961,7 +961,8 @@ public class ExpressionTest {
     Object[] exponential = new Object[] {"exponential", getX};
     Object[] getY = new Object[] {"get", "y"};
     Object[] expected = new Object[] {"interpolate", exponential, getY, 0, 100, 100, 200};
-    Object[] actual = interpolate(exponential(get("x")), get("y"), stop(0, 100), stop(100, 200)).toArray();
+    Object[] actual = interpolate(exponential(get("x").asNumber()), get("y").asNumber(),
+      stop(0, 100), stop(100, 200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -971,7 +972,7 @@ public class ExpressionTest {
     Object[] get = new Object[] {"get", "x"};
     Object[] expected = new Object[] {"interpolate", cubicBezier, get, 0, 100, 100, 200};
     Object[] actual = interpolate(cubicBezier(literal(1), literal(1), literal(1), literal(1)),
-      get(literal("x")), literal(0), literal(100), literal(100), literal(200)).toArray();
+      get(literal("x")).asNumber(), literal(0), literal(100), literal(100), literal(200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -980,7 +981,8 @@ public class ExpressionTest {
     Object[] cubicBezier = new Object[] {"cubic-bezier", 1, 1, 1, 1};
     Object[] get = new Object[] {"get", "x"};
     Object[] expected = new Object[] {"interpolate", cubicBezier, get, 0, 100, 100, 200};
-    Object[] actual = interpolate(cubicBezier(1, 1, 1, 1), get("x"), stop(0, 100), stop(100, 200)).toArray();
+    Object[] actual = interpolate(cubicBezier(1, 1, 1, 1), get("x").asNumber(),
+      stop(0, 100), stop(100, 200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -991,8 +993,9 @@ public class ExpressionTest {
     Object[] getZ = new Object[] {"get", "z"};
     Object[] cubicBezier = new Object[] {"cubic-bezier", getZ, 1, getY, 1};
     Object[] expected = new Object[] {"interpolate", cubicBezier, getX, 0, 100, 200};
-    Object[] actual = interpolate(cubicBezier(get(literal("z")), literal(1),
-      get(literal("y")), literal(1)), get(literal("x")), literal(0), literal(100), literal(200)).toArray();
+    Object[] actual = interpolate(cubicBezier(get(literal("z")).asNumber(), literal(1),
+      get(literal("y")).asNumber(), literal(1)), get(literal("x")).asNumber(), literal(0),
+      literal(100), literal(200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -1003,8 +1006,8 @@ public class ExpressionTest {
     Object[] getZ = new Object[] {"get", "z"};
     Object[] cubicBezier = new Object[] {"cubic-bezier", getZ, 1, getY, 1};
     Object[] expected = new Object[] {"interpolate", cubicBezier, getX, 0, 100, 100, 200};
-    Object[] actual = interpolate(cubicBezier(get("z"), literal(1), get("y"),
-      literal(1)), get("x"), stop(0, 100), stop(100, 200)).toArray();
+    Object[] actual = interpolate(cubicBezier(get("z").asNumber(), literal(1), get("y").asNumber(),
+      literal(1)), get("x").asNumber(), stop(0, 100), stop(100, 200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 }

@@ -210,7 +210,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
       fillColor(
         interpolate(
           exponential(0.5f),
-          get("stroke-width"),
+          get("stroke-width").asNumber(),
           stop(1f, color(Color.RED)),
           stop(5f, color(Color.BLUE)),
           stop(10f, color(Color.GREEN))
@@ -260,7 +260,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     layer.setProperties(
       fillColor(
         step(
-          get("stroke-width"),
+          get("stroke-width").asNumber(),
           color(Color.CYAN),
           stop(1f, color(Color.RED)),
           stop(2f, color(Color.BLUE)),
@@ -282,21 +282,21 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
           exponential(1f),
           zoom(),
           stop(12, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.RED)),
             stop(2f, color(Color.WHITE)),
             stop(3f, color(Color.BLUE))
           )),
           stop(15, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.YELLOW)),
             stop(2f, color(Color.LTGRAY)),
             stop(3f, color(Color.CYAN))
           )),
           stop(18, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.WHITE)),
             stop(2f, color(Color.GRAY)),
@@ -319,21 +319,21 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
           linear(),
           zoom(),
           stop(12, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.RED)),
             stop(2f, color(Color.WHITE)),
             stop(3f, color(Color.BLUE))
           )),
           stop(15, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.YELLOW)),
             stop(2f, color(Color.LTGRAY)),
             stop(3f, color(Color.CYAN))
           )),
           stop(18, step(
-            get("stroke-width"),
+            get("stroke-width").asNumber(),
             color(Color.BLACK),
             stop(1f, color(Color.WHITE)),
             stop(2f, color(Color.GRAY)),
