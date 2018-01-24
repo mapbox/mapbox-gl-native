@@ -103,7 +103,7 @@ public:
 
         auto pausing = paused->get_future();
 
-        loop->invoke([this] {
+        loop->invoke(RunLoop::Priority::High, [this] {
             auto resuming = resumed->get_future();
             paused->set_value();
             resuming.get();

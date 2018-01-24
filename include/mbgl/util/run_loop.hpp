@@ -26,6 +26,11 @@ public:
         New,
     };
 
+    enum class Priority : bool {
+        Default = false,
+        High = true,
+    };
+
     enum class Event : uint8_t {
         None      = 0,
         Read      = 1,
@@ -49,9 +54,14 @@ public:
 
     // Invoke fn(args...) on this RunLoop.
     template <class Fn, class... Args>
+    void invoke(Priority priority, Fn&& fn, Args&&... args) {
+        push(priority, WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...));
+    }
+
+    // Invoke fn(args...) on this RunLoop.
+    template <class Fn, class... Args>
     void invoke(Fn&& fn, Args&&... args) {
-        std::shared_ptr<WorkTask> task = WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
-        push(task);
+        invoke(Priority::Default, std::forward<Fn>(fn), std::forward<Args>(args)...);
     }
 
     // Post the cancellable work fn(args...) to this RunLoop.
@@ -59,7 +69,7 @@ public:
     std::unique_ptr<AsyncRequest>
     invokeCancellable(Fn&& fn, Args&&... args) {
         std::shared_ptr<WorkTask> task = WorkTask::make(std::forward<Fn>(fn), std::forward<Args>(args)...);
-        push(task);
+        push(Priority::Default, task);
         return std::make_unique<WorkRequest>(task);
     }
                     
@@ -80,25 +90,38 @@ private:
     void wake();
 
     // Adds a WorkTask to the queue, and wakes it up.
-    void push(std::shared_ptr<WorkTask> task) {
+    void push(Priority priority, std::shared_ptr<WorkTask> task) {
         std::lock_guard<std::mutex> lock(mutex);
-        queue.push(std::move(task));
+        if (priority == Priority::High) {
+            highPriorityQueue.emplace(std::move(task));
+        } else {
+            defaultQueue.emplace(std::move(task));
+        }
         wake();
     }
 
     void process() {
-        std::unique_lock<std::mutex> lock(mutex);
         std::shared_ptr<WorkTask> task;
-        while (!queue.empty()) {
-            task = std::move(queue.front());
-            queue.pop();
+        std::unique_lock<std::mutex> lock(mutex);
+        while (true) {
+            if (!highPriorityQueue.empty()) {
+                task = std::move(highPriorityQueue.front());
+                highPriorityQueue.pop();
+            } else if (!defaultQueue.empty()) {
+                task = std::move(defaultQueue.front());
+                defaultQueue.pop();
+            } else {
+                break;
+            }
             lock.unlock();
             (*task)();
+            task.reset();
             lock.lock();
         }
     }
 
-    Queue queue;
+    Queue defaultQueue;
+    Queue highPriorityQueue;
     std::mutex mutex;
 
     std::unique_ptr<Impl> impl;
