@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger, MGLLight<%- camelize(property.name) %>) {
  A structure containing information about the position of the light source
  relative to lit geometries.
  */
-typedef struct MGLSphericalPosition {
+typedef struct __attribute__((objc_boxable)) MGLSphericalPosition {
     /** Distance from the center of the base of an object to its light. */
     CGFloat radial;
     /** Position of the light relative to 0° (0° when `MGLLight.anchor` is set to viewport corresponds
@@ -77,7 +77,7 @@ MGL_EXPORT
  href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-<%- originalPropertyName(property) %>"><code><%- originalPropertyName(property) %></code></a>
  light property in the Mapbox Style Specification.
  */
-@property (nonatomic<% if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% if (property.transition) { -%>
 /**
@@ -89,7 +89,7 @@ MGL_EXPORT
 
 <% } -%>
 <% if (property.original) { -%>
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) NSExpression *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 
 <% } -%>
 <% } -%>

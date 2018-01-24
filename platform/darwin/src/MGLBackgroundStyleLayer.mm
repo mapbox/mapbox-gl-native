@@ -32,21 +32,21 @@
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setBackgroundColor:(MGLStyleValue<MGLColor *> *)backgroundColor {
+- (void)setBackgroundColor:(NSExpression *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toInterpolatablePropertyValue(backgroundColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::PropertyValue<mbgl::Color>>(backgroundColor);
     self.rawLayer->setBackgroundColor(mbglValue);
 }
 
-- (MGLStyleValue<MGLColor *> *)backgroundColor {
+- (NSExpression *)backgroundColor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getBackgroundColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(self.rawLayer->getDefaultBackgroundColor());
+        propertyValue = self.rawLayer->getDefaultBackgroundColor();
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(propertyValue);
 }
 
 - (void)setBackgroundColorTransition:(MGLTransition )transition {
@@ -67,21 +67,21 @@
     return transition;
 }
 
-- (void)setBackgroundOpacity:(MGLStyleValue<NSNumber *> *)backgroundOpacity {
+- (void)setBackgroundOpacity:(NSExpression *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(backgroundOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(backgroundOpacity);
     self.rawLayer->setBackgroundOpacity(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)backgroundOpacity {
+- (NSExpression *)backgroundOpacity {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getBackgroundOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultBackgroundOpacity());
+        propertyValue = self.rawLayer->getDefaultBackgroundOpacity();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setBackgroundOpacityTransition:(MGLTransition )transition {
@@ -102,21 +102,21 @@
     return transition;
 }
 
-- (void)setBackgroundPattern:(MGLStyleValue<NSString *> *)backgroundPattern {
+- (void)setBackgroundPattern:(NSExpression *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(backgroundPattern);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(backgroundPattern);
     self.rawLayer->setBackgroundPattern(mbglValue);
 }
 
-- (MGLStyleValue<NSString *> *)backgroundPattern {
+- (NSExpression *)backgroundPattern {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getBackgroundPattern();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultBackgroundPattern());
+        propertyValue = self.rawLayer->getDefaultBackgroundPattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setBackgroundPatternTransition:(MGLTransition )transition {

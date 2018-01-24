@@ -1,7 +1,7 @@
 #import "NSComparisonPredicate+MGLAdditions.h"
 
 #import "NSPredicate+MGLAdditions.h"
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 
 @implementation NSComparisonPredicate (MGLAdditions)
 
@@ -291,6 +291,48 @@
                     format:@"Comparison predicate must compare an attribute (as a key path) to a constant or vice versa."];
     }
     return identifier;
+}
+
+@end
+
+@implementation NSComparisonPredicate (MGLExpressionAdditions)
+
+- (id)mgl_jsonExpressionObject {
+    NSString *op;
+    switch (self.predicateOperatorType) {
+        case NSLessThanPredicateOperatorType:
+            op = @"<";
+            break;
+        case NSLessThanOrEqualToPredicateOperatorType:
+            op = @"<=";
+            break;
+        case NSGreaterThanPredicateOperatorType:
+            op = @">";
+            break;
+        case NSGreaterThanOrEqualToPredicateOperatorType:
+            op = @">=";
+            break;
+        case NSEqualToPredicateOperatorType:
+            op = @"==";
+            break;
+        case NSNotEqualToPredicateOperatorType:
+            op = @"!=";
+            break;
+        case NSMatchesPredicateOperatorType:
+        case NSLikePredicateOperatorType:
+        case NSBeginsWithPredicateOperatorType:
+        case NSEndsWithPredicateOperatorType:
+        case NSInPredicateOperatorType:
+        case NSCustomSelectorPredicateOperatorType:
+        case NSContainsPredicateOperatorType:
+        case NSBetweenPredicateOperatorType:
+            [NSException raise:NSInvalidArgumentException
+                        format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
+    }
+    if (op) {
+        return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
+    }
+    return nil;
 }
 
 @end

@@ -2,7 +2,6 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLStyleValue.h"
 #import "MGLStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -38,45 +37,28 @@ which it is added.
 
 #pragma mark - Accessing the Paint Attributes
 
-#if TARGET_OS_IPHONE
 /**
  The color with which the background will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
  This property is only applied to the style if `backgroundPattern` is set to
  `nil`. Otherwise, it is ignored.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *backgroundColor;
-#else
-/**
- The color with which the background will be drawn.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
- value.
- 
- This property is only applied to the style if `backgroundPattern` is set to
- `nil`. Otherwise, it is ignored.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *backgroundColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *backgroundColor;
 
 /**
  The transition affecting any changes to this layer’s `backgroundColor` property.
@@ -88,18 +70,21 @@ which it is added.
 /**
  The opacity at which the background will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *backgroundOpacity;
+@property (nonatomic, null_resettable) NSExpression *backgroundOpacity;
 
 /**
  The transition affecting any changes to this layer’s `backgroundOpacity` property.
@@ -113,13 +98,19 @@ which it is added.
  seamless patterns, image width and height must be a factor of two (2, 4, 8,
  ..., 512).
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant string values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSString *> *backgroundPattern;
+@property (nonatomic, null_resettable) NSExpression *backgroundPattern;
 
 /**
  The transition affecting any changes to this layer’s `backgroundPattern` property.

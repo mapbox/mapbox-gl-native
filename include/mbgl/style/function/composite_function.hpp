@@ -111,6 +111,8 @@ public:
         return *lhs.expression == *rhs.expression;
     }
 
+    const expression::Expression& getExpression() const { return *expression; }
+
     std::string property;
     Stops stops;
     optional<T> defaultValue;

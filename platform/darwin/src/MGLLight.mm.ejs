@@ -55,15 +55,15 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 <% for (const property of properties) { -%>
 <% if (property.type == "enum") { -%>
         auto <%- camelizeWithLeadingLowercase(property.name) -%> = mbglLight->get<%- camelize(property.name) -%>();
-        MGLStyleValue<NSValue *> *<%- camelizeWithLeadingLowercase(property.name) -%>StyleValue;
+        NSExpression *<%- camelizeWithLeadingLowercase(property.name) -%>Expression;
         if (<%- camelizeWithLeadingLowercase(property.name) -%>.isUndefined()) {
             mbgl::style::PropertyValue<mbgl::style::Light<%- camelize(property.name) -%>Type> default<%- camelize(property.name) -%> = mbglLight->getDefault<%- camelize(property.name) -%>();
-            <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumStyleValue(default<%- camelize(property.name) -%>);
+            <%- camelizeWithLeadingLowercase(property.name) -%>Expression = MGLStyleValueTransformer<mbgl::style::LightAnchorType, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toExpression(default<%- camelize(property.name) -%>);
         } else {
-            <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumStyleValue(<%- camelizeWithLeadingLowercase(property.name) -%>);
+            <%- camelizeWithLeadingLowercase(property.name) -%>Expression = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toExpression(<%- camelizeWithLeadingLowercase(property.name) -%>);
         }
 
-        _<%- camelizeWithLeadingLowercase(property.name) -%> = <%- camelizeWithLeadingLowercase(property.name) -%>StyleValue;
+        _<%- camelizeWithLeadingLowercase(property.name) -%> = <%- camelizeWithLeadingLowercase(property.name) -%>Expression;
 
 <% if (property.transition) { -%>
         _<%- camelizeWithLeadingLowercase(property.name) -%>Transition = MGLTransitionFromOptions(mbglLight->get<%- camelize(property.name) -%>Transition());
@@ -72,9 +72,9 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 <% } else {-%>
         auto <%- camelizeWithLeadingLowercase(property.name) -%>Value = mbglLight->get<%- camelize(property.name) -%>();
         if (<%- camelizeWithLeadingLowercase(property.name) -%>Value.isUndefined()) {
-            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(mbglLight->getDefault<%- camelize(property.name) -%>());
+            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(mbglLight->getDefault<%- camelize(property.name) -%>());
         } else {
-            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toStyleValue(<%- camelizeWithLeadingLowercase(property.name) -%>Value);
+            _<%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(<%- camelizeWithLeadingLowercase(property.name) -%>Value);
         }
 <% if (property.transition) { -%>        
         _<%- camelizeWithLeadingLowercase(property.name) -%>Transition = MGLTransitionFromOptions(mbglLight->get<%- camelize(property.name) -%>Transition());
@@ -93,11 +93,11 @@ NS_INLINE mbgl::style::TransitionOptions MGLOptionsFromTransition(MGLTransition 
 <% if (properties.length) { -%>
 <% for (const property of properties) { -%>
 <% if (property.type == "enum") { -%>
-    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toEnumPropertyValue(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
+    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<mbgl::style::Light<%- camelize(property.name) -%>Type, NSValue *, mbgl::style::Light<%- camelize(property.name) -%>Type, MGLLight<%- camelize(property.name) -%>>().toPropertyValue<mbgl::style::PropertyValue<<%- valueTransformerArguments(property)[0] %>>>(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
     mbglLight.set<%- camelize(property.name) -%>(<%- camelizeWithLeadingLowercase(property.name) -%>);
 
 <% } else {-%>
-    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toInterpolatablePropertyValue(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
+    auto <%- camelizeWithLeadingLowercase(property.name) -%> = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::PropertyValue<<%- valueTransformerArguments(property)[0] %>>>(self.<%- camelizeWithLeadingLowercase(property.name) -%>);
     mbglLight.set<%- camelize(property.name) -%>(<%- camelizeWithLeadingLowercase(property.name) -%>);
  
 <% } -%>

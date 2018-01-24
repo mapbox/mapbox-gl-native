@@ -27,29 +27,28 @@
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        auto lightFromMGLlight = [mglLight mbglLight];
+        auto lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getDefaultAnchor(), lightFromMGLlight.getAnchor());
-        XCTAssert([mglLight.anchor isKindOfClass:[MGLConstantStyleValue class]], @"mglLight.anchor isn’t a MGLConstantStyleValue.");
-        NSValue *anchorValue = ((MGLConstantStyleValue *)mglLight.anchor).rawValue;
-        XCTAssertEqual(anchorValue.MGLLightAnchorValue, MGLLightAnchorViewport);
+        XCTAssertEqual(light.getDefaultAnchor(), lightFromMGLLight.getAnchor());
+        XCTAssertEqual(mglLight.anchor.expressionType, NSConstantValueExpressionType, @"mglLight.anchor isn’t a constant value expression.");
+        XCTAssertEqualObjects(mglLight.anchor.constantValue, @"viewport");
 
         mbgl::style::PropertyValue<mbgl::style::LightAnchorType> propertyValue = { mbgl::style::LightAnchorType::Viewport };
         light.setAnchor(propertyValue);
         mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        lightFromMGLlight = [mglLight mbglLight];
+        lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getAnchor(), lightFromMGLlight.getAnchor());
+        XCTAssertEqual(light.getAnchor(), lightFromMGLLight.getAnchor());
     }
 
     // position
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        auto lightFromMGLlight = [mglLight mbglLight];
+        auto lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getDefaultPosition(), lightFromMGLlight.getPosition());
-        auto positionTransition = lightFromMGLlight.getPositionTransition();
+        XCTAssertEqual(light.getDefaultPosition(), lightFromMGLLight.getPosition());
+        auto positionTransition = lightFromMGLLight.getPositionTransition();
         XCTAssert(positionTransition.delay && MGLTimeIntervalFromDuration(*positionTransition.delay) == defaultTransition.delay);
         XCTAssert(positionTransition.duration && MGLTimeIntervalFromDuration(*positionTransition.duration) == defaultTransition.duration);
 
@@ -60,10 +59,10 @@
         light.setPositionTransition(transitionOptions);
 
         mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        lightFromMGLlight = [mglLight mbglLight];
+        lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getPosition(), lightFromMGLlight.getPosition());
-        positionTransition = lightFromMGLlight.getPositionTransition();
+        XCTAssertEqual(light.getPosition(), lightFromMGLLight.getPosition());
+        positionTransition = lightFromMGLLight.getPositionTransition();
         XCTAssert(positionTransition.delay && MGLTimeIntervalFromDuration(*positionTransition.delay) == transition.delay);
         XCTAssert(positionTransition.duration && MGLTimeIntervalFromDuration(*positionTransition.duration) == transition.duration);
 
@@ -73,10 +72,10 @@
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        auto lightFromMGLlight = [mglLight mbglLight];
+        auto lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getDefaultColor(), lightFromMGLlight.getColor());
-        auto colorTransition = lightFromMGLlight.getColorTransition();
+        XCTAssertEqual(light.getDefaultColor(), lightFromMGLLight.getColor());
+        auto colorTransition = lightFromMGLLight.getColorTransition();
         XCTAssert(colorTransition.delay && MGLTimeIntervalFromDuration(*colorTransition.delay) == defaultTransition.delay);
         XCTAssert(colorTransition.duration && MGLTimeIntervalFromDuration(*colorTransition.duration) == defaultTransition.duration);
 
@@ -85,10 +84,10 @@
         light.setColorTransition(transitionOptions);
 
         mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        lightFromMGLlight = [mglLight mbglLight];
+        lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getColor(), lightFromMGLlight.getColor());
-        colorTransition = lightFromMGLlight.getColorTransition();
+        XCTAssertEqual(light.getColor(), lightFromMGLLight.getColor());
+        colorTransition = lightFromMGLLight.getColorTransition();
         XCTAssert(colorTransition.delay && MGLTimeIntervalFromDuration(*colorTransition.delay) == transition.delay);
         XCTAssert(colorTransition.duration && MGLTimeIntervalFromDuration(*colorTransition.duration) == transition.duration);
 
@@ -98,10 +97,10 @@
     {
         mbgl::style::Light light;
         MGLLight *mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        auto lightFromMGLlight = [mglLight mbglLight];
+        auto lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getDefaultIntensity(), lightFromMGLlight.getIntensity());
-        auto intensityTransition = lightFromMGLlight.getIntensityTransition();
+        XCTAssertEqual(light.getDefaultIntensity(), lightFromMGLLight.getIntensity());
+        auto intensityTransition = lightFromMGLLight.getIntensityTransition();
         XCTAssert(intensityTransition.delay && MGLTimeIntervalFromDuration(*intensityTransition.delay) == defaultTransition.delay);
         XCTAssert(intensityTransition.duration && MGLTimeIntervalFromDuration(*intensityTransition.duration) == defaultTransition.duration);
 
@@ -110,10 +109,10 @@
         light.setIntensityTransition(transitionOptions);
 
         mglLight = [[MGLLight alloc] initWithMBGLLight:&light];
-        lightFromMGLlight = [mglLight mbglLight];
+        lightFromMGLLight = mglLight.mbglLight;
 
-        XCTAssertEqual(light.getIntensity(), lightFromMGLlight.getIntensity());
-        intensityTransition = lightFromMGLlight.getIntensityTransition();
+        XCTAssertEqual(light.getIntensity(), lightFromMGLLight.getIntensity());
+        intensityTransition = lightFromMGLLight.getIntensityTransition();
         XCTAssert(intensityTransition.delay && MGLTimeIntervalFromDuration(*intensityTransition.delay) == transition.delay);
         XCTAssert(intensityTransition.duration && MGLTimeIntervalFromDuration(*intensityTransition.duration) == transition.duration);
 

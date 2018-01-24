@@ -64,45 +64,49 @@
     {
         XCTAssertTrue(rawLayer->get<%- camelize(originalPropertyName(property)) %>().isUndefined(),
                       @"<%- originalPropertyName(property) %> should be unset initially.");
-        MGLStyleValue<<%- propertyType(property) %>> *defaultStyleValue = layer.<%- objCName(property) %>;
+        NSExpression *defaultExpression = layer.<%- objCName(property) %>;
 
-        MGLStyleValue<<%- propertyType(property) %>> *constantStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithRawValue:<%- objCTestValue(property, type, 3) %>];
-        layer.<%- objCName(property) %> = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, true, 3) %>];
+        layer.<%- objCName(property) %> = constantExpression;
 <% if (property["property-function"]) { -%>
         mbgl::style::DataDrivenPropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
 <% } else { -%>
         mbgl::style::PropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
 <% } -%>
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
-                       @"Setting <%- objCName(property) %> to a constant value should update <%- originalPropertyName(property) %>.");
-        XCTAssertEqualObjects(layer.<%- objCName(property) %>, constantStyleValue,
-                              @"<%- objCName(property) %> should round-trip constant values.");
+                       @"Setting <%- objCName(property) %> to a constant value expression should update <%- originalPropertyName(property) %>.");
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, constantExpression,
+                              @"<%- objCName(property) %> should round-trip constant value expressions.");
 
-        MGLStyleValue<<%- propertyType(property) %>> * functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.<%- objCName(property) %> = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, false, 3) %>];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.<%- objCName(property) %> = functionExpression;
 
-        mbgl::style::IntervalStops<<%- mbglType(property) %>> intervalStops = { {{18, <%- mbglTestValue(property, type) %>}} };
+        mbgl::style::IntervalStops<<%- mbglType(property) %>> intervalStops = {{
+            { -INFINITY, <%- mbglTestValue(property, type) %> },
+            { 18, <%- mbglTestValue(property, type) %> },
+        }};
         propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>> { intervalStops };
         
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
-                       @"Setting <%- objCName(property) %> to a camera function should update <%- originalPropertyName(property) %>.");
-        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionStyleValue,
-                              @"<%- objCName(property) %> should round-trip camera functions.");
+                       @"Setting <%- objCName(property) %> to a camera expression should update <%- originalPropertyName(property) %>.");
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
+                              @"<%- objCName(property) %> should round-trip camera expressions.");
 
 <% if (property["property-function"] && isInterpolatable(property)) { -%>
-        functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.<%- objCName(property) %> = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.<%- objCName(property) %> = functionExpression;
 
         mbgl::style::ExponentialStops<<%- mbglType(property) %>> exponentialStops = { {{18, <%- mbglTestValue(property, type) %>}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<<%- mbglType(property) %>> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
-                       @"Setting <%- objCName(property) %> to a source function should update <%- originalPropertyName(property) %>.");
-        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionStyleValue,
-                              @"<%- objCName(property) %> should round-trip source functions.");
+                       @"Setting <%- objCName(property) %> to a data expression should update <%- originalPropertyName(property) %>.");
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
+                              @"<%- objCName(property) %> should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.<%- objCName(property) %> = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.<%- objCName(property) %> = functionExpression;
 
         std::map<float, <%- mbglType(property) %>> innerStops { {18, <%- mbglTestValue(property, type) %>} };
         mbgl::style::CompositeExponentialStops<<%- mbglType(property) %>> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -110,24 +114,25 @@
         propertyValue = mbgl::style::CompositeFunction<<%- mbglType(property) %>> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
-                       @"Setting <%- objCName(property) %> to a composite function should update <%- originalPropertyName(property) %>.");
-        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionStyleValue,
-                              @"<%- objCName(property) %> should round-trip composite functions.");                                                                                                          
+                       @"Setting <%- objCName(property) %> to a camera-data expression should update <%- originalPropertyName(property) %>.");
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
+                              @"<%- objCName(property) %> should round-trip camera-data expressions.");
 <% } -%>                              
 <% if (!property.required) { -%>
 
         layer.<%- objCName(property) %> = nil;
         XCTAssertTrue(rawLayer->get<%- camelize(originalPropertyName(property)) %>().isUndefined(),
                       @"Unsetting <%- objCName(property) %> should return <%- originalPropertyName(property) %> to the default value.");
-        XCTAssertEqualObjects(layer.<%- objCName(property) %>, defaultStyleValue,
+        XCTAssertEqualObjects(layer.<%- objCName(property) %>, defaultExpression,
                               @"<%- objCName(property) %> should return the default value after being unset.");
 <% } -%>
 <% if (!property["property-function"]) { -%>
 
-        functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<<%- propertyType(property) %>> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionExpression, NSException, NSInvalidArgumentException, @"MGL<%- camelize(type) %>Layer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionExpression, NSException, NSInvalidArgumentException, @"MGL<%- camelize(type) %>Layer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
 <% } -%>
 <% if (property["transition"] && !property.original) { -%>
         // Transition property test

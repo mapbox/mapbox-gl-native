@@ -1,6 +1,9 @@
 #import <Mapbox/Mapbox.h>
 #import <XCTest/XCTest.h>
 
+#define MGLConstantExpression(constant) \
+    [NSExpression expressionForConstantValue:constant]
+
 @interface MGLStyleLayerTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic, copy, readonly, class) NSString *layerType;

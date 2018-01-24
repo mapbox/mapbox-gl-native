@@ -59,3 +59,4 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLStyleValue.h"
 #import "MGLAttributionInfo.h"
 #import "MGLMapSnapshotter.h"
+#import "NSExpression+MGLAdditions.h"

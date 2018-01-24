@@ -77,45 +77,45 @@ namespace mbgl {
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setFillAntialiased:(MGLStyleValue<NSNumber *> *)fillAntialiased {
+- (void)setFillAntialiased:(NSExpression *)fillAntialiased {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue(fillAntialiased);
+    auto mbglValue = MGLStyleValueTransformer<bool, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<bool>>(fillAntialiased);
     self.rawLayer->setFillAntialias(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)isFillAntialiased {
+- (NSExpression *)isFillAntialiased {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillAntialias();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(self.rawLayer->getDefaultFillAntialias());
+        propertyValue = self.rawLayer->getDefaultFillAntialias();
     }
-    return MGLStyleValueTransformer<bool, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<bool, NSNumber *>().toExpression(propertyValue);
 }
 
-- (void)setFillAntialias:(MGLStyleValue<NSNumber *> *)fillAntialias {
+- (void)setFillAntialias:(NSExpression *)fillAntialias {
 }
 
-- (MGLStyleValue<NSNumber *> *)fillAntialias {
+- (NSExpression *)fillAntialias {
     return self.isFillAntialiased;
 }
 
-- (void)setFillColor:(MGLStyleValue<MGLColor *> *)fillColor {
+- (void)setFillColor:(NSExpression *)fillColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(fillColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<mbgl::Color>>(fillColor);
     self.rawLayer->setFillColor(mbglValue);
 }
 
-- (MGLStyleValue<MGLColor *> *)fillColor {
+- (NSExpression *)fillColor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillColor());
+        propertyValue = self.rawLayer->getDefaultFillColor();
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(propertyValue);
 }
 
 - (void)setFillColorTransition:(MGLTransition )transition {
@@ -136,21 +136,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillOpacity:(MGLStyleValue<NSNumber *> *)fillOpacity {
+- (void)setFillOpacity:(NSExpression *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(fillOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<float>>(fillOpacity);
     self.rawLayer->setFillOpacity(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)fillOpacity {
+- (NSExpression *)fillOpacity {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillOpacity());
+        propertyValue = self.rawLayer->getDefaultFillOpacity();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setFillOpacityTransition:(MGLTransition )transition {
@@ -171,21 +171,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillOutlineColor:(MGLStyleValue<MGLColor *> *)fillOutlineColor {
+- (void)setFillOutlineColor:(NSExpression *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(fillOutlineColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<mbgl::Color>>(fillOutlineColor);
     self.rawLayer->setFillOutlineColor(mbglValue);
 }
 
-- (MGLStyleValue<MGLColor *> *)fillOutlineColor {
+- (NSExpression *)fillOutlineColor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillOutlineColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillOutlineColor());
+        propertyValue = self.rawLayer->getDefaultFillOutlineColor();
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(propertyValue);
 }
 
 - (void)setFillOutlineColorTransition:(MGLTransition )transition {
@@ -206,21 +206,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillPattern:(MGLStyleValue<NSString *> *)fillPattern {
+- (void)setFillPattern:(NSExpression *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(fillPattern);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillPattern);
     self.rawLayer->setFillPattern(mbglValue);
 }
 
-- (MGLStyleValue<NSString *> *)fillPattern {
+- (NSExpression *)fillPattern {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillPattern();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultFillPattern());
+        propertyValue = self.rawLayer->getDefaultFillPattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setFillPatternTransition:(MGLTransition )transition {
@@ -241,21 +241,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillTranslation:(MGLStyleValue<NSValue *> *)fillTranslation {
+- (void)setFillTranslation:(NSExpression *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toInterpolatablePropertyValue(fillTranslation);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue<mbgl::style::PropertyValue<std::array<float, 2>>>(fillTranslation);
     self.rawLayer->setFillTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslation {
+- (NSExpression *)fillTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillTranslate();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(self.rawLayer->getDefaultFillTranslate());
+        propertyValue = self.rawLayer->getDefaultFillTranslate();
     }
-    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toExpression(propertyValue);
 }
 
 - (void)setFillTranslationTransition:(MGLTransition )transition {
@@ -276,34 +276,34 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillTranslate:(MGLStyleValue<NSValue *> *)fillTranslate {
+- (void)setFillTranslate:(NSExpression *)fillTranslate {
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslate {
+- (NSExpression *)fillTranslate {
     return self.fillTranslation;
 }
 
-- (void)setFillTranslationAnchor:(MGLStyleValue<NSValue *> *)fillTranslationAnchor {
+- (void)setFillTranslationAnchor:(NSExpression *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumPropertyValue(fillTranslationAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType>>(fillTranslationAnchor);
     self.rawLayer->setFillTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslationAnchor {
+- (NSExpression *)fillTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillTranslateAnchor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(self.rawLayer->getDefaultFillTranslateAnchor());
+        propertyValue = self.rawLayer->getDefaultFillTranslateAnchor();
     }
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillTranslationAnchor>().toExpression(propertyValue);
 }
 
-- (void)setFillTranslateAnchor:(MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+- (void)setFillTranslateAnchor:(NSExpression *)fillTranslateAnchor {
 }
 
-- (MGLStyleValue<NSValue *> *)fillTranslateAnchor {
+- (NSExpression *)fillTranslateAnchor {
     return self.fillTranslationAnchor;
 }
 
