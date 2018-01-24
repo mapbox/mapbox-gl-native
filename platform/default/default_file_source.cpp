@@ -14,16 +14,6 @@
 
 #include <cassert>
 
-namespace {
-
-const std::string assetProtocol = "asset://";
-
-bool isAssetURL(const std::string& url) {
-    return std::equal(assetProtocol.begin(), assetProtocol.end(), url.begin());
-}
-
-} // namespace
-
 namespace mbgl {
 
 class DefaultFileSource::Impl {
@@ -118,7 +108,7 @@ public:
             ref.invoke(&FileSourceRequest::setResponse, res);
         };
 
-        if (isAssetURL(resource.url)) {
+        if (AssetFileSource::acceptsURL(resource.url)) {
             //Asset request
             tasks[req] = assetFileSource->request(resource, callback);
         } else if (LocalFileSource::acceptsURL(resource.url)) {
