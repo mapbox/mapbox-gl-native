@@ -443,9 +443,5 @@ void MapWindow::paintGL()
 {
     m_frameDraws++;
     m_map->resize(size(), size() * pixelRatio());
-#if QT_VERSION >= 0x050400
-    // When we're using QOpenGLWidget, we need to tell Mapbox GL about the framebuffer we're using.
-    m_map->setFramebufferObject(defaultFramebufferObject());
-#endif
     m_map->render();
 }
