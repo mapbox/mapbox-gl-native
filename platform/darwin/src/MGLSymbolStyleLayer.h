@@ -559,14 +559,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `2`. Set this property to `nil` to reset it to the default value.
+ 2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -610,7 +610,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -673,7 +673,7 @@ MGL_EXPORT
  This property is measured in factor of the original icon sizes.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -684,7 +684,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -853,7 +853,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `45`. Set this property to `nil` to reset it to the default value.
+ 45. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an expression that evaluates to `line`. Otherwise,
@@ -885,7 +885,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `10`. Set this property to `nil` to reset it to the default value.
+ 10. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -896,7 +896,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -968,14 +968,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `250`. Set this property to `nil` to reset it to the default value.
+ 250. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `symbolPlacement` is set to an
  expression that evaluates to `line`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 1
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1122,7 +1122,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `16`. Set this property to `nil` to reset it to the default value.
+ 16. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1133,7 +1133,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1212,7 +1212,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1234,7 +1234,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `1.2`. Set this property to `nil` to reset it to the default value.
+ 1.2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1331,14 +1331,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `2`. Set this property to `nil` to reset it to the default value.
+ 2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1382,7 +1382,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1498,14 +1498,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1556,14 +1556,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1583,14 +1583,14 @@ MGL_EXPORT
  The opacity at which the icon will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1741,14 +1741,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1799,14 +1799,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1826,14 +1826,14 @@ MGL_EXPORT
  The opacity at which the text will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
