@@ -76,6 +76,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.var;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Expression unit tests that validate the expression output with the expected Object[]array representation.
@@ -1006,5 +1007,27 @@ public class ExpressionTest {
     Object[] actual = interpolate(cubicBezier(get("z"), literal(1), get("y"),
       literal(1)), get("x"), stop(0, 100), stop(100, 200)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testExpressionConcatToString() throws Exception {
+    String expected = "[\"concat\", foo, bar]";
+    String actual = concat(literal("foo"), literal("bar")).toString();
+    assertEquals("toString should match", expected, actual);
+  }
+
+  @Test
+  public void testExpressionMinToString() throws Exception {
+    String expected = "[\"min\", 0, 1, 2, 3]";
+    String actual = min(0, 1, 2, 3).toString();
+    assertEquals("toString should match", expected, actual);
+  }
+
+  @Test
+  public void testExpressionExponentialToString() throws Exception {
+    String expected = "[\"interpolate\", [\"cubic-bezier\", 1, 1, 1, 1], [\"get\", x], 0, 100, 100, 200]";
+    String actual = interpolate(cubicBezier(literal(1), literal(1), literal(1), literal(1)),
+      get(literal("x")), literal(0), literal(100), literal(100), literal(200)).toString();
+    assertEquals("toString should match", expected, actual);
   }
 }
