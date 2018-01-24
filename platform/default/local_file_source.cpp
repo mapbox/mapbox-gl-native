@@ -16,8 +16,7 @@
 
 namespace {
 
-const char* protocol = "file://";
-const std::size_t protocolLength = 7;
+const std::string fileProtocol = "file://";
 
 } // namespace
 
@@ -28,11 +27,17 @@ public:
     Impl(ActorRef<Impl>) {}
 
     void request(const std::string& url, ActorRef<FileSourceRequest> req) {
-        // Cut off the protocol
-        std::string path = mbgl::util::percentDecode(url.substr(protocolLength));
-
         Response response;
 
+        if (!acceptsURL(url)) {
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                               "Invalid file URL");
+            req.invoke(&FileSourceRequest::setResponse, response);
+            return;
+        }
+
+        // Cut off the protocol and prefix with path.
+        const auto path = mbgl::util::percentDecode(url.substr(fileProtocol.size()));
         struct stat buf;
         int result = stat(path.c_str(), &buf);
 
@@ -70,7 +75,7 @@ std::unique_ptr<AsyncRequest> LocalFileSource::request(const Resource& resource,
 }
 
 bool LocalFileSource::acceptsURL(const std::string& url) {
-    return url.compare(0, protocolLength, protocol) == 0;
+    return std::equal(fileProtocol.begin(), fileProtocol.end(), url.begin());
 }
 
 } // namespace mbgl
