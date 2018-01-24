@@ -41,19 +41,6 @@ namespace android {
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
-    jni::Object<TransitionOptions> HillshadeLayer::getHillshadeIlluminationDirectionTransition(jni::JNIEnv& env) {
-        using namespace mbgl::android::conversion;
-        mbgl::style::TransitionOptions options = layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationDirectionTransition();
-        return *convert<jni::Object<TransitionOptions>>(env, options);
-    }
-
-    void HillshadeLayer::setHillshadeIlluminationDirectionTransition(jni::JNIEnv&, jlong duration, jlong delay) {
-        mbgl::style::TransitionOptions options;
-        options.duration.emplace(mbgl::Milliseconds(duration));
-        options.delay.emplace(mbgl::Milliseconds(delay));
-        layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::setHillshadeIlluminationDirectionTransition(options);
-    }
-
     jni::Object<jni::ObjectTag> HillshadeLayer::getHillshadeIlluminationAnchor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HillshadeLayer>()->HillshadeLayer::getHillshadeIlluminationAnchor());
@@ -156,8 +143,6 @@ namespace android {
             std::make_unique<HillshadeLayer, JNIEnv&, jni::String, jni::String>,
             "initialize",
             "finalize",
-            METHOD(&HillshadeLayer::getHillshadeIlluminationDirectionTransition, "nativeGetHillshadeIlluminationDirectionTransition"),
-            METHOD(&HillshadeLayer::setHillshadeIlluminationDirectionTransition, "nativeSetHillshadeIlluminationDirectionTransition"),
             METHOD(&HillshadeLayer::getHillshadeIlluminationDirection, "nativeGetHillshadeIlluminationDirection"),
             METHOD(&HillshadeLayer::getHillshadeIlluminationAnchor, "nativeGetHillshadeIlluminationAnchor"),
             METHOD(&HillshadeLayer::getHillshadeExaggerationTransition, "nativeGetHillshadeExaggerationTransition"),
