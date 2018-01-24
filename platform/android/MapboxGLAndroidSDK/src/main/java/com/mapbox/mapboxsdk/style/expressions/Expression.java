@@ -1758,4 +1758,22 @@ public class Expression<T> {
     return output;
   }
 
+
+  @Override
+  public String toString() {
+    StringBuilder builder = new StringBuilder();
+    builder.append("[\"").append(operator).append("\"");
+    if (arguments != null) {
+      for (Expression argument : arguments) {
+        builder.append(", ");
+        if (argument instanceof ExpressionLiteral) {
+          builder.append(((ExpressionLiteral) argument).toValue());
+        } else {
+          builder.append(argument.toString());
+        }
+      }
+    }
+    builder.append("]");
+    return builder.toString();
+  }
 }
