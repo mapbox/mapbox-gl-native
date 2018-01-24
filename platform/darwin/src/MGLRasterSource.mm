@@ -33,10 +33,15 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
-    auto source = std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
-                                                              configurationURL.mgl_URLByStandardizingScheme.absoluteString.UTF8String,
-                                                              uint16_t(round(tileSize)));
+    auto source = [self pendingSourceWithIdentifier:identifier configurationURL:configurationURL tileSize:tileSize];
     return self = [super initWithPendingSource:std::move(source)];
+}
+
+- (std::unique_ptr<mbgl::style::RasterSource>)pendingSourceWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL tileSize:(CGFloat)tileSize {
+    NSString *configurationURLString = configurationURL.mgl_URLByStandardizingScheme.absoluteString;
+    return std::make_unique<mbgl::style::RasterSource>(identifier.UTF8String,
+                                                       configurationURLString.UTF8String,
+                                                       uint16_t(round(tileSize)));
 }
 
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {

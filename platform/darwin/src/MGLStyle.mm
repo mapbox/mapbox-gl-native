@@ -20,6 +20,7 @@
 #import "MGLVectorSource.h"
 #import "MGLVectorSource_Private.h"
 #import "MGLRasterSource.h"
+#import "MGLRasterDEMSource.h"
 #import "MGLShapeSource.h"
 #import "MGLImageSource.h"
 
@@ -35,12 +36,14 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/style/sources/geojson_source.hpp>
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/style/sources/raster_source.hpp>
+#include <mbgl/style/sources/raster_dem_source.hpp>
 #include <mbgl/style/sources/image_source.hpp>
 
 #import "NSDate+MGLAdditions.h"
@@ -232,6 +235,8 @@ static NSURL *MGLStyleURL_trafficNight;
         return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource mapView:self.mapView];
     } else if (auto rasterSource = rawSource->as<mbgl::style::RasterSource>()) {
         return [[MGLRasterSource alloc] initWithRawSource:rasterSource mapView:self.mapView];
+    } else if (auto rasterDEMSource = rawSource->as<mbgl::style::RasterDEMSource>()) {
+        return [[MGLRasterDEMSource alloc] initWithRawSource:rasterDEMSource mapView:self.mapView];
     } else if (auto imageSource = rawSource->as<mbgl::style::ImageSource>()) {
         return [[MGLImageSource alloc] initWithRawSource:imageSource mapView:self.mapView];
     } else {
@@ -396,10 +401,10 @@ static NSURL *MGLStyleURL_trafficNight;
         return [[MGLSymbolStyleLayer alloc] initWithRawLayer:symbolLayer];
     } else if (auto rasterLayer = rawLayer->as<mbgl::style::RasterLayer>()) {
         return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer];
+    } else if (auto hillshadeLayer = rawLayer->as<mbgl::style::HillshadeLayer>()) {
+        return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:hillshadeLayer];
     } else if (auto circleLayer = rawLayer->as<mbgl::style::CircleLayer>()) {
         return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer];
-    } else if (auto hillshadeLayer = rawLayer->as<mbgl::style::HillshadeLayer>()) {
-        return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:circleLayer];
     } else if (auto backgroundLayer = rawLayer->as<mbgl::style::BackgroundLayer>()) {
         return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
     } else if (auto customLayer = rawLayer->as<mbgl::style::CustomLayer>()) {

@@ -162,6 +162,8 @@
 		DAB2CCE51DF632ED001B2FE1 /* LimeGreenStyleLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */; };
 		DAC25FCA200FD5E2009BE98E /* NSExpression+MGLPrivateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC25FC9200FD5E2009BE98E /* NSExpression+MGLPrivateAdditions.h */; };
 		DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */; };
+		DACA8622201920BE00E9693A /* MGLRasterDEMSource.h in Headers */ = {isa = PBXBuildFile; fileRef = DACA8620201920BE00E9693A /* MGLRasterDEMSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DACA8623201920BE00E9693A /* MGLRasterDEMSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACA8621201920BE00E9693A /* MGLRasterDEMSource.mm */; };
 		DACB0C391E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */; };
 		DACC22141CF3D3E200D220D9 /* MGLFeature.h in Headers */ = {isa = PBXBuildFile; fileRef = DACC22121CF3D3E200D220D9 /* MGLFeature.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DACC22151CF3D3E200D220D9 /* MGLFeature.mm in Sources */ = {isa = PBXBuildFile; fileRef = DACC22131CF3D3E200D220D9 /* MGLFeature.mm */; };
@@ -510,6 +512,8 @@
 		DAB2CCE41DF632ED001B2FE1 /* LimeGreenStyleLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LimeGreenStyleLayer.m; sourceTree = "<group>"; };
 		DAC25FC9200FD5E2009BE98E /* NSExpression+MGLPrivateAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLPrivateAdditions.h"; sourceTree = "<group>"; };
 		DAC2ABC41CC6D343006D18C4 /* MGLAnnotationImage_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationImage_Private.h; sourceTree = "<group>"; };
+		DACA8620201920BE00E9693A /* MGLRasterDEMSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLRasterDEMSource.h; sourceTree = "<group>"; };
+		DACA8621201920BE00E9693A /* MGLRasterDEMSource.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLRasterDEMSource.mm; sourceTree = "<group>"; };
 		DACB0C371E18DFFD005DDBEA /* MGLStyle+MBXAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MGLStyle+MBXAdditions.h"; sourceTree = "<group>"; };
 		DACB0C381E18DFFD005DDBEA /* MGLStyle+MBXAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "MGLStyle+MBXAdditions.m"; sourceTree = "<group>"; };
 		DACBC6082011885800C4D7E2 /* he */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = he; path = he.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -707,6 +711,8 @@
 				352742831D4C244700A1ECE6 /* MGLRasterSource.h */,
 				DA7DC9821DED647F0027472F /* MGLRasterSource_Private.h */,
 				352742841D4C244700A1ECE6 /* MGLRasterSource.mm */,
+				DACA8620201920BE00E9693A /* MGLRasterDEMSource.h */,
+				DACA8621201920BE00E9693A /* MGLRasterDEMSource.mm */,
 				352742871D4C245800A1ECE6 /* MGLShapeSource.h */,
 				DA87A99B1DC9D8DD00810D09 /* MGLShapeSource_Private.h */,
 				352742881D4C245800A1ECE6 /* MGLShapeSource.mm */,
@@ -1195,6 +1201,7 @@
 				DA7DC9811DED5F5C0027472F /* MGLVectorSource_Private.h in Headers */,
 				DAE6C3861CC31E2A00DB3429 /* MGLGeometry_Private.h in Headers */,
 				DAE6C3841CC31E2A00DB3429 /* MGLAccountManager_Private.h in Headers */,
+				DACA8622201920BE00E9693A /* MGLRasterDEMSource.h in Headers */,
 				DAE6C3691CC31E0400DB3429 /* MGLTypes.h in Headers */,
 				07D9474D1F67441B00E37934 /* MGLAbstractShapeSource_Private.h in Headers */,
 				DAE6C3991CC31E2A00DB3429 /* NSException+MGLAdditions.h in Headers */,
@@ -1532,6 +1539,7 @@
 				DAD165751CF4CD7A001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				35C5D8481D6DD66D00E95907 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
 				DA35A2AE1CCA091800E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
+				DACA8623201920BE00E9693A /* MGLRasterDEMSource.mm in Sources */,
 				DA8F258C1D51CA540010E6B5 /* MGLLineStyleLayer.mm in Sources */,
 				DA8F25941D51CA750010E6B5 /* MGLSymbolStyleLayer.mm in Sources */,
 				3529039C1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm in Sources */,

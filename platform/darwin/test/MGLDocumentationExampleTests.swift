@@ -88,6 +88,22 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "clouds"))
     }
+    
+    func testMGLRasterDEMSource() {
+        //#-example-code
+        let source = MGLRasterDEMSource(identifier: "hills", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
+            .minimumZoomLevel: 9,
+            .maximumZoomLevel: 16,
+            .tileSize: 512,
+            .attributionInfos: [
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+            ]
+        ])
+        mapView.style?.addSource(source)
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "hills"))
+    }
 
     func testMGLVectorSource() {
         //#-example-code
@@ -257,8 +273,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLHillshadeStyleLayer() {
-        // TODO: Replace this source with a raster DEM source.
-        let source = MGLRasterSource(identifier: "dem", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+        let source = MGLRasterDEMSource(identifier: "dem", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,
@@ -281,8 +296,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         }
         //#-end-example-code
 
-        // TODO: Uncomment this assertion once raster DEM sources are implemented.
-//        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "hills"))
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "hills"))
     }
 
     func testMGLVectorStyleLayer$predicate() {

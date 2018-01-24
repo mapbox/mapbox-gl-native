@@ -53,6 +53,7 @@ FOUNDATION_EXPORT MGL_EXPORT const unsigned char MapboxVersionString[];
 #import "MGLAbstractShapeSource.h"
 #import "MGLComputedShapeSource.h"
 #import "MGLRasterSource.h"
+#import "MGLRasterDEMSource.h"
 #import "MGLImageSource.h"
 #import "MGLTilePyramidOfflineRegion.h"
 #import "MGLTypes.h"
