@@ -297,7 +297,7 @@ public class MapView extends FrameLayout {
       mapRenderer = new TextureViewMapRenderer(getContext(), textureView, options.getLocalIdeographFontFamily()) {
         @Override
         protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          initRenderSurface();
+          MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
         }
       };
@@ -309,7 +309,7 @@ public class MapView extends FrameLayout {
       mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, options.getLocalIdeographFontFamily()) {
         @Override
         public void onSurfaceCreated(GL10 gl, EGLConfig config) {
-          initRenderSurface();
+          MapView.this.onSurfaceCreated();
           super.onSurfaceCreated(gl, config);
         }
       };
@@ -321,16 +321,13 @@ public class MapView extends FrameLayout {
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
 
-  private void initRenderSurface() {
+  private void onSurfaceCreated() {
     hasSurface = true;
-    post(new Runnable() {
-      @Override
-      public void run() {
-        // Initialise only when not destroyed and only once
-        if (!destroyed && mapboxMap == null) {
-          initialiseMap();
-          mapboxMap.onStart();
-        }
+    post(() -> {
+      // Initialise only when not destroyed and only once
+      if (!destroyed && mapboxMap == null) {
+        initialiseMap();
+        mapboxMap.onStart();
       }
     });
   }
