@@ -42,6 +42,17 @@ struct UnitBezier {
         , ay(1.0 - (3.0 * p1y) - (3.0 * (p2y - p1y) - (3.0 * p1y))) {
     }
 
+    std::pair<double, double> getP1() const {
+        return { cx / 3.0, cy / 3.0 };
+    }
+
+    std::pair<double, double> getP2() const {
+        return {
+            (bx + (3.0 * cx / 3.0) + cx) / 3.0,
+            (by + (3.0 * cy / 3.0) + cy) / 3.0,
+        };
+    }
+
     double sampleCurveX(double t) const {
         // `ax t^3 + bx t^2 + cx t' expanded using Horner's rule.
         return ((ax * t + bx) * t + cx) * t;

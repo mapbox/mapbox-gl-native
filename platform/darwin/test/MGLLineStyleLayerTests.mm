@@ -52,72 +52,81 @@
     {
         XCTAssertTrue(rawLayer->getLineCap().isUndefined(),
                       @"line-cap should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.lineCap;
+        NSExpression *defaultExpression = layer.lineCap;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLineCap:MGLLineCapSquare]];
-        layer.lineCap = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'square'"];
+        layer.lineCap = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::LineCapType> propertyValue = { mbgl::style::LineCapType::Square };
         XCTAssertEqual(rawLayer->getLineCap(), propertyValue,
-                       @"Setting lineCap to a constant value should update line-cap.");
-        XCTAssertEqualObjects(layer.lineCap, constantStyleValue,
-                              @"lineCap should round-trip constant values.");
+                       @"Setting lineCap to a constant value expression should update line-cap.");
+        XCTAssertEqualObjects(layer.lineCap, constantExpression,
+                              @"lineCap should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineCap = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'square'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineCap = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::LineCapType> intervalStops = { {{18, mbgl::style::LineCapType::Square}} };
+        mbgl::style::IntervalStops<mbgl::style::LineCapType> intervalStops = {{
+            { -INFINITY, mbgl::style::LineCapType::Square },
+            { 18, mbgl::style::LineCapType::Square },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::LineCapType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineCap(), propertyValue,
-                       @"Setting lineCap to a camera function should update line-cap.");
-        XCTAssertEqualObjects(layer.lineCap, functionStyleValue,
-                              @"lineCap should round-trip camera functions.");
+                       @"Setting lineCap to a camera expression should update line-cap.");
+        XCTAssertEqualObjects(layer.lineCap, functionExpression,
+                              @"lineCap should round-trip camera expressions.");
 
                               
 
         layer.lineCap = nil;
         XCTAssertTrue(rawLayer->getLineCap().isUndefined(),
                       @"Unsetting lineCap should return line-cap to the default value.");
-        XCTAssertEqualObjects(layer.lineCap, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineCap, defaultExpression,
                               @"lineCap should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineCap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineCap = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineCap = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineCap = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-join
     {
         XCTAssertTrue(rawLayer->getLineJoin().isUndefined(),
                       @"line-join should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.lineJoin;
+        NSExpression *defaultExpression = layer.lineJoin;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLineJoin:MGLLineJoinMiter]];
-        layer.lineJoin = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'miter'"];
+        layer.lineJoin = constantExpression;
         mbgl::style::DataDrivenPropertyValue<mbgl::style::LineJoinType> propertyValue = { mbgl::style::LineJoinType::Miter };
         XCTAssertEqual(rawLayer->getLineJoin(), propertyValue,
-                       @"Setting lineJoin to a constant value should update line-join.");
-        XCTAssertEqualObjects(layer.lineJoin, constantStyleValue,
-                              @"lineJoin should round-trip constant values.");
+                       @"Setting lineJoin to a constant value expression should update line-join.");
+        XCTAssertEqualObjects(layer.lineJoin, constantExpression,
+                              @"lineJoin should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineJoin = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'miter'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineJoin = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::LineJoinType> intervalStops = { {{18, mbgl::style::LineJoinType::Miter}} };
+        mbgl::style::IntervalStops<mbgl::style::LineJoinType> intervalStops = {{
+            { -INFINITY, mbgl::style::LineJoinType::Miter },
+            { 18, mbgl::style::LineJoinType::Miter },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::LineJoinType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineJoin(), propertyValue,
-                       @"Setting lineJoin to a camera function should update line-join.");
-        XCTAssertEqualObjects(layer.lineJoin, functionStyleValue,
-                              @"lineJoin should round-trip camera functions.");
+                       @"Setting lineJoin to a camera expression should update line-join.");
+        XCTAssertEqualObjects(layer.lineJoin, functionExpression,
+                              @"lineJoin should round-trip camera expressions.");
 
                               
 
         layer.lineJoin = nil;
         XCTAssertTrue(rawLayer->getLineJoin().isUndefined(),
                       @"Unsetting lineJoin should return line-join to the default value.");
-        XCTAssertEqualObjects(layer.lineJoin, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineJoin, defaultExpression,
                               @"lineJoin should return the default value after being unset.");
     }
 
@@ -125,118 +134,132 @@
     {
         XCTAssertTrue(rawLayer->getLineMiterLimit().isUndefined(),
                       @"line-miter-limit should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineMiterLimit;
+        NSExpression *defaultExpression = layer.lineMiterLimit;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineMiterLimit = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineMiterLimit = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineMiterLimit(), propertyValue,
-                       @"Setting lineMiterLimit to a constant value should update line-miter-limit.");
-        XCTAssertEqualObjects(layer.lineMiterLimit, constantStyleValue,
-                              @"lineMiterLimit should round-trip constant values.");
+                       @"Setting lineMiterLimit to a constant value expression should update line-miter-limit.");
+        XCTAssertEqualObjects(layer.lineMiterLimit, constantExpression,
+                              @"lineMiterLimit should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineMiterLimit = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineMiterLimit = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineMiterLimit(), propertyValue,
-                       @"Setting lineMiterLimit to a camera function should update line-miter-limit.");
-        XCTAssertEqualObjects(layer.lineMiterLimit, functionStyleValue,
-                              @"lineMiterLimit should round-trip camera functions.");
+                       @"Setting lineMiterLimit to a camera expression should update line-miter-limit.");
+        XCTAssertEqualObjects(layer.lineMiterLimit, functionExpression,
+                              @"lineMiterLimit should round-trip camera expressions.");
 
                               
 
         layer.lineMiterLimit = nil;
         XCTAssertTrue(rawLayer->getLineMiterLimit().isUndefined(),
                       @"Unsetting lineMiterLimit should return line-miter-limit to the default value.");
-        XCTAssertEqualObjects(layer.lineMiterLimit, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineMiterLimit, defaultExpression,
                               @"lineMiterLimit should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineMiterLimit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineMiterLimit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineMiterLimit = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineMiterLimit = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-round-limit
     {
         XCTAssertTrue(rawLayer->getLineRoundLimit().isUndefined(),
                       @"line-round-limit should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineRoundLimit;
+        NSExpression *defaultExpression = layer.lineRoundLimit;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineRoundLimit = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineRoundLimit = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineRoundLimit(), propertyValue,
-                       @"Setting lineRoundLimit to a constant value should update line-round-limit.");
-        XCTAssertEqualObjects(layer.lineRoundLimit, constantStyleValue,
-                              @"lineRoundLimit should round-trip constant values.");
+                       @"Setting lineRoundLimit to a constant value expression should update line-round-limit.");
+        XCTAssertEqualObjects(layer.lineRoundLimit, constantExpression,
+                              @"lineRoundLimit should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineRoundLimit = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineRoundLimit = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineRoundLimit(), propertyValue,
-                       @"Setting lineRoundLimit to a camera function should update line-round-limit.");
-        XCTAssertEqualObjects(layer.lineRoundLimit, functionStyleValue,
-                              @"lineRoundLimit should round-trip camera functions.");
+                       @"Setting lineRoundLimit to a camera expression should update line-round-limit.");
+        XCTAssertEqualObjects(layer.lineRoundLimit, functionExpression,
+                              @"lineRoundLimit should round-trip camera expressions.");
 
                               
 
         layer.lineRoundLimit = nil;
         XCTAssertTrue(rawLayer->getLineRoundLimit().isUndefined(),
                       @"Unsetting lineRoundLimit should return line-round-limit to the default value.");
-        XCTAssertEqualObjects(layer.lineRoundLimit, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineRoundLimit, defaultExpression,
                               @"lineRoundLimit should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineRoundLimit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineRoundLimit = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineRoundLimit = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineRoundLimit = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-blur
     {
         XCTAssertTrue(rawLayer->getLineBlur().isUndefined(),
                       @"line-blur should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineBlur;
+        NSExpression *defaultExpression = layer.lineBlur;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineBlur = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineBlur = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
-                       @"Setting lineBlur to a constant value should update line-blur.");
-        XCTAssertEqualObjects(layer.lineBlur, constantStyleValue,
-                              @"lineBlur should round-trip constant values.");
+                       @"Setting lineBlur to a constant value expression should update line-blur.");
+        XCTAssertEqualObjects(layer.lineBlur, constantExpression,
+                              @"lineBlur should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineBlur = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineBlur = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
-                       @"Setting lineBlur to a camera function should update line-blur.");
-        XCTAssertEqualObjects(layer.lineBlur, functionStyleValue,
-                              @"lineBlur should round-trip camera functions.");
+                       @"Setting lineBlur to a camera expression should update line-blur.");
+        XCTAssertEqualObjects(layer.lineBlur, functionExpression,
+                              @"lineBlur should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineBlur = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineBlur = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
-                       @"Setting lineBlur to a source function should update line-blur.");
-        XCTAssertEqualObjects(layer.lineBlur, functionStyleValue,
-                              @"lineBlur should round-trip source functions.");
+                       @"Setting lineBlur to a data expression should update line-blur.");
+        XCTAssertEqualObjects(layer.lineBlur, functionExpression,
+                              @"lineBlur should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineBlur = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineBlur = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -244,15 +267,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
-                       @"Setting lineBlur to a composite function should update line-blur.");
-        XCTAssertEqualObjects(layer.lineBlur, functionStyleValue,
-                              @"lineBlur should round-trip composite functions.");                                                                                                          
+                       @"Setting lineBlur to a camera-data expression should update line-blur.");
+        XCTAssertEqualObjects(layer.lineBlur, functionExpression,
+                              @"lineBlur should round-trip camera-data expressions.");
                               
 
         layer.lineBlur = nil;
         XCTAssertTrue(rawLayer->getLineBlur().isUndefined(),
                       @"Unsetting lineBlur should return line-blur to the default value.");
-        XCTAssertEqualObjects(layer.lineBlur, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineBlur, defaultExpression,
                               @"lineBlur should return the default value after being unset.");
         // Transition property test
         layer.lineBlurTransition = transitionTest;
@@ -269,40 +292,44 @@
     {
         XCTAssertTrue(rawLayer->getLineColor().isUndefined(),
                       @"line-color should be unset initially.");
-        MGLStyleValue<MGLColor *> *defaultStyleValue = layer.lineColor;
+        NSExpression *defaultExpression = layer.lineColor;
 
-        MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
-        layer.lineColor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        layer.lineColor = constantExpression;
         mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
-                       @"Setting lineColor to a constant value should update line-color.");
-        XCTAssertEqualObjects(layer.lineColor, constantStyleValue,
-                              @"lineColor should round-trip constant values.");
+                       @"Setting lineColor to a constant value expression should update line-color.");
+        XCTAssertEqualObjects(layer.lineColor, constantExpression,
+                              @"lineColor should round-trip constant value expressions.");
 
-        MGLStyleValue<MGLColor *> * functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineColor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = { {{18, { 1, 0, 0, 1 }}} };
+        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
+            { -INFINITY, { 1, 0, 0, 1 } },
+            { 18, { 1, 0, 0, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
-                       @"Setting lineColor to a camera function should update line-color.");
-        XCTAssertEqualObjects(layer.lineColor, functionStyleValue,
-                              @"lineColor should round-trip camera functions.");
+                       @"Setting lineColor to a camera expression should update line-color.");
+        XCTAssertEqualObjects(layer.lineColor, functionExpression,
+                              @"lineColor should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineColor = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineColor = functionExpression;
 
         mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
-                       @"Setting lineColor to a source function should update line-color.");
-        XCTAssertEqualObjects(layer.lineColor, functionStyleValue,
-                              @"lineColor should round-trip source functions.");
+                       @"Setting lineColor to a data expression should update line-color.");
+        XCTAssertEqualObjects(layer.lineColor, functionExpression,
+                              @"lineColor should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineColor = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineColor = functionExpression;
 
         std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
         mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -310,15 +337,15 @@
         propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
-                       @"Setting lineColor to a composite function should update line-color.");
-        XCTAssertEqualObjects(layer.lineColor, functionStyleValue,
-                              @"lineColor should round-trip composite functions.");                                                                                                          
+                       @"Setting lineColor to a camera-data expression should update line-color.");
+        XCTAssertEqualObjects(layer.lineColor, functionExpression,
+                              @"lineColor should round-trip camera-data expressions.");
                               
 
         layer.lineColor = nil;
         XCTAssertTrue(rawLayer->getLineColor().isUndefined(),
                       @"Unsetting lineColor should return line-color to the default value.");
-        XCTAssertEqualObjects(layer.lineColor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineColor, defaultExpression,
                               @"lineColor should return the default value after being unset.");
         // Transition property test
         layer.lineColorTransition = transitionTest;
@@ -335,79 +362,88 @@
     {
         XCTAssertTrue(rawLayer->getLineDasharray().isUndefined(),
                       @"line-dasharray should be unset initially.");
-        MGLStyleValue<NSArray<NSNumber *> *> *defaultStyleValue = layer.lineDashPattern;
+        NSExpression *defaultExpression = layer.lineDashPattern;
 
-        MGLStyleValue<NSArray<NSNumber *> *> *constantStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithRawValue:@[@1, @2]];
-        layer.lineDashPattern = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"{1, 2}"];
+        layer.lineDashPattern = constantExpression;
         mbgl::style::PropertyValue<std::vector<float>> propertyValue = { {1, 2} };
         XCTAssertEqual(rawLayer->getLineDasharray(), propertyValue,
-                       @"Setting lineDashPattern to a constant value should update line-dasharray.");
-        XCTAssertEqualObjects(layer.lineDashPattern, constantStyleValue,
-                              @"lineDashPattern should round-trip constant values.");
+                       @"Setting lineDashPattern to a constant value expression should update line-dasharray.");
+        XCTAssertEqualObjects(layer.lineDashPattern, constantExpression,
+                              @"lineDashPattern should round-trip constant value expressions.");
 
-        MGLStyleValue<NSArray<NSNumber *> *> * functionStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineDashPattern = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"{1, 2}"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineDashPattern = functionExpression;
 
-        mbgl::style::IntervalStops<std::vector<float>> intervalStops = { {{18, {1, 2}}} };
+        mbgl::style::IntervalStops<std::vector<float>> intervalStops = {{
+            { -INFINITY, {1, 2} },
+            { 18, {1, 2} },
+        }};
         propertyValue = mbgl::style::CameraFunction<std::vector<float>> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineDasharray(), propertyValue,
-                       @"Setting lineDashPattern to a camera function should update line-dasharray.");
-        XCTAssertEqualObjects(layer.lineDashPattern, functionStyleValue,
-                              @"lineDashPattern should round-trip camera functions.");
+                       @"Setting lineDashPattern to a camera expression should update line-dasharray.");
+        XCTAssertEqualObjects(layer.lineDashPattern, functionExpression,
+                              @"lineDashPattern should round-trip camera expressions.");
 
                               
 
         layer.lineDashPattern = nil;
         XCTAssertTrue(rawLayer->getLineDasharray().isUndefined(),
                       @"Unsetting lineDashPattern should return line-dasharray to the default value.");
-        XCTAssertEqualObjects(layer.lineDashPattern, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineDashPattern, defaultExpression,
                               @"lineDashPattern should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSArray<NSNumber *> *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineDashPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-gap-width
     {
         XCTAssertTrue(rawLayer->getLineGapWidth().isUndefined(),
                       @"line-gap-width should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineGapWidth;
+        NSExpression *defaultExpression = layer.lineGapWidth;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineGapWidth = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineGapWidth = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
-                       @"Setting lineGapWidth to a constant value should update line-gap-width.");
-        XCTAssertEqualObjects(layer.lineGapWidth, constantStyleValue,
-                              @"lineGapWidth should round-trip constant values.");
+                       @"Setting lineGapWidth to a constant value expression should update line-gap-width.");
+        XCTAssertEqualObjects(layer.lineGapWidth, constantExpression,
+                              @"lineGapWidth should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineGapWidth = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineGapWidth = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
-                       @"Setting lineGapWidth to a camera function should update line-gap-width.");
-        XCTAssertEqualObjects(layer.lineGapWidth, functionStyleValue,
-                              @"lineGapWidth should round-trip camera functions.");
+                       @"Setting lineGapWidth to a camera expression should update line-gap-width.");
+        XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
+                              @"lineGapWidth should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineGapWidth = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineGapWidth = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
-                       @"Setting lineGapWidth to a source function should update line-gap-width.");
-        XCTAssertEqualObjects(layer.lineGapWidth, functionStyleValue,
-                              @"lineGapWidth should round-trip source functions.");
+                       @"Setting lineGapWidth to a data expression should update line-gap-width.");
+        XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
+                              @"lineGapWidth should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineGapWidth = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineGapWidth = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -415,15 +451,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
-                       @"Setting lineGapWidth to a composite function should update line-gap-width.");
-        XCTAssertEqualObjects(layer.lineGapWidth, functionStyleValue,
-                              @"lineGapWidth should round-trip composite functions.");                                                                                                          
+                       @"Setting lineGapWidth to a camera-data expression should update line-gap-width.");
+        XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
+                              @"lineGapWidth should round-trip camera-data expressions.");
                               
 
         layer.lineGapWidth = nil;
         XCTAssertTrue(rawLayer->getLineGapWidth().isUndefined(),
                       @"Unsetting lineGapWidth should return line-gap-width to the default value.");
-        XCTAssertEqualObjects(layer.lineGapWidth, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineGapWidth, defaultExpression,
                               @"lineGapWidth should return the default value after being unset.");
         // Transition property test
         layer.lineGapWidthTransition = transitionTest;
@@ -440,40 +476,44 @@
     {
         XCTAssertTrue(rawLayer->getLineOffset().isUndefined(),
                       @"line-offset should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineOffset;
+        NSExpression *defaultExpression = layer.lineOffset;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineOffset = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineOffset = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
-                       @"Setting lineOffset to a constant value should update line-offset.");
-        XCTAssertEqualObjects(layer.lineOffset, constantStyleValue,
-                              @"lineOffset should round-trip constant values.");
+                       @"Setting lineOffset to a constant value expression should update line-offset.");
+        XCTAssertEqualObjects(layer.lineOffset, constantExpression,
+                              @"lineOffset should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineOffset = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineOffset = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
-                       @"Setting lineOffset to a camera function should update line-offset.");
-        XCTAssertEqualObjects(layer.lineOffset, functionStyleValue,
-                              @"lineOffset should round-trip camera functions.");
+                       @"Setting lineOffset to a camera expression should update line-offset.");
+        XCTAssertEqualObjects(layer.lineOffset, functionExpression,
+                              @"lineOffset should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineOffset = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineOffset = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
-                       @"Setting lineOffset to a source function should update line-offset.");
-        XCTAssertEqualObjects(layer.lineOffset, functionStyleValue,
-                              @"lineOffset should round-trip source functions.");
+                       @"Setting lineOffset to a data expression should update line-offset.");
+        XCTAssertEqualObjects(layer.lineOffset, functionExpression,
+                              @"lineOffset should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineOffset = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineOffset = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -481,15 +521,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
-                       @"Setting lineOffset to a composite function should update line-offset.");
-        XCTAssertEqualObjects(layer.lineOffset, functionStyleValue,
-                              @"lineOffset should round-trip composite functions.");                                                                                                          
+                       @"Setting lineOffset to a camera-data expression should update line-offset.");
+        XCTAssertEqualObjects(layer.lineOffset, functionExpression,
+                              @"lineOffset should round-trip camera-data expressions.");
                               
 
         layer.lineOffset = nil;
         XCTAssertTrue(rawLayer->getLineOffset().isUndefined(),
                       @"Unsetting lineOffset should return line-offset to the default value.");
-        XCTAssertEqualObjects(layer.lineOffset, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineOffset, defaultExpression,
                               @"lineOffset should return the default value after being unset.");
         // Transition property test
         layer.lineOffsetTransition = transitionTest;
@@ -506,40 +546,44 @@
     {
         XCTAssertTrue(rawLayer->getLineOpacity().isUndefined(),
                       @"line-opacity should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineOpacity;
+        NSExpression *defaultExpression = layer.lineOpacity;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineOpacity = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineOpacity = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
-                       @"Setting lineOpacity to a constant value should update line-opacity.");
-        XCTAssertEqualObjects(layer.lineOpacity, constantStyleValue,
-                              @"lineOpacity should round-trip constant values.");
+                       @"Setting lineOpacity to a constant value expression should update line-opacity.");
+        XCTAssertEqualObjects(layer.lineOpacity, constantExpression,
+                              @"lineOpacity should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineOpacity = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineOpacity = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
-                       @"Setting lineOpacity to a camera function should update line-opacity.");
-        XCTAssertEqualObjects(layer.lineOpacity, functionStyleValue,
-                              @"lineOpacity should round-trip camera functions.");
+                       @"Setting lineOpacity to a camera expression should update line-opacity.");
+        XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
+                              @"lineOpacity should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineOpacity = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineOpacity = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
-                       @"Setting lineOpacity to a source function should update line-opacity.");
-        XCTAssertEqualObjects(layer.lineOpacity, functionStyleValue,
-                              @"lineOpacity should round-trip source functions.");
+                       @"Setting lineOpacity to a data expression should update line-opacity.");
+        XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
+                              @"lineOpacity should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineOpacity = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineOpacity = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -547,15 +591,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
-                       @"Setting lineOpacity to a composite function should update line-opacity.");
-        XCTAssertEqualObjects(layer.lineOpacity, functionStyleValue,
-                              @"lineOpacity should round-trip composite functions.");                                                                                                          
+                       @"Setting lineOpacity to a camera-data expression should update line-opacity.");
+        XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
+                              @"lineOpacity should round-trip camera-data expressions.");
                               
 
         layer.lineOpacity = nil;
         XCTAssertTrue(rawLayer->getLineOpacity().isUndefined(),
                       @"Unsetting lineOpacity should return line-opacity to the default value.");
-        XCTAssertEqualObjects(layer.lineOpacity, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineOpacity, defaultExpression,
                               @"lineOpacity should return the default value after being unset.");
         // Transition property test
         layer.lineOpacityTransition = transitionTest;
@@ -572,39 +616,44 @@
     {
         XCTAssertTrue(rawLayer->getLinePattern().isUndefined(),
                       @"line-pattern should be unset initially.");
-        MGLStyleValue<NSString *> *defaultStyleValue = layer.linePattern;
+        NSExpression *defaultExpression = layer.linePattern;
 
-        MGLStyleValue<NSString *> *constantStyleValue = [MGLStyleValue<NSString *> valueWithRawValue:@"Line Pattern"];
-        layer.linePattern = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Line Pattern'"];
+        layer.linePattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Line Pattern" };
         XCTAssertEqual(rawLayer->getLinePattern(), propertyValue,
-                       @"Setting linePattern to a constant value should update line-pattern.");
-        XCTAssertEqualObjects(layer.linePattern, constantStyleValue,
-                              @"linePattern should round-trip constant values.");
+                       @"Setting linePattern to a constant value expression should update line-pattern.");
+        XCTAssertEqualObjects(layer.linePattern, constantExpression,
+                              @"linePattern should round-trip constant value expressions.");
 
-        MGLStyleValue<NSString *> * functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.linePattern = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'Line Pattern'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.linePattern = functionExpression;
 
-        mbgl::style::IntervalStops<std::string> intervalStops = { {{18, "Line Pattern"}} };
+        mbgl::style::IntervalStops<std::string> intervalStops = {{
+            { -INFINITY, "Line Pattern" },
+            { 18, "Line Pattern" },
+        }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLinePattern(), propertyValue,
-                       @"Setting linePattern to a camera function should update line-pattern.");
-        XCTAssertEqualObjects(layer.linePattern, functionStyleValue,
-                              @"linePattern should round-trip camera functions.");
+                       @"Setting linePattern to a camera expression should update line-pattern.");
+        XCTAssertEqualObjects(layer.linePattern, functionExpression,
+                              @"linePattern should round-trip camera expressions.");
 
                               
 
         layer.linePattern = nil;
         XCTAssertTrue(rawLayer->getLinePattern().isUndefined(),
                       @"Unsetting linePattern should return line-pattern to the default value.");
-        XCTAssertEqualObjects(layer.linePattern, defaultStyleValue,
+        XCTAssertEqualObjects(layer.linePattern, defaultExpression,
                               @"linePattern should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.linePattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.linePattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.linePattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.linePatternTransition = transitionTest;
         auto toptions = rawLayer->getLinePatternTransition();
@@ -620,124 +669,138 @@
     {
         XCTAssertTrue(rawLayer->getLineTranslate().isUndefined(),
                       @"line-translate should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.lineTranslation;
+        NSExpression *defaultExpression = layer.lineTranslation;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@",
 #if TARGET_OS_IPHONE
             [NSValue valueWithCGVector:CGVectorMake(1, 1)]
 #else
             [NSValue valueWithMGLVector:CGVectorMake(1, -1)]
 #endif
         ];
-        layer.lineTranslation = constantStyleValue;
+        layer.lineTranslation = constantExpression;
         mbgl::style::PropertyValue<std::array<float, 2>> propertyValue = { { 1, 1 } };
         XCTAssertEqual(rawLayer->getLineTranslate(), propertyValue,
-                       @"Setting lineTranslation to a constant value should update line-translate.");
-        XCTAssertEqualObjects(layer.lineTranslation, constantStyleValue,
-                              @"lineTranslation should round-trip constant values.");
+                       @"Setting lineTranslation to a constant value expression should update line-translate.");
+        XCTAssertEqualObjects(layer.lineTranslation, constantExpression,
+                              @"lineTranslation should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineTranslation = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"{1, 1}"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineTranslation = functionExpression;
 
-        mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = { {{18, { 1, 1 }}} };
+        mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = {{
+            { -INFINITY, { 1, 1 } },
+            { 18, { 1, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineTranslate(), propertyValue,
-                       @"Setting lineTranslation to a camera function should update line-translate.");
-        XCTAssertEqualObjects(layer.lineTranslation, functionStyleValue,
-                              @"lineTranslation should round-trip camera functions.");
+                       @"Setting lineTranslation to a camera expression should update line-translate.");
+        XCTAssertEqualObjects(layer.lineTranslation, functionExpression,
+                              @"lineTranslation should round-trip camera expressions.");
 
                               
 
         layer.lineTranslation = nil;
         XCTAssertTrue(rawLayer->getLineTranslate().isUndefined(),
                       @"Unsetting lineTranslation should return line-translate to the default value.");
-        XCTAssertEqualObjects(layer.lineTranslation, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineTranslation, defaultExpression,
                               @"lineTranslation should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-translate-anchor
     {
         XCTAssertTrue(rawLayer->getLineTranslateAnchor().isUndefined(),
                       @"line-translate-anchor should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.lineTranslationAnchor;
+        NSExpression *defaultExpression = layer.lineTranslationAnchor;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLLineTranslationAnchor:MGLLineTranslationAnchorViewport]];
-        layer.lineTranslationAnchor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        layer.lineTranslationAnchor = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType> propertyValue = { mbgl::style::TranslateAnchorType::Viewport };
         XCTAssertEqual(rawLayer->getLineTranslateAnchor(), propertyValue,
-                       @"Setting lineTranslationAnchor to a constant value should update line-translate-anchor.");
-        XCTAssertEqualObjects(layer.lineTranslationAnchor, constantStyleValue,
-                              @"lineTranslationAnchor should round-trip constant values.");
+                       @"Setting lineTranslationAnchor to a constant value expression should update line-translate-anchor.");
+        XCTAssertEqualObjects(layer.lineTranslationAnchor, constantExpression,
+                              @"lineTranslationAnchor should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineTranslationAnchor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineTranslationAnchor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = { {{18, mbgl::style::TranslateAnchorType::Viewport}} };
+        mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = {{
+            { -INFINITY, mbgl::style::TranslateAnchorType::Viewport },
+            { 18, mbgl::style::TranslateAnchorType::Viewport },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineTranslateAnchor(), propertyValue,
-                       @"Setting lineTranslationAnchor to a camera function should update line-translate-anchor.");
-        XCTAssertEqualObjects(layer.lineTranslationAnchor, functionStyleValue,
-                              @"lineTranslationAnchor should round-trip camera functions.");
+                       @"Setting lineTranslationAnchor to a camera expression should update line-translate-anchor.");
+        XCTAssertEqualObjects(layer.lineTranslationAnchor, functionExpression,
+                              @"lineTranslationAnchor should round-trip camera expressions.");
 
                               
 
         layer.lineTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getLineTranslateAnchor().isUndefined(),
                       @"Unsetting lineTranslationAnchor should return line-translate-anchor to the default value.");
-        XCTAssertEqualObjects(layer.lineTranslationAnchor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineTranslationAnchor, defaultExpression,
                               @"lineTranslationAnchor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.lineTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLLineLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // line-width
     {
         XCTAssertTrue(rawLayer->getLineWidth().isUndefined(),
                       @"line-width should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.lineWidth;
+        NSExpression *defaultExpression = layer.lineWidth;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.lineWidth = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.lineWidth = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
-                       @"Setting lineWidth to a constant value should update line-width.");
-        XCTAssertEqualObjects(layer.lineWidth, constantStyleValue,
-                              @"lineWidth should round-trip constant values.");
+                       @"Setting lineWidth to a constant value expression should update line-width.");
+        XCTAssertEqualObjects(layer.lineWidth, constantExpression,
+                              @"lineWidth should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.lineWidth = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.lineWidth = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
-                       @"Setting lineWidth to a camera function should update line-width.");
-        XCTAssertEqualObjects(layer.lineWidth, functionStyleValue,
-                              @"lineWidth should round-trip camera functions.");
+                       @"Setting lineWidth to a camera expression should update line-width.");
+        XCTAssertEqualObjects(layer.lineWidth, functionExpression,
+                              @"lineWidth should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.lineWidth = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.lineWidth = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
-                       @"Setting lineWidth to a source function should update line-width.");
-        XCTAssertEqualObjects(layer.lineWidth, functionStyleValue,
-                              @"lineWidth should round-trip source functions.");
+                       @"Setting lineWidth to a data expression should update line-width.");
+        XCTAssertEqualObjects(layer.lineWidth, functionExpression,
+                              @"lineWidth should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.lineWidth = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.lineWidth = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -745,15 +808,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
-                       @"Setting lineWidth to a composite function should update line-width.");
-        XCTAssertEqualObjects(layer.lineWidth, functionStyleValue,
-                              @"lineWidth should round-trip composite functions.");                                                                                                          
+                       @"Setting lineWidth to a camera-data expression should update line-width.");
+        XCTAssertEqualObjects(layer.lineWidth, functionExpression,
+                              @"lineWidth should round-trip camera-data expressions.");
                               
 
         layer.lineWidth = nil;
         XCTAssertTrue(rawLayer->getLineWidth().isUndefined(),
                       @"Unsetting lineWidth should return line-width to the default value.");
-        XCTAssertEqualObjects(layer.lineWidth, defaultStyleValue,
+        XCTAssertEqualObjects(layer.lineWidth, defaultExpression,
                               @"lineWidth should return the default value after being unset.");
         // Transition property test
         layer.lineWidthTransition = transitionTest;

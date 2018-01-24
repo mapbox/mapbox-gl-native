@@ -2,7 +2,6 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLStyleValue.h"
 #import "MGLVectorStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -59,41 +58,26 @@ MGL_EXPORT
 
 #pragma mark - Accessing the Paint Attributes
 
-#if TARGET_OS_IPHONE
 /**
  The shading color used to accentuate rugged terrain like sharp cliffs and
  gorges.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *hillshadeAccentColor;
-#else
-/**
- The shading color used to accentuate rugged terrain like sharp cliffs and
- gorges.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
- value.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *hillshadeAccentColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *hillshadeAccentColor;
 
 /**
  The transition affecting any changes to this layer’s `hillshadeAccentColor` property.
@@ -105,18 +89,21 @@ MGL_EXPORT
 /**
  Intensity of the hillshade
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0.5`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0.5`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *hillshadeExaggeration;
+@property (nonatomic, null_resettable) NSExpression *hillshadeExaggeration;
 
 /**
  The transition affecting any changes to this layer’s `hillshadeExaggeration` property.
@@ -125,39 +112,25 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition hillshadeExaggerationTransition;
 
-#if TARGET_OS_IPHONE
 /**
  The shading color of areas that faces towards the light source.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.whiteColor`. Set this property to `nil` to reset it to the default
  value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *hillshadeHighlightColor;
-#else
-/**
- The shading color of areas that faces towards the light source.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.whiteColor`. Set this property to `nil` to reset it to the default
- value.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *hillshadeHighlightColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *hillshadeHighlightColor;
 
 /**
  The transition affecting any changes to this layer’s `hillshadeHighlightColor` property.
@@ -169,17 +142,26 @@ MGL_EXPORT
 /**
  Direction of light source when map is rotated.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSValue` object containing `MGLHillshadeIlluminationAnchorViewport`. Set this
- property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to
+ `viewport`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of
- `MGLInterpolationModeInterval`
+ * Constant `MGLHillshadeIlluminationAnchor` values
+ * Any of the following constant string values:
+   * `map`: The hillshade illumination is relative to the north direction.
+   * `viewport`: The hillshade illumination is relative to the top of the
+ viewport.
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation functions to the
+ `$zoomLevel` variable or applying interpolation or step functions to feature
+ attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSValue *> *hillshadeIlluminationAnchor;
+@property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationAnchor;
 
 /**
  The direction of the light source used to generate the hillshading with 0 as
@@ -187,18 +169,21 @@ MGL_EXPORT
  `MGLHillshadeIlluminationAnchorViewport` and due north if
  `hillshadeIlluminationAnchor` is set to `MGLHillshadeIlluminationAnchorMap`.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `335`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `335`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *hillshadeIlluminationDirection;
+@property (nonatomic, null_resettable) NSExpression *hillshadeIlluminationDirection;
 
 /**
  The transition affecting any changes to this layer’s `hillshadeIlluminationDirection` property.
@@ -207,39 +192,25 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition hillshadeIlluminationDirectionTransition;
 
-#if TARGET_OS_IPHONE
 /**
  The shading color of areas that face away from the light source.
  
- The default value of this property is an `MGLStyleValue` object containing
+ The default value of this property is an expression that evaluates to
  `UIColor.blackColor`. Set this property to `nil` to reset it to the default
  value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<UIColor *> *hillshadeShadowColor;
-#else
-/**
- The shading color of areas that face away from the light source.
- 
- The default value of this property is an `MGLStyleValue` object containing
- `NSColor.blackColor`. Set this property to `nil` to reset it to the default
- value.
- 
- You can set this property to an instance of:
- 
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
- */
-@property (nonatomic, null_resettable) MGLStyleValue<NSColor *> *hillshadeShadowColor;
-#endif
+@property (nonatomic, null_resettable) NSExpression *hillshadeShadowColor;
 
 /**
  The transition affecting any changes to this layer’s `hillshadeShadowColor` property.

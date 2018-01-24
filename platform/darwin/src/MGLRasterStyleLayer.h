@@ -2,7 +2,6 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLStyleValue.h"
 #import "MGLForegroundStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
@@ -29,7 +28,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  ```swift
  let layer = MGLRasterStyleLayer(identifier: "clouds", source: source)
- layer.rasterOpacity = MGLStyleValue(rawValue: 0.5)
+ layer.rasterOpacity = NSExpression(forConstantValue: 0.5)
  mapView.style?.addLayer(layer)
  ```
  */
@@ -57,22 +56,25 @@ MGL_EXPORT
  Increase or reduce the brightness of the image. The value is the maximum
  brightness.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-max"><code>raster-brightness-max</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *maximumRasterBrightness;
+@property (nonatomic, null_resettable) NSExpression *maximumRasterBrightness;
 
 /**
  The transition affecting any changes to this layer’s `maximumRasterBrightness` property.
@@ -81,28 +83,31 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition maximumRasterBrightnessTransition;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMax __attribute__((unavailable("Use maximumRasterBrightness instead.")));
+@property (nonatomic, null_resettable) NSExpression *rasterBrightnessMax __attribute__((unavailable("Use maximumRasterBrightness instead.")));
 
 /**
  Increase or reduce the brightness of the image. The value is the minimum
  brightness.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-brightness-min"><code>raster-brightness-min</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *minimumRasterBrightness;
+@property (nonatomic, null_resettable) NSExpression *minimumRasterBrightness;
 
 /**
  The transition affecting any changes to this layer’s `minimumRasterBrightness` property.
@@ -111,23 +116,26 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition minimumRasterBrightnessTransition;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterBrightnessMin __attribute__((unavailable("Use minimumRasterBrightness instead.")));
+@property (nonatomic, null_resettable) NSExpression *rasterBrightnessMin __attribute__((unavailable("Use minimumRasterBrightness instead.")));
 
 /**
  Increase or reduce the contrast of the image.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterContrast;
+@property (nonatomic, null_resettable) NSExpression *rasterContrast;
 
 /**
  The transition affecting any changes to this layer’s `rasterContrast` property.
@@ -141,40 +149,46 @@ MGL_EXPORT
  
  This property is measured in milliseconds.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `300`. Set this property to `nil` to
- reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `300`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterFadeDuration;
+@property (nonatomic, null_resettable) NSExpression *rasterFadeDuration;
 
 /**
  Rotates hues around the color wheel.
  
  This property is measured in degrees.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#paint-raster-hue-rotate"><code>raster-hue-rotate</code></a>
  layout property in the Mapbox Style Specification.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotation;
+@property (nonatomic, null_resettable) NSExpression *rasterHueRotation;
 
 /**
  The transition affecting any changes to this layer’s `rasterHueRotation` property.
@@ -183,23 +197,26 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition rasterHueRotationTransition;
 
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterHueRotate __attribute__((unavailable("Use rasterHueRotation instead.")));
+@property (nonatomic, null_resettable) NSExpression *rasterHueRotate __attribute__((unavailable("Use rasterHueRotation instead.")));
 
 /**
  The opacity at which the image will be drawn.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `1`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterOpacity;
+@property (nonatomic, null_resettable) NSExpression *rasterOpacity;
 
 /**
  The transition affecting any changes to this layer’s `rasterOpacity` property.
@@ -211,18 +228,21 @@ MGL_EXPORT
 /**
  Increase or reduce the saturation of the image.
  
- The default value of this property is an `MGLStyleValue` object containing an
- `NSNumber` object containing the float `0`. Set this property to `nil` to reset
- it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
- You can set this property to an instance of:
+ You can set this property to an expression containing any of the following:
  
- * `MGLConstantStyleValue`
- * `MGLCameraStyleFunction` with an interpolation mode of:
-   * `MGLInterpolationModeExponential`
-   * `MGLInterpolationModeInterval`
+ * Constant numeric values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
  */
-@property (nonatomic, null_resettable) MGLStyleValue<NSNumber *> *rasterSaturation;
+@property (nonatomic, null_resettable) NSExpression *rasterSaturation;
 
 /**
  The transition affecting any changes to this layer’s `rasterSaturation` property.

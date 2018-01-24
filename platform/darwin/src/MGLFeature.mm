@@ -12,7 +12,7 @@
 
 #import "NSDictionary+MGLAdditions.h"
 #import "NSArray+MGLAdditions.h"
-#import "NSExpression+MGLAdditions.h"
+#import "NSExpression+MGLPrivateAdditions.h"
 
 #import <mbgl/util/geometry.hpp>
 #import <mbgl/style/conversion/geojson.hpp>

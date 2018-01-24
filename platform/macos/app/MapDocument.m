@@ -716,7 +716,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style addLayer:lineLayer];
     MGLSymbolStyleLayer *labelLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"graticule.labels"
                                                                                source:source];
-    labelLayer.text = [MGLStyleValue valueWithRawValue:@"{value}"];
+    labelLayer.text = [NSExpression expressionWithFormat:@"value"];
     [self.mapView.style addLayer:labelLayer];
 }
 
@@ -787,16 +787,16 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     self.mapView.style.transition = transition;
 
     MGLStyleLayer *waterLayer = [self.mapView.style layerWithIdentifier:@"water"];
-    MGLStyleValue *colorFunction = [MGLStyleValue<NSColor *> valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
-        @0.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor redColor]],
-        @10.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor yellowColor]],
-        @20.0: [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor blackColor]],
-    } options:nil];
+    NSExpression *colorExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{
+        @0.0: [NSColor redColor],
+        @10.0: [NSColor yellowColor],
+        @20.0: [NSColor blackColor],
+    }];
     
     if ([waterLayer respondsToSelector:@selector(fillColor)]) {
-        [waterLayer setValue:colorFunction forKey:@"fillColor"];
+        [waterLayer setValue:colorExpression forKey:@"fillColor"];
     } else if ([waterLayer respondsToSelector:@selector(lineColor)]) {
-        [waterLayer setValue:colorFunction forKey:@"lineColor"];
+        [waterLayer setValue:colorExpression forKey:@"lineColor"];
     }
 
     NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"amsterdam" ofType:@"geojson"];
@@ -805,8 +805,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style addSource:source];
 
     MGLCircleStyleLayer *circleLayer = [[MGLCircleStyleLayer alloc] initWithIdentifier:@"test" source:source];
-    circleLayer.circleColor = [MGLStyleValue<NSColor *> valueWithRawValue:[NSColor greenColor]];
-    circleLayer.circleRadius = [MGLStyleValue<NSNumber *> valueWithRawValue:[NSNumber numberWithInteger:40]];
+    circleLayer.circleColor = [NSExpression expressionForConstantValue:[NSColor greenColor]];
+    circleLayer.circleRadius = [NSExpression expressionForConstantValue:@40];
 //    fillLayer.predicate = [NSPredicate predicateWithFormat:@"%K == %@", @"type", @"park"];
     [self.mapView.style addLayer:circleLayer];
 
@@ -818,13 +818,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         MGLSymbolStyleLayer *theaterLayer = [[MGLSymbolStyleLayer alloc] initWithIdentifier:@"theaters" source:streetsSource];
         theaterLayer.sourceLayerIdentifier = @"poi_label";
         theaterLayer.predicate = [NSPredicate predicateWithFormat:@"maki == 'theatre'"];
-        theaterLayer.iconImageName = [MGLStyleValue valueWithRawValue:NSImageNameIChatTheaterTemplate];
-        theaterLayer.iconScale = [MGLStyleValue valueWithRawValue:@2];
-        theaterLayer.iconColor = [MGLStyleValue valueWithInterpolationMode:MGLInterpolationModeExponential cameraStops:@{
-            @16.0: [MGLStyleValue valueWithRawValue:[NSColor redColor]],
-            @18.0: [MGLStyleValue valueWithRawValue:[NSColor yellowColor]],
-            @20.0: [MGLStyleValue valueWithRawValue:[NSColor blackColor]],
-        } options:nil];
+        theaterLayer.iconImageName = [NSExpression expressionForConstantValue:NSImageNameIChatTheaterTemplate];
+        theaterLayer.iconScale = [NSExpression expressionForConstantValue:@2];
+        theaterLayer.iconColor = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{
+            @16.0: [NSColor redColor],
+            @18.0: [NSColor yellowColor],
+            @20.0: [NSColor blackColor],
+        }];
         [self.mapView.style addLayer:theaterLayer];
     }
 

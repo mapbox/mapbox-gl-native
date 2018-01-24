@@ -52,40 +52,44 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionBase().isUndefined(),
                       @"fill-extrusion-base should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.fillExtrusionBase;
+        NSExpression *defaultExpression = layer.fillExtrusionBase;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.fillExtrusionBase = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.fillExtrusionBase = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
-                       @"Setting fillExtrusionBase to a constant value should update fill-extrusion-base.");
-        XCTAssertEqualObjects(layer.fillExtrusionBase, constantStyleValue,
-                              @"fillExtrusionBase should round-trip constant values.");
+                       @"Setting fillExtrusionBase to a constant value expression should update fill-extrusion-base.");
+        XCTAssertEqualObjects(layer.fillExtrusionBase, constantExpression,
+                              @"fillExtrusionBase should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionBase = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionBase = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
-                       @"Setting fillExtrusionBase to a camera function should update fill-extrusion-base.");
-        XCTAssertEqualObjects(layer.fillExtrusionBase, functionStyleValue,
-                              @"fillExtrusionBase should round-trip camera functions.");
+                       @"Setting fillExtrusionBase to a camera expression should update fill-extrusion-base.");
+        XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
+                              @"fillExtrusionBase should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionBase = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.fillExtrusionBase = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
-                       @"Setting fillExtrusionBase to a source function should update fill-extrusion-base.");
-        XCTAssertEqualObjects(layer.fillExtrusionBase, functionStyleValue,
-                              @"fillExtrusionBase should round-trip source functions.");
+                       @"Setting fillExtrusionBase to a data expression should update fill-extrusion-base.");
+        XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
+                              @"fillExtrusionBase should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionBase = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.fillExtrusionBase = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -93,15 +97,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
-                       @"Setting fillExtrusionBase to a composite function should update fill-extrusion-base.");
-        XCTAssertEqualObjects(layer.fillExtrusionBase, functionStyleValue,
-                              @"fillExtrusionBase should round-trip composite functions.");                                                                                                          
+                       @"Setting fillExtrusionBase to a camera-data expression should update fill-extrusion-base.");
+        XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
+                              @"fillExtrusionBase should round-trip camera-data expressions.");
                               
 
         layer.fillExtrusionBase = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionBase().isUndefined(),
                       @"Unsetting fillExtrusionBase should return fill-extrusion-base to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionBase, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionBase, defaultExpression,
                               @"fillExtrusionBase should return the default value after being unset.");
         // Transition property test
         layer.fillExtrusionBaseTransition = transitionTest;
@@ -118,40 +122,44 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionColor().isUndefined(),
                       @"fill-extrusion-color should be unset initially.");
-        MGLStyleValue<MGLColor *> *defaultStyleValue = layer.fillExtrusionColor;
+        NSExpression *defaultExpression = layer.fillExtrusionColor;
 
-        MGLStyleValue<MGLColor *> *constantStyleValue = [MGLStyleValue<MGLColor *> valueWithRawValue:[MGLColor redColor]];
-        layer.fillExtrusionColor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        layer.fillExtrusionColor = constantExpression;
         mbgl::style::DataDrivenPropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
-                       @"Setting fillExtrusionColor to a constant value should update fill-extrusion-color.");
-        XCTAssertEqualObjects(layer.fillExtrusionColor, constantStyleValue,
-                              @"fillExtrusionColor should round-trip constant values.");
+                       @"Setting fillExtrusionColor to a constant value expression should update fill-extrusion-color.");
+        XCTAssertEqualObjects(layer.fillExtrusionColor, constantExpression,
+                              @"fillExtrusionColor should round-trip constant value expressions.");
 
-        MGLStyleValue<MGLColor *> * functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionColor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionColor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::Color> intervalStops = { {{18, { 1, 0, 0, 1 }}} };
+        mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
+            { -INFINITY, { 1, 0, 0, 1 } },
+            { 18, { 1, 0, 0, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
-                       @"Setting fillExtrusionColor to a camera function should update fill-extrusion-color.");
-        XCTAssertEqualObjects(layer.fillExtrusionColor, functionStyleValue,
-                              @"fillExtrusionColor should round-trip camera functions.");
+                       @"Setting fillExtrusionColor to a camera expression should update fill-extrusion-color.");
+        XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
+                              @"fillExtrusionColor should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionColor = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.fillExtrusionColor = functionExpression;
 
         mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<mbgl::Color> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
-                       @"Setting fillExtrusionColor to a source function should update fill-extrusion-color.");
-        XCTAssertEqualObjects(layer.fillExtrusionColor, functionStyleValue,
-                              @"fillExtrusionColor should round-trip source functions.");
+                       @"Setting fillExtrusionColor to a data expression should update fill-extrusion-color.");
+        XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
+                              @"fillExtrusionColor should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<MGLColor *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionColor = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.fillExtrusionColor = functionExpression;
 
         std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
         mbgl::style::CompositeExponentialStops<mbgl::Color> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -159,15 +167,15 @@
         propertyValue = mbgl::style::CompositeFunction<mbgl::Color> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
-                       @"Setting fillExtrusionColor to a composite function should update fill-extrusion-color.");
-        XCTAssertEqualObjects(layer.fillExtrusionColor, functionStyleValue,
-                              @"fillExtrusionColor should round-trip composite functions.");                                                                                                          
+                       @"Setting fillExtrusionColor to a camera-data expression should update fill-extrusion-color.");
+        XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
+                              @"fillExtrusionColor should round-trip camera-data expressions.");
                               
 
         layer.fillExtrusionColor = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionColor().isUndefined(),
                       @"Unsetting fillExtrusionColor should return fill-extrusion-color to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionColor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionColor, defaultExpression,
                               @"fillExtrusionColor should return the default value after being unset.");
         // Transition property test
         layer.fillExtrusionColorTransition = transitionTest;
@@ -184,40 +192,44 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionHeight().isUndefined(),
                       @"fill-extrusion-height should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.fillExtrusionHeight;
+        NSExpression *defaultExpression = layer.fillExtrusionHeight;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.fillExtrusionHeight = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.fillExtrusionHeight = constantExpression;
         mbgl::style::DataDrivenPropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
-                       @"Setting fillExtrusionHeight to a constant value should update fill-extrusion-height.");
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, constantStyleValue,
-                              @"fillExtrusionHeight should round-trip constant values.");
+                       @"Setting fillExtrusionHeight to a constant value expression should update fill-extrusion-height.");
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, constantExpression,
+                              @"fillExtrusionHeight should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionHeight = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionHeight = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
-                       @"Setting fillExtrusionHeight to a camera function should update fill-extrusion-height.");
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionStyleValue,
-                              @"fillExtrusionHeight should round-trip camera functions.");
+                       @"Setting fillExtrusionHeight to a camera expression should update fill-extrusion-height.");
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
+                              @"fillExtrusionHeight should round-trip camera expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential sourceStops:@{@18: constantStyleValue} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionHeight = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        layer.fillExtrusionHeight = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
         propertyValue = mbgl::style::SourceFunction<float> { "keyName", exponentialStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
-                       @"Setting fillExtrusionHeight to a source function should update fill-extrusion-height.");
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionStyleValue,
-                              @"fillExtrusionHeight should round-trip source functions.");
+                       @"Setting fillExtrusionHeight to a data expression should update fill-extrusion-height.");
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
+                              @"fillExtrusionHeight should round-trip data expressions.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeExponential compositeStops:@{@10: @{@18: constantStyleValue}} attributeName:@"keyName" options:nil];
-        layer.fillExtrusionHeight = functionStyleValue;
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        layer.fillExtrusionHeight = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
         mbgl::style::CompositeExponentialStops<float> compositeStops { { {10.0, innerStops} }, 1.0 };
@@ -225,15 +237,15 @@
         propertyValue = mbgl::style::CompositeFunction<float> { "keyName", compositeStops };
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
-                       @"Setting fillExtrusionHeight to a composite function should update fill-extrusion-height.");
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionStyleValue,
-                              @"fillExtrusionHeight should round-trip composite functions.");                                                                                                          
+                       @"Setting fillExtrusionHeight to a camera-data expression should update fill-extrusion-height.");
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
+                              @"fillExtrusionHeight should round-trip camera-data expressions.");
                               
 
         layer.fillExtrusionHeight = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionHeight().isUndefined(),
                       @"Unsetting fillExtrusionHeight should return fill-extrusion-height to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, defaultExpression,
                               @"fillExtrusionHeight should return the default value after being unset.");
         // Transition property test
         layer.fillExtrusionHeightTransition = transitionTest;
@@ -250,39 +262,44 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionOpacity().isUndefined(),
                       @"fill-extrusion-opacity should be unset initially.");
-        MGLStyleValue<NSNumber *> *defaultStyleValue = layer.fillExtrusionOpacity;
+        NSExpression *defaultExpression = layer.fillExtrusionOpacity;
 
-        MGLStyleValue<NSNumber *> *constantStyleValue = [MGLStyleValue<NSNumber *> valueWithRawValue:@0xff];
-        layer.fillExtrusionOpacity = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        layer.fillExtrusionOpacity = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getFillExtrusionOpacity(), propertyValue,
-                       @"Setting fillExtrusionOpacity to a constant value should update fill-extrusion-opacity.");
-        XCTAssertEqualObjects(layer.fillExtrusionOpacity, constantStyleValue,
-                              @"fillExtrusionOpacity should round-trip constant values.");
+                       @"Setting fillExtrusionOpacity to a constant value expression should update fill-extrusion-opacity.");
+        XCTAssertEqualObjects(layer.fillExtrusionOpacity, constantExpression,
+                              @"fillExtrusionOpacity should round-trip constant value expressions.");
 
-        MGLStyleValue<NSNumber *> * functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionOpacity = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionOpacity = functionExpression;
 
-        mbgl::style::IntervalStops<float> intervalStops = { {{18, 0xff}} };
+        mbgl::style::IntervalStops<float> intervalStops = {{
+            { -INFINITY, 0xff },
+            { 18, 0xff },
+        }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionOpacity(), propertyValue,
-                       @"Setting fillExtrusionOpacity to a camera function should update fill-extrusion-opacity.");
-        XCTAssertEqualObjects(layer.fillExtrusionOpacity, functionStyleValue,
-                              @"fillExtrusionOpacity should round-trip camera functions.");
+                       @"Setting fillExtrusionOpacity to a camera expression should update fill-extrusion-opacity.");
+        XCTAssertEqualObjects(layer.fillExtrusionOpacity, functionExpression,
+                              @"fillExtrusionOpacity should round-trip camera expressions.");
 
                               
 
         layer.fillExtrusionOpacity = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionOpacity().isUndefined(),
                       @"Unsetting fillExtrusionOpacity should return fill-extrusion-opacity to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionOpacity, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionOpacity, defaultExpression,
                               @"fillExtrusionOpacity should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSNumber *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.fillExtrusionOpacityTransition = transitionTest;
         auto toptions = rawLayer->getFillExtrusionOpacityTransition();
@@ -298,39 +315,44 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionPattern().isUndefined(),
                       @"fill-extrusion-pattern should be unset initially.");
-        MGLStyleValue<NSString *> *defaultStyleValue = layer.fillExtrusionPattern;
+        NSExpression *defaultExpression = layer.fillExtrusionPattern;
 
-        MGLStyleValue<NSString *> *constantStyleValue = [MGLStyleValue<NSString *> valueWithRawValue:@"Fill Extrusion Pattern"];
-        layer.fillExtrusionPattern = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Fill Extrusion Pattern'"];
+        layer.fillExtrusionPattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Fill Extrusion Pattern" };
         XCTAssertEqual(rawLayer->getFillExtrusionPattern(), propertyValue,
-                       @"Setting fillExtrusionPattern to a constant value should update fill-extrusion-pattern.");
-        XCTAssertEqualObjects(layer.fillExtrusionPattern, constantStyleValue,
-                              @"fillExtrusionPattern should round-trip constant values.");
+                       @"Setting fillExtrusionPattern to a constant value expression should update fill-extrusion-pattern.");
+        XCTAssertEqualObjects(layer.fillExtrusionPattern, constantExpression,
+                              @"fillExtrusionPattern should round-trip constant value expressions.");
 
-        MGLStyleValue<NSString *> * functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionPattern = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'Fill Extrusion Pattern'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionPattern = functionExpression;
 
-        mbgl::style::IntervalStops<std::string> intervalStops = { {{18, "Fill Extrusion Pattern"}} };
+        mbgl::style::IntervalStops<std::string> intervalStops = {{
+            { -INFINITY, "Fill Extrusion Pattern" },
+            { 18, "Fill Extrusion Pattern" },
+        }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionPattern(), propertyValue,
-                       @"Setting fillExtrusionPattern to a camera function should update fill-extrusion-pattern.");
-        XCTAssertEqualObjects(layer.fillExtrusionPattern, functionStyleValue,
-                              @"fillExtrusionPattern should round-trip camera functions.");
+                       @"Setting fillExtrusionPattern to a camera expression should update fill-extrusion-pattern.");
+        XCTAssertEqualObjects(layer.fillExtrusionPattern, functionExpression,
+                              @"fillExtrusionPattern should round-trip camera expressions.");
 
                               
 
         layer.fillExtrusionPattern = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionPattern().isUndefined(),
                       @"Unsetting fillExtrusionPattern should return fill-extrusion-pattern to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionPattern, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionPattern, defaultExpression,
                               @"fillExtrusionPattern should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSString *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.fillExtrusionPatternTransition = transitionTest;
         auto toptions = rawLayer->getFillExtrusionPatternTransition();
@@ -346,84 +368,94 @@
     {
         XCTAssertTrue(rawLayer->getFillExtrusionTranslate().isUndefined(),
                       @"fill-extrusion-translate should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslation;
+        NSExpression *defaultExpression = layer.fillExtrusionTranslation;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@",
 #if TARGET_OS_IPHONE
             [NSValue valueWithCGVector:CGVectorMake(1, 1)]
 #else
             [NSValue valueWithMGLVector:CGVectorMake(1, -1)]
 #endif
         ];
-        layer.fillExtrusionTranslation = constantStyleValue;
+        layer.fillExtrusionTranslation = constantExpression;
         mbgl::style::PropertyValue<std::array<float, 2>> propertyValue = { { 1, 1 } };
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
-                       @"Setting fillExtrusionTranslation to a constant value should update fill-extrusion-translate.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslation, constantStyleValue,
-                              @"fillExtrusionTranslation should round-trip constant values.");
+                       @"Setting fillExtrusionTranslation to a constant value expression should update fill-extrusion-translate.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, constantExpression,
+                              @"fillExtrusionTranslation should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionTranslation = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"{1, 1}"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionTranslation = functionExpression;
 
-        mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = { {{18, { 1, 1 }}} };
+        mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = {{
+            { -INFINITY, { 1, 1 } },
+            { 18, { 1, 1 } },
+        }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
-                       @"Setting fillExtrusionTranslation to a camera function should update fill-extrusion-translate.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslation, functionStyleValue,
-                              @"fillExtrusionTranslation should round-trip camera functions.");
+                       @"Setting fillExtrusionTranslation to a camera expression should update fill-extrusion-translate.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, functionExpression,
+                              @"fillExtrusionTranslation should round-trip camera expressions.");
 
                               
 
         layer.fillExtrusionTranslation = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslate().isUndefined(),
                       @"Unsetting fillExtrusionTranslation should return fill-extrusion-translate to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslation, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionTranslation, defaultExpression,
                               @"fillExtrusionTranslation should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
     // fill-extrusion-translate-anchor
     {
         XCTAssertTrue(rawLayer->getFillExtrusionTranslateAnchor().isUndefined(),
                       @"fill-extrusion-translate-anchor should be unset initially.");
-        MGLStyleValue<NSValue *> *defaultStyleValue = layer.fillExtrusionTranslationAnchor;
+        NSExpression *defaultExpression = layer.fillExtrusionTranslationAnchor;
 
-        MGLStyleValue<NSValue *> *constantStyleValue = [MGLStyleValue<NSValue *> valueWithRawValue:[NSValue valueWithMGLFillExtrusionTranslationAnchor:MGLFillExtrusionTranslationAnchorViewport]];
-        layer.fillExtrusionTranslationAnchor = constantStyleValue;
+        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        layer.fillExtrusionTranslationAnchor = constantExpression;
         mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType> propertyValue = { mbgl::style::TranslateAnchorType::Viewport };
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
-                       @"Setting fillExtrusionTranslationAnchor to a constant value should update fill-extrusion-translate-anchor.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, constantStyleValue,
-                              @"fillExtrusionTranslationAnchor should round-trip constant values.");
+                       @"Setting fillExtrusionTranslationAnchor to a constant value expression should update fill-extrusion-translate-anchor.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, constantExpression,
+                              @"fillExtrusionTranslationAnchor should round-trip constant value expressions.");
 
-        MGLStyleValue<NSValue *> * functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval cameraStops:@{@18: constantStyleValue} options:nil];
-        layer.fillExtrusionTranslationAnchor = functionStyleValue;
+        constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        layer.fillExtrusionTranslationAnchor = functionExpression;
 
-        mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = { {{18, mbgl::style::TranslateAnchorType::Viewport}} };
+        mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = {{
+            { -INFINITY, mbgl::style::TranslateAnchorType::Viewport },
+            { 18, mbgl::style::TranslateAnchorType::Viewport },
+        }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
         
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
-                       @"Setting fillExtrusionTranslationAnchor to a camera function should update fill-extrusion-translate-anchor.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, functionStyleValue,
-                              @"fillExtrusionTranslationAnchor should round-trip camera functions.");
+                       @"Setting fillExtrusionTranslationAnchor to a camera expression should update fill-extrusion-translate-anchor.");
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, functionExpression,
+                              @"fillExtrusionTranslationAnchor should round-trip camera expressions.");
 
                               
 
         layer.fillExtrusionTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslateAnchor().isUndefined(),
                       @"Unsetting fillExtrusionTranslationAnchor should return fill-extrusion-translate-anchor to the default value.");
-        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, defaultStyleValue,
+        XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, defaultExpression,
                               @"fillExtrusionTranslationAnchor should return the default value after being unset.");
 
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeIdentity sourceStops:nil attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
-        functionStyleValue = [MGLStyleValue<NSValue *> valueWithInterpolationMode:MGLInterpolationModeInterval compositeStops:@{@18: constantStyleValue} attributeName:@"" options:nil];
-        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionStyleValue, NSException, NSInvalidArgumentException, @"MGLStyleValue should raise an exception if it is applied to a property that cannot support it");
+        functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        XCTAssertThrowsSpecificNamed(layer.fillExtrusionTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLFillExtrusionLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 }
 

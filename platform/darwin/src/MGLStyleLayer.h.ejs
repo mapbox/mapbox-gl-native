@@ -9,7 +9,6 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLStyleValue.h"
 #import "MGL<%-
 (type === 'background' ? '' :
  (type === 'raster' ? 'Foreground' :
@@ -120,10 +119,10 @@ which it is added.
 /**
 <%- propertyDoc(property.name, property, type, 'layout').wrap(80, 1) %>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% if (property.original) { %>
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) NSExpression *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 
 <% } -%>
 <% } -%>
@@ -135,7 +134,7 @@ which it is added.
 /**
 <%- propertyDoc(property.name, property, type, 'paint').wrap(80, 1) %>
  */
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(property.name) %>;
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } if (property.getter) { %>, getter=<%- objCGetter(property) -%><% } %>) NSExpression *<%- camelizeWithLeadingLowercase(property.name) %>;
 
 <% if (property["transition"]) { -%>
 /**
@@ -147,7 +146,7 @@ which it is added.
 
 <% } -%>
 <% if (property.original) { -%>
-@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) MGLStyleValue<<%- propertyType(property, true) %>> *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
+@property (nonatomic<% if (!property.required) { %>, null_resettable<% } %>) NSExpression *<%- camelizeWithLeadingLowercase(originalPropertyName(property)) %> __attribute__((unavailable("Use <%- camelizeWithLeadingLowercase(property.name) %> instead.")));
 
 <% } -%>
 <% } -%>

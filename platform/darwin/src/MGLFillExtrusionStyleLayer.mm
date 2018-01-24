@@ -77,21 +77,21 @@ namespace mbgl {
 
 #pragma mark - Accessing the Paint Attributes
 
-- (void)setFillExtrusionBase:(MGLStyleValue<NSNumber *> *)fillExtrusionBase {
+- (void)setFillExtrusionBase:(NSExpression *)fillExtrusionBase {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(fillExtrusionBase);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<float>>(fillExtrusionBase);
     self.rawLayer->setFillExtrusionBase(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)fillExtrusionBase {
+- (NSExpression *)fillExtrusionBase {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionBase();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillExtrusionBase());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionBase();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionBaseTransition:(MGLTransition )transition {
@@ -112,21 +112,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionColor:(MGLStyleValue<MGLColor *> *)fillExtrusionColor {
+- (void)setFillExtrusionColor:(NSExpression *)fillExtrusionColor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenPropertyValue(fillExtrusionColor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<mbgl::Color>>(fillExtrusionColor);
     self.rawLayer->setFillExtrusionColor(mbglValue);
 }
 
-- (MGLStyleValue<MGLColor *> *)fillExtrusionColor {
+- (NSExpression *)fillExtrusionColor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionColor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillExtrusionColor());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionColor();
     }
-    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionColorTransition:(MGLTransition )transition {
@@ -147,21 +147,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionHeight:(MGLStyleValue<NSNumber *> *)fillExtrusionHeight {
+- (void)setFillExtrusionHeight:(NSExpression *)fillExtrusionHeight {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenPropertyValue(fillExtrusionHeight);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<float>>(fillExtrusionHeight);
     self.rawLayer->setFillExtrusionHeight(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)fillExtrusionHeight {
+- (NSExpression *)fillExtrusionHeight {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionHeight();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(self.rawLayer->getDefaultFillExtrusionHeight());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionHeight();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toDataDrivenStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionHeightTransition:(MGLTransition )transition {
@@ -182,21 +182,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionOpacity:(MGLStyleValue<NSNumber *> *)fillExtrusionOpacity {
+- (void)setFillExtrusionOpacity:(NSExpression *)fillExtrusionOpacity {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toInterpolatablePropertyValue(fillExtrusionOpacity);
+    auto mbglValue = MGLStyleValueTransformer<float, NSNumber *>().toPropertyValue<mbgl::style::PropertyValue<float>>(fillExtrusionOpacity);
     self.rawLayer->setFillExtrusionOpacity(mbglValue);
 }
 
-- (MGLStyleValue<NSNumber *> *)fillExtrusionOpacity {
+- (NSExpression *)fillExtrusionOpacity {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionOpacity();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(self.rawLayer->getDefaultFillExtrusionOpacity());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionOpacity();
     }
-    return MGLStyleValueTransformer<float, NSNumber *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<float, NSNumber *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionOpacityTransition:(MGLTransition )transition {
@@ -217,21 +217,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionPattern:(MGLStyleValue<NSString *> *)fillExtrusionPattern {
+- (void)setFillExtrusionPattern:(NSExpression *)fillExtrusionPattern {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue(fillExtrusionPattern);
+    auto mbglValue = MGLStyleValueTransformer<std::string, NSString *>().toPropertyValue<mbgl::style::PropertyValue<std::string>>(fillExtrusionPattern);
     self.rawLayer->setFillExtrusionPattern(mbglValue);
 }
 
-- (MGLStyleValue<NSString *> *)fillExtrusionPattern {
+- (NSExpression *)fillExtrusionPattern {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionPattern();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(self.rawLayer->getDefaultFillExtrusionPattern());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionPattern();
     }
-    return MGLStyleValueTransformer<std::string, NSString *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::string, NSString *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionPatternTransition:(MGLTransition )transition {
@@ -252,21 +252,21 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionTranslation:(MGLStyleValue<NSValue *> *)fillExtrusionTranslation {
+- (void)setFillExtrusionTranslation:(NSExpression *)fillExtrusionTranslation {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toInterpolatablePropertyValue(fillExtrusionTranslation);
+    auto mbglValue = MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toPropertyValue<mbgl::style::PropertyValue<std::array<float, 2>>>(fillExtrusionTranslation);
     self.rawLayer->setFillExtrusionTranslate(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillExtrusionTranslation {
+- (NSExpression *)fillExtrusionTranslation {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionTranslate();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(self.rawLayer->getDefaultFillExtrusionTranslate());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionTranslate();
     }
-    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toStyleValue(propertyValue);
+    return MGLStyleValueTransformer<std::array<float, 2>, NSValue *>().toExpression(propertyValue);
 }
 
 - (void)setFillExtrusionTranslationTransition:(MGLTransition )transition {
@@ -287,34 +287,34 @@ namespace mbgl {
     return transition;
 }
 
-- (void)setFillExtrusionTranslate:(MGLStyleValue<NSValue *> *)fillExtrusionTranslate {
+- (void)setFillExtrusionTranslate:(NSExpression *)fillExtrusionTranslate {
 }
 
-- (MGLStyleValue<NSValue *> *)fillExtrusionTranslate {
+- (NSExpression *)fillExtrusionTranslate {
     return self.fillExtrusionTranslation;
 }
 
-- (void)setFillExtrusionTranslationAnchor:(MGLStyleValue<NSValue *> *)fillExtrusionTranslationAnchor {
+- (void)setFillExtrusionTranslationAnchor:(NSExpression *)fillExtrusionTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
-    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillExtrusionTranslationAnchor>().toEnumPropertyValue(fillExtrusionTranslationAnchor);
+    auto mbglValue = MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillExtrusionTranslationAnchor>().toPropertyValue<mbgl::style::PropertyValue<mbgl::style::TranslateAnchorType>>(fillExtrusionTranslationAnchor);
     self.rawLayer->setFillExtrusionTranslateAnchor(mbglValue);
 }
 
-- (MGLStyleValue<NSValue *> *)fillExtrusionTranslationAnchor {
+- (NSExpression *)fillExtrusionTranslationAnchor {
     MGLAssertStyleLayerIsValid();
 
     auto propertyValue = self.rawLayer->getFillExtrusionTranslateAnchor();
     if (propertyValue.isUndefined()) {
-        return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillExtrusionTranslationAnchor>().toEnumStyleValue(self.rawLayer->getDefaultFillExtrusionTranslateAnchor());
+        propertyValue = self.rawLayer->getDefaultFillExtrusionTranslateAnchor();
     }
-    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillExtrusionTranslationAnchor>().toEnumStyleValue(propertyValue);
+    return MGLStyleValueTransformer<mbgl::style::TranslateAnchorType, NSValue *, mbgl::style::TranslateAnchorType, MGLFillExtrusionTranslationAnchor>().toExpression(propertyValue);
 }
 
-- (void)setFillExtrusionTranslateAnchor:(MGLStyleValue<NSValue *> *)fillExtrusionTranslateAnchor {
+- (void)setFillExtrusionTranslateAnchor:(NSExpression *)fillExtrusionTranslateAnchor {
 }
 
-- (MGLStyleValue<NSValue *> *)fillExtrusionTranslateAnchor {
+- (NSExpression *)fillExtrusionTranslateAnchor {
     return self.fillExtrusionTranslationAnchor;
 }
 
