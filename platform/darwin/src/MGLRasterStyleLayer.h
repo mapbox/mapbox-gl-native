@@ -7,16 +7,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An `MGLRasterStyleLayer` is a style layer that renders raster tiles on the map.
+ An `MGLRasterStyleLayer` is a style layer that renders georeferenced raster
+ imagery on the map, especially raster tiles.
  
  Use a raster style layer to configure the color parameters of raster tiles
- loaded by an `MGLRasterSource` object. For example, you could use a raster
- style layer to render <a href="https://www.mapbox.com/satellite/">Mapbox
- Satellite</a> imagery, a <a
+ loaded by an `MGLRasterSource` object or raster images loaded by an
+ `MGLImageSource` object. For example, you could use a raster style layer to
+ render <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a>
+ imagery, a <a
  href="https://www.mapbox.com/help/define-tileset/#raster-tilesets">raster tile
  set</a> uploaded to Mapbox Studio, or a raster map authored in <a
  href="https://tilemill-project.github.io/tilemill/">TileMill</a>, the classic
  Mapbox Editor, or Mapbox Studio Classic.
+ 
+ Raster images may also be used as icons or patterns in a style layer. To
+ register an image for use as an icon or pattern, use the `-[MGLStyle
+ setImage:forName:]` method. To configure a point annotation’s image, use the
+ `MGLAnnotationImage` class.
 
  You can access an existing raster style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
