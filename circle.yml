@@ -4,6 +4,7 @@ workflows:
   version: 2
   default:
     jobs:
+      - nitpick
       - clang-tidy:
           filters:
             branches:
@@ -217,6 +218,47 @@ step-library:
         destination: render-tests
 
 jobs:
+  nitpick:
+    docker:
+      - image: mbgl/7d2403f42e:base
+    working_directory: /src
+    environment:
+      LIBSYSCONFCPUS: 4
+      JOBS: 4
+      BUILDTYPE: Debug
+    steps:
+      - checkout
+      - *generate-cache-key
+      - *restore-cache
+      - run:
+          name: Initialize submodule
+          command: git submodule update --init mapbox-gl-js
+      - run:
+          name: npm install
+          command: npm install --ignore-scripts
+      - *save-cache
+      - run:
+          name: Verify submodule pin
+          command: scripts/nitpick/submodule-pin.js
+          when: always
+      - run:
+          name: CMake file list generation
+          command: scripts/nitpick/generated-code.js cmake
+          when: always
+      - run:
+          name: Shader code generation
+          command: scripts/nitpick/generated-code.js shader
+          when: always
+      - run:
+          name: Style code generation
+          command: scripts/nitpick/generated-code.js style
+          when: always
+      - run:
+          name: Android code generation
+          command: scripts/nitpick/generated-code.js android
+          when: always
+
+
 # ------------------------------------------------------------------------------
   clang-tidy:
     docker:
@@ -685,6 +727,9 @@ jobs:
       - run:
           name: Lint plist files
           command: make ios-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
 
@@ -744,6 +789,9 @@ jobs:
       - run:
           name: Lint plist files
           command: make macos-lint
+      - run:
+          name: Nitpick Darwin code generation
+          command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
       - store_artifacts:

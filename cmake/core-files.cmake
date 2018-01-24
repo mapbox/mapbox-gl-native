@@ -1,4 +1,4 @@
-# Do not edit. Regenerate this with ./scripts/generate-core-files.sh
+# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
 
 set(MBGL_CORE_FILES
     # actor
@@ -740,4 +740,5 @@ set(MBGL_CORE_FILES
     src/mbgl/util/version.cpp
     src/mbgl/util/version.hpp
     src/mbgl/util/work_request.cpp
+
 )

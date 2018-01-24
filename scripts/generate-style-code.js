@@ -1,8 +1,9 @@
+#!/usr/bin/env node
 'use strict';
 
 const fs = require('fs');
 const ejs = require('ejs');
-const spec = require('../mapbox-gl-js/src/style-spec/reference/v8');
+const spec = require('./style-spec');
 const colorParser = require('csscolorparser');
 
 require('./style-code');

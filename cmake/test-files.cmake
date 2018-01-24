@@ -1,4 +1,4 @@
-# Do not edit. Regenerate this with ./scripts/generate-test-files.sh
+# This file is generated. Do not edit. Regenerate this with scripts/generate-cmake-files.js
 
 set(MBGL_TEST_FILES
     # actor
@@ -29,9 +29,6 @@ set(MBGL_TEST_FILES
     test/gl/context.test.cpp
     test/gl/object.test.cpp
 
-    # include/mbgl
-    test/include/mbgl/test.hpp
-
     # map
     test/map/map.test.cpp
     test/map/prefetch.test.cpp
@@ -55,7 +52,49 @@ set(MBGL_TEST_FILES
     test/sprite/sprite_loader.test.cpp
     test/sprite/sprite_parser.test.cpp
 
-    # src/mbgl/test
+    # storage
+    test/storage/asset_file_source.test.cpp
+    test/storage/default_file_source.test.cpp
+    test/storage/headers.test.cpp
+    test/storage/http_file_source.test.cpp
+    test/storage/local_file_source.test.cpp
+    test/storage/offline.test.cpp
+    test/storage/offline_database.test.cpp
+    test/storage/offline_download.test.cpp
+    test/storage/online_file_source.test.cpp
+    test/storage/resource.test.cpp
+    test/storage/sqlite.test.cpp
+
+    # style
+    test/style/filter.test.cpp
+    test/style/properties.test.cpp
+    test/style/source.test.cpp
+    test/style/style.test.cpp
+    test/style/style_image.test.cpp
+    test/style/style_layer.test.cpp
+    test/style/style_parser.test.cpp
+
+    # style/conversion
+    test/style/conversion/function.test.cpp
+    test/style/conversion/geojson_options.test.cpp
+    test/style/conversion/layer.test.cpp
+    test/style/conversion/light.test.cpp
+    test/style/conversion/stringify.test.cpp
+    test/style/conversion/tileset.test.cpp
+
+    # style/expression
+    test/style/expression/expression.test.cpp
+    test/style/expression/util.test.cpp
+
+    # style/function
+    test/style/function/camera_function.test.cpp
+    test/style/function/composite_function.test.cpp
+    test/style/function/exponential_stops.test.cpp
+    test/style/function/interval_stops.test.cpp
+    test/style/function/source_function.test.cpp
+
+    # test
+    test/include/mbgl/test.hpp
     test/src/mbgl/test/fake_file_source.hpp
     test/src/mbgl/test/fixture_log_observer.cpp
     test/src/mbgl/test/fixture_log_observer.hpp
@@ -71,49 +110,6 @@ set(MBGL_TEST_FILES
     test/src/mbgl/test/test.cpp
     test/src/mbgl/test/util.cpp
     test/src/mbgl/test/util.hpp
-
-    # storage
-    test/storage/asset_file_source.test.cpp
-    test/storage/default_file_source.test.cpp
-    test/storage/headers.test.cpp
-    test/storage/http_file_source.test.cpp
-    test/storage/local_file_source.test.cpp
-    test/storage/offline.test.cpp
-    test/storage/offline_database.test.cpp
-    test/storage/offline_download.test.cpp
-    test/storage/online_file_source.test.cpp
-    test/storage/resource.test.cpp
-    test/storage/sqlite.test.cpp
-
-    # style/conversion
-    test/style/conversion/function.test.cpp
-    test/style/conversion/geojson_options.test.cpp
-    test/style/conversion/layer.test.cpp
-    test/style/conversion/light.test.cpp
-    test/style/conversion/stringify.test.cpp
-    test/style/conversion/tileset.test.cpp
-
-    # style/expression
-    test/style/expression/expression.test.cpp
-    test/style/expression/util.test.cpp
-
-    # style
-    test/style/filter.test.cpp
-
-    # style/function
-    test/style/function/camera_function.test.cpp
-    test/style/function/composite_function.test.cpp
-    test/style/function/exponential_stops.test.cpp
-    test/style/function/interval_stops.test.cpp
-    test/style/function/source_function.test.cpp
-
-    # style
-    test/style/properties.test.cpp
-    test/style/source.test.cpp
-    test/style/style.test.cpp
-    test/style/style_image.test.cpp
-    test/style/style_layer.test.cpp
-    test/style/style_parser.test.cpp
 
     # text
     test/text/cross_tile_symbol_index.test.cpp
@@ -156,4 +152,5 @@ set(MBGL_TEST_FILES
     test/util/token.test.cpp
     test/util/unique_any.test.cpp
     test/util/url.test.cpp
+
 )
