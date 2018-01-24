@@ -256,6 +256,35 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "clouds"))
     }
 
+    func testMGLHillshadeStyleLayer() {
+        // TODO: Replace this source with a raster DEM source.
+        let source = MGLRasterSource(identifier: "dem", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+            .minimumZoomLevel: 9,
+            .maximumZoomLevel: 16,
+            .tileSize: 512,
+            .attributionInfos: [
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+            ]
+        ])
+        mapView.style?.addSource(source)
+        
+        let canals = MGLVectorSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
+        mapView.style?.addSource(canals)
+        let canalShadowLayer = MGLLineStyleLayer(identifier: "waterway-river-canal-shadow", source: canals)
+        mapView.style?.addLayer(canalShadowLayer)
+
+        //#-example-code
+        let layer = MGLHillshadeStyleLayer(identifier: "hills", source: source)
+        layer.hillshadeExaggeration = NSExpression(forConstantValue: 0.6)
+        if let canalShadowLayer = mapView.style?.layer(withIdentifier: "waterway-river-canal-shadow") {
+            mapView.style?.insertLayer(layer, below: canalShadowLayer)
+        }
+        //#-end-example-code
+
+        // TODO: Uncomment this assertion once raster DEM sources are implemented.
+//        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "hills"))
+    }
+
     func testMGLVectorStyleLayer$predicate() {
         let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(terrain)

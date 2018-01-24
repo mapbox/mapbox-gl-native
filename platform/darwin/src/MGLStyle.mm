@@ -8,6 +8,7 @@
 #import "MGLLineStyleLayer.h"
 #import "MGLCircleStyleLayer.h"
 #import "MGLSymbolStyleLayer.h"
+#import "MGLHillshadeStyleLayer.h"
 #import "MGLRasterStyleLayer.h"
 #import "MGLBackgroundStyleLayer.h"
 #import "MGLOpenGLStyleLayer.h"
@@ -397,6 +398,8 @@ static NSURL *MGLStyleURL_trafficNight;
         return [[MGLRasterStyleLayer alloc] initWithRawLayer:rasterLayer];
     } else if (auto circleLayer = rawLayer->as<mbgl::style::CircleLayer>()) {
         return [[MGLCircleStyleLayer alloc] initWithRawLayer:circleLayer];
+    } else if (auto hillshadeLayer = rawLayer->as<mbgl::style::HillshadeLayer>()) {
+        return [[MGLHillshadeStyleLayer alloc] initWithRawLayer:circleLayer];
     } else if (auto backgroundLayer = rawLayer->as<mbgl::style::BackgroundLayer>()) {
         return [[MGLBackgroundStyleLayer alloc] initWithRawLayer:backgroundLayer];
     } else if (auto customLayer = rawLayer->as<mbgl::style::CustomLayer>()) {

@@ -23,7 +23,7 @@
     return @"<%- type %>";
 }
 
-<% if (type !== 'background' && type !== 'raster') { -%>
+<% if (type !== 'background' && type !== 'raster' && type !== 'hillshade') { -%>
 - (void)testPredicates {
     MGLPointFeature *feature = [[MGLPointFeature alloc] init];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];

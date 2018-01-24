@@ -2,7 +2,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLVectorStyleLayer.h"
+#import "MGLForegroundStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -36,10 +36,15 @@ typedef NS_ENUM(NSUInteger, MGLHillshadeIlluminationAnchor) {
  ### Example
 
  ```swift
+ let layer = MGLHillshadeStyleLayer(identifier: "hills", source: source)
+ layer.hillshadeExaggeration = NSExpression(forConstantValue: 0.6)
+ if let canalShadowLayer = mapView.style?.layer(withIdentifier: "waterway-river-canal-shadow") {
+     mapView.style?.insertLayer(layer, below: canalShadowLayer)
+ }
  ```
  */
 MGL_EXPORT
-@interface MGLHillshadeStyleLayer : MGLVectorStyleLayer
+@interface MGLHillshadeStyleLayer : MGLForegroundStyleLayer
 
 /**
  Returns a hillshade style layer initialized with an identifier and source.
