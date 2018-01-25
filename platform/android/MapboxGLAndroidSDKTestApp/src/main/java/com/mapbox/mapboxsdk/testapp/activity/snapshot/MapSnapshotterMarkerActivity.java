@@ -9,12 +9,14 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.ViewTreeObserver;
 import android.widget.ImageView;
+
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshot;
 import com.mapbox.mapboxsdk.snapshotter.MapSnapshotter;
 import com.mapbox.mapboxsdk.testapp.R;
+
 import timber.log.Timber;
 
 /**
@@ -72,9 +74,10 @@ public class MapSnapshotterMarkerActivity extends AppCompatActivity implements M
     // Dom toren
     PointF markerLocation = snapshot.pixelForLatLng(new LatLng(52.090649433011315, 5.121310651302338));
     canvas.drawBitmap(marker,
-      markerLocation.x,
-      /* Subtract height (in dp) so the bottom of the marker aligns correctly */
-      markerLocation.y - (marker.getHeight() / getResources().getDisplayMetrics().density),
+      /* Subtract half of the width so we center the bitmap correctly */
+      markerLocation.x - marker.getWidth() / 2,
+      /* Subtract half of the height so we align the bitmap bottom correctly */
+      markerLocation.y - marker.getHeight() / 2,
       null
     );
     return snapshot.getBitmap();
