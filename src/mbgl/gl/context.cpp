@@ -249,9 +249,10 @@ UniqueTexture Context::createTexture() {
 
 bool Context::supportsVertexArrays() const {
     static bool blacklisted = []() {
-        // Blacklist Adreno 3xx as it crashes on glBuffer(Sub)Data
+        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
         const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-        return renderer.find("Adreno (TM) 3") != std::string::npos;
+        return renderer.find("Adreno (TM) 2") != std::string::npos
+         || renderer.find("Adreno (TM) 3") != std::string::npos;
     }();
 
     return !blacklisted &&
