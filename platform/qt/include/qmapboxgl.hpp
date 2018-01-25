@@ -226,6 +226,11 @@ public:
 
     void setFilter(const QString &layer, const QVariant &filter);
 
+    // When rendering on a different thread,
+    // should be called on this thread
+    void createRenderer();
+    void destroyRenderer();
+
 public slots:
     void render();
     void connectionEstablished();
