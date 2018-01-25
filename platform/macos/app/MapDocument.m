@@ -50,6 +50,25 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     return flattenedShapes;
 }
 
+@interface MGLVectorSource (MBXAdditions)
+
+@property (nonatomic, readonly, getter=isMapboxTerrain) BOOL mapboxTerrain;
+
+@end
+
+@implementation MGLVectorSource (MBXAdditions)
+
+- (BOOL)isMapboxTerrain {
+    NSURL *url = self.configurationURL;
+    if (![url.scheme isEqualToString:@"mapbox"]) {
+        return NO;
+    }
+    NSArray *identifiers = [url.host componentsSeparatedByString:@","];
+    return [identifiers containsObject:@"mapbox.mapbox-terrain-v2"] || [identifiers containsObject:@"mapbox.mapbox-terrain-v1"];
+}
+
+@end
+
 @interface MapDocument () <NSWindowDelegate, NSSharingServicePickerDelegate, NSMenuDelegate, NSSplitViewDelegate, MGLMapViewDelegate, MGLComputedShapeSourceDataSource>
 
 @property (weak) IBOutlet NSArrayController *styleLayersArrayController;
@@ -739,6 +758,49 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     [self.mapView.style removeSource:source];
 }
 
+- (IBAction)enhanceTerrain:(id)sender {
+    // Find all the identifiers of Mapbox Terrain sources used in the style.
+    NSMutableSet *terrainSourceIdentifiers = [NSMutableSet set];
+    for (MGLVectorSource *source in self.mapView.style.sources) {
+        if (![source isKindOfClass:[MGLVectorSource class]]) {
+            continue;
+        }
+        
+        if (source.mapboxTerrain) {
+            [terrainSourceIdentifiers addObject:source.identifier];
+        }
+    }
+    
+    // Find and remove all the style layers using those sources.
+    NSUInteger hillshadeIndex = NSNotFound;
+    NSEnumerator *layerEnumerator = self.mapView.style.layers.objectEnumerator;
+    MGLVectorStyleLayer *layer;
+    for (NSUInteger i = 0; (layer = layerEnumerator.nextObject); i++) {
+        if (![layer isKindOfClass:[MGLVectorStyleLayer class]]) {
+            continue;
+        }
+        
+        if ([terrainSourceIdentifiers containsObject:layer.sourceIdentifier]
+            && [layer.sourceLayerIdentifier isEqualToString:@"hillshade"]) {
+            hillshadeIndex = i;
+            [self.mapView.style removeLayer:layer];
+        }
+    }
+    
+    if (hillshadeIndex == NSNotFound) {
+        return;
+    }
+    
+    // Add a Mapbox Terrain-RGB source.
+    NSURL *terrainRGBURL = [NSURL URLWithString:@"mapbox://mapbox.terrain-rgb"];
+    MGLRasterDEMSource *terrainRGBSource = [[MGLRasterDEMSource alloc] initWithIdentifier:@"terrain" configurationURL:terrainRGBURL];
+    [self.mapView.style addSource:terrainRGBSource];
+    
+    // Insert a hillshade layer where the Mapbox Terrain–based layers were.
+    MGLHillshadeStyleLayer *hillshadeLayer = [[MGLHillshadeStyleLayer alloc] initWithIdentifier:@"hillshade" source:terrainRGBSource];
+    [self.mapView.style insertLayer:hillshadeLayer atIndex:hillshadeIndex];
+}
+
 #pragma mark Offline packs
 
 - (IBAction)addOfflinePack:(id)sender {
@@ -1057,6 +1119,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
+    }
+    if (menuItem.action == @selector(enhanceTerrain:)) {
+        return YES;
     }
     if (menuItem.action == @selector(startWorldTour:)) {
         return !_isTouringWorld;

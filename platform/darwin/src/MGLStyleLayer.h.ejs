@@ -11,7 +11,7 @@
 #import "MGLFoundation.h"
 #import "MGL<%-
 (type === 'background' ? '' :
- (type === 'raster' ? 'Foreground' :
+ (type === 'raster' || type === 'hillshade' ? 'Foreground' :
   'Vector'))
 %>StyleLayer.h"
 
@@ -78,7 +78,7 @@ typedef NS_ENUM(NSUInteger, MGL<%- camelize(property.name) %>) {
 MGL_EXPORT
 @interface MGL<%- camelize(type) %>StyleLayer : MGL<%-
 (type === 'background' ? '' :
- (type === 'raster' ? 'Foreground' :
+ (type === 'raster' || type === 'hillshade' ? 'Foreground' :
   'Vector'))
 %>StyleLayer
 <% if (type === 'background') { -%>

@@ -2,7 +2,7 @@
 // Edit platform/darwin/scripts/generate-style-code.js, then run `make darwin-style-code`.
 
 #import "MGLFoundation.h"
-#import "MGLVectorStyleLayer.h"
+#import "MGLForegroundStyleLayer.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -24,8 +24,20 @@ typedef NS_ENUM(NSUInteger, MGLHillshadeIlluminationAnchor) {
 };
 
 /**
- Client-side hillshading visualization based on DEM data. Currently, the
- implementation only supports Mapbox Terrain RGB tiles
+ An `MGLHillshadeStyleLayer` is a style layer that renders raster <a
+ href="https://en.wikipedia.org/wiki/Digital_elevation_model">digital elevation
+ model</a> (DEM) tiles on the map.
+ 
+ Use a hillshade style layer to configure the color parameters of raster tiles
+ loaded by an `MGLRasterDEMSource` object. For example, you could use a
+ hillshade style layer to render <a
+ href="https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb">Mapbox
+ Terrain-RGB</a> data.
+ 
+ To display posterized hillshading based on vector shapes, as with the <a
+ href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
+ source, use an `MGLVectorSource` object in conjunction with several
+ `MGLFillStyleLayer` objects.
 
  You can access an existing hillshade style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -36,10 +48,15 @@ typedef NS_ENUM(NSUInteger, MGLHillshadeIlluminationAnchor) {
  ### Example
 
  ```swift
+ let layer = MGLHillshadeStyleLayer(identifier: "hills", source: source)
+ layer.hillshadeExaggeration = NSExpression(forConstantValue: 0.6)
+ if let canalShadowLayer = mapView.style?.layer(withIdentifier: "waterway-river-canal-shadow") {
+     mapView.style?.insertLayer(layer, below: canalShadowLayer)
+ }
  ```
  */
 MGL_EXPORT
-@interface MGLHillshadeStyleLayer : MGLVectorStyleLayer
+@interface MGLHillshadeStyleLayer : MGLForegroundStyleLayer
 
 /**
  Returns a hillshade style layer initialized with an identifier and source.
