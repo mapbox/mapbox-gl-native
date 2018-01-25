@@ -11,7 +11,7 @@ namespace mbgl {
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_color_ramp);
-}
+} // namespace heatmap
 
 class HeatmapTextureProgram : public Program<
     shaders::heatmap_texture,
