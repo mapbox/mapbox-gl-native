@@ -22,7 +22,7 @@ import java.lang.annotation.RetentionPolicy;
  */
 public class MyBearingTracking {
 
-  @IntDef( {NONE, COMPASS, GPS})
+  @IntDef( {NONE, COMPASS, GPS, GPS_NORTH_FACING})
   @Retention(RetentionPolicy.SOURCE)
   public @interface Mode {
   }
@@ -41,5 +41,10 @@ public class MyBearingTracking {
    * Tracking the bearing of the user based on GPS data
    */
   public static final int GPS = 0x00000008;
+
+  /**
+   * Tracking the bearing of the user based on GPS data, but camera always faces north direction
+   */
+  public static final int GPS_NORTH_FACING = 0x0000000B;
 
 }
