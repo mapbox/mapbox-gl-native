@@ -103,6 +103,23 @@ TEST(StyleParser, FontStacks) {
     ASSERT_EQ(FontStack({"a", "b", "c"}), result[2]);
 }
 
+TEST(StyleParser, FontStacksNoTextField) {
+    style::Parser parser;
+    parser.parse(R"({
+        "version": 8,
+        "layers": [{
+            "id": "symbol",
+            "type": "symbol",
+            "source": "vector",
+            "layout": {
+                "text-font": ["a"]
+            }
+        }]
+    })");
+    auto result = parser.fontStacks();
+    ASSERT_EQ(0u, result.size());
+}
+
 TEST(StyleParser, FontStacksCaseExpression) {
     style::Parser parser;
     parser.parse(R"({
@@ -112,6 +129,7 @@ TEST(StyleParser, FontStacksCaseExpression) {
             "type": "symbol",
             "source": "vector",
             "layout": {
+                "text-field": "a",
                 "text-font": ["case", ["==", "a", ["string", ["get", "text-font"]]], ["literal", ["Arial"]], ["literal", ["Helvetica"]]]
             }
         }]
@@ -131,6 +149,7 @@ TEST(StyleParser, FontStacksMatchExpression) {
             "type": "symbol",
             "source": "vector",
             "layout": {
+                "text-field": "a",
                 "text-font": ["match", ["get", "text-font"], "a", ["literal", ["Arial"]], ["literal", ["Helvetica"]]]
             }
         }]
@@ -150,6 +169,7 @@ TEST(StyleParser, FontStacksStepExpression) {
             "type": "symbol",
             "source": "vector",
             "layout": {
+                "text-field": "a",
                 "text-font": ["array", "string", ["step", ["get", "text-font"], ["literal", ["Arial"]], 0, ["literal", ["Helvetica"]]]]
             }
         }]
@@ -170,6 +190,7 @@ TEST(StyleParser, FontStacksGetExpression) {
             "type": "symbol",
             "source": "vector",
             "layout": {
+                "text-field": "a",
                 "text-font": ["array", "string", ["get", "text-font"]]
             }
         }]

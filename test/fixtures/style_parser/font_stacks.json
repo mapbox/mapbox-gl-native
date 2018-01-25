@@ -12,6 +12,7 @@
     "source": "source",
     "source-layer": "source-layer",
     "layout": {
+      "text-field": "a",
       "text-font": ["a"]
     }
   }, {
@@ -20,6 +21,7 @@
     "source": "source",
     "source-layer": "source-layer",
     "layout": {
+      "text-field": "a",
       "text-font": {
         "stops": [[0, ["a", "b"]]]
       }
@@ -30,6 +32,7 @@
     "source": "source",
     "source-layer": "source-layer",
     "layout": {
+      "text-field": "a",
       "text-font": {
         "stops": [[0, ["a", "b"]], [1, ["a", "b", "c"]]]
       }
