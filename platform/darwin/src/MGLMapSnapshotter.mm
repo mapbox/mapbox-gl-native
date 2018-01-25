@@ -76,7 +76,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
 - (CGPoint)pointForCoordinate:(CLLocationCoordinate2D)coordinate
 {
     mbgl::ScreenCoordinate sc = _pointForFn(MGLLatLngFromLocationCoordinate2D(coordinate));
-    return CGPointMake(sc.x * self.scale, sc.y * self.scale);
+    return CGPointMake(sc.x, sc.y);
 }
 @end
 

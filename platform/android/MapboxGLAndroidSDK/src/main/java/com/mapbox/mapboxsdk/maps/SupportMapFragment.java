@@ -68,7 +68,6 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     super.onCreateView(inflater, container, savedInstanceState);
     Context context = inflater.getContext();
     map = new MapView(context, MapFragmentUtils.resolveArgs(context, getArguments()));
-    map.setVisibility(View.INVISIBLE);
     return map;
   }
 
@@ -91,7 +90,6 @@ public class SupportMapFragment extends Fragment implements OnMapReadyCallback {
     for (OnMapReadyCallback onMapReadyCallback : mapReadyCallbackList) {
       onMapReadyCallback.onMapReady(mapboxMap);
     }
-    map.setVisibility(View.VISIBLE);
   }
 
   /**
