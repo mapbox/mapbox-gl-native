@@ -46,35 +46,6 @@ namespace mbgl {
     return @(self.rawLayer->getSourceID().c_str());
 }
 
-- (NSString *)sourceLayerIdentifier
-{
-    MGLAssertStyleLayerIsValid();
-
-    auto layerID = self.rawLayer->getSourceLayer();
-    return layerID.empty() ? nil : @(layerID.c_str());
-}
-
-- (void)setSourceLayerIdentifier:(NSString *)sourceLayerIdentifier
-{
-    MGLAssertStyleLayerIsValid();
-
-    self.rawLayer->setSourceLayer(sourceLayerIdentifier.UTF8String ?: "");
-}
-
-- (void)setPredicate:(NSPredicate *)predicate
-{
-    MGLAssertStyleLayerIsValid();
-
-    self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::NullFilter());
-}
-
-- (NSPredicate *)predicate
-{
-    MGLAssertStyleLayerIsValid();
-
-    return [NSPredicate mgl_predicateWithFilter:self.rawLayer->getFilter()];
-}
-
 #pragma mark - Accessing the Paint Attributes
 
 - (void)setHillshadeAccentColor:(NSExpression *)hillshadeAccentColor {

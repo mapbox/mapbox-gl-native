@@ -88,6 +88,26 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
 
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "clouds"))
     }
+    
+    func testMGLRasterDEMSource() {
+        // We want to use mapbox.terrain-rgb in the example, but using a mapbox:
+        // URL requires setting an access token. So this identically named
+        // subclass of MGLRasterDEMSource swaps in a nonexistent URL.
+        class MGLRasterDEMSource: Mapbox.MGLRasterDEMSource {
+            override init(identifier: String, configurationURL: URL, tileSize: CGFloat = 256) {
+                let bogusURL = URL(string: "https://example.com/raster-rgb.json")!
+                super.init(identifier: identifier, configurationURL: bogusURL, tileSize: tileSize)
+            }
+        }
+        
+        //#-example-code
+        let terrainRGBURL = URL(string: "mapbox://mapbox.terrain-rgb")!
+        let source = MGLRasterDEMSource(identifier: "hills", configurationURL: terrainRGBURL)
+        mapView.style?.addSource(source)
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.source(withIdentifier: "hills"))
+    }
 
     func testMGLVectorSource() {
         //#-example-code
@@ -254,6 +274,33 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
 
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "clouds"))
+    }
+
+    func testMGLHillshadeStyleLayer() {
+        let source = MGLRasterDEMSource(identifier: "dem", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
+            .minimumZoomLevel: 9,
+            .maximumZoomLevel: 16,
+            .tileSize: 256,
+            .attributionInfos: [
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+            ]
+        ])
+        mapView.style?.addSource(source)
+        
+        let canals = MGLVectorSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
+        mapView.style?.addSource(canals)
+        let canalShadowLayer = MGLLineStyleLayer(identifier: "waterway-river-canal-shadow", source: canals)
+        mapView.style?.addLayer(canalShadowLayer)
+
+        //#-example-code
+        let layer = MGLHillshadeStyleLayer(identifier: "hills", source: source)
+        layer.hillshadeExaggeration = NSExpression(forConstantValue: 0.6)
+        if let canalShadowLayer = mapView.style?.layer(withIdentifier: "waterway-river-canal-shadow") {
+            mapView.style?.insertLayer(layer, below: canalShadowLayer)
+        }
+        //#-end-example-code
+
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "hills"))
     }
 
     func testMGLVectorStyleLayer$predicate() {

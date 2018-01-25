@@ -31,7 +31,10 @@
     if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
         return [NSImage imageNamed:@"symbol"];
     }
-
+    if ([layer isKindOfClass:[MGLHillshadeStyleLayer class]]) {
+        return [NSImage imageNamed:@"hillshade"];
+    }
+    
     return nil;
 }
 

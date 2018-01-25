@@ -68,6 +68,7 @@ custom_categories:
       - MGLShapeSource
       - MGLComputedShapeSource
       - MGLRasterSource
+      - MGLRasterDEMSource
       - MGLVectorSource
   - name: Style Layers
     children:
@@ -79,6 +80,7 @@ custom_categories:
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
       - MGLFillExtrusionStyleLayer
+      - MGLHillshadeStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
   - name: Offline Maps

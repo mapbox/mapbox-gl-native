@@ -11,10 +11,11 @@ NS_ASSUME_NONNULL_BEGIN
  `MGLForegroundStyleLayer` is an abstract superclass for style layers whose
  content is defined by an `MGLSource` object.
 
- Create instances of `MGLRasterStyleLayer` and the concrete subclasses of
- `MGLVectorStyleLayer` in order to use `MGLForegroundStyleLayer`'s methods.
- Do not create instances of `MGLForegroundStyleLayer` directly, and do not
- create your own subclasses of this class.
+ Create instances of `MGLRasterStyleLayer`, `MGLHillshadeStyleLayer`, and the
+ concrete subclasses of `MGLVectorStyleLayer` in order to use
+ `MGLForegroundStyleLayer`'s methods. Do not create instances of
+ `MGLForegroundStyleLayer` directly, and do not create your own subclasses of
+ this class.
  */
 MGL_EXPORT
 @interface MGLForegroundStyleLayer : MGLStyleLayer

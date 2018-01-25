@@ -18,24 +18,6 @@
     return @"hillshade";
 }
 
-- (void)testPredicates {
-    MGLPointFeature *feature = [[MGLPointFeature alloc] init];
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
-    MGLHillshadeStyleLayer *layer = [[MGLHillshadeStyleLayer alloc] initWithIdentifier:@"layerID" source:source];
-
-    XCTAssertNil(layer.sourceLayerIdentifier);
-    layer.sourceLayerIdentifier = @"layerID";
-    XCTAssertEqualObjects(layer.sourceLayerIdentifier, @"layerID");
-    layer.sourceLayerIdentifier = nil;
-    XCTAssertNil(layer.sourceLayerIdentifier);
-
-    XCTAssertNil(layer.predicate);
-    layer.predicate = [NSPredicate predicateWithValue:NO];
-    XCTAssertEqualObjects(layer.predicate, [NSPredicate predicateWithValue:NO]);
-    layer.predicate = nil;
-    XCTAssertNil(layer.predicate);
-}
-
 - (void)testProperties {
     MGLPointFeature *feature = [[MGLPointFeature alloc] init];
     MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"sourceID" shape:feature options:nil];
