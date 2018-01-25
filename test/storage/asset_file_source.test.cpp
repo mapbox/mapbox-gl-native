@@ -69,6 +69,15 @@ TEST(AssetFileSource, Load) {
     loop.run();
 }
 
+TEST(AssetFileSource, AcceptsURL) {
+    EXPECT_TRUE(AssetFileSource::acceptsURL("asset://empty"));
+    EXPECT_TRUE(AssetFileSource::acceptsURL("asset:///test"));
+    EXPECT_FALSE(AssetFileSource::acceptsURL("assds://foo"));
+    EXPECT_FALSE(AssetFileSource::acceptsURL("asset:"));
+    EXPECT_FALSE(AssetFileSource::acceptsURL("style.json"));
+    EXPECT_FALSE(AssetFileSource::acceptsURL(""));
+}
+
 TEST(AssetFileSource, EmptyFile) {
     util::RunLoop loop;
 
@@ -112,6 +121,23 @@ TEST(AssetFileSource, NonExistentFile) {
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         ASSERT_FALSE(res.data.get());
         // Do not assert on platform-specific error message.
+        loop.stop();
+    });
+
+    loop.run();
+}
+
+TEST(AssetFileSource, InvalidURL) {
+    util::RunLoop loop;
+
+    AssetFileSource fs("test/fixtures/storage/assets");
+
+    std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, "test://wrong-scheme" }, [&](Response res) {
+        req.reset();
+        ASSERT_NE(nullptr, res.error);
+        EXPECT_EQ(Response::Error::Reason::Other, res.error->reason);
+        EXPECT_EQ("Invalid asset URL", res.error->message);
+        ASSERT_FALSE(res.data.get());
         loop.stop();
     });
 
