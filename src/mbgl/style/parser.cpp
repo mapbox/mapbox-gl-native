@@ -277,7 +277,7 @@ std::vector<FontStack> Parser::fontStacks() const {
     std::set<FontStack> result;
 
     for (const auto& layer : layers) {
-        if (layer->is<SymbolLayer>()) {
+        if (layer->is<SymbolLayer>() && !layer->as<SymbolLayer>()->getTextField().isUndefined()) {
             layer->as<SymbolLayer>()->getTextFont().match(
                 [&] (Undefined) {
                     result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
