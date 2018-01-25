@@ -62,9 +62,10 @@ public:
     gl::StencilMode stencilModeForClipping(const ClipID&) const;
     gl::ColorMode colorModeForRenderPass() const;
 
-    mat4 matrixForTile(const UnwrappedTileID&);
+    mat4 matrixForTile(const UnwrappedTileID&, bool aligned = false) const;
 
     mat4 projMatrix;
+    mat4 alignedProjMatrix;
     mat4 nearClippedProjMatrix;
 
     int numSublayers = 3;

@@ -41,7 +41,7 @@ void RenderImageSource::startRender(PaintParameters& parameters) {
         mat4 matrix;
         matrix::identity(matrix);
         parameters.state.matrixFor(matrix, tileIds[i]);
-        matrix::multiply(matrix, parameters.projMatrix, matrix);
+        matrix::multiply(matrix, parameters.alignedProjMatrix, matrix);
         matrices.push_back(matrix);
     }
 

@@ -137,13 +137,13 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
 
             if (bucket.vertexBuffer && bucket.indexBuffer && !bucket.segments.empty()) {
                 // Draw only the parts of the tile that aren't drawn by another tile in the layer.
-                draw(tile.matrix,
+                draw(parameters.matrixForTile(tile.id, true),
                      *bucket.vertexBuffer,
                      *bucket.indexBuffer,
                      bucket.segments);
             } else {
                 // Draw the full tile.
-                draw(tile.matrix,
+                draw(parameters.matrixForTile(tile.id, true),
                      parameters.staticData.rasterVertexBuffer,
                      parameters.staticData.quadTriangleIndexBuffer,
                      parameters.staticData.rasterSegments);
