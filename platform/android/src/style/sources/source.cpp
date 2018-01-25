@@ -28,6 +28,7 @@
 #include "unknown_source.hpp"
 #include "vector_source.hpp"
 #include "custom_geometry_source.hpp"
+#include "raster_dem_source.hpp"
 
 namespace mbgl {
 namespace android {
@@ -155,6 +156,7 @@ namespace android {
         UnknownSource::registerNative(env);
         VectorSource::registerNative(env);
         CustomGeometrySource::registerNative(env);
+        RasterDEMSource::registerNative(env);
     }
 
 } // namespace android
