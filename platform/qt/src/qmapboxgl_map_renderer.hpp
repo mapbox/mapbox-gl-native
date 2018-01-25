@@ -48,4 +48,6 @@ private:
 
     std::mutex m_taskQueueMutex;
     std::queue<std::weak_ptr<mbgl::Mailbox>> m_taskQueue;
+
+    bool m_threadWithScheduler;
 };
