@@ -19,18 +19,15 @@
  `MGLRasterDEMSource` object that you can use to initialize new style layers.
  You can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
+ 
+ Currently, raster DEM sources only support the format used by
+ <a href="https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb">Mapbox Terrain-RGB</a>.
 
  ### Example
 
  ```swift
- let source = MGLRasterDEMSource(identifier: "hills", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
-     .minimumZoomLevel: 9,
-     .maximumZoomLevel: 16,
-     .tileSize: 512,
-     .attributionInfos: [
-         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
-     ]
- ])
+ let terrainRGBURL = URL(string: "mapbox://mapbox.terrain-rgb")!
+ let source = MGLRasterDEMSource(identifier: "hills", configurationURL: terrainRGBURL)
  mapView.style?.addSource(source)
  ```
  */

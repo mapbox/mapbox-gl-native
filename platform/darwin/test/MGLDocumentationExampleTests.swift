@@ -90,15 +90,19 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
     
     func testMGLRasterDEMSource() {
+        // We want to use mapbox.terrain-rgb in the example, but using a mapbox:
+        // URL requires setting an access token. So this identically named
+        // subclass of MGLRasterDEMSource swaps in a nonexistent URL.
+        class MGLRasterDEMSource: Mapbox.MGLRasterDEMSource {
+            override init(identifier: String, configurationURL: URL, tileSize: CGFloat = 256) {
+                let bogusURL = URL(string: "https://example.com/raster-rgb.json")!
+                super.init(identifier: identifier, configurationURL: bogusURL, tileSize: tileSize)
+            }
+        }
+        
         //#-example-code
-        let source = MGLRasterDEMSource(identifier: "hills", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
-            .minimumZoomLevel: 9,
-            .maximumZoomLevel: 16,
-            .tileSize: 512,
-            .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
-            ]
-        ])
+        let terrainRGBURL = URL(string: "mapbox://mapbox.terrain-rgb")!
+        let source = MGLRasterDEMSource(identifier: "hills", configurationURL: terrainRGBURL)
         mapView.style?.addSource(source)
         //#-end-example-code
         
@@ -276,7 +280,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         let source = MGLRasterDEMSource(identifier: "dem", tileURLTemplates: ["https://example.com/raster-rgb/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
-            .tileSize: 512,
+            .tileSize: 256,
             .attributionInfos: [
                 MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
             ]
