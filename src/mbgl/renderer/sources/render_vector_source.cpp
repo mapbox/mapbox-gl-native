@@ -32,14 +32,14 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     enabled = needsRendering;
 
-    optional<Tileset> tileset = impl().getTileset();
+    optional<Tileset> _tileset = impl().getTileset();
 
-    if (!tileset) {
+    if (!_tileset) {
         return;
     }
 
-    if (tileURLTemplates != tileset->tiles) {
-        tileURLTemplates = tileset->tiles;
+    if (tileset != _tileset) {
+        tileset = _tileset;
 
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
