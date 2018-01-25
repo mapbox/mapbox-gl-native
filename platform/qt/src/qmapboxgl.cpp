@@ -1468,6 +1468,23 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     qWarning() << "Layer doesn't support filters";
 }
 
+void QMapboxGL::createRenderer()
+{
+    d_ptr->mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
+        d_ptr->pixelRatio,
+        *d_ptr->fileSourceObj,
+        *d_ptr->threadPool,
+        d_ptr->mode
+    );
+
+    d_ptr->mapRenderer->setObserver(d_ptr->rendererObserver);
+}
+
+void QMapboxGL::destroyRenderer()
+{
+    d_ptr->mapRenderer.reset();
+}
+
 /*!
     Renders the map using OpenGL draw calls. It will make sure to bind the
     framebuffer object before drawing; otherwise a valid OpenGL context is
@@ -1479,6 +1496,10 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 */
 void QMapboxGL::render()
 {
+    if (!d_ptr->mapRenderer) {
+        createRenderer();
+    }
+
 #if defined(__APPLE__) && QT_VERSION < 0x050000
     // FIXME Qt 4.x provides an incomplete FBO at start.
     // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
@@ -1527,7 +1548,7 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
-QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio)
+QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
     , q_ptr(q)
     , fileSourceObj(sharedDefaultFileSource(
@@ -1535,6 +1556,8 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
     , threadPool(mbgl::sharedThreadPool())
+    , mode(settings.contextMode())
+    , pixelRatio(pixelRatio_)
 {
     // Setup the FileSource
     fileSourceObj->setAccessToken(settings.accessToken().toStdString());
@@ -1556,9 +1579,6 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     connect(mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)));
     connect(mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)));
 
-    // Setup RendererBackend
-    mapRenderer = std::make_unique<QMapboxGLMapRenderer>(pixelRatio, *fileSourceObj, *threadPool, settings.contextMode());
-
     // Setup the Map object
     mapObj = std::make_unique<mbgl::Map>(
             *this, // RendererFrontend
@@ -1579,6 +1599,10 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 
 void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters)
 {
+    if (!mapRenderer) {
+        return;
+    }
+
     mapRenderer->updateParameters(std::move(parameters));
 
     if (!renderQueued.test_and_set()) {
@@ -1588,8 +1612,10 @@ void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters
 
 void QMapboxGLPrivate::setObserver(mbgl::RendererObserver &observer)
 {
-    m_rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
+    rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
             *mbgl::util::RunLoop::Get(), observer);
 
-    mapRenderer->setObserver(m_rendererObserver);
+    if (mapRenderer) {
+        mapRenderer->setObserver(rendererObserver);
+    }
 }
