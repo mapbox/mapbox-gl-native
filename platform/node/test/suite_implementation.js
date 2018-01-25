@@ -53,6 +53,7 @@ module.exports = function (style, options, callback) {
     options.zoom = style.zoom || 0;
     options.bearing = style.bearing || 0;
     options.pitch = style.pitch || 0;
+    options.light = style.light || {};
 
     map.load(style, { defaultStyleCamera: true });
 
@@ -129,6 +130,8 @@ module.exports = function (style, options, callback) {
                 options.bearing = operation[1];
             } else if (operation[0] === 'setPitch') {
                 options.pitch = operation[1];
+            } else if (operation[0] === 'setLight') {
+                options.light = operation[1];
             }
 
             map[operation[0]].apply(map, operation.slice(1));

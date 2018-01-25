@@ -121,6 +121,7 @@ test('Map', function(t) {
             'setZoom',
             'setBearing',
             'setPitch',
+            'setLight',
             'setAxonometric',
             'setXSkew',
             'setYSkew',
