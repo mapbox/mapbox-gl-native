@@ -87,6 +87,7 @@ public class MapboxMapOptions implements Parcelable {
   private String apiBaseUrl;
 
   private boolean textureMode;
+  private boolean translucentTextureSurface;
 
   private String style;
 
@@ -156,6 +157,7 @@ public class MapboxMapOptions implements Parcelable {
     style = in.readString();
     apiBaseUrl = in.readString();
     textureMode = in.readByte() != 0;
+    translucentTextureSurface = in.readByte() != 0;
     prefetchesTiles = in.readByte() != 0;
     zMediaOverlay = in.readByte() != 0;
     localIdeographFontFamily = in.readString();
@@ -289,6 +291,8 @@ public class MapboxMapOptions implements Parcelable {
         typedArray.getFloat(R.styleable.mapbox_MapView_mapbox_myLocationAccuracyThreshold, 0));
       mapboxMapOptions.textureMode(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureMode, false));
+      mapboxMapOptions.translucentTextureSurface(
+        typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_renderTextureTranslucentSurface, false));
       mapboxMapOptions.setPrefetchesTiles(
         typedArray.getBoolean(R.styleable.mapbox_MapView_mapbox_enableTilePrefetch, true));
       mapboxMapOptions.renderSurfaceOnTop(
@@ -711,6 +715,11 @@ public class MapboxMapOptions implements Parcelable {
     return this;
   }
 
+  public MapboxMapOptions translucentTextureSurface(boolean translucentTextureSurface) {
+    this.translucentTextureSurface = translucentTextureSurface;
+    return this;
+  }
+
   /**
    * Enable tile pre-fetching. Loads tiles at a lower zoom-level to pre-render
    * a low resolution preview while more detailed tiles are loaded.
@@ -1085,6 +1094,10 @@ public class MapboxMapOptions implements Parcelable {
     return textureMode;
   }
 
+  public boolean getTranslucentTextureSurface() {
+    return translucentTextureSurface;
+  }
+
   /**
    * Returns the font-family for locally overriding generation of glyphs in the
    * ‘CJK Unified Ideographs’ and ‘Hangul Syllables’ ranges.
@@ -1159,6 +1172,7 @@ public class MapboxMapOptions implements Parcelable {
     dest.writeString(style);
     dest.writeString(apiBaseUrl);
     dest.writeByte((byte) (textureMode ? 1 : 0));
+    dest.writeByte((byte) (translucentTextureSurface ? 1 : 0));
     dest.writeByte((byte) (prefetchesTiles ? 1 : 0));
     dest.writeByte((byte) (zMediaOverlay ? 1 : 0));
     dest.writeString(localIdeographFontFamily);
@@ -1340,6 +1354,7 @@ public class MapboxMapOptions implements Parcelable {
       ? Float.floatToIntBits(myLocationAccuracyThreshold) : 0);
     result = 31 * result + (apiBaseUrl != null ? apiBaseUrl.hashCode() : 0);
     result = 31 * result + (textureMode ? 1 : 0);
+    result = 31 * result + (translucentTextureSurface ? 1 : 0);
     result = 31 * result + (style != null ? style.hashCode() : 0);
     result = 31 * result + (prefetchesTiles ? 1 : 0);
     result = 31 * result + (zMediaOverlay ? 1 : 0);

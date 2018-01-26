@@ -1,20 +1,22 @@
 package com.mapbox.mapboxsdk.testapp.activity.textureview;
 
 import android.os.Bundle;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
+import android.widget.ImageView;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
+import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
+
+import java.io.IOException;
+
+import timber.log.Timber;
 
 /**
- * Test resizing a {@link android.view.TextureView} backed map on the fly.
+ * Example showcasing how to create a TextureView with a transparent background.
  */
-public class TextureViewResizeActivity extends AppCompatActivity {
+public class TextureViewTransparentBackgroundActivity extends AppCompatActivity {
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -22,33 +24,27 @@ public class TextureViewResizeActivity extends AppCompatActivity {
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_textureview_resize);
-    setupToolbar();
+    setContentView(R.layout.activity_textureview_transparent);
+    setupBackground();
     setupMapView(savedInstanceState);
-    setupFab();
   }
 
-  private void setupToolbar() {
-    ActionBar actionBar = getSupportActionBar();
-    if (actionBar != null) {
-      getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-      getSupportActionBar().setHomeButtonEnabled(true);
-    }
+  private void setupBackground() {
+    ImageView imageView = (ImageView) findViewById(R.id.imageView);
+    imageView.setImageResource(R.drawable.water);
+    imageView.setScaleType(ImageView.ScaleType.FIT_XY);
   }
 
   private void setupMapView(Bundle savedInstanceState) {
     mapView = (MapView) findViewById(R.id.mapView);
-    mapView.getMapAsync(mapboxMap -> TextureViewResizeActivity.this.mapboxMap = mapboxMap);
-  }
+    mapView.onCreate(savedInstanceState);
+    mapView.getMapAsync(map -> {
+      mapboxMap = map;
 
-  private void setupFab() {
-    FloatingActionButton fabDebug = (FloatingActionButton) findViewById(R.id.fabResize);
-    fabDebug.setOnClickListener(view -> {
-      if (mapView != null) {
-        View parent = findViewById(R.id.coordinator_layout);
-        int width = parent.getWidth() == mapView.getWidth() ? parent.getWidth() / 2 : parent.getWidth();
-        int height = parent.getHeight() == mapView.getHeight() ? parent.getHeight() / 2 : parent.getHeight();
-        mapView.setLayoutParams(new CoordinatorLayout.LayoutParams(width, height));
+      try {
+        map.setStyleJson(ResourceUtils.readRawResource(getApplicationContext(), R.raw.no_bg_style));
+      } catch (IOException exception) {
+        Timber.e(exception);
       }
     });
   }
