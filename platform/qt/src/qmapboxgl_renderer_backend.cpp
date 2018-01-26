@@ -11,7 +11,15 @@
 void QMapboxGLRendererBackend::updateAssumedState()
 {
     assumeFramebufferBinding(ImplicitFramebufferBinding);
-    assumeViewport(0, 0, { 800, 600 });
+    assumeViewport(0, 0, m_size);
+}
+
+void QMapboxGLRendererBackend::bind()
+{
+    assert(mbgl::BackendScope::exists());
+
+    setFramebufferBinding(m_fbo);
+    setViewport(0, 0, m_size);
 }
 
 mbgl::Size QMapboxGLRendererBackend::getFramebufferSize() const
@@ -19,8 +27,9 @@ mbgl::Size QMapboxGLRendererBackend::getFramebufferSize() const
     return m_size;
 }
 
-void QMapboxGLRendererBackend::setFramebufferSize(const mbgl::Size &size)
+void QMapboxGLRendererBackend::updateFramebuffer(quint32 fbo, const mbgl::Size &size)
 {
+    m_fbo = fbo;
     m_size = size;
 }
 

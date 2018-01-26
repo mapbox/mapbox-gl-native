@@ -14,10 +14,10 @@ public:
 
     // mbgl::RendererBackend implementation
     void updateAssumedState() final;
-    void bind() final {}
+    void bind() final;
     mbgl::Size getFramebufferSize() const final;
 
-    void setFramebufferSize(const mbgl::Size &);
+    void updateFramebuffer(quint32 fbo, const mbgl::Size &);
 
 protected:
     mbgl::gl::ProcAddress getExtensionFunctionPointer(const char*) final;
@@ -27,6 +27,7 @@ protected:
     void deactivate() final {}
 
 private:
+    quint32 m_fbo = 0;
     mbgl::Size m_size = { 0, 0 };
 
     Q_DISABLE_COPY(QMapboxGLRendererBackend)

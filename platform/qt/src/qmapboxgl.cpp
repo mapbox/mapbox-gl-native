@@ -1047,34 +1047,17 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
 }
 
 /*!
-    Resize the map to \a size and scale to fit at \a framebufferSize. For
-    high DPI screens, the size will be smaller than the \a framebufferSize.
-
-    This fallowing example will double the pixel density of the map for
-    a given \c size:
-
-    \code
-        map->resize(size / 2, size);
-    \endcode
+    Resize the map to \a size_ and scale to fit at the framebuffer. For
+    high DPI screens, the size will be smaller than the framebuffer.
 */
-void QMapboxGL::resize(const QSize& size_, const QSize& framebufferSize)
+void QMapboxGL::resize(const QSize& size_)
 {
     auto size = sanitizedSize(size_);
 
     if (d_ptr->mapObj->getSize() == size)
         return;
 
-    d_ptr->mapRenderer->updateFramebufferSize(sanitizedSize(framebufferSize));
     d_ptr->mapObj->setSize(size);
-}
-
-/*!
-    If Mapbox GL needs to rebind the default \a fbo, it will use the
-    ID supplied here.
-*/
-void QMapboxGL::setFramebufferObject(quint32)
-{
-    // FIXME: No-op, implicit.
 }
 
 /*!
@@ -1510,6 +1493,20 @@ void QMapboxGL::render()
 
     d_ptr->renderQueued.clear();
     d_ptr->mapRenderer->render();
+}
+
+/*!
+    If Mapbox GL needs to rebind the default \a fbo, it will use the
+    ID supplied here. \a size is the size of the framebuffer, which
+    on high DPI screens is usually bigger than the map size.
+*/
+void QMapboxGL::setFramebufferObject(quint32 fbo, const QSize& size)
+{
+    if (!d_ptr->mapRenderer) {
+        createRenderer();
+    }
+
+    d_ptr->mapRenderer->updateFramebuffer(fbo, sanitizedSize(size));
 }
 
 /*!

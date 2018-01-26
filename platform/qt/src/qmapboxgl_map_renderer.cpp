@@ -25,10 +25,9 @@ void QMapboxGLMapRenderer::updateParameters(std::shared_ptr<mbgl::UpdateParamete
     m_updateParameters = std::move(newParameters);
 }
 
-void QMapboxGLMapRenderer::updateFramebufferSize(const mbgl::Size &size)
+void QMapboxGLMapRenderer::updateFramebuffer(quint32 fbo, const mbgl::Size &size)
 {
-    std::lock_guard<std::mutex> lock(m_updateMutex);
-    m_backend.setFramebufferSize(size);
+    m_backend.updateFramebuffer(fbo, size);
 }
 
 void QMapboxGLMapRenderer::render()

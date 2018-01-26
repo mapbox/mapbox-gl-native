@@ -9,6 +9,8 @@
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
 
+#include <QtGlobal>
+
 #include <memory>
 #include <mutex>
 #include <queue>
@@ -31,11 +33,11 @@ public:
     void schedule(std::weak_ptr<mbgl::Mailbox> scheduled) final;
 
     void render();
+    void updateFramebuffer(quint32 fbo, const mbgl::Size &size);
     void setObserver(std::shared_ptr<mbgl::RendererObserver>);
 
     // Thread-safe, called by the Frontend
     void updateParameters(std::shared_ptr<mbgl::UpdateParameters>);
-    void updateFramebufferSize(const mbgl::Size &size);
 
 private:
     Q_DISABLE_COPY(QMapboxGLMapRenderer)
