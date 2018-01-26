@@ -1,9 +1,9 @@
 #import "MGLLocationManager.h"
+#import "MGLConfig.h"
 #import <UIKit/UIKit.h>
 
 static const NSTimeInterval MGLLocationManagerHibernationTimeout = 300.0;
 static const NSTimeInterval MGLLocationManagerHibernationPollInterval = 5.0;
-static const CLLocationDistance MGLLocationManagerHibernationRadius = 300.0;
 static const CLLocationDistance MGLLocationManagerDistanceFilter = 5.0;
 static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManagerRegionIdentifier.fence.center";
 
@@ -22,6 +22,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
 - (instancetype)init {
     self = [super init];
     if (self) {
+        [MGLConfig.sharedConfig configurationFromKey:[[NSUserDefaults standardUserDefaults] objectForKey:MGLMapboxMetricsProfile]];
         NSArray *backgroundModes = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"UIBackgroundModes"];
        _hostAppHasBackgroundCapability = [backgroundModes containsObject:@"location"];
     }
@@ -122,7 +123,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
 }
 
 - (void)establishRegionMonitoringForLocation:(CLLocation *)location {
-    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:MGLLocationManagerHibernationRadius identifier:MGLLocationManagerRegionIdentifier];
+    CLCircularRegion *region = [[CLCircularRegion alloc] initWithCenter:location.coordinate radius:MGLConfig.sharedConfig.MGLLocationManagerHibernationRadius identifier:MGLLocationManagerRegionIdentifier];
     region.notifyOnEntry = NO;
     region.notifyOnExit = YES;
     [self.standardLocationManager startMonitoringForRegion:region];
@@ -151,7 +152,7 @@ static NSString * const MGLLocationManagerRegionIdentifier = @"MGLLocationManage
     if (location.speed > 0.0) {
         [self startBackgroundTimeoutTimer];
     }
-    if (self.standardLocationManager.monitoredRegions.count == 0 || location.horizontalAccuracy < MGLLocationManagerHibernationRadius) {
+    if (self.standardLocationManager.monitoredRegions.count == 0 || location.horizontalAccuracy < MGLConfig.sharedConfig.MGLLocationManagerHibernationRadius) {
         [self establishRegionMonitoringForLocation:location];
     }
     if ([self.delegate respondsToSelector:@selector(locationManager:didUpdateLocations:)]) {
