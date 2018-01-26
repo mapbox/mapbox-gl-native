@@ -16,7 +16,7 @@ private:
     std::shared_ptr<expression::Expression> value;
 
     friend bool operator==(const HeatmapColorPropertyValue& lhs, const HeatmapColorPropertyValue& rhs) {
-        return *(lhs.value) == *(rhs.value);
+        return (lhs.isUndefined() && rhs.isUndefined()) || (lhs.value && rhs.value && *(lhs.value) == *(rhs.value));
     }
 
     friend bool operator!=(const HeatmapColorPropertyValue& lhs, const HeatmapColorPropertyValue& rhs) {

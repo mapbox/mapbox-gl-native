@@ -137,14 +137,13 @@ public:
         obj.size = image.size;
     }
 
-    // Creates an empty texture with the specified dimensions.
+    // Creates a texture from raw data
     Texture createTexture(const Size size,
                           TextureFormat format = TextureFormat::RGBA,
-                          TextureUnit unit = 0) {
-        return { size, createTexture(size, nullptr, format, unit) };
+                          TextureUnit unit = 0,
+                          const void* data = nullptr) {
+        return { size, createTexture(size, data, format, unit) };
     }
-
-    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
 
     void bindTexture(Texture&,
                      TextureUnit = 0,
@@ -261,6 +260,7 @@ private:
     void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
+    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
     void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);

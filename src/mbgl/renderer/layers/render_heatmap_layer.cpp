@@ -60,7 +60,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (!colorRampTexture) {
             const auto colorRampSize = Size{256, 1};
-            colorRampTexture = gl::Texture{colorRampSize, parameters.context.createTexture(colorRampSize, colorRamp.data(), gl::TextureFormat::RGBA, 1)};
+            colorRampTexture = parameters.context.createTexture(colorRampSize, gl::TextureFormat::RGBA, 1, colorRamp.data());
         }
 
         renderTexture->bind();
