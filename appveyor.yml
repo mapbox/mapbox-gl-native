@@ -7,10 +7,6 @@ environment:
 
 shallow_clone: true
 
-branches:
-  only:
-    - master
-
 cache:
   - '%APPVEYOR_BUILD_FOLDER%\mason_packages'
   - '%APPVEYOR_BUILD_FOLDER%\LLVM-5.0.1-win64.exe'
