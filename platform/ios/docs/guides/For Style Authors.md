@@ -345,7 +345,6 @@ In style specification | Method, function, or predicate type | Format string syn
 `concat`               | `stringByAppendingString:` |
 `downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
-
 `rgb`                  | `+[UIColor colorWithRed:green:blue:alpha:]` |
 `rgba`                 | `+[UIColor colorWithRed:green:blue:alpha:]` |
 `to-rgba`              | |
