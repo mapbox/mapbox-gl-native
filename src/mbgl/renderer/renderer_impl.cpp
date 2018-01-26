@@ -409,9 +409,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
-        
-        placement->setRecent(parameters.timePoint);
 
+        placement->setRecent(parameters.timePoint);
+        
         updateFadingTiles();
     } else {
         placement->setStale();
