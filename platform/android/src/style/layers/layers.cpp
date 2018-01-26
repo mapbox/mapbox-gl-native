@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -17,6 +18,7 @@
 #include "fill_extrusion_layer.hpp"
 #include "fill_layer.hpp"
 #include "hillshade_layer.hpp"
+#include "heatmap_layer.hpp"
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
