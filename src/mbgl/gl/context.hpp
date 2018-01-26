@@ -81,7 +81,7 @@ public:
             createIndexBuffer(v.data(), v.byteSize(), usage)
         };
     }
-
+    
     template <class DrawMode>
     void updateIndexBuffer(IndexBuffer<DrawMode>& buffer, IndexVector<DrawMode>&& v) {
         assert(v.indexSize() == buffer.indexCount);
