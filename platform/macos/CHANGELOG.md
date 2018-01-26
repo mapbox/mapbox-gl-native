@@ -16,9 +16,6 @@
 ### Other changes
 
 * Added a Hebrew localization. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967))
-
-### Snapshots
-
 * Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))
 * Fixed an issue that caused `MGLMapSnapshotter.pointForCoordinate` to return an incorrect value. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
 
