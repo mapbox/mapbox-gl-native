@@ -2,9 +2,28 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
-## master
+## 6.0.0-beta.1 - January 26, 2018
+ - Binding integration for expressions [#10654](https://github.com/mapbox/mapbox-gl-native/pull/10654)
+ - CustomGeometrySource [#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983)
+ - HillshadeLayer and RasterDemSource [#11031](https://github.com/mapbox/mapbox-gl-native/pull/11031)
+ - Revisit marker placement for snapshot [#11029](https://github.com/mapbox/mapbox-gl-native/pull/11029)
+ - SafeVarargs annotation for expressions [#11027](https://github.com/mapbox/mapbox-gl-native/pull/11027)
+ - Expression#toString [#11024](https://github.com/mapbox/mapbox-gl-native/pull/11024)
+ - Rename initRenderSurface to onSurfaceCreated [#11023](https://github.com/mapbox/mapbox-gl-native/pull/11023)
+ - Expose attribution manager as public API [#10942](https://github.com/mapbox/mapbox-gl-native/pull/10942)
+ - Replace Mapzen vector source example with Mapillary [#10931](https://github.com/mapbox/mapbox-gl-native/pull/10931)
  - Add Hebrew localization [#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967)
-
+ - Cleanup gradle configuration files [#10903](https://github.com/mapbox/mapbox-gl-native/pull/10903)
+ - Send double tap event only once [#10855](https://github.com/mapbox/mapbox-gl-native/pull/10855)
+ - Parameter validation for LatLngBounds#from [#10831](https://github.com/mapbox/mapbox-gl-native/pull/10831)
+ - Replace JSON parsing [#10815](https://github.com/mapbox/mapbox-gl-native/pull/10815)
+ - Orientation change regression test [#10814](https://github.com/mapbox/mapbox-gl-native/pull/10814)
+ - Max & min LatLng constants [#10780](https://github.com/mapbox/mapbox-gl-native/pull/10780)
+ - LatLng#wrap return new instance of LatLng [#10769](https://github.com/mapbox/mapbox-gl-native/pull/10769)
+ - Custom library loader [#10733](https://github.com/mapbox/mapbox-gl-native/pull/10733)
+ - Inconsistent parameters for LatLngBounds.union [#10728](https://github.com/mapbox/mapbox-gl-native/pull/10728)
+ - Gradle 4.1 / AS 3.0 [#10549](https://github.com/mapbox/mapbox-gl-native/pull/10549)
+ 
 ## 5.3.2 - January 22, 2018
  - Validate surface creation before destroying [#10890](https://github.com/mapbox/mapbox-gl-native/pull/10890)
  - Add filesource activation ot OfflineRegion [#10904](https://github.com/mapbox/mapbox-gl-native/pull/10904)
