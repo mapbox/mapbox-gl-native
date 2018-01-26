@@ -7,17 +7,27 @@
 * The layout and paint properties on subclasses of `MGLStyleLayer` are now of type `NSExpression` instead of `MGLStyleValue`. A new “Predicates and Expressions” guide provides an overview of the supported operators. ([#10726](https://github.com/mapbox/mapbox-gl-native/pull/10726))
 * Added an `MGLComputedShapeSource` class that allows applications to supply vector data to a style layer on a per-tile basis. ([#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983))
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
-* Properties such as `MGLSymbolStyleLayer.iconAllowsOverlap` and `MGLSymbolStyleLayer.iconIgnoresPlacement` now account for symbols in other sources. ([#10436](https://github.com/mapbox/mapbox-gl-native/pull/10436))
+* The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
+
+### Map rendering
+
 * Improved the reliability of collision detection between symbols near the edges of tiles, as well as between symbols when the map is tilted. It is no longer necessary to enable `MGLSymbolStyleLayer.symbolAvoidsEdges` to prevent symbols in adjacent tiles from overlapping with each other. ([#10436](https://github.com/mapbox/mapbox-gl-native/pull/10436))
 * Symbols can fade in and out as the map pans, rotates, or tilts. ([#10436](https://github.com/mapbox/mapbox-gl-native/pull/10436))
+* Properties such as `MGLSymbolStyleLayer.iconAllowsOverlap` and `MGLSymbolStyleLayer.iconIgnoresPlacement` now account for symbols in other sources. ([#10436](https://github.com/mapbox/mapbox-gl-native/pull/10436))
 * Fixed an issue preventing a dynamically-added `MGLRasterStyleLayer` from drawing until the map pans. ([#10270](https://github.com/mapbox/mapbox-gl-native/pull/10270))
 * Fixed an issue preventing `MGLImageSource`s from drawing on the map when the map is zoomed in and tilted. ([#10677](https://github.com/mapbox/mapbox-gl-native/pull/10677))
+* Improved the sharpness of raster tiles on Retina displays. ([#10984](https://github.com/mapbox/mapbox-gl-native/pull/10984))
+* Fixed a crash parsing a malformed style. ([#11001](https://github.com/mapbox/mapbox-gl-native/pull/11001))
+
+### Map snapshots
+
+* Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))
+* Fixed an issue that caused `MGLMapSnapshotter.pointForCoordinate` to return an incorrect value. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
 
 ### Other changes
 
 * Added a Hebrew localization. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967))
-* Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))
-* Fixed an issue that caused `MGLMapSnapshotter.pointForCoordinate` to return an incorrect value. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
+* Feature querying results now account for the `MGLSymbolStyleLayer.circleStrokeWidth` property. ([#10897](https://github.com/mapbox/mapbox-gl-native/pull/10897))
 
 ## v0.6.1 - January 16, 2018
 
