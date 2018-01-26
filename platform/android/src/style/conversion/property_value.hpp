@@ -2,6 +2,7 @@
 
 #include <mbgl/style/property_value.hpp>
 #include <mbgl/style/data_driven_property_value.hpp>
+#include <mbgl/style/heatmap_color_property_value.hpp>
 #include "../../conversion/conversion.hpp"
 #include "../../conversion/constant.hpp"
 #include "types.hpp"
@@ -65,6 +66,18 @@ template <class T>
 struct Converter<jni::jobject*, mbgl::style::DataDrivenPropertyValue<T>> {
 
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::DataDrivenPropertyValue<T>& value) const {
+        PropertyValueEvaluator<T> evaluator(env);
+        return value.evaluate(evaluator);
+    }
+};
+
+/**
+ * Convert core heatmap color property values to java
+ */
+template <class T>
+struct Converter<jni::jobject*, mbgl::style::HeatmapColorPropertyValue<T>> {
+
+    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::HeatmapColorPropertyValue<T>& value) const {
         PropertyValueEvaluator<T> evaluator(env);
         return value.evaluate(evaluator);
     }
