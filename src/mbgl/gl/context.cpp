@@ -60,6 +60,14 @@ static_assert(std::is_same<std::underlying_type_t<TextureFormat>, GLenum>::value
 static_assert(underlying_type(TextureFormat::RGBA) == GL_RGBA, "OpenGL type mismatch");
 static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mismatch");
 
+static_assert(std::is_same<std::underlying_type_t<TextureType>, GLenum>::value, "OpenGL type mismatch");
+static_assert(underlying_type(TextureType::UnsignedByte) == GL_UNSIGNED_BYTE, "OpenGL type mismatch");
+#if MBGL_USE_GLES2
+static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_OES, "OpenGL type mismatch");
+#else
+static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_ARB, "OpenGL type mismatch");
+#endif
+
 static_assert(underlying_type(UniformDataType::Float) == GL_FLOAT, "OpenGL type mismatch");
 static_assert(underlying_type(UniformDataType::FloatVec2) == GL_FLOAT_VEC2, "OpenGL type mismatch");
 static_assert(underlying_type(UniformDataType::FloatVec3) == GL_FLOAT_VEC3, "OpenGL type mismatch");
@@ -115,6 +123,15 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
 #if MBGL_HAS_BINARY_PROGRAMS
         programBinary = std::make_unique<extension::ProgramBinary>(fn);
 #endif
+
+#if MBGL_USE_GLES2
+        constexpr const char* halfFloatExtensionName = "OES_texture_half_float";
+#else
+        constexpr const char* halfFloatExtensionName = "ARB_half_float_pixel";
+#endif
+        if (strstr(extensions, halfFloatExtensionName) != nullptr) {
+            halfFloat = true;
+        }
 
         if (!supportsVertexArrays()) {
             Log::Warning(Event::OpenGL, "Not using Vertex Array Objects");
@@ -268,6 +285,10 @@ bool Context::supportsVertexArrays() const {
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
+}
+
+bool Context::supportsHalfFloatTextures() const {
+    return halfFloat;
 }
 
 #if MBGL_HAS_BINARY_PROGRAMS
@@ -489,11 +510,11 @@ Context::createFramebuffer(const Texture& color,
     return { depthTarget.size, std::move(fbo) };
 }
 
-UniqueTexture
-Context::createTexture(const Size size, const void* data, TextureFormat format, TextureUnit unit) {
+UniqueTexture Context::createTexture(
+    const Size size, const void* data, TextureFormat format, TextureUnit unit, TextureType type) {
     auto obj = createTexture();
     pixelStoreUnpack = { 1 };
-    updateTexture(obj, size, data, format, unit);
+    updateTexture(obj, size, data, format, unit, type);
     // We are using clamp to edge here since OpenGL ES doesn't allow GL_REPEAT on NPOT textures.
     // We use those when the pixelRatio isn't a power of two, e.g. on iPhone 6 Plus.
     MBGL_CHECK_ERROR(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
@@ -503,13 +524,17 @@ Context::createTexture(const Size size, const void* data, TextureFormat format, 
     return obj;
 }
 
-void Context::updateTexture(
-    TextureID id, const Size size, const void* data, TextureFormat format, TextureUnit unit) {
+void Context::updateTexture(TextureID id,
+                            const Size size,
+                            const void* data,
+                            TextureFormat format,
+                            TextureUnit unit,
+                            TextureType type) {
     activeTextureUnit = unit;
     texture[unit] = id;
     MBGL_CHECK_ERROR(glTexImage2D(GL_TEXTURE_2D, 0, static_cast<GLenum>(format), size.width,
-                                  size.height, 0, static_cast<GLenum>(format), GL_UNSIGNED_BYTE,
-                                  data));
+                                  size.height, 0, static_cast<GLenum>(format),
+                                  static_cast<GLenum>(type), data));
 }
 
 void Context::bindTexture(Texture& obj,

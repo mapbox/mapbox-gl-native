@@ -53,6 +53,8 @@ public:
     UniqueTexture createTexture();
     VertexArray createVertexArray();
 
+    bool supportsHalfFloatTextures() const;
+
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
 #else
@@ -125,23 +127,29 @@ public:
 
     // Create a texture from an image with data.
     template <typename Image>
-    Texture createTexture(const Image& image, TextureUnit unit = 0) {
+    Texture createTexture(const Image& image,
+                          TextureUnit unit = 0,
+                          TextureType type = TextureType::UnsignedByte) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        return { image.size, createTexture(image.size, image.data.get(), format, unit) };
+        return { image.size, createTexture(image.size, image.data.get(), format, unit, type) };
     }
 
     template <typename Image>
-    void updateTexture(Texture& obj, const Image& image, TextureUnit unit = 0) {
+    void updateTexture(Texture& obj,
+                       const Image& image,
+                       TextureUnit unit = 0,
+                       TextureType type = TextureType::UnsignedByte) {
         auto format = image.channels == 4 ? TextureFormat::RGBA : TextureFormat::Alpha;
-        updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit);
+        updateTexture(obj.texture.get(), image.size, image.data.get(), format, unit, type);
         obj.size = image.size;
     }
 
     // Creates an empty texture with the specified dimensions.
     Texture createTexture(const Size size,
                           TextureFormat format = TextureFormat::RGBA,
-                          TextureUnit unit = 0) {
-        return { size, createTexture(size, nullptr, format, unit) };
+                          TextureUnit unit = 0,
+                          TextureType type = TextureType::UnsignedByte) {
+        return { size, createTexture(size, nullptr, format, unit, type) };
     }
 
     void bindTexture(Texture&,
@@ -209,6 +217,7 @@ private:
 #if MBGL_HAS_BINARY_PROGRAMS
     std::unique_ptr<extension::ProgramBinary> programBinary;
 #endif
+    bool halfFloat = false;
 
 public:
     State<value::ActiveTextureUnit> activeTextureUnit;
@@ -259,8 +268,8 @@ private:
     void updateVertexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
     UniqueBuffer createIndexBuffer(const void* data, std::size_t size, const BufferUsage usage);
     void updateIndexBuffer(UniqueBuffer& buffer, const void* data, std::size_t size);
-    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit);
-    void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit);
+    UniqueTexture createTexture(Size size, const void* data, TextureFormat, TextureUnit, TextureType);
+    void updateTexture(TextureID, Size size, const void* data, TextureFormat, TextureUnit, TextureType);
     UniqueFramebuffer createFramebuffer();
     UniqueRenderbuffer createRenderbuffer(RenderbufferType, Size size);
     std::unique_ptr<uint8_t[]> readFramebuffer(Size, TextureFormat, bool flip);
