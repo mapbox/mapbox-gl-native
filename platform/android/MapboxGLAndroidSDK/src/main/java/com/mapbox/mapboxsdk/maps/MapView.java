@@ -294,7 +294,9 @@ public class MapView extends FrameLayout {
   private void initialiseDrawingSurface(MapboxMapOptions options) {
     if (options.getTextureMode()) {
       TextureView textureView = new TextureView(getContext());
-      mapRenderer = new TextureViewMapRenderer(getContext(), textureView, options.getLocalIdeographFontFamily()) {
+      String localFontFamily = options.getLocalIdeographFontFamily();
+      boolean translucentSurface = options.getTranslucentTextureSurface();
+      mapRenderer = new TextureViewMapRenderer(getContext(), textureView, localFontFamily, translucentSurface) {
         @Override
         protected void onSurfaceCreated(GL10 gl, EGLConfig config) {
           MapView.this.onSurfaceCreated();

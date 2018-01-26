@@ -67,6 +67,7 @@
     <string name="activity_textureview_debug">TextureView debug</string>
     <string name="activity_textureview_resize">TextureView resize</string>
     <string name="activity_textureview_animate">TextureView animation</string>
+    <string name="activity_textureview_transparent">TextureView transparent background</string>
     <string name="activity_grid_source">Grid Source</string>
     <string name="activity_local_glyph">Local CJK glyph generation</string>
     <string name="activity_hillshade">Hillshade</string>
