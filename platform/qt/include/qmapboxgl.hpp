@@ -191,8 +191,7 @@ public:
     void scaleBy(double scale, const QPointF &center = QPointF());
     void rotateBy(const QPointF &first, const QPointF &second);
 
-    void resize(const QSize &size, const QSize &framebufferSize);
-    void setFramebufferObject(quint32 fbo);
+    void resize(const QSize &size);
 
     double metersPerPixelAtLatitude(double latitude, double zoom) const;
     QMapbox::ProjectedMeters projectedMetersForCoordinate(const QMapbox::Coordinate &) const;
@@ -227,9 +226,10 @@ public:
     void setFilter(const QString &layer, const QVariant &filter);
 
     // When rendering on a different thread,
-    // should be called on this thread
+    // should be called on the render thread.
     void createRenderer();
     void destroyRenderer();
+    void setFramebufferObject(quint32 fbo, const QSize &size);
 
 public slots:
     void render();
