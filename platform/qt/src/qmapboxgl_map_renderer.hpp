@@ -8,6 +8,7 @@
 #include <mbgl/renderer/renderer_observer.hpp>
 #include <mbgl/storage/default_file_source.hpp>
 #include <mbgl/util/shared_thread_pool.hpp>
+#include <mbgl/util/util.hpp>
 
 #include <QtGlobal>
 
@@ -40,6 +41,8 @@ public:
     void updateParameters(std::shared_ptr<mbgl::UpdateParameters>);
 
 private:
+    MBGL_STORE_THREAD(tid)
+
     Q_DISABLE_COPY(QMapboxGLMapRenderer)
 
     std::mutex m_updateMutex;

@@ -1453,19 +1453,12 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 
 void QMapboxGL::createRenderer()
 {
-    d_ptr->mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
-        d_ptr->pixelRatio,
-        *d_ptr->fileSourceObj,
-        *d_ptr->threadPool,
-        d_ptr->mode
-    );
-
-    d_ptr->mapRenderer->setObserver(d_ptr->rendererObserver);
+    d_ptr->createRenderer();
 }
 
 void QMapboxGL::destroyRenderer()
 {
-    d_ptr->mapRenderer.reset();
+    d_ptr->destroyRenderer();
 }
 
 /*!
@@ -1479,20 +1472,7 @@ void QMapboxGL::destroyRenderer()
 */
 void QMapboxGL::render()
 {
-    if (!d_ptr->mapRenderer) {
-        createRenderer();
-    }
-
-#if defined(__APPLE__) && QT_VERSION < 0x050000
-    // FIXME Qt 4.x provides an incomplete FBO at start.
-    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        return;
-    }
-#endif
-
-    d_ptr->renderQueued.clear();
-    d_ptr->mapRenderer->render();
+    d_ptr->render();
 }
 
 /*!
@@ -1502,11 +1482,7 @@ void QMapboxGL::render()
 */
 void QMapboxGL::setFramebufferObject(quint32 fbo, const QSize& size)
 {
-    if (!d_ptr->mapRenderer) {
-        createRenderer();
-    }
-
-    d_ptr->mapRenderer->updateFramebuffer(fbo, sanitizedSize(size));
+    d_ptr->setFramebufferObject(fbo, size);
 }
 
 /*!
@@ -1547,47 +1523,46 @@ void QMapboxGL::connectionEstablished()
 
 QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
-    , q_ptr(q)
-    , fileSourceObj(sharedDefaultFileSource(
+    , m_fileSourceObj(sharedDefaultFileSource(
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
-    , threadPool(mbgl::sharedThreadPool())
-    , mode(settings.contextMode())
-    , pixelRatio(pixelRatio_)
+    , m_threadPool(mbgl::sharedThreadPool())
+    , m_mode(settings.contextMode())
+    , m_pixelRatio(pixelRatio_)
 {
     // Setup the FileSource
-    fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+    m_fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    m_fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
 
     if (settings.resourceTransform()) {
         m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
             [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
                 return callback(std::move(url_));
             });
-       fileSourceObj->setResourceTransform(m_resourceTransform->self());
+       m_fileSourceObj->setResourceTransform(m_resourceTransform->self());
     }
 
     // Setup MapObserver
-    mapObserver = std::make_unique<QMapboxGLMapObserver>(this);
+    m_mapObserver = std::make_unique<QMapboxGLMapObserver>(this);
 
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
-    connect(mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)));
-    connect(mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)));
+    connect(m_mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
     // Setup the Map object
     mapObj = std::make_unique<mbgl::Map>(
             *this, // RendererFrontend
-            *mapObserver,
+            *m_mapObserver,
             sanitizedSize(size),
-            pixelRatio, *fileSourceObj, *threadPool,
+            m_pixelRatio, *m_fileSourceObj, *m_threadPool,
             mbgl::MapMode::Continuous,
             static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
             static_cast<mbgl::ViewportMode>(settings.viewportMode()));
 
     // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
-    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
+    connect(this, SIGNAL(needsRendering()), q, SIGNAL(needsRendering()), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
@@ -1596,23 +1571,83 @@ QMapboxGLPrivate::~QMapboxGLPrivate()
 
 void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters)
 {
-    if (!mapRenderer) {
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (!m_mapRenderer) {
         return;
     }
 
-    mapRenderer->updateParameters(std::move(parameters));
+    m_mapRenderer->updateParameters(std::move(parameters));
 
-    if (!renderQueued.test_and_set()) {
+    if (!m_renderQueued.test_and_set()) {
         emit needsRendering();
     }
 }
 
 void QMapboxGLPrivate::setObserver(mbgl::RendererObserver &observer)
 {
-    rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
+    m_rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
             *mbgl::util::RunLoop::Get(), observer);
 
-    if (mapRenderer) {
-        mapRenderer->setObserver(rendererObserver);
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (m_mapRenderer) {
+        m_mapRenderer->setObserver(m_rendererObserver);
     }
+}
+
+void QMapboxGLPrivate::createRenderer()
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (m_mapRenderer) {
+        return;
+    }
+
+    m_mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
+        m_pixelRatio,
+        *m_fileSourceObj,
+        *m_threadPool,
+        m_mode
+    );
+
+    m_mapRenderer->setObserver(m_rendererObserver);
+}
+
+void QMapboxGLPrivate::destroyRenderer()
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    m_mapRenderer.reset();
+}
+
+void QMapboxGLPrivate::render()
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (!m_mapRenderer) {
+        createRenderer();
+    }
+
+#if defined(__APPLE__) && QT_VERSION < 0x050000
+    // FIXME Qt 4.x provides an incomplete FBO at start.
+    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return;
+    }
+#endif
+
+    m_renderQueued.clear();
+    m_mapRenderer->render();
+}
+
+void QMapboxGLPrivate::setFramebufferObject(quint32 fbo, const QSize& size)
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (!m_mapRenderer) {
+        createRenderer();
+    }
+
+    m_mapRenderer->updateFramebuffer(fbo, sanitizedSize(size));
 }
