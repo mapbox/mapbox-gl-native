@@ -93,9 +93,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // Reset zoom history state.
         zoomHistory.first = true;
     }
-
+    
     assert(BackendScope::exists());
-
+    
     updateParameters.annotationManager.updateData();
 
     const bool zoomChanged = zoomHistory.update(updateParameters.transformState.getZoom(), updateParameters.timePoint);
@@ -191,7 +191,6 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 layer.as<RenderHeatmapLayer>()->updateColorRamp();
             }
         }
-
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
             layer.evaluate(evaluationParameters);
@@ -410,7 +409,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
-
+        
         placement->setRecent(parameters.timePoint);
 
         updateFadingTiles();
@@ -435,7 +434,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         parameters.imageManager.upload(parameters.context, 0);
         parameters.lineAtlas.upload(parameters.context, 0);
-
+        
         // Update all clipping IDs + upload buckets.
         for (const auto& entry : renderSources) {
             if (entry.second->isEnabled()) {
@@ -778,7 +777,7 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     if (placement->hasTransitions(timePoint)) {
         return true;
     }
-
+    
     if (fadingTiles) {
         return true;
     }

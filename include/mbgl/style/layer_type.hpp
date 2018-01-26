@@ -13,7 +13,7 @@ enum class LayerType {
     Background,
     Custom,
     FillExtrusion,
-    Heatmap
+    Heatmap,
 };
 
 } // namespace style

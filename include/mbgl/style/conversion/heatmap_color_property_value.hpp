@@ -24,6 +24,7 @@ struct Converter<HeatmapColorPropertyValue> {
             if (!expression) {
                 return {};
             }
+            assert(*expression);
             if (!isFeatureConstant(**expression)) {
                 error = { "property expressions not supported" };
                 return {};
@@ -43,4 +44,3 @@ struct Converter<HeatmapColorPropertyValue> {
 } // namespace conversion
 } // namespace style
 } // namespace mbgl
-

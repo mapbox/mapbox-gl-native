@@ -387,7 +387,7 @@ global.describeValue = function (value, property, layerType) {
                 throw new Error(`No description available for ${value[0]} expression in ${property.name} of ${layerType}.`);
         }
     }
-    
+
     switch (property.type) {
         case 'boolean':
             return value ? '`YES`' : '`NO`';
@@ -414,7 +414,6 @@ global.describeValue = function (value, property, layerType) {
             }
             return displayValue;
         case 'color':
-            if (property.name === 'heatmap-color') value = 'red';
             let color = parseColor(value);
             if (!color) {
                 throw new Error(`unrecognized color format in default value of ${property.name}`);
