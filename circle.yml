@@ -414,7 +414,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "release-boba" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------
