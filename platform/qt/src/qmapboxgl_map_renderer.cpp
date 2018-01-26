@@ -11,6 +11,7 @@ QMapboxGLMapRenderer::QMapboxGLMapRenderer(qreal pixelRatio,
 
 QMapboxGLMapRenderer::~QMapboxGLMapRenderer()
 {
+    MBGL_VERIFY_THREAD(tid);
 }
 
 void QMapboxGLMapRenderer::schedule(std::weak_ptr<mbgl::Mailbox> mailbox)
@@ -27,11 +28,15 @@ void QMapboxGLMapRenderer::updateParameters(std::shared_ptr<mbgl::UpdateParamete
 
 void QMapboxGLMapRenderer::updateFramebuffer(quint32 fbo, const mbgl::Size &size)
 {
+    MBGL_VERIFY_THREAD(tid);
+
     m_backend.updateFramebuffer(fbo, size);
 }
 
 void QMapboxGLMapRenderer::render()
 {
+    MBGL_VERIFY_THREAD(tid);
+
     std::shared_ptr<mbgl::UpdateParameters> params;
     {
         // Lock on the parameters

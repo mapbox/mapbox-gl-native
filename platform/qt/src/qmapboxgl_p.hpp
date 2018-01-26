@@ -31,27 +31,32 @@ public:
     void setObserver(mbgl::RendererObserver &) final;
     void update(std::shared_ptr<mbgl::UpdateParameters>) final;
 
+    // These need to be called on the same thread.
+    void createRenderer();
+    void destroyRenderer();
+    void render();
+    void setFramebufferObject(quint32 fbo, const QSize& size);
+
     mbgl::EdgeInsets margins;
-
-    QMapboxGL *q_ptr { nullptr };
-
-    std::shared_ptr<mbgl::DefaultFileSource> fileSourceObj;
-    std::shared_ptr<mbgl::ThreadPool> threadPool;
     std::unique_ptr<mbgl::Map> mapObj;
 
-    std::unique_ptr<QMapboxGLMapObserver> mapObserver;
-    std::unique_ptr<QMapboxGLMapRenderer> mapRenderer;
-    std::shared_ptr<mbgl::RendererObserver> rendererObserver;
-
-    QMapboxGLSettings::GLContextMode mode;
-    qreal pixelRatio;
-
-    std::atomic_flag renderQueued = ATOMIC_FLAG_INIT;
 signals:
     void needsRendering();
 
 private:
     Q_DISABLE_COPY(QMapboxGLPrivate)
 
+    std::recursive_mutex m_mapRendererMutex;
+    std::shared_ptr<mbgl::RendererObserver> m_rendererObserver;
+
+    std::unique_ptr<QMapboxGLMapObserver> m_mapObserver;
+    std::shared_ptr<mbgl::DefaultFileSource> m_fileSourceObj;
+    std::shared_ptr<mbgl::ThreadPool> m_threadPool;
+    std::unique_ptr<QMapboxGLMapRenderer> m_mapRenderer;
     std::unique_ptr<mbgl::Actor<mbgl::ResourceTransform>> m_resourceTransform;
+
+    QMapboxGLSettings::GLContextMode m_mode;
+    qreal m_pixelRatio;
+
+    std::atomic_flag m_renderQueued = ATOMIC_FLAG_INIT;
 };
