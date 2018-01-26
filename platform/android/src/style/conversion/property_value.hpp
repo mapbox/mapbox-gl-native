@@ -62,7 +62,6 @@ struct Converter<jni::jobject*, mbgl::style::PropertyValue<T>> {
 /**
  * Convert core data driven property values to java
  */
-template <class T>
 struct Converter<jni::jobject*, mbgl::style::DataDrivenPropertyValue<T>> {
 
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::DataDrivenPropertyValue<T>& value) const {
@@ -74,7 +73,6 @@ struct Converter<jni::jobject*, mbgl::style::DataDrivenPropertyValue<T>> {
 /**
  * Convert core heatmap color property values to java
  */
-template <class T>
 struct Converter<jni::jobject*, mbgl::style::HeatmapColorPropertyValue> {
 
     Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::HeatmapColorPropertyValue& value) const {
