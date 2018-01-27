@@ -2,11 +2,11 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.text.TextUtils;
+
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,10 +31,10 @@ public class GeoParseUtil {
   public static List<LatLng> parseGeoJsonCoordinates(String geojsonStr) {
     List<LatLng> latLngs = new ArrayList<>();
     FeatureCollection featureCollection = FeatureCollection.fromJson(geojsonStr);
-    for (Feature feature : featureCollection.getFeatures()) {
-      if (feature.getGeometry() instanceof Point) {
-        Position point = ((Point) feature.getGeometry()).getCoordinates();
-        latLngs.add(new LatLng(point.getLatitude(), point.getLongitude()));
+    for (Feature feature : featureCollection.features()) {
+      if (feature.geometry() instanceof Point) {
+        Point point = (Point) feature.geometry();
+        latLngs.add(new LatLng(point.latitude(), point.longitude()));
       }
     }
     return latLngs;

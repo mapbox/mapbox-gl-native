@@ -16,6 +16,8 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
@@ -42,8 +44,6 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.services.android.telemetry.location.LocationEngine;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.Geometry;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;

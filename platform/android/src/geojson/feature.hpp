@@ -16,17 +16,17 @@ namespace geojson {
 class Feature : private mbgl::util::noncopyable {
 public:
 
-    static constexpr auto Name() { return "com/mapbox/services/commons/geojson/Feature"; };
+    static constexpr auto Name() { return "com/mapbox/geojson/Feature"; };
 
     static jni::Object<Feature> fromGeometry(jni::JNIEnv&, jni::Object<Geometry>, jni::Object<gson::JsonObject>, jni::String);
 
     static mbgl::Feature convert(jni::JNIEnv&, jni::Object<Feature>);
 
-    static jni::Object<Geometry> getGeometry(jni::JNIEnv&, jni::Object<Feature>);
+    static jni::Object<Geometry> geometry(jni::JNIEnv&, jni::Object<Feature>);
 
-    static jni::String getId(jni::JNIEnv&, jni::Object<Feature>);
+    static jni::String id(jni::JNIEnv&, jni::Object<Feature>);
 
-    static jni::Object<gson::JsonObject> getProperties(jni::JNIEnv&, jni::Object<Feature>);
+    static jni::Object<gson::JsonObject> properties(jni::JNIEnv&, jni::Object<Feature>);
 
     static jni::Class<Feature> javaClass;
 

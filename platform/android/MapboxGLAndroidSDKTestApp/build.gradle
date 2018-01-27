@@ -57,6 +57,8 @@ dependencies {
         transitive = true
     }
 
+    api dependenciesList.mapboxJavaTurf
+
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
     implementation dependenciesList.supportDesign

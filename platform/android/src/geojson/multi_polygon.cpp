@@ -10,27 +10,27 @@ mapbox::geojson::multi_polygon MultiPolygon::convert(jni::JNIEnv &env, jni::Obje
     mapbox::geojson::multi_polygon multiPolygon;
 
     if (jMultiPolygon) {
-        auto jPositionListsListList = MultiPolygon::getCoordinates(env, jMultiPolygon);
-        auto jPositionListsListArray = java::util::List::toArray<java::util::List>(env, jPositionListsListList);
+        auto jPointListsListList = MultiPolygon::coordinates(env, jMultiPolygon);
+        auto jPointListsListArray = java::util::List::toArray<java::util::List>(env, jPointListsListList);
 
-        auto size = jPositionListsListArray.Length(env);
+        auto size = jPointListsListArray.Length(env);
         multiPolygon.reserve(size);
 
         for (size_t i = 0; i < size; i++) {
-            auto jPositionListsList = jPositionListsListArray.Get(env, i);
+            auto jPositionListsList = jPointListsListArray.Get(env, i);
             multiPolygon.push_back(Polygon::convert(env, jPositionListsList));
             jni::DeleteLocalRef(env, jPositionListsList);
         }
 
-        jni::DeleteLocalRef(env, jPositionListsListList);
-        jni::DeleteLocalRef(env, jPositionListsListArray);
+        jni::DeleteLocalRef(env, jPointListsListList);
+        jni::DeleteLocalRef(env, jPointListsListArray);
     }
 
     return multiPolygon;
 }
 
-jni::Object<java::util::List> MultiPolygon::getCoordinates(jni::JNIEnv &env, jni::Object<MultiPolygon> jPolygon) {
-    static auto method = MultiPolygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+jni::Object<java::util::List> MultiPolygon::coordinates(jni::JNIEnv &env, jni::Object<MultiPolygon> jPolygon) {
+    static auto method = MultiPolygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jPolygon.Call(env, method);
 }
 

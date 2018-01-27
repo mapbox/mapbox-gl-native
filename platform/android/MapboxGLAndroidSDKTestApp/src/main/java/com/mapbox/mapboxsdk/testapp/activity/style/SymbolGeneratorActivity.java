@@ -15,7 +15,8 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.gson.GsonBuilder;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
@@ -25,12 +26,7 @@ import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Geometry;
-import com.mapbox.services.commons.geojson.custom.GeometryDeserializer;
-import com.mapbox.services.commons.geojson.custom.PositionDeserializer;
-import com.mapbox.services.commons.models.Position;
+
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -211,14 +207,8 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       try {
         // read local geojson from raw folder
         String tinyCountriesJson = ResourceUtils.readRawResource(activity, R.raw.tiny_countries);
+        return FeatureCollection.fromJson(tinyCountriesJson);
 
-        // convert geojson to a model
-        FeatureCollection featureCollection = new GsonBuilder()
-          .registerTypeAdapter(Geometry.class, new GeometryDeserializer())
-          .registerTypeAdapter(Position.class, new PositionDeserializer())
-          .create().fromJson(tinyCountriesJson, FeatureCollection.class);
-
-        return featureCollection;
       } catch (IOException exception) {
         return null;
       }
@@ -288,7 +278,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       FeatureCollection featureCollection = params[0];
 
       HashMap<String, Bitmap> imagesMap = new HashMap<>();
-      for (Feature feature : featureCollection.getFeatures()) {
+      for (Feature feature : featureCollection.features()) {
         String countryName = feature.getStringProperty(FEATURE_ID);
         TextView textView = new TextView(context);
         textView.setBackgroundColor(context.getResources().getColor(R.color.blueAccent));

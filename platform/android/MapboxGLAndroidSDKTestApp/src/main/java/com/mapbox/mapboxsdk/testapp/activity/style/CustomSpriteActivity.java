@@ -7,6 +7,9 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -15,10 +18,7 @@ import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
+
 
 import timber.log.Timber;
 
@@ -58,7 +58,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
             mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
             // Add a source with a geojson point
-            point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
+            point = Point.fromLngLat(13.400972d, 52.519003d);
             source = new GeoJsonSource(
               "point",
               FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
@@ -78,15 +78,13 @@ public class CustomSpriteActivity extends AppCompatActivity {
             fab.setImageResource(R.drawable.ic_directions_car_black);
           } else {
             // Update point
-            point = Point.fromCoordinates(
-              Position.fromCoordinates(point.getCoordinates().getLongitude() + 0.001,
-                point.getCoordinates().getLatitude() + 0.001)
-            );
+            point = Point.fromLngLat(point.longitude() + 0.001,
+                point.latitude() + 0.001);
             source.setGeoJson(FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)}));
 
             // Move the camera as well
             mapboxMap.moveCamera(CameraUpdateFactory.newLatLng(new LatLng(
-              point.getCoordinates().getLatitude(), point.getCoordinates().getLongitude())));
+              point.latitude(), point.longitude())));
           }
         }
       });
