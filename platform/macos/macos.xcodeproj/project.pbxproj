@@ -16,6 +16,7 @@
 		07D9474D1F67441B00E37934 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D947471F6741F500E37934 /* MGLAbstractShapeSource_Private.h */; };
 		07F8E2F71F674C8800F794BB /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07F8E2F41F674C8000F794BB /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07F8E2F81F674C9000F794BB /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07F8E2F51F674C8000F794BB /* MGLComputedShapeSource.mm */; };
+		170A82BF201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */; };
 		1753ED401E53CE6100A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */; };
 		1F7454A31ECFB00300021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A01ECFB00300021D39 /* MGLLight_Private.h */; };
 		1F7454A41ECFB00300021D39 /* MGLLight.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454A11ECFB00300021D39 /* MGLLight.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -301,6 +302,7 @@
 		07D947491F6741F500E37934 /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
 		07F8E2F41F674C8000F794BB /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
 		07F8E2F51F674C8000F794BB /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
+		170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayerTests.mm; sourceTree = "<group>"; };
 		1753ED3F1E53CE5200A9FD90 /* MGLConversion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLConversion.h; sourceTree = "<group>"; };
 		1F7454A01ECFB00300021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A11ECFB00300021D39 /* MGLLight.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight.h; sourceTree = "<group>"; };
@@ -884,6 +886,7 @@
 		DA8F257C1D51C5F40010E6B5 /* Layers */ = {
 			isa = PBXGroup;
 			children = (
+				170A82BE201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm */,
 				40E1601A1DF216E6005EA6D9 /* MGLStyleLayerTests.h */,
 				40E1601B1DF216E6005EA6D9 /* MGLStyleLayerTests.m */,
 				DA2207BA1DC076930002F84D /* test-Bridging-Header.h */,
@@ -1577,6 +1580,7 @@
 				DAE6C3D21CC34C9900DB3429 /* MGLGeometryTests.mm in Sources */,
 				DA87A9A41DCACC5000810D09 /* MGLSymbolStyleLayerTests.mm in Sources */,
 				40E1601D1DF217D6005EA6D9 /* MGLStyleLayerTests.m in Sources */,
+				170A82BF201BDD1B00943087 /* MGLHeatmapStyleLayerTests.mm in Sources */,
 				1F95931B1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
 				DAF25721201902C100367EF5 /* MGLHillshadeStyleLayerTests.mm in Sources */,
 				DA87A9A61DCACC5000810D09 /* MGLCircleStyleLayerTests.mm in Sources */,

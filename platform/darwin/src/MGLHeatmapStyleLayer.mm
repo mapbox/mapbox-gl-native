@@ -68,6 +68,23 @@
 
 #pragma mark - Accessing the Paint Attributes
 
+- (void)setHeatmapColor:(NSExpression *)heatmapColor {
+    MGLAssertStyleLayerIsValid();
+
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
+    self.rawLayer->setHeatmapColor(mbglValue);
+}
+
+- (NSExpression *)heatmapColor {
+    MGLAssertStyleLayerIsValid();
+
+    auto propertyValue = self.rawLayer->getHeatmapColor();
+    if (propertyValue.isUndefined()) {
+        propertyValue = self.rawLayer->getDefaultHeatmapColor();
+    }
+    return MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toExpression(propertyValue);
+}
+
 - (void)setHeatmapIntensity:(NSExpression *)heatmapIntensity {
     MGLAssertStyleLayerIsValid();
 

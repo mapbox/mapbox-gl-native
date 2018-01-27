@@ -40,6 +40,8 @@ public:
 
     bool isDataDriven()     const { return false; }
     bool hasDataDrivenPropertyDifference(const HeatmapColorPropertyValue&) const { return false; }
+    
+    const expression::Expression& getExpression() const { return *value; }
 };
 
 

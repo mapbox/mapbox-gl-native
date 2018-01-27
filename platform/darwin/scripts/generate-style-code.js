@@ -311,7 +311,8 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         if (property["property-function"]) {
             doc += '* Interpolation and step functions applied to the `$zoomLevel` variable and/or feature attributes\n';
         } else if (property.function === "interpolated") {
-            doc += '* Interpolation and step functions applied to the `$zoomLevel` variable\n\n' +
+            const variable = property.name === 'heatmap-color' ? '$heatmapDensity' : '$zoomLevel';
+            doc += `* Interpolation and step functions applied to the \`${variable}\` variable\n\n` +
                 'This property does not support applying interpolation or step functions to feature attributes.';
         } else {
             doc += '* Step functions applied to the `$zoomLevel` variable\n\n' +
@@ -632,7 +633,6 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
     }, []);
 
     const paintProperties = Object.keys(spec[`paint_${layerType}`]).reduce((memo, name) => {
-        if (name === 'heatmap-color') return memo;
         spec[`paint_${layerType}`][name].name = name;
         memo.push(spec[`paint_${layerType}`][name]);
         return memo;
