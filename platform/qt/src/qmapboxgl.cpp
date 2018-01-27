@@ -1451,11 +1451,23 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
     qWarning() << "Layer doesn't support filters";
 }
 
+/*!
+    Creates the infrastructure needed for rendering the map. It
+    should be called before any call to render().
+
+    Must be called on the render thread.
+*/
 void QMapboxGL::createRenderer()
 {
     d_ptr->createRenderer();
 }
 
+/*!
+    Destroys the infrastructure needed for rendering the map,
+    releasing resources.
+
+    Must be called on the render thread.
+*/
 void QMapboxGL::destroyRenderer()
 {
     d_ptr->destroyRenderer();
@@ -1469,6 +1481,8 @@ void QMapboxGL::destroyRenderer()
 
     This function should be called only after the signal needsRendering() is
     emitted at least once.
+
+    Must be called on the render thread.
 */
 void QMapboxGL::render()
 {
@@ -1479,6 +1493,8 @@ void QMapboxGL::render()
     If Mapbox GL needs to rebind the default \a fbo, it will use the
     ID supplied here. \a size is the size of the framebuffer, which
     on high DPI screens is usually bigger than the map size.
+
+    Must be called on the render thread.
 */
 void QMapboxGL::setFramebufferObject(quint32 fbo, const QSize& size)
 {
