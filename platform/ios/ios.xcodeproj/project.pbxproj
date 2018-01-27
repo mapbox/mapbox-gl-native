@@ -226,8 +226,8 @@
 		55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */; };
 		632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 632281DE1E6F855900D75A5D /* MBXEmbeddedMapViewController.m */; };
 		6407D6701E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */; };
-		8989B17C201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; };
-		8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; };
+		8989B17C201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17E201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
 		8989B17F201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
 		920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */; };

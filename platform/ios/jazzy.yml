@@ -94,6 +94,7 @@ custom_categories:
       - MGLCircleStyleLayer
       - MGLFillStyleLayer
       - MGLFillExtrusionStyleLayer
+      - MGLHeatmapStyleLayer
       - MGLLineStyleLayer
       - MGLSymbolStyleLayer
   - name: Offline Maps
