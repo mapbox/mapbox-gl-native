@@ -89,7 +89,7 @@ More information about building and distributing this project in [DISTRIBUTE.md]
 
 #### Using the SDK snapshot
 
-Instead of using the latest stable release of the Maps SDK for Android, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example, the `5.3.2-SNAPSHOT` would look like:
+Instead of using the latest stable release of the Maps SDK for Android, you can use a "snapshot" or the beta version if there is one available. Our snapshots are built every time a Github pull request adds code to this repository's `master` branch. If you'd like to use a snapshot build, your Android project's gradle file should have -SNAPSHOT appended to the SDK version number. For example, the `5.2.0-SNAPSHOT` would look like:
 
 ```java
 // Mapbox SDK dependency
