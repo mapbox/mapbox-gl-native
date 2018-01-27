@@ -8,11 +8,11 @@ namespace geojson {
 
 mbgl::Feature Feature::convert(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
     // Convert
-    auto jGeometry = getGeometry(env, jFeature);
-    auto jProperties = Feature::getProperties(env, jFeature);
+    auto jGeometry = geometry(env, jFeature);
+    auto jProperties = Feature::properties(env, jFeature);
 
     std::experimental::optional<mapbox::geometry::identifier> id;
-    auto jId = Feature::getId(env, jFeature);
+    auto jId = Feature::id(env, jFeature);
     if (jId) {
         id = {  jni::Make<std::string>(env, jId) };
     }
@@ -31,18 +31,18 @@ mbgl::Feature Feature::convert(jni::JNIEnv& env, jni::Object<Feature> jFeature) 
     return feature;
 }
 
-jni::Object<Geometry> Feature::getGeometry(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::Object<Geometry> ()>(env, "getGeometry");
+jni::Object<Geometry> Feature::geometry(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
+    static auto method = Feature::javaClass.GetMethod<jni::Object<Geometry> ()>(env, "geometry");
     return jFeature.Call(env, method);
 }
 
-jni::Object<gson::JsonObject> Feature::getProperties(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::Object<gson::JsonObject> ()>(env, "getProperties");
+jni::Object<gson::JsonObject> Feature::properties(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
+    static auto method = Feature::javaClass.GetMethod<jni::Object<gson::JsonObject> ()>(env, "properties");
     return jFeature.Call(env, method);
 }
 
-jni::String Feature::getId(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
-    static auto method = Feature::javaClass.GetMethod<jni::String ()>(env, "getId");
+jni::String Feature::id(jni::JNIEnv& env, jni::Object<Feature> jFeature) {
+    static auto method = Feature::javaClass.GetMethod<jni::String ()>(env, "id");
     return jFeature.Call(env, method);
 }
 

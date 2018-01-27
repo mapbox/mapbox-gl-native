@@ -7,16 +7,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.google.gson.JsonObject;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
-import com.mapbox.services.commons.models.Position;
+
 
 import java.util.List;
 
@@ -87,15 +87,13 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
   }
 
   private FeatureCollection createFeatureCollection() {
-    Position position = isInitialPosition
-      ? Position.fromCoordinates(-74.01618140, 40.701745)
-      : Position.fromCoordinates(-73.988097, 40.749864);
+    Point point = isInitialPosition
+      ? Point.fromLngLat(-74.01618140, 40.701745)
+      : Point.fromLngLat(-73.988097, 40.749864);
 
-    Point point = Point.fromCoordinates(position);
-    Feature feature = Feature.fromGeometry(point);
     JsonObject properties = new JsonObject();
     properties.addProperty(KEY_PROPERTY_SELECTED, isSelected);
-    feature.setProperties(properties);
+    Feature feature = Feature.fromGeometry(point, properties);
     return FeatureCollection.fromFeatures(new Feature[] {feature});
   }
 

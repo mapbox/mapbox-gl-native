@@ -5,6 +5,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.MultiLineString;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
@@ -13,10 +17,7 @@ import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.CustomGeometrySource;
 import com.mapbox.mapboxsdk.style.sources.GeometryTileProvider;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.MultiLineString;
-import com.mapbox.services.commons.models.Position;
+
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -68,18 +69,18 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
       List gridLines = new ArrayList();
       for (double y = Math.ceil(bounds.getLatNorth() / gridSpacing) * gridSpacing;
            y >= Math.floor(bounds.getLatSouth() / gridSpacing) * gridSpacing; y -= gridSpacing) {
-        gridLines.add(Arrays.asList(Position.fromCoordinates(bounds.getLonWest(), y),
-          Position.fromCoordinates(bounds.getLonEast(), y)));
+        gridLines.add(Arrays.asList(Point.fromLngLat(bounds.getLonWest(), y),
+          Point.fromLngLat(bounds.getLonEast(), y)));
       }
-      features.add(Feature.fromGeometry(MultiLineString.fromCoordinates(gridLines)));
+      features.add(Feature.fromGeometry(MultiLineString.fromLngLats(gridLines)));
 
       gridLines = new ArrayList();
       for (double x = Math.floor(bounds.getLonWest() / gridSpacing) * gridSpacing;
            x <= Math.ceil(bounds.getLonEast() / gridSpacing) * gridSpacing; x += gridSpacing) {
-        gridLines.add(Arrays.asList(Position.fromCoordinates(x, bounds.getLatSouth()),
-          Position.fromCoordinates(x, bounds.getLatNorth())));
+        gridLines.add(Arrays.asList(Point.fromLngLat(x, bounds.getLatSouth()),
+          Point.fromLngLat(x, bounds.getLatNorth())));
       }
-      features.add(Feature.fromGeometry(MultiLineString.fromCoordinates(gridLines)));
+      features.add(Feature.fromGeometry(MultiLineString.fromLngLats(gridLines)));
 
       return FeatureCollection.fromFeatures(features);
     }
