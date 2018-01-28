@@ -86,7 +86,7 @@
 		55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D120A41F7906E6004B6D81 /* libmbgl-filesource.a */; };
 		55E2AD111E5B0A6900E8C587 /* MGLOfflineStorageTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 55E2AD101E5B0A6900E8C587 /* MGLOfflineStorageTests.mm */; };
 		89462399200D199100DA8EF2 /* heatmap.json in Resources */ = {isa = PBXBuildFile; fileRef = 89462398200D199100DA8EF2 /* heatmap.json */; };
-		8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */; };
+		8946239D200E744800DA8EF2 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		894623A0200E748000DA8EF2 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */; };
 		92092EF01F5EB10E00AF5130 /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 92092EEE1F5EB10E00AF5130 /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		92092EF11F5EB10E00AF5130 /* MGLMapSnapshotter.mm in Sources */ = {isa = PBXBuildFile; fileRef = 92092EEF1F5EB10E00AF5130 /* MGLMapSnapshotter.mm */; };
@@ -668,8 +668,6 @@
 		35136D471D42295400C20EFD /* Layers */ = {
 			isa = PBXGroup;
 			children = (
-				8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */,
-				8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */,
 				DA8F25851D51C9E10010E6B5 /* MGLBackgroundStyleLayer.h */,
 				DA8F25861D51C9E10010E6B5 /* MGLBackgroundStyleLayer.mm */,
 				3527428B1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h */,
@@ -680,6 +678,8 @@
 				35602BF91D3EA99F0050646F /* MGLFillStyleLayer.mm */,
 				35602BFD1D3EA9B40050646F /* MGLForegroundStyleLayer.h */,
 				35602BFE1D3EA9B40050646F /* MGLForegroundStyleLayer.mm */,
+				8946239A200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.h */,
+				8946239B200E73CA00DA8EF2 /* MGLHeatmapStyleLayer.mm */,
 				DAF25714201901C200367EF5 /* MGLHillshadeStyleLayer.h */,
 				DAF25713201901C100367EF5 /* MGLHillshadeStyleLayer.mm */,
 				DA8F25891D51CA540010E6B5 /* MGLLineStyleLayer.h */,

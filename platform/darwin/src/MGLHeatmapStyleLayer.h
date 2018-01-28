@@ -7,7 +7,23 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- A heatmap.
+ An `MGLHeatmapStyleLayer` is a style layer that renders a <a
+ href="https://en.wikipedia.org/wiki/Heat_map">heatmap</a>.
+ 
+ A heatmap visualizes the spatial distribution of a large, dense set of point
+ data, using color to avoid cluttering the map with individual points at low
+ zoom levels. The points are weighted by an attribute you specify. Use a heatmap
+ style layer in conjunction with point or point collection features in vector
+ tiles loaded by an `MGLVectorSource` object or `MGLPointAnnotation`,
+ `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature`
+ instances in an `MGLShapeSource` object.
+ 
+ Consider accompanying a heatmap style layer with an `MGLCircleStyleLayer` or
+ `MGLSymbolStyleLayer` at high zoom levels. If you are unsure whether the point
+ data in an `MGLShapeSource` is dense enough to warrant a heatmap, you can
+ alternatively cluster the source using the `MGLShapeSourceOptionClustered`
+ option and render the data using an `MGLCircleStyleLayer` or
+ `MGLSymbolStyleLayer`.
 
  You can access an existing heatmap style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -18,6 +34,14 @@ NS_ASSUME_NONNULL_BEGIN
  ### Example
 
  ```swift
+ let layer = MGLHeatmapStyleLayer(identifier: "earthquake-heat", source: earthquakes)
+ layer.heatmapWeight = NSExpression(format: "FUNCTION(magnitude, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                    [0: 0,
+                                     6: 1])
+ layer.heatmapIntensity = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                       [0: 1,
+                                        9: 3])
+ mapView.style?.addLayer(layer)
  ```
  */
 MGL_EXPORT
