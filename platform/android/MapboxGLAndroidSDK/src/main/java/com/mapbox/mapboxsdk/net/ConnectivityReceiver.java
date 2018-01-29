@@ -37,10 +37,8 @@ public class ConnectivityReceiver extends BroadcastReceiver {
       INSTANCE = new ConnectivityReceiver(context.getApplicationContext());
       // Add default listeners
       INSTANCE.addListener(new NativeConnectivityListener());
-      Timber.d("ConnectivityReceiver: listener added");
     }
 
-    Timber.d("ConnectivityReceiver: return");
     return INSTANCE;
   }
 
