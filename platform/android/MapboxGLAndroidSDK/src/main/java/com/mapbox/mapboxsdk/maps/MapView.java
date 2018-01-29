@@ -23,9 +23,11 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 
+import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
-import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.android.telemetry.MapboxTelemetry;
+import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -287,9 +289,12 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
     if (savedInstanceState == null) {
-      // TODO Push AppUserTurnstile event
+      MapboxTelemetry telemetry = Events.obtainTelemetry();
+      AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
+        BuildConfig.MAPBOX_VERSION_STRING);
+      telemetry.push(turnstileEvent);
       MapEventFactory mapEventFactory = new MapEventFactory();
-      Mapbox.obtainTelemetry().push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
+      telemetry.push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
       this.savedInstanceState = savedInstanceState;
     }
