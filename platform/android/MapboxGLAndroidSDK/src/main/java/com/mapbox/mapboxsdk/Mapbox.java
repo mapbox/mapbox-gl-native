@@ -11,12 +11,9 @@ import android.text.TextUtils;
 import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
-import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-
-import timber.log.Timber;
 
 /**
  * The entry point to initialize the Mapbox Android SDK.
@@ -35,8 +32,6 @@ public final class Mapbox {
   private String accessToken;
   private Boolean connected;
   private LocationEngine locationEngine;
-  @SuppressLint("StaticFieldLeak")
-  private static MapboxTelemetry telemetry;
 
   /**
    * Get an instance of Mapbox.
@@ -56,13 +51,6 @@ public final class Mapbox {
       LocationEngine locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
       INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
-
-      try {
-        telemetry = new MapboxTelemetry(appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT);
-        telemetry.enable();
-      } catch (Exception exception) {
-        Timber.e(exception, "Unable to instantiate Mapbox telemetry");
-      }
 
       ConnectivityReceiver.instance(appContext);
     }
@@ -152,11 +140,8 @@ public final class Mapbox {
    *
    * @return the location engine configured
    */
+  // TODO Do we need to expose this?
   public static LocationEngine getLocationEngine() {
     return INSTANCE.locationEngine;
-  }
-
-  public static MapboxTelemetry obtainTelemetry() {
-    return INSTANCE.telemetry;
   }
 }
