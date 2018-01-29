@@ -65,7 +65,9 @@ public final class Mapbox {
       }
 
       ConnectivityReceiver.instance(appContext);
+      Timber.d("instance: connectivity receiver started");
     }
+
     return INSTANCE;
   }
 
