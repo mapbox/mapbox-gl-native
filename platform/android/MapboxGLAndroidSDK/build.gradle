@@ -25,8 +25,8 @@ android {
         minSdkVersion androidVersions.minSdkVersion
         targetSdkVersion androidVersions.targetSdkVersion
         buildConfigField "String", "GIT_REVISION_SHORT", String.format("\"%s\"", getGitRevision())
-        // TODO Review sdkIdentifier and sdkVersion values (used in AppUserTurnstile)
-        buildConfigField "String", "MAPBOX_SDK_IDENTIFIER", String.format("\"%s\"", "MapboxMapsAndroid")
+        buildConfigField "String", "MAPBOX_SDK_IDENTIFIER", String.format("\"%s\"", "mapbox-maps-android")
+        buildConfigField "String", "MAPBOX_SDK_VERSION", String.format("\"%s\"", project.VERSION_NAME)
         buildConfigField "String", "MAPBOX_VERSION_STRING", String.format("\"Mapbox/%s\"", project.VERSION_NAME)
         buildConfigField "String", "MAPBOX_EVENTS_USER_AGENT", String.format("\"MapboxEventsAndroid/%s\"", project.VERSION_NAME)
     }

@@ -291,7 +291,7 @@ public class MapView extends FrameLayout {
     if (savedInstanceState == null) {
       MapboxTelemetry telemetry = Events.obtainTelemetry();
       AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
-        BuildConfig.MAPBOX_VERSION_STRING);
+        BuildConfig.MAPBOX_SDK_VERSION);
       telemetry.push(turnstileEvent);
       MapEventFactory mapEventFactory = new MapEventFactory();
       telemetry.push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
