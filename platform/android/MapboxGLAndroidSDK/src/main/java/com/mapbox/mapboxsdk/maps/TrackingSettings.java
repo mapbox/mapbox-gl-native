@@ -374,7 +374,7 @@ public final class TrackingSettings {
   }
 
   private void setMyLocationEnabled(boolean locationEnabled, boolean isCustomLocationSource) {
-    if (!PermissionsManager.areLocationPermissionsGranted(myLocationView.getContext())) {
+    if (locationEnabled && !PermissionsManager.areLocationPermissionsGranted(myLocationView.getContext())) {
       Timber.e("Could not activate user location tracking: "
         + "user did not accept the permission or permissions were not requested.");
       return;
