@@ -246,7 +246,7 @@ public class Expression<T> {
   }
 
   /**
-   * Create a literal object expression
+   * Create a literal object expression.
    *
    * @param object the object
    * @return the expression
@@ -280,6 +280,7 @@ public class Expression<T> {
    * @param green green color expression
    * @param blue  blue color expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-rgb">Style specification</a>
    */
   public static Expression<Color> rgb(@NonNull Expression<Number> red, @NonNull Expression<Number> green,
                                       @NonNull Expression<Number> blue) {
@@ -297,6 +298,7 @@ public class Expression<T> {
    * @param green green color value
    * @param blue  blue color value
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-rgb">Style specification</a>
    */
   public static Expression<Color> rgb(@NonNull Number red, @NonNull Number green, @NonNull Number blue) {
     return rgb(literal(red), literal(green), literal(blue));
@@ -314,6 +316,7 @@ public class Expression<T> {
    * @param blue  blue color value
    * @param alpha alpha color value
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-rgba">Style specification</a>
    */
   public static Expression<Color> rgba(@NonNull Expression<Number> red, @NonNull Expression<Number> green,
                                        @NonNull Expression<Number> blue, @NonNull Expression<Number> alpha) {
@@ -332,6 +335,7 @@ public class Expression<T> {
    * @param blue  blue color value
    * @param alpha alpha color value
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-rgba">Style specification</a>
    */
   public static Expression<Color> rgba(@NonNull Number red, @NonNull Number green, @NonNull Number blue, @NonNull Number alpha) {
     return rgba(literal(red), literal(green), literal(blue), literal(alpha));
@@ -342,6 +346,7 @@ public class Expression<T> {
    *
    * @param expression an expression to convert to a color
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-to-rgba">Style specification</a>
    */
   public static Expression<Array> toRgba(@NonNull Expression<Color> expression) {
     return new Expression<>("to-rgba", expression);
@@ -358,6 +363,7 @@ public class Expression<T> {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression<Boolean> eq(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>("==", compareOne, compareTwo);
@@ -369,6 +375,7 @@ public class Expression<T> {
    * @param compareOne the first boolean
    * @param compareTwo the second boolean
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression<Boolean> eq(boolean compareOne, boolean compareTwo) {
     return eq(literal(compareOne), literal(compareTwo));
@@ -380,6 +387,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression<Boolean> eq(@NonNull String compareOne, @NonNull String compareTwo) {
     return eq(literal(compareOne), literal(compareTwo));
@@ -391,6 +399,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
   public static Expression<Boolean> eq(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return eq(literal(compareOne), literal(compareTwo));
@@ -403,6 +412,7 @@ public class Expression<T> {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression<Boolean> neq(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>("!=", compareOne, compareTwo);
@@ -414,6 +424,7 @@ public class Expression<T> {
    * @param compareOne the first boolean
    * @param compareTwo the second boolean
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression<Boolean> neq(boolean compareOne, boolean compareTwo) {
     return new Expression<>("!=", literal(compareOne), literal(compareTwo));
@@ -425,6 +436,7 @@ public class Expression<T> {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression<Boolean> neq(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression<>("!=", literal(compareOne), literal(compareTwo));
@@ -436,6 +448,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
   public static Expression<Boolean> neq(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression<>("!=", literal(compareOne), literal(compareTwo));
@@ -448,6 +461,7 @@ public class Expression<T> {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
    */
   public static Expression<Boolean> gt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>(">", compareOne, compareTwo);
@@ -459,6 +473,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
    */
   public static Expression<Boolean> gt(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression<>(">", literal(compareOne), literal(compareTwo));
@@ -470,6 +485,7 @@ public class Expression<T> {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
    */
   public static Expression<Boolean> gt(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression<>(">", literal(compareOne), literal(compareTwo));
@@ -482,6 +498,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
    */
   public static Expression<Boolean> lt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>("<", compareOne, compareTwo);
@@ -493,6 +510,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
    */
   public static Expression<Boolean> lt(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression<>("<", literal(compareOne), literal(compareTwo));
@@ -504,6 +522,7 @@ public class Expression<T> {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
    */
   public static Expression<Boolean> lt(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression<>("<", literal(compareOne), literal(compareTwo));
@@ -516,6 +535,7 @@ public class Expression<T> {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
    */
   public static Expression<Boolean> gte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>(">=", compareOne, compareTwo);
@@ -527,6 +547,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
    */
   public static Expression<Boolean> gte(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression<>(">=", literal(compareOne), literal(compareTwo));
@@ -538,6 +559,7 @@ public class Expression<T> {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
    */
   public static Expression<Boolean> gte(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression<>(">=", literal(compareOne), literal(compareTwo));
@@ -550,6 +572,7 @@ public class Expression<T> {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
    */
   public static Expression<Boolean> lte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression<>("<=", compareOne, compareTwo);
@@ -561,6 +584,7 @@ public class Expression<T> {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
    */
   public static Expression<Boolean> lte(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression<>("<=", literal(compareOne), literal(compareTwo));
@@ -572,6 +596,7 @@ public class Expression<T> {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
    */
   public static Expression<Boolean> lte(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression<>("<=", literal(compareOne), literal(compareTwo));
@@ -587,6 +612,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-all">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Boolean> all(@NonNull Expression<Boolean>... input) {
@@ -603,6 +629,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-any">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Boolean> any(@NonNull Expression<Boolean>... input) {
@@ -614,6 +641,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!">Style specification</a>
    */
   public static Expression<Boolean> not(@NonNull Expression<Boolean> input) {
     return new Expression<>("!", input);
@@ -624,6 +652,7 @@ public class Expression<T> {
    *
    * @param input boolean input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!">Style specification</a>
    */
   public static Expression<Boolean> not(boolean input) {
     return not(literal(input));
@@ -631,9 +660,14 @@ public class Expression<T> {
 
   /**
    * Selects the first output whose corresponding test condition evaluates to true.
+   * <p>
+   * For each case a condition and an output should be provided.
+   * The last parameter should provide the default output.
+   * </p>
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-case">Style specification</a>
    */
   @SafeVarargs
   public static Expression switchCase(@NonNull @Size(min = 1) Expression... input) {
@@ -647,6 +681,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match">Style specification</a>
    */
   public static Expression match(@NonNull @Size(min = 2) Expression... input) {
     return new Expression("match", input);
@@ -659,6 +694,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match">Style specification</a>
    */
   public static Expression match(@NonNull Expression input, @NonNull Stop... stops) {
     Expression[] expressions = new Expression[stops.length * 2];
@@ -674,6 +710,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-coalesce">Style specification</a>
    */
   public static Expression coalesce(@NonNull Expression... input) {
     return new Expression("coalesce", input);
@@ -690,6 +727,7 @@ public class Expression<T> {
    * </p>
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties">Style specification</a>
    */
   public static Expression<Object> properties() {
     return new Expression<>("properties");
@@ -699,6 +737,7 @@ public class Expression<T> {
    * Gets the feature's geometry type: Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-geometry-types">Style specification</a>
    */
   public static Expression<String> geometryType() {
     return new Expression<>("geometry-type");
@@ -708,6 +747,7 @@ public class Expression<T> {
    * Gets the feature's id, if it has one.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-id">Style specification</a>
    */
   public static Expression<Number> id() {
     return new Expression<>("id");
@@ -723,6 +763,7 @@ public class Expression<T> {
    * Can only be used in the `heatmap-color` property.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-heatmap-density">Style specification</a>
    */
   public static Expression<Number> heatmapDensity() {
     return new Expression<>("heatmap-density");
@@ -738,6 +779,7 @@ public class Expression<T> {
    * @param number     the index expression
    * @param expression the array expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-at">Style specification</a>
    */
   public static Expression<Object> at(@NonNull Expression<Number> number, @NonNull Expression expression) {
     return new Expression<>("at", number, expression);
@@ -749,6 +791,7 @@ public class Expression<T> {
    * @param number     the index expression
    * @param expression the array expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-at">Style specification</a>
    */
   public static Expression<Object> at(@NonNull Number number, @NonNull Expression expression) {
     return at(literal(number), expression);
@@ -761,6 +804,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get">Style specification</a>
    */
   public static Expression get(@NonNull Expression<String> input) {
     return new Expression<>("get", input);
@@ -773,6 +817,7 @@ public class Expression<T> {
    *
    * @param input string input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get">Style specification</a>
    */
   public static Expression get(@NonNull String input) {
     return get(literal(input));
@@ -785,6 +830,7 @@ public class Expression<T> {
    * @param key    a property value key
    * @param object an expression object
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get">Style specification</a>
    */
   public static Expression<Object> get(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
     return new Expression<>("get", key, object);
@@ -797,6 +843,7 @@ public class Expression<T> {
    * @param key    a property value key
    * @param object an expression object
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-get">Style specification</a>
    */
   public static Expression<Object> get(@NonNull String key, @NonNull Expression<Object> object) {
     return get(literal(key), object);
@@ -807,6 +854,7 @@ public class Expression<T> {
    *
    * @param key the expression property value key
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-has">Style specification</a>
    */
   public static Expression<Boolean> has(@NonNull Expression<String> key) {
     return new Expression<>("has", key);
@@ -817,6 +865,7 @@ public class Expression<T> {
    *
    * @param key the property value key
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-has">Style specification</a>
    */
   public static Expression<Boolean> has(@NonNull String key) {
     return has(literal(key));
@@ -828,6 +877,7 @@ public class Expression<T> {
    * @param key    the expression property value key
    * @param object an expression object
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-has">Style specification</a>
    */
   public static Expression<Boolean> has(@NonNull Expression<String> key, @NonNull Expression<Object> object) {
     return new Expression<>("has", key, object);
@@ -839,6 +889,7 @@ public class Expression<T> {
    * @param key    the property value key
    * @param object an expression object
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-has">Style specification</a>
    */
   public static Expression<Boolean> has(@NonNull String key, @NonNull Expression<Object> object) {
     return has(literal(key), object);
@@ -849,6 +900,7 @@ public class Expression<T> {
    *
    * @param expression an expression object or expression string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-lenght">Style specification</a>
    */
   public static Expression<Number> length(@NonNull Expression<?> expression) {
     return new Expression<>("length", expression);
@@ -859,6 +911,7 @@ public class Expression<T> {
    *
    * @param input a string
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-lenght">Style specification</a>
    */
   public static Expression<Number> length(@NonNull String input) {
     return length(literal(input));
@@ -872,6 +925,7 @@ public class Expression<T> {
    * Returns mathematical constant ln(2).
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-ln2">Style specification</a>
    */
   public static Expression<Number> ln2() {
     return new Expression<>("ln2");
@@ -881,6 +935,7 @@ public class Expression<T> {
    * Returns the mathematical constant pi.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-pi">Style specification</a>
    */
   public static Expression<Number> pi() {
     return new Expression<>("pi");
@@ -890,6 +945,7 @@ public class Expression<T> {
    * Returns the mathematical constant e.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-e">Style specification</a>
    */
   public static Expression<Number> e() {
     return new Expression<>("e");
@@ -900,6 +956,7 @@ public class Expression<T> {
    *
    * @param numbers the numbers to calculate the sum for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-+">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Number> sum(@Size(min = 2) Expression<Number>... numbers) {
@@ -911,6 +968,7 @@ public class Expression<T> {
    *
    * @param numbers the numbers to calculate the sum for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-+">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> sum(@Size(min = 2) Number... numbers) {
@@ -926,6 +984,7 @@ public class Expression<T> {
    *
    * @param numbers the numbers to calculate the product for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-*">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Number> product(@Size(min = 2) Expression<Number>... numbers) {
@@ -937,6 +996,7 @@ public class Expression<T> {
    *
    * @param numbers the numbers to calculate the product for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-*">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> product(@Size(min = 2) Number... numbers) {
@@ -952,6 +1012,7 @@ public class Expression<T> {
    *
    * @param number the number subtract from 0
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions--">Style specification</a>
    */
   public static Expression<Number> subtract(@NonNull Expression<Number> number) {
     return new Expression<>("-", number);
@@ -962,6 +1023,7 @@ public class Expression<T> {
    *
    * @param number the number subtract from 0
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions--">Style specification</a>
    */
   public static Expression<Number> subtract(@NonNull Number number) {
     return subtract(literal(number));
@@ -973,6 +1035,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions--">Style specification</a>
    */
   public static Expression<Number> subtract(@NonNull Expression<Number> first, @NonNull Expression<Number> second) {
     return new Expression<>("-", first, second);
@@ -984,6 +1047,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions--">Style specification</a>
    */
   public static Expression<Number> subtract(@NonNull Number first, @NonNull Number second) {
     return subtract(literal(first), literal(second));
@@ -995,6 +1059,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-/">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> division(@NonNull Expression<Number> first, @NonNull Expression<Number> second) {
@@ -1007,6 +1072,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-/">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> division(@NonNull Number first, @NonNull Number second) {
@@ -1019,6 +1085,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
    */
   public static Expression<Number> mod(@NonNull Expression<Number> first, @NonNull Expression<Number> second) {
     return new Expression<>("%", first, second);
@@ -1030,6 +1097,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
    */
   public static Expression<Number> mod(@NonNull Number first, @NonNull Number second) {
     return mod(literal(first), literal(second));
@@ -1041,6 +1109,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
    */
   public static Expression<Number> pow(@NonNull Expression<Number> first, @NonNull Expression<Number> second) {
     return new Expression<>("^", first, second);
@@ -1052,6 +1121,7 @@ public class Expression<T> {
    * @param first  the first number
    * @param second the second number
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
    */
   public static Expression<Number> pow(@NonNull Number first, @NonNull Number second) {
     return pow(literal(first), literal(second));
@@ -1062,6 +1132,7 @@ public class Expression<T> {
    *
    * @param number the number to take the square root from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-sqrt">Style specification</a>
    */
   public static Expression<Number> sqrt(@NonNull Expression<Number> number) {
     return new Expression<>("sqrt", number);
@@ -1072,6 +1143,7 @@ public class Expression<T> {
    *
    * @param number the number to take the square root from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-sqrt">Style specification</a>
    */
   public static Expression<Number> sqrt(@NonNull Number number) {
     return sqrt(literal(number));
@@ -1082,6 +1154,7 @@ public class Expression<T> {
    *
    * @param number the number to take base-ten logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-log10">Style specification</a>
    */
   public static Expression<Number> log10(@NonNull Expression<Number> number) {
     return new Expression<>("log10", number);
@@ -1092,6 +1165,7 @@ public class Expression<T> {
    *
    * @param number the number to take base-ten logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-log10">Style specification</a>
    */
   public static Expression<Number> log10(@NonNull Number number) {
     return log10(literal(number));
@@ -1102,6 +1176,7 @@ public class Expression<T> {
    *
    * @param number the number to take natural logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-ln">Style specification</a>
    */
   public static Expression<Number> ln(Expression<Number> number) {
     return new Expression<>("ln", number);
@@ -1112,6 +1187,7 @@ public class Expression<T> {
    *
    * @param number the number to take natural logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-ln">Style specification</a>
    */
   public static Expression<Number> ln(Number number) {
     return ln(literal(number));
@@ -1122,6 +1198,7 @@ public class Expression<T> {
    *
    * @param number the number to take base-two logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-log2">Style specification</a>
    */
   public static Expression<Number> log2(@NonNull Expression<Number> number) {
     return new Expression<>("log2", number);
@@ -1132,6 +1209,7 @@ public class Expression<T> {
    *
    * @param number the number to take base-two logarithm from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-log2">Style specification</a>
    */
   public static Expression<Number> log2(@NonNull Number number) {
     return log2(literal(number));
@@ -1142,6 +1220,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the sine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-sin">Style specification</a>
    */
   public static Expression<Number> sin(@NonNull Expression<Number> number) {
     return new Expression<>("sin", number);
@@ -1152,6 +1231,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the sine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-sin">Style specification</a>
    */
   public static Expression<Number> sin(@NonNull Number number) {
     return sin(literal(number));
@@ -1162,6 +1242,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the cosine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-cos">Style specification</a>
    */
   public static Expression<Number> cos(@NonNull Expression<Number> number) {
     return new Expression<>("cos", number);
@@ -1172,6 +1253,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the cosine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-cos">Style specification</a>
    */
   public static Expression<Number> cos(@NonNull Number number) {
     return new Expression<>("cos", literal(number));
@@ -1182,6 +1264,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the tangent for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-tan">Style specification</a>
    */
   public static Expression<Number> tan(@NonNull Expression<Number> number) {
     return new Expression<>("tan", number);
@@ -1192,6 +1275,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the tangent for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-tan">Style specification</a>
    */
   public static Expression<Number> tan(@NonNull Number number) {
     return new Expression<>("tan", literal(number));
@@ -1202,6 +1286,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arcsine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-asin">Style specification</a>
    */
   public static Expression<Number> asin(@NonNull Expression<Number> number) {
     return new Expression<>("asin", number);
@@ -1212,6 +1297,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arcsine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-asin">Style specification</a>
    */
   public static Expression<Number> asin(@NonNull Number number) {
     return asin(literal(number));
@@ -1222,6 +1308,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arccosine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-acos">Style specification</a>
    */
   public static Expression<Number> acos(@NonNull Expression<Number> number) {
     return new Expression<>("acos", number);
@@ -1232,6 +1319,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arccosine for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-acos">Style specification</a>
    */
   public static Expression<Number> acos(@NonNull Number number) {
     return acos(literal(number));
@@ -1242,6 +1330,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arctangent for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-atan">Style specification</a>
    */
   public static Expression<Number> atan(@NonNull Expression<Number> number) {
     return new Expression("atan", number);
@@ -1252,6 +1341,7 @@ public class Expression<T> {
    *
    * @param number the number to calculate the arctangent for
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-atan">Style specification</a>
    */
   public static Expression<Number> atan(@NonNull Number number) {
     return atan(literal(number));
@@ -1262,6 +1352,7 @@ public class Expression<T> {
    *
    * @param numbers varargs of numbers to get the minimum from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-min">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Number> min(@Size(min = 1) Expression<Number>... numbers) {
@@ -1273,6 +1364,7 @@ public class Expression<T> {
    *
    * @param numbers varargs of numbers to get the minimum from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-min">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> min(@Size(min = 1) Number... numbers) {
@@ -1288,6 +1380,7 @@ public class Expression<T> {
    *
    * @param numbers varargs of numbers to get the maximum from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-max">Style specification</a>
    */
   @SafeVarargs
   public static Expression<Number> max(@Size(min = 1) Expression<Number>... numbers) {
@@ -1299,6 +1392,7 @@ public class Expression<T> {
    *
    * @param numbers varargs of numbers to get the maximum from
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-max">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<Number> max(@Size(min = 1) Number... numbers) {
@@ -1322,6 +1416,7 @@ public class Expression<T> {
    *
    * @param string the string to upcase
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-upcase">Style specification</a>
    */
   public static Expression<String> upcase(@NonNull Expression<String> string) {
     return new Expression<>("upcase", string);
@@ -1336,6 +1431,7 @@ public class Expression<T> {
    *
    * @param string string to upcase
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-upcase">Style specification</a>
    */
   public static Expression<String> upcase(@NonNull String string) {
     return upcase(literal(string));
@@ -1350,6 +1446,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-downcase">Style specification</a>
    */
   public static Expression<String> downcase(@NonNull Expression<String> input) {
     return new Expression<>("downcase", input);
@@ -1364,6 +1461,7 @@ public class Expression<T> {
    *
    * @param input string to downcase
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-downcase">Style specification</a>
    */
   public static Expression<String> downcase(@NonNull String input) {
     return downcase(literal(input));
@@ -1374,6 +1472,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat">Style specification</a>
    */
   @SafeVarargs
   public static Expression<String> concat(@NonNull Expression<String>... input) {
@@ -1385,6 +1484,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat">Style specification</a>
    */
   @SuppressWarnings("unchecked")
   public static Expression<String> concat(@NonNull String... input) {
@@ -1406,6 +1506,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-array">Style specification</a>
    */
   public static Expression<Boolean> array(@NonNull Expression input) {
     return new Expression<>("array", input);
@@ -1416,6 +1517,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-typeof">Style specification</a>
    */
   public static Expression<String> typeOf(@NonNull Expression input) {
     return new Expression<>("typeof", input);
@@ -1428,6 +1530,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-string">Style specification</a>
    */
   public static Expression<Boolean> string(@NonNull Expression input) {
     return new Expression<>("string", input);
@@ -1440,6 +1543,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-number">Style specification</a>
    */
   public static Expression<Boolean> number(@NonNull Expression input) {
     return new Expression<>("number", input);
@@ -1452,6 +1556,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-boolean">Style specification</a>
    */
   public static Expression<Boolean> bool(@NonNull Expression input) {
     return new Expression<>("boolean", input);
@@ -1462,6 +1567,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-object">Style specification</a>
    */
   public static Expression<Boolean> object(@NonNull Expression input) {
     return new Expression<>("object", input);
@@ -1479,6 +1585,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-string">Style specification</a>
    */
   public static Expression<String> toString(@NonNull Expression input) {
     return new Expression<>("to-string", input);
@@ -1494,6 +1601,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-number">Style specification</a>
    */
   public static Expression<Number> toNumber(@NonNull Expression input) {
     return new Expression<>("to-number", input);
@@ -1505,6 +1613,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-boolean">Style specification</a>
    */
   public static Expression<Boolean> toBool(@NonNull Expression input) {
     return new Expression<>("to-boolean", input);
@@ -1517,6 +1626,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-color">Style specification</a>
    */
   public static Expression<Color> toColor(@NonNull Expression input) {
     return new Expression<>("to-color", input);
@@ -1532,6 +1642,7 @@ public class Expression<T> {
    *
    * @param input expression input
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-let">Style specification</a>
    */
   @SafeVarargs
   public static Expression let(@Size(min = 1) Expression... input) {
@@ -1543,6 +1654,7 @@ public class Expression<T> {
    *
    * @param expression the variable naming expression that was bound with using let
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-var">Style specification</a>
    */
   public static Expression<Object> var(@NonNull Expression<String> expression) {
     return new Expression<>("var", expression);
@@ -1553,6 +1665,7 @@ public class Expression<T> {
    *
    * @param variableName the variable naming that was bound with using let
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-var">Style specification</a>
    */
   public static Expression var(@NonNull String variableName) {
     return var(literal(variableName));
@@ -1570,6 +1683,7 @@ public class Expression<T> {
    * </p>
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-zoom">Style specification</a>
    */
   public static Expression<Number> zoom() {
     return new Expression<>("zoom");
@@ -1579,6 +1693,13 @@ public class Expression<T> {
   // Ramps, scales, curves
   //
 
+  /**
+   * Produces a stop value to be used as part of the step expression.
+   *
+   * @param stop the stop input
+   * @param value the stop output
+   * @return the stop
+   */
   public static Stop stop(@NonNull Object stop, @NonNull Object value) {
     return new Stop(stop, value);
   }
@@ -1593,6 +1714,7 @@ public class Expression<T> {
    * @param input the input value
    * @param stops pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
   @SafeVarargs
   public static Expression step(@NonNull Number input, @NonNull Expression expression, Expression... stops) {
@@ -1609,6 +1731,7 @@ public class Expression<T> {
    * @param expression the input expression
    * @param stops      pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
   @SafeVarargs
   public static Expression step(@NonNull Expression<Number> input, @NonNull Expression expression, Expression... stops) {
@@ -1625,6 +1748,7 @@ public class Expression<T> {
    * @param input the input value
    * @param stops pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
   @SafeVarargs
   public static Expression step(@NonNull Number input, @NonNull Expression expression, Stop... stops) {
@@ -1646,6 +1770,7 @@ public class Expression<T> {
    * @param input the input value
    * @param stops pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
   @SafeVarargs
   public static Expression step(@NonNull Expression<Number> input, @NonNull Expression expression, Stop... stops) {
@@ -1667,6 +1792,7 @@ public class Expression<T> {
    * @param number        the input expression
    * @param stops         pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   @SafeVarargs
   public static Expression interpolate(@NonNull Expression<Interpolator> interpolation,
@@ -1684,6 +1810,7 @@ public class Expression<T> {
    * @param number        the input expression
    * @param stops         pair of input and output values
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   @SafeVarargs
   public static Expression interpolate(@NonNull Expression<Interpolator> interpolation,
@@ -1700,6 +1827,7 @@ public class Expression<T> {
    * interpolates linearly between the pair of stops just less than and just greater than the input.
    *
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression<Interpolator> linear() {
     return new Expression<>("linear");
@@ -1713,6 +1841,7 @@ public class Expression<T> {
    *
    * @param base value controlling the route at which the output increases
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression<Interpolator> exponential(@NonNull Number base) {
     return exponential(literal(base));
@@ -1726,6 +1855,7 @@ public class Expression<T> {
    *
    * @param expression base number expression
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression<Interpolator> exponential(@NonNull Expression<Number> expression) {
     return new Expression<>("exponential", expression);
@@ -1739,6 +1869,7 @@ public class Expression<T> {
    * @param x2 x value of the second point of a cubic bezier, ranges from 0 to 1
    * @param y2 y value fo the second point of a cubic bezier, ranges from 0 to 1
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression<Interpolator> cubicBezier(@NonNull Expression<Number> x1, @NonNull Expression<Number> y1,
                                                      @NonNull Expression<Number> x2, @NonNull Expression<Number> y2) {
@@ -1753,6 +1884,7 @@ public class Expression<T> {
    * @param x2 x value of the second point of a cubic bezier, ranges from 0 to 1
    * @param y2 y value fo the second point of a cubic bezier, ranges from 0 to 1
    * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
    */
   public static Expression<Interpolator> cubicBezier(@NonNull Number x1, @NonNull Number y1,
                                                      @NonNull Number x2, @NonNull Number y2) {
@@ -1777,6 +1909,11 @@ public class Expression<T> {
   }
 
 
+  /**
+   * Returns a string representation of the object that matches the definition set in the style specification.
+   *
+   * @return a string representation of the object.
+   */
   @Override
   public String toString() {
     StringBuilder builder = new StringBuilder();
