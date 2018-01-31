@@ -356,7 +356,7 @@ public class MyLocationView extends View {
         foregroundDrawable.draw(canvas);
       }
     } else if (foregroundBearingDrawable != null && foregroundBounds != null) {
-      if (myBearingTrackingMode == MyBearingTracking.GPS || compassListener.isSensorAvailable()) {
+      if (myBearingTrackingMode == MyBearingTracking.GPS || myBearingTrackingMode == MyBearingTracking.GPS_NORTH_FACING || compassListener.isSensorAvailable()) {
         foregroundBearingDrawable.draw(canvas);
       } else {
         // We are tracking MyBearingTracking.COMPASS, but sensor is not available.
@@ -383,7 +383,7 @@ public class MyLocationView extends View {
   public void setBearing(double bearing) {
     this.bearing = bearing;
     if (myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
-      if (myBearingTrackingMode == MyBearingTracking.GPS) {
+      if (myBearingTrackingMode == MyBearingTracking.GPS || myBearingTrackingMode == MyBearingTracking.GPS_NORTH_FACING) {
         if (location != null) {
           setCompass(location.getBearing() - bearing);
         }
@@ -580,7 +580,7 @@ public class MyLocationView extends View {
     this.location = location;
     myLocationBehavior.updateLatLng(location);
 
-    if (mapboxMap != null && myBearingTrackingMode == MyBearingTracking.GPS
+    if (mapboxMap != null && (myBearingTrackingMode == MyBearingTracking.GPS || myBearingTrackingMode == MyBearingTracking.GPS_NORTH_FACING) 
       && myLocationTrackingMode == MyLocationTracking.TRACKING_NONE) {
       setBearing(mapboxMap.getCameraPosition().bearing);
     }
@@ -616,7 +616,7 @@ public class MyLocationView extends View {
       compassListener.onResume();
     } else {
       compassListener.onPause();
-      if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW) {
+      if (myLocationTrackingMode == MyLocationTracking.TRACKING_FOLLOW && myBearingTrackingMode == MyBearingTracking.GPS) {
         // always face north
         setCompass(0);
       } else {
@@ -1015,6 +1015,14 @@ public class MyLocationView extends View {
           builder.bearing(location.getBearing());
         }
         setCompass(0, COMPASS_UPDATE_RATE_MS);
+      }
+
+      if (myBearingTrackingMode == MyBearingTracking.GPS_NORTH_FACING) {
+        builder.bearing(0);
+        
+        if (location.hasBearing()) {
+          setCompass(location.getBearing(), COMPASS_UPDATE_RATE_MS);
+        }
       }
 
       // accuracy
