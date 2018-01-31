@@ -13,7 +13,7 @@ BUILDTYPE=Debug or BUILDTYPE=Release
 ##### Creating an Android Archive file that supports all ABIs
 
 ```sh
-BUILDTYPE=RELEASE make apackage
+BUILDTYPE=Release make apackage
 ```
 
 This will build native libraries to support following ABIs:
