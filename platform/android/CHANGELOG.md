@@ -2,6 +2,12 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.4.0 - January 30, 2018
+ - Blacklist Adreno 2xx GPU for VAO support [#11047](https://github.com/mapbox/mapbox-gl-native/pull/11047)
+ - Bearing tracking mode GPS_NORTH_FACING [#11095](https://github.com/mapbox/mapbox-gl-native/pull/11095)
+ - Disable logging missing location permissons [#11084](https://github.com/mapbox/mapbox-gl-native/pull/11084)
+ - Create offline handler using the main thread looper [#11021](https://github.com/mapbox/mapbox-gl-native/pull/11021)
+
 ## 6.0.0-beta.1 - January 26, 2018
  - Binding integration for expressions [#10654](https://github.com/mapbox/mapbox-gl-native/pull/10654)
  - CustomGeometrySource [#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983)
