@@ -2,7 +2,7 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSProcessInfo+MGLAdditions.h"
 
-static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
+static NSString * const MGLAPIClientUserAgentBase = @"mapbox-maps-ios";
 static NSString * const MGLMapboxAccountType = @"MGLMapboxAccountType";
 static NSString * const MGLMapboxMetricsEnabled = @"MGLMapboxMetricsEnabled";
 static NSString * const MGLMapboxMetricsDebugLoggingEnabled = @"MGLMapboxMetricsDebugLoggingEnabled";
