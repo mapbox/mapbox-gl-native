@@ -62,13 +62,13 @@ public:
     }
 
     
-    CTFontRef getFont(const std::string& fontName) {
+    CTFontRef getFont(const std::u16string& fontName) {
         
         if (fontHandles.find(fontName) == fontHandles.end()) {
             // TODO: Make sure these are the right attributes
           NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontName.c_str() encoding:NSUTF8StringEncoding]
+                (NSString *)kCTFontFamilyNameAttribute: [NSString stringWithCharacters:(UniChar*)fontName.data() length:fontName.length()]
             };
 
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
@@ -84,7 +84,7 @@ public:
     
 private:
     optional<std::string> fontFamily;
-    std::unordered_map<std::string, CTFontRef> fontHandles;
+    std::unordered_map<std::u16string, CTFontRef> fontHandles;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)

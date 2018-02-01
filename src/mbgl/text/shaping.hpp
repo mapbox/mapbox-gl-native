@@ -57,6 +57,8 @@ const Shaping getShaping(const std::u16string& string,
                          BiDi& bidi,
                          const Glyphs& glyphs);
 
+// implemented in CTShaping.mm
 GlyphIDs getGlyphDependencies(const std::u16string& string);
+void shapeLine(Shaping&, const std::u16string&);
 
 } // namespace mbgl

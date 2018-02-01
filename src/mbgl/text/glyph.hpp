@@ -17,8 +17,8 @@
 
 namespace mbgl {
 
-using FontGlyphID = char16_t;
-using GlyphID = std::pair<std::string, FontGlyphID>;
+using FontGlyphID = uint16_t;
+using GlyphID = std::pair<std::u16string, FontGlyphID>;
 using GlyphIDs = std::set<GlyphID>;
     
 // Note: this only works for the BMP
@@ -46,7 +46,7 @@ public:
     // also need to be reencoded.
     static constexpr const uint8_t borderSize = 3;
 
-    GlyphID id = { "", 0 };
+    GlyphID id = { u"", 0 };
 
     // A signed distance field of the glyph with a border (see above).
     AlphaImage bitmap;
@@ -63,7 +63,7 @@ public:
     explicit PositionedGlyph(GlyphID glyph_, float x_, float y_, bool vertical_)
         : glyph(glyph_), x(x_), y(y_), vertical(vertical_) {}
 
-    GlyphID glyph = { "", 0 };
+    GlyphID glyph = { u"", 0 };
     float x = 0;
     float y = 0;
     bool vertical = false;

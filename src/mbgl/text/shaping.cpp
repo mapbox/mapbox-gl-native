@@ -248,26 +248,6 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
     return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
-void shapeLine(Shaping&, const std::u16string&) {
-//    for (char16_t chr : line) {
-//        auto it = glyphs.find(chr);
-//        if (it == glyphs.end() || !it->second) {
-//            continue;
-//        }
-//        
-//        const Glyph& glyph = **it->second;
-//        
-//        if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
-//            shaping.positionedGlyphs.emplace_back(chr, x, y, false);
-//            x += glyph.metrics.advance + spacing;
-//        } else {
-//            shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
-//            x += verticalHeight + spacing;
-//        }
-//    }
-    // TODO: Turn line into a CTRun, and for each glyph add an entry to shaping.positionedGlyphs
-
-}
 
 void shapeLines(Shaping& shaping,
                           const std::vector<std::u16string>& lines,
@@ -350,16 +330,6 @@ const Shaping getShaping(const std::u16string& logicalInput,
                textJustify, verticalHeight, writingMode, glyphs);
     
     return shaping;
-}
-
-
-GlyphIDs getGlyphDependencies(const std::u16string& text) {
-    // TODO: Run shaping on the string as a whole, return the set of CGGlyphs and font names as GlyphIDs
-    GlyphIDs dependencies;
-    for (char16_t chr : text) {
-        dependencies.insert({"Helvetica", chr });
-    }
-    return dependencies;
 }
 
 } // namespace mbgl
