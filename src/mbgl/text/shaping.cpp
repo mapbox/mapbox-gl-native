@@ -111,21 +111,22 @@ void justifyLine(std::vector<PositionedGlyph>& positionedGlyphs,
     }
 }
 
-float determineAverageLineWidth(const std::u16string& logicalInput,
-                                const float spacing,
+float determineAverageLineWidth(const std::u16string&,
+                                const float,
                                 float maxWidth,
-                                const Glyphs& glyphs) {
-    float totalWidth = 0;
-    
-    for (char16_t chr : logicalInput) {
-        auto it = glyphs.find(chr);
-        if (it != glyphs.end() && it->second) {
-            totalWidth += (*it->second)->metrics.advance + spacing;
-        }
-    }
-    
-    int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
-    return totalWidth / targetLineCount;
+                                const Glyphs&) {
+    return maxWidth;
+//    float totalWidth = 0;
+//
+//    for (char16_t chr : logicalInput) {
+//        auto it = glyphs.find(chr);
+//        if (it != glyphs.end() && it->second) {
+//            totalWidth += (*it->second)->metrics.advance + spacing;
+//        }
+//    }
+//
+//    int32_t targetLineCount = ::fmax(1, std::ceil(totalWidth / maxWidth));
+//    return totalWidth / targetLineCount;
 }
 
 float calculateBadness(const float lineWidth, const float targetWidth, const float penalty, const bool isLastBreak) {
@@ -229,10 +230,10 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
     
     for (std::size_t i = 0; i < logicalInput.size(); i++) {
         const char16_t codePoint = logicalInput[i];
-        auto it = glyphs.find(codePoint);
-        if (it != glyphs.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
-            currentX += (*it->second)->metrics.advance + spacing;
-        }
+//        auto it = glyphs.find(codePoint);
+//        if (it != glyphs.end() && it->second && !boost::algorithm::is_any_of(u" \t\n\v\f\r")(codePoint)) {
+//            currentX += (*it->second)->metrics.advance + spacing;
+//        }
         
         // Ideographic characters, spaces, and word-breaking punctuation that often appear without
         // surrounding spaces.
@@ -247,14 +248,35 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
     return leastBadBreaks(evaluateBreak(logicalInput.size(), currentX, targetWidth, potentialBreaks, 0, true));
 }
 
+void shapeLine(Shaping&, const std::u16string&) {
+//    for (char16_t chr : line) {
+//        auto it = glyphs.find(chr);
+//        if (it == glyphs.end() || !it->second) {
+//            continue;
+//        }
+//        
+//        const Glyph& glyph = **it->second;
+//        
+//        if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
+//            shaping.positionedGlyphs.emplace_back(chr, x, y, false);
+//            x += glyph.metrics.advance + spacing;
+//        } else {
+//            shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
+//            x += verticalHeight + spacing;
+//        }
+//    }
+    // TODO: Turn line into a CTRun, and for each glyph add an entry to shaping.positionedGlyphs
+
+}
+
 void shapeLines(Shaping& shaping,
                           const std::vector<std::u16string>& lines,
                           const float spacing,
                           const float lineHeight,
                           const style::SymbolAnchorType textAnchor,
                           const style::TextJustifyType textJustify,
-                          const float verticalHeight,
-                          const WritingModeType writingMode,
+                          const float,
+                          const WritingModeType,
                           const Glyphs& glyphs) {
     
     // the y offset *should* be part of the font metadata
@@ -279,23 +301,8 @@ void shapeLines(Shaping& shaping,
         }
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
-        for (char16_t chr : line) {
-            auto it = glyphs.find(chr);
-            if (it == glyphs.end() || !it->second) {
-                continue;
-            }
-            
-            const Glyph& glyph = **it->second;
-            
-            if (writingMode == WritingModeType::Horizontal || !util::i18n::hasUprightVerticalOrientation(chr)) {
-                shaping.positionedGlyphs.emplace_back(chr, x, y, false);
-                x += glyph.metrics.advance + spacing;
-            } else {
-                shaping.positionedGlyphs.emplace_back(chr, x, 0, true);
-                x += verticalHeight + spacing;
-            }
-        }
-        
+        shapeLine(shaping, line);
+
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
             float lineLength = x - spacing; // Don't count trailing spacing
@@ -345,5 +352,14 @@ const Shaping getShaping(const std::u16string& logicalInput,
     return shaping;
 }
 
+
+GlyphIDs getGlyphDependencies(const std::u16string& text) {
+    // TODO: Run shaping on the string as a whole, return the set of CGGlyphs and font names as GlyphIDs
+    GlyphIDs dependencies;
+    for (char16_t chr : text) {
+        dependencies.insert({"Helvetica", chr });
+    }
+    return dependencies;
+}
 
 } // namespace mbgl

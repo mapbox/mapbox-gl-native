@@ -53,39 +53,38 @@ class LocalGlyphRasterizer::Impl {
 public:
     Impl(const optional<std::string> fontFamily_)
         : fontFamily(fontFamily_)
-        , fontHandle(NULL)
     {}
     
     ~Impl() {
-        if (fontHandle) {
-            CFRelease(fontHandle);
+        for (auto& pair : fontHandles) {
+            CFRelease(pair.second);
         }
     }
 
     
-    CTFontRef getFont() {
-        if (!fontFamily) {
-            return NULL;
-        }
+    CTFontRef getFont(const std::string& fontName) {
         
-        if (!fontHandle) {
+        if (fontHandles.find(fontName) == fontHandles.end()) {
+            // TODO: Make sure these are the right attributes
           NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
-                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontFamily->c_str() encoding:NSUTF8StringEncoding]
+                (NSString *)kCTFontFamilyNameAttribute: [[NSString alloc] initWithCString:fontName.c_str() encoding:NSUTF8StringEncoding]
             };
 
             CTFontDescriptorRefHandle descriptor(CTFontDescriptorCreateWithAttributes((CFDictionaryRef)fontAttributes));
-            fontHandle = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
-            if (!fontHandle) {
+            CTFontRef font = CTFontCreateWithFontDescriptor(*descriptor, 0.0, NULL);
+            if (!font) {
                 throw std::runtime_error("CTFontCreateWithFontDescriptor failed");
             }
+            fontHandles[fontName] = font;
+
         }
-        return fontHandle;
+        return fontHandles[fontName];
     }
     
 private:
     optional<std::string> fontFamily;
-    CTFontRef fontHandle;
+    std::unordered_map<std::string, CTFontRef> fontHandles;
 };
 
 LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamily)
@@ -95,11 +94,13 @@ LocalGlyphRasterizer::LocalGlyphRasterizer(const optional<std::string> fontFamil
 LocalGlyphRasterizer::~LocalGlyphRasterizer()
 {}
 
-bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont();
+bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID) {
+    return true;
+    //return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont();
 }
 
-PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
+PremultipliedImage drawGlyphBitmap(CGGlyph glyphID, CTFontRef font, Size size) {
+    // TODO: Draw with assumption that glyphID is a CGGlyph, not a Unicode character
     PremultipliedImage rgbaBitmap(size);
     
     CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(&glyphID), 1));
@@ -144,32 +145,39 @@ PremultipliedImage drawGlyphBitmap(GlyphID glyphID, CTFontRef font, Size size) {
     return rgbaBitmap;
 }
 
+GlyphMetrics getGlyphMetrics(CGGlyph, CTFontRef) {
+    // TODO: hook this up to an actual metrics lookup
+    GlyphMetrics metrics;
+    metrics.width = 35;
+    metrics.height = 35;
+    metrics.left = 3;
+    metrics.top = -1;
+    metrics.advance = 24;
+    
+    return metrics;
+}
+
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
-    Glyph fixedMetrics;
-    CTFontRef font = impl->getFont();
+    Glyph manufacturedGlyph;
+    CTFontRef font = impl->getFont(glyphID.first);
     if (!font) {
-        return fixedMetrics;
+        return manufacturedGlyph;
     }
     
-    fixedMetrics.id = glyphID;
+    manufacturedGlyph.id = glyphID;
+    manufacturedGlyph.metrics = getGlyphMetrics(glyphID.second, font);
 
-    Size size(35, 35);
+    Size size(manufacturedGlyph.metrics.width, manufacturedGlyph.metrics.height);
     
-    fixedMetrics.metrics.width = size.width;
-    fixedMetrics.metrics.height = size.height;
-    fixedMetrics.metrics.left = 3;
-    fixedMetrics.metrics.top = -1;
-    fixedMetrics.metrics.advance = 24;
-
-    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID, font, size);
+    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID.second, font, size);
    
     // Copy alpha values from RGBA bitmap into the AlphaImage output
-    fixedMetrics.bitmap = AlphaImage(size);
+    manufacturedGlyph.bitmap = AlphaImage(size);
     for (uint32_t i = 0; i < size.width * size.height; i++) {
-        fixedMetrics.bitmap.data[i] = rgbaBitmap.data[4 * i + 3];
+        manufacturedGlyph.bitmap.data[i] = rgbaBitmap.data[4 * i + 3];
     }
 
-    return fixedMetrics;
+    return manufacturedGlyph;
 }
 
 } // namespace mbgl

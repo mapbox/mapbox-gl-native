@@ -397,13 +397,14 @@ bool allowsFixedWidthGlyphGeneration(char16_t chr) {
     return isInCJKUnifiedIdeographs(chr) || isInHangulSyllables(chr);
 }
 
-bool allowsVerticalWritingMode(const std::u16string& string) {
-    for (char32_t chr : string) {
-        if (hasUprightVerticalOrientation(chr)) {
-            return true;
-        }
-    }
+bool allowsVerticalWritingMode(const std::u16string&) {
     return false;
+//    for (char32_t chr : string) {
+//        if (hasUprightVerticalOrientation(chr)) {
+//            return true;
+//        }
+//    }
+//    return false;
 }
 
 // The following logic comes from

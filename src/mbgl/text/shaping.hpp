@@ -57,4 +57,6 @@ const Shaping getShaping(const std::u16string& string,
                          BiDi& bidi,
                          const Glyphs& glyphs);
 
+GlyphIDs getGlyphDependencies(const std::u16string& string);
+
 } // namespace mbgl

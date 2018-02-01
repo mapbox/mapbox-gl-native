@@ -32,12 +32,8 @@ void GlyphManager::getGlyphs(GlyphRequestor& requestor, GlyphDependencies glyphD
         const GlyphIDs& glyphIDs = dependency.second;
         GlyphRangeSet ranges;
         for (const auto& glyphID : glyphIDs) {
-            if (localGlyphRasterizer->canRasterizeGlyph(fontStack, glyphID)) {
-                if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
-                    entry.glyphs.emplace(glyphID, makeMutable<Glyph>(generateLocalSDF(fontStack, glyphID)));
-                }
-            } else {
-                ranges.insert(getGlyphRange(glyphID));
+            if (entry.glyphs.find(glyphID) == entry.glyphs.end()) {
+                entry.glyphs.emplace(glyphID, makeMutable<Glyph>(generateLocalSDF(fontStack, glyphID)));
             }
         }
 

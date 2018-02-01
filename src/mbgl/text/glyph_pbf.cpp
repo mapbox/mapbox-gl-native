@@ -24,7 +24,7 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
             while (glyph_pbf.next()) {
                 switch (glyph_pbf.tag()) {
                 case 1: // id
-                    glyph.id = glyph_pbf.get_uint32();
+                    glyph.id.second = glyph_pbf.get_uint32();
                     hasID = true;
                     break;
                 case 2: // bitmap
@@ -65,7 +65,7 @@ std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string
                 glyph.metrics.left < -128 || glyph.metrics.left >= 128 ||
                 glyph.metrics.top < -128 || glyph.metrics.top >= 128 ||
                 glyph.metrics.advance >= 256 ||
-                glyph.id < glyphRange.first || glyph.id > glyphRange.second) {
+                glyph.id.second < glyphRange.first || glyph.id.second > glyphRange.second) {
                 continue;
             }
 

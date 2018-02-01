@@ -139,22 +139,25 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
             }
 
             ft.text = applyArabicShaping(util::utf8_to_utf16::convert(u8string));
-            const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
-                                         && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
-                                         && util::i18n::allowsVerticalWritingMode(*ft.text);
+//            const bool canVerticalizeText = layout.get<TextRotationAlignment>() == AlignmentType::Map
+//                                         && layout.get<SymbolPlacement>() == SymbolPlacementType::Line
+//                                         && util::i18n::allowsVerticalWritingMode(*ft.text);
 
             FontStack fontStack = layout.evaluate<TextFont>(zoom, ft);
             GlyphIDs& dependencies = glyphDependencies[fontStack];
+            for (GlyphID glyph : getGlyphDependencies(*ft.text)) {
+                dependencies.insert(glyph);
+            }
 
             // Loop through all characters of this text and collect unique codepoints.
-            for (char16_t chr : *ft.text) {
-                dependencies.insert(chr);
-                if (canVerticalizeText) {
-                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
-                        dependencies.insert(verticalChr);
-                    }
-                }
-            }
+//            for (char16_t chr : *ft.text) {
+//                dependencies.insert(chr);
+//                if (canVerticalizeText) {
+//                    if (char16_t verticalChr = util::i18n::verticalizePunctuation(chr)) {
+//                        dependencies.insert(verticalChr);
+//                    }
+//                }
+//            }
         }
 
         if (hasIcon) {
