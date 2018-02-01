@@ -287,7 +287,7 @@ UniqueTexture Context::createTexture() {
 
 bool Context::supportsVertexArrays() const {
     static bool blacklisted = []() {
-        const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+        const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
 
         Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
 
@@ -318,7 +318,7 @@ bool Context::supportsProgramBinaries() const {
     // https://chromium.googlesource.com/chromium/src/gpu/+/master/config/gpu_driver_bug_list.json#2316
     // Blacklist Vivante GC4000 due to bugs when linking loaded programs:
     // https://github.com/mapbox/mapbox-gl-native/issues/10704
-    const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+    const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
     if (renderer.find("Adreno (TM) 3") != std::string::npos
      || renderer.find("Adreno (TM) 4") != std::string::npos
      || renderer.find("Adreno (TM) 5") != std::string::npos
