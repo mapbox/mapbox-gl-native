@@ -477,7 +477,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onLowMemory() {
-    nativeMapView.onLowMemory();
+    if (nativeMapView != null) {
+      nativeMapView.onLowMemory();
+    }
   }
 
   /**
