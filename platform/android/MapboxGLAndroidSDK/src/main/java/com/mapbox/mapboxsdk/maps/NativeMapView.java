@@ -758,20 +758,11 @@ final class NativeMapView {
       return;
     }
 
-    // Check/correct config
-    if (image.getConfig() != Bitmap.Config.ARGB_8888) {
-      image = image.copy(Bitmap.Config.ARGB_8888, false);
-    }
-
-    // Get pixels
-    ByteBuffer buffer = ByteBuffer.allocate(image.getByteCount());
-    image.copyPixelsToBuffer(buffer);
-
     // Determine pixel ratio
     float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
     float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
 
-    nativeAddImage(name, image.getWidth(), image.getHeight(), pixelRatio, buffer.array());
+    nativeAddImage(name, image, pixelRatio);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
@@ -1032,8 +1023,7 @@ final class NativeMapView {
 
   private native void nativeRemoveSource(Source source, long sourcePtr);
 
-  private native void nativeAddImage(String name, int width, int height, float pixelRatio,
-                                     byte[] array);
+  private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio);
 
   private native void nativeAddImages(Image[] images);
 
