@@ -251,7 +251,7 @@ std::set<std::size_t> determineLineBreaks(const std::u16string& logicalInput,
 
 void shapeLines(Shaping& shaping,
                           const std::vector<std::u16string>& lines,
-                          const float spacing,
+                          const float,
                           const float lineHeight,
                           const style::SymbolAnchorType textAnchor,
                           const style::TextJustifyType textJustify,
@@ -260,7 +260,7 @@ void shapeLines(Shaping& shaping,
                           const Glyphs& glyphs) {
     
     // the y offset *should* be part of the font metadata
-    const int32_t yOffset = -17;
+    const int32_t yOffset = 0;//-17;
     
     float x = 0;
     float y = yOffset;
@@ -281,11 +281,10 @@ void shapeLines(Shaping& shaping,
         }
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
-        shapeLine(shaping, line);
+        const float lineLength = shapeLine(shaping, line, y);
 
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
-            float lineLength = x - spacing; // Don't count trailing spacing
             maxLineLength = util::max(lineLength, maxLineLength);
             
             justifyLine(shaping.positionedGlyphs, glyphs, lineStartIndex,

@@ -99,11 +99,21 @@ bool LocalGlyphRasterizer::canRasterizeGlyph(const FontStack&, GlyphID) {
     //return util::i18n::allowsFixedWidthGlyphGeneration(glyphID) && impl->getFont();
 }
 
-PremultipliedImage drawGlyphBitmap(CGGlyph glyphID, CTFontRef font, Size size) {
-    // TODO: Draw with assumption that glyphID is a CGGlyph, not a Unicode character
-    PremultipliedImage rgbaBitmap(size);
+PremultipliedImage drawGlyphBitmap(CGGlyph glyphID, CTFontRef font, GlyphMetrics& metrics) {
     
-    CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(&glyphID), 1));
+    CGRect boundingRects[1];
+    CGGlyph glyphs[1];
+    glyphs[0] = glyphID;
+    CTFontGetBoundingRectsForGlyphs(font, kCTFontOrientationHorizontal, glyphs, boundingRects, 1);
+    metrics.width = std::ceil(boundingRects[0].size.width) + 6;
+    metrics.height = std::ceil(boundingRects[0].size.height) + 16;
+    metrics.left = -3;
+    metrics.top = -13;
+    metrics.advance = 24;
+    
+    Size size(metrics.width, metrics.height);
+    
+    PremultipliedImage rgbaBitmap(size);
 
     CGColorSpaceHandle colorSpace(CGColorSpaceCreateDeviceRGB());
     if (!colorSpace) {
@@ -126,36 +136,14 @@ PremultipliedImage drawGlyphBitmap(CGGlyph glyphID, CTFontRef font, Size size) {
         throw std::runtime_error("CGBitmapContextCreate failed");
     }
 
-    CFStringRef keys[] = { kCTFontAttributeName };
-    CFTypeRef values[] = { font };
+    CGPoint positions[1];
+    positions[0] = CGPointMake(3.0, 13.0);
 
-    CFDictionaryRefHandle attributes(
-        CFDictionaryCreate(kCFAllocatorDefault, (const void**)&keys,
-            (const void**)&values, sizeof(keys) / sizeof(keys[0]),
-            &kCFTypeDictionaryKeyCallBacks,
-            &kCFTypeDictionaryValueCallBacks));
-
-    CFAttributedStringRefHandle attrString(CFAttributedStringCreate(kCFAllocatorDefault, *string, *attributes));
-    CTLineRefHandle line(CTLineCreateWithAttributedString(*attrString));
-    
-    // Start drawing a little bit below the top of the bitmap
-    CGContextSetTextPosition(*context, 0.0, 5.0);
-    CTLineDraw(*line, *context);
+    CTFontDrawGlyphs(font, glyphs, positions, 1, *context);
     
     return rgbaBitmap;
 }
 
-GlyphMetrics getGlyphMetrics(CGGlyph, CTFontRef) {
-    // TODO: hook this up to an actual metrics lookup
-    GlyphMetrics metrics;
-    metrics.width = 35;
-    metrics.height = 35;
-    metrics.left = 3;
-    metrics.top = -1;
-    metrics.advance = 24;
-    
-    return metrics;
-}
 
 Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     Glyph manufacturedGlyph;
@@ -165,12 +153,10 @@ Glyph LocalGlyphRasterizer::rasterizeGlyph(const FontStack&, GlyphID glyphID) {
     }
     
     manufacturedGlyph.id = glyphID;
-    manufacturedGlyph.metrics = getGlyphMetrics(glyphID.second, font);
-
-    Size size(manufacturedGlyph.metrics.width, manufacturedGlyph.metrics.height);
     
-    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID.second, font, size);
+    PremultipliedImage rgbaBitmap = drawGlyphBitmap(glyphID.second, font, manufacturedGlyph.metrics);
    
+    Size size(manufacturedGlyph.metrics.width, manufacturedGlyph.metrics.height);
     // Copy alpha values from RGBA bitmap into the AlphaImage output
     manufacturedGlyph.bitmap = AlphaImage(size);
     for (uint32_t i = 0; i < size.width * size.height; i++) {
