@@ -759,10 +759,7 @@ final class NativeMapView {
     }
 
     // Determine pixel ratio
-    float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
-    float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
-
-    nativeAddImage(name, image, pixelRatio);
+    nativeAddImage(name, image, image.getDensity() / DisplayMetrics.DENSITY_DEFAULT);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
