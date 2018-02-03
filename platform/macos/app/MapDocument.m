@@ -423,7 +423,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
 - (IBAction)setLabelLanguage:(NSMenuItem *)sender {
     _isLocalizingLabels = sender.tag;
-    [self reload:sender];
+    [self updateLabels];
 }
 
 - (void)updateLabels {
