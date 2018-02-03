@@ -923,7 +923,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     NSString *title;
     for (id <MGLFeature> feature in features) {
         if (!title) {
-            title = [feature attributeForKey:@"name_en"] ?: [feature attributeForKey:@"name"];
+            title = [feature attributeForKey:@"name"];
         }
     }
 
