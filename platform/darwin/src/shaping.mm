@@ -63,10 +63,10 @@ float shapeLine(Shaping& shaping, const std::u16string& text, const float y) {
         for (CFIndex j = 0; j < runGlyphCount; j++) {
             CGRect frame = boundingRects[j];
             frame.origin.x += runAdvance.width;
-            //frame.origin.y += runAdvance.height;
+            frame.origin.y += runAdvance.height;
             runAdvance.width += advances[j].width;
             runAdvance.height += advances[j].height;
-            shaping.positionedGlyphs.emplace_back(GlyphID(fontName, PTR_OR_ARRAY(runGlyphs)[j]), frame.origin.x, y + frame.origin.y - frame.size.height, false);
+            shaping.positionedGlyphs.emplace_back(GlyphID(fontName, PTR_OR_ARRAY(runGlyphs)[j]), CGRectGetMinX(frame), y - CGRectGetHeight(frame), false);
             maxLineLength = std::max<float>(maxLineLength, frame.origin.x + frame.size.width);
         }
         free(runGlyphs);
