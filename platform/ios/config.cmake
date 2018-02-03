@@ -32,6 +32,7 @@ macro(mbgl_platform_core)
         PRIVATE platform/darwin/src/local_glyph_rasterizer.mm
         PRIVATE platform/darwin/src/logging_nslog.mm
         PRIVATE platform/darwin/src/nsthread.mm
+        PRIVATE platform/darwin/src/shaping.mm
         PRIVATE platform/darwin/src/string_nsstring.mm
         PRIVATE platform/default/bidi.cpp
         PRIVATE platform/default/thread_local.cpp

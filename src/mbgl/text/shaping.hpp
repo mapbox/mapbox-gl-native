@@ -57,7 +57,7 @@ const Shaping getShaping(const std::u16string& string,
                          BiDi& bidi,
                          const Glyphs& glyphs);
 
-// implemented in CTShaping.mm
+// implemented in shaping.mm
 GlyphIDs getGlyphDependencies(const std::u16string& string);
 float shapeLine(Shaping&, const std::u16string&, const float y);
 
