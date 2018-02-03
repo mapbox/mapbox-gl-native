@@ -658,65 +658,46 @@ static NSURL *MGLStyleURL_trafficNight;
         return;
     }
     
-    if (_localizesLabels) {
-        NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
-        NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
-        for (MGLSymbolStyleLayer *layer in self.layers) {
-            if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
-                continue;
-            }
-            
-            MGLVectorSource *source = (MGLVectorSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
-            if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
-                continue;
-            }
-            
-            NSDictionary *localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier];
-            if (!localizedKeysByKey) {
-                localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier] = [source localizedKeysByKeyForPreferredLanguage:preferredLanguage];
-            }
-            
-            NSString *(^stringByLocalizingString)(NSString *) = ^ NSString * (NSString *string) {
-                NSMutableString *localizedString = string.mutableCopy;
-                [localizedKeysByKey enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull localizedKey, BOOL * _Nonnull stop) {
-                    NSAssert([key isKindOfClass:[NSString class]], @"key is not a string");
-                    NSAssert([localizedKey isKindOfClass:[NSString class]], @"localizedKey is not a string");
-                    [localizedString replaceOccurrencesOfString:[NSString stringWithFormat:@"{%@}", key]
-                                                     withString:[NSString stringWithFormat:@"{%@}", localizedKey]
-                                                        options:0
-                                                          range:NSMakeRange(0, localizedString.length)];
-                }];
-                return localizedString;
-            };
-            
-            if (layer.text.expressionType == NSConstantValueExpressionType) {
-                NSString *textField = layer.text.constantValue;
-                NSString *localizingString = stringByLocalizingString(textField);
-                if (![textField isEqualToString:localizingString]) {
-                    MGLTextLanguage *textLanguage = [[MGLTextLanguage alloc] initWithTextLanguage:textField
-                                                                                 updatedTextField:localizingString];
-                    [self.localizedLayersByIdentifier setObject:@{ textField : textLanguage } forKey:layer.identifier];
-                    layer.text = [NSExpression expressionForConstantValue:localizingString];
-                }
+    NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
+    NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
+    for (MGLSymbolStyleLayer *layer in self.layers) {
+        if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+            continue;
+        }
+        
+        MGLVectorSource *source = (MGLVectorSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
+        if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
+            continue;
+        }
+        
+        NSDictionary *localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier];
+        if (!localizedKeysByKey) {
+            localizedKeysByKey = localizedKeysByKeyBySourceIdentifier[layer.sourceIdentifier] = [source localizedKeysByKeyForPreferredLanguage:_localizesLabels ? preferredLanguage : nil];
+        }
+        
+        NSString *(^stringByLocalizingString)(NSString *) = ^ NSString * (NSString *string) {
+            NSMutableString *localizedString = string.mutableCopy;
+            [localizedKeysByKey enumerateKeysAndObjectsUsingBlock:^(NSString * _Nonnull key, NSString * _Nonnull localizedKey, BOOL * _Nonnull stop) {
+                NSAssert([key isKindOfClass:[NSString class]], @"key is not a string");
+                NSAssert([localizedKey isKindOfClass:[NSString class]], @"localizedKey is not a string");
+                [localizedString replaceOccurrencesOfString:[NSString stringWithFormat:@"{%@}", key]
+                                                 withString:[NSString stringWithFormat:@"{%@}", localizedKey]
+                                                    options:0
+                                                      range:NSMakeRange(0, localizedString.length)];
+            }];
+            return localizedString;
+        };
+        
+        if (layer.text.expressionType == NSConstantValueExpressionType) {
+            NSString *textField = layer.text.constantValue;
+            NSString *localizingString = stringByLocalizingString(textField);
+            if (![textField isEqualToString:localizingString]) {
+                MGLTextLanguage *textLanguage = [[MGLTextLanguage alloc] initWithTextLanguage:textField
+                                                                             updatedTextField:localizingString];
+                [self.localizedLayersByIdentifier setObject:@{ textField : textLanguage } forKey:layer.identifier];
+                layer.text = [NSExpression expressionForConstantValue:localizingString];
             }
         }
-    } else {
-        
-        [self.localizedLayersByIdentifier enumerateKeysAndObjectsUsingBlock:^(NSString *identifier, NSDictionary<NSObject *, MGLTextLanguage *> *textFields, BOOL *done) {
-            MGLSymbolStyleLayer *layer = (MGLSymbolStyleLayer *)[self.mapView.style layerWithIdentifier:identifier];
-            
-            if (layer.text.expressionType == NSConstantValueExpressionType) {
-                NSString *textField = layer.text.constantValue;
-                [textFields enumerateKeysAndObjectsUsingBlock:^(NSObject *originalLanguage, MGLTextLanguage *textLanguage, BOOL *done) {
-                    if ([textLanguage.updatedTextField isEqualToString:textField]) {
-                        layer.text = [NSExpression expressionForConstantValue:textLanguage.originalTextField];
-                    }
-                }];
-
-            }
-        }];
-
-        self.localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
 }
 
