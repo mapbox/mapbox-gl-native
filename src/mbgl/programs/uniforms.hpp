@@ -55,6 +55,7 @@ MBGL_DEFINE_UNIFORM_SCALAR(gl::TextureUnit, u_fadetexture);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_a);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_scale_b);
 MBGL_DEFINE_UNIFORM_SCALAR(float,    u_tile_units_to_pixels);
+MBGL_DEFINE_UNIFORM_SCALAR(float,    u_overscale_factor);
 
 } // namespace uniforms
 } // namespace mbgl
