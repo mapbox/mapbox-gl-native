@@ -44,9 +44,12 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
         FeatureCollection.fromFeatures(new Feature[] {
           Feature.fromGeometry(Point.fromCoordinates(new double[] {0, 0}), properties)
         }));
-      mapboxMap.addSource(source);
+      mapboxMap.getStyle().addSource(source);
 
-      mapboxMap.addLayer(new CircleLayer("test-layer", source.getId()).withFilter(Filter.neq("key1", "value1")));
+      mapboxMap.getStyle().addLayer(
+        new CircleLayer("test-layer", source.getId())
+          .withFilter(Filter.neq("key1", "value1"))
+      );
 
       // Add a click listener
       mapboxMap.setOnMapClickListener(point -> {

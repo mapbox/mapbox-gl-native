@@ -54,7 +54,7 @@ public class BackgroundLayerTest extends BaseActivityTest {
     invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
       @Override
       public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        layer = mapboxMap.getLayerAs("background");
+        layer = mapboxMap.getStyle().getLayerAs("background");
       }
     });
   }

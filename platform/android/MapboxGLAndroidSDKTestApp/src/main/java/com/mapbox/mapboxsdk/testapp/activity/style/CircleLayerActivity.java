@@ -9,10 +9,10 @@ import android.view.View;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -70,7 +70,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
     } catch (MalformedURLException exception) {
       Timber.e(exception, "That's not an url... ");
     }
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
   }
 
   private void addBusStopCircleLayer() {
@@ -79,7 +79,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
       circleColor(Color.parseColor("#FF9800")),
       circleRadius(2.0f)
     );
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
   }
 
   private void initFloatingActionButtons() {
@@ -122,7 +122,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
   private void addBusRouteSource() {
     try {
-      mapboxMap.addSource(new GeoJsonSource("bus_route",
+      mapboxMap.getStyle().addSource(new GeoJsonSource("bus_route",
         new URL("https://gist.githubusercontent.com/tobrun/7fbc0fe7e9ffea509f7608cda2601d5d/raw/"
           + "a4b8cc289020f91fa2e1553524820054395e36f5/line.geojson")));
     } catch (MalformedURLException malformedUrlException) {
@@ -132,7 +132,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
 
   private void addBusRouteLayer() {
     LineLayer lineLayer = new LineLayer("route_layer", "bus_route");
-    mapboxMap.addLayerBelow(lineLayer, "stops_layer");
+    mapboxMap.getStyle().addLayerBelow(lineLayer, "stops_layer");
     mapboxMap.animateCamera(CameraUpdateFactory.newCameraPosition(
       new CameraPosition.Builder()
         .target(new LatLng(1.3896777, 103.9874997))
@@ -150,28 +150,30 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void removeBusStop() {
-    mapboxMap.removeLayer(layer);
-    mapboxMap.removeSource(source);
+    com.mapbox.mapboxsdk.maps.Style style = mapboxMap.getStyle();
+    style.removeLayer(layer);
+    style.removeSource(source);
   }
 
   private void loadNewStyle() {
-    mapboxMap.setStyleUrl(getNextStyle(), style -> {
+    mapboxMap.setStyle(getNextStyle(), style -> {
       addBusStop();
       isLoadingStyle = false;
     });
   }
 
   private void addBusStop() {
-    mapboxMap.addLayer(layer);
-    mapboxMap.addSource(source);
+    com.mapbox.mapboxsdk.maps.Style style = mapboxMap.getStyle();
+    style.addLayer(layer);
+    style.addSource(source);
   }
 
-  private String getNextStyle() {
+  private Style getNextStyle() {
     currentStyleIndex++;
     if (currentStyleIndex == Data.STYLES.length) {
       currentStyleIndex = 0;
     }
-    return Data.STYLES[currentStyleIndex];
+    return Style.fromUrl(Data.STYLES[currentStyleIndex]);
   }
 
   @Override

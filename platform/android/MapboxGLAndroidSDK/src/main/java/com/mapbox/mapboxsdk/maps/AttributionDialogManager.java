@@ -146,7 +146,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
 
     private Set<Attribution> build() {
       List<String> attributions = new ArrayList<>();
-      for (Source source : mapboxMap.getSources()) {
+      for (Source source : mapboxMap.getStyle().getSources()) {
         attributions.add(source.getAttribution());
       }
 

@@ -11,6 +11,7 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.rule.ActivityTestRule;
 import android.view.View;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.OnMapReadyIdlingResource;
 import junit.framework.Assert;
@@ -30,6 +31,7 @@ public abstract class BaseActivityTest {
   @Rule
   public ActivityTestRule<Activity> rule = new ActivityTestRule<>(getActivityClass());
   protected MapboxMap mapboxMap;
+  protected Style style;
   protected OnMapReadyIdlingResource idlingResource;
 
   @Before
@@ -40,6 +42,7 @@ public abstract class BaseActivityTest {
       Espresso.registerIdlingResources(idlingResource);
       checkViewIsDisplayed(R.id.mapView);
       mapboxMap = idlingResource.getMapboxMap();
+      style = mapboxMap.getStyle();
     } catch (IdlingResourceTimeoutException idlingResourceTimeoutException) {
       Timber.e("Idling resource timed out. Couldn't not validate if map is ready.");
       throw new RuntimeException("Could not start test for " + getActivityClass().getSimpleName() + ".\n"

@@ -8,10 +8,10 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
@@ -37,7 +37,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   public void onMapReady(MapboxMap map) {
     mapboxMap = map;
-    mapboxMap.setStyleUrl(Style.OUTDOORS);
+    mapboxMap.setStyle(Style.fromUrl(Style.OUTDOORS));
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     if (fab != null) {
       fab.setColorFilter(ContextCompat.getColor(SnapshotActivity.this, R.color.primary));

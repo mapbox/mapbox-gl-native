@@ -101,7 +101,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
 
     // add source
     CustomGeometrySource source = new CustomGeometrySource(ID_GRID_SOURCE, new GridProvider());
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     // add layer
     LineLayer layer = new LineLayer(ID_GRID_LAYER, ID_GRID_SOURCE);
@@ -109,7 +109,7 @@ public class GridSourceActivity extends AppCompatActivity implements OnMapReadyC
       lineColor(Color.parseColor("#000000"))
     );
 
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
   }
 
   @Override

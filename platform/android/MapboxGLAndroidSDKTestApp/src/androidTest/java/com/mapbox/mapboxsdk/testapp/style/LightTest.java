@@ -173,7 +173,7 @@ public class LightTest extends BaseActivityTest {
 
       @Override
       public void perform(UiController uiController, View view) {
-        light = mapboxMap.getLight();
+        light = style.getLight();
         FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
         fillExtrusionLayer.setSourceLayer("building");
         fillExtrusionLayer.setFilter(eq("extrude", "true"));
@@ -184,7 +184,7 @@ public class LightTest extends BaseActivityTest {
           fillExtrusionBase(Function.property("min_height", new IdentityStops<Float>())),
           fillExtrusionOpacity(0.6f)
         );
-        mapboxMap.addLayer(fillExtrusionLayer);
+        style.addLayer(fillExtrusionLayer);
       }
     });
   }

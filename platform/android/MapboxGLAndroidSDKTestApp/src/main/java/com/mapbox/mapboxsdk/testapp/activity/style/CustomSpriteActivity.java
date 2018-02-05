@@ -11,6 +11,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -53,9 +54,11 @@ public class CustomSpriteActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
           if (point == null) {
+            Style style = map.getStyle();
+
             Timber.i("First click -> Car");
             // Add an icon to reference later
-            mapboxMap.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
+            style.addImage(CUSTOM_ICON, BitmapFactory.decodeResource(getResources(), R.drawable.ic_car_top));
 
             // Add a source with a geojson point
             point = Point.fromCoordinates(Position.fromCoordinates(13.400972d, 52.519003d));
@@ -63,7 +66,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
               "point",
               FeatureCollection.fromFeatures(new Feature[] {Feature.fromGeometry(point)})
             );
-            mapboxMap.addSource(source);
+            style.addSource(source);
 
             // Add a symbol layer that references that point source
             layer = new SymbolLayer("layer", "point");
@@ -73,7 +76,7 @@ public class CustomSpriteActivity extends AppCompatActivity {
             );
 
             // lets add a circle below labels!
-            mapboxMap.addLayerBelow(layer, "waterway-label");
+            style.addLayerBelow(layer, "waterway-label");
 
             fab.setImageResource(R.drawable.ic_directions_car_black);
           } else {

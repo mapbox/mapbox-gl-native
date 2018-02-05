@@ -202,6 +202,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/position.hpp
     platform/android/src/style/light.cpp
     platform/android/src/style/light.hpp
+    platform/android/src/style/style.cpp
+    platform/android/src/style/style.hpp
 
     # FileSource holder
     platform/android/src/file_source.cpp

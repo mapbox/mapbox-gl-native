@@ -15,6 +15,7 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.maps.Style;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
@@ -53,8 +54,11 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     mapView.getMapAsync(map -> {
       mapboxMap = map;
 
+
+      Style style =  map.getStyle();
+
       // Add a image for the makers
-      mapboxMap.addImage(
+      style.addImage(
         "my-marker-image",
         BitmapFactory.decodeResource(SymbolLayerActivity.this.getResources(),
           R.drawable.mapbox_marker_icon_default)
@@ -65,10 +69,10 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
         Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35673}), featureProperties("Marker 1")),
         Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.34673}), featureProperties("Marker 2"))
       });
-      mapboxMap.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
+      style.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
 
       // Add the symbol-layer
-      mapboxMap.addLayer(
+      style.addLayer(
         new SymbolLayer(MARKER_LAYER, MARKER_SOURCE)
           .withProperties(
             iconImage("my-marker-image"),
@@ -93,7 +97,7 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
     PointF screenLoc = mapboxMap.getProjection().toScreenLocation(point);
     List<Feature> features = mapboxMap.queryRenderedFeatures(screenLoc, MARKER_LAYER);
 
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     if (features.size() == 0) {
       // Reset
       layer.setProperties(iconSize(1f));
@@ -103,17 +107,17 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
   }
 
   private void toggleTextSize() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     layer.setProperties(layer.getTextSize().getValue() > 10 ? textSize(10f) : textSize(20f));
   }
 
   private void toggleTextField() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
     layer.setProperties("{title}".equals(layer.getTextField().getValue()) ? textField("āA") : textField("{title}"));
   }
 
   private void toggleTextFont() {
-    SymbolLayer layer = mapboxMap.getLayerAs(MARKER_LAYER);
+    SymbolLayer layer = mapboxMap.getStyle().getLayerAs(MARKER_LAYER);
 
     String[] fonts = layer.getTextFont().getValue();
     if (fonts == null || fonts.length == 0 || Arrays.asList(fonts).contains("Arial Unicode MS Regular")) {

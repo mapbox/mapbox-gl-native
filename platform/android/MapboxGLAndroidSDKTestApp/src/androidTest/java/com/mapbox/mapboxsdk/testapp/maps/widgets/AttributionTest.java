@@ -151,7 +151,7 @@ public class AttributionTest extends BaseActivityTest {
 
   private void buildUrlSpans() {
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      for (Source source : mapboxMap.getSources()) {
+      for (Source source : mapboxMap.getStyle().getSources()) {
         String attributionSource = source.getAttribution();
         if (!TextUtils.isEmpty(attributionSource)) {
           SpannableStringBuilder htmlBuilder = (SpannableStringBuilder) Html.fromHtml(attributionSource);

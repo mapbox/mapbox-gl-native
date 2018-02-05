@@ -75,7 +75,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       source.setGeoJson(featureCollection);
     } else {
       source = new GeoJsonSource(SOURCE_ID, featureCollection);
-      mapboxMap.addSource(source);
+      mapboxMap.getStyle().addSource(source);
     }
   }
 
@@ -121,7 +121,7 @@ public class ZoomFunctionSymbolLayerActivity extends AppCompatActivity {
       ),
       iconAllowOverlap(true)
     );
-    mapboxMap.addLayer(layer);
+    mapboxMap.getStyle().addLayer(layer);
   }
 
   private void addMapClickListener() {

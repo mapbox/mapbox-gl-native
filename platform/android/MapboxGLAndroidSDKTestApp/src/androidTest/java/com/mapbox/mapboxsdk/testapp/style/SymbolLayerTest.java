@@ -54,13 +54,13 @@ public class SymbolLayerTest extends BaseActivityTest {
     invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
       @Override
       public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        if ((layer = mapboxMap.getLayerAs("my-layer")) == null) {
+        if ((layer = style.getLayerAs("my-layer")) == null) {
           Timber.i("Adding layer");
           layer = new SymbolLayer("my-layer", "composite");
           layer.setSourceLayer("composite");
-          mapboxMap.addLayer(layer);
+          style.addLayer(layer);
           // Layer reference is now stale, get new reference
-          layer = mapboxMap.getLayerAs("my-layer");
+          layer = style.getLayerAs("my-layer");
         }
       }
     });

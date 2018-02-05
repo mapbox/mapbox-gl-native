@@ -61,11 +61,11 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
       fillExtrusionBase(Function.property("min_height", new IdentityStops<Float>())),
       fillExtrusionOpacity(0.9f)
     );
-    mapboxMap.addLayer(fillExtrusionLayer);
+    mapboxMap.getStyle().addLayer(fillExtrusionLayer);
   }
 
   private void setupLight() {
-    light = mapboxMap.getLight();
+    light = mapboxMap.getStyle().getLight();
 
     findViewById(R.id.fabLightPosition).setOnClickListener(v -> {
       isInitPosition = !isInitPosition;

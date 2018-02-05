@@ -114,7 +114,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
   private void addClusteredGeoJsonSource() {
     // Add a clustered source
     try {
-      mapboxMap.addSource(
+      mapboxMap.getStyle().addSource(
         new GeoJsonSource("earthquakes",
           new URL("https://www.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson"),
           new GeoJsonOptions()
@@ -136,7 +136,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
 
     SymbolLayer unclustered = new SymbolLayer("unclustered-points", "earthquakes");
     unclustered.setProperties(iconImage("marker-15"));
-    mapboxMap.addLayer(unclustered);
+    mapboxMap.getStyle().addLayer(unclustered);
 
     for (int i = 0; i < layers.length; i++) {
       // Add some nice circles
@@ -150,7 +150,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
           ? gte("point_count", layers[i][0]) :
           all(gte("point_count", layers[i][0]), lt("point_count", layers[i - 1][0]))
       );
-      mapboxMap.addLayer(circles);
+      mapboxMap.getStyle().addLayer(circles);
     }
 
     // Add the count labels
@@ -160,7 +160,7 @@ public class GeoJsonClusteringActivity extends AppCompatActivity {
       textSize(12f),
       textColor(Color.WHITE)
     );
-    mapboxMap.addLayer(count);
+    mapboxMap.getStyle().addLayer(count);
 
 
     // Zoom out to start

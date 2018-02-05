@@ -114,11 +114,11 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     if (item.getItemId() == R.id.menu_action_icon_overlap) {
-      SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
+      SymbolLayer layer = mapboxMap.getStyle().getLayerAs(LAYER_ID);
       layer.setProperties(iconAllowOverlap(!layer.getIconAllowOverlap().getValue()));
       return true;
     } else if (item.getItemId() == R.id.menu_action_filter) {
-      SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
+      SymbolLayer layer = mapboxMap.getStyle().getLayerAs(LAYER_ID);
       layer.setFilter(Filter.eq(FEATURE_RANK, 1));
       //layer.setFilter(eq(get(FEATURE_RANK), 1));
       return true;
@@ -171,7 +171,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   /**
    * Utility class to generate Bitmaps for Symbol.
    * <p>
-   * Bitmaps can be added to the map with {@link com.mapbox.mapboxsdk.maps.MapboxMap#addImage(String, Bitmap)}
+   * Bitmaps can be added to the map with {@link com.mapbox.mapboxsdk.maps.Style#addImage(String, Bitmap)}
    * </p>
    */
   private static class SymbolGenerator {
@@ -238,10 +238,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   public void onDataLoaded(@NonNull FeatureCollection featureCollection) {
     // add a geojson to the map
     Source source = new GeoJsonSource(SOURCE_ID, featureCollection);
-    mapboxMap.addSource(source);
+    mapboxMap.getStyle().addSource(source);
 
     // create layer use
-    mapboxMap.addLayer(new SymbolLayer(LAYER_ID, SOURCE_ID)
+    mapboxMap.getStyle().addLayer(new SymbolLayer(LAYER_ID, SOURCE_ID)
       .withProperties(
 
         // icon configuration
@@ -303,7 +303,7 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
     @Override
     protected void onPostExecute(HashMap<String, Bitmap> bitmapHashMap) {
       super.onPostExecute(bitmapHashMap);
-      mapboxMap.addImages(bitmapHashMap);
+      mapboxMap.getStyle().addImages(bitmapHashMap);
     }
   }
 }

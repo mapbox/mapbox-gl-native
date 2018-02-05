@@ -54,8 +54,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
         } catch (IOException exception) {
           Timber.e(exception);
         }
-        mapboxMap.addSource(source);
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+        style.addSource(source);
+        style.addLayer(new CircleLayer("layer", source.getId()));
       }
     });
   }
@@ -68,9 +68,9 @@ public class GeoJsonSourceTests extends BaseActivityTest {
       @Override
       public void perform(UiController uiController, View view) {
         GeoJsonSource source = new GeoJsonSource("source", Point.fromCoordinates(new double[] {0d, 0d}));
-        mapboxMap.addSource(source);
+        style.addSource(source);
 
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+        style.addLayer(new CircleLayer("layer", source.getId()));
       }
 
     });
@@ -90,9 +90,9 @@ public class GeoJsonSourceTests extends BaseActivityTest {
         } catch (IOException exception) {
           Timber.e(exception);
         }
-        mapboxMap.addSource(source);
+        style.addSource(source);
 
-        mapboxMap.addLayer(new CircleLayer("layer", source.getId()));
+        style.addLayer(new CircleLayer("layer", source.getId()));
       }
 
     });
@@ -140,9 +140,9 @@ public class GeoJsonSourceTests extends BaseActivityTest {
       @Override
       public void perform(UiController uiController, View view) {
         GeoJsonSource source = new GeoJsonSource("source");
-        mapboxMap.addSource(source);
+        style.addSource(source);
         Layer layer = new CircleLayer("layer", source.getId());
-        mapboxMap.addLayer(layer);
+        style.addLayer(layer);
 
         try {
           source.setGeoJson(Feature.fromJson(ResourceUtils.readRawResource(rule.getActivity(), resource)));
@@ -150,8 +150,8 @@ public class GeoJsonSourceTests extends BaseActivityTest {
           Timber.e(exception);
         }
 
-        mapboxMap.removeLayer(layer);
-        mapboxMap.removeSource(source);
+        style.removeLayer(layer);
+        style.removeSource(source);
       }
 
     });
