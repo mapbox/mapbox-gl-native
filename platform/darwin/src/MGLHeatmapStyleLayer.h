@@ -66,7 +66,7 @@ MGL_EXPORT
 
 /**
  Defines the color of each point based on its density value in a heatmap. 
- Should be an expression that uses `["heatmapDensity"]` as input.
+ Should be an expression that uses `$heatmapDensity` as input.
  
  The default value of this property is an expression that evaluates to a rainbow
  color scale from blue to red. Set this property to `nil` to reset it to the
