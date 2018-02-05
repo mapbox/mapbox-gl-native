@@ -34,10 +34,6 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     optional<Tileset> _tileset = impl().getTileset();
 
-    if (!_tileset) {
-        return;
-    }
-
     if (tileset != _tileset) {
         tileset = _tileset;
 
@@ -46,6 +42,11 @@ void RenderVectorSource::update(Immutable<style::Source::Impl> baseImpl_,
         tilePyramid.tiles.clear();
         tilePyramid.renderTiles.clear();
         tilePyramid.cache.clear();
+    }
+    // Allow clearing the tile pyramid first, before the early return in case
+    //  the new tileset is not yet available or has an error in loading
+    if (!_tileset) {
+        return;
     }
 
     tilePyramid.update(layers,
