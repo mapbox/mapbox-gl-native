@@ -271,7 +271,7 @@ namespace mbgl {
                 placedGlyphs.push_back(*placedGlyph);
             }
             placedGlyphs.push_back(*lastPlacedGlyph);
-        } else {
+        } else if (symbol.glyphOffsets.size() == 1) {
             // Only a single glyph to place
             // So, determine whether to flip based on projected angle of the line segment it's on
             if (keepUpright && !flip) {
@@ -289,7 +289,6 @@ namespace mbgl {
                     return PlacementResult::NeedsFlipping;
                 }
             }
-            assert(symbol.glyphOffsets.size() == 1); // We are relying on SymbolInstance.hasText filtering out symbols without any glyphs at all
             const float glyphOffsetX = symbol.glyphOffsets.front();
             optional<PlacedGlyph> singleGlyph = placeGlyphAlongLine(fontScale * glyphOffsetX, lineOffsetX, lineOffsetY, flip, projectedAnchorPoint, symbol.anchorPoint, symbol.segment,
                 symbol.line, labelPlaneMatrix);
@@ -299,6 +298,8 @@ namespace mbgl {
             placedGlyphs.push_back(*singleGlyph);
         }
 
+        // The number of placedGlyphs must equal the number of glyphOffsets, which must correspond to the number of glyph vertices
+        // There may be 0 glyphs here, if a label consists entirely of glyphs that have 0x0 dimensions
         for (auto& placedGlyph : placedGlyphs) {
             addDynamicAttributes(placedGlyph.point, placedGlyph.angle, symbol.placementZoom, dynamicVertexArray);
         }
