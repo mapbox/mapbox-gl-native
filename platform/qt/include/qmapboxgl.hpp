@@ -26,6 +26,11 @@ public:
         SharedGLContext
     };
 
+    enum MapMode {
+        Continuous = 0,
+        Static
+    };
+
     enum ConstrainMode {
         NoConstrain = 0,
         ConstrainHeightOnly,
@@ -39,6 +44,9 @@ public:
 
     GLContextMode contextMode() const;
     void setContextMode(GLContextMode);
+
+    MapMode mapMode() const;
+    void setMapMode(MapMode);
 
     ConstrainMode constrainMode() const;
     void setConstrainMode(ConstrainMode);
@@ -66,6 +74,7 @@ public:
 
 private:
     GLContextMode m_contextMode;
+    MapMode m_mapMode;
     ConstrainMode m_constrainMode;
     ViewportMode m_viewportMode;
 
@@ -235,10 +244,16 @@ public slots:
     void render();
     void connectionEstablished();
 
+    // Commit changes, load all the resources
+    // and renders the map when completed.
+    void startStaticRender();
+
 signals:
     void needsRendering();
     void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
+
+    void staticRenderFinished(const QString &error);
 
 private:
     Q_DISABLE_COPY(QMapboxGL)

@@ -40,6 +40,9 @@ public:
     mbgl::EdgeInsets margins;
     std::unique_ptr<mbgl::Map> mapObj;
 
+public slots:
+    void requestRendering();
+
 signals:
     void needsRendering();
 

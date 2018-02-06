@@ -64,6 +64,10 @@ using namespace QMapbox;
 static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Unique), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Shared), "error");
 
+// mbgl::MapMode
+static_assert(mbgl::underlying_type(QMapboxGLSettings::Continuous) == mbgl::underlying_type(mbgl::MapMode::Continuous), "error");
+static_assert(mbgl::underlying_type(QMapboxGLSettings::Static) == mbgl::underlying_type(mbgl::MapMode::Static), "error");
+
 // mbgl::ConstrainMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::NoConstrain) == mbgl::underlying_type(mbgl::ConstrainMode::None), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::ConstrainHeightOnly) == mbgl::underlying_type(mbgl::ConstrainMode::HeightOnly), "error");
@@ -164,6 +168,27 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
 */
 
 /*!
+    \enum QMapboxGLSettings::MapMode
+
+    This enum sets the map rendering mode
+
+    \value Continuous  The map will render as data arrives from the network and
+    react immediately to state changes.
+
+    This is the default mode and the preferred when the map is intended to be
+    interactive.
+
+    \value Static  The map will no longer react to state changes and will only
+    be rendered when QMapboxGL::startStaticRender is called. After all the
+    resources are loaded, the QMapboxGL::staticRenderFinished signal is emitted.
+
+    This mode is useful for taking a snapshot of the finished rendering result
+    of the map into a QImage.
+
+    \sa mapMode()
+*/
+
+/*!
     \enum QMapboxGLSettings::ConstrainMode
 
     This enum determines if the map wraps.
@@ -199,6 +224,7 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
 */
 QMapboxGLSettings::QMapboxGLSettings()
     : m_contextMode(QMapboxGLSettings::SharedGLContext)
+    , m_mapMode(QMapboxGLSettings::Continuous)
     , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
     , m_viewportMode(QMapboxGLSettings::DefaultViewport)
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
@@ -226,6 +252,31 @@ QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
 void QMapboxGLSettings::setContextMode(GLContextMode mode)
 {
     m_contextMode = mode;
+}
+
+/*!
+    Returns the map mode. Static mode will emit a signal for
+    rendering a map only when the map is fully loaded.
+    Animations like style transitions and labels fading won't
+    be seen.
+
+    The Continuous mode will emit the signal for every new
+    change on the map and it is usually what you expect for
+    a interactive map.
+
+    By default, it is set to QMapboxGLSettings::Continuous.
+*/
+QMapboxGLSettings::MapMode QMapboxGLSettings::mapMode() const
+{
+    return m_mapMode;
+}
+
+/*!
+    Sets the map \a mode.
+*/
+void QMapboxGLSettings::setMapMode(MapMode mode)
+{
+    m_mapMode = mode;
 }
 
 /*!
@@ -1474,6 +1525,29 @@ void QMapboxGL::destroyRenderer()
 }
 
 /*!
+    Start a static rendering of the current state of the map. This
+    should only be called when the map is initialized in static mode.
+
+    \sa QMapboxGLSettings::MapMode
+*/
+void QMapboxGL::startStaticRender()
+{
+    d_ptr->mapObj->renderStill([this](std::exception_ptr err) {
+        QString what;
+
+        try {
+            if (err) {
+                std::rethrow_exception(err);
+            }
+        } catch(const std::exception& e) {
+            what = e.what();
+        }
+
+        emit staticRenderFinished(what);
+    });
+}
+
+/*!
     Renders the map using OpenGL draw calls. It will make sure to bind the
     framebuffer object before drawing; otherwise a valid OpenGL context is
     expected with an appropriate OpenGL viewport state set for the size of
@@ -1518,6 +1592,16 @@ void QMapboxGL::connectionEstablished()
     with the current state.
 
     \sa render()
+*/
+
+/*!
+    \fn void QMapboxGL::staticRenderFinished(const QString &error)
+
+    This signal is emitted when a static map is fully drawn. Usually the next
+    step is to extract the map from a framebuffer into a container like a
+    QImage. \a error is set to a message when an error occurs.
+
+    \sa startStaticRender()
 */
 
 /*!
@@ -1573,7 +1657,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
             *m_mapObserver,
             sanitizedSize(size),
             m_pixelRatio, *m_fileSourceObj, *m_threadPool,
-            mbgl::MapMode::Continuous,
+            static_cast<mbgl::MapMode>(settings.mapMode()),
             static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
             static_cast<mbgl::ViewportMode>(settings.viewportMode()));
 
@@ -1595,9 +1679,7 @@ void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters
 
     m_mapRenderer->updateParameters(std::move(parameters));
 
-    if (!m_renderQueued.test_and_set()) {
-        emit needsRendering();
-    }
+    requestRendering();
 }
 
 void QMapboxGLPrivate::setObserver(mbgl::RendererObserver &observer)
@@ -1626,6 +1708,8 @@ void QMapboxGLPrivate::createRenderer()
         *m_threadPool,
         m_mode
     );
+
+    connect(m_mapRenderer.get(), SIGNAL(needsRendering()), this, SLOT(requestRendering()));
 
     m_mapRenderer->setObserver(m_rendererObserver);
 }
@@ -1666,4 +1750,11 @@ void QMapboxGLPrivate::setFramebufferObject(quint32 fbo, const QSize& size)
     }
 
     m_mapRenderer->updateFramebuffer(fbo, sanitizedSize(size));
+}
+
+void QMapboxGLPrivate::requestRendering()
+{
+    if (!m_renderQueued.test_and_set()) {
+        emit needsRendering();
+    }
 }
