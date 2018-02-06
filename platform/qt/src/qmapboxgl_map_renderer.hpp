@@ -23,8 +23,10 @@ class UpdateParameters;
 
 class QMapboxGLRendererBackend;
 
-class QMapboxGLMapRenderer : public mbgl::Scheduler
+class QMapboxGLMapRenderer : public QObject, public mbgl::Scheduler
 {
+    Q_OBJECT
+
 public:
     QMapboxGLMapRenderer(qreal pixelRatio, mbgl::DefaultFileSource &,
             mbgl::ThreadPool &, QMapboxGLSettings::GLContextMode);
@@ -39,6 +41,9 @@ public:
 
     // Thread-safe, called by the Frontend
     void updateParameters(std::shared_ptr<mbgl::UpdateParameters>);
+
+signals:
+    void needsRendering();
 
 private:
     MBGL_STORE_THREAD(tid)

@@ -18,6 +18,10 @@ void QMapboxGLMapRenderer::schedule(std::weak_ptr<mbgl::Mailbox> mailbox)
 {
     std::lock_guard<std::mutex> lock(m_taskQueueMutex);
     m_taskQueue.push(mailbox);
+
+    // Need to force the main thread to wake
+    // up this thread and process the events.
+    emit needsRendering();
 }
 
 void QMapboxGLMapRenderer::updateParameters(std::shared_ptr<mbgl::UpdateParameters> newParameters)
