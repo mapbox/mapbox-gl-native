@@ -9,6 +9,7 @@
   "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/collision-lines": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
+  "render-tests/debug/collision-lines-overscaled": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
   "render-tests/debug/collision-lines-pitched": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
   "render-tests/debug/collision-pitched-wrapped": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
   "render-tests/debug/tile": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
