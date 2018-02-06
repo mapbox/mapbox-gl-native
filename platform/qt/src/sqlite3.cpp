@@ -186,74 +186,82 @@ void Database::exec(const std::string &sql) {
     }
 }
 
-Statement Database::prepare(const char *query) {
-    return Statement(this, query);
-}
-
-Statement::Statement(Database *db, const char *sql)
-        : impl(std::make_unique<StatementImpl>(QString(sql), QSqlDatabase::database(db->impl->connectionName))) {
+Statement::Statement(Database& db, const char* sql)
+    : impl(std::make_unique<StatementImpl>(QString(sql),
+                                           QSqlDatabase::database(db.impl->connectionName))) {
     assert(impl);
-}
-
-Statement::Statement(Statement &&other)
-        : impl(std::move(other.impl)) {
-    assert(impl);
-}
-
-Statement &Statement::operator=(Statement &&other) {
-    assert(impl);
-    std::swap(impl, other.impl);
-    return *this;
 }
 
 Statement::~Statement() {
+#ifndef NDEBUG
+    // Crash if we're destructing this object while we know a Query object references this.
+    assert(!used);
+#endif
 }
 
-template void Statement::bind(int, int64_t);
+Query::Query(Statement& stmt_) : stmt(stmt_) {
+    assert(stmt.impl);
+
+#ifndef NDEBUG
+    assert(!stmt.used);
+    stmt.used = true;
+#endif
+}
+
+Query::~Query() {
+    reset();
+    clearBindings();
+
+#ifndef NDEBUG
+    stmt.used = false;
+#endif
+}
+
+template void Query::bind(int, int64_t);
 
 template <typename T>
-void Statement::bind(int offset, T value) {
-    assert(impl);
+void Query::bind(int offset, T value) {
+    assert(stmt.impl);
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QVariant::fromValue<T>(value), QSql::In);
-    checkQueryError(impl->query);
+    stmt.impl->query.bindValue(offset - 1, QVariant::fromValue<T>(value), QSql::In);
+    checkQueryError(stmt.impl->query);
 }
 
 template <>
-void Statement::bind(int offset, std::nullptr_t) {
-    assert(impl);
+void Query::bind(int offset, std::nullptr_t) {
+    assert(stmt.impl);
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QVariant(QVariant::Invalid), QSql::In);
-    checkQueryError(impl->query);
+    stmt.impl->query.bindValue(offset - 1, QVariant(QVariant::Invalid), QSql::In);
+    checkQueryError(stmt.impl->query);
 }
 
 template <>
-void Statement::bind(int offset, int32_t value) {
+void Query::bind(int offset, int32_t value) {
     bind(offset, static_cast<int64_t>(value));
 }
 
 template <>
-void Statement::bind(int offset, bool value) {
+void Query::bind(int offset, bool value) {
     bind(offset, static_cast<int>(value));
 }
 
 template <>
-void Statement::bind(int offset, int8_t value) {
+void Query::bind(int offset, int8_t value) {
     bind(offset, static_cast<int64_t>(value));
 }
 
 template <>
-void Statement::bind(int offset, uint8_t value) {
+void Query::bind(int offset, uint8_t value) {
     bind(offset, static_cast<int64_t>(value));
 }
 
 template <>
-void Statement::bind(int offset, mbgl::Timestamp value) {
+void Query::bind(int offset, mbgl::Timestamp value) {
     bind(offset, std::chrono::system_clock::to_time_t(value));
 }
 
 template <>
-void Statement::bind(int offset, optional<std::string> value) {
+void Query::bind(int offset, optional<std::string> value) {
     if (value) {
         bind(offset, *value);
     } else {
@@ -262,7 +270,7 @@ void Statement::bind(int offset, optional<std::string> value) {
 }
 
 template <>
-void Statement::bind(int offset, optional<mbgl::Timestamp> value) {
+void Query::bind(int offset, optional<mbgl::Timestamp> value) {
     if (value) {
         bind(offset, *value);
     } else {
@@ -270,25 +278,25 @@ void Statement::bind(int offset, optional<mbgl::Timestamp> value) {
     }
 }
 
-void Statement::bind(int offset, const char* value, std::size_t length, bool /* retain */) {
-    assert(impl);
+void Query::bind(int offset, const char* value, std::size_t length, bool /* retain */) {
+    assert(stmt.impl);
     if (length > std::numeric_limits<int>::max()) {
         // Kept for consistence with the default implementation.
         throw std::range_error("value too long");
     }
 
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, QString(QByteArray(value, length)), QSql::In);
+    stmt.impl->query.bindValue(offset - 1, QString(QByteArray(value, length)), QSql::In);
 
-    checkQueryError(impl->query);
+    checkQueryError(stmt.impl->query);
 }
 
-void Statement::bind(int offset, const std::string& value, bool retain) {
+void Query::bind(int offset, const std::string& value, bool retain) {
     bind(offset, value.data(), value.size(), retain);
 }
 
-void Statement::bindBlob(int offset, const void* value_, std::size_t length, bool retain) {
-    assert(impl);
+void Query::bindBlob(int offset, const void* value_, std::size_t length, bool retain) {
+    assert(stmt.impl);
     const char* value = reinterpret_cast<const char*>(value_);
     if (length > std::numeric_limits<int>::max()) {
         // Kept for consistence with the default implementation.
@@ -296,123 +304,123 @@ void Statement::bindBlob(int offset, const void* value_, std::size_t length, boo
     }
 
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
+    stmt.impl->query.bindValue(offset - 1, retain ? QByteArray(value, length) :
             QByteArray::fromRawData(value, length), QSql::In | QSql::Binary);
 
-    checkQueryError(impl->query);
+    checkQueryError(stmt.impl->query);
 }
 
-void Statement::bindBlob(int offset, const std::vector<uint8_t>& value, bool retain) {
+void Query::bindBlob(int offset, const std::vector<uint8_t>& value, bool retain) {
     bindBlob(offset, value.data(), value.size(), retain);
 }
 
-bool Statement::run() {
-    assert(impl);
+bool Query::run() {
+    assert(stmt.impl);
 
-    if (!impl->query.isValid()) {
-       if (impl->query.exec()) {
-           impl->lastInsertRowId = impl->query.lastInsertId().value<int64_t>();
-           impl->changes = impl->query.numRowsAffected();
+    if (!stmt.impl->query.isValid()) {
+       if (stmt.impl->query.exec()) {
+           stmt.impl->lastInsertRowId = stmt.impl->query.lastInsertId().value<int64_t>();
+           stmt.impl->changes = stmt.impl->query.numRowsAffected();
        } else {
-           checkQueryError(impl->query);
+           checkQueryError(stmt.impl->query);
        }
     }
 
-    const bool hasNext = impl->query.next();
-    if (!hasNext) impl->query.finish();
+    const bool hasNext = stmt.impl->query.next();
+    if (!hasNext) stmt.impl->query.finish();
 
     return hasNext;
 }
 
-template bool Statement::get(int);
-template int Statement::get(int);
-template int64_t Statement::get(int);
-template double Statement::get(int);
+template bool Query::get(int);
+template int Query::get(int);
+template int64_t Query::get(int);
+template double Query::get(int);
 
-template <typename T> T Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QVariant value = impl->query.value(offset);
-    checkQueryError(impl->query);
+template <typename T> T Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QVariant value = stmt.impl->query.value(offset);
+    checkQueryError(stmt.impl->query);
     return value.value<T>();
 }
 
-template <> std::vector<uint8_t> Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QByteArray byteArray = impl->query.value(offset).toByteArray();
-    checkQueryError(impl->query);
+template <> std::vector<uint8_t> Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QByteArray byteArray = stmt.impl->query.value(offset).toByteArray();
+    checkQueryError(stmt.impl->query);
     std::vector<uint8_t> blob(byteArray.begin(), byteArray.end());
     return blob;
 }
 
-template <> mbgl::Timestamp Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QVariant value = impl->query.value(offset);
-    checkQueryError(impl->query);
+template <> mbgl::Timestamp Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QVariant value = stmt.impl->query.value(offset);
+    checkQueryError(stmt.impl->query);
     return std::chrono::time_point_cast<std::chrono::seconds>(
         std::chrono::system_clock::from_time_t(value.value<::time_t>()));
 }
 
-template <> optional<int64_t> Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QVariant value = impl->query.value(offset);
-    checkQueryError(impl->query);
+template <> optional<int64_t> Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QVariant value = stmt.impl->query.value(offset);
+    checkQueryError(stmt.impl->query);
     if (value.isNull())
         return {};
     return { value.value<int64_t>() };
 }
 
-template <> optional<double> Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QVariant value = impl->query.value(offset);
-    checkQueryError(impl->query);
+template <> optional<double> Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QVariant value = stmt.impl->query.value(offset);
+    checkQueryError(stmt.impl->query);
     if (value.isNull())
         return {};
     return { value.value<double>() };
 }
 
-template <> std::string Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QByteArray value = impl->query.value(offset).toByteArray();
-    checkQueryError(impl->query);
+template <> std::string Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QByteArray value = stmt.impl->query.value(offset).toByteArray();
+    checkQueryError(stmt.impl->query);
     return std::string(value.constData(), value.size());
 }
 
-template <> optional<std::string> Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QByteArray value = impl->query.value(offset).toByteArray();
-    checkQueryError(impl->query);
+template <> optional<std::string> Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QByteArray value = stmt.impl->query.value(offset).toByteArray();
+    checkQueryError(stmt.impl->query);
     if (value.isNull())
         return {};
     return { std::string(value.constData(), value.size()) };
 }
 
-template <> optional<mbgl::Timestamp> Statement::get(int offset) {
-    assert(impl && impl->query.isValid());
-    QVariant value = impl->query.value(offset);
-    checkQueryError(impl->query);
+template <> optional<mbgl::Timestamp> Query::get(int offset) {
+    assert(stmt.impl && stmt.impl->query.isValid());
+    QVariant value = stmt.impl->query.value(offset);
+    checkQueryError(stmt.impl->query);
     if (value.isNull())
         return {};
     return { std::chrono::time_point_cast<mbgl::Seconds>(
         std::chrono::system_clock::from_time_t(value.value<::time_t>())) };
 }
 
-void Statement::reset() {
-    assert(impl);
-    impl->query.finish();
+void Query::reset() {
+    assert(stmt.impl);
+    stmt.impl->query.finish();
 }
 
-void Statement::clearBindings() {
+void Query::clearBindings() {
     // no-op
 }
 
-int64_t Statement::lastInsertRowId() const {
-    assert(impl);
-    return impl->lastInsertRowId;
+int64_t Query::lastInsertRowId() const {
+    assert(stmt.impl);
+    return stmt.impl->lastInsertRowId;
 }
 
-uint64_t Statement::changes() const {
-    assert(impl);
-    return (impl->changes < 0 ? 0 : impl->changes);
+uint64_t Query::changes() const {
+    assert(stmt.impl);
+    return (stmt.impl->changes < 0 ? 0 : stmt.impl->changes);
 }
 
 Transaction::Transaction(Database& db_, Mode mode)
