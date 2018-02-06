@@ -50,3 +50,17 @@ TEST(RunLoop, MultipleRun) {
 
     EXPECT_TRUE(secondTimeout);
 }
+
+TEST(RunLoop, Priorities) {
+    std::vector<int> order;
+
+    RunLoop loop(RunLoop::Type::New);
+    loop.invoke([&] { order.push_back(1); });
+    loop.invoke(RunLoop::Priority::High, [&] { order.push_back(2); });
+    loop.invoke([&] { order.push_back(3); });
+    loop.invoke(RunLoop::Priority::High, [&] { order.push_back(4); });
+    loop.invoke(RunLoop::Priority::Default, [&] { loop.stop(); });
+    loop.run();
+
+    EXPECT_EQ((std::vector<int>{ 2, 4, 1, 3 }), order);
+}
