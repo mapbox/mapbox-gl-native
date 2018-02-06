@@ -39,7 +39,7 @@ private:
     const style::VectorSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
-    optional<std::vector<std::string>> tileURLTemplates;
+    optional<Tileset> tileset;
 };
 
 template <>
