@@ -292,7 +292,7 @@ public class MapView extends FrameLayout {
 
       addView(textureView, 0);
     } else {
-      GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+      GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
       glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
       mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, options.getLocalIdeographFontFamily()) {
         @Override
@@ -302,7 +302,7 @@ public class MapView extends FrameLayout {
         }
       };
 
-      glSurfaceView.setVisibility(View.VISIBLE);
+      addView(glSurfaceView, 0);
     }
 
     nativeMapView = new NativeMapView(this, mapRenderer);
