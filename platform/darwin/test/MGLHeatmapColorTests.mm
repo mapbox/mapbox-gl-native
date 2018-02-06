@@ -21,7 +21,7 @@
                   @"heatmap-color should be unset initially.");
     NSExpression *defaultExpression = layer.heatmapColor;
 
-    NSExpression *constantExpression = [NSExpression expressionWithFormat:@"red"];
+    NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
     layer.heatmapColor = constantExpression;
 
     
@@ -31,8 +31,8 @@
     XCTAssertEqualObjects(layer.heatmapColor, constantExpression,
                           @"heatmapColor should round-trip constant value expressions.");
 
-    constantExpression = [NSExpression expressionWithFormat:@"red"];
-    NSExpression *constantExpression2 = [NSExpression expressionWithFormat:@"blue"];
+    constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+    NSExpression *constantExpression2 = [NSExpression expressionWithFormat:@"%@", [MGLColor blueColor]];
     NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($heatmapDensity, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@12: constantExpression2}];
     layer.heatmapColor = functionExpression;
     
