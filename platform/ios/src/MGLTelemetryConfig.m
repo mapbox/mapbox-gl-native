@@ -1,7 +1,7 @@
 #import "MGLTelemetryConfig.h"
 
 static const CLLocationDistance MGLConfigHibernationRadiusDefault = 300.0;
-static const CLLocationDistance MGLConfigHibernationRadiusWide = 1200.0;
+static const CLLocationDistance MGLConfigHibernationRadiusWide = 600.0;
 
 NSString *const MGLMapboxMetricsProfile = @"MGLMapboxMetricsProfile";
 
