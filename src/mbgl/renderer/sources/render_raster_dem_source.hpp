@@ -36,11 +36,16 @@ public:
     void reduceMemoryUse() final;
     void dumpDebugLogs() const final;
 
+    uint8_t getMaxZoom() const {
+        return maxzoom;
+    };
+
 private:
     const style::RasterSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
     optional<Tileset> tileset;
+    uint8_t maxzoom = 15;
 
 protected:
     void onTileChanged(Tile&) final;
