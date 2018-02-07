@@ -6,7 +6,7 @@
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
 #import "MBXEmbeddedMapViewController.h"
-
+#import "LimeGreenStyleLayer.h"
 #import <Mapbox/Mapbox.h>
 
 #import <objc/runtime.h>
@@ -124,6 +124,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @property (nonatomic) BOOL usingLocaleBasedCountryLabels;
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 @property (nonatomic) BOOL showZoomLevelEnabled;
+@property (nonatomic, strong) LimeGreenStyleLayer *greenLayer;
+@property (nonatomic) BOOL layerOn;
 
 @end
 
@@ -1882,8 +1884,34 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+    self.greenLayer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"LimeGreenLayer"];
+    [mapView.style addLayer:self.greenLayer];
+        [NSTimer scheduledTimerWithTimeInterval:2 target:self selector:@selector(toggleLayer) userInfo:nil repeats:YES];
+    self.layerOn = YES;
+//    [self toggleLayer];
 }
 
+- (void) toggleLayer {
+    
+//    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 2 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+        //        NSLog(@"%@", [[self.mapView.style layers] containsObject:self.greenLayer] ? @"YES" : @"NO");
+        //        NSLog(@"%@", self.greenLayer.debugDescription);
+        if (self.layerOn) {
+            
+            [self.mapView.style removeLayer:self.greenLayer];
+           
+            self.layerOn = NO;
+        }
+        else {
+            // self.greenLayer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"LimeGreenLayer"];
+            [self.mapView.style addLayer:self.greenLayer];
+            self.layerOn = YES;
+        }
+        
+//        [self toggleLayer];
+//    });
+    
+}
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView
 {
     [self updateHUD];
