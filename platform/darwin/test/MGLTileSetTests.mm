@@ -2,6 +2,7 @@
 
 #import <Mapbox/Mapbox.h>
 #import "MGLTileSource_Private.h"
+#import "MGLGeometry_Private.h"
 
 #include <mbgl/util/tileset.hpp>
 
@@ -39,6 +40,19 @@
     // the mbgl object reflects the set values for min and max zoom level
     XCTAssertEqual(tileSet.zoomRange.min, 1);
     XCTAssertEqual(tileSet.zoomRange.max, 2);
+
+    // when the tile set has a bounds set
+    MGLCoordinateBounds bounds = MGLCoordinateBoundsMake(CLLocationCoordinate2DMake(12, 34), CLLocationCoordinate2DMake(56, 78));
+    tileSet = MGLTileSetFromTileURLTemplates(@[@"tile.1"], @{
+        MGLTileSourceOptionCoordinateBounds: @(bounds),
+    });
+
+    // the mbgl object reflects the set values for the bounds
+    XCTAssert(!!tileSet.bounds, @"The bounds are set after setting the bounds");
+    if (tileSet.bounds) {
+        MGLCoordinateBounds actual = MGLCoordinateBoundsFromLatLngBounds(*tileSet.bounds);
+        XCTAssert(MGLCoordinateBoundsEqualToCoordinateBounds(bounds, actual), @"The bounds round-trip");
+    }
 
     // when the tile set has an attribution
     NSString *attribution = @"my tileset © ©️🎈";

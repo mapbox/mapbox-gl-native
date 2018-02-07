@@ -1,5 +1,9 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## v0.6.2
+
+* Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))
+
 ## v0.6.1 - January 16, 2018
 
 This version of the Mapbox macOS SDK corresponds to version 3.7.3 of the Mapbox Maps SDK for iOS.
