@@ -726,11 +726,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         [self.undoManager setActionName:@"Add Graticule"];
     }
 
+    NSDictionary *sourceOptions = @{
+        MGLShapeSourceOptionMaximumZoomLevel:@14,
+        MGLShapeSourceOptionWrapsCoordinates: @YES,
+        MGLShapeSourceOptionClipsCoordinates: @YES,
+    };
     MGLComputedShapeSource *source = [[MGLComputedShapeSource alloc] initWithIdentifier:@"graticule"
-     options:@{MGLShapeSourceOptionMaximumZoomLevel:@14
-            , MGLShapeSourceOptionWrapCoordinates: @YES
-            , MGLShapeSourceOptionClipCoordinates: @YES
-            }];
+                                                                                options:sourceOptions];
 
     source.dataSource = self;
     [self.mapView.style addSource:source];
