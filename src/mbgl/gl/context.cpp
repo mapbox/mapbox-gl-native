@@ -62,9 +62,11 @@ static_assert(underlying_type(TextureFormat::Alpha) == GL_ALPHA, "OpenGL type mi
 
 static_assert(std::is_same<std::underlying_type_t<TextureType>, GLenum>::value, "OpenGL type mismatch");
 static_assert(underlying_type(TextureType::UnsignedByte) == GL_UNSIGNED_BYTE, "OpenGL type mismatch");
-#if MBGL_USE_GLES2
+
+#if MBGL_USE_GLES2 && GL_HALF_FLOAT_OES
 static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_OES, "OpenGL type mismatch");
-#else
+#endif
+#if !MBGL_USE_GLES2 && GL_HALF_FLOAT_ARB
 static_assert(underlying_type(TextureType::HalfFloat) == GL_HALF_FLOAT_ARB, "OpenGL type mismatch");
 #endif
 
