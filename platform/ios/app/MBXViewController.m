@@ -271,6 +271,16 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 
         [self presentViewController:alertController animated:YES completion:nil];
     }
+
+    // Add fall-through single tap gesture recognizer. This will be called when
+    // the map view's tap recognizers fail.
+    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+    for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers) {
+        if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
+            [singleTap requireGestureRecognizerToFail:gesture];
+        }
+    }
+    [self.mapView addGestureRecognizer:singleTap];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
@@ -1829,6 +1839,14 @@ CLLocationCoordinate2D randomWorldCoordinate() {
 }
 
 #pragma mark - User Actions
+
+- (void)handleSingleTap:(UITapGestureRecognizer *)singleTap {
+    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
+
+    // This is how you'd get the coordinate for the point where the user tapped:
+    //    CGPoint tapPoint = [singleTap locationInView:self.mapView];
+    //    CLLocationCoordinate2D tapCoordinate = [self.mapView convertPoint:tapPoint toCoordinateFromView:nil];
+}
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
 {
