@@ -82,22 +82,29 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance;
 
 /**
- An `NSNumber` object containing a boolean; specifies whether the geometry for a
- `MGLComputedShapeSource` needs to be wrapped to accomodate coordinates with longitudes outside the [-180,180] extents. The default is `false.`
+ An `NSNumber` object containing a Boolean value; specifies whether the shape of
+ an `MGLComputedShapeSource` should be wrapped to accomodate coordinates with
+ longitudes beyond −180 and 180. The default value is `NO`.
  
- Setting this option to `true` affects performance.
-  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapCoordinates;
+ Setting this option to `YES` affects rendering performance.
+ 
+ This option is ignored when creating an instance of a class besides
+ `MGLComputedShapeSource`.
+ */
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates;
 
 /**
- An `NSNumber` object containing a boolean; specifies whether the geometry for a
- `MGLComputedShapeSource` needs to be clipped at the tile boundaries.
- The default is `false.`
-
- Setting this options to `true` affects performance. Use this option to clip
- polygons and lines at tile boundaries without artefacts.
+ An `NSNumber` object containing a Boolean value; specifies whether the shape of
+ an `MGLComputedShapeSource` should be clipped at the edge of each tile. The
+ default value is `NO`.
+ 
+ Setting this option to `YES` affects rendering performance. Use this option to
+ clip `MGLPolyline`s and `MGLPolygon`s at tile boundaries without artifacts.
+ 
+ This option is ignored when creating an instance of a class besides
+ `MGLComputedShapeSource`.
  */
-extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipCoordinates;
+extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates;
 
 /**
  `MGLAbstractShapeSource` is an abstract base class for map content sources that
