@@ -96,6 +96,7 @@ the following terms for concepts defined in the style specification:
 
 In the style specification | In the SDK
 ---------------------------|---------
+bounds                     | coordinate bounds
 filter                     | predicate
 function type              | interpolation mode
 id                         | identifier
@@ -136,6 +137,7 @@ In style JSON | In TileJSON   | In the SDK
 `tiles`       | `tiles`       | `tileURLTemplates` parameter in `-[MGLTileSource initWithIdentifier:tileURLTemplates:options:]`
 `minzoom`     | `minzoom`     | `MGLTileSourceOptionMinimumZoomLevel`
 `maxzoom`     | `maxzoom`     | `MGLTileSourceOptionMaximumZoomLevel`
+`bounds`      | `bounds`      | `MGLTileSourceOptionCoordinateBounds`
 `tileSize`    | —             | `MGLTileSourceOptionTileSize`
 `attribution` | `attribution` | `MGLTileSourceOptionAttributionHTMLString` (but consider specifying `MGLTileSourceOptionAttributionInfos` instead for improved security)
 `scheme`      | `scheme`      | `MGLTileSourceOptionTileCoordinateSystem`
