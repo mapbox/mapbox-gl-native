@@ -128,10 +128,14 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
 
 #if MBGL_USE_GLES2
         constexpr const char* halfFloatExtensionName = "OES_texture_half_float";
+        constexpr const char* halfFloatColorBufferExtensionName = "EXT_color_buffer_half_float";
 #else
         constexpr const char* halfFloatExtensionName = "ARB_half_float_pixel";
+        constexpr const char* halfFloatColorBufferExtensionName = "ARB_color_buffer_float";
 #endif
-        if (strstr(extensions, halfFloatExtensionName) != nullptr) {
+        if (strstr(extensions, halfFloatExtensionName) != nullptr &&
+            strstr(extensions, halfFloatColorBufferExtensionName) != nullptr) {
+
             halfFloat = true;
         }
 
