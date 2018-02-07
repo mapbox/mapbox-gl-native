@@ -557,40 +557,6 @@ public class HeatmapLayerTest extends BaseActivityTest {
   }
 
   @Test
-  public void testHeatmapColorAsConstant() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("heatmap-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        layer.setProperties(heatmapColor("rgba(0, 0, 0, 1)"));
-        assertEquals((String) layer.getHeatmapColor().getValue(), (String) "rgba(0, 0, 0, 1)");
-      }
-    });
-  }
-
-  @Test
-  public void testHeatmapColorAsIntConstant() {
-    validateTestSetup();
-    setupLayer();
-    Timber.i("heatmap-color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(layer);
-
-        // Set and Get
-        layer.setProperties(heatmapColor(Color.RED));
-        assertEquals(layer.getHeatmapColorAsInt(), Color.RED);
-      }
-    });
-  }
-
-  @Test
   public void testHeatmapOpacityTransition() {
     validateTestSetup();
     setupLayer();
