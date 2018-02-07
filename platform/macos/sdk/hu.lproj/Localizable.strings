@@ -1,8 +1,8 @@
-﻿/* User-friendly error description */
+/* User-friendly error description */
 "LOAD_MAP_FAILED_DESC" = "Egy ismeretlen hiba miatt nem sikerült betölteni a térképet.";
 
 /* User-friendly error description */
-"LOAD_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílus nem tölthető be.";
+"LOAD_STYLE_FAILED_DESC" = "Nem sikerült betölteni a térképet, mert a stílust nem lehetett betölteni.";
 
 /* Accessibility title */
 "MAP_A11Y_TITLE" = "Mapbox";
