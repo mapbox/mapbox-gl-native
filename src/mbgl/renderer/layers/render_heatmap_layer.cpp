@@ -55,10 +55,10 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            const auto type = parameters.context.supportsHalfFloatTextures() ?
+            const auto textureType = parameters.context.supportsHalfFloatTextures() ?
                     gl::TextureType::HalfFloat : gl::TextureType::UnsignedByte;
 
-            renderTexture = OffscreenTexture(parameters.context, size, type);
+            renderTexture = OffscreenTexture(parameters.context, size, textureType);
         }
 
         if (!colorRampTexture) {
