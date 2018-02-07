@@ -7,9 +7,6 @@ const outputPath = 'src/mbgl/shaders';
 
 var shaders = require('../mapbox-gl-js/src/shaders');
 
-delete shaders.heatmap;
-delete shaders.heatmapTexture;
-
 require('./style-code');
 
 writeIfModified(path.join(outputPath, 'preludes.hpp'), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.

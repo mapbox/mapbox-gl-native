@@ -17,9 +17,16 @@ uniform highp float u_weight;
 #endif
 
 
+#ifndef HAS_UNIFORM_u_radius
+uniform lowp float a_radius_t;
+attribute mediump vec2 a_radius;
+#else
+uniform mediump float u_radius;
+#endif
+
+
 uniform mat4 u_matrix;
 uniform float u_extrude_scale;
-uniform float u_radius;
 uniform float u_opacity;
 uniform float u_intensity;
 
@@ -36,11 +43,18 @@ const highp float ZERO = 1.0 / 255.0 / 16.0;
 #define GAUSS_COEF 0.3989422804014327
 
 void main(void) {
-
+    
 #ifndef HAS_UNIFORM_u_weight
     weight = unpack_mix_vec2(a_weight, a_weight_t);
 #else
     highp float weight = u_weight;
+#endif
+
+    
+#ifndef HAS_UNIFORM_u_radius
+    mediump float radius = unpack_mix_vec2(a_radius, a_radius_t);
+#else
+    mediump float radius = u_radius;
 #endif
 
 
@@ -60,12 +74,12 @@ void main(void) {
     // S = sqrt(-2.0 * log(ZERO / (weight * u_intensity * GAUSS_COEF))) / 3.0
     float S = sqrt(-2.0 * log(ZERO / weight / u_intensity / GAUSS_COEF)) / 3.0;
 
-    // Pass the varying in units of u_radius
+    // Pass the varying in units of radius
     v_extrude = S * unscaled_extrude;
 
-    // Scale by u_radius and the zoom-based scale factor to produce actual
+    // Scale by radius and the zoom-based scale factor to produce actual
     // mesh position
-    vec2 extrude = v_extrude * u_radius * u_extrude_scale;
+    vec2 extrude = v_extrude * radius * u_extrude_scale;
 
     // multiply a_pos by 0.5, since we had it * 2 in order to sneak
     // in extrusion data
@@ -85,14 +99,13 @@ uniform highp float u_weight;
 
 
 uniform highp float u_intensity;
-uniform highp float u_radius;
 varying vec2 v_extrude;
 
 // Gaussian kernel coefficient: 1 / sqrt(2 * PI)
 #define GAUSS_COEF 0.3989422804014327
 
 void main() {
-
+    
 #ifdef HAS_UNIFORM_u_weight
     highp float weight = u_weight;
 #endif
