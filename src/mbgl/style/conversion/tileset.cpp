@@ -40,6 +40,14 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
         }
     }
 
+    auto encodingValue = objectMember(value, "encoding");
+    if (encodingValue) {
+        optional<std::string> encoding = toString(*encodingValue);
+        if (encoding && *encoding == "terrarium") {
+            result.encoding = Tileset::Encoding::Terrarium;
+        }
+    }
+
     auto minzoomValue = objectMember(value, "minzoom");
     if (minzoomValue) {
         optional<float> minzoom = toNumber(*minzoomValue);
