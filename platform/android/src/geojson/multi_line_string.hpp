@@ -13,15 +13,15 @@ namespace geojson {
 
 class MultiLineString : private mbgl::util::noncopyable {
 public:
-    static constexpr auto Name() { return "com/mapbox/services/commons/geojson/MultiLineString"; };
+    static constexpr auto Name() { return "com/mapbox/geojson/MultiLineString"; };
 
     static constexpr auto Type() { return "MultiLineString"; };
 
     static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<MultiLineString>);
 
-    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<java::util::List<Position>>*/>);
+    static mapbox::geojson::multi_line_string convert(jni::JNIEnv&, jni::Object<java::util::List/*<java::util::List<Point>>*/>);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
+    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiLineString>);
 
     static jni::Class<MultiLineString> javaClass;
 

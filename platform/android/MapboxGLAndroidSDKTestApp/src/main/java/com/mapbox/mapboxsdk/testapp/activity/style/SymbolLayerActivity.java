@@ -11,6 +11,9 @@ import android.view.MenuItem;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -18,9 +21,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
+
 
 import java.util.Arrays;
 import java.util.List;
@@ -62,8 +63,8 @@ public class SymbolLayerActivity extends AppCompatActivity implements MapboxMap.
 
       // Add a source
       FeatureCollection markers = FeatureCollection.fromFeatures(new Feature[] {
-        Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.35673}), featureProperties("Marker 1")),
-        Feature.fromGeometry(Point.fromCoordinates(new double[] {4.91638, 52.34673}), featureProperties("Marker 2"))
+        Feature.fromGeometry(Point.fromLngLat(4.91638, 52.35673), featureProperties("Marker 1")),
+        Feature.fromGeometry(Point.fromLngLat(4.91638, 52.34673), featureProperties("Marker 2"))
       });
       mapboxMap.addSource(new GeoJsonSource(MARKER_SOURCE, markers));
 

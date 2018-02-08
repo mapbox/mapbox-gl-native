@@ -13,13 +13,13 @@ namespace geojson {
 
 class MultiPolygon : private mbgl::util::noncopyable {
 public:
-    static constexpr auto Name() { return "com/mapbox/services/commons/geojson/MultiPolygon"; };
+    static constexpr auto Name() { return "com/mapbox/geojson/MultiPolygon"; };
 
     static constexpr auto Type() { return "MultiPolygon"; };
 
     static mapbox::geojson::multi_polygon convert(jni::JNIEnv&, jni::Object<MultiPolygon>);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
+    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPolygon>);
 
     static jni::Class<MultiPolygon> javaClass;
 
