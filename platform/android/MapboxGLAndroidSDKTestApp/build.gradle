@@ -52,12 +52,10 @@ android {
 }
 
 dependencies {
-    implementation(project(':MapboxGLAndroidSDK'))
-    implementation(dependenciesList.mapboxJavaServices) {
-        transitive = true
-    }
+    api(project(':MapboxGLAndroidSDK'))
+    implementation dependenciesList.mapboxJavaServices
 
-    api dependenciesList.mapboxJavaTurf
+    implementation dependenciesList.mapboxJavaTurf
 
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
