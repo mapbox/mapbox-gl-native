@@ -207,6 +207,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     // Add fall-through single tap gesture recognizer. This will be called when
     // the map view's tap recognizers fail.
+
+    // NOTE: Since MBXViewController implements `mapView:didSingleTapAtCoordinate` the following
+    // gesture recognizer WILL NOT be triggered, since the default single tap gesture does not fail.
+    //
+    // If you need a custom tap gesture to be trigger consider not implementing `mapView:didSingleTapAtCoordinate`
+
     UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
     for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers) {
         if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {

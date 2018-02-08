@@ -171,11 +171,28 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Tells the delegate that the user has tapped on the map view.
 
+ This method will not be called when the user single taps on an annotation, or if an annotation
+ is currently selected.
+
  @param mapView The map view that was tapped.
  @param coordinate Location of tap in world coordinates.
 
- @note This method will not be called when the user single taps on an annotation, or if an annotation
- is currently selected.
+ @note If  you implement this method, custom tap gesture recognizers that are installed in the following
+ way
+
+```
+UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
+for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers)
+{
+    if ([gesture isKindOfClass:[UITapGestureRecognizer class]])
+    {
+        [singleTap requireGestureRecognizerToFail:gesture];
+    }
+}
+[self.mapView addGestureRecognizer:singleTap];
+```
+
+ will fail to trigger, since the built-in single tap recognizer will no longer fail.
  */
 - (void)mapView:(MGLMapView *)mapView didSingleTapAtCoordinate:(CLLocationCoordinate2D)coordinate;
 
