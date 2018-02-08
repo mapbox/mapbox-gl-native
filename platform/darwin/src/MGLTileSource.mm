@@ -1,7 +1,9 @@
 #import "MGLTileSource_Private.h"
 
 #import "MGLAttributionInfo_Private.h"
+#import "MGLGeometry_Private.h"
 #import "NSString+MGLAdditions.h"
+#import "NSValue+MGLAdditions.h"
 
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
@@ -13,6 +15,7 @@
 
 const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel = @"MGLTileSourceOptionMinimumZoomLevel";
 const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel = @"MGLTileSourceOptionMaximumZoomLevel";
+const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds = @"MGLTileSourceOptionCoordinateBounds";
 const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString = @"MGLTileSourceOptionAttributionHTMLString";
 const MGLTileSourceOption MGLTileSourceOptionAttributionInfos = @"MGLTileSourceOptionAttributionInfos";
 const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSourceOptionTileCoordinateSystem";
@@ -69,6 +72,15 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
     if (tileSet.zoomRange.min > tileSet.zoomRange.max) {
         [NSException raise:NSInvalidArgumentException
                     format:@"MGLTileSourceOptionMinimumZoomLevel must be less than MGLTileSourceOptionMaximumZoomLevel."];
+    }
+    
+    if (NSValue *coordinateBounds = options[MGLTileSourceOptionCoordinateBounds]) {
+        if (![coordinateBounds isKindOfClass:[NSValue class]]
+            && strcmp(coordinateBounds.objCType, @encode(MGLCoordinateBounds)) == 0) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionCoordinateBounds must be set to an NSValue containing an MGLCoordinateBounds."];
+        }
+        tileSet.bounds = MGLLatLngBoundsFromCoordinateBounds(coordinateBounds.MGLCoordinateBoundsValue);
     }
 
     if (NSString *attribution = options[MGLTileSourceOptionAttributionHTMLString]) {

@@ -41,6 +41,20 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
+/**
+ An `NSValue` object containing an `MGLCoordinateBounds` struct that specifies
+ the geographic extent of the source.
+ 
+ If this option is specified, the SDK avoids requesting any tile that falls
+ outside of the coordinate bounds. Otherwise, the SDK requests any tile needed
+ to cover the viewport, as it does by default.
+
+ This option corresponds to the `bounds` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds;
+
 #if TARGET_OS_IPHONE
 /**
  An HTML string defining the buttons to be displayed in an action sheet when the
