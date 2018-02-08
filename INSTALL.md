@@ -16,9 +16,10 @@ operating system and what platform you want to develop for.
 ### macOS
 
  1. Install [Xcode](https://developer.apple.com/xcode/)
- 2. Install [Homebrew](http://brew.sh)
- 3. Install [Node.js](https://nodejs.org/), [ruby](https://www.ruby-lang.org/), [CMake](https://cmake.org/), and [ccache](https://ccache.samba.org) (`brew install nodejs ruby cmake ccache`)
- 4. Install [xcpretty](https://github.com/supermarin/xcpretty) (`gem install xcpretty`)
+ 2. Launch Xcode and install any updates
+ 3. Install [Homebrew](http://brew.sh)
+ 4. Install [Node.js](https://nodejs.org/), [ruby](https://www.ruby-lang.org/), [CMake](https://cmake.org/), and [ccache](https://ccache.samba.org) (`brew install nodejs ruby cmake ccache`)
+ 5. Install [xcpretty](https://github.com/supermarin/xcpretty) (`gem install xcpretty`)
 
 ### Linux
 
