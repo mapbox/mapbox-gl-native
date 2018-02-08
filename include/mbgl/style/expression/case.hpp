@@ -28,6 +28,7 @@ public:
 
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    std::string getOperator() const override { return "case"; }
 private:
     std::vector<Branch> branches;
     std::unique_ptr<Expression> otherwise;

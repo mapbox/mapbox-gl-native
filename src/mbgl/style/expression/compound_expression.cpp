@@ -42,20 +42,19 @@ template <class R, class... Params>
 struct Signature<R (Params...)> : SignatureBase {
     using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
     
-    Signature(R (*evaluate_)(Params...)) :
+    Signature(R (*evaluate_)(Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...}
+            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...},
+            std::move(name_)
         ),
-        evaluate(evaluate_)
-    {}
+        evaluate(evaluate_)    {}
     
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
     
-    std::unique_ptr<Expression> makeExpression(const std::string& name,
-                                               std::vector<std::unique_ptr<Expression>> args) const override {
+    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
         typename Signature::Args argsArray;
         std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
@@ -80,16 +79,16 @@ template <class R, typename T>
 struct Signature<R (const Varargs<T>&)> : SignatureBase {
     using Args = std::vector<std::unique_ptr<Expression>>;
     
-    Signature(R (*evaluate_)(const Varargs<T>&)) :
+    Signature(R (*evaluate_)(const Varargs<T>&), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            VarargsType { valueTypeToExpressionType<T>() }
+            VarargsType { valueTypeToExpressionType<T>() },
+            std::move(name_)
         ),
         evaluate(evaluate_)
     {}
     
-    std::unique_ptr<Expression> makeExpression(const std::string& name,
-                                               std::vector<std::unique_ptr<Expression>> args) const override  {
+    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override  {
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
     };
     
@@ -115,16 +114,16 @@ template <class R, class... Params>
 struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
     using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
     
-    Signature(R (*evaluate_)(const EvaluationContext&, Params...)) :
+    Signature(R (*evaluate_)(const EvaluationContext&, Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
-            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...}
+            std::vector<type::Type> {valueTypeToExpressionType<std::decay_t<Params>>()...},
+            std::move(name_)
         ),
         evaluate(evaluate_)
     {}
     
-    std::unique_ptr<Expression> makeExpression(const std::string& name,
-                                               std::vector<std::unique_ptr<Expression>> args) const override {
+    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
         typename Signature::Args argsArray;
         std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
@@ -176,14 +175,14 @@ struct Signature<Lambda, std::enable_if_t<std::is_class<Lambda>::value>>
 using Definition = CompoundExpressionRegistry::Definition;
 
 template <typename Fn>
-static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction) {
-    return std::make_unique<detail::Signature<Fn>>(evaluateFunction);
+static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction, std::string name) {
+    return std::make_unique<detail::Signature<Fn>>(evaluateFunction, std::move(name));
 }
 
 std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initializeDefinitions() {
     std::unordered_map<std::string, CompoundExpressionRegistry::Definition> definitions;
     auto define = [&](std::string name, auto fn) {
-        definitions[name].push_back(makeSignature(fn));
+        definitions[name].push_back(makeSignature(fn, name));
     };
     
     define("e", []() -> Result<double> { return 2.718281828459045; });
@@ -461,7 +460,7 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
         }
         args.push_back(std::move(*parsed));
     }
-    return createCompoundExpression(name, definition, std::move(args), ctx);
+    return createCompoundExpression(definition, std::move(args), ctx);
 }
 
 
@@ -469,12 +468,11 @@ ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx)
 {
-    return createCompoundExpression(name, CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
+    return createCompoundExpression(CompoundExpressionRegistry::definitions.at(name), std::move(args), ctx);
 }
 
 
-ParseResult createCompoundExpression(const std::string& name,
-                                     const Definition& definition,
+ParseResult createCompoundExpression(const Definition& definition,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx)
 {
@@ -512,7 +510,7 @@ ParseResult createCompoundExpression(const std::string& name,
         }
         
         if (signatureContext.getErrors().size() == 0) {
-            return ParseResult(signature->makeExpression(name, std::move(args)));
+            return ParseResult(signature->makeExpression(std::move(args)));
         }
     }
     

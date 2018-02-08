@@ -35,6 +35,10 @@ ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
     return ParseResult(std::make_unique<Assertion>(it->second, std::move(parsed)));
 }
 
+std::string Assertion::getOperator() const {
+    return type::toString(getType());
+}
+
 EvaluationResult Assertion::evaluate(const EvaluationContext& params) const {
     for (std::size_t i = 0; i < inputs.size(); i++) {
         EvaluationResult value = inputs[i]->evaluate(params);

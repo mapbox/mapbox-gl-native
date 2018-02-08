@@ -45,6 +45,9 @@ suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
         compiled.isZoomConstant = expression.isZoomConstant();
         compiled.type = expression.getType();
 
+        console.log("input: " + JSON.stringify(fixture.expression));
+        console.log("output: " + JSON.stringify(expression.serialize()));
+
         const evaluate = fixture.inputs || [];
         const evaluateResults = [];
         for (const input of evaluate) {
@@ -68,4 +71,3 @@ suite.run('native', {ignores: ignores, tests: tests}, (fixture) => {
 
     return result;
 });
-
