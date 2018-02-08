@@ -272,7 +272,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
     backend.updateAssumedState();
 
-    if (parameters.contextMode == GLContextMode::Shared) {
+    if (parameters.contextMode & GLContextMode::SharedState) {
         parameters.context.setDirtyState();
     }
 
@@ -300,7 +300,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (const RenderBackgroundLayer* background = layer->as<RenderBackgroundLayer>()) {
             const BackgroundPaintProperties::PossiblyEvaluated& paint = background->evaluated;
-            if (parameters.contextMode == GLContextMode::Unique
+            if (parameters.contextMode == GLContextMode::Automatic
                     && layerImpl.get() == layerImpls->at(0).get()
                     && paint.get<BackgroundPattern>().from.empty()) {
                 // This is a solid background. We can use glClear().
@@ -470,7 +470,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         parameters.backend.bind();
         if (parameters.debugOptions & MapDebugOptions::Overdraw) {
             parameters.context.clear(Color::black(), ClearDepth::Default, ClearStencil::Default);
-        } else if (parameters.contextMode == GLContextMode::Shared) {
+        } else if (parameters.contextMode & GLContextMode::SharedState) {
             parameters.context.clear({}, ClearDepth::Default, ClearStencil::Default);
         } else {
             parameters.context.clear(backgroundColor, ClearDepth::Default, ClearStencil::Default);

@@ -11,18 +11,26 @@ HeadlessFrontend::HeadlessFrontend(float pixelRatio_, FileSource& fileSource, Sc
     : HeadlessFrontend({ 256, 256 }, pixelRatio_, fileSource, scheduler, programCacheDir, mode, localFontFamily) {
 }
 
-HeadlessFrontend::HeadlessFrontend(Size size_, float pixelRatio_, FileSource& fileSource, Scheduler& scheduler, const optional<std::string> programCacheDir, GLContextMode mode, const optional<std::string> localFontFamily)
+HeadlessFrontend::HeadlessFrontend(Size size_,
+                                   float pixelRatio_,
+                                   FileSource& fileSource,
+                                   Scheduler& scheduler,
+                                   const optional<std::string> programCacheDir,
+                                   GLContextMode mode,
+                                   const optional<std::string> localFontFamily)
     : size(size_),
-    pixelRatio(pixelRatio_),
-    backend({ static_cast<uint32_t>(size.width * pixelRatio),
-              static_cast<uint32_t>(size.height * pixelRatio) }),
-    asyncInvalidate([this] {
-        if (renderer && updateParameters) {
-            mbgl::BackendScope guard { backend };
-            renderer->render(*updateParameters);
-        }
-    }),
-    renderer(std::make_unique<Renderer>(backend, pixelRatio, fileSource, scheduler, mode, programCacheDir, localFontFamily)) {
+      pixelRatio(pixelRatio_),
+      backend({ static_cast<uint32_t>(size.width * pixelRatio),
+                static_cast<uint32_t>(size.height * pixelRatio) },
+              mode),
+      asyncInvalidate([this] {
+          if (renderer && updateParameters) {
+              mbgl::BackendScope guard{ backend };
+              renderer->render(*updateParameters);
+          }
+      }),
+      renderer(std::make_unique<Renderer>(
+          backend, pixelRatio, fileSource, scheduler, mode, programCacheDir, localFontFamily)) {
 }
 
 HeadlessFrontend::~HeadlessFrontend() = default;

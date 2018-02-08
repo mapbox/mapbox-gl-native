@@ -9,6 +9,9 @@ using namespace mbgl;
 
 class StubRendererBackend: public RendererBackend {
 public:
+    StubRendererBackend() : RendererBackend(GLContextMode::Automatic) {
+    }
+
     void bind() override {
     }
 

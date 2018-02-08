@@ -16,7 +16,7 @@ NS_ASSUME_NONNULL_BEGIN
 /** The file source to use. Defaults to `mbgl::DefaultFileSource` */
 @property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;
 
-/** The GL context mode to use. Defaults to `mbgl::GLContextMode::Unique` */
+/** The GL context mode to use. Defaults to `mbgl::GLContextMode::Automatic` */
 @property (nonatomic, readonly) mbgl::GLContextMode contextMode;
 
 /** The scale factor to use.

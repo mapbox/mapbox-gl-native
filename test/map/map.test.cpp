@@ -72,18 +72,23 @@ public:
     HeadlessFrontend frontend;
     Map map;
 
-    MapTest(float pixelRatio = 1, MapMode mode = MapMode::Static)
-        : frontend(pixelRatio, fileSource, threadPool)
-        , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
+    MapTest(float pixelRatio = 1,
+            MapMode mapMode = MapMode::Static,
+            GLContextMode contextMode = GLContextMode::Automatic)
+        : frontend(pixelRatio, fileSource, threadPool, {}, contextMode),
+          map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mapMode) {
     }
 
     template <typename T = FileSource>
-    MapTest(const std::string& cachePath, const std::string& assetRoot,
-            float pixelRatio = 1, MapMode mode = MapMode::Static,
+    MapTest(const std::string& cachePath,
+            const std::string& assetRoot,
+            float pixelRatio = 1,
+            MapMode mapMode = MapMode::Static,
+            GLContextMode contextMode = GLContextMode::Automatic,
             typename std::enable_if<std::is_same<T, DefaultFileSource>::value>::type* = 0)
-            : fileSource { cachePath, assetRoot }
-            , frontend(pixelRatio, fileSource, threadPool)
-            , map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mode) {
+        : fileSource{ cachePath, assetRoot },
+          frontend(pixelRatio, fileSource, threadPool, {}, contextMode),
+          map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, mapMode) {
     }
 };
 
@@ -447,10 +452,10 @@ TEST(Map, AddLayer) {
 }
 
 TEST(Map, WithoutVAOExtension) {
-    MapTest<DefaultFileSource> test { ":memory:", "test/fixtures/api/assets" };
+    MapTest<DefaultFileSource> test{ ":memory:", "test/fixtures/api/assets", 1, MapMode::Static,
+                                     GLContextMode::DisableVAOExtension };
 
     BackendScope scope { *test.frontend.getBackend() };
-    test.frontend.getBackend()->getContext().disableVAOExtension = true;
 
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
 

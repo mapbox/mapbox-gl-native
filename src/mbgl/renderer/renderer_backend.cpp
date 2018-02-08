@@ -8,7 +8,8 @@
 
 namespace mbgl {
 
-RendererBackend::RendererBackend() = default;
+RendererBackend::RendererBackend(GLContextMode mode_) : mode(mode_) {
+}
 
 gl::Context& RendererBackend::getContext() {
     assert(BackendScope::exists());
@@ -16,7 +17,9 @@ gl::Context& RendererBackend::getContext() {
         context = std::make_unique<gl::Context>();
         context->enableDebugging();
         context->initializeExtensions(
-            std::bind(&RendererBackend::getExtensionFunctionPointer, this, std::placeholders::_1));
+            std::bind(&RendererBackend::getExtensionFunctionPointer, this, std::placeholders::_1),
+            mode & GLContextMode::DisableVAOExtension,
+            mode & GLContextMode::DisableProgramBinariesExtension);
     });
     return *context;
 }

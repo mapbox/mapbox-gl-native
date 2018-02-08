@@ -9,7 +9,7 @@ namespace mbgl {
 
 class HeadlessBackend : public RendererBackend {
 public:
-    HeadlessBackend(Size = { 256, 256 });
+    HeadlessBackend(Size = { 256, 256 }, GLContextMode = GLContextMode::Automatic);
     ~HeadlessBackend() override;
 
     void bind() override;

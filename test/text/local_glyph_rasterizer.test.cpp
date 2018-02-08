@@ -32,7 +32,7 @@ namespace {
 class LocalGlyphRasterizerTest {
 public:
     LocalGlyphRasterizerTest(const optional<std::string> fontFamily)
-        : frontend(pixelRatio, fileSource, threadPool, optional<std::string>(), GLContextMode::Unique, fontFamily)
+        : frontend(pixelRatio, fileSource, threadPool, optional<std::string>(), GLContextMode::Automatic, fontFamily)
     {
     }
 

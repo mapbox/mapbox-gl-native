@@ -41,7 +41,9 @@ public:
     Context();
     ~Context();
 
-    void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&);
+    void initializeExtensions(const std::function<gl::ProcAddress(const char*)>&,
+                              bool disableVAOExtension,
+                              bool disableProgramBinariesExtension);
 
     void enableDebugging();
 
@@ -287,15 +289,6 @@ private:
     std::vector<VertexArrayID> abandonedVertexArrays;
     std::vector<FramebufferID> abandonedFramebuffers;
     std::vector<RenderbufferID> abandonedRenderbuffers;
-
-public:
-    // For testing and Windows because Qt + ANGLE
-    // crashes with VAO enabled.
-#if defined(_WINDOWS)
-    bool disableVAOExtension = true;
-#else
-    bool disableVAOExtension = false;
-#endif
 };
 
 } // namespace gl

@@ -24,7 +24,7 @@ class UpdateParameters;
 class Renderer {
 public:
     Renderer(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&,
-             GLContextMode = GLContextMode::Unique,
+             GLContextMode = GLContextMode::Automatic,
              const optional<std::string> programCacheDir = {},
              const optional<std::string> localFontFamily = {});
     ~Renderer();

@@ -92,7 +92,11 @@ Context::~Context() {
     }
 }
 
-void Context::initializeExtensions(const std::function<gl::ProcAddress(const char*)>& getProcAddress) {
+void Context::initializeExtensions(
+    const std::function<gl::ProcAddress(const char*)>& getProcAddress,
+    bool disableVAOExtension,
+    bool disableProgramBinariesExtension) {
+    const std::string renderer = reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_RENDERER)));
     if (const auto* extensions =
             reinterpret_cast<const char*>(MBGL_CHECK_ERROR(glGetString(GL_EXTENSIONS)))) {
 
@@ -109,11 +113,32 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         };
 
         debugging = std::make_unique<extension::Debugging>(fn);
-        if (!disableVAOExtension) {
+
+        // Load the Vertex Array Objects extension
+        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
+        // Qt + ANGLE crashes with VAO enabled.
+        if (!disableVAOExtension &&
+            !(renderer.find("Adreno (TM) 2") != std::string::npos ||
+              renderer.find("Adreno (TM) 3") != std::string::npos ||
+              renderer.find("ANGLE") != std::string::npos)) {
             vertexArray = std::make_unique<extension::VertexArray>(fn);
         }
+
+        // Load the Program Binaries extension
+        (void)disableProgramBinariesExtension;
 #if MBGL_HAS_BINARY_PROGRAMS
-        programBinary = std::make_unique<extension::ProgramBinary>(fn);
+        // Blacklist Adreno 3xx, 4xx, and 5xx GPUs due to known bugs:
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=510637
+        // https://chromium.googlesource.com/chromium/src/gpu/+/master/config/gpu_driver_bug_list.json#2316
+        // Blacklist Vivante GC4000 due to bugs when linking loaded programs:
+        // https://github.com/mapbox/mapbox-gl-native/issues/10704
+        if (!disableProgramBinariesExtension &&
+            !(renderer.find("Adreno (TM) 3") != std::string::npos ||
+              renderer.find("Adreno (TM) 4") != std::string::npos ||
+              renderer.find("Adreno (TM) 5") != std::string::npos ||
+              renderer.find("Vivante GC4000") != std::string::npos)) {
+            programBinary = std::make_unique<extension::ProgramBinary>(fn);
+        }
 #endif
 
         if (!supportsVertexArrays()) {
@@ -257,15 +282,7 @@ UniqueTexture Context::createTexture() {
 }
 
 bool Context::supportsVertexArrays() const {
-    static bool blacklisted = []() {
-        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
-        const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-        return renderer.find("Adreno (TM) 2") != std::string::npos
-         || renderer.find("Adreno (TM) 3") != std::string::npos;
-    }();
-
-    return !blacklisted &&
-           vertexArray &&
+    return vertexArray &&
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
@@ -273,24 +290,9 @@ bool Context::supportsVertexArrays() const {
 
 #if MBGL_HAS_BINARY_PROGRAMS
 bool Context::supportsProgramBinaries() const {
-    if (!programBinary || !programBinary->programBinary || !programBinary->getProgramBinary) {
-        return false;
-    }
-
-    // Blacklist Adreno 3xx, 4xx, and 5xx GPUs due to known bugs:
-    // https://bugs.chromium.org/p/chromium/issues/detail?id=510637
-    // https://chromium.googlesource.com/chromium/src/gpu/+/master/config/gpu_driver_bug_list.json#2316
-    // Blacklist Vivante GC4000 due to bugs when linking loaded programs:
-    // https://github.com/mapbox/mapbox-gl-native/issues/10704
-    const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
-    if (renderer.find("Adreno (TM) 3") != std::string::npos
-     || renderer.find("Adreno (TM) 4") != std::string::npos
-     || renderer.find("Adreno (TM) 5") != std::string::npos
-     || renderer.find("Vivante GC4000") != std::string::npos) {
-        return false;
-    }
-
-    return true;
+    return programBinary &&
+           programBinary->programBinary &&
+           programBinary->getProgramBinary;
 }
 
 optional<std::pair<BinaryProgramFormat, std::string>>

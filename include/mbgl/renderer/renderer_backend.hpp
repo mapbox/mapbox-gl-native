@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/renderer/backend_scope.hpp>
+#include <mbgl/renderer/mode.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/size.hpp>
 #include <mbgl/util/util.hpp>
@@ -20,7 +21,7 @@ using FramebufferID = uint32_t;
 // the actual rendering.
 class RendererBackend {
 public:
-    RendererBackend();
+    RendererBackend(GLContextMode);
     virtual ~RendererBackend();
 
     // Returns the backend's context which manages OpenGL state.
@@ -81,6 +82,7 @@ protected:
 
 private:
     std::once_flag initialized;
+    const GLContextMode mode;
 
     friend class BackendScope;
 };
