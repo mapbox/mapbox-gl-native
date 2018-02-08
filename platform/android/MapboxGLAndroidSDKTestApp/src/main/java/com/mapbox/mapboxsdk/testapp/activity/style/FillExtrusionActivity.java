@@ -12,7 +12,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Polygon;
+import com.mapbox.geojson.Polygon;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionHeight;
@@ -35,7 +35,7 @@ public class FillExtrusionActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      Polygon domTower = Polygon.fromCoordinates(new double[][][] {
+      Polygon domTower = Polygon.fromLngLats(new double[][][] {
         new double[][] {
           new double[] {
             5.12112557888031,

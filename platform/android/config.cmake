@@ -248,8 +248,6 @@ add_library(mbgl-android STATIC
     platform/android/src/geojson/point.hpp
     platform/android/src/geojson/polygon.cpp
     platform/android/src/geojson/polygon.hpp
-    platform/android/src/geojson/position.cpp
-    platform/android/src/geojson/position.hpp
 
     # Geometry
     platform/android/src/geometry/lat_lng.cpp

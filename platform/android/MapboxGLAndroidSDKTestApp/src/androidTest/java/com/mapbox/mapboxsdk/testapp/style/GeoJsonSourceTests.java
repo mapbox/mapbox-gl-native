@@ -13,9 +13,9 @@ import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.RuntimeStyleTestActivity;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
@@ -67,7 +67,7 @@ public class GeoJsonSourceTests extends BaseActivityTest {
 
       @Override
       public void perform(UiController uiController, View view) {
-        GeoJsonSource source = new GeoJsonSource("source", Point.fromCoordinates(new double[] {0d, 0d}));
+        GeoJsonSource source = new GeoJsonSource("source", Point.fromLngLat(0d, 0d));
         mapboxMap.addSource(source);
 
         mapboxMap.addLayer(new CircleLayer("layer", source.getId()));

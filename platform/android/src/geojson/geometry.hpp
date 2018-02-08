@@ -11,7 +11,7 @@ namespace geojson {
 
 class Geometry : private mbgl::util::noncopyable {
 public:
-    static constexpr auto Name() { return "com/mapbox/services/commons/geojson/Geometry"; };
+    static constexpr auto Name() { return "com/mapbox/geojson/Geometry"; };
 
     static mapbox::geojson::geometry convert(jni::JNIEnv&, jni::Object<Geometry>);
 

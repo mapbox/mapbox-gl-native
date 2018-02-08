@@ -33,7 +33,7 @@ mapbox::geojson::geometry Geometry::convert(jni::JNIEnv &env, jni::Object<Geomet
 }
 
 std::string Geometry::getType(jni::JNIEnv &env, jni::Object<Geometry> jGeometry) {
-    static auto method = Geometry::javaClass.GetMethod<jni::String ()>(env, "getType");
+    static auto method = Geometry::javaClass.GetMethod<jni::String ()>(env, "type");
     auto jType = jGeometry.Call(env, method);
     auto type = jni::Make<std::string>(env, jType);
     jni::DeleteLocalRef(env, jType);
