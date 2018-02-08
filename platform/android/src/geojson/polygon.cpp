@@ -12,7 +12,7 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<Polygon>
     mapbox::geojson::polygon polygon;
 
     if (jPolygon) {
-        auto jPositionListsList = Polygon::getCoordinates(env, jPolygon);
+        auto jPositionListsList = Polygon::coordinates(env, jPolygon);
         polygon = Polygon::convert(env, jPositionListsList);
         jni::DeleteLocalRef(env, jPositionListsList);
     }
@@ -20,11 +20,11 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<Polygon>
     return polygon;
 }
 
-mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<java::util::List<Position>>*/> jPositionListsList) {
+mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<java::util::List<Point>>*/> jPointListsList) {
     mapbox::geojson::polygon polygon;
 
-    if (jPositionListsList) {
-        auto multiLine = MultiLineString::convert(env, jPositionListsList);
+    if (jPointListsList) {
+        auto multiLine = MultiLineString::convert(env, jPointListsList);
         polygon.reserve(multiLine.size());
         for (auto&& line : multiLine) {
             polygon.emplace_back(convertExplicit<mapbox::geojson::linear_ring>(std::move(line)));
@@ -35,8 +35,8 @@ mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<java::ut
 }
 
 
-jni::Object<java::util::List> Polygon::getCoordinates(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
-    static auto method = Polygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+jni::Object<java::util::List> Polygon::coordinates(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
+    static auto method = Polygon::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jPolygon.Call(env, method);
 }
 

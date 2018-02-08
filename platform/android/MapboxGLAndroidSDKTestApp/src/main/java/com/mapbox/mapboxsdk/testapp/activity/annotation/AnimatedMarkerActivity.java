@@ -12,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
 
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
@@ -25,8 +26,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
-import com.mapbox.services.api.utils.turf.TurfMeasurement;
-import com.mapbox.services.commons.models.Position;
+import com.mapbox.turf.TurfMeasurement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -272,8 +272,8 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
   private double getBearing(LatLng from, LatLng to) {
     return TurfMeasurement.bearing(
-      Position.fromCoordinates(from.getLongitude(), from.getLatitude()),
-      Position.fromCoordinates(to.getLongitude(), to.getLatitude())
+      Point.fromLngLat(from.getLongitude(), from.getLatitude()),
+      Point.fromLngLat(to.getLongitude(), to.getLatitude())
     );
   }
 

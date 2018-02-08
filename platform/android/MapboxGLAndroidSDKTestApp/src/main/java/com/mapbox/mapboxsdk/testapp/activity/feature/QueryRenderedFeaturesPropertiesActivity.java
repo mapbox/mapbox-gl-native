@@ -12,12 +12,13 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.gson.JsonElement;
+import com.mapbox.geojson.Feature;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
+
 
 import java.util.List;
 import java.util.Map;
@@ -80,12 +81,12 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
     for (Feature feature : features) {
       if (feature != null) {
         Timber.i("Got feature %s with %s properties and Geometry %s",
-          feature.getId(),
-          feature.getProperties() != null ? feature.getProperties().entrySet().size() : "<null>",
-          feature.getGeometry() != null ? feature.getGeometry().getClass().getSimpleName() : "<null>"
+          feature.id(),
+          feature.properties() != null ? feature.properties().entrySet().size() : "<null>",
+          feature.geometry() != null ? feature.geometry().getClass().getSimpleName() : "<null>"
         );
-        if (feature.getProperties() != null) {
-          for (Map.Entry<String, JsonElement> entry : feature.getProperties().entrySet()) {
+        if (feature.properties() != null) {
+          for (Map.Entry<String, JsonElement> entry : feature.properties().entrySet()) {
             Timber.i("Prop %s - %s", entry.getKey(), entry.getValue());
           }
         }
@@ -114,7 +115,7 @@ public class QueryRenderedFeaturesPropertiesActivity extends AppCompatActivity {
         if (customMarker.features.size() > 0) {
           view.addView(row(String.format("Found %s features", customMarker.features.size())));
           Feature feature = customMarker.features.get(0);
-          for (Map.Entry<String, JsonElement> prop : feature.getProperties().entrySet()) {
+          for (Map.Entry<String, JsonElement> prop : feature.properties().entrySet()) {
             view.addView(row(String.format("%s: %s", prop.getKey(), prop.getValue())));
           }
         } else {

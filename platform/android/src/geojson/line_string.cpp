@@ -1,6 +1,6 @@
 #include "line_string.hpp"
 
-#include "position.hpp"
+#include "point.hpp"
 
 namespace mbgl {
 namespace android {
@@ -10,35 +10,35 @@ mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<L
     mapbox::geojson::line_string lineString;
 
     if (jLineString) {
-        auto jPositionList = LineString::getCoordinates(env, jLineString);
-        lineString = LineString::convert(env, jPositionList);
-        jni::DeleteLocalRef(env, jPositionList);
+        auto jPointList = LineString::coordinates(env, jLineString);
+        lineString = LineString::convert(env, jPointList);
+        jni::DeleteLocalRef(env, jPointList);
     }
 
     return lineString;
 }
 
-mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<Position>*/> jPositionList) {
+mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<Point>*/> jPointList) {
     mapbox::geojson::line_string lineString;
 
-    if (jPositionList) {
-        auto jPositionArray = java::util::List::toArray<Position>(env, jPositionList);
+    if (jPointList) {
+        auto jPointArray = java::util::List::toArray<Point>(env, jPointList);
 
-        auto size = jPositionArray.Length(env);
+        auto size = jPointArray.Length(env);
         for (std::size_t i = 0; i < size; i++) {
-            auto jPosition = jPositionArray.Get(env, i);
-            lineString.push_back(Position::convert(env, jPosition));
-            jni::DeleteLocalRef(env, jPosition);
+            auto jPoint = jPointArray.Get(env, i);
+            lineString.push_back(Point::convert(env, jPoint));
+            jni::DeleteLocalRef(env, jPoint);
         }
 
-        jni::DeleteLocalRef(env, jPositionArray);
+        jni::DeleteLocalRef(env, jPointArray);
     }
 
     return lineString;
 }
 
-jni::Object<java::util::List> LineString::getCoordinates(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
-    static auto method = LineString::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "getCoordinates");
+jni::Object<java::util::List> LineString::coordinates(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
+    static auto method = LineString::javaClass.GetMethod<jni::Object<java::util::List> ()>(env, "coordinates");
     return jLineString.Call(env, method);
 }
 

@@ -8,6 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -28,8 +30,7 @@ import com.mapbox.mapboxsdk.style.sources.TileSet;
 import com.mapbox.mapboxsdk.style.sources.VectorSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
+
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -364,7 +365,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
 
       Timber.d("Updating parks source");
       // change the source
-      int park = counter < parks.getFeatures().size() - 1 ? counter : 0;
+      int park = counter < parks.features().size() - 1 ? counter : 0;
 
       GeoJsonSource source = mapboxMap.getSourceAs("dynamic-park-source");
 
@@ -375,7 +376,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       }
 
       List<Feature> features = new ArrayList<>();
-      features.add(parks.getFeatures().get(park));
+      features.add(parks.features().get(park));
       source.setGeoJson(FeatureCollection.fromFeatures(features));
 
       // Re-post

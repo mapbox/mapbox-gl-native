@@ -5,15 +5,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.google.gson.JsonObject;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Point;
+
 
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
       properties.addProperty("key1", "value1");
       final GeoJsonSource source = new GeoJsonSource("test-source",
         FeatureCollection.fromFeatures(new Feature[] {
-          Feature.fromGeometry(Point.fromCoordinates(new double[] {0, 0}), properties)
+          Feature.fromGeometry(Point.fromLngLat(0, 0), properties)
         }));
       mapboxMap.addSource(source);
 

@@ -20,7 +20,6 @@
 #include "geojson/multi_polygon.hpp"
 #include "geojson/point.hpp"
 #include "geojson/polygon.hpp"
-#include "geojson/position.hpp"
 #include "geometry/lat_lng.hpp"
 #include "geometry/lat_lng_bounds.hpp"
 #include "geometry/lat_lng_quad.hpp"
@@ -128,7 +127,6 @@ void registerNatives(JavaVM *vm) {
     geojson::MultiPolygon::registerNative(env);
     geojson::Point::registerNative(env);
     geojson::Polygon::registerNative(env);
-    geojson::Position::registerNative(env);
 
     // Geometry
     LatLng::registerNative(env);
