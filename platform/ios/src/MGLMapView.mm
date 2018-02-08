@@ -5493,7 +5493,7 @@ public:
         {
             [self.delegate mapView:self regionDidChangeAnimated:animated reason:self.cameraChangeReason];
         }
-        else
+        else if (respondsToSelector)
         {
             [self.delegate mapView:self regionDidChangeAnimated:animated];
         }
