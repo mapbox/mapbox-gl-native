@@ -216,6 +216,30 @@ std::vector<optional<Value>> InterpolateBase::possibleOutputs() const {
     return result;
 }
 
+template <typename T>
+mbgl::Value Interpolate<T>::serialize() const {
+    std::vector<mbgl::Value> serialized;
+    serialized.emplace_back(getOperator());
+    
+    interpolator.match(
+        [&](const ExponentialInterpolator& exponential) {
+            serialized.emplace_back(std::vector<mbgl::Value>{{ std::string("exponential"), exponential.base }});
+        },
+        [&](const CubicBezierInterpolator& cubicBezier) {
+            static const std::string cubicBezierTag("cubic-bezier");
+            auto p1 = cubicBezier.ub.getP1();
+            auto p2 = cubicBezier.ub.getP2();
+            serialized.emplace_back(std::vector<mbgl::Value>{{ cubicBezierTag, p1.first, p1.second, p2.first, p2.second }});
+        }
+    );
+    serialized.emplace_back(input->serialize());
+    for (auto& entry : stops) {
+        serialized.emplace_back(entry.first);
+        serialized.emplace_back(entry.second->serialize());
+    };
+    return serialized;
+}
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl

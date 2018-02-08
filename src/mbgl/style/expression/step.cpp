@@ -168,6 +168,18 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
     return ParseResult(std::make_unique<Step>(*outputType, std::move(*input), std::move(stops)));
 }
 
+mbgl::Value Step::serialize() const {
+    std::vector<mbgl::Value> serialized;
+    serialized.emplace_back(getOperator());
+    serialized.emplace_back(input->serialize());
+    for (auto& entry : stops) {
+        if (entry.first > -std::numeric_limits<double>::infinity()) {
+            serialized.emplace_back(entry.first);
+        }
+        serialized.emplace_back(entry.second->serialize());
+    }
+    return serialized;
+}
 
 } // namespace expression
 } // namespace style

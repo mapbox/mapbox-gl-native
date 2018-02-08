@@ -31,6 +31,8 @@ public:
     std::vector<optional<Value>> possibleOutputs() const override {
         return { nullopt };
     }
+    
+    std::string getOperator() const override { return "at"; }
 
 private:
     std::unique_ptr<Expression> index;
