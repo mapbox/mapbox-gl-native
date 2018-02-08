@@ -209,6 +209,8 @@ public:
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 
+@property (nonatomic) MGLCameraChangeReason cameraChangeReason;
+
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
 
@@ -535,12 +537,13 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil]; // $$jr missing???
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+
 
     // set initial position
     //
@@ -549,6 +552,9 @@ public:
     mbgl::EdgeInsets padding = MGLEdgeInsetsFromNSEdgeInsets(self.contentInset);
     options.padding = padding;
     options.zoom = 0;
+
+    _cameraChangeReason = MGLCameraChangeReasonUnknown;
+
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
     _pendingLongitude = NAN;
@@ -1235,6 +1241,8 @@ public:
 
 - (void)handleCompassTapGesture:(__unused id)sender
 {
+    self.cameraChangeReason = MGLCameraChangeReasonGestureResetNorth;
+
     [self resetNorthAnimated:YES];
 
     if (self.userTrackingMode == MGLUserTrackingModeFollowWithHeading ||
@@ -1257,6 +1265,7 @@ public:
 
 - (void)notifyGestureDidBegin {
     BOOL animated = NO;
+
     [self cameraWillChangeAnimated:animated];
     _mbglMap->setGestureInProgress(true);
     _changeDelimiterSuppressionDepth++;
@@ -1280,6 +1289,23 @@ public:
     return _changeDelimiterSuppressionDepth > 0;
 }
 
+- (BOOL)_shouldChangeFromCamera:(nonnull MGLMapCamera *)oldCamera toCamera:(nonnull MGLMapCamera *)newCamera
+{
+    // Check delegates first
+    if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:reason:)])
+    {
+        return [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:newCamera reason:self.cameraChangeReason];
+    }
+    else if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)])
+    {
+        return [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:newCamera];
+    }
+    else
+    {
+        return YES;
+    }
+}
+
 - (void)handlePanGesture:(UIPanGestureRecognizer *)pan
 {
     if ( ! self.isScrollEnabled) return;
@@ -1287,7 +1313,9 @@ public:
     _mbglMap->cancelTransitions();
 
     MGLMapCamera *oldCamera = self.camera;
-    
+
+    self.cameraChangeReason = MGLCameraChangeReasonGesturePan;
+
     if (pan.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
@@ -1301,9 +1329,8 @@ public:
         CGPoint delta = [pan translationInView:pan.view];
 
         MGLMapCamera *toCamera = [self cameraByPanningWithTranslation:delta panGesture:pan];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             _mbglMap->moveBy({ delta.x, delta.y });
             [pan setTranslation:CGPointZero inView:pan.view];
@@ -1325,9 +1352,8 @@ public:
         {
             CGPoint offset = CGPointMake(velocity.x * self.decelerationRate / 4, velocity.y * self.decelerationRate / 4);
             MGLMapCamera *toCamera = [self cameraByPanningWithTranslation:offset panGesture:pan];
-            
-            if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-                [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
                 _mbglMap->moveBy({ offset.x, offset.y }, MGLDurationFromTimeInterval(self.decelerationRate));
             }
@@ -1358,6 +1384,8 @@ public:
     CGPoint centerPoint = [self anchorPointForGesture:pinch];
     MGLMapCamera *oldCamera = self.camera;
 
+    self.cameraChangeReason = MGLCameraChangeReasonGesturePinch;
+
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
@@ -1374,9 +1402,8 @@ public:
 
         // Calculates the final camera zoom, has no effect within current map camera.
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:centerPoint];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             _mbglMap->setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
             // The gesture recognizer only reports the gesture’s current center
@@ -1428,9 +1455,8 @@ public:
         // Calculates the final camera zoom, this has no effect within current map camera.
         double zoom = log2(newScale);
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:centerPoint];
-        
-        if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)]
-            && ![self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             drift = NO;
         } else {
@@ -1456,7 +1482,9 @@ public:
 
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
-    
+
+    self.cameraChangeReason = MGLCameraChangeReasonGestureRotate;
+
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
@@ -1483,9 +1511,8 @@ public:
         }
         
         MGLMapCamera *toCamera = [self cameraByRotatingToDirection:newDegrees aroundAnchorPoint:centerPoint];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
            _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
         }
@@ -1503,9 +1530,8 @@ public:
             CGFloat newDegrees = MGLDegreesFromRadians(newRadians) * -1;
 
             MGLMapCamera *toCamera = [self cameraByRotatingToDirection:newDegrees aroundAnchorPoint:centerPoint];
-            
-            if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-                [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+            if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
             {
                 _mbglMap->setBearing(newDegrees, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(decelerationRate));
                 
@@ -1550,6 +1576,8 @@ public:
         }
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
+
+        // Should we call mapView:didSingleTapAtCoordinate: here? If so, what coordinate?
         return;
     }
 
@@ -1560,9 +1588,20 @@ public:
         CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
         [self selectAnnotation:annotation animated:YES calloutPositioningRect:positionRect];
     }
-    else
+    else if (self.selectedAnnotation)
     {
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
+    }
+    else 
+    {
+        // An annotation wasn't selected or deselected.
+        if ([self.delegate respondsToSelector:@selector(mapView:didSingleTapAtCoordinate:)])
+        {
+            CGPoint pointInView = [singleTap locationInView:singleTap.view];
+            CLLocationCoordinate2D tapCoordinate = [self convertPoint:pointInView toCoordinateFromView:singleTap.view];
+
+            [self.delegate mapView:self didSingleTapAtCoordinate:tapCoordinate];
+        }
     }
 }
 
@@ -1642,6 +1681,8 @@ public:
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
+        self.cameraChangeReason = MGLCameraChangeReasonGestureDoubleTap;
+
         MGLMapCamera *oldCamera = self.camera;
 
         double newZoom = round(self.zoomLevel) + 1.0;
@@ -1649,9 +1690,8 @@ public:
         CGPoint gesturePoint = [self anchorPointForGesture:doubleTap];
 
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
             
@@ -1678,9 +1718,13 @@ public:
 
     _mbglMap->cancelTransitions();
 
+    self.cameraChangeReason = MGLCameraChangeReasonGestureTwoFingerSingleTap;
+
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+
+        [self notifyGestureDidBegin];
     }
     else if (twoFingerTap.state == UIGestureRecognizerStateEnded)
     {
@@ -1691,9 +1735,8 @@ public:
         CGPoint gesturePoint = [self anchorPointForGesture:twoFingerTap];
 
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:gesturePoint];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
             _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
@@ -1713,7 +1756,9 @@ public:
     if ( ! self.isZoomEnabled) return;
 
     _mbglMap->cancelTransitions();
-    
+
+    self.cameraChangeReason = MGLCameraChangeReasonGestureQuickZoom;
+
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
         [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
@@ -1736,9 +1781,8 @@ public:
         
         MGLMapCamera *oldCamera = self.camera;
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:newZoom aroundAnchorPoint:centerPoint];
-        
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             _mbglMap->setZoom(newZoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
         }
@@ -1757,6 +1801,8 @@ public:
     if ( ! self.isPitchEnabled) return;
 
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonGesturePitchStart;
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
@@ -1777,8 +1823,7 @@ public:
         MGLMapCamera *oldCamera = self.camera;
         MGLMapCamera *toCamera = [self cameraByTiltingToPitch:pitchNew];
 
-        if (![self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)] ||
-            [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:toCamera])
+        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             _mbglMap->setPitch(pitchNew, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y });
         }
@@ -1936,7 +1981,8 @@ public:
         {
             id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
             if(!annotation) {
-                return NO;
+                // Only allow this gesture to be recognized if the delegate implements the single tap method
+                return [self.delegate respondsToSelector:@selector(mapView:didSingleTapAtCoordinate:)];
             }
         }
     }
@@ -2854,6 +2900,8 @@ public:
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
 
@@ -2903,6 +2951,9 @@ public:
     }
     
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     _mbglMap->easeTo(cameraOptions, animationOptions);
 }
 
@@ -2925,6 +2976,8 @@ public:
 {
     if (zoomLevel == self.zoomLevel) return;
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
@@ -3014,6 +3067,9 @@ public:
 - (void)setVisibleCoordinates:(const CLLocationCoordinate2D *)coordinates count:(NSUInteger)count edgePadding:(UIEdgeInsets)insets direction:(CLLocationDirection)direction duration:(NSTimeInterval)duration animationTimingFunction:(nullable CAMediaTimingFunction *)function completionHandler:(nullable void (^)(void))completion
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     [self _setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:completion];
 }
 
@@ -3063,6 +3119,9 @@ public:
     
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
 }
@@ -3095,6 +3154,8 @@ public:
     _mbglMap->cancelTransitions();
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
 
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
@@ -3180,6 +3241,9 @@ public:
 
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:edgePadding];
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
@@ -3236,6 +3300,9 @@ public:
 
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
+
+    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
     _mbglMap->flyTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"camera"];
@@ -3394,6 +3461,26 @@ public:
 - (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
 {
     return [self metersPerPointAtLatitude:latitude];
+}
+
+#pragma mark - Camera Change Reason -
+
+- (void)resetCameraChangeReason
+{
+    self.cameraChangeReason = MGLCameraChangeReasonUnknown;
+}
+
+- (void)setCameraChangeReason:(MGLCameraChangeReason)reason
+{
+    // If not already set, update. This is required since the reason can be set in succession (for
+    // example "resetting north" sets the reason to MGLCameraChangeReasonGestureResetNorth before
+    // calling a public method which calls self.cameraChangeReason with MGLCameraChangeReasonProgramatic.
+    // We want the first reason to win out. This may be better handled with a stack or some other
+    // mechanism.
+    if (MGLCameraChangeReasonUnknown == _cameraChangeReason)
+    {
+        _cameraChangeReason = reason;
+    }
 }
 
 #pragma mark - Styling -
@@ -5342,9 +5429,16 @@ public:
         }
     }
 
-    if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
+    if ( ! [self isSuppressingChangeDelimiters] )
     {
-        [self.delegate mapView:self regionWillChangeAnimated:animated];
+        if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:reason:)])
+        {
+            [self.delegate mapView:self regionWillChangeAnimated:animated reason:self.cameraChangeReason];
+        }
+        else if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
+        {
+            [self.delegate mapView:self regionWillChangeAnimated:animated];
+        }
     }
 }
 
@@ -5358,8 +5452,12 @@ public:
     if (!self.scaleBar.hidden) {
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
     }
-    
-    if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
+
+    if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
+    {
+        [self.delegate mapView:self regionIsChangingWithReason:self.cameraChangeReason];
+    }
+    else if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
         [self.delegate mapViewRegionIsChanging:self];
     }
@@ -5372,9 +5470,13 @@ public:
 
     [self updateCompass];
 
-    if ( ! [self isSuppressingChangeDelimiters] && [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)])
+    if ( ! [self isSuppressingChangeDelimiters])
     {
-        if ([UIApplication sharedApplication].applicationState == UIApplicationStateActive)
+        BOOL respondsToSelector = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)];
+        BOOL respondsToSelectorWithReason = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:reason:)];
+
+        if ((respondsToSelector || respondsToSelectorWithReason) &&
+            ([UIApplication sharedApplication].applicationState == UIApplicationStateActive))
         {
             _featureAccessibilityElements = nil;
             _visiblePlaceFeatures = nil;
@@ -5386,7 +5488,17 @@ public:
                 UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
             }
         }
-        [self.delegate mapView:self regionDidChangeAnimated:animated];
+
+        if (respondsToSelectorWithReason)
+        {
+            [self.delegate mapView:self regionDidChangeAnimated:animated reason:self.cameraChangeReason];
+        }
+        else
+        {
+            [self.delegate mapView:self regionDidChangeAnimated:animated];
+        }
+
+        [self resetCameraChangeReason];
     }
 }
 

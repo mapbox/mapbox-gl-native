@@ -1,0 +1,14 @@
+#import "MGLFoundation.h"
+
+typedef NSString *MGLCameraChangeReason NS_TYPED_ENUM;
+
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonUnknown;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonProgramatic;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGestureResetNorth;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGesturePan;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGesturePinch;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGestureRotate;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGestureDoubleTap;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGestureTwoFingerSingleTap;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGestureQuickZoom;
+extern MGL_EXPORT const MGLCameraChangeReason MGLCameraChangeReasonGesturePitchStart;

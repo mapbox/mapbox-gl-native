@@ -1279,6 +1279,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleDynamicPointCollection
 {
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(36.9979, -109.0441) zoomLevel:14 animated:NO];
+
     CLLocationCoordinate2D coordinates[] = {
         {37.00145594210082, -109.04960632324219},
         {37.00173012609867, -109.0404224395752},
@@ -1879,13 +1880,32 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
-- (void)mapViewRegionIsChanging:(MGLMapView *)mapView
+- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera reason:(MGLCameraChangeReason)reason
+{
+    return YES;
+}
+
+- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason
+{
+}
+
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView reason:(MGLCameraChangeReason)reason
 {
     [self updateHUD];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason
+{
     [self updateHUD];
+}
+
+- (void)mapView:(MGLMapView *)mapView didSingleTapAtCoordinate:(CLLocationCoordinate2D)coordinate
+{
+#if 0
+    MGLPointAnnotation *annot = [[MGLPointAnnotation alloc] init];
+    annot.coordinate = coordinate;
+    [self.mapView addAnnotation:annot];
+#endif
 }
 
 - (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation {

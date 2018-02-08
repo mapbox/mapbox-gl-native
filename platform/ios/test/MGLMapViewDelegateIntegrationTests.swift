@@ -11,7 +11,7 @@ class MGLMapViewDelegateIntegrationTests: XCTestCase {
 
 extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
-    func mapViewRegionIsChanging(_ mapView: MGLMapView) {}
+    func mapViewRegionIsChanging(_ mapView: MGLMapView, reason: MGLCameraChangeReason) {}
 
     func mapView(_ mapView: MGLMapView, didChange mode: MGLUserTrackingMode, animated: Bool) {}
 
@@ -33,9 +33,9 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, didDeselect annotation: MGLAnnotation) {}
 
-    func mapView(_ mapView: MGLMapView, regionDidChangeAnimated animated: Bool) {}
+    func mapView(_ mapView: MGLMapView, regionDidChangeAnimated animated: Bool, reason: MGLCameraChangeReason) {}
 
-    func mapView(_ mapView: MGLMapView, regionWillChangeAnimated animated: Bool) {}
+    func mapView(_ mapView: MGLMapView, regionWillChangeAnimated animated: Bool, reason: MGLCameraChangeReason) {}
 
     func mapViewDidFailLoadingMap(_ mapView: MGLMapView, withError error: Error) {}
 
