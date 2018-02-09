@@ -281,7 +281,7 @@ public:
     bool operator()(const GeometryTileFeature&) const;
 
     template <class PropertyAccessor>
-    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const;
+    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, float zoom) const;
 };
 
 } // namespace style

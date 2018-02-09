@@ -247,16 +247,18 @@ inline bool Filter::operator()(const Feature& feature) const {
         if (it == feature.properties.end())
             return {};
         return it->second;
-    });
+    }, 0);
 }
 
 template <class GeometryTileFeature>
 bool Filter::operator()(const GeometryTileFeature& feature) const {
-    return operator()(feature.getType(), feature.getID(), [&] (const auto& key) { return feature.getValue(key); });
+    return operator()(feature.getType(), feature.getID(), [&] (const auto& key) { return feature.getValue(key); }, 0);
 }
 
 template <class PropertyAccessor>
-bool Filter::operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor) const {
+// TODO add zoom & expression-compatible feature reference to this call
+bool Filter::operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, float zoom) const {
+    (void) zoom;
     return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, id, accessor });
 }
 
