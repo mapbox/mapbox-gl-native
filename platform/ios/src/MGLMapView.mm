@@ -1579,7 +1579,6 @@ public:
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
         UIAccessibilityPostNotification(UIAccessibilityScreenChangedNotification, nextElement);
 
-        // Should we call mapView:didSingleTapAtCoordinate: here? If so, what coordinate?
         return;
     }
 
@@ -1593,17 +1592,6 @@ public:
     else if (self.selectedAnnotation)
     {
         [self deselectAnnotation:self.selectedAnnotation animated:YES];
-    }
-    else 
-    {
-        // An annotation wasn't selected or deselected.
-        if ([self.delegate respondsToSelector:@selector(mapView:didSingleTapAtCoordinate:)])
-        {
-            CGPoint pointInView = [singleTap locationInView:singleTap.view];
-            CLLocationCoordinate2D tapCoordinate = [self convertPoint:pointInView toCoordinateFromView:singleTap.view];
-
-            [self.delegate mapView:self didSingleTapAtCoordinate:tapCoordinate];
-        }
     }
 }
 
@@ -1983,8 +1971,7 @@ public:
         {
             id<MGLAnnotation>annotation = [self annotationForGestureRecognizer:(UITapGestureRecognizer*)gestureRecognizer persistingResults:NO];
             if(!annotation) {
-                // Only allow this gesture to be recognized if the delegate implements the single tap method
-                return [self.delegate respondsToSelector:@selector(mapView:didSingleTapAtCoordinate:)];
+                return NO;
             }
         }
     }

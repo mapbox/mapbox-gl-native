@@ -1880,7 +1880,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
-- (void)mapViewRegionIsChanging:(MGLMapView *)mapView reason:(MGLCameraChangeReason)reason
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView
 {
     [self updateHUD];
 }
@@ -1888,17 +1888,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
 {
     [self updateHUD];
-}
-
-- (void)mapView:(MGLMapView *)mapView didSingleTapAtCoordinate:(CLLocationCoordinate2D)coordinate
-{
-    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
-
-#if 0
-    MGLPointAnnotation *annot = [[MGLPointAnnotation alloc] init];
-    annot.coordinate = coordinate;
-    [self.mapView addAnnotation:annot];
-#endif
 }
 
 - (void)mapView:(MGLMapView *)mapView didUpdateUserLocation:(MGLUserLocation *)userLocation {
