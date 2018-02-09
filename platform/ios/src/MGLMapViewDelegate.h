@@ -23,131 +23,24 @@ NS_ASSUME_NONNULL_BEGIN
 #pragma mark Responding to Map Position Changes
 
 /**
- Tells the delegate that the viewpoint depicted by the map view is about to change.
- 
- This method is called whenever the currently displayed map camera will start
- changing for any reason.
-
- This method will be deprecated in a future release, please transition to
- `-mapView:regionWillChangeForReason:animated:`
-
- @param mapView The map view whose viewpoint will change.
- @param animated Whether the change will cause an animated effect on the map.
-
- @note If `-mapView:regionWillChangeForReason:animated:` is implemented this method will not be called.
- */
-- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
-
-/**
- Tells the delegate that the viewpoint depicted by the map view is about to change.
-
- This method is called whenever the currently displayed map camera will start
- changing for any reason.
-
- @param mapView The map view whose viewpoint will change.
- @param animated Whether the change will cause an animated effect on the map.
- @param reason The reason for the camera change.
-
- @note If this method is implemented `-mapView:regionWillChangeAnimated:` will not be called.
- */
-- (void)mapView:(MGLMapView *)mapView regionWillChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
-
-/**
- Tells the delegate that the viewpoint depicted by the map view is changing.
-
- This method is called as the currently displayed map camera changes as part of
- an animation, whether due to a user gesture or due to a call to a method such
- as `-[MGLMapView setCamera:animated:]`. This method can be called before
- `-mapViewDidFinishLoadingMap:` is called.
- 
- During the animation, this method may be called many times to report updates to 
- the viewpoint. Therefore, your implementation of this method should be as lightweight 
- as possible to avoid affecting performance.
-
- This method will be deprecated in a future release, please transition to
- `-mapView:regionIsChangingForReason:`
-
- @param mapView The map view whose viewpoint is changing.
-
- @note If `-mapView:regionIsChangingForReason:` is implemented this method will not be called.
- */
-- (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
-
-/**
- Tells the delegate that the viewpoint depicted by the map view is changing.
-
- This method is called as the currently displayed map camera changes as part of
- an animation, whether due to a user gesture or due to a call to a method such
- as `-[MGLMapView setCamera:animated:]`. This method can be called before
- `-mapViewDidFinishLoadingMap:` is called.
-
- During the animation, this method may be called many times to report updates to
- the viewpoint. Therefore, your implementation of this method should be as lightweight
- as possible to avoid affecting performance.
-
- @param mapView The map view whose viewpoint is changing.
- @param reason The reason for the camera change.
-
- @note If this method is implemented `-mapViewRegionIsChanging:` will not be called.
- */
-- (void)mapView:(MGLMapView *)mapView regionIsChangingForReason:(MGLCameraChangeReason)reason;
-
-/**
- Tells the delegate that the viewpoint depicted by the map view has finished
- changing.
-
- This method is called whenever the currently displayed map camera has finished
- changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore, 
- this method can be called before `-mapViewDidFinishLoadingMap:` is called.
-
- This method will be deprecated in a future release, please transition to
- `mapView:regionDidChangeForReason:animated:`
-
- @param mapView The map view whose viewpoint has changed.
- @param animated Whether the change caused an animated effect on the map.
-
- @note If `mapView:regionDidChangeForReason:animated:` is implemented this method will not be called.
- */
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
-
-/**
- Tells the delegate that the viewpoint depicted by the map view has finished
- changing.
-
- This method is called whenever the currently displayed map camera has finished
- changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore,
- this method can be called before `-mapViewDidFinishLoadingMap:` is called.
-
- @param mapView The map view whose viewpoint has changed.
- @param animated Whether the change caused an animated effect on the map.
- @param reason The reason for the camera change.
-
- @note If this method is implemented `-mapView:regionDidChangeAnimated:` will not be called.
- */
-- (void)mapView:(MGLMapView *)mapView regionDidChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
-
-/**
  Asks the delegate whether the map view should be allowed to change from the
  existing camera to the new camera in response to a user gesture.
- 
+
  This method is called as soon as the user gesture is recognized. It is not
  called in response to a programmatic camera change, such as by setting the
  `centerCoordinate` property or calling `-flyToCamera:completionHandler:`.
- 
- This method is called many times during gesturing, so you should avoid performing 
- complex or performance-intensive tasks in your implementation.
 
- This method will be deprecated in a future release, please transition to
- `-mapView:shouldChangeFromCamera:toCamera:reason:`
+ This method is called many times during gesturing, so you should avoid performing
+ complex or performance-intensive tasks in your implementation.
 
  @param mapView The map view that the user is manipulating.
  @param oldCamera The camera representing the viewpoint at the moment the
-    gesture is recognized. If this method returns `NO`, the map view’s camera
-    continues to be this camera.
+ gesture is recognized. If this method returns `NO`, the map view’s camera
+ continues to be this camera.
  @param newCamera The expected camera after the gesture completes. If this
-    method returns `YES`, this camera becomes the map view’s camera.
+ method returns `YES`, this camera becomes the map view’s camera.
  @return A Boolean value indicating whether the map view should stay at
-    `oldCamera` or change to `newCamera`.
+ `oldCamera` or change to `newCamera`.
 
  @note If `-mapView:shouldChangeFromCamera:toCamera:reason:` is implemented this method will not be called.
  */
@@ -177,6 +70,102 @@ NS_ASSUME_NONNULL_BEGIN
  @note If this method is implemented `-mapView:shouldChangeFromCamera:toCamera:` will not be called.
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera reason:(MGLCameraChangeReason)reason;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view is about to change.
+ 
+ This method is called whenever the currently displayed map camera will start
+ changing for any reason.
+
+ @param mapView The map view whose viewpoint will change.
+ @param animated Whether the change will cause an animated effect on the map.
+
+ @note If `-mapView:regionWillChangeWithReason:animated:` is implemented this method will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view is about to change.
+
+ This method is called whenever the currently displayed map camera will start
+ changing for any reason.
+
+ @param mapView The map view whose viewpoint will change.
+ @param animated Whether the change will cause an animated effect on the map.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapView:regionWillChangeAnimated:` will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionWillChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view is changing.
+
+ This method is called as the currently displayed map camera changes as part of
+ an animation, whether due to a user gesture or due to a call to a method such
+ as `-[MGLMapView setCamera:animated:]`. This method can be called before
+ `-mapViewDidFinishLoadingMap:` is called.
+ 
+ During the animation, this method may be called many times to report updates to 
+ the viewpoint. Therefore, your implementation of this method should be as lightweight 
+ as possible to avoid affecting performance.
+
+ @param mapView The map view whose viewpoint is changing.
+
+ @note If `-mapView:regionIsChangingWithReason:` is implemented this method will not be called.
+ */
+- (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view is changing.
+
+ This method is called as the currently displayed map camera changes as part of
+ an animation, whether due to a user gesture or due to a call to a method such
+ as `-[MGLMapView setCamera:animated:]`. This method can be called before
+ `-mapViewDidFinishLoadingMap:` is called.
+
+ During the animation, this method may be called many times to report updates to
+ the viewpoint. Therefore, your implementation of this method should be as lightweight
+ as possible to avoid affecting performance.
+
+ @param mapView The map view whose viewpoint is changing.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapViewRegionIsChanging:` will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionIsChangingWithReason:(MGLCameraChangeReason)reason;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view has finished
+ changing.
+
+ This method is called whenever the currently displayed map camera has finished
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore, 
+ this method can be called before `-mapViewDidFinishLoadingMap:` is called.
+
+ @param mapView The map view whose viewpoint has changed.
+ @param animated Whether the change caused an animated effect on the map.
+
+ @note If `-mapView:regionDidChangeWithReason:animated:` is implemented this method will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
+
+/**
+ Tells the delegate that the viewpoint depicted by the map view has finished
+ changing.
+
+ This method is called whenever the currently displayed map camera has finished
+ changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore,
+ this method can be called before `-mapViewDidFinishLoadingMap:` is called.
+
+ @param mapView The map view whose viewpoint has changed.
+ @param animated Whether the change caused an animated effect on the map.
+ @param reason The reason for the camera change.
+
+ @note If this method is implemented `-mapView:regionDidChangeAnimated:` will not be called.
+ */
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
+
 
 #pragma mark Responding to user gestures
 

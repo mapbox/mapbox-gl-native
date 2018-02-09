@@ -1885,7 +1885,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self updateHUD];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
 {
     [self updateHUD];
 }

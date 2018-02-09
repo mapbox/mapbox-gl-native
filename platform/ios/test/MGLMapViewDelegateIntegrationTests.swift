@@ -15,7 +15,7 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapViewRegionIsChanging(_ mapView: MGLMapView, reason: MGLCameraChangeReason) {}
 
-    func mapView(_ mapView: MGLMapView, regionIsChangingFor reason: MGLCameraChangeReason) {}
+    func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {}
 
     func mapView(_ mapView: MGLMapView, didChange mode: MGLUserTrackingMode, animated: Bool) {}
 
@@ -41,11 +41,11 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, regionDidChangeAnimated animated: Bool) {}
 
-    func mapView(_ mapView: MGLMapView, regionDidChangeFor reason: MGLCameraChangeReason, animated: Bool) {}
+    func mapView(_ mapView: MGLMapView, regionDidChangeWith reason: MGLCameraChangeReason, animated: Bool) {}
 
     func mapView(_ mapView: MGLMapView, regionWillChangeAnimated animated: Bool) {}
 
-    func mapView(_ mapView: MGLMapView, regionWillChangeFor reason: MGLCameraChangeReason, animated: Bool) {}
+    func mapView(_ mapView: MGLMapView, regionWillChangeWith reason: MGLCameraChangeReason, animated: Bool) {}
 
     func mapViewDidFailLoadingMap(_ mapView: MGLMapView, withError error: Error) {}
 

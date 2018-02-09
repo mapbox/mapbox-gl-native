@@ -5420,9 +5420,9 @@ public:
 
     if ( ! [self isSuppressingChangeDelimiters] )
     {
-        if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeForReason:animated:)])
+        if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeWithReason:animated:)])
         {
-            [self.delegate mapView:self regionWillChangeForReason:self.cameraChangeReason animated:animated];
+            [self.delegate mapView:self regionWillChangeWithReason:self.cameraChangeReason animated:animated];
         }
         else if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
         {
@@ -5442,9 +5442,9 @@ public:
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
     }
 
-    if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingForReason:)])
+    if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
     {
-        [self.delegate mapView:self regionIsChangingForReason:self.cameraChangeReason];
+        [self.delegate mapView:self regionIsChangingWithReason:self.cameraChangeReason];
     }
     else if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
@@ -5462,7 +5462,7 @@ public:
     if ( ! [self isSuppressingChangeDelimiters])
     {
         BOOL respondsToSelector = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)];
-        BOOL respondsToSelectorWithReason = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeForReason:animated:)];
+        BOOL respondsToSelectorWithReason = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeWithReason:animated:)];
 
         if ((respondsToSelector || respondsToSelectorWithReason) &&
             ([UIApplication sharedApplication].applicationState == UIApplicationStateActive))
@@ -5480,7 +5480,7 @@ public:
 
         if (respondsToSelectorWithReason)
         {
-            [self.delegate mapView:self regionDidChangeForReason:self.cameraChangeReason animated:animated];
+            [self.delegate mapView:self regionDidChangeWithReason:self.cameraChangeReason animated:animated];
         }
         else if (respondsToSelector)
         {
