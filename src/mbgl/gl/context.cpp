@@ -136,7 +136,7 @@ void Context::initializeExtensions(const std::function<gl::ProcAddress(const cha
         if (strstr(extensions, halfFloatExtensionName) != nullptr &&
             strstr(extensions, halfFloatColorBufferExtensionName) != nullptr) {
 
-            halfFloat = true;
+            supportsHalfFloatTextures = true;
         }
 
         if (!supportsVertexArrays()) {
@@ -292,10 +292,6 @@ bool Context::supportsVertexArrays() const {
            vertexArray->genVertexArrays &&
            vertexArray->bindVertexArray &&
            vertexArray->deleteVertexArrays;
-}
-
-bool Context::supportsHalfFloatTextures() const {
-    return halfFloat;
 }
 
 #if MBGL_HAS_BINARY_PROGRAMS

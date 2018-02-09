@@ -53,8 +53,6 @@ public:
     UniqueTexture createTexture();
     VertexArray createVertexArray();
 
-    bool supportsHalfFloatTextures() const;
-
 #if MBGL_HAS_BINARY_PROGRAMS
     bool supportsProgramBinaries() const;
 #else
@@ -217,7 +215,6 @@ private:
 #if MBGL_HAS_BINARY_PROGRAMS
     std::unique_ptr<extension::ProgramBinary> programBinary;
 #endif
-    bool halfFloat = false;
 
 public:
     State<value::ActiveTextureUnit> activeTextureUnit;
@@ -241,6 +238,8 @@ public:
     State<value::PixelTransferStencil> pixelTransferStencil;
 #endif // MBGL_USE_GLES2
 
+    bool supportsHalfFloatTextures = false;
+    
 private:
     State<value::StencilFunc> stencilFunc;
     State<value::StencilMask> stencilMask;
