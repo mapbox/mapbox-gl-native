@@ -23,12 +23,12 @@ ext {
     ]
 
     dependenciesList = [
-            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}@jar",
-            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}@jar",
-            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}@aar",
+            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
+            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
+            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
 
             // for testApp
-            mapboxJavaTurf        : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}@jar",
+            mapboxJavaTurf        : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
 
             junit                 : "junit:junit:${versions.junit}",
             mockito               : "org.mockito:mockito-core:${versions.mockito}",
