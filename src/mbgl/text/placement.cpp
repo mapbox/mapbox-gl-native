@@ -230,6 +230,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
+    JointOpacityState duplicateOpacityState(false, false, true);
+
     JointOpacityState defaultOpacityState(
             bucket.layout.get<style::TextAllowOverlap>(),
             bucket.layout.get<style::IconAllowOverlap>(),
@@ -239,9 +241,12 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         bool isDuplicate = seenCrossTileIDs.count(symbolInstance.crossTileID) > 0;
 
         auto it = opacities.find(symbolInstance.crossTileID);
-        auto opacityState = it != opacities.end() && !isDuplicate ?
-            it->second :
-            defaultOpacityState;
+        auto opacityState = defaultOpacityState;
+        if (isDuplicate) {
+            opacityState = duplicateOpacityState;
+        } else if (it != opacities.end()) {
+            opacityState = it->second;
+        }
 
         if (it == opacities.end()) {
             opacities.emplace(symbolInstance.crossTileID, defaultOpacityState);
