@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 
 import com.mapbox.mapboxsdk.LibraryLoader;
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
 import java.lang.annotation.Retention;
@@ -399,6 +400,20 @@ public class OfflineRegion {
     });
   }
 
+  /**
+   * Gets the tile count.
+   *
+   * @param zoomLevel zoom level of the map (?)
+   * @param tileSize size of tiles (?)
+   * @return the tile count
+   */
+  public long getTileCount(byte zoomLevel, int tileSize) {
+    if (getDefinition() == null) {
+      throw new RuntimeException("OfflineRegion is not loaded yet.");
+    }
+    return tileCount(getDefinition().getBounds(), zoomLevel, tileSize);
+  }
+
   private native void initialize(long offlineRegionPtr, FileSource fileSource);
 
   @Override
@@ -414,4 +429,5 @@ public class OfflineRegion {
 
   private native void updateOfflineRegionMetadata(byte[] metadata, OfflineRegionUpdateMetadataCallback callback);
 
+  private native long tileCount(LatLngBounds bounds, byte zoomLevel, int tileSize);
 }

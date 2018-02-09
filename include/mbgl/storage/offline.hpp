@@ -13,6 +13,7 @@
 namespace mbgl {
 
 class TileID;
+class LatLngBounds;
 
 /*
  * An offline region defined by a style URL, geographic bounding box, zoom range, and
@@ -197,6 +198,9 @@ public:
     int64_t getID() const;
     const OfflineRegionDefinition& getDefinition() const;
     const OfflineRegionMetadata& getMetadata() const;
+
+    // Compute only the count of tiles needed for tileCover
+    uint64_t getTileCount(const LatLngBounds&, uint8_t zoom, uint16_t tileSize) const;
 
 private:
     friend class OfflineDatabase;
