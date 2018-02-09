@@ -504,10 +504,6 @@ public:
     _doubleTap.numberOfTapsRequired = 2;
     [self addGestureRecognizer:_doubleTap];
 
-    _singleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
-    [_singleTapGestureRecognizer requireGestureRecognizerToFail:_doubleTap];
-    _singleTapGestureRecognizer.delegate = self;
-    [self addGestureRecognizer:_singleTapGestureRecognizer];
 
     _twoFingerDrag = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(handleTwoFingerDragGesture:)];
     _twoFingerDrag.minimumNumberOfTouches = 2;
@@ -531,6 +527,12 @@ public:
     _quickZoom.minimumPressDuration = 0;
     [_quickZoom requireGestureRecognizerToFail:_doubleTap];
     [self addGestureRecognizer:_quickZoom];
+
+    _singleTapGestureRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTapGesture:)];
+    [_singleTapGestureRecognizer requireGestureRecognizerToFail:_doubleTap];
+    _singleTapGestureRecognizer.delegate = self;
+    [_singleTapGestureRecognizer requireGestureRecognizerToFail:_quickZoom];
+    [self addGestureRecognizer:_singleTapGestureRecognizer];
 
     // observe app activity
     //

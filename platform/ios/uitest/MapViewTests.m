@@ -543,7 +543,7 @@
     [[NSNotificationCenter defaultCenter] postNotificationName:@"regionDidChangeAnimated"
                                                         object:mapView
                                                       userInfo:@{ @"animated" : @(animated),
-                                                                  @"reason" : reason
+                                                                  @"reason" : @(reason)
                                                                   }];
 }
 
