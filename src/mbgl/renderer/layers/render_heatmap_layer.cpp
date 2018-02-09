@@ -18,7 +18,7 @@ using namespace style;
 
 RenderHeatmapLayer::RenderHeatmapLayer(Immutable<style::HeatmapLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Heatmap, _impl),
-      unevaluated(impl().paint.untransitioned()) {
+    unevaluated(impl().paint.untransitioned()), colorRamp({256, 1}) {
 }
 
 const style::HeatmapLayer::Impl& RenderHeatmapLayer::impl() const {
@@ -76,9 +76,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         }
 
         if (!colorRampTexture) {
-            const auto colorRampSize = Size{256, 1};
-            colorRampTexture = parameters.context.createTexture(colorRampSize, gl::TextureFormat::RGBA, 1,
-                                                                gl::TextureType::UnsignedByte, colorRamp.data());
+            colorRampTexture = parameters.context.createTexture(colorRamp, 1, gl::TextureType::UnsignedByte);
         }
 
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
@@ -147,14 +145,14 @@ void RenderHeatmapLayer::updateColorRamp() {
         colorValue = HeatmapLayer::getDefaultHeatmapColor();
     }
 
-    const auto size = colorRamp.size();
+    const auto length = colorRamp.bytes();
 
-    for (uint32_t i = 0; i < size; i += 4) {
-        const auto color = colorValue.evaluate(static_cast<double>(i) / size);
-        colorRamp[i + 0] = std::floor(color.r * 255);
-        colorRamp[i + 1] = std::floor(color.g * 255);
-        colorRamp[i + 2] = std::floor(color.b * 255);
-        colorRamp[i + 3] = std::floor(color.a * 255);
+    for (uint32_t i = 0; i < length; i += 4) {
+        const auto color = colorValue.evaluate(static_cast<double>(i) / length);
+        colorRamp.data[i + 0] = std::floor(color.r * 255);
+        colorRamp.data[i + 1] = std::floor(color.g * 255);
+        colorRamp.data[i + 2] = std::floor(color.b * 255);
+        colorRamp.data[i + 3] = std::floor(color.a * 255);
     }
 
     if (colorRampTexture) {

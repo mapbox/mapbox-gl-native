@@ -144,13 +144,12 @@ public:
         obj.size = image.size;
     }
 
-    // Creates a texture from raw data
+    // Creates an empty texture with the specified dimensions.
     Texture createTexture(const Size size,
                           TextureFormat format = TextureFormat::RGBA,
                           TextureUnit unit = 0,
-                          TextureType type = TextureType::UnsignedByte,
-                          const void* data = nullptr) {
-        return { size, createTexture(size, data, format, unit, type) };
+                          TextureType type = TextureType::UnsignedByte) {
+        return { size, createTexture(size, nullptr, format, unit, type) };
     }
 
     void bindTexture(Texture&,

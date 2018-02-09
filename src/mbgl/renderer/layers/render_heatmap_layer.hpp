@@ -35,7 +35,7 @@ public:
 
     const style::HeatmapLayer::Impl& impl() const;
 
-    std::array<uint8_t, 1024> colorRamp;
+    PremultipliedImage colorRamp;
     optional<OffscreenTexture> renderTexture;
     optional<gl::Texture> colorRampTexture;
 };
