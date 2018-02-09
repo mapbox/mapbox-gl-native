@@ -553,7 +553,7 @@ public:
     options.padding = padding;
     options.zoom = 0;
 
-    _cameraChangeReason = MGLCameraChangeReasonUnknown;
+    _cameraChangeReason = MGLCameraChangeReasonNone;
 
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
@@ -1241,7 +1241,7 @@ public:
 
 - (void)handleCompassTapGesture:(__unused id)sender
 {
-    self.cameraChangeReason = MGLCameraChangeReasonGestureResetNorth;
+    self.cameraChangeReason |= MGLCameraChangeReasonResetNorth;
 
     [self resetNorthAnimated:YES];
 
@@ -1314,7 +1314,7 @@ public:
 
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason = MGLCameraChangeReasonGesturePan;
+    self.cameraChangeReason |= MGLCameraChangeReasonGesturePan;
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -1384,7 +1384,7 @@ public:
     CGPoint centerPoint = [self anchorPointForGesture:pinch];
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason = MGLCameraChangeReasonGesturePinch;
+    self.cameraChangeReason |= MGLCameraChangeReasonGesturePinch;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -1483,7 +1483,7 @@ public:
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason = MGLCameraChangeReasonGestureRotate;
+    self.cameraChangeReason |= MGLCameraChangeReasonGestureRotate;
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -1681,7 +1681,7 @@ public:
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        self.cameraChangeReason = MGLCameraChangeReasonGestureDoubleTap;
+        self.cameraChangeReason |= MGLCameraChangeReasonGestureZoomIn;
 
         MGLMapCamera *oldCamera = self.camera;
 
@@ -1718,7 +1718,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonGestureTwoFingerSingleTap;
+    self.cameraChangeReason |= MGLCameraChangeReasonGestureZoomOut;
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
@@ -1757,7 +1757,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonGestureQuickZoom;
+    self.cameraChangeReason |= MGLCameraChangeReasonGestureQuickZoom;
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
@@ -1802,7 +1802,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonGesturePitchStart;
+    self.cameraChangeReason |= MGLCameraChangeReasonGesturePitch;
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
@@ -2900,7 +2900,7 @@ public:
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
@@ -2952,7 +2952,7 @@ public:
     
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     _mbglMap->easeTo(cameraOptions, animationOptions);
 }
@@ -2977,7 +2977,7 @@ public:
     if (zoomLevel == self.zoomLevel) return;
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
@@ -3068,7 +3068,7 @@ public:
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     [self _setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:completion];
 }
@@ -3120,7 +3120,7 @@ public:
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
@@ -3155,7 +3155,7 @@ public:
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
@@ -3242,7 +3242,7 @@ public:
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:edgePadding];
     _mbglMap->easeTo(cameraOptions, animationOptions);
@@ -3301,7 +3301,7 @@ public:
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason = MGLCameraChangeReasonProgramatic;
+    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
 
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
     _mbglMap->flyTo(cameraOptions, animationOptions);
@@ -3467,20 +3467,7 @@ public:
 
 - (void)resetCameraChangeReason
 {
-    self.cameraChangeReason = MGLCameraChangeReasonUnknown;
-}
-
-- (void)setCameraChangeReason:(MGLCameraChangeReason)reason
-{
-    // If not already set, update. This is required since the reason can be set in succession (for
-    // example "resetting north" sets the reason to MGLCameraChangeReasonGestureResetNorth before
-    // calling a public method which calls self.cameraChangeReason with MGLCameraChangeReasonProgramatic.
-    // We want the first reason to win out. This may be better handled with a stack or some other
-    // mechanism.
-    if (MGLCameraChangeReasonUnknown == _cameraChangeReason)
-    {
-        _cameraChangeReason = reason;
-    }
+    self.cameraChangeReason = MGLCameraChangeReasonNone;
 }
 
 #pragma mark - Styling -
@@ -5431,9 +5418,9 @@ public:
 
     if ( ! [self isSuppressingChangeDelimiters] )
     {
-        if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:reason:)])
+        if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeForReason:animated:)])
         {
-            [self.delegate mapView:self regionWillChangeAnimated:animated reason:self.cameraChangeReason];
+            [self.delegate mapView:self regionWillChangeForReason:self.cameraChangeReason animated:animated];
         }
         else if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
         {
@@ -5453,9 +5440,9 @@ public:
         [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
     }
 
-    if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
+    if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingForReason:)])
     {
-        [self.delegate mapView:self regionIsChangingWithReason:self.cameraChangeReason];
+        [self.delegate mapView:self regionIsChangingForReason:self.cameraChangeReason];
     }
     else if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
@@ -5473,7 +5460,7 @@ public:
     if ( ! [self isSuppressingChangeDelimiters])
     {
         BOOL respondsToSelector = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:)];
-        BOOL respondsToSelectorWithReason = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeAnimated:reason:)];
+        BOOL respondsToSelectorWithReason = [self.delegate respondsToSelector:@selector(mapView:regionDidChangeForReason:animated:)];
 
         if ((respondsToSelector || respondsToSelectorWithReason) &&
             ([UIApplication sharedApplication].applicationState == UIApplicationStateActive))
@@ -5491,7 +5478,7 @@ public:
 
         if (respondsToSelectorWithReason)
         {
-            [self.delegate mapView:self regionDidChangeAnimated:animated reason:self.cameraChangeReason];
+            [self.delegate mapView:self regionDidChangeForReason:self.cameraChangeReason animated:animated];
         }
         else if (respondsToSelector)
         {

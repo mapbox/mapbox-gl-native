@@ -538,7 +538,7 @@
                                                       userInfo:@{ @"animated" : @(animated) }];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason {
+- (void)mapView:(MGLMapView *)mapView regionDidChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated {
 
     [[NSNotificationCenter defaultCenter] postNotificationName:@"regionDidChangeAnimated"
                                                         object:mapView

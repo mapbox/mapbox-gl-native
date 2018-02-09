@@ -251,8 +251,6 @@
 		AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */; };
 		AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
 		AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
-		CA55CD3F202C16AA00CE7095 /* MGLCameraChange.m in Sources */ = {isa = PBXBuildFile; fileRef = CA55CD3D202C16A900CE7095 /* MGLCameraChange.m */; };
-		CA55CD40202C16AA00CE7095 /* MGLCameraChange.m in Sources */ = {isa = PBXBuildFile; fileRef = CA55CD3D202C16A900CE7095 /* MGLCameraChange.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChange.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChange.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChange.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChange.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -760,7 +758,6 @@
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
-		CA55CD3D202C16A900CE7095 /* MGLCameraChange.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCameraChange.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChange.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChange.h; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
@@ -1462,7 +1459,6 @@
 				DAD165851CF4D08B001FF4B9 /* Telemetry */,
 				355ADFF91E9281C300F3939D /* Views */,
 				CA55CD3E202C16AA00CE7095 /* MGLCameraChange.h */,
-				CA55CD3D202C16A900CE7095 /* MGLCameraChange.m */,
 				DA704CC01F65A475004B3F28 /* MGLMapAccessibilityElement.h */,
 				DA704CC11F65A475004B3F28 /* MGLMapAccessibilityElement.mm */,
 				DA17BE2F1CC4BAC300402C41 /* MGLMapView_Private.h */,
@@ -2417,7 +2413,6 @@
 				35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
 				DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
-				CA55CD3F202C16AA00CE7095 /* MGLCameraChange.m in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				3510FFFB1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
 				AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */,
@@ -2508,7 +2503,6 @@
 				35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
 				DA72620E1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
-				CA55CD40202C16AA00CE7095 /* MGLCameraChange.m in Sources */,
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				3510FFFC1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
 				AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */,

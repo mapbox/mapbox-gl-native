@@ -27,11 +27,14 @@ NS_ASSUME_NONNULL_BEGIN
  
  This method is called whenever the currently displayed map camera will start
  changing for any reason.
- 
+
+ This method will be deprecated in a future release, please transition to
+ `-mapView:regionWillChangeForReason:animated:`
+
  @param mapView The map view whose viewpoint will change.
  @param animated Whether the change will cause an animated effect on the map.
 
- @note If `mapView:regionWillChangeAnimated:reason` is implemented this method will not be called.
+ @note If `-mapView:regionWillChangeForReason:animated:` is implemented this method will not be called.
  */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
@@ -45,9 +48,9 @@ NS_ASSUME_NONNULL_BEGIN
  @param animated Whether the change will cause an animated effect on the map.
  @param reason The reason for the camera change.
 
- @note If this method is implemented `mapView:regionWillChangeAnimated:` will not be called.
+ @note If this method is implemented `-mapView:regionWillChangeAnimated:` will not be called.
  */
-- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason;
+- (void)mapView:(MGLMapView *)mapView regionWillChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
 
 /**
  Tells the delegate that the viewpoint depicted by the map view is changing.
@@ -61,9 +64,12 @@ NS_ASSUME_NONNULL_BEGIN
  the viewpoint. Therefore, your implementation of this method should be as lightweight 
  as possible to avoid affecting performance.
 
+ This method will be deprecated in a future release, please transition to
+ `-mapView:regionIsChangingForReason:`
+
  @param mapView The map view whose viewpoint is changing.
 
- @note If `mapView:regionIsChangingWithReason:` is implemented this method will not be called.
+ @note If `-mapView:regionIsChangingForReason:` is implemented this method will not be called.
  */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
@@ -82,9 +88,9 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view whose viewpoint is changing.
  @param reason The reason for the camera change.
 
- @note If this method is implemented `mapViewRegionIsChanging:` will not be called.
+ @note If this method is implemented `-mapViewRegionIsChanging:` will not be called.
  */
-- (void)mapView:(MGLMapView *)mapView regionIsChangingWithReason:(MGLCameraChangeReason)reason;
+- (void)mapView:(MGLMapView *)mapView regionIsChangingForReason:(MGLCameraChangeReason)reason;
 
 /**
  Tells the delegate that the viewpoint depicted by the map view has finished
@@ -94,10 +100,13 @@ NS_ASSUME_NONNULL_BEGIN
  changing, after any calls to `-mapViewRegionIsChanging:` due to animation. Therefore, 
  this method can be called before `-mapViewDidFinishLoadingMap:` is called.
 
+ This method will be deprecated in a future release, please transition to
+ `mapView:regionDidChangeForReason:animated:`
+
  @param mapView The map view whose viewpoint has changed.
  @param animated Whether the change caused an animated effect on the map.
 
- @note If `mapView:regionDidChangeAnimated:reason:` is implemented this method will not be called.
+ @note If `mapView:regionDidChangeForReason:animated:` is implemented this method will not be called.
  */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
@@ -113,9 +122,9 @@ NS_ASSUME_NONNULL_BEGIN
  @param animated Whether the change caused an animated effect on the map.
  @param reason The reason for the camera change.
 
- @note If this method is implemented `mapView:regionDidChangeAnimated:` will not be called.
+ @note If this method is implemented `-mapView:regionDidChangeAnimated:` will not be called.
  */
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason;
+- (void)mapView:(MGLMapView *)mapView regionDidChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated;
 
 /**
  Asks the delegate whether the map view should be allowed to change from the
@@ -127,7 +136,10 @@ NS_ASSUME_NONNULL_BEGIN
  
  This method is called many times during gesturing, so you should avoid performing 
  complex or performance-intensive tasks in your implementation.
- 
+
+ This method will be deprecated in a future release, please transition to
+ `-mapView:shouldChangeFromCamera:toCamera:reason:`
+
  @param mapView The map view that the user is manipulating.
  @param oldCamera The camera representing the viewpoint at the moment the
     gesture is recognized. If this method returns `NO`, the map view’s camera
@@ -137,7 +149,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A Boolean value indicating whether the map view should stay at
     `oldCamera` or change to `newCamera`.
 
- @note If `mapView:shouldChangeFromCamera:toCamera:reason:` is implemented this method will not be called.
+ @note If `-mapView:shouldChangeFromCamera:toCamera:reason:` is implemented this method will not be called.
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
 
@@ -162,7 +174,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return A Boolean value indicating whether the map view should stay at
  `oldCamera` or change to `newCamera`.
 
- @note If this method is implemented `mapView:shouldChangeFromCamera:toCamera:` will not be called.
+ @note If this method is implemented `-mapView:shouldChangeFromCamera:toCamera:` will not be called.
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera reason:(MGLCameraChangeReason)reason;
 
@@ -177,22 +189,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param mapView The map view that was tapped.
  @param coordinate Location of tap in world coordinates.
 
- @note If  you implement this method, custom tap gesture recognizers that are installed in the following
- way
-
-```
-UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
-for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers)
-{
-    if ([gesture isKindOfClass:[UITapGestureRecognizer class]])
-    {
-        [singleTap requireGestureRecognizerToFail:gesture];
-    }
-}
-[self.mapView addGestureRecognizer:singleTap];
-```
-
- will fail to trigger, since the built-in single tap recognizer will no longer fail.
+ @note If you implement this method, custom tap gesture recognizers that are installed will fail to
+ trigger, since the built-in single tap recognizer will no longer fail.
  */
 - (void)mapView:(MGLMapView *)mapView didSingleTapAtCoordinate:(CLLocationCoordinate2D)coordinate;
 

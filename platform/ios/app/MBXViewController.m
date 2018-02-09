@@ -204,22 +204,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         }
         [self presentViewController:alertController animated:YES completion:nil];
     }
-
-    // Add fall-through single tap gesture recognizer. This will be called when
-    // the map view's tap recognizers fail.
-
-    // NOTE: Since MBXViewController implements `mapView:didSingleTapAtCoordinate` the following
-    // gesture recognizer WILL NOT be triggered, since the default single tap gesture does not fail.
-    //
-    // If you need a custom tap gesture to be trigger consider not implementing `mapView:didSingleTapAtCoordinate`
-
-    UITapGestureRecognizer *singleTap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(handleSingleTap:)];
-    for (UIGestureRecognizer *gesture in self.mapView.gestureRecognizers) {
-        if ([gesture isKindOfClass:[UITapGestureRecognizer class]]) {
-            [singleTap requireGestureRecognizerToFail:gesture];
-        }
-    }
-    [self.mapView addGestureRecognizer:singleTap];
 }
 
 - (void)saveState:(__unused NSNotification *)notification
@@ -1574,14 +1558,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 #pragma mark - User Actions
 
-- (void)handleSingleTap:(UITapGestureRecognizer *)singleTap {
-    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
-
-    // This is how you'd get the coordinate for the point where the user tapped:
-    //    CGPoint tapPoint = [singleTap locationInView:self.mapView];
-    //    CLLocationCoordinate2D tapCoordinate = [self.mapView convertPoint:tapPoint toCoordinateFromView:nil];
-}
-
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
 {
     if (longPress.state == UIGestureRecognizerStateBegan)
@@ -1904,27 +1880,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     _usingLocaleBasedCountryLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
 }
 
-- (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera reason:(MGLCameraChangeReason)reason
-{
-    return YES;
-}
-
-- (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason
-{
-}
-
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView reason:(MGLCameraChangeReason)reason
 {
     [self updateHUD];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated reason:(MGLCameraChangeReason)reason
+- (void)mapView:(MGLMapView *)mapView regionDidChangeForReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
 {
     [self updateHUD];
 }
 
 - (void)mapView:(MGLMapView *)mapView didSingleTapAtCoordinate:(CLLocationCoordinate2D)coordinate
 {
+    [self.navigationController setNavigationBarHidden:!self.navigationController.navigationBarHidden animated:YES];
+
 #if 0
     MGLPointAnnotation *annot = [[MGLPointAnnotation alloc] init];
     annot.coordinate = coordinate;
