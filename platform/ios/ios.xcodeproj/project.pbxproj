@@ -232,6 +232,7 @@
 		8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8989B17E201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
 		8989B17F201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */; };
+		899B8E15202C8F360052269E /* heatmap.json in Resources */ = {isa = PBXBuildFile; fileRef = 899B8E14202C8F360052269E /* heatmap.json */; };
 		920A3E5D1E6F995200C16EFC /* MGLSourceQueryTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */; };
 		927FBCFC1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */; };
 		927FBCFF1F4DB05500F8BF1F /* MGLMapSnapshotter.h in Headers */ = {isa = PBXBuildFile; fileRef = 927FBCFD1F4DB05500F8BF1F /* MGLMapSnapshotter.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -805,6 +806,7 @@
 		6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MGLDocumentationExampleTests.swift; path = ../../darwin/test/MGLDocumentationExampleTests.swift; sourceTree = "<group>"; };
 		8989B17A201A48EA0081CF59 /* MGLHeatmapStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHeatmapStyleLayer.h; sourceTree = "<group>"; };
 		8989B17B201A48EA0081CF59 /* MGLHeatmapStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHeatmapStyleLayer.mm; sourceTree = "<group>"; };
+		899B8E14202C8F360052269E /* heatmap.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = heatmap.json; sourceTree = "<group>"; };
 		920A3E5C1E6F995200C16EFC /* MGLSourceQueryTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLSourceQueryTests.m; path = ../../darwin/test/MGLSourceQueryTests.m; sourceTree = "<group>"; };
 		927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBXSnapshotsViewController.h; sourceTree = "<group>"; };
 		927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBXSnapshotsViewController.m; sourceTree = "<group>"; };
@@ -1438,6 +1440,7 @@
 				354B839A1D2E9B48005D9406 /* MBXUserLocationAnnotationView.h */,
 				354B839B1D2E9B48005D9406 /* MBXUserLocationAnnotationView.m */,
 				DA1DC9681CB6C6B7006E619F /* MBXOfflinePacksTableViewController.h */,
+				899B8E14202C8F360052269E /* heatmap.json */,
 				DA1DC9691CB6C6B7006E619F /* MBXOfflinePacksTableViewController.m */,
 				927FBCFA1F4DAA8300F8BF1F /* MBXSnapshotsViewController.h */,
 				927FBCFB1F4DAA8300F8BF1F /* MBXSnapshotsViewController.m */,
@@ -2328,6 +2331,7 @@
 					};
 					DA1DC9491CB6C1C2006E619F = {
 						CreatedOnToolsVersion = 7.3;
+						DevelopmentTeam = GJZR2MEM28;
 						LastSwiftMigration = 0820;
 					};
 					DA25D5B81CCD9EDE00607828 = {
@@ -2425,6 +2429,7 @@
 				DA1DC9701CB6C6CE006E619F /* points.geojson in Resources */,
 				353BAEF61D646370009A8DA9 /* amsterdam.geojson in Resources */,
 				DA1DC9711CB6C6CE006E619F /* polyline.geojson in Resources */,
+				899B8E15202C8F360052269E /* heatmap.json in Resources */,
 				DD4823761D94AE6C00EB71B7 /* line_filter_style.json in Resources */,
 				DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */,
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
@@ -3205,7 +3210,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -3219,7 +3224,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = GJZR2MEM28;
 				INFOPLIST_FILE = "$(SRCROOT)/app/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

@@ -1593,25 +1593,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         styleNames = @[
-            @"Streets",
-            @"Outdoors",
-            @"Light",
-            @"Dark",
-            @"Satellite",
-            @"Satellite Streets",
-            @"Traffic Day",
-            @"Traffic Night",
+            @"Heatmap"
         ];
         styleURLs = @[
-            [MGLStyle streetsStyleURL],
-            [MGLStyle outdoorsStyleURL],
-            [MGLStyle lightStyleURL],
-            [MGLStyle darkStyleURL],
-            [MGLStyle satelliteStyleURL],
-            [MGLStyle satelliteStreetsStyleURL],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"],
-            
+            [NSURL URLWithString:@"heatmap.json"]
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");
 
@@ -1629,9 +1614,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 }
             }
         }
-        NSAssert(numStyleURLMethods == styleNames.count,
-                 @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
-                 numStyleURLMethods, (unsigned long)styleNames.count);
+//        NSAssert(numStyleURLMethods == styleNames.count,
+//                 @"MGLStyle provides %u default styles but iosapp only knows about %lu of them.",
+//                 numStyleURLMethods, (unsigned long)styleNames.count);
     });
 
     self.styleIndex = (self.styleIndex + 1) % styleNames.count;
