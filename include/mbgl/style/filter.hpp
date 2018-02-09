@@ -3,6 +3,7 @@
 #include <mbgl/util/variant.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/style/expression/expression.hpp>
 
 #include <string>
 #include <vector>
@@ -232,6 +233,15 @@ public:
         return true;
     }
 };
+    
+class ExpressionFilter {
+public:
+    std::shared_ptr<mbgl::style::expression::Expression> expression;
+    
+    friend bool operator==(const ExpressionFilter& lhs, const ExpressionFilter& rhs) {
+        return lhs.expression == rhs.expression;
+    }
+};
 
 
 using FilterBase = variant<
@@ -258,7 +268,8 @@ using FilterBase = variant<
     class IdentifierInFilter,
     class IdentifierNotInFilter,
     class HasIdentifierFilter,
-    class NotHasIdentifierFilter>;
+    class NotHasIdentifierFilter,
+    class ExpressionFilter>;
 
 class Filter : public FilterBase {
 public:

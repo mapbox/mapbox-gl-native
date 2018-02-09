@@ -194,6 +194,10 @@ public:
     NSPredicate *operator()(mbgl::style::NotHasIdentifierFilter filter) {
         return [NSPredicate predicateWithFormat:@"%K == nil", @"$id"];
     }
+    
+    NSPredicate *operator()(mbgl::style::ExpressionFilter filter) {
+        return nil;
+    }
 };
 
 @implementation NSPredicate (MGLAdditions)

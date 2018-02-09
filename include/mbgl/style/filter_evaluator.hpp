@@ -180,6 +180,10 @@ public:
     bool operator()(const NotHasIdentifierFilter&) const {
         return !featureIdentifier;
     }
+    
+    bool operator()(const ExpressionFilter&) const {
+        return false;
+    }
 
 private:
     template <class Op>

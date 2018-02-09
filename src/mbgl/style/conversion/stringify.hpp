@@ -225,6 +225,10 @@ public:
     void operator()(const NotHasIdentifierFilter&) {
         stringifyUnaryFilter("!has", "$id");
     }
+    
+    void operator()(const ExpressionFilter&) {
+        stringifyUnaryFilter("herp", "derp");
+    }
 
 private:
     template <class F>
