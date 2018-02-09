@@ -114,7 +114,6 @@ android {
 
     lintOptions {
         disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
-        baseline file("lint-baseline-local.xml")
         checkAllWarnings true
         warningsAsErrors false
     }
@@ -148,4 +147,3 @@ apply from: "${rootDir}/gradle/gradle-javadoc.gradle"
 apply from: "${rootDir}/gradle/gradle-publish.gradle"
 apply from: "${rootDir}/gradle/gradle-checkstyle.gradle"
 apply from: "${rootDir}/gradle/gradle-tests-staticblockremover.gradle"
-apply from: "${rootDir}/gradle/gradle-lint.gradle"
