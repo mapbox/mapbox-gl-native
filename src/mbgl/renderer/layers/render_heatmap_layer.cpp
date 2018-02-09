@@ -55,10 +55,24 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
         const auto size = Size{viewportSize.width / 4, viewportSize.height / 4};
 
         if (!renderTexture || renderTexture->getSize() != size) {
-            const auto textureType = parameters.context.supportsHalfFloatTextures() ?
-                    gl::TextureType::HalfFloat : gl::TextureType::UnsignedByte;
+            if (parameters.context.supportsHalfFloatTextures()) {
+                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::HalfFloat);
 
-            renderTexture = OffscreenTexture(parameters.context, size, textureType);
+                try {
+                    renderTexture->bind();
+                } catch (const std::runtime_error& ex) {
+                    // can't render to a half-float texture; falling back to unsigned byte one
+                    renderTexture = nullopt;
+                }
+            }
+
+            if (!renderTexture) {
+                renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::UnsignedByte);
+                renderTexture->bind();
+            }
+
+        } else {
+            renderTexture->bind();
         }
 
         if (!colorRampTexture) {
@@ -66,8 +80,6 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             colorRampTexture = parameters.context.createTexture(colorRampSize, gl::TextureFormat::RGBA, 1,
                                                                 gl::TextureType::UnsignedByte, colorRamp.data());
         }
-
-        renderTexture->bind();
 
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 1.0f }, {}, {});
 
