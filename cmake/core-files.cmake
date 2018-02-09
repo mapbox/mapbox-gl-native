@@ -170,6 +170,7 @@ set(MBGL_CORE_FILES
     include/mbgl/renderer/renderer.hpp
     include/mbgl/renderer/renderer_backend.hpp
     include/mbgl/renderer/renderer_frontend.hpp
+    include/mbgl/renderer/renderer_observer.hpp
     src/mbgl/renderer/backend_scope.cpp
     src/mbgl/renderer/bucket.hpp
     src/mbgl/renderer/bucket_parameters.cpp
@@ -206,7 +207,6 @@ set(MBGL_CORE_FILES
     src/mbgl/renderer/renderer_backend.cpp
     src/mbgl/renderer/renderer_impl.cpp
     src/mbgl/renderer/renderer_impl.hpp
-    src/mbgl/renderer/renderer_observer.hpp
     src/mbgl/renderer/style_diff.cpp
     src/mbgl/renderer/style_diff.hpp
     src/mbgl/renderer/tile_mask.hpp

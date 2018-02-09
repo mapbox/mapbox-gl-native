@@ -1,6 +1,8 @@
 #include "qmapboxgl.hpp"
 #include "qmapboxgl_p.hpp"
-#include "qmapboxgl_renderer_frontend_p.hpp"
+
+#include "qmapboxgl_map_observer.hpp"
+#include "qmapboxgl_renderer_observer.hpp"
 
 #include "qt_conversion.hpp"
 #include "qt_geojson.hpp"
@@ -43,11 +45,8 @@
 
 #if QT_VERSION >= 0x050000
 #include <QGuiApplication>
-#include <QWindow>
-#include <QOpenGLContext>
 #else
 #include <QCoreApplication>
-#include <QGLContext>
 #endif
 
 #include <QDebug>
@@ -64,6 +63,10 @@ using namespace QMapbox;
 // mbgl::GLContextMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::UniqueGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Unique), "error");
 static_assert(mbgl::underlying_type(QMapboxGLSettings::SharedGLContext) == mbgl::underlying_type(mbgl::GLContextMode::Shared), "error");
+
+// mbgl::MapMode
+static_assert(mbgl::underlying_type(QMapboxGLSettings::Continuous) == mbgl::underlying_type(mbgl::MapMode::Continuous), "error");
+static_assert(mbgl::underlying_type(QMapboxGLSettings::Static) == mbgl::underlying_type(mbgl::MapMode::Static), "error");
 
 // mbgl::ConstrainMode
 static_assert(mbgl::underlying_type(QMapboxGLSettings::NoConstrain) == mbgl::underlying_type(mbgl::ConstrainMode::None), "error");
@@ -165,6 +168,27 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
 */
 
 /*!
+    \enum QMapboxGLSettings::MapMode
+
+    This enum sets the map rendering mode
+
+    \value Continuous  The map will render as data arrives from the network and
+    react immediately to state changes.
+
+    This is the default mode and the preferred when the map is intended to be
+    interactive.
+
+    \value Static  The map will no longer react to state changes and will only
+    be rendered when QMapboxGL::startStaticRender is called. After all the
+    resources are loaded, the QMapboxGL::staticRenderFinished signal is emitted.
+
+    This mode is useful for taking a snapshot of the finished rendering result
+    of the map into a QImage.
+
+    \sa mapMode()
+*/
+
+/*!
     \enum QMapboxGLSettings::ConstrainMode
 
     This enum determines if the map wraps.
@@ -200,6 +224,7 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
 */
 QMapboxGLSettings::QMapboxGLSettings()
     : m_contextMode(QMapboxGLSettings::SharedGLContext)
+    , m_mapMode(QMapboxGLSettings::Continuous)
     , m_constrainMode(QMapboxGLSettings::ConstrainHeightOnly)
     , m_viewportMode(QMapboxGLSettings::DefaultViewport)
     , m_cacheMaximumSize(mbgl::util::DEFAULT_MAX_CACHE_SIZE)
@@ -227,6 +252,31 @@ QMapboxGLSettings::GLContextMode QMapboxGLSettings::contextMode() const
 void QMapboxGLSettings::setContextMode(GLContextMode mode)
 {
     m_contextMode = mode;
+}
+
+/*!
+    Returns the map mode. Static mode will emit a signal for
+    rendering a map only when the map is fully loaded.
+    Animations like style transitions and labels fading won't
+    be seen.
+
+    The Continuous mode will emit the signal for every new
+    change on the map and it is usually what you expect for
+    a interactive map.
+
+    By default, it is set to QMapboxGLSettings::Continuous.
+*/
+QMapboxGLSettings::MapMode QMapboxGLSettings::mapMode() const
+{
+    return m_mapMode;
+}
+
+/*!
+    Sets the map \a mode.
+*/
+void QMapboxGLSettings::setMapMode(MapMode mode)
+{
+    m_mapMode = mode;
 }
 
 /*!
@@ -1048,32 +1098,17 @@ void QMapboxGL::rotateBy(const QPointF &first, const QPointF &second)
 }
 
 /*!
-    Resize the map to \a size and scale to fit at \a framebufferSize. For
-    high DPI screens, the size will be smaller than the \a framebufferSize.
-
-    This fallowing example will double the pixel density of the map for
-    a given \c size:
-
-    \code
-        map->resize(size / 2, size);
-    \endcode
+    Resize the map to \a size_ and scale to fit at the framebuffer. For
+    high DPI screens, the size will be smaller than the framebuffer.
 */
-void QMapboxGL::resize(const QSize& size, const QSize& framebufferSize)
+void QMapboxGL::resize(const QSize& size_)
 {
-    if (d_ptr->size == size && d_ptr->fbSize == framebufferSize) return;
+    auto size = sanitizedSize(size_);
 
-    d_ptr->size = size;
-    d_ptr->fbSize = framebufferSize;
+    if (d_ptr->mapObj->getSize() == size)
+        return;
 
-    d_ptr->mapObj->setSize(sanitizedSize(size));
-}
-
-/*!
-    If Mapbox GL needs to rebind the default \a fbo, it will use the
-    ID supplied here.
-*/
-void QMapboxGL::setFramebufferObject(quint32 fbo) {
-    d_ptr->fbObject = fbo;
+    d_ptr->mapObj->setSize(size);
 }
 
 /*!
@@ -1468,6 +1503,51 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 }
 
 /*!
+    Creates the infrastructure needed for rendering the map. It
+    should be called before any call to render().
+
+    Must be called on the render thread.
+*/
+void QMapboxGL::createRenderer()
+{
+    d_ptr->createRenderer();
+}
+
+/*!
+    Destroys the infrastructure needed for rendering the map,
+    releasing resources.
+
+    Must be called on the render thread.
+*/
+void QMapboxGL::destroyRenderer()
+{
+    d_ptr->destroyRenderer();
+}
+
+/*!
+    Start a static rendering of the current state of the map. This
+    should only be called when the map is initialized in static mode.
+
+    \sa QMapboxGLSettings::MapMode
+*/
+void QMapboxGL::startStaticRender()
+{
+    d_ptr->mapObj->renderStill([this](std::exception_ptr err) {
+        QString what;
+
+        try {
+            if (err) {
+                std::rethrow_exception(err);
+            }
+        } catch(const std::exception& e) {
+            what = e.what();
+        }
+
+        emit staticRenderFinished(what);
+    });
+}
+
+/*!
     Renders the map using OpenGL draw calls. It will make sure to bind the
     framebuffer object before drawing; otherwise a valid OpenGL context is
     expected with an appropriate OpenGL viewport state set for the size of
@@ -1475,19 +1555,24 @@ void QMapboxGL::setFilter(const QString& layer, const QVariant& filter)
 
     This function should be called only after the signal needsRendering() is
     emitted at least once.
+
+    Must be called on the render thread.
 */
 void QMapboxGL::render()
 {
-#if defined(__APPLE__) && QT_VERSION < 0x050000
-    // FIXME Qt 4.x provides an incomplete FBO at start.
-    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        return;
-    }
-#endif
-
-    d_ptr->dirty = false;
     d_ptr->render();
+}
+
+/*!
+    If Mapbox GL needs to rebind the default \a fbo, it will use the
+    ID supplied here. \a size is the size of the framebuffer, which
+    on high DPI screens is usually bigger than the map size.
+
+    Must be called on the render thread.
+*/
+void QMapboxGL::setFramebufferObject(quint32 fbo, const QSize& size)
+{
+    d_ptr->setFramebufferObject(fbo, size);
 }
 
 /*!
@@ -1496,7 +1581,7 @@ void QMapboxGL::render()
 */
 void QMapboxGL::connectionEstablished()
 {
-    d_ptr->connectionEstablished();
+    mbgl::NetworkStatus::Reachable();
 }
 
 /*!
@@ -1507,6 +1592,16 @@ void QMapboxGL::connectionEstablished()
     with the current state.
 
     \sa render()
+*/
+
+/*!
+    \fn void QMapboxGL::staticRenderFinished(const QString &error)
+
+    This signal is emitted when a static map is fully drawn. Usually the next
+    step is to extract the map from a framebuffer into a container like a
+    QImage. \a error is set to a message when an error occurs.
+
+    \sa startStaticRender()
 */
 
 /*!
@@ -1526,186 +1621,140 @@ void QMapboxGL::connectionEstablished()
     \a copyrightsHtml is a string with a HTML snippet.
 */
 
-class QMapboxGLRendererFrontend;
-
-QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size_, qreal pixelRatio)
+QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settings, const QSize &size, qreal pixelRatio_)
     : QObject(q)
-    , size(size_)
-    , q_ptr(q)
-    , fileSourceObj(sharedDefaultFileSource(
+    , m_fileSourceObj(sharedDefaultFileSource(
         settings.cacheDatabasePath().toStdString(),
         settings.assetPath().toStdString(),
         settings.cacheDatabaseMaximumSize()))
-    , threadPool(mbgl::sharedThreadPool())
+    , m_threadPool(mbgl::sharedThreadPool())
+    , m_mode(settings.contextMode())
+    , m_pixelRatio(pixelRatio_)
 {
-    // Setup resource transform if needed
+    // Setup the FileSource
+    m_fileSourceObj->setAccessToken(settings.accessToken().toStdString());
+    m_fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+
     if (settings.resourceTransform()) {
-      m_resourceTransform =
-        std::make_unique< mbgl::Actor<mbgl::ResourceTransform> >( *mbgl::Scheduler::GetCurrent(),
-                                                                  [callback = settings.resourceTransform()]
-                                                                  (mbgl::Resource::Kind , const std::string&& url_)  -> std::string {
-                                                                    return callback(std::move(url_));
-                                                                  }
-                                                                  );
-      fileSourceObj->setResourceTransform(m_resourceTransform->self());
+        m_resourceTransform = std::make_unique<mbgl::Actor<mbgl::ResourceTransform>>(*mbgl::Scheduler::GetCurrent(),
+            [callback = settings.resourceTransform()] (mbgl::Resource::Kind, const std::string &&url_) -> std::string {
+                return callback(std::move(url_));
+            });
+       m_fileSourceObj->setResourceTransform(m_resourceTransform->self());
     }
 
-    // Setup and connect the renderer frontend
-    frontend = std::make_unique<QMapboxGLRendererFrontend>(
-            std::make_unique<mbgl::Renderer>(*this, pixelRatio, *fileSourceObj, *threadPool,
-                                             static_cast<mbgl::GLContextMode>(settings.contextMode())),
-            *this);
-    connect(frontend.get(), SIGNAL(updated()), this, SLOT(invalidate()));
-
-    mapObj = std::make_unique<mbgl::Map>(
-            *frontend,
-            *this, sanitizedSize(size),
-            pixelRatio, *fileSourceObj, *threadPool,
-            mbgl::MapMode::Continuous,
-            static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
-            static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+    // Setup MapObserver
+    m_mapObserver = std::make_unique<QMapboxGLMapObserver>(this);
 
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
-    fileSourceObj->setAccessToken(settings.accessToken().toStdString());
-    fileSourceObj->setAPIBaseURL(settings.apiBaseUrl().toStdString());
+    connect(m_mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
-    connect(this, SIGNAL(needsRendering()), q_ptr, SIGNAL(needsRendering()), Qt::QueuedConnection);
-    connect(this, SIGNAL(mapChanged(QMapboxGL::MapChange)), q_ptr, SIGNAL(mapChanged(QMapboxGL::MapChange)), Qt::QueuedConnection);
-    connect(this, SIGNAL(copyrightsChanged(QString)), q_ptr, SIGNAL(copyrightsChanged(QString)), Qt::QueuedConnection);
+    // Setup the Map object
+    mapObj = std::make_unique<mbgl::Map>(
+            *this, // RendererFrontend
+            *m_mapObserver,
+            sanitizedSize(size),
+            m_pixelRatio, *m_fileSourceObj, *m_threadPool,
+            static_cast<mbgl::MapMode>(settings.mapMode()),
+            static_cast<mbgl::ConstrainMode>(settings.constrainMode()),
+            static_cast<mbgl::ViewportMode>(settings.viewportMode()));
+
+    // Needs to be Queued to give time to discard redundant draw calls via the `renderQueued` flag.
+    connect(this, SIGNAL(needsRendering()), q, SIGNAL(needsRendering()), Qt::QueuedConnection);
 }
 
 QMapboxGLPrivate::~QMapboxGLPrivate()
 {
 }
 
-mbgl::Size QMapboxGLPrivate::getFramebufferSize() const {
-    return sanitizedSize(fbSize);
-}
-
-void QMapboxGLPrivate::updateAssumedState() {
-    assumeFramebufferBinding(fbObject);
-#if QT_VERSION >= 0x050600
-    assumeViewport(0, 0, getFramebufferSize());
-#endif
-}
-
-void QMapboxGLPrivate::bind() {
-    setFramebufferBinding(fbObject);
-    setViewport(0, 0, getFramebufferSize());
-}
-
-void QMapboxGLPrivate::invalidate()
+void QMapboxGLPrivate::update(std::shared_ptr<mbgl::UpdateParameters> parameters)
 {
-    if (!dirty) {
-        emit needsRendering();
-        dirty = true;
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (!m_mapRenderer) {
+        return;
     }
+
+    m_mapRenderer->updateParameters(std::move(parameters));
+
+    requestRendering();
+}
+
+void QMapboxGLPrivate::setObserver(mbgl::RendererObserver &observer)
+{
+    m_rendererObserver = std::make_shared<QMapboxGLRendererObserver>(
+            *mbgl::util::RunLoop::Get(), observer);
+
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (m_mapRenderer) {
+        m_mapRenderer->setObserver(m_rendererObserver);
+    }
+}
+
+void QMapboxGLPrivate::createRenderer()
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (m_mapRenderer) {
+        return;
+    }
+
+    m_mapRenderer = std::make_unique<QMapboxGLMapRenderer>(
+        m_pixelRatio,
+        *m_fileSourceObj,
+        *m_threadPool,
+        m_mode
+    );
+
+    connect(m_mapRenderer.get(), SIGNAL(needsRendering()), this, SLOT(requestRendering()));
+
+    m_mapRenderer->setObserver(m_rendererObserver);
+}
+
+void QMapboxGLPrivate::destroyRenderer()
+{
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    m_mapRenderer.reset();
 }
 
 void QMapboxGLPrivate::render()
 {
-    frontend->render();
-}
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
 
-void QMapboxGLPrivate::onCameraWillChange(mbgl::MapObserver::CameraChangeMode mode)
-{
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionWillChangeAnimated);
+    if (!m_mapRenderer) {
+        createRenderer();
     }
-}
 
-void QMapboxGLPrivate::onCameraIsChanging()
-{
-    emit mapChanged(QMapboxGL::MapChangeRegionIsChanging);
-}
-
-void QMapboxGLPrivate::onCameraDidChange(mbgl::MapObserver::CameraChangeMode mode)
-{
-    if (mode == mbgl::MapObserver::CameraChangeMode::Immediate) {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChange);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeRegionDidChangeAnimated);
+#if defined(__APPLE__) && QT_VERSION < 0x050000
+    // FIXME Qt 4.x provides an incomplete FBO at start.
+    // See https://bugreports.qt.io/browse/QTBUG-36802 for details.
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        return;
     }
-}
-
-void QMapboxGLPrivate::onWillStartLoadingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFinishLoadingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFailLoadingMap(std::exception_ptr)
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
-}
-
-void QMapboxGLPrivate::onWillStartRenderingFrame()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartRenderingFrame);
-}
-
-void QMapboxGLPrivate::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMode mode)
-{
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrame);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingFrameFullyRendered);
-    }
-}
-
-void QMapboxGLPrivate::onWillStartRenderingMap()
-{
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
-}
-
-void QMapboxGLPrivate::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode)
-{
-    if (mode == mbgl::MapObserver::RenderMode::Partial) {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMap);
-    } else {
-        emit mapChanged(QMapboxGL::MapChangeDidFinishRenderingMapFullyRendered);
-    }
-}
-
-void QMapboxGLPrivate::onDidFinishLoadingStyle()
-{
-    emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingStyle);
-}
-
-void QMapboxGLPrivate::onSourceChanged(mbgl::style::Source&)
-{
-    std::string attribution;
-    for (const auto& source : mapObj->getStyle().getSources()) {
-        // Avoid duplicates by using the most complete attribution HTML snippet.
-        if (source->getAttribution() && (attribution.size() < source->getAttribution()->size()))
-            attribution = *source->getAttribution();
-    }
-    emit copyrightsChanged(QString::fromStdString(attribution));
-    emit mapChanged(QMapboxGL::MapChangeSourceDidChange);
-}
-
-/*!
-    Initializes an OpenGL extension function such as Vertex Array Objects (VAOs),
-    required by Mapbox GL Native engine.
-*/
-mbgl::gl::ProcAddress QMapboxGLPrivate::getExtensionFunctionPointer(const char* name) {
-#if QT_VERSION >= 0x050000
-    QOpenGLContext* thisContext = QOpenGLContext::currentContext();
-    return thisContext->getProcAddress(name);
-#else
-    const QGLContext* thisContext = QGLContext::currentContext();
-    return reinterpret_cast<mbgl::gl::ProcAddress>(thisContext->getProcAddress(name));
 #endif
+
+    m_renderQueued.clear();
+    m_mapRenderer->render();
 }
 
-void QMapboxGLPrivate::connectionEstablished()
+void QMapboxGLPrivate::setFramebufferObject(quint32 fbo, const QSize& size)
 {
-    mbgl::NetworkStatus::Reachable();
+    std::lock_guard<std::recursive_mutex> lock(m_mapRendererMutex);
+
+    if (!m_mapRenderer) {
+        createRenderer();
+    }
+
+    m_mapRenderer->updateFramebuffer(fbo, sanitizedSize(size));
+}
+
+void QMapboxGLPrivate::requestRendering()
+{
+    if (!m_renderQueued.test_and_set()) {
+        emit needsRendering();
+    }
 }
