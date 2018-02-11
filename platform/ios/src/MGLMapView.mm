@@ -4106,7 +4106,7 @@ public:
             // The first selection in the cycle should be the one nearest to the
             // tap.
             CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
-            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+            std::sort(_annotationsNearbyLastTap.begin(), _annotationsNearbyLastTap.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
                 CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
                 CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
                 CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
@@ -4147,6 +4147,18 @@ public:
         }
         else
         {
+            // The first selection in the cycle should be the one nearest to the
+            // tap.
+            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+                CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                                 coordinateA.longitude - currentCoordinate.longitude);
+                CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                                 coordinateB.longitude - currentCoordinate.longitude);
+                return deltaA < deltaB;
+            });
             // Remember the nearby annotations for the next time this method is
             // called.
             if (persist)
