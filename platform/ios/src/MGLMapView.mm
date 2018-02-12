@@ -209,7 +209,7 @@ public:
 @property (nonatomic) UILongPressGestureRecognizer *quickZoom;
 @property (nonatomic) UIPanGestureRecognizer *twoFingerDrag;
 
-@property (nonatomic) MGLCameraChangeReason cameraChangeReason;
+@property (nonatomic) MGLCameraChangeReason cameraChangeReasonBitmask;
 
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
@@ -555,7 +555,7 @@ public:
     options.padding = padding;
     options.zoom = 0;
 
-    _cameraChangeReason = MGLCameraChangeReasonNone;
+    _cameraChangeReasonBitmask = MGLCameraChangeReasonNone;
 
     _mbglMap->jumpTo(options);
     _pendingLatitude = NAN;
@@ -1243,7 +1243,7 @@ public:
 
 - (void)handleCompassTapGesture:(__unused id)sender
 {
-    self.cameraChangeReason |= MGLCameraChangeReasonResetNorth;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonResetNorth;
 
     [self resetNorthAnimated:YES];
 
@@ -1296,7 +1296,7 @@ public:
     // Check delegates first
     if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:reason:)])
     {
-        return [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:newCamera reason:self.cameraChangeReason];
+        return [self.delegate mapView:self shouldChangeFromCamera:oldCamera toCamera:newCamera reason:self.cameraChangeReasonBitmask];
     }
     else if ([self.delegate respondsToSelector:@selector(mapView:shouldChangeFromCamera:toCamera:)])
     {
@@ -1316,7 +1316,7 @@ public:
 
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGesturePan;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGesturePan;
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
@@ -1386,7 +1386,7 @@ public:
     CGPoint centerPoint = [self anchorPointForGesture:pinch];
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGesturePinch;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGesturePinch;
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
@@ -1485,7 +1485,7 @@ public:
     CGPoint centerPoint = [self anchorPointForGesture:rotate];
     MGLMapCamera *oldCamera = self.camera;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGestureRotate;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureRotate;
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
@@ -1671,7 +1671,7 @@ public:
 
     if (doubleTap.state == UIGestureRecognizerStateEnded)
     {
-        self.cameraChangeReason |= MGLCameraChangeReasonGestureZoomIn;
+        self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomIn;
 
         MGLMapCamera *oldCamera = self.camera;
 
@@ -1708,7 +1708,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGestureZoomOut;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureZoomOut;
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
@@ -1747,7 +1747,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGestureQuickZoom;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureOneFingerZoom;
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
@@ -1792,7 +1792,7 @@ public:
 
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonGesturePitch;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonGestureTilt;
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
@@ -2889,7 +2889,7 @@ public:
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     [self _setCenterCoordinate:centerCoordinate edgePadding:self.contentInset zoomLevel:zoomLevel direction:direction duration:animated ? MGLAnimationDuration : 0 animationTimingFunction:nil completionHandler:completion];
 }
@@ -2941,7 +2941,7 @@ public:
     
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     _mbglMap->easeTo(cameraOptions, animationOptions);
 }
@@ -2966,7 +2966,7 @@ public:
     if (zoomLevel == self.zoomLevel) return;
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
@@ -3057,7 +3057,7 @@ public:
 {
     self.userTrackingMode = MGLUserTrackingModeNone;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     [self _setVisibleCoordinates:coordinates count:count edgePadding:insets direction:direction duration:duration animationTimingFunction:function completionHandler:completion];
 }
@@ -3109,7 +3109,7 @@ public:
     [self willChangeValueForKey:@"visibleCoordinateBounds"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     _mbglMap->easeTo(cameraOptions, animationOptions);
     [self didChangeValueForKey:@"visibleCoordinateBounds"];
@@ -3144,7 +3144,7 @@ public:
 
     CGFloat duration = animated ? MGLAnimationDuration : 0;
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     if (self.userTrackingMode == MGLUserTrackingModeNone)
     {
@@ -3231,7 +3231,7 @@ public:
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:edgePadding];
     _mbglMap->easeTo(cameraOptions, animationOptions);
@@ -3290,7 +3290,7 @@ public:
     [self willChangeValueForKey:@"camera"];
     _mbglMap->cancelTransitions();
 
-    self.cameraChangeReason |= MGLCameraChangeReasonProgrammatic;
+    self.cameraChangeReasonBitmask |= MGLCameraChangeReasonProgrammatic;
 
     mbgl::CameraOptions cameraOptions = [self cameraOptionsObjectForAnimatingToCamera:camera edgePadding:insets];
     _mbglMap->flyTo(cameraOptions, animationOptions);
@@ -3456,7 +3456,7 @@ public:
 
 - (void)resetCameraChangeReason
 {
-    self.cameraChangeReason = MGLCameraChangeReasonNone;
+    self.cameraChangeReasonBitmask = MGLCameraChangeReasonNone;
 }
 
 #pragma mark - Styling -
@@ -5409,7 +5409,7 @@ public:
     {
         if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeWithReason:animated:)])
         {
-            [self.delegate mapView:self regionWillChangeWithReason:self.cameraChangeReason animated:animated];
+            [self.delegate mapView:self regionWillChangeWithReason:self.cameraChangeReasonBitmask animated:animated];
         }
         else if ([self.delegate respondsToSelector:@selector(mapView:regionWillChangeAnimated:)])
         {
@@ -5431,7 +5431,7 @@ public:
 
     if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
     {
-        [self.delegate mapView:self regionIsChangingWithReason:self.cameraChangeReason];
+        [self.delegate mapView:self regionIsChangingWithReason:self.cameraChangeReasonBitmask];
     }
     else if ([self.delegate respondsToSelector:@selector(mapViewRegionIsChanging:)])
     {
@@ -5467,7 +5467,7 @@ public:
 
         if (respondsToSelectorWithReason)
         {
-            [self.delegate mapView:self regionDidChangeWithReason:self.cameraChangeReason animated:animated];
+            [self.delegate mapView:self regionDidChangeWithReason:self.cameraChangeReasonBitmask animated:animated];
         }
         else if (respondsToSelector)
         {

@@ -5,7 +5,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ## 3.7.4
 
 * Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))
-* Provide optional delegate methods that provide a reason for a camera change. These are called in preference over the existing methods that do not have the parameter. ([#11151](https://github.com/mapbox/mapbox-gl-native/pull/11151))
+* Added optional delegate methods that provide a reason for a camera change. These are called in preference over the existing methods that do not have the parameter. ([#11151](https://github.com/mapbox/mapbox-gl-native/pull/11151))
 
 ## 3.7.3 - January 10, 2018
 

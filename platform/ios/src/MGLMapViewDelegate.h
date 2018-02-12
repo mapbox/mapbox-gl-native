@@ -1,7 +1,7 @@
 #import <UIKit/UIKit.h>
 
 #import "MGLTypes.h"
-#import "MGLCameraChange.h"
+#import "MGLCameraChangeReason.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -47,6 +47,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
 
 /**
+ :nodoc:
  Asks the delegate whether the map view should be allowed to change from the
  existing camera to the new camera in response to a user gesture.
 
@@ -85,6 +86,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
 /**
+ :nodoc:
  Tells the delegate that the viewpoint depicted by the map view is about to change.
 
  This method is called whenever the currently displayed map camera will start
@@ -117,6 +119,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
 /**
+ :nodoc:
  Tells the delegate that the viewpoint depicted by the map view is changing.
 
  This method is called as the currently displayed map camera changes as part of
@@ -151,6 +154,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
 /**
+ :nodoc:
  Tells the delegate that the viewpoint depicted by the map view has finished
  changing.
 
