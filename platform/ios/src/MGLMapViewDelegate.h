@@ -41,8 +41,6 @@ NS_ASSUME_NONNULL_BEGIN
  method returns `YES`, this camera becomes the map view’s camera.
  @return A Boolean value indicating whether the map view should stay at
  `oldCamera` or change to `newCamera`.
-
- @note If `-mapView:shouldChangeFromCamera:toCamera:reason:` is implemented this method will not be called.
  */
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera;
 
@@ -80,8 +78,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param mapView The map view whose viewpoint will change.
  @param animated Whether the change will cause an animated effect on the map.
-
- @note If `-mapView:regionWillChangeWithReason:animated:` is implemented this method will not be called.
  */
 - (void)mapView:(MGLMapView *)mapView regionWillChangeAnimated:(BOOL)animated;
 
@@ -113,8 +109,6 @@ NS_ASSUME_NONNULL_BEGIN
  as possible to avoid affecting performance.
 
  @param mapView The map view whose viewpoint is changing.
-
- @note If `-mapView:regionIsChangingWithReason:` is implemented this method will not be called.
  */
 - (void)mapViewRegionIsChanging:(MGLMapView *)mapView;
 
@@ -148,8 +142,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  @param mapView The map view whose viewpoint has changed.
  @param animated Whether the change caused an animated effect on the map.
-
- @note If `-mapView:regionDidChangeWithReason:animated:` is implemented this method will not be called.
  */
 - (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated;
 
