@@ -50,12 +50,13 @@
     options.zoomLevel = 10;
     
     // Create and start the snapshotter
+    __weak UIImageView *weakImageView = imageView;
     MGLMapSnapshotter* snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
     [snapshotter startWithCompletionHandler: ^(MGLMapSnapshot* snapshot, NSError *error) {
         if (error) {
             NSLog(@"Could not load snapshot: %@", [error localizedDescription]);
         } else {
-            imageView.image = snapshot.image;
+            weakImageView.image = snapshot.image;
         }
     }];
     
