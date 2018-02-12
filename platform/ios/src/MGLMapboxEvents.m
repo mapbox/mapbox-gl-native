@@ -50,10 +50,13 @@ static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
         _eventsManager.accountType = [[NSUserDefaults standardUserDefaults] integerForKey:MGLMapboxAccountType];
         _eventsManager.metricsEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:MGLMapboxMetricsEnabled];
         
-        // Because we can get here [MGLAccountManaber +load] it is possible that values from user defaults will be read and
-        // applied here. These checks and local accessToken and baseURL assigns work around that fact. If user default value
-        // are set, they are stored on the local properties here and then only applied later on once MMEEventsManager is
-        // fully initialized (once -[MMEEventsManager initializeWithAccessToken:userAgentBase:hostSDKVersion:] is called.
+        // It is possible for the shared instance of this class to be created because of a call to
+        // +[MGLAccountManager load] early on in the app lifecycle of the host application.
+        // If user default values for access token and base URL are available, they are stored here
+        // on local properties so that they can be applied later once MMEEventsManager is fully initialized
+        // (once -[MMEEventsManager initializeWithAccessToken:userAgentBase:hostSDKVersion:] is called.
+        // Normally, the telem access token and base URL are not set this way. However, overriding these values
+        // with user defaults can be useful for testing with an alternative (test) backend system.
         if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
             self.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
         }
@@ -80,16 +83,18 @@ static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
 - (void)updateNonDisablingConfigurationValues {
     self.eventsManager.debugLoggingEnabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"MGLMapboxMetricsDebugLoggingEnabled"];
     
-    // It is possible that MGLTelemetryAccessToken is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
-    // In that case, setting the access token here will be a noop. In practice, that's fine because the access token value
-    // will be resolved when setupWithAccessToken: is called eventually
+    // It is possible for `MGLTelemetryAccessToken` to have been set yet `userDefaultsDidChange:`
+    // is called before `setupWithAccessToken:` is called.
+    // In that case, setting the access token here will have no effect. In practice, that's fine
+    // because the access token value will be resolved when `setupWithAccessToken:` is called eventually
     if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryAccessToken]) {
         self.eventsManager.accessToken = [[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryAccessToken];
     }
     
-    // It is possible that MGLTelemetryBaseURL is set and userDefaultsDidChange: is called before setupWithAccessToken: is called.
-    // In that case, setting baseURL here will be a noop. In practice, that's fine because the baseURL value
-    // will be resolved when setupWithAccessToken: is called eventually
+    // It is possible for `MGLTelemetryBaseURL` to have been set yet `userDefaultsDidChange:`
+    // is called before setupWithAccessToken: is called.
+    // In that case, setting the base URL here will have no effect. In practice, that's fine
+    // because the base URL value will be resolved when `setupWithAccessToken:` is called eventually
     if ([[[[NSUserDefaults standardUserDefaults] dictionaryRepresentation] allKeys] containsObject:MGLTelemetryBaseURL]) {
         NSURL *baseURL = [NSURL URLWithString:[[NSUserDefaults standardUserDefaults] objectForKey:MGLTelemetryBaseURL]];
         self.eventsManager.baseURL = baseURL;
@@ -98,7 +103,7 @@ static NSString * const MGLTelemetryBaseURL = @"MGLTelemetryBaseURL";
 
 - (void)updateDisablingConfigurationValuesWithNotification:(NSNotification *)notification {
     // Guard against over calling pause / resume if the values this implementation actually
-    // cares about have not changed. We guard becasue the pause and resume method checks CoreLocation's
+    // cares about have not changed. We guard because the pause and resume method checks CoreLocation's
     // authorization status and that can drag on the main thread if done too many times (e.g. if the host
     // app heavily uses the user defaults API and this method is called very frequently)
     if ([[notification object] respondsToSelector:@selector(objectForKey:)]) {
