@@ -12,7 +12,7 @@ struct Converter<Tileset> {
 public:
 
     bool validateLatitude(const double lat) const {
-        return lat < 90 && lat > -90;
+        return lat <= 90 && lat >= -90;
     }
 
     template <class V>
