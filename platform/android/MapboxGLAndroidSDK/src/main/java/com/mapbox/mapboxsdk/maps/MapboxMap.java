@@ -621,6 +621,9 @@ public final class MapboxMap {
   /**
    * Moves the center of the screen to a latitude and longitude specified by a LatLng object. This centers the
    * camera on the LatLng object.
+   * <p>
+   * Note that at low zoom levels, setLatLng is constrained so that the entire viewport shows map data.
+   * </p>
    *
    * @param latLng Target location to change to
    */
@@ -638,6 +641,21 @@ public final class MapboxMap {
       focalPoint = new PointF(nativeMapView.getWidth() / 2, nativeMapView.getHeight() / 2);
     }
     nativeMapView.setZoom(zoom, focalPoint, 0);
+  }
+
+  /**
+   * Moves the center and the zoom of the camera specified by a LatLng object and double zoom.
+   * <p>
+   * Note that at low zoom levels, setLatLng is constrained so that the entire viewport shows map data.
+   * </p>
+   *
+   * @param latLng Target location to change to
+   */
+  public void setLatLngZoom(@NonNull LatLng latLng,
+                            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
+                              to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
+    setZoom(zoom);
+    setLatLng(latLng);
   }
 
   /**
@@ -1882,7 +1900,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnScrollListener(OnScrollListener)} instead.
    */
   @Deprecated
@@ -1895,7 +1912,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void addOnScrollListener(@Nullable OnScrollListener listener) {
     onRegisterTouchListener.onAddScrollListener(listener);
@@ -1906,7 +1922,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void removeOnScrollListener(@Nullable OnScrollListener listener) {
     onRegisterTouchListener.onRemoveScrollListener(listener);
@@ -1917,7 +1932,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is flinged.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnFlingListener(OnFlingListener)} instead.
    */
   @Deprecated
@@ -1950,7 +1964,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapClickListener(OnMapClickListener)} instead.
    */
   @Deprecated
@@ -1983,7 +1996,6 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapLongClickListener(OnMapLongClickListener)} instead.
    */
   @Deprecated
