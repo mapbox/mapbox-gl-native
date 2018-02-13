@@ -7,11 +7,6 @@ dependencies {
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.timber
     implementation dependenciesList.okhttp3
-    compileOnly(dependenciesList.lost) {
-        exclude group: 'com.google.guava'
-        exclude group: 'com.android.support'
-    }
-    testImplementation dependenciesList.lost
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
