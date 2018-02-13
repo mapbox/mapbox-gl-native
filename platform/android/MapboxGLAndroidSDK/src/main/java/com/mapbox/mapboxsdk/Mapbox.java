@@ -139,8 +139,10 @@ public final class Mapbox {
    * Returns the location engine used by the SDK.
    *
    * @return the location engine configured
+   * @deprecated use location layer plugin from
+   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
    */
-  // TODO Do we need to expose this?
+  @Deprecated
   public static LocationEngine getLocationEngine() {
     return INSTANCE.locationEngine;
   }
