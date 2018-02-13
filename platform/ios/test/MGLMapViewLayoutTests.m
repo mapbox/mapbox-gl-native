@@ -67,7 +67,7 @@
     CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
 
-    if ( [self.mapView respondsToSelector:@selector(safeAreaInsets)] ) {
+    if (@available(iOS 11.0, *)) {
         bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
     }
     
