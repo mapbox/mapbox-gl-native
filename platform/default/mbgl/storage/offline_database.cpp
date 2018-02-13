@@ -28,7 +28,7 @@ OfflineDatabase::~OfflineDatabase() {
         statements.clear();
         db.reset();
     } catch (mapbox::sqlite::Exception& ex) {
-        Log::Error(Event::Database, ex.code, ex.what());
+        Log::Error(Event::Database, (int)ex.code, ex.what());
     }
 }
 
@@ -57,13 +57,13 @@ void OfflineDatabase::ensureSchema() {
             removeExisting();
             connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
         } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != mapbox::sqlite::Exception::Code::CANTOPEN && ex.code != mapbox::sqlite::Exception::Code::NOTADB) {
+            if (ex.code != mapbox::sqlite::ResultCode::CantOpen && ex.code != mapbox::sqlite::ResultCode::NotADB) {
                 Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
                 throw;
             }
 
             try {
-                if (ex.code == mapbox::sqlite::Exception::Code::NOTADB) {
+                if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
                     removeExisting();
                 }
                 connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
