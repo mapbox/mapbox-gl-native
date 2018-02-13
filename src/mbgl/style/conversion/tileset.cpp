@@ -6,7 +6,7 @@ namespace style {
 namespace conversion {
 
 bool validateLatitude(const double lat) {
-    return lat < 90 && lat > -90;
+    return lat <= 90 && lat >= -90;
 }
 
 optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error& error) const {
