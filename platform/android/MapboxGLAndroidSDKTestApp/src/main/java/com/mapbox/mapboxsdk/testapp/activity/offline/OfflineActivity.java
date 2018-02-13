@@ -175,7 +175,8 @@ public class OfflineActivity extends AppCompatActivity
         // Get regions info
         ArrayList<String> offlineRegionsNames = new ArrayList<>();
         for (OfflineRegion offlineRegion : offlineRegions) {
-          offlineRegionsNames.add(OfflineUtils.convertRegionName(offlineRegion.getMetadata()));
+          long tileCount = offlineRegion.getTileCount((byte) mapboxMap.getMinZoomLevel(), 256 );
+          offlineRegionsNames.add(OfflineUtils.convertRegionName(offlineRegion.getMetadata()) + " TileCount: " + tileCount);
         }
 
         // Create args

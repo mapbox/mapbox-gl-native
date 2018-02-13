@@ -4,6 +4,7 @@
 #include <jni/jni.hpp>
 
 #include "../file_source.hpp"
+#include "../geometry/lat_lng_bounds.hpp"
 
 #include <memory>
 
@@ -79,6 +80,8 @@ public:
     void deleteOfflineRegion(jni::JNIEnv&, jni::Object<OfflineRegionDeleteCallback>);
 
     void updateOfflineRegionMetadata(jni::JNIEnv&, jni::Array<jni::jbyte>, jni::Object<OfflineRegionUpdateMetadataCallback>);
+
+    jni::jlong tileCount(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds> bounds, jni::jbyte zoom, jni::jint tileSize);
 
     static jni::Object<OfflineRegion> New(jni::JNIEnv&, jni::Object<FileSource>, mbgl::OfflineRegion);
 

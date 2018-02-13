@@ -8,6 +8,7 @@
 #include "offline_region_status.hpp"
 #include "../attach_env.hpp"
 #include "../jni/generic_global_ref_deleter.hpp"
+#include "../geometry/lat_lng_bounds.hpp"
 
 namespace mbgl {
 namespace android {
@@ -214,7 +215,8 @@ void OfflineRegion::registerNative(jni::JNIEnv& env) {
         METHOD(&OfflineRegion::setOfflineRegionDownloadState, "setOfflineRegionDownloadState"),
         METHOD(&OfflineRegion::getOfflineRegionStatus, "getOfflineRegionStatus"),
         METHOD(&OfflineRegion::deleteOfflineRegion, "deleteOfflineRegion"),
-        METHOD(&OfflineRegion::updateOfflineRegionMetadata, "updateOfflineRegionMetadata")
+        METHOD(&OfflineRegion::updateOfflineRegionMetadata, "updateOfflineRegionMetadata"),
+        METHOD(&OfflineRegion::tileCount, "tileCount")
     );
 }
 
@@ -303,6 +305,13 @@ void OfflineRegion::OfflineRegionUpdateMetadataCallback::onUpdate(jni::JNIEnv& e
     callback.Call(env, method, jMetadata);
     jni::DeleteLocalRef(env, jMetadata);
 }
+
+jni::jlong OfflineRegion::tileCount(jni::JNIEnv& env, jni::Object<mbgl::android::LatLngBounds> jBounds, jni::jbyte zoom, jni::jint tileSize) {
+    auto bounds = LatLngBounds::getLatLngBounds(env, jBounds);
+    auto tileCount = region->getTileCount(bounds, zoom, tileSize);
+    return tileCount;
+}
+
 
 } // namespace android
 } // namespace mbgl
