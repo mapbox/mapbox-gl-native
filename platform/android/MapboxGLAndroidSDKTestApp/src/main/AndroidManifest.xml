@@ -806,7 +806,7 @@
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"
-            android:value="https://cloudfront-staging.tilestream.net"/>
+            android:value="api-events-staging.tilestream.net"/>
         <meta-data
             android:name="com.mapbox.TestEventsAccessToken"
             android:value="pk.eyJ1IjoiYmxzdGFnaW5nIiwiYSI6ImNpdDF3OHpoaTAwMDcyeXA5Y3Z0Nmk2dzEifQ.0IfB7v5Qbm2MGVYt8Kb8fg"/>

@@ -8,7 +8,7 @@ import android.support.annotation.FloatRange;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.services.android.telemetry.utils.MathUtils;
+import com.mapbox.mapboxsdk.utils.MathUtils;
 
 /**
  * Resembles the position, angle, zoom and tilt of the user's viewpoint.

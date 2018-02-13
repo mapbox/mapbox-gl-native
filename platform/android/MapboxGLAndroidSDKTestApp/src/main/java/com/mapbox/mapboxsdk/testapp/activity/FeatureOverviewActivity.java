@@ -22,8 +22,8 @@ import com.mapbox.mapboxsdk.testapp.adapter.FeatureAdapter;
 import com.mapbox.mapboxsdk.testapp.adapter.FeatureSectionAdapter;
 import com.mapbox.mapboxsdk.testapp.model.activity.Feature;
 import com.mapbox.mapboxsdk.testapp.utils.ItemClickSupport;
-import com.mapbox.services.android.telemetry.permissions.PermissionsListener;
-import com.mapbox.services.android.telemetry.permissions.PermissionsManager;
+import com.mapbox.android.core.permissions.PermissionsListener;
+import com.mapbox.android.core.permissions.PermissionsManager;
 
 import java.util.ArrayList;
 import java.util.Collections;
