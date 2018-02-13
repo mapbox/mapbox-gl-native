@@ -15,7 +15,7 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEngineListener;
 
 /**
  * Test activity showcasing how to change the MyLocationView drawable.
