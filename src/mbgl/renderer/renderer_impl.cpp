@@ -724,10 +724,10 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
 
 void Renderer::Impl::onLowMemory() {
     assert(BackendScope::exists());
-    backend.getContext().performCleanup();
     for (const auto& entry : renderSources) {
         entry.second->onLowMemory();
     }
+    backend.getContext().performCleanup();
     observer->onInvalidate();
 }
 
