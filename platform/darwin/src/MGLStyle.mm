@@ -130,11 +130,8 @@ static NSURL *MGLStyleURL_hybrid;
 // Emerald is no longer getting new versions as a default style, so the current version is hard-coded here.
 static NSURL *MGLStyleURL_emerald;
 + (NSURL *)emeraldStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_emerald = [NSURL URLWithString:@"mapbox://styles/mapbox/emerald-v8"];
-    });
-    return MGLStyleURL_emerald;
+    [NSException raise:NSException format:<#(nonnull NSString *), ...#>]
+    return nil;
 }
 
 // Traffic Day is no longer getting new versions as a default style, so the current version is hard-coded here.

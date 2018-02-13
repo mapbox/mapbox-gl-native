@@ -89,7 +89,7 @@ MGL_EXPORT
 
  Emerald is a tactile style with subtle textures and dramatic hillshading.
  */
-+ (NSURL *)emeraldStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
++ (NSURL *)emeraldStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
  Returns the URL to the current version of the
