@@ -236,7 +236,7 @@ public:
     
 class ExpressionFilter {
 public:
-    std::shared_ptr<mbgl::style::expression::Expression> expression;
+    std::shared_ptr<expression::Expression> expression;
     
     friend bool operator==(const ExpressionFilter& lhs, const ExpressionFilter& rhs) {
         return lhs.expression == rhs.expression;
@@ -281,7 +281,7 @@ public:
     bool operator()(const GeometryTileFeature&) const;
 
     template <class PropertyAccessor>
-    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, float zoom) const;
+    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, expression::EvaluationContext context) const;
 };
 
 } // namespace style
