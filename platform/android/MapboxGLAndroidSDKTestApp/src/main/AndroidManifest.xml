@@ -743,6 +743,13 @@
         </activity>
 
         <!-- TextureView -->
+        <activity android:name=".activity.textureview.TextureViewOverlayActivity"
+                  android:description="@string/description_textureview_overlay"
+                  android:label="@string/activity_textureview_overlay">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_textureview"/>
+        </activity>
         <activity
             android:name=".activity.textureview.TextureViewDebugModeActivity"
             android:description="@string/description_textureview_debug"
