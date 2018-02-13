@@ -13,6 +13,3 @@
 -dontwarn okio.**
 -dontwarn javax.annotation.Nullable
 -dontwarn javax.annotation.ParametersAreNonnullByDefault
-
-# config for optional location provider https://github.com/mapbox/mapbox-gl-native/issues/10960
--dontwarn com.mapzen.android.lost.api**
