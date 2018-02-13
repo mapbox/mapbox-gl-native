@@ -4,7 +4,6 @@ import android.graphics.SurfaceTexture;
 import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.view.TextureView;
-
 import com.mapbox.mapboxsdk.maps.renderer.egl.EGLConfigChooser;
 
 import java.lang.ref.WeakReference;
@@ -219,13 +218,6 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
                 break;
               }
 
-              // Check if the size has changed
-              if (sizeChanged) {
-                recreateSurface = true;
-                sizeChanged = false;
-                break;
-              }
-
               // Reset the request render flag now, so we can catch new requests
               // while rendering
               requestRender = false;
@@ -270,6 +262,12 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
         if (recreateSurface) {
           eglHolder.createSurface();
           mapRenderer.onSurfaceChanged(gl, w, h);
+          continue;
+        }
+
+        if (sizeChanged) {
+          mapRenderer.onSurfaceChanged(gl, w, h);
+          sizeChanged = false;
           continue;
         }
 
