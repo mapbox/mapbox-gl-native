@@ -52,6 +52,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import timber.log.Timber;
+
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
 
