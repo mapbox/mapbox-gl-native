@@ -5,7 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEngine;
 
 import org.junit.Before;
 import org.junit.Test;
