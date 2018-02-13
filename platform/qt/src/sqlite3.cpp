@@ -24,11 +24,11 @@ namespace mapbox {
 namespace sqlite {
 
 // https://www.sqlite.org/rescode.html#ok
-static_assert(mbgl::underlying_type(Exception::OK) == 0, "error");
+static_assert(mbgl::underlying_type(ResultCode::OK) == 0, "error");
 // https://www.sqlite.org/rescode.html#cantopen
-static_assert(mbgl::underlying_type(Exception::CANTOPEN) == 14, "error");
+static_assert(mbgl::underlying_type(ResultCode::CantOpen) == 14, "error");
 // https://www.sqlite.org/rescode.html#notadb
-static_assert(mbgl::underlying_type(Exception::NOTADB) == 26, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotADB) == 26, "error");
 
 void checkQueryError(const QSqlQuery& query) {
     QSqlError lastError = query.lastError();
@@ -57,7 +57,7 @@ void checkDatabaseOpenError(const QSqlDatabase &db) {
     // always returns -1 for `nativeErrorCode()` on database errors.
     QSqlError lastError = db.lastError();
     if (lastError.type() != QSqlError::NoError) {
-        throw Exception { Exception::Code::CANTOPEN, "Error opening the database." };
+        throw Exception { ResultCode::CantOpen, "Error opening the database." };
     }
 }
 
@@ -74,7 +74,7 @@ public:
         : connectionName(QString::number(uint64_t(QThread::currentThread())) + incrementCounter())
     {
         if (!QSqlDatabase::drivers().contains("QSQLITE")) {
-            throw Exception { Exception::Code::CANTOPEN, "SQLite driver not found." };
+            throw Exception { ResultCode::CantOpen, "SQLite driver not found." };
         }
 
         assert(!QSqlDatabase::contains(connectionName));

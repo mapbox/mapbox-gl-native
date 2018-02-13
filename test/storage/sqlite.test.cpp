@@ -33,6 +33,6 @@ TEST(SQLite, TEST_REQUIRES_WRITE(CantOpenException)) {
         mapbox::sqlite::Database("test/fixtures/offline_database/foobar123.db", mapbox::sqlite::ReadOnly);
         FAIL();
     } catch (mapbox::sqlite::Exception& ex) {
-        ASSERT_EQ(ex.code, mapbox::sqlite::Exception::Code::CANTOPEN);
+        ASSERT_EQ(ex.code, mapbox::sqlite::ResultCode::CantOpen);
     }
 }

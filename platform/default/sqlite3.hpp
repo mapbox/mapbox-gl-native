@@ -19,16 +19,49 @@ enum OpenFlag : int {
     PrivateCache = 0x00040000,
 };
 
-struct Exception : std::runtime_error {
-    enum Code : int {
-        OK = 0,
-        CANTOPEN = 14,
-        NOTADB = 26
-    };
+enum class ResultCode : int {
+    OK = 0,
+    Error = 1,
+    Internal = 2,
+    Perm = 3,
+    Abort = 4,
+    Busy = 5,
+    Locked = 6,
+    NoMem = 7,
+    ReadOnly = 8,
+    Interrupt = 9,
+    IOErr = 10,
+    Corrupt = 11,
+    NotFound = 12,
+    Full = 13,
+    CantOpen = 14,
+    Protocol = 15,
+    Schema = 17,
+    TooBig = 18,
+    Constraint = 19,
+    Mismatch = 20,
+    Misuse = 21,
+    NoLFS = 22,
+    Auth = 23,
+    Range = 25,
+    NotADB = 26
+};
 
-    Exception(int err, const char *msg) : std::runtime_error(msg), code(err) {}
-    Exception(int err, const std::string& msg) : std::runtime_error(msg), code(err) {}
-    const int code = OK;
+class Exception : public std::runtime_error {
+public:
+    Exception(int err, const char* msg)
+        : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
+    }
+    Exception(ResultCode err, const char* msg)
+        : std::runtime_error(msg), code(err) {
+    }
+    Exception(int err, const std::string& msg)
+        : std::runtime_error(msg), code(static_cast<ResultCode>(err)) {
+    }
+    Exception(ResultCode err, const std::string& msg)
+        : std::runtime_error(msg), code(err) {
+    }
+    const ResultCode code = ResultCode::OK;
 };
 
 class DatabaseImpl;
