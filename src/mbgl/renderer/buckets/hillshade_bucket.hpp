@@ -8,6 +8,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/renderer/tile_mask.hpp>
 #include <mbgl/geometry/dem_data.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <mbgl/util/image.hpp>
 #include <mbgl/util/mat4.hpp>
 #include <mbgl/util/optional.hpp>
@@ -16,8 +17,8 @@ namespace mbgl {
 
 class HillshadeBucket : public Bucket {
 public:
-    HillshadeBucket(PremultipliedImage&&);
-    HillshadeBucket(std::shared_ptr<PremultipliedImage>);
+    HillshadeBucket(PremultipliedImage&&, Tileset::DEMEncoding encoding);
+    HillshadeBucket(std::shared_ptr<PremultipliedImage>, Tileset::DEMEncoding encoding);
     HillshadeBucket(DEMData&&);
 
 

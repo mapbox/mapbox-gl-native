@@ -14,22 +14,28 @@ namespace mbgl {
 class Tileset {
 public:
     enum class Scheme : bool { XYZ, TMS };
+    enum class DEMEncoding : bool { Mapbox, Terrarium };
 
     std::vector<std::string> tiles;
     Range<uint8_t> zoomRange;
     std::string attribution;
     Scheme scheme;
+    // DEMEncoding is not supported by the TileJSON spec
+    DEMEncoding encoding;
     optional<LatLngBounds> bounds;
+
 
     Tileset(std::vector<std::string> tiles_ = std::vector<std::string>(),
             Range<uint8_t> zoomRange_ = { 0, util::DEFAULT_MAX_ZOOM },
             std::string attribution_ = {},
-            Scheme scheme_ = Scheme::XYZ)
+            Scheme scheme_ = Scheme::XYZ,
+            DEMEncoding encoding_ = DEMEncoding::Mapbox)
         : tiles(std::move(tiles_)),
           zoomRange(std::move(zoomRange_)),
           attribution(std::move(attribution_)),
           scheme(scheme_),
-          bounds() {}
+          encoding(encoding_),
+          bounds() {};
 
     // TileJSON also includes center and zoom but they are not used by mbgl.
 
