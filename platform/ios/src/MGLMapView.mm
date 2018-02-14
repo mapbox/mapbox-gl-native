@@ -716,7 +716,7 @@ public:
 {
     MGLAssertIsMainThread();
 
-    _rendererFrontend->onLowMemory();
+    _rendererFrontend->reduceMemoryUse();
 }
 
 #pragma mark - Layout -
@@ -1158,6 +1158,13 @@ public:
 - (void)sleepGL:(__unused NSNotification *)notification
 {
     MGLAssertIsMainThread();
+    
+    // Ideally we would wait until we actually received a memory warning but the bulk of the memory
+    // we have to release is tied up in GL buffers that we can't touch once we're in the background.
+    // Compromise position: release everything but currently rendering tiles
+    // A possible improvement would be to store a copy of the GL buffers that we could use to rapidly
+    // restart, but that we could also discard in response to a memory warning.
+    _rendererFrontend->reduceMemoryUse();
 
     if ( ! self.dormant)
     {
@@ -2315,7 +2322,7 @@ public:
 
 - (void)emptyMemoryCache
 {
-    _rendererFrontend->onLowMemory();
+    _rendererFrontend->reduceMemoryUse();
 }
 
 - (void)setZoomEnabled:(BOOL)zoomEnabled
