@@ -17,7 +17,7 @@ auto fakeImage = [](Size s) {
 
 TEST(DEMData, Constructor) {
     PremultipliedImage image = fakeImage({16, 16});
-    DEMData demdata(image, Tileset::Encoding::Mapbox);
+    DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
 
     EXPECT_EQ(demdata.dim, 16);
     EXPECT_EQ(demdata.border, 8);
@@ -29,7 +29,7 @@ TEST(DEMData, Constructor) {
 
 TEST(DEMData, RoundTrip) {
     PremultipliedImage image = fakeImage({16, 16});
-    DEMData demdata(image, Tileset::Encoding::Mapbox);
+    DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
 
     demdata.set(4, 6, 255);
     EXPECT_EQ(demdata.get(4, 6), 255);
@@ -38,7 +38,7 @@ TEST(DEMData, RoundTrip) {
 TEST(DEMData, InitialBackfill) {
 
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMData dem1(image1, Tileset::Encoding::Mapbox);
+    DEMData dem1(image1, Tileset::DEMEncoding::Mapbox);
 
     bool nonempty = true;
     // checking that a 1 px border around the fake image has been populated
@@ -92,10 +92,10 @@ TEST(DEMData, InitialBackfill) {
 
 TEST(DEMData, BackfillNeighbor) {
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMData dem0(image1, Tileset::Encoding::Mapbox);
+    DEMData dem0(image1, Tileset::DEMEncoding::Mapbox);
 
     PremultipliedImage image2 = fakeImage({4, 4});
-    DEMData dem1(image2, Tileset::Encoding::Mapbox);
+    DEMData dem1(image2, Tileset::DEMEncoding::Mapbox);
 
     dem0.backfillBorder(dem1, -1, 0);
     for (int y = 0; y < 4; y++) {

@@ -3,7 +3,7 @@
 
 namespace mbgl {
 
-DEMData::DEMData(const PremultipliedImage& _image, Tileset::Encoding encoding):
+DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding):
     dim(_image.size.height),
     border(std::max<int32_t>(std::ceil(_image.size.height / 2), 1)),
     stride(dim + 2 * border),
@@ -13,14 +13,17 @@ DEMData::DEMData(const PremultipliedImage& _image, Tileset::Encoding encoding):
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
-    auto decodeRGB = [&] (const uint8_t r, const uint8_t g, const uint8_t b) {
-        if (encoding == Tileset::Encoding::Mapbox) {
-            return (r * 256 * 256 + g * 256 + b)/10 - 10000;
-        } else {
-            // encoding == Tileset::Encoding::Terrarium;
-            return ((r * 256 + g + b / 256) - 32768);
-        }
+    auto decodeMapbox = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+        // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
+        return (r * 256 * 256 + g * 256 + b)/10 - 10000;
     };
+
+    auto decodeTerrarium = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+        // https://aws.amazon.com/public-datasets/terrain/
+        return ((r * 256 + g + b / 256) - 32768);
+    };
+
+    auto decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
 
     std::memset(image.data.get(), 0, image.bytes());
 

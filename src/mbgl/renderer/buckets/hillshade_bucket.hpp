@@ -17,8 +17,8 @@ namespace mbgl {
 
 class HillshadeBucket : public Bucket {
 public:
-    HillshadeBucket(PremultipliedImage&&, Tileset::Encoding encoding);
-    HillshadeBucket(std::shared_ptr<PremultipliedImage>, Tileset::Encoding encoding);
+    HillshadeBucket(PremultipliedImage&&, Tileset::DEMEncoding encoding);
+    HillshadeBucket(std::shared_ptr<PremultipliedImage>, Tileset::DEMEncoding encoding);
     HillshadeBucket(DEMData&&);
 
 
