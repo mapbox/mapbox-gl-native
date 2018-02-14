@@ -198,15 +198,15 @@ IOS_USER_DATA_PATH = $(IOS_WORK_PATH)/xcuserdata/$(USER).xcuserdatad
 
 IOS_SIMULATORS = -destination 'platform=iOS Simulator,name=iPhone X,OS=latest' \
 	-destination 'platform=iOS Simulator,name=iPhone 8,OS=latest' \
-	-destination 'platform=iOS Simulator,name=iPad Pro (10.5-inch),OS=latest' \
 	-destination 'platform=iOS Simulator,name=iPhone 7 Plus,OS=10.3.1' \
-	-destination 'platform=iOS Simulator,name=iPhone 7,OS=10.3.1' \
-	-destination 'platform=iOS Simulator,name=iPad (5th generation),OS=10.3.1'
+	-destination 'platform=iOS Simulator,name=iPhone 7,OS=10.3.1'
 
 # Run full compatibility suite locally
 ifeq ($(CI),)
   IOS_SIMULATORS += \
+	-destination 'platform=iOS Simulator,name=iPad Pro (10.5-inch),OS=latest' \
 	-destination 'platform=iOS Simulator,name=iPhone SE,OS=latest' \
+	-destination 'platform=iOS Simulator,name=iPad (5th generation),OS=10.3.1' \
 	-destination 'platform=iOS Simulator,name=iPhone 5s,OS=10.3.1' \
 	-destination 'platform=iOS Simulator,name=iPhone 6s Plus,OS=9.3' \
 	-destination 'platform=iOS Simulator,name=iPhone 6s,OS=9.3' \
@@ -223,7 +223,7 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	$(IOS_SIMULATORS) \
 	-parallelizeTargets \
 	-jobs $(JOBS) \
-	-maximum-concurrent-test-simulator-destinations 3 \
+	-maximum-concurrent-test-simulator-destinations 4 \
 	-workspace $(IOS_WORK_PATH)
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
