@@ -16,6 +16,7 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.android.core.location.LocationEngine;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -43,7 +44,6 @@ import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.android.core.location.LocationEngine;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
@@ -601,7 +601,7 @@ public final class MapboxMap {
   }
 
   //
-  //
+  // Light
   //
 
   /**
@@ -617,65 +617,6 @@ public final class MapboxMap {
   //
   // Camera API
   //
-
-  /**
-   * Moves the center of the screen to a latitude and longitude specified by a LatLng object. This centers the
-   * camera on the LatLng object.
-   * <p>
-   * Note that at low zoom levels, setLatLng is constrained so that the entire viewport shows map data.
-   * </p>
-   *
-   * @param latLng Target location to change to
-   */
-  public void setLatLng(@NonNull LatLng latLng) {
-    nativeMapView.setLatLng(latLng);
-  }
-
-  /**
-   * Moves the camera viewpoint to a particular zoom level.
-   *
-   * @param zoom Zoom level to change to
-   */
-  public void setZoom(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
-    if (focalPoint == null) {
-      focalPoint = new PointF(nativeMapView.getWidth() / 2, nativeMapView.getHeight() / 2);
-    }
-    nativeMapView.setZoom(zoom, focalPoint, 0);
-  }
-
-  /**
-   * Moves the center and the zoom of the camera specified by a LatLng object and double zoom.
-   * <p>
-   * Note that at low zoom levels, setLatLng is constrained so that the entire viewport shows map data.
-   * </p>
-   *
-   * @param latLng Target location to change to
-   */
-  public void setLatLngZoom(@NonNull LatLng latLng,
-                            @FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
-                              to = MapboxConstants.MAXIMUM_ZOOM) double zoom) {
-    setZoom(zoom);
-    setLatLng(latLng);
-  }
-
-  /**
-   * Moves the camera viewpoint angle to a particular angle in degrees.
-   *
-   * @param tilt Tilt angle to change to
-   */
-  public void setTilt(@FloatRange(from = MapboxConstants.MINIMUM_TILT, to = MapboxConstants.MAXIMUM_TILT) double tilt) {
-    nativeMapView.setPitch(tilt, 0);
-  }
-
-  /**
-   * Moves the camera viewpoint direction to a particular angle in degrees.
-   *
-   * @param bearing Direction angle to change to
-   */
-  public void setBearing(@FloatRange(from = MapboxConstants.MINIMUM_DIRECTION, to = MapboxConstants.MAXIMUM_DIRECTION)
-                           double bearing) {
-    nativeMapView.setBearing(bearing);
-  }
 
   /**
    * Cancels ongoing animations.

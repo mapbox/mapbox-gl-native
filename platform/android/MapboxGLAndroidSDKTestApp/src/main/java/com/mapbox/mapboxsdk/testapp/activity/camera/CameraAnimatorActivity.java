@@ -115,7 +115,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator latLngAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), currentPosition, targetPosition);
     latLngAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     latLngAnimator.setInterpolator(new FastOutSlowInInterpolator());
-    latLngAnimator.addUpdateListener(animation -> mapboxMap.setLatLng((LatLng) animation.getAnimatedValue()));
+    latLngAnimator.addUpdateListener(animation -> mapboxMap.moveCamera(
+      CameraUpdateFactory.newLatLng((LatLng) animation.getAnimatedValue()))
+    );
     return latLngAnimator;
   }
 
@@ -124,7 +126,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     zoomAnimator.setDuration((long) (2200 * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setStartDelay((long) (600 * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setInterpolator(new AnticipateOvershootInterpolator());
-    zoomAnimator.addUpdateListener(animation -> mapboxMap.setZoom((Float) animation.getAnimatedValue()));
+    zoomAnimator.addUpdateListener(animation -> mapboxMap.moveCamera(
+      CameraUpdateFactory.zoomTo((Float) animation.getAnimatedValue()))
+    );
     return zoomAnimator;
   }
 
@@ -133,7 +137,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     bearingAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     bearingAnimator.setStartDelay((long) (1000 * ANIMATION_DELAY_FACTOR));
     bearingAnimator.setInterpolator(new FastOutLinearInInterpolator());
-    bearingAnimator.addUpdateListener(animation -> mapboxMap.setBearing((Float) animation.getAnimatedValue()));
+    bearingAnimator.addUpdateListener(animation -> mapboxMap.moveCamera(
+      CameraUpdateFactory.bearingTo((Float) animation.getAnimatedValue()))
+    );
     return bearingAnimator;
   }
 
@@ -141,7 +147,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator tiltAnimator = ValueAnimator.ofFloat((float) currentTilt, (float) targetTilt);
     tiltAnimator.setDuration((long) (1000 * ANIMATION_DELAY_FACTOR));
     tiltAnimator.setStartDelay((long) (1500 * ANIMATION_DELAY_FACTOR));
-    tiltAnimator.addUpdateListener(animation -> mapboxMap.setTilt((Float) animation.getAnimatedValue()));
+    tiltAnimator.addUpdateListener(animation -> mapboxMap.moveCamera(
+      CameraUpdateFactory.tiltTo((Float) animation.getAnimatedValue()))
+    );
     return tiltAnimator;
   }
 
@@ -192,7 +200,9 @@ public class CameraAnimatorActivity extends AppCompatActivity implements OnMapRe
     ValueAnimator zoomAnimator = ValueAnimator.ofFloat(11.0f, 16.0f);
     zoomAnimator.setDuration((long) (duration * ANIMATION_DELAY_FACTOR));
     zoomAnimator.setInterpolator(interpolator);
-    zoomAnimator.addUpdateListener(animation -> mapboxMap.setZoom((Float) animation.getAnimatedValue()));
+    zoomAnimator.addUpdateListener(animation -> mapboxMap.moveCamera(
+      CameraUpdateFactory.zoomTo((Float) animation.getAnimatedValue()))
+    );
     return zoomAnimator;
   }
 
