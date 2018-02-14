@@ -23,8 +23,6 @@ TEST(DEMData, ConstructorMapbox) {
     EXPECT_EQ(demdata.border, 8);
     EXPECT_EQ(demdata.stride, 32);
     EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
-    EXPECT_EQ(demdata.dim, 16);
-    EXPECT_EQ(demdata.border, 8);
 };
 
 TEST(DEMData, ConstructorTerrarium) {
@@ -35,8 +33,6 @@ TEST(DEMData, ConstructorTerrarium) {
     EXPECT_EQ(demdata.border, 8);
     EXPECT_EQ(demdata.stride, 32);
     EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
-    EXPECT_EQ(demdata.dim, 16);
-    EXPECT_EQ(demdata.border, 8);
 };
 
 TEST(DEMData, RoundTrip) {
