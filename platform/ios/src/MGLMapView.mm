@@ -716,7 +716,7 @@ public:
 {
     MGLAssertIsMainThread();
 
-    _rendererFrontend->onLowMemory();
+    _rendererFrontend->reduceMemoryUse();
 }
 
 #pragma mark - Layout -
@@ -2315,7 +2315,7 @@ public:
 
 - (void)emptyMemoryCache
 {
-    _rendererFrontend->onLowMemory();
+    _rendererFrontend->reduceMemoryUse();
 }
 
 - (void)setZoomEnabled:(BOOL)zoomEnabled

@@ -88,8 +88,8 @@ std::vector<Feature> RenderVectorSource::querySourceFeatures(const SourceQueryOp
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderVectorSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderVectorSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderVectorSource::dumpDebugLogs() const {
