@@ -3432,37 +3432,6 @@ public:
      __PRETTY_FUNCTION__, styleID];
 }
 
-// JK: Update with NSExceptions
-//- (NS_ARRAY_OF(NSString *) *)styleClasses
-//{
-//    return [self.style styleClasses];
-//}
-//
-//- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
-//{
-//    [self setStyleClasses:appliedClasses transitionDuration:0];
-//}
-//
-//- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
-//{
-//    [self.style setStyleClasses:appliedClasses transitionDuration:transitionDuration];
-//}
-//
-//- (BOOL)hasStyleClass:(NSString *)styleClass
-//{
-//    return [self.style hasStyleClass:styleClass];
-//}
-//
-//- (void)addStyleClass:(NSString *)styleClass
-//{
-//    [self.style addStyleClass:styleClass];
-//}
-//
-//- (void)removeStyleClass:(NSString *)styleClass
-//{
-//    [self.style removeStyleClass:styleClass];
-//}
-
 #pragma mark - Annotations -
 
 - (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations
