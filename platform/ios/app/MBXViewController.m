@@ -1599,8 +1599,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             @"Dark",
             @"Satellite",
             @"Satellite Streets",
-            @"Traffic Day",
-            @"Traffic Night",
         ];
         styleURLs = @[
             [MGLStyle streetsStyleURL],
@@ -1608,9 +1606,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [MGLStyle lightStyleURL],
             [MGLStyle darkStyleURL],
             [MGLStyle satelliteStyleURL],
-            [MGLStyle satelliteStreetsStyleURL],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"],
-            [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"],
+            [MGLStyle satelliteStreetsStyleURL]
             
         ];
         NSAssert(styleNames.count == styleURLs.count, @"Style names and URLs don’t match.");

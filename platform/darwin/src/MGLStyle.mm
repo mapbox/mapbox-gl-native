@@ -117,52 +117,6 @@ MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
 static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
 
-// Hybrid has been renamed Satellite Streets, so the last Hybrid version is hard-coded here.
-static NSURL *MGLStyleURL_hybrid;
-+ (NSURL *)hybridStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_hybrid = [NSURL URLWithString:@"mapbox://styles/mapbox/satellite-hybrid-v8"];
-    });
-    return MGLStyleURL_hybrid;
-}
-
-// Emerald is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_emerald;
-+ (NSURL *)emeraldStyleURL {
-    [NSException raise:NSException format:<#(nonnull NSString *), ...#>]
-    return nil;
-}
-
-// Traffic Day is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_trafficDay;
-+ (NSURL *)trafficDayStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_trafficDay = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"];
-    });
-    return MGLStyleURL_trafficDay;
-}
-
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version {
-    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-day-v" stringByAppendingFormat:@"%li", (long)version]];
-}
-
-// Traffic Night is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_trafficNight;
-+ (NSURL *)trafficNightStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_trafficNight = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"];
-    });
-    return MGLStyleURL_trafficNight;
-}
-
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version {
-    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-night-v" stringByAppendingFormat:@"%li", (long)version]];
-}
-
-
 #pragma mark -
 
 - (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView {
