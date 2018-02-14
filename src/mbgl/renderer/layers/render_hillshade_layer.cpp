@@ -61,7 +61,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
         return;
     
     RenderRasterDEMSource* demsrc = dynamic_cast<RenderRasterDEMSource*>(src);
-    const uint8_t maxzoom = demsrc->getMaxZoom();
+    const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : 15;
 
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
