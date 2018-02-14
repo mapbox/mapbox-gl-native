@@ -22,6 +22,11 @@
 
 * Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))
 
+## v0.6.2
+
+* Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))
+* Fixed an issue that caused `-[MGLMapSnapshotter pointForCoordinate:]` to return the wrong point. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
+
 ## v0.6.1 - January 16, 2018
 
 This version of the Mapbox macOS SDK corresponds to version 3.7.3 of the Mapbox Maps SDK for iOS.
