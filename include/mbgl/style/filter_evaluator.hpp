@@ -241,17 +241,6 @@ private:
     }
 };
 
-inline bool Filter::operator()(const Feature& feature) const {
-    return operator()(apply_visitor(ToFeatureType(), feature.geometry), feature.id, [&] (const std::string& key) -> optional<Value> {
-        auto it = feature.properties.find(key);
-        if (it == feature.properties.end())
-            return {};
-        return it->second;
-        
-    // TODO include GeoJSONFeature-wrapped feature
-    }, expression::EvaluationContext { 0.0 } );
-}
-
 template <class GeometryTileFeature>
 bool Filter::operator()(const GeometryTileFeature& feature) const {
     return operator()(feature.getType(), feature.getID(), [&] (const auto& key) { return feature.getValue(key); }, expression::EvaluationContext { &feature });

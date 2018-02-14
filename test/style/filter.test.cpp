@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/util/feature.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/test/stub_geometry_tile_feature.hpp>
 
 #include <mbgl/style/filter.hpp>
 #include <mbgl/style/filter_evaluator.hpp>
@@ -17,10 +18,8 @@ Filter parse(const char * expression) {
     return *filter;
 }
 
-Feature feature(const PropertyMap& properties, const Geometry<double>& geometry = Point<double>()) {
-    Feature result { geometry };
-    result.properties = properties;
-    return result;
+StubGeometryTileFeature feature(const PropertyMap& properties) {
+    return StubGeometryTileFeature { properties };
 }
 
 TEST(Filter, EqualsString) {
@@ -46,15 +45,15 @@ TEST(Filter, EqualsNumber) {
 
 TEST(Filter, EqualsType) {
     Filter f = parse(R"(["==", "$type", "LineString"])");
-    ASSERT_FALSE(f(feature({{}}, Point<double>())));
-    ASSERT_TRUE(f(feature({{}}, LineString<double>())));
+    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {})));
 }
 
 TEST(Filter, InType) {
     Filter f = parse(R"(["in", "$type", "LineString", "Polygon"])");
-    ASSERT_FALSE(f(feature({{}}, Point<double>())));
-    ASSERT_TRUE(f(feature({{}}, LineString<double>())));
-    ASSERT_TRUE(f(feature({{}}, Polygon<double>())));
+    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::Polygon, {}, {})));
 }
 
 TEST(Filter, Any) {
@@ -110,14 +109,12 @@ TEST(Filter, NotHas) {
 }
 
 TEST(Filter, ID) {
-    Feature feature1 { Point<double>() };
-    feature1.id = { uint64_t(1234) };
+    StubGeometryTileFeature feature1 { FeatureIdentifier{ int64_t{ 1234 } }, {}, {}, {} };
 
     ASSERT_TRUE(parse("[\"==\", \"$id\", 1234]")(feature1));
     ASSERT_FALSE(parse("[\"==\", \"$id\", \"1234\"]")(feature1));
-
-    Feature feature2 { Point<double>() };
-    feature2.properties["id"] = { uint64_t(1234) };
+    
+    StubGeometryTileFeature feature2 { {{ "id", uint64_t(1234) }} };
 
     ASSERT_FALSE(parse("[\"==\", \"$id\", 1234]")(feature2));
 }
