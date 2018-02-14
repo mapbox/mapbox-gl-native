@@ -391,7 +391,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         }
         //#-end-example-code
         
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
     }
     
     // For testMGLMapView().
