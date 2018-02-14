@@ -22,46 +22,47 @@ namespace style {
 template <class PropertyAccessor>
 class FilterEvaluator {
 public:
-    const FeatureType featureType;
-    const optional<FeatureIdentifier> featureIdentifier;
-    const PropertyAccessor propertyAccessor;
+    const FeatureType _featureType;
+    const optional<FeatureIdentifier> _featureIdentifier;
+    const PropertyAccessor _propertyAccessor;
+    const expression::EvaluationContext context;
 
     bool operator()(const NullFilter&) const {
         return true;
     }
 
     bool operator()(const EqualsFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return actual && equal(*actual, filter.value);
     }
 
     bool operator()(const NotEqualsFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return !actual || !equal(*actual, filter.value);
     }
 
     bool operator()(const LessThanFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ < rhs_; });
     }
 
     bool operator()(const LessThanEqualsFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ <= rhs_; });
     }
 
     bool operator()(const GreaterThanFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ > rhs_; });
     }
 
     bool operator()(const GreaterThanEqualsFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ >= rhs_; });
     }
 
     bool operator()(const InFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         if (!actual)
             return false;
         for (const auto& v: filter.values) {
@@ -73,7 +74,7 @@ public:
     }
 
     bool operator()(const NotInFilter& filter) const {
-        optional<Value> actual = propertyAccessor(filter.key);
+        optional<Value> actual = context.feature->getValue(filter.key);
         if (!actual)
             return true;
         for (const auto& v: filter.values) {
@@ -112,25 +113,25 @@ public:
     }
 
     bool operator()(const HasFilter& filter) const {
-        return bool(propertyAccessor(filter.key));
+        return bool(context.feature->getValue(filter.key));
     }
 
     bool operator()(const NotHasFilter& filter) const {
-        return !propertyAccessor(filter.key);
+        return !context.feature->getValue(filter.key);
     }
 
 
     bool operator()(const TypeEqualsFilter& filter) const {
-        return featureType == filter.value;
+        return context.feature->getType() == filter.value;
     }
 
     bool operator()(const TypeNotEqualsFilter& filter) const {
-        return featureType != filter.value;
+        return context.feature->getType() != filter.value;
     }
 
     bool operator()(const TypeInFilter& filter) const {
         for (const auto& v: filter.values) {
-            if (featureType == v) {
+            if (context.feature->getType() == v) {
                 return true;
             }
         }
@@ -139,7 +140,7 @@ public:
 
     bool operator()(const TypeNotInFilter& filter) const {
         for (const auto& v: filter.values) {
-            if (featureType == v) {
+            if (context.feature->getType() == v) {
                 return false;
             }
         }
@@ -148,16 +149,16 @@ public:
 
 
     bool operator()(const IdentifierEqualsFilter& filter) const {
-        return featureIdentifier == filter.value;
+        return context.feature->getID() == filter.value;
     }
 
     bool operator()(const IdentifierNotEqualsFilter& filter) const {
-        return featureIdentifier != filter.value;
+        return context.feature->getID() != filter.value;
     }
 
     bool operator()(const IdentifierInFilter& filter) const {
         for (const auto& v: filter.values) {
-            if (featureIdentifier == v) {
+            if (context.feature->getID() == v) {
                 return true;
             }
         }
@@ -166,7 +167,7 @@ public:
 
     bool operator()(const IdentifierNotInFilter& filter) const {
         for (const auto& v: filter.values) {
-            if (featureIdentifier == v) {
+            if (context.feature->getID() == v) {
                 return false;
             }
         }
@@ -174,11 +175,11 @@ public:
     }
 
     bool operator()(const HasIdentifierFilter&) const {
-        return bool(featureIdentifier);
+        return bool(context.feature->getID());
     }
 
     bool operator()(const NotHasIdentifierFilter&) const {
-        return !featureIdentifier;
+        return !context.feature->getID();
     }
     
     bool operator()(const ExpressionFilter&) const {
@@ -249,8 +250,7 @@ bool Filter::operator()(const GeometryTileFeature& feature) const {
 template <class PropertyAccessor>
 // TODO add zoom & expression-compatible feature reference to this call
     bool Filter::operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, expression::EvaluationContext context) const {
-    (void) context;
-    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, id, accessor });
+    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, id, accessor, context });
 }
 
 } // namespace style
