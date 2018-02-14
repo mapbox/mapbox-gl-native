@@ -11,7 +11,7 @@ import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 
 /**
- * Client-side hillshading visualization based on DEM data. Currently, the implementation only supports Mapbox Terrain RGB tiles
+ * Client-side hillshading visualization based on DEM data. Currently, the implementation only supports Mapbox Terrain RGB and Mapzen Terrarium tiles.
  *
  * @see <a href="https://www.mapbox.com/mapbox-gl-style-spec/#layers-hillshade">The online documentation</a>
  */
