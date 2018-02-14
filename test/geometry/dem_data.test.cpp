@@ -15,9 +15,21 @@ auto fakeImage = [](Size s) {
     return img;
 };
 
-TEST(DEMData, Constructor) {
+TEST(DEMData, ConstructorMapbox) {
     PremultipliedImage image = fakeImage({16, 16});
     DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
+
+    EXPECT_EQ(demdata.dim, 16);
+    EXPECT_EQ(demdata.border, 8);
+    EXPECT_EQ(demdata.stride, 32);
+    EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
+    EXPECT_EQ(demdata.dim, 16);
+    EXPECT_EQ(demdata.border, 8);
+};
+
+TEST(DEMData, ConstructorTerrarium) {
+    PremultipliedImage image = fakeImage({16, 16});
+    DEMData demdata(image, Tileset::DEMEncoding::Terrarium);
 
     EXPECT_EQ(demdata.dim, 16);
     EXPECT_EQ(demdata.border, 8);
