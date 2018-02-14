@@ -85,8 +85,8 @@ std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOp
     return {};
 }
 
-void RenderRasterSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderRasterSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderRasterSource::dumpDebugLogs() const {
