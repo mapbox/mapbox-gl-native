@@ -36,7 +36,7 @@ void RenderRasterDEMSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     if (tileset != _tileset) {
         tileset = _tileset;
-
+        maxzoom = tileset->zoomRange.max;
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
         tilePyramid.tiles.clear();
