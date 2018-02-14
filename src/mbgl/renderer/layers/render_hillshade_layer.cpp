@@ -1,6 +1,7 @@
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/buckets/hillshade_bucket.hpp>
 #include <mbgl/renderer/render_tile.hpp>
+#include <mbgl/renderer/sources/render_raster_dem_source.hpp>
 #include <mbgl/renderer/paint_parameters.hpp>
 #include <mbgl/renderer/render_static_data.hpp>
 #include <mbgl/programs/programs.hpp>
@@ -55,10 +56,14 @@ bool RenderHillshadeLayer::hasTransition() const {
     return unevaluated.hasTransition();
 }
 
-void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
+void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src) {
     if (parameters.pass != RenderPass::Translucent && parameters.pass != RenderPass::Pass3D)
         return;
     
+    RenderRasterDEMSource* demsrc = dynamic_cast<RenderRasterDEMSource*>(src);
+    const uint8_t TERRAIN_RGB_MAXZOOM = 15;
+    const uint8_t maxzoom = demsrc != nullptr ? demsrc->getMaxZoom() : TERRAIN_RGB_MAXZOOM;
+
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
@@ -118,6 +123,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource*) {
                     uniforms::u_matrix::Value { mat },
                     uniforms::u_dimension::Value { {{uint16_t(tilesize * 2), uint16_t(tilesize * 2) }} },
                     uniforms::u_zoom::Value{ float(tile.id.canonical.z) },
+                    uniforms::u_maxzoom::Value{ float(maxzoom) },
                     uniforms::u_image::Value{ 0 }
                 },
                 parameters.staticData.rasterVertexBuffer,
