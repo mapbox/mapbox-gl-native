@@ -5,7 +5,7 @@
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
-#include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/transition_options.hpp>
 
 #include <string>

@@ -97,8 +97,8 @@ global.paintPropertyType = function (property, type) {
 global.propertyValueType = function (property) {
   if (isDataDriven(property)) {
     return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
-  } else if (property.name === 'heatmap-color') {
-    return `HeatmapColorPropertyValue`;
+  } else if (property.name === 'heatmap-color' || property.name === 'line-gradient') {
+    return `ColorRampPropertyValue`;
   } else {
     return `PropertyValue<${evaluatedType(property)}>`;
   }
@@ -114,7 +114,7 @@ global.defaultValue = function (property) {
     return '{}';
   }
 
-  if (property.name === 'heatmap-color') {
+  if (property.name === 'heatmap-color' || property.name === 'line-gradient') {
       return '{}';
   }
 

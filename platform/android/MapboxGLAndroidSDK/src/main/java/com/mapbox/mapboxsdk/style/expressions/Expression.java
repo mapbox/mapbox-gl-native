@@ -714,7 +714,7 @@ public class Expression<T> {
   }
 
   //
-  // Heatmap
+  // Color ramp properties
   //
 
   /**
@@ -726,6 +726,17 @@ public class Expression<T> {
    */
   public static Expression<Number> heatmapDensity() {
     return new Expression<>("heatmap-density");
+  }
+
+  /**
+   * Gets the progress along a line feature in a line layer, if `line-gradient`
+   * is used and correct distance properties are assigned to the feature.
+   * Can only be used in the `line-gradient` property.
+   *
+   * @return expression
+   */
+  public static Expression<Number> lineProgress() {
+    return new Expression<>("line-progress");
   }
 
   //

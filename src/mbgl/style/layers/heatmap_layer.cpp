@@ -6,7 +6,7 @@
 // for constructing default heatmap-color ramp expression from style JSON
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/json.hpp>
-#include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
 
 namespace mbgl {
 namespace style {
@@ -179,17 +179,17 @@ TransitionOptions HeatmapLayer::getHeatmapIntensityTransition() const {
     return impl().paint.template get<HeatmapIntensity>().options;
 }
 
-HeatmapColorPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
+ColorRampPropertyValue HeatmapLayer::getDefaultHeatmapColor() {
     conversion::Error error;
     std::string rawValue = R"JSON(["interpolate",["linear"],["heatmap-density"],0,"rgba(0, 0, 255, 0)",0.1,"royalblue",0.3,"cyan",0.5,"lime",0.7,"yellow",1,"red"])JSON";
-    return *conversion::convertJSON<HeatmapColorPropertyValue>(rawValue, error);
+    return *conversion::convertJSON<ColorRampPropertyValue>(rawValue, error);
 }
 
-HeatmapColorPropertyValue HeatmapLayer::getHeatmapColor() const {
+ColorRampPropertyValue HeatmapLayer::getHeatmapColor() const {
     return impl().paint.template get<HeatmapColor>().value;
 }
 
-void HeatmapLayer::setHeatmapColor(HeatmapColorPropertyValue value) {
+void HeatmapLayer::setHeatmapColor(ColorRampPropertyValue value) {
     if (value == getHeatmapColor())
         return;
     auto impl_ = mutableImpl();

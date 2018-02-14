@@ -53,13 +53,12 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeAccentColor(), propertyValue,
                        @"Setting hillshadeAccentColor to a camera expression should update hillshade-accent-color.");
         XCTAssertEqualObjects(layer.hillshadeAccentColor, functionExpression,
                               @"hillshadeAccentColor should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeAccentColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeAccentColor().isUndefined(),
@@ -106,13 +105,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeExaggeration(), propertyValue,
                        @"Setting hillshadeExaggeration to a camera expression should update hillshade-exaggeration.");
         XCTAssertEqualObjects(layer.hillshadeExaggeration, functionExpression,
                               @"hillshadeExaggeration should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeExaggeration = nil;
         XCTAssertTrue(rawLayer->getHillshadeExaggeration().isUndefined(),
@@ -159,13 +157,12 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeHighlightColor(), propertyValue,
                        @"Setting hillshadeHighlightColor to a camera expression should update hillshade-highlight-color.");
         XCTAssertEqualObjects(layer.hillshadeHighlightColor, functionExpression,
                               @"hillshadeHighlightColor should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeHighlightColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeHighlightColor().isUndefined(),
@@ -212,13 +209,12 @@
             { 18, mbgl::style::HillshadeIlluminationAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::HillshadeIlluminationAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeIlluminationAnchor(), propertyValue,
                        @"Setting hillshadeIlluminationAnchor to a camera expression should update hillshade-illumination-anchor.");
         XCTAssertEqualObjects(layer.hillshadeIlluminationAnchor, functionExpression,
                               @"hillshadeIlluminationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeIlluminationAnchor = nil;
         XCTAssertTrue(rawLayer->getHillshadeIlluminationAnchor().isUndefined(),
@@ -256,13 +252,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeIlluminationDirection(), propertyValue,
                        @"Setting hillshadeIlluminationDirection to a camera expression should update hillshade-illumination-direction.");
         XCTAssertEqualObjects(layer.hillshadeIlluminationDirection, functionExpression,
                               @"hillshadeIlluminationDirection should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeIlluminationDirection = nil;
         XCTAssertTrue(rawLayer->getHillshadeIlluminationDirection().isUndefined(),
@@ -300,13 +295,12 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHillshadeShadowColor(), propertyValue,
                        @"Setting hillshadeShadowColor to a camera expression should update hillshade-shadow-color.");
         XCTAssertEqualObjects(layer.hillshadeShadowColor, functionExpression,
                               @"hillshadeShadowColor should round-trip camera expressions.");
 
-                              
 
         layer.hillshadeShadowColor = nil;
         XCTAssertTrue(rawLayer->getHillshadeShadowColor().isUndefined(),

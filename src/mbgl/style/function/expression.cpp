@@ -28,9 +28,9 @@ public:
 };
 
 
-EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> heatmapDensity) const {
+EvaluationResult Expression::evaluate(optional<float> zoom, const Feature& feature, optional<double> rampEvaluationParameter) const {
     GeoJSONFeature f(feature);
-    return this->evaluate(EvaluationContext(zoom, &f, heatmapDensity));
+    return this->evaluate(EvaluationContext(zoom, &f, rampEvaluationParameter));
 }
 
 } // namespace expression

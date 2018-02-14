@@ -4,6 +4,7 @@
 #include <mbgl/style/layers/line_layer_impl.hpp>
 #include <mbgl/style/layers/line_layer_properties.hpp>
 #include <mbgl/programs/uniforms.hpp>
+#include <mbgl/util/image.hpp>
 
 namespace mbgl {
 
@@ -32,6 +33,8 @@ public:
             const float,
             const float) const override;
 
+    void updateColorRamp();
+
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
 
     // Paint properties
@@ -39,6 +42,9 @@ public:
     RenderLinePaintProperties::PossiblyEvaluated evaluated;
 
     const style::LineLayer::Impl& impl() const;
+
+    PremultipliedImage colorRamp;
+    optional<gl::Texture> colorRampTexture;
 
 private:
     float getLineWidth(const GeometryTileFeature&, const float) const;

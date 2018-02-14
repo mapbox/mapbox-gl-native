@@ -71,13 +71,12 @@
             { 18, false },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillAntialias(), propertyValue,
                        @"Setting fillAntialiased to a camera expression should update fill-antialias.");
         XCTAssertEqualObjects(layer.fillAntialiased, functionExpression,
                               @"fillAntialiased should round-trip camera expressions.");
 
-                              
 
         layer.fillAntialiased = nil;
         XCTAssertTrue(rawLayer->getFillAntialias().isUndefined(),
@@ -115,7 +114,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillColor(), propertyValue,
                        @"Setting fillColor to a camera expression should update fill-color.");
         XCTAssertEqualObjects(layer.fillColor, functionExpression,
@@ -144,7 +143,6 @@
                        @"Setting fillColor to a camera-data expression should update fill-color.");
         XCTAssertEqualObjects(layer.fillColor, functionExpression,
                               @"fillColor should round-trip camera-data expressions.");
-                              
 
         layer.fillColor = nil;
         XCTAssertTrue(rawLayer->getFillColor().isUndefined(),
@@ -185,7 +183,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillOpacity(), propertyValue,
                        @"Setting fillOpacity to a camera expression should update fill-opacity.");
         XCTAssertEqualObjects(layer.fillOpacity, functionExpression,
@@ -214,7 +212,6 @@
                        @"Setting fillOpacity to a camera-data expression should update fill-opacity.");
         XCTAssertEqualObjects(layer.fillOpacity, functionExpression,
                               @"fillOpacity should round-trip camera-data expressions.");
-                              
 
         layer.fillOpacity = nil;
         XCTAssertTrue(rawLayer->getFillOpacity().isUndefined(),
@@ -255,7 +252,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillOutlineColor(), propertyValue,
                        @"Setting fillOutlineColor to a camera expression should update fill-outline-color.");
         XCTAssertEqualObjects(layer.fillOutlineColor, functionExpression,
@@ -284,7 +281,6 @@
                        @"Setting fillOutlineColor to a camera-data expression should update fill-outline-color.");
         XCTAssertEqualObjects(layer.fillOutlineColor, functionExpression,
                               @"fillOutlineColor should round-trip camera-data expressions.");
-                              
 
         layer.fillOutlineColor = nil;
         XCTAssertTrue(rawLayer->getFillOutlineColor().isUndefined(),
@@ -325,13 +321,12 @@
             { 18, "Fill Pattern" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillPattern(), propertyValue,
                        @"Setting fillPattern to a camera expression should update fill-pattern.");
         XCTAssertEqualObjects(layer.fillPattern, functionExpression,
                               @"fillPattern should round-trip camera expressions.");
 
-                              
 
         layer.fillPattern = nil;
         XCTAssertTrue(rawLayer->getFillPattern().isUndefined(),
@@ -384,13 +379,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillTranslate(), propertyValue,
                        @"Setting fillTranslation to a camera expression should update fill-translate.");
         XCTAssertEqualObjects(layer.fillTranslation, functionExpression,
                               @"fillTranslation should round-trip camera expressions.");
 
-                              
 
         layer.fillTranslation = nil;
         XCTAssertTrue(rawLayer->getFillTranslate().isUndefined(),
@@ -428,13 +422,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillTranslateAnchor(), propertyValue,
                        @"Setting fillTranslationAnchor to a camera expression should update fill-translate-anchor.");
         XCTAssertEqualObjects(layer.fillTranslationAnchor, functionExpression,
                               @"fillTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.fillTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getFillTranslateAnchor().isUndefined(),

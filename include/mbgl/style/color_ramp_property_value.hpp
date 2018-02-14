@@ -11,21 +11,21 @@ namespace style {
  * Special-case implementation of (a subset of) the PropertyValue<T> interface
  * used for building the HeatmapColor paint property traits class.
  */
-class HeatmapColorPropertyValue {
+class ColorRampPropertyValue {
 private:
     std::shared_ptr<expression::Expression> value;
 
-    friend bool operator==(const HeatmapColorPropertyValue& lhs, const HeatmapColorPropertyValue& rhs) {
+    friend bool operator==(const ColorRampPropertyValue& lhs, const ColorRampPropertyValue& rhs) {
         return (lhs.isUndefined() && rhs.isUndefined()) || (lhs.value && rhs.value && *(lhs.value) == *(rhs.value));
     }
 
-    friend bool operator!=(const HeatmapColorPropertyValue& lhs, const HeatmapColorPropertyValue& rhs) {
+    friend bool operator!=(const ColorRampPropertyValue& lhs, const ColorRampPropertyValue& rhs) {
         return !(lhs == rhs);
     }
 
 public:
-    HeatmapColorPropertyValue() : value(nullptr) {}
-    HeatmapColorPropertyValue(std::shared_ptr<expression::Expression> value_) : value(std::move(value_)) {}
+    ColorRampPropertyValue() : value(nullptr) {}
+    ColorRampPropertyValue(std::shared_ptr<expression::Expression> value_) : value(std::move(value_)) {}
 
     bool isUndefined() const { return value.get() == nullptr; }
 
@@ -33,13 +33,13 @@ public:
     template <typename Evaluator>
     Color evaluate(const Evaluator&, TimePoint = {}) const { return {}; }
 
-    Color evaluate(double heatmapDensity) const {
-        const auto result = value->evaluate(expression::EvaluationContext({}, nullptr, {heatmapDensity}));
+    Color evaluate(double rampEvaluationParameter) const {
+        const auto result = value->evaluate(expression::EvaluationContext({}, nullptr, {rampEvaluationParameter}));
         return *expression::fromExpressionValue<Color>(*result);
     }
 
     bool isDataDriven()     const { return false; }
-    bool hasDataDrivenPropertyDifference(const HeatmapColorPropertyValue&) const { return false; }
+    bool hasDataDrivenPropertyDifference(const ColorRampPropertyValue&) const { return false; }
     
     const expression::Expression& getExpression() const { return *value; }
 };

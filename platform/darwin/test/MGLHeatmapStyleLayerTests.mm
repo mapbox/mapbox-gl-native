@@ -71,13 +71,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHeatmapIntensity(), propertyValue,
                        @"Setting heatmapIntensity to a camera expression should update heatmap-intensity.");
         XCTAssertEqualObjects(layer.heatmapIntensity, functionExpression,
                               @"heatmapIntensity should round-trip camera expressions.");
 
-                              
 
         layer.heatmapIntensity = nil;
         XCTAssertTrue(rawLayer->getHeatmapIntensity().isUndefined(),
@@ -124,13 +123,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHeatmapOpacity(), propertyValue,
                        @"Setting heatmapOpacity to a camera expression should update heatmap-opacity.");
         XCTAssertEqualObjects(layer.heatmapOpacity, functionExpression,
                               @"heatmapOpacity should round-trip camera expressions.");
 
-                              
 
         layer.heatmapOpacity = nil;
         XCTAssertTrue(rawLayer->getHeatmapOpacity().isUndefined(),
@@ -177,7 +175,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a camera expression should update heatmap-radius.");
         XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
@@ -206,7 +204,6 @@
                        @"Setting heatmapRadius to a camera-data expression should update heatmap-radius.");
         XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
                               @"heatmapRadius should round-trip camera-data expressions.");
-                              
 
         layer.heatmapRadius = nil;
         XCTAssertTrue(rawLayer->getHeatmapRadius().isUndefined(),
@@ -247,7 +244,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a camera expression should update heatmap-weight.");
         XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
@@ -276,7 +273,6 @@
                        @"Setting heatmapWeight to a camera-data expression should update heatmap-weight.");
         XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
                               @"heatmapWeight should round-trip camera-data expressions.");
-                              
 
         layer.heatmapWeight = nil;
         XCTAssertTrue(rawLayer->getHeatmapWeight().isUndefined(),

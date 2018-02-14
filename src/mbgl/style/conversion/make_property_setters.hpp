@@ -115,6 +115,8 @@ inline auto makePaintPropertySetters() {
     result["line-dasharray-transition"] = &setTransition<LineLayer, &LineLayer::setLineDasharrayTransition>;
     result["line-pattern"] = &setProperty<LineLayer, PropertyValue<std::string>, &LineLayer::setLinePattern>;
     result["line-pattern-transition"] = &setTransition<LineLayer, &LineLayer::setLinePatternTransition>;
+    result["line-gradient"] = &setProperty<LineLayer, ColorRampPropertyValue, &LineLayer::setLineGradient>;
+    result["line-gradient-transition"] = &setTransition<LineLayer, &LineLayer::setLineGradientTransition>;
 
     result["icon-opacity"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setIconOpacity>;
     result["icon-opacity-transition"] = &setTransition<SymbolLayer, &SymbolLayer::setIconOpacityTransition>;
@@ -174,7 +176,7 @@ inline auto makePaintPropertySetters() {
     result["heatmap-weight-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapWeightTransition>;
     result["heatmap-intensity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapIntensity>;
     result["heatmap-intensity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapIntensityTransition>;
-    result["heatmap-color"] = &setProperty<HeatmapLayer, HeatmapColorPropertyValue, &HeatmapLayer::setHeatmapColor>;
+    result["heatmap-color"] = &setProperty<HeatmapLayer, ColorRampPropertyValue, &HeatmapLayer::setHeatmapColor>;
     result["heatmap-color-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapColorTransition>;
     result["heatmap-opacity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapOpacity>;
     result["heatmap-opacity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapOpacityTransition>;

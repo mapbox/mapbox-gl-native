@@ -1,12 +1,12 @@
 // NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.
 
-#include <mbgl/shaders/line.hpp>
+#include <mbgl/shaders/line_gradient.hpp>
 
 namespace mbgl {
 namespace shaders {
 
-const char* line::name = "line";
-const char* line::vertexSource = R"MBGL_SHADER(
+const char* line_gradient::name = "line_gradient";
+const char* line_gradient::vertexSource = R"MBGL_SHADER(
 
 
 // the distance over which the line edge fades out.
@@ -174,7 +174,9 @@ void main() {
 }
 
 )MBGL_SHADER";
-const char* line::fragmentSource = R"MBGL_SHADER(
+const char* line_gradient::fragmentSource = R"MBGL_SHADER(
+#define MAX_LINE_DISTANCE 32767.0
+
 
 #ifndef HAS_UNIFORM_u_color
 varying highp vec4 color;
@@ -197,9 +199,12 @@ uniform lowp float u_opacity;
 #endif
 
 
+uniform sampler2D u_image;
+
 varying vec2 v_width2;
 varying vec2 v_normal;
 varying float v_gamma_scale;
+varying float v_linesofar;
 
 void main() {
     
@@ -226,6 +231,10 @@ void main() {
     // (v_width2.s)
     float blur2 = (blur + 1.0 / DEVICE_PIXEL_RATIO) * v_gamma_scale;
     float alpha = clamp(min(dist - (v_width2.t - blur2), v_width2.s - dist) / blur2, 0.0, 1.0);
+
+    // For gradient lines, v_linesofar is the ratio along the entire line,
+    // scaled to [0, 2^15), and the gradient ramp is stored in a texture.
+    color = texture2D(u_image, vec2(v_linesofar / MAX_LINE_DISTANCE, 0.5));
 
     gl_FragColor = color * (alpha * opacity);
 

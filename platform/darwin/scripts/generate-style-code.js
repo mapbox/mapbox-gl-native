@@ -308,7 +308,8 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';
-        const inputVariable = property.name === 'heatmap-color' ? '$heatmapDensity' : '$zoomLevel';
+        const inputVariable = property.name === 'heatmap-color' ? '$heatmapDensity' :
+            property.name === 'line-gradient' ? '$lineProgress': '$zoomLevel';
         if (property["property-function"]) {
             doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable and/or feature attributes\n`;
         } else if (property.function === "interpolated") {

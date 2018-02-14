@@ -44,6 +44,20 @@ LineProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& p
     );
 }
 
+LineGradientProgram::UniformValues
+LineGradientProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
+                           const RenderTile& tile,
+                           const TransformState& state,
+                           const std::array<float, 2>& pixelsToGLUnits) {
+    return makeValues<LineGradientProgram::UniformValues>(
+        properties,
+        tile,
+        state,
+        pixelsToGLUnits,
+        uniforms::u_image::Value{ 0 }
+    );
+}
+
 LineSDFProgram::UniformValues
 LineSDFProgram::uniformValues(const RenderLinePaintProperties::PossiblyEvaluated& properties,
                               float pixelRatio,

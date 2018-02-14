@@ -11,6 +11,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/util/color_ramp.hpp>
 
 namespace mbgl {
 
@@ -146,15 +147,7 @@ void RenderHeatmapLayer::updateColorRamp() {
         colorValue = HeatmapLayer::getDefaultHeatmapColor();
     }
 
-    const auto length = colorRamp.bytes();
-
-    for (uint32_t i = 0; i < length; i += 4) {
-        const auto color = colorValue.evaluate(static_cast<double>(i) / length);
-        colorRamp.data[i + 0] = std::floor(color.r * 255);
-        colorRamp.data[i + 1] = std::floor(color.g * 255);
-        colorRamp.data[i + 2] = std::floor(color.b * 255);
-        colorRamp.data[i + 3] = std::floor(color.a * 255);
-    }
+    util::renderColorRamp(colorRamp, colorValue);
 
     if (colorRampTexture) {
         colorRampTexture = nullopt;

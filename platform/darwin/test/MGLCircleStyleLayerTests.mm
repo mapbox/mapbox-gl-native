@@ -71,7 +71,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleBlur(), propertyValue,
                        @"Setting circleBlur to a camera expression should update circle-blur.");
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
@@ -100,7 +100,6 @@
                        @"Setting circleBlur to a camera-data expression should update circle-blur.");
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
                               @"circleBlur should round-trip camera-data expressions.");
-                              
 
         layer.circleBlur = nil;
         XCTAssertTrue(rawLayer->getCircleBlur().isUndefined(),
@@ -141,7 +140,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleColor(), propertyValue,
                        @"Setting circleColor to a camera expression should update circle-color.");
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
@@ -170,7 +169,6 @@
                        @"Setting circleColor to a camera-data expression should update circle-color.");
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
                               @"circleColor should round-trip camera-data expressions.");
-                              
 
         layer.circleColor = nil;
         XCTAssertTrue(rawLayer->getCircleColor().isUndefined(),
@@ -211,7 +209,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleOpacity(), propertyValue,
                        @"Setting circleOpacity to a camera expression should update circle-opacity.");
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
@@ -240,7 +238,6 @@
                        @"Setting circleOpacity to a camera-data expression should update circle-opacity.");
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
                               @"circleOpacity should round-trip camera-data expressions.");
-                              
 
         layer.circleOpacity = nil;
         XCTAssertTrue(rawLayer->getCircleOpacity().isUndefined(),
@@ -281,13 +278,12 @@
             { 18, mbgl::style::AlignmentType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCirclePitchAlignment(), propertyValue,
                        @"Setting circlePitchAlignment to a camera expression should update circle-pitch-alignment.");
         XCTAssertEqualObjects(layer.circlePitchAlignment, functionExpression,
                               @"circlePitchAlignment should round-trip camera expressions.");
 
-                              
 
         layer.circlePitchAlignment = nil;
         XCTAssertTrue(rawLayer->getCirclePitchAlignment().isUndefined(),
@@ -325,7 +321,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleRadius(), propertyValue,
                        @"Setting circleRadius to a camera expression should update circle-radius.");
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
@@ -354,7 +350,6 @@
                        @"Setting circleRadius to a camera-data expression should update circle-radius.");
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
                               @"circleRadius should round-trip camera-data expressions.");
-                              
 
         layer.circleRadius = nil;
         XCTAssertTrue(rawLayer->getCircleRadius().isUndefined(),
@@ -395,13 +390,12 @@
             { 18, mbgl::style::CirclePitchScaleType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::CirclePitchScaleType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCirclePitchScale(), propertyValue,
                        @"Setting circleScaleAlignment to a camera expression should update circle-pitch-scale.");
         XCTAssertEqualObjects(layer.circleScaleAlignment, functionExpression,
                               @"circleScaleAlignment should round-trip camera expressions.");
 
-                              
 
         layer.circleScaleAlignment = nil;
         XCTAssertTrue(rawLayer->getCirclePitchScale().isUndefined(),
@@ -439,7 +433,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeColor(), propertyValue,
                        @"Setting circleStrokeColor to a camera expression should update circle-stroke-color.");
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
@@ -468,7 +462,6 @@
                        @"Setting circleStrokeColor to a camera-data expression should update circle-stroke-color.");
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
                               @"circleStrokeColor should round-trip camera-data expressions.");
-                              
 
         layer.circleStrokeColor = nil;
         XCTAssertTrue(rawLayer->getCircleStrokeColor().isUndefined(),
@@ -509,7 +502,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeOpacity(), propertyValue,
                        @"Setting circleStrokeOpacity to a camera expression should update circle-stroke-opacity.");
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
@@ -538,7 +531,6 @@
                        @"Setting circleStrokeOpacity to a camera-data expression should update circle-stroke-opacity.");
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
                               @"circleStrokeOpacity should round-trip camera-data expressions.");
-                              
 
         layer.circleStrokeOpacity = nil;
         XCTAssertTrue(rawLayer->getCircleStrokeOpacity().isUndefined(),
@@ -579,7 +571,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleStrokeWidth(), propertyValue,
                        @"Setting circleStrokeWidth to a camera expression should update circle-stroke-width.");
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
@@ -608,7 +600,6 @@
                        @"Setting circleStrokeWidth to a camera-data expression should update circle-stroke-width.");
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
                               @"circleStrokeWidth should round-trip camera-data expressions.");
-                              
 
         layer.circleStrokeWidth = nil;
         XCTAssertTrue(rawLayer->getCircleStrokeWidth().isUndefined(),
@@ -655,13 +646,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleTranslate(), propertyValue,
                        @"Setting circleTranslation to a camera expression should update circle-translate.");
         XCTAssertEqualObjects(layer.circleTranslation, functionExpression,
                               @"circleTranslation should round-trip camera expressions.");
 
-                              
 
         layer.circleTranslation = nil;
         XCTAssertTrue(rawLayer->getCircleTranslate().isUndefined(),
@@ -699,13 +689,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getCircleTranslateAnchor(), propertyValue,
                        @"Setting circleTranslationAnchor to a camera expression should update circle-translate-anchor.");
         XCTAssertEqualObjects(layer.circleTranslationAnchor, functionExpression,
                               @"circleTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.circleTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getCircleTranslateAnchor().isUndefined(),

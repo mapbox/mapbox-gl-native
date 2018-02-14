@@ -71,7 +71,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a camera expression should update fill-extrusion-base.");
         XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
@@ -100,7 +100,6 @@
                        @"Setting fillExtrusionBase to a camera-data expression should update fill-extrusion-base.");
         XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
                               @"fillExtrusionBase should round-trip camera-data expressions.");
-                              
 
         layer.fillExtrusionBase = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionBase().isUndefined(),
@@ -141,7 +140,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a camera expression should update fill-extrusion-color.");
         XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
@@ -170,7 +169,6 @@
                        @"Setting fillExtrusionColor to a camera-data expression should update fill-extrusion-color.");
         XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
                               @"fillExtrusionColor should round-trip camera-data expressions.");
-                              
 
         layer.fillExtrusionColor = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionColor().isUndefined(),
@@ -211,7 +209,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a camera expression should update fill-extrusion-height.");
         XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
@@ -240,7 +238,6 @@
                        @"Setting fillExtrusionHeight to a camera-data expression should update fill-extrusion-height.");
         XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
                               @"fillExtrusionHeight should round-trip camera-data expressions.");
-                              
 
         layer.fillExtrusionHeight = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionHeight().isUndefined(),
@@ -281,13 +278,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionOpacity(), propertyValue,
                        @"Setting fillExtrusionOpacity to a camera expression should update fill-extrusion-opacity.");
         XCTAssertEqualObjects(layer.fillExtrusionOpacity, functionExpression,
                               @"fillExtrusionOpacity should round-trip camera expressions.");
 
-                              
 
         layer.fillExtrusionOpacity = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionOpacity().isUndefined(),
@@ -334,13 +330,12 @@
             { 18, "Fill Extrusion Pattern" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionPattern(), propertyValue,
                        @"Setting fillExtrusionPattern to a camera expression should update fill-extrusion-pattern.");
         XCTAssertEqualObjects(layer.fillExtrusionPattern, functionExpression,
                               @"fillExtrusionPattern should round-trip camera expressions.");
 
-                              
 
         layer.fillExtrusionPattern = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionPattern().isUndefined(),
@@ -393,13 +388,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionTranslate(), propertyValue,
                        @"Setting fillExtrusionTranslation to a camera expression should update fill-extrusion-translate.");
         XCTAssertEqualObjects(layer.fillExtrusionTranslation, functionExpression,
                               @"fillExtrusionTranslation should round-trip camera expressions.");
 
-                              
 
         layer.fillExtrusionTranslation = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslate().isUndefined(),
@@ -437,13 +431,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getFillExtrusionTranslateAnchor(), propertyValue,
                        @"Setting fillExtrusionTranslationAnchor to a camera expression should update fill-extrusion-translate-anchor.");
         XCTAssertEqualObjects(layer.fillExtrusionTranslationAnchor, functionExpression,
                               @"fillExtrusionTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.fillExtrusionTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getFillExtrusionTranslateAnchor().isUndefined(),

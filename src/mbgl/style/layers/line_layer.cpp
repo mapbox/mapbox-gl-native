@@ -429,5 +429,32 @@ TransitionOptions LineLayer::getLinePatternTransition() const {
     return impl().paint.template get<LinePattern>().options;
 }
 
+ColorRampPropertyValue LineLayer::getDefaultLineGradient() {
+    return { {} };
+}
+
+ColorRampPropertyValue LineLayer::getLineGradient() const {
+    return impl().paint.template get<LineGradient>().value;
+}
+
+void LineLayer::setLineGradient(ColorRampPropertyValue value) {
+    if (value == getLineGradient())
+        return;
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<LineGradient>().value = value;
+    baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
+}
+
+void LineLayer::setLineGradientTransition(const TransitionOptions& options) {
+    auto impl_ = mutableImpl();
+    impl_->paint.template get<LineGradient>().options = options;
+    baseImpl = std::move(impl_);
+}
+
+TransitionOptions LineLayer::getLineGradientTransition() const {
+    return impl().paint.template get<LineGradient>().options;
+}
+
 } // namespace style
 } // namespace mbgl

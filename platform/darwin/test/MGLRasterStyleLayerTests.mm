@@ -53,13 +53,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterBrightnessMax(), propertyValue,
                        @"Setting maximumRasterBrightness to a camera expression should update raster-brightness-max.");
         XCTAssertEqualObjects(layer.maximumRasterBrightness, functionExpression,
                               @"maximumRasterBrightness should round-trip camera expressions.");
 
-                              
 
         layer.maximumRasterBrightness = nil;
         XCTAssertTrue(rawLayer->getRasterBrightnessMax().isUndefined(),
@@ -97,13 +96,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterBrightnessMin(), propertyValue,
                        @"Setting minimumRasterBrightness to a camera expression should update raster-brightness-min.");
         XCTAssertEqualObjects(layer.minimumRasterBrightness, functionExpression,
                               @"minimumRasterBrightness should round-trip camera expressions.");
 
-                              
 
         layer.minimumRasterBrightness = nil;
         XCTAssertTrue(rawLayer->getRasterBrightnessMin().isUndefined(),
@@ -141,13 +139,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterContrast(), propertyValue,
                        @"Setting rasterContrast to a camera expression should update raster-contrast.");
         XCTAssertEqualObjects(layer.rasterContrast, functionExpression,
                               @"rasterContrast should round-trip camera expressions.");
 
-                              
 
         layer.rasterContrast = nil;
         XCTAssertTrue(rawLayer->getRasterContrast().isUndefined(),
@@ -194,13 +191,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterFadeDuration(), propertyValue,
                        @"Setting rasterFadeDuration to a camera expression should update raster-fade-duration.");
         XCTAssertEqualObjects(layer.rasterFadeDuration, functionExpression,
                               @"rasterFadeDuration should round-trip camera expressions.");
 
-                              
 
         layer.rasterFadeDuration = nil;
         XCTAssertTrue(rawLayer->getRasterFadeDuration().isUndefined(),
@@ -238,13 +234,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterHueRotate(), propertyValue,
                        @"Setting rasterHueRotation to a camera expression should update raster-hue-rotate.");
         XCTAssertEqualObjects(layer.rasterHueRotation, functionExpression,
                               @"rasterHueRotation should round-trip camera expressions.");
 
-                              
 
         layer.rasterHueRotation = nil;
         XCTAssertTrue(rawLayer->getRasterHueRotate().isUndefined(),
@@ -282,13 +277,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterOpacity(), propertyValue,
                        @"Setting rasterOpacity to a camera expression should update raster-opacity.");
         XCTAssertEqualObjects(layer.rasterOpacity, functionExpression,
                               @"rasterOpacity should round-trip camera expressions.");
 
-                              
 
         layer.rasterOpacity = nil;
         XCTAssertTrue(rawLayer->getRasterOpacity().isUndefined(),
@@ -335,13 +329,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getRasterSaturation(), propertyValue,
                        @"Setting rasterSaturation to a camera expression should update raster-saturation.");
         XCTAssertEqualObjects(layer.rasterSaturation, functionExpression,
                               @"rasterSaturation should round-trip camera expressions.");
 
-                              
 
         layer.rasterSaturation = nil;
         XCTAssertTrue(rawLayer->getRasterSaturation().isUndefined(),

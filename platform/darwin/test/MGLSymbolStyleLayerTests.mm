@@ -71,13 +71,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconAllowOverlap(), propertyValue,
                        @"Setting iconAllowsOverlap to a camera expression should update icon-allow-overlap.");
         XCTAssertEqualObjects(layer.iconAllowsOverlap, functionExpression,
                               @"iconAllowsOverlap should round-trip camera expressions.");
 
-                              
 
         layer.iconAllowsOverlap = nil;
         XCTAssertTrue(rawLayer->getIconAllowOverlap().isUndefined(),
@@ -115,13 +114,12 @@
             { 18, mbgl::style::SymbolAnchorType::BottomRight },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::SymbolAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconAnchor(), propertyValue,
                        @"Setting iconAnchor to a camera expression should update icon-anchor.");
         XCTAssertEqualObjects(layer.iconAnchor, functionExpression,
                               @"iconAnchor should round-trip camera expressions.");
 
-                              
 
         layer.iconAnchor = nil;
         XCTAssertTrue(rawLayer->getIconAnchor().isUndefined(),
@@ -153,13 +151,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconIgnorePlacement(), propertyValue,
                        @"Setting iconIgnoresPlacement to a camera expression should update icon-ignore-placement.");
         XCTAssertEqualObjects(layer.iconIgnoresPlacement, functionExpression,
                               @"iconIgnoresPlacement should round-trip camera expressions.");
 
-                              
 
         layer.iconIgnoresPlacement = nil;
         XCTAssertTrue(rawLayer->getIconIgnorePlacement().isUndefined(),
@@ -197,13 +194,12 @@
             { 18, "Icon Image" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconImage(), propertyValue,
                        @"Setting iconImageName to a camera expression should update icon-image.");
         XCTAssertEqualObjects(layer.iconImageName, functionExpression,
                               @"iconImageName should round-trip camera expressions.");
 
-                              
 
         layer.iconImageName = nil;
         XCTAssertTrue(rawLayer->getIconImage().isUndefined(),
@@ -241,7 +237,7 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconOffset(), propertyValue,
                        @"Setting iconOffset to a camera expression should update icon-offset.");
         XCTAssertEqualObjects(layer.iconOffset, functionExpression,
@@ -270,7 +266,6 @@
                        @"Setting iconOffset to a camera-data expression should update icon-offset.");
         XCTAssertEqualObjects(layer.iconOffset, functionExpression,
                               @"iconOffset should round-trip camera-data expressions.");
-                              
 
         layer.iconOffset = nil;
         XCTAssertTrue(rawLayer->getIconOffset().isUndefined(),
@@ -302,13 +297,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconOptional(), propertyValue,
                        @"Setting iconOptional to a camera expression should update icon-optional.");
         XCTAssertEqualObjects(layer.iconOptional, functionExpression,
                               @"iconOptional should round-trip camera expressions.");
 
-                              
 
         layer.iconOptional = nil;
         XCTAssertTrue(rawLayer->getIconOptional().isUndefined(),
@@ -346,13 +340,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconPadding(), propertyValue,
                        @"Setting iconPadding to a camera expression should update icon-padding.");
         XCTAssertEqualObjects(layer.iconPadding, functionExpression,
                               @"iconPadding should round-trip camera expressions.");
 
-                              
 
         layer.iconPadding = nil;
         XCTAssertTrue(rawLayer->getIconPadding().isUndefined(),
@@ -390,13 +383,12 @@
             { 18, mbgl::style::AlignmentType::Auto },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconPitchAlignment(), propertyValue,
                        @"Setting iconPitchAlignment to a camera expression should update icon-pitch-alignment.");
         XCTAssertEqualObjects(layer.iconPitchAlignment, functionExpression,
                               @"iconPitchAlignment should round-trip camera expressions.");
 
-                              
 
         layer.iconPitchAlignment = nil;
         XCTAssertTrue(rawLayer->getIconPitchAlignment().isUndefined(),
@@ -434,7 +426,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconRotate(), propertyValue,
                        @"Setting iconRotation to a camera expression should update icon-rotate.");
         XCTAssertEqualObjects(layer.iconRotation, functionExpression,
@@ -463,7 +455,6 @@
                        @"Setting iconRotation to a camera-data expression should update icon-rotate.");
         XCTAssertEqualObjects(layer.iconRotation, functionExpression,
                               @"iconRotation should round-trip camera-data expressions.");
-                              
 
         layer.iconRotation = nil;
         XCTAssertTrue(rawLayer->getIconRotate().isUndefined(),
@@ -495,13 +486,12 @@
             { 18, mbgl::style::AlignmentType::Auto },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconRotationAlignment(), propertyValue,
                        @"Setting iconRotationAlignment to a camera expression should update icon-rotation-alignment.");
         XCTAssertEqualObjects(layer.iconRotationAlignment, functionExpression,
                               @"iconRotationAlignment should round-trip camera expressions.");
 
-                              
 
         layer.iconRotationAlignment = nil;
         XCTAssertTrue(rawLayer->getIconRotationAlignment().isUndefined(),
@@ -539,7 +529,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
                        @"Setting iconScale to a camera expression should update icon-size.");
         XCTAssertEqualObjects(layer.iconScale, functionExpression,
@@ -568,7 +558,6 @@
                        @"Setting iconScale to a camera-data expression should update icon-size.");
         XCTAssertEqualObjects(layer.iconScale, functionExpression,
                               @"iconScale should round-trip camera-data expressions.");
-                              
 
         layer.iconScale = nil;
         XCTAssertTrue(rawLayer->getIconSize().isUndefined(),
@@ -600,13 +589,12 @@
             { 18, mbgl::style::IconTextFitType::Both },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::IconTextFitType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconTextFit(), propertyValue,
                        @"Setting iconTextFit to a camera expression should update icon-text-fit.");
         XCTAssertEqualObjects(layer.iconTextFit, functionExpression,
                               @"iconTextFit should round-trip camera expressions.");
 
-                              
 
         layer.iconTextFit = nil;
         XCTAssertTrue(rawLayer->getIconTextFit().isUndefined(),
@@ -650,13 +638,12 @@
             { 18, { 1, 1, 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 4>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconTextFitPadding(), propertyValue,
                        @"Setting iconTextFitPadding to a camera expression should update icon-text-fit-padding.");
         XCTAssertEqualObjects(layer.iconTextFitPadding, functionExpression,
                               @"iconTextFitPadding should round-trip camera expressions.");
 
-                              
 
         layer.iconTextFitPadding = nil;
         XCTAssertTrue(rawLayer->getIconTextFitPadding().isUndefined(),
@@ -694,13 +681,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconKeepUpright(), propertyValue,
                        @"Setting keepsIconUpright to a camera expression should update icon-keep-upright.");
         XCTAssertEqualObjects(layer.keepsIconUpright, functionExpression,
                               @"keepsIconUpright should round-trip camera expressions.");
 
-                              
 
         layer.keepsIconUpright = nil;
         XCTAssertTrue(rawLayer->getIconKeepUpright().isUndefined(),
@@ -738,13 +724,12 @@
             { 18, false },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextKeepUpright(), propertyValue,
                        @"Setting keepsTextUpright to a camera expression should update text-keep-upright.");
         XCTAssertEqualObjects(layer.keepsTextUpright, functionExpression,
                               @"keepsTextUpright should round-trip camera expressions.");
 
-                              
 
         layer.keepsTextUpright = nil;
         XCTAssertTrue(rawLayer->getTextKeepUpright().isUndefined(),
@@ -782,13 +767,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextMaxAngle(), propertyValue,
                        @"Setting maximumTextAngle to a camera expression should update text-max-angle.");
         XCTAssertEqualObjects(layer.maximumTextAngle, functionExpression,
                               @"maximumTextAngle should round-trip camera expressions.");
 
-                              
 
         layer.maximumTextAngle = nil;
         XCTAssertTrue(rawLayer->getTextMaxAngle().isUndefined(),
@@ -826,7 +810,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
                        @"Setting maximumTextWidth to a camera expression should update text-max-width.");
         XCTAssertEqualObjects(layer.maximumTextWidth, functionExpression,
@@ -855,7 +839,6 @@
                        @"Setting maximumTextWidth to a camera-data expression should update text-max-width.");
         XCTAssertEqualObjects(layer.maximumTextWidth, functionExpression,
                               @"maximumTextWidth should round-trip camera-data expressions.");
-                              
 
         layer.maximumTextWidth = nil;
         XCTAssertTrue(rawLayer->getTextMaxWidth().isUndefined(),
@@ -887,13 +870,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getSymbolAvoidEdges(), propertyValue,
                        @"Setting symbolAvoidsEdges to a camera expression should update symbol-avoid-edges.");
         XCTAssertEqualObjects(layer.symbolAvoidsEdges, functionExpression,
                               @"symbolAvoidsEdges should round-trip camera expressions.");
 
-                              
 
         layer.symbolAvoidsEdges = nil;
         XCTAssertTrue(rawLayer->getSymbolAvoidEdges().isUndefined(),
@@ -931,13 +913,12 @@
             { 18, mbgl::style::SymbolPlacementType::Line },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::SymbolPlacementType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getSymbolPlacement(), propertyValue,
                        @"Setting symbolPlacement to a camera expression should update symbol-placement.");
         XCTAssertEqualObjects(layer.symbolPlacement, functionExpression,
                               @"symbolPlacement should round-trip camera expressions.");
 
-                              
 
         layer.symbolPlacement = nil;
         XCTAssertTrue(rawLayer->getSymbolPlacement().isUndefined(),
@@ -975,13 +956,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getSymbolSpacing(), propertyValue,
                        @"Setting symbolSpacing to a camera expression should update symbol-spacing.");
         XCTAssertEqualObjects(layer.symbolSpacing, functionExpression,
                               @"symbolSpacing should round-trip camera expressions.");
 
-                              
 
         layer.symbolSpacing = nil;
         XCTAssertTrue(rawLayer->getSymbolSpacing().isUndefined(),
@@ -1019,13 +999,12 @@
             { 18, "Text Field" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextField(), propertyValue,
                        @"Setting text to a camera expression should update text-field.");
         XCTAssertEqualObjects(layer.text, functionExpression,
                               @"text should round-trip camera expressions.");
 
-                              
 
         layer.text = nil;
         XCTAssertTrue(rawLayer->getTextField().isUndefined(),
@@ -1057,13 +1036,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextAllowOverlap(), propertyValue,
                        @"Setting textAllowsOverlap to a camera expression should update text-allow-overlap.");
         XCTAssertEqualObjects(layer.textAllowsOverlap, functionExpression,
                               @"textAllowsOverlap should round-trip camera expressions.");
 
-                              
 
         layer.textAllowsOverlap = nil;
         XCTAssertTrue(rawLayer->getTextAllowOverlap().isUndefined(),
@@ -1101,13 +1079,12 @@
             { 18, mbgl::style::SymbolAnchorType::BottomRight },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::SymbolAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextAnchor(), propertyValue,
                        @"Setting textAnchor to a camera expression should update text-anchor.");
         XCTAssertEqualObjects(layer.textAnchor, functionExpression,
                               @"textAnchor should round-trip camera expressions.");
 
-                              
 
         layer.textAnchor = nil;
         XCTAssertTrue(rawLayer->getTextAnchor().isUndefined(),
@@ -1139,13 +1116,12 @@
             { 18, { "Text Font", "Tnof Txet" } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::vector<std::string>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextFont(), propertyValue,
                        @"Setting textFontNames to a camera expression should update text-font.");
         XCTAssertEqualObjects(layer.textFontNames, functionExpression,
                               @"textFontNames should round-trip camera expressions.");
 
-                              
 
         layer.textFontNames = nil;
         XCTAssertTrue(rawLayer->getTextFont().isUndefined(),
@@ -1177,7 +1153,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
                        @"Setting textFontSize to a camera expression should update text-size.");
         XCTAssertEqualObjects(layer.textFontSize, functionExpression,
@@ -1206,7 +1182,6 @@
                        @"Setting textFontSize to a camera-data expression should update text-size.");
         XCTAssertEqualObjects(layer.textFontSize, functionExpression,
                               @"textFontSize should round-trip camera-data expressions.");
-                              
 
         layer.textFontSize = nil;
         XCTAssertTrue(rawLayer->getTextSize().isUndefined(),
@@ -1238,13 +1213,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextIgnorePlacement(), propertyValue,
                        @"Setting textIgnoresPlacement to a camera expression should update text-ignore-placement.");
         XCTAssertEqualObjects(layer.textIgnoresPlacement, functionExpression,
                               @"textIgnoresPlacement should round-trip camera expressions.");
 
-                              
 
         layer.textIgnoresPlacement = nil;
         XCTAssertTrue(rawLayer->getTextIgnorePlacement().isUndefined(),
@@ -1282,13 +1256,12 @@
             { 18, mbgl::style::TextJustifyType::Right },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TextJustifyType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextJustify(), propertyValue,
                        @"Setting textJustification to a camera expression should update text-justify.");
         XCTAssertEqualObjects(layer.textJustification, functionExpression,
                               @"textJustification should round-trip camera expressions.");
 
-                              
 
         layer.textJustification = nil;
         XCTAssertTrue(rawLayer->getTextJustify().isUndefined(),
@@ -1320,7 +1293,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
                        @"Setting textLetterSpacing to a camera expression should update text-letter-spacing.");
         XCTAssertEqualObjects(layer.textLetterSpacing, functionExpression,
@@ -1349,7 +1322,6 @@
                        @"Setting textLetterSpacing to a camera-data expression should update text-letter-spacing.");
         XCTAssertEqualObjects(layer.textLetterSpacing, functionExpression,
                               @"textLetterSpacing should round-trip camera-data expressions.");
-                              
 
         layer.textLetterSpacing = nil;
         XCTAssertTrue(rawLayer->getTextLetterSpacing().isUndefined(),
@@ -1381,13 +1353,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextLineHeight(), propertyValue,
                        @"Setting textLineHeight to a camera expression should update text-line-height.");
         XCTAssertEqualObjects(layer.textLineHeight, functionExpression,
                               @"textLineHeight should round-trip camera expressions.");
 
-                              
 
         layer.textLineHeight = nil;
         XCTAssertTrue(rawLayer->getTextLineHeight().isUndefined(),
@@ -1431,7 +1402,7 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
                        @"Setting textOffset to a camera expression should update text-offset.");
         XCTAssertEqualObjects(layer.textOffset, functionExpression,
@@ -1460,7 +1431,6 @@
                        @"Setting textOffset to a camera-data expression should update text-offset.");
         XCTAssertEqualObjects(layer.textOffset, functionExpression,
                               @"textOffset should round-trip camera-data expressions.");
-                              
 
         layer.textOffset = nil;
         XCTAssertTrue(rawLayer->getTextOffset().isUndefined(),
@@ -1492,13 +1462,12 @@
             { 18, true },
         }};
         propertyValue = mbgl::style::CameraFunction<bool> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextOptional(), propertyValue,
                        @"Setting textOptional to a camera expression should update text-optional.");
         XCTAssertEqualObjects(layer.textOptional, functionExpression,
                               @"textOptional should round-trip camera expressions.");
 
-                              
 
         layer.textOptional = nil;
         XCTAssertTrue(rawLayer->getTextOptional().isUndefined(),
@@ -1536,13 +1505,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextPadding(), propertyValue,
                        @"Setting textPadding to a camera expression should update text-padding.");
         XCTAssertEqualObjects(layer.textPadding, functionExpression,
                               @"textPadding should round-trip camera expressions.");
 
-                              
 
         layer.textPadding = nil;
         XCTAssertTrue(rawLayer->getTextPadding().isUndefined(),
@@ -1580,13 +1548,12 @@
             { 18, mbgl::style::AlignmentType::Auto },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextPitchAlignment(), propertyValue,
                        @"Setting textPitchAlignment to a camera expression should update text-pitch-alignment.");
         XCTAssertEqualObjects(layer.textPitchAlignment, functionExpression,
                               @"textPitchAlignment should round-trip camera expressions.");
 
-                              
 
         layer.textPitchAlignment = nil;
         XCTAssertTrue(rawLayer->getTextPitchAlignment().isUndefined(),
@@ -1624,7 +1591,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
                        @"Setting textRotation to a camera expression should update text-rotate.");
         XCTAssertEqualObjects(layer.textRotation, functionExpression,
@@ -1653,7 +1620,6 @@
                        @"Setting textRotation to a camera-data expression should update text-rotate.");
         XCTAssertEqualObjects(layer.textRotation, functionExpression,
                               @"textRotation should round-trip camera-data expressions.");
-                              
 
         layer.textRotation = nil;
         XCTAssertTrue(rawLayer->getTextRotate().isUndefined(),
@@ -1685,13 +1651,12 @@
             { 18, mbgl::style::AlignmentType::Auto },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::AlignmentType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextRotationAlignment(), propertyValue,
                        @"Setting textRotationAlignment to a camera expression should update text-rotation-alignment.");
         XCTAssertEqualObjects(layer.textRotationAlignment, functionExpression,
                               @"textRotationAlignment should round-trip camera expressions.");
 
-                              
 
         layer.textRotationAlignment = nil;
         XCTAssertTrue(rawLayer->getTextRotationAlignment().isUndefined(),
@@ -1729,13 +1694,12 @@
             { 18, mbgl::style::TextTransformType::Lowercase },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TextTransformType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextTransform(), propertyValue,
                        @"Setting textTransform to a camera expression should update text-transform.");
         XCTAssertEqualObjects(layer.textTransform, functionExpression,
                               @"textTransform should round-trip camera expressions.");
 
-                              
 
         layer.textTransform = nil;
         XCTAssertTrue(rawLayer->getTextTransform().isUndefined(),
@@ -1767,7 +1731,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
                        @"Setting iconColor to a camera expression should update icon-color.");
         XCTAssertEqualObjects(layer.iconColor, functionExpression,
@@ -1796,7 +1760,6 @@
                        @"Setting iconColor to a camera-data expression should update icon-color.");
         XCTAssertEqualObjects(layer.iconColor, functionExpression,
                               @"iconColor should round-trip camera-data expressions.");
-                              
 
         layer.iconColor = nil;
         XCTAssertTrue(rawLayer->getIconColor().isUndefined(),
@@ -1837,7 +1800,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
                        @"Setting iconHaloBlur to a camera expression should update icon-halo-blur.");
         XCTAssertEqualObjects(layer.iconHaloBlur, functionExpression,
@@ -1866,7 +1829,6 @@
                        @"Setting iconHaloBlur to a camera-data expression should update icon-halo-blur.");
         XCTAssertEqualObjects(layer.iconHaloBlur, functionExpression,
                               @"iconHaloBlur should round-trip camera-data expressions.");
-                              
 
         layer.iconHaloBlur = nil;
         XCTAssertTrue(rawLayer->getIconHaloBlur().isUndefined(),
@@ -1907,7 +1869,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
                        @"Setting iconHaloColor to a camera expression should update icon-halo-color.");
         XCTAssertEqualObjects(layer.iconHaloColor, functionExpression,
@@ -1936,7 +1898,6 @@
                        @"Setting iconHaloColor to a camera-data expression should update icon-halo-color.");
         XCTAssertEqualObjects(layer.iconHaloColor, functionExpression,
                               @"iconHaloColor should round-trip camera-data expressions.");
-                              
 
         layer.iconHaloColor = nil;
         XCTAssertTrue(rawLayer->getIconHaloColor().isUndefined(),
@@ -1977,7 +1938,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
                        @"Setting iconHaloWidth to a camera expression should update icon-halo-width.");
         XCTAssertEqualObjects(layer.iconHaloWidth, functionExpression,
@@ -2006,7 +1967,6 @@
                        @"Setting iconHaloWidth to a camera-data expression should update icon-halo-width.");
         XCTAssertEqualObjects(layer.iconHaloWidth, functionExpression,
                               @"iconHaloWidth should round-trip camera-data expressions.");
-                              
 
         layer.iconHaloWidth = nil;
         XCTAssertTrue(rawLayer->getIconHaloWidth().isUndefined(),
@@ -2047,7 +2007,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
                        @"Setting iconOpacity to a camera expression should update icon-opacity.");
         XCTAssertEqualObjects(layer.iconOpacity, functionExpression,
@@ -2076,7 +2036,6 @@
                        @"Setting iconOpacity to a camera-data expression should update icon-opacity.");
         XCTAssertEqualObjects(layer.iconOpacity, functionExpression,
                               @"iconOpacity should round-trip camera-data expressions.");
-                              
 
         layer.iconOpacity = nil;
         XCTAssertTrue(rawLayer->getIconOpacity().isUndefined(),
@@ -2123,13 +2082,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconTranslate(), propertyValue,
                        @"Setting iconTranslation to a camera expression should update icon-translate.");
         XCTAssertEqualObjects(layer.iconTranslation, functionExpression,
                               @"iconTranslation should round-trip camera expressions.");
 
-                              
 
         layer.iconTranslation = nil;
         XCTAssertTrue(rawLayer->getIconTranslate().isUndefined(),
@@ -2167,13 +2125,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getIconTranslateAnchor(), propertyValue,
                        @"Setting iconTranslationAnchor to a camera expression should update icon-translate-anchor.");
         XCTAssertEqualObjects(layer.iconTranslationAnchor, functionExpression,
                               @"iconTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.iconTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getIconTranslateAnchor().isUndefined(),
@@ -2211,7 +2168,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
                        @"Setting textColor to a camera expression should update text-color.");
         XCTAssertEqualObjects(layer.textColor, functionExpression,
@@ -2240,7 +2197,6 @@
                        @"Setting textColor to a camera-data expression should update text-color.");
         XCTAssertEqualObjects(layer.textColor, functionExpression,
                               @"textColor should round-trip camera-data expressions.");
-                              
 
         layer.textColor = nil;
         XCTAssertTrue(rawLayer->getTextColor().isUndefined(),
@@ -2281,7 +2237,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
                        @"Setting textHaloBlur to a camera expression should update text-halo-blur.");
         XCTAssertEqualObjects(layer.textHaloBlur, functionExpression,
@@ -2310,7 +2266,6 @@
                        @"Setting textHaloBlur to a camera-data expression should update text-halo-blur.");
         XCTAssertEqualObjects(layer.textHaloBlur, functionExpression,
                               @"textHaloBlur should round-trip camera-data expressions.");
-                              
 
         layer.textHaloBlur = nil;
         XCTAssertTrue(rawLayer->getTextHaloBlur().isUndefined(),
@@ -2351,7 +2306,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
                        @"Setting textHaloColor to a camera expression should update text-halo-color.");
         XCTAssertEqualObjects(layer.textHaloColor, functionExpression,
@@ -2380,7 +2335,6 @@
                        @"Setting textHaloColor to a camera-data expression should update text-halo-color.");
         XCTAssertEqualObjects(layer.textHaloColor, functionExpression,
                               @"textHaloColor should round-trip camera-data expressions.");
-                              
 
         layer.textHaloColor = nil;
         XCTAssertTrue(rawLayer->getTextHaloColor().isUndefined(),
@@ -2421,7 +2375,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
                        @"Setting textHaloWidth to a camera expression should update text-halo-width.");
         XCTAssertEqualObjects(layer.textHaloWidth, functionExpression,
@@ -2450,7 +2404,6 @@
                        @"Setting textHaloWidth to a camera-data expression should update text-halo-width.");
         XCTAssertEqualObjects(layer.textHaloWidth, functionExpression,
                               @"textHaloWidth should round-trip camera-data expressions.");
-                              
 
         layer.textHaloWidth = nil;
         XCTAssertTrue(rawLayer->getTextHaloWidth().isUndefined(),
@@ -2491,7 +2444,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
                        @"Setting textOpacity to a camera expression should update text-opacity.");
         XCTAssertEqualObjects(layer.textOpacity, functionExpression,
@@ -2520,7 +2473,6 @@
                        @"Setting textOpacity to a camera-data expression should update text-opacity.");
         XCTAssertEqualObjects(layer.textOpacity, functionExpression,
                               @"textOpacity should round-trip camera-data expressions.");
-                              
 
         layer.textOpacity = nil;
         XCTAssertTrue(rawLayer->getTextOpacity().isUndefined(),
@@ -2567,13 +2519,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextTranslate(), propertyValue,
                        @"Setting textTranslation to a camera expression should update text-translate.");
         XCTAssertEqualObjects(layer.textTranslation, functionExpression,
                               @"textTranslation should round-trip camera expressions.");
 
-                              
 
         layer.textTranslation = nil;
         XCTAssertTrue(rawLayer->getTextTranslate().isUndefined(),
@@ -2611,13 +2562,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getTextTranslateAnchor(), propertyValue,
                        @"Setting textTranslationAnchor to a camera expression should update text-translate-anchor.");
         XCTAssertEqualObjects(layer.textTranslationAnchor, functionExpression,
                               @"textTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.textTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getTextTranslateAnchor().isUndefined(),

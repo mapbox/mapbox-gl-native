@@ -2,7 +2,7 @@
 
 #include <mbgl/style/properties.hpp>
 #include <mbgl/style/property_value.hpp>
-#include <mbgl/style/heatmap_color_property_value.hpp>
+#include <mbgl/style/color_ramp_property_value.hpp>
 #include <mbgl/style/data_driven_property_value.hpp>
 #include <mbgl/renderer/property_evaluator.hpp>
 #include <mbgl/renderer/cross_faded_property_evaluator.hpp>
@@ -50,19 +50,19 @@ public:
 };
 
 /*
- * Special-case paint property traits for heatmap-color, needed because
- * heatmap-color values do not fit into the
+ * Special-case paint property traits for heatmap-color and line-gradient,
+ * needed because these values do not fit into the
  * Undefined | Value | {Camera,Source,Composite}Function taxonomy that applies
  * to all other paint properties.
  *
- * These traits are provided here--despite the fact that heatmap-color
- * is not used like other paint properties--to allow the parameter-pack-based
+ * These traits are provided here--despite the fact that color ramps
+ * are not used like other paint properties--to allow the parameter-pack-based
  * batch evaluation of paint properties to compile properly.
  */
-class HeatmapColor {
+class ColorRampProperty {
 public:
-    using TransitionableType = Transitionable<HeatmapColorPropertyValue>;
-    using UnevaluatedType = Transitioning<HeatmapColorPropertyValue>;
+    using TransitionableType = Transitionable<ColorRampPropertyValue>;
+    using UnevaluatedType = Transitioning<ColorRampPropertyValue>;
     using EvaluatorType = PropertyEvaluator<Color>;
     using PossiblyEvaluatedType = Color;
     using Type = Color;

@@ -340,6 +340,26 @@ MGL_EXPORT
 @property (nonatomic) MGLTransition lineGapWidthTransition;
 
 /**
+ ¡ EXPERIMENTAL, UNSUPPORTED ! Defines the color of a point of a line based on
+ its progress along the line, if using gradient lines.
+ 
+ This property is only applied to the style if `lineDasharray` is set to `nil`,
+ and `linePattern` is set to `nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `UIColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$lineProgress` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+ */
+@property (nonatomic, null_resettable) NSExpression *lineGradient;
+
+/**
  The line's offset. For linear features, a positive value offsets the line to
  the right, relative to the direction of the line, and a negative value to the
  left. For polygon features, a positive value results in an inset, and a

@@ -157,8 +157,8 @@ namespace mbgl {
 - (void)set<%- camelize(property.name) %>:(NSExpression *)<%- objCName(property) %> {
     MGLAssertStyleLayerIsValid();
 
-<% if (property.name === 'heatmap-color') { -%>
-    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::HeatmapColorPropertyValue>(heatmapColor);
+<% if (property.name === 'heatmap-color' || property.name === 'line-gradient') { -%>
+    auto mbglValue = MGLStyleValueTransformer<mbgl::Color, MGLColor *>().toPropertyValue<mbgl::style::ColorRampPropertyValue>(<%- objCName(property) %>);
 <% } else if (property["property-function"]) { -%>
     auto mbglValue = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toPropertyValue<mbgl::style::DataDrivenPropertyValue<<%- valueTransformerArguments(property)[0] %>>>(<%- objCName(property) %>);
 <% } else { -%>

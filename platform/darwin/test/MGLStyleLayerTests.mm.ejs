@@ -59,7 +59,7 @@
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 <% for (const property of properties) { -%>
-<%   if (property.name === 'heatmap-color') continue; -%>
+<%   if (property.name === 'heatmap-color' || property.name === 'line-gradient') continue; -%>
 
     // <%- originalPropertyName(property) %>
     {
@@ -88,7 +88,7 @@
             { 18, <%- mbglTestValue(property, type) %> },
         }};
         propertyValue = mbgl::style::CameraFunction<<%- mbglType(property) %>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a camera expression should update <%- originalPropertyName(property) %>.");
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
@@ -118,7 +118,7 @@
                        @"Setting <%- objCName(property) %> to a camera-data expression should update <%- originalPropertyName(property) %>.");
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
                               @"<%- objCName(property) %> should round-trip camera-data expressions.");
-<% } -%>                              
+<% } -%>
 <% if (!property.required) { -%>
 
         layer.<%- objCName(property) %> = nil;
@@ -152,7 +152,7 @@
 
 - (void)testPropertyNames {
 <% for (const property of properties) { -%>
-<%   if (property.name === 'heatmap-color') continue; -%>
+<%   if (property.name === 'heatmap-color' || property.name === 'line-gradient') continue; -%>
     [self testPropertyName:@"<%- property.getter || property.name %>" isBoolean:<%- property.type === 'boolean' ? 'YES' : 'NO' %>];
 <% } -%>
 }

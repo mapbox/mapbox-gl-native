@@ -315,6 +315,8 @@ set(MBGL_CORE_FILES
     src/mbgl/shaders/hillshade_prepare.hpp
     src/mbgl/shaders/line.cpp
     src/mbgl/shaders/line.hpp
+    src/mbgl/shaders/line_gradient.cpp
+    src/mbgl/shaders/line_gradient.hpp
     src/mbgl/shaders/line_pattern.cpp
     src/mbgl/shaders/line_pattern.hpp
     src/mbgl/shaders/line_sdf.cpp
@@ -357,11 +359,11 @@ set(MBGL_CORE_FILES
     src/mbgl/storage/response.cpp
 
     # style
+    include/mbgl/style/color_ramp_property_value.hpp
     include/mbgl/style/conversion.hpp
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
     include/mbgl/style/filter_evaluator.hpp
-    include/mbgl/style/heatmap_color_property_value.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
     include/mbgl/style/layer_type.hpp
@@ -404,6 +406,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/types.cpp
 
     # style/conversion
+    include/mbgl/style/conversion/color_ramp_property_value.hpp
     include/mbgl/style/conversion/constant.hpp
     include/mbgl/style/conversion/coordinate.hpp
     include/mbgl/style/conversion/custom_geometry_source_options.hpp
@@ -414,7 +417,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/geojson.hpp
     include/mbgl/style/conversion/geojson_options.hpp
     include/mbgl/style/conversion/get_json_type.hpp
-    include/mbgl/style/conversion/heatmap_color_property_value.hpp
     include/mbgl/style/conversion/layer.hpp
     include/mbgl/style/conversion/light.hpp
     include/mbgl/style/conversion/position.hpp
@@ -702,6 +704,8 @@ set(MBGL_CORE_FILES
     src/mbgl/util/clip_id.cpp
     src/mbgl/util/clip_id.hpp
     src/mbgl/util/color.cpp
+    src/mbgl/util/color_ramp.cpp
+    src/mbgl/util/color_ramp.hpp
     src/mbgl/util/compression.cpp
     src/mbgl/util/constants.cpp
     src/mbgl/util/convert.cpp

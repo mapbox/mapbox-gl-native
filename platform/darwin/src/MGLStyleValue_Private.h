@@ -10,7 +10,7 @@
 #import "MGLConversion.h"
 #include <mbgl/style/conversion/property_value.hpp>
 #include <mbgl/style/conversion/data_driven_property_value.hpp>
-#include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+#include <mbgl/style/conversion/color_ramp_property_value.hpp>
 #include <mbgl/style/conversion/position.hpp>
 #import <mbgl/style/types.hpp>
 
@@ -54,7 +54,7 @@ public:
     }
     
     // Convert an mbgl heatmap color property value into an mgl style value
-    NSExpression *toExpression(const mbgl::style::HeatmapColorPropertyValue &mbglValue) {
+    NSExpression *toExpression(const mbgl::style::ColorRampPropertyValue &mbglValue) {
         if (mbglValue.isUndefined()) {
             return nil;
         }
@@ -65,7 +65,7 @@ public:
      Converts an NSExpression to an mbgl property value.
      */
     template <typename MBGLValue>
-    typename std::enable_if_t<!std::is_same<MBGLValue, mbgl::style::HeatmapColorPropertyValue>::value,
+    typename std::enable_if_t<!std::is_same<MBGLValue, mbgl::style::ColorRampPropertyValue>::value,
     MBGLValue> toPropertyValue(NSExpression *expression) {
         if (!expression) {
             return {};
@@ -100,7 +100,7 @@ public:
      Converts an NSExpression to an mbgl property value.
      */
     template <typename MBGLValue>
-    typename std::enable_if_t<std::is_same<MBGLValue, mbgl::style::HeatmapColorPropertyValue>::value,
+    typename std::enable_if_t<std::is_same<MBGLValue, mbgl::style::ColorRampPropertyValue>::value,
     MBGLValue> toPropertyValue(NSExpression *expression) {
         if (!expression) {
             return {};
@@ -109,7 +109,7 @@ public:
         NSArray *jsonExpression = expression.mgl_jsonExpressionObject;
         
         mbgl::style::conversion::Error valueError;
-        auto value = mbgl::style::conversion::convert<mbgl::style::HeatmapColorPropertyValue>(
+        auto value = mbgl::style::conversion::convert<mbgl::style::ColorRampPropertyValue>(
             mbgl::style::conversion::makeConvertible(jsonExpression), valueError);
         if (!value) {
             [NSException raise:NSInvalidArgumentException

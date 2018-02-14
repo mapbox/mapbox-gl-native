@@ -25,10 +25,13 @@ struct <%- camelize(property.name) %> : <%- layoutPropertyType(property, type) %
 
 <% } -%>
 <% for (const property of paintProperties) { -%>
-<%   if (property.name === 'heatmap-color') continue; -%>
+<%   if (property.name === 'heatmap-color' || property.name === 'line-gradient') { -%>
+struct <%- camelize(property.name) %> : ColorRampProperty {};
+<%   } else { -%>
 struct <%- camelize(property.name) %> : <%- paintPropertyType(property, type) %> {
     static <%- evaluatedType(property) %> defaultValue() { return <%- defaultValue(property) %>; }
 };
+<%   } -%>
 
 <% } -%>
 <% if (layoutProperties.length) { -%>

@@ -50,13 +50,12 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getBackgroundColor(), propertyValue,
                        @"Setting backgroundColor to a camera expression should update background-color.");
         XCTAssertEqualObjects(layer.backgroundColor, functionExpression,
                               @"backgroundColor should round-trip camera expressions.");
 
-                              
 
         layer.backgroundColor = nil;
         XCTAssertTrue(rawLayer->getBackgroundColor().isUndefined(),
@@ -103,13 +102,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getBackgroundOpacity(), propertyValue,
                        @"Setting backgroundOpacity to a camera expression should update background-opacity.");
         XCTAssertEqualObjects(layer.backgroundOpacity, functionExpression,
                               @"backgroundOpacity should round-trip camera expressions.");
 
-                              
 
         layer.backgroundOpacity = nil;
         XCTAssertTrue(rawLayer->getBackgroundOpacity().isUndefined(),
@@ -156,13 +154,12 @@
             { 18, "Background Pattern" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getBackgroundPattern(), propertyValue,
                        @"Setting backgroundPattern to a camera expression should update background-pattern.");
         XCTAssertEqualObjects(layer.backgroundPattern, functionExpression,
                               @"backgroundPattern should round-trip camera expressions.");
 
-                              
 
         layer.backgroundPattern = nil;
         XCTAssertTrue(rawLayer->getBackgroundPattern().isUndefined(),

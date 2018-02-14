@@ -11,6 +11,7 @@
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/util/math.hpp>
 #include <mbgl/util/intersection_tests.hpp>
+#include <mbgl/util/color_ramp.hpp>
 
 namespace mbgl {
 
@@ -18,7 +19,7 @@ using namespace style;
 
 RenderLineLayer::RenderLineLayer(Immutable<style::LineLayer::Impl> _impl)
     : RenderLayer(style::LayerType::Line, _impl),
-      unevaluated(impl().paint.untransitioned()) {
+      unevaluated(impl().paint.untransitioned()), colorRamp({256, 1}) {
 }
 
 const style::LineLayer::Impl& RenderLineLayer::impl() const {
@@ -61,12 +62,12 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl)));
         LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
 
-        auto draw = [&] (auto& program, auto&& uniformValues) {
+        auto draw = [&] (auto& program, const auto& stencilMode, auto&& uniformValues) {
             program.get(evaluated).draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                parameters.stencilModeForClipping(tile.clip),
+                stencilMode,
                 parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *bucket.vertexBuffer,
@@ -88,6 +89,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.lineAtlas.bind(parameters.context, 0);
 
             draw(parameters.programs.lineSDF,
+                 parameters.stencilModeForClipping(tile.clip),
                  LineSDFProgram::uniformValues(
                      evaluated,
                      parameters.pixelRatio,
@@ -108,6 +110,7 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.imageManager.bind(parameters.context, 0);
 
             draw(parameters.programs.linePattern,
+                 parameters.stencilModeForClipping(tile.clip),
                  LinePatternProgram::uniformValues(
                      evaluated,
                      tile,
@@ -117,8 +120,22 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                      *posA,
                      *posB));
 
+        } else if (!unevaluated.get<LineGradient>().getValue().isUndefined()) {
+            if (!colorRampTexture) {
+                colorRampTexture = parameters.context.createTexture(colorRamp);
+            }
+
+            draw(parameters.programs.lineGradient,
+                 gl::StencilMode::disabled(),
+                 LineGradientProgram::uniformValues(
+                    evaluated,
+                    tile,
+                    parameters.state,
+                    parameters.pixelsToGLUnits));
+
         } else {
             draw(parameters.programs.line,
+                 parameters.stencilModeForClipping(tile.clip),
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
@@ -156,6 +173,19 @@ optional<GeometryCollection> offsetLine(const GeometryCollection& rings, const d
     }
 
     return newRings;
+}
+
+void RenderLineLayer::updateColorRamp() {
+    auto colorValue = unevaluated.get<LineGradient>().getValue();
+    if (colorValue.isUndefined()) {
+        return;
+    }
+
+    util::renderColorRamp(colorRamp, colorValue);
+
+    if (colorRampTexture) {
+        colorRampTexture = nullopt;
+    }
 }
 
 bool RenderLineLayer::queryIntersectsFeature(
