@@ -223,6 +223,7 @@ IOS_XCODEBUILD_SIM = xcodebuild \
 	$(IOS_SIMULATORS) \
 	-parallelizeTargets \
 	-jobs $(JOBS) \
+	-maximum-concurrent-test-simulator-destinations 3 \
 	-workspace $(IOS_WORK_PATH)
 
 $(IOS_PROJ_PATH): $(IOS_USER_DATA_PATH)/WorkspaceSettings.xcsettings $(BUILD_DEPS)
