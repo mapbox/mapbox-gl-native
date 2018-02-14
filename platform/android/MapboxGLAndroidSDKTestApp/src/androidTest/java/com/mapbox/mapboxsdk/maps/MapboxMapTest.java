@@ -162,16 +162,6 @@ public class MapboxMapTest extends BaseActivityTest {
   }
 
   //
-  // TrackingSettings
-  //
-
-  @Test
-  public void testTrackingSettings() {
-    validateTestSetup();
-    assertNotNull("TrackingSettings should not be null", mapboxMap.getTrackingSettings());
-  }
-
-  //
   // InfoWindow
   //
 
@@ -200,30 +190,6 @@ public class MapboxMapTest extends BaseActivityTest {
       MapboxMap.InfoWindowAdapter infoWindowAdapter = marker -> null;
       mapboxMap.setInfoWindowAdapter(infoWindowAdapter);
       assertEquals("InfoWindowAdpter should be the same", infoWindowAdapter, mapboxMap.getInfoWindowAdapter());
-    }));
-  }
-
-  //
-  // Location
-  //
-
-  @Test
-  @Ignore /* disabled due to enabling permissions during test #7177 */
-  public void testMyLocationEnabled() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMyLocationEnabled(true);
-      assertTrue("MyLocationEnabled should be true", mapboxMap.isMyLocationEnabled());
-    }));
-  }
-
-  @Test
-  @Ignore /* can't create handler inside thread that not called Looper.prepare() */
-  public void testMyLocationDisabled() {
-    validateTestSetup();
-    onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.setMyLocationEnabled(false);
-      assertFalse("MyLocationEnabled should be false", mapboxMap.isMyLocationEnabled());
     }));
   }
 

@@ -2,21 +2,16 @@ package com.mapbox.mapboxsdk.maps;
 
 import android.graphics.Bitmap;
 import android.graphics.PointF;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.util.LongSparseArray;
-import android.view.View;
 
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
-import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -31,7 +26,7 @@ import timber.log.Timber;
  * Responsible for managing and tracking state of Annotations linked to Map. All events related to
  * annotations that occur on {@link MapboxMap} are forwarded to this class.
  * <p>
- * Responsible for referencing {@link InfoWindowManager} and {@link MarkerViewManager}.
+ * Responsible for referencing {@link InfoWindowManager}.
  * </p>
  * <p>
  * Exposes convenience methods to add/remove/update all subtypes of annotations found in
@@ -45,7 +40,6 @@ class AnnotationManager {
   private final MapView mapView;
   private final IconManager iconManager;
   private final InfoWindowManager infoWindowManager = new InfoWindowManager();
-  private final MarkerViewManager markerViewManager;
   private final LongSparseArray<Annotation> annotationsArray;
   private final List<Marker> selectedMarkers = new ArrayList<>();
 
@@ -60,34 +54,27 @@ class AnnotationManager {
   private Polygons polygons;
   private Polylines polylines;
 
-  AnnotationManager(NativeMapView view, MapView mapView, LongSparseArray<Annotation> annotationsArray,
-                    MarkerViewManager markerViewManager, IconManager iconManager, Annotations annotations,
-                    Markers markers, Polygons polygons, Polylines polylines, ShapeAnnotations shapeAnnotations) {
+  AnnotationManager(MapView mapView, LongSparseArray<Annotation> annotationsArray, IconManager iconManager,
+                    Annotations annotations, Markers markers, Polygons polygons, Polylines polylines,
+                    ShapeAnnotations shapeAnnotations) {
     this.mapView = mapView;
     this.annotationsArray = annotationsArray;
-    this.markerViewManager = markerViewManager;
     this.iconManager = iconManager;
     this.annotations = annotations;
     this.markers = markers;
     this.polygons = polygons;
     this.polylines = polylines;
     this.shapeAnnotations = shapeAnnotations;
-    if (view != null) {
-      // null checking needed for unit tests
-      view.addOnMapChangedListener(markerViewManager);
-    }
   }
 
   // TODO refactor MapboxMap out for Projection and Transform
   // Requires removing MapboxMap from Annotations by using Peer model from #6912
   AnnotationManager bind(MapboxMap mapboxMap) {
     this.mapboxMap = mapboxMap;
-    this.markerViewManager.bind(mapboxMap);
     return this;
   }
 
   void update() {
-    markerViewManager.update();
     infoWindowManager.update();
   }
 
@@ -114,13 +101,8 @@ class AnnotationManager {
       if (selectedMarkers.contains(marker)) {
         selectedMarkers.remove(marker);
       }
-
-      if (marker instanceof MarkerView) {
-        markerViewManager.removeMarkerView((MarkerView) marker);
-      } else {
-        // do icon cleanup
-        iconManager.iconCleanup(marker.getIcon());
-      }
+      // do icon cleanup
+      iconManager.iconCleanup(marker.getIcon());
     }
     annotations.removeBy(annotation);
   }
@@ -133,12 +115,7 @@ class AnnotationManager {
         if (selectedMarkers.contains(marker)) {
           selectedMarkers.remove(marker);
         }
-
-        if (marker instanceof MarkerView) {
-          markerViewManager.removeMarkerView((MarkerView) marker);
-        } else {
-          iconManager.iconCleanup(marker.getIcon());
-        }
+        iconManager.iconCleanup(marker.getIcon());
       }
     }
     annotations.removeBy(annotationList);
@@ -155,11 +132,7 @@ class AnnotationManager {
       if (annotation instanceof Marker) {
         Marker marker = (Marker) annotation;
         marker.hideInfoWindow();
-        if (marker instanceof MarkerView) {
-          markerViewManager.removeMarkerView((MarkerView) marker);
-        } else {
-          iconManager.iconCleanup(marker.getIcon());
-        }
+        iconManager.iconCleanup(marker.getIcon());
       }
     }
     annotations.removeAll();
@@ -192,20 +165,6 @@ class AnnotationManager {
   @NonNull
   List<Marker> getMarkersInRect(@NonNull RectF rectangle) {
     return markers.obtainAllIn(rectangle);
-  }
-
-  MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions, @NonNull MapboxMap mapboxMap,
-                       @Nullable MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
-    return markers.addViewBy(markerOptions, mapboxMap, onMarkerViewAddedListener);
-  }
-
-  List<MarkerView> addMarkerViews(@NonNull List<? extends BaseMarkerViewOptions> markerViewOptions,
-                                  @NonNull MapboxMap mapboxMap) {
-    return markers.addViewsBy(markerViewOptions, mapboxMap);
-  }
-
-  List<MarkerView> getMarkerViewsInRect(@NonNull RectF rectangle) {
-    return markers.obtainViewsIn(rectangle);
   }
 
   void reloadMarkers() {
@@ -283,11 +242,6 @@ class AnnotationManager {
       deselectMarkers();
     }
 
-    if (marker instanceof MarkerView) {
-      markerViewManager.select((MarkerView) marker, false);
-      markerViewManager.ensureInfoWindowOffset((MarkerView) marker);
-    }
-
     if (infoWindowManager.isInfoWindowValidForMarker(marker) || infoWindowManager.getInfoWindowAdapter() != null) {
       infoWindowManager.add(marker.showInfoWindow(mapboxMap, mapView));
     }
@@ -306,10 +260,6 @@ class AnnotationManager {
         if (marker.isInfoWindowShown()) {
           marker.hideInfoWindow();
         }
-
-        if (marker instanceof MarkerView) {
-          markerViewManager.deselect((MarkerView) marker, false);
-        }
       }
     }
 
@@ -326,10 +276,6 @@ class AnnotationManager {
       marker.hideInfoWindow();
     }
 
-    if (marker instanceof MarkerView) {
-      markerViewManager.deselect((MarkerView) marker, false);
-    }
-
     selectedMarkers.remove(marker);
   }
 
@@ -339,10 +285,6 @@ class AnnotationManager {
 
   InfoWindowManager getInfoWindowManager() {
     return infoWindowManager;
-  }
-
-  MarkerViewManager getMarkerViewManager() {
-    return markerViewManager;
   }
 
   void adjustTopOffsetPixels(MapboxMap mapboxMap) {
@@ -424,13 +366,8 @@ class AnnotationManager {
   }
 
   private boolean isClickHandledForMarker(long markerId) {
-    boolean handledDefaultClick;
     Marker marker = (Marker) getAnnotation(markerId);
-    if (marker instanceof MarkerView) {
-      handledDefaultClick = markerViewManager.onClickMarkerView((MarkerView) marker);
-    } else {
-      handledDefaultClick = onClickMarker(marker);
-    }
+    boolean handledDefaultClick = onClickMarker(marker);
 
     if (!handledDefaultClick) {
       toggleMarkerSelectionState(marker);
@@ -470,21 +407,17 @@ class AnnotationManager {
 
   private static class MarkerHitResolver {
 
-    private final MarkerViewManager markerViewManager;
     private final Projection projection;
 
-    private View view;
     private Bitmap bitmap;
     private PointF markerLocation;
 
-    private Rect hitRectView = new Rect();
     private RectF hitRectMarker = new RectF();
     private RectF highestSurfaceIntersection = new RectF();
 
     private long closestMarkerId = NO_ANNOTATION_ID;
 
     MarkerHitResolver(@NonNull MapboxMap mapboxMap) {
-      this.markerViewManager = mapboxMap.getMarkerViewManager();
       this.projection = mapboxMap.getProjection();
     }
 
@@ -495,20 +428,7 @@ class AnnotationManager {
 
     private void resolveForMarkers(MarkerHit markerHit) {
       for (Marker marker : markerHit.markers) {
-        if (marker instanceof MarkerView) {
-          resolveForMarkerView(markerHit, (MarkerView) marker);
-        } else {
-          resolveForMarker(markerHit, marker);
-        }
-      }
-    }
-
-    private void resolveForMarkerView(MarkerHit markerHit, MarkerView markerView) {
-      view = markerViewManager.getView(markerView);
-      if (view != null) {
-        view.getHitRect(hitRectView);
-        hitRectMarker = new RectF(hitRectView);
-        hitTestMarker(markerHit, markerView, hitRectMarker);
+        resolveForMarker(markerHit, marker);
       }
     }
 

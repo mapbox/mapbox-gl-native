@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.maplayout;
 
 import android.content.Context;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -151,10 +150,9 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-      Location location = mapboxMap.getMyLocation();
-      if (location != null) {
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
-      }
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+        new LatLng(51.510790, -0.078966), 15)
+      );
     }
 
     @Override
@@ -230,10 +228,9 @@ public class BottomSheetActivity extends AppCompatActivity {
 
     @Override
     public void onMapReady(MapboxMap mapboxMap) {
-      Location location = mapboxMap.getMyLocation();
-      if (location != null) {
-        mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location), 15));
-      }
+      mapboxMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+        new LatLng(52.529910, 13.402729), 15)
+      );
     }
 
     @Override

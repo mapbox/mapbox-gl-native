@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="description_user_location_tracking">Tracks the location of the user</string>
-    <string name="description_user_location_customization">Customize the location of the user</string>
-    <string name="description_user_location_dot_color">Customize the user location color</string>
-    <string name="description_user_location_toggle">Toggle location of the user on and off</string>
-    <string name="description_custom_location_engine">Customize location engine</string>
     <string name="description_custom_layer">Overlay a custom native layer on the map</string>
     <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
     <string name="description_cameraposition">CameraPosition capabilities</string>
@@ -24,13 +19,11 @@
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
     <string name="description_offline_region_delete">Delete region example</string>
-    <string name="description_animated_marker">Animate the position change of a marker</string>
     <string name="description_polyline">Add a polyline to a map</string>
     <string name="description_polygon">Add a polygon to a map</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
     <string name="description_snapshot">Example to make a snapshot of the map</string>
     <string name="description_doublemap">2 maps in a view hierarchy</string>
-    <string name="description_view_marker">Use an Android SDK View as marker</string>
     <string name="description_dynamic_info_window_adapter">Learn how to create a dynamic custom InfoWindow</string>
     <string name="description_viewpager">Use SupportMapFragments in a ViewPager</string>
     <string name="description_runtime_style">Adopt the map style on the fly</string>
@@ -51,7 +44,6 @@
     <string name="description_add_remove_markers">Change Symbol icon when zoom levels changes</string>
     <string name="description_style_file">Use a local file as the style</string>
     <string name="description_map_in_dialog">Display a map inside a dialog fragment</string>
-    <string name="description_marker_view_rectangle">Marker Views within a rectangle</string>
     <string name="description_circle_layer">Show bus stops and route in Singapore</string>
     <string name="description_url_transform">Transform urls on the fly</string>
     <string name="description_restricted_bounds">Limit viewport to Iceland</string>

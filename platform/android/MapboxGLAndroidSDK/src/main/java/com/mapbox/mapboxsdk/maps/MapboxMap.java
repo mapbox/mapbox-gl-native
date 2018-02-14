@@ -4,27 +4,21 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
-import android.support.v4.util.Pools;
 import android.text.TextUtils;
 import android.view.View;
-import android.view.ViewGroup;
 
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.BaseMarkerOptions;
-import com.mapbox.mapboxsdk.annotations.BaseMarkerViewOptions;
 import com.mapbox.mapboxsdk.annotations.Marker;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.annotations.Polygon;
 import com.mapbox.mapboxsdk.annotations.PolygonOptions;
 import com.mapbox.mapboxsdk.annotations.Polyline;
@@ -33,19 +27,14 @@ import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
-import com.mapbox.mapboxsdk.constants.MyBearingTracking;
-import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.android.core.location.LocationEngine;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.List;
 
@@ -66,11 +55,9 @@ public final class MapboxMap {
   private final NativeMapView nativeMapView;
 
   private final UiSettings uiSettings;
-  private final TrackingSettings trackingSettings;
   private final Projection projection;
   private final Transform transform;
   private final AnnotationManager annotationManager;
-  private final MyLocationViewSettings myLocationViewSettings;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
   private final OnRegisterTouchListener onRegisterTouchListener;
@@ -78,14 +65,11 @@ public final class MapboxMap {
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
   private PointF focalPoint;
 
-  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
-            MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
+  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection proj, OnRegisterTouchListener listener,
             AnnotationManager annotations, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
-    this.trackingSettings = tracking;
-    this.projection = projection;
-    this.myLocationViewSettings = myLocationView;
+    this.projection = proj;
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
     this.onRegisterTouchListener = listener;
@@ -95,8 +79,6 @@ public final class MapboxMap {
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
     transform.initialise(this, options);
     uiSettings.initialise(context, options);
-    myLocationViewSettings.initialise(options);
-    trackingSettings.initialise(options);
 
     // Map configuration
     setDebugActive(options.getDebugActive());
@@ -110,7 +92,6 @@ public final class MapboxMap {
    */
   void onStart() {
     nativeMapView.update();
-    trackingSettings.onStart();
     if (TextUtils.isEmpty(nativeMapView.getStyleUrl())) {
       // if user hasn't loaded a Style yet
       nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
@@ -121,7 +102,6 @@ public final class MapboxMap {
    * Called when the hosting Activity/Fragment onStop() method is called.
    */
   void onStop() {
-    trackingSettings.onStop();
   }
 
   /**
@@ -133,9 +113,7 @@ public final class MapboxMap {
     outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
-    trackingSettings.onSaveInstanceState(outState);
     uiSettings.onSaveInstanceState(outState);
-    myLocationViewSettings.onSaveInstanceState(outState);
   }
 
   /**
@@ -145,19 +123,11 @@ public final class MapboxMap {
    */
   void onRestoreInstanceState(Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
-
-    myLocationViewSettings.onRestoreInstanceState(savedInstanceState);
     uiSettings.onRestoreInstanceState(savedInstanceState);
-    trackingSettings.onRestoreInstanceState(savedInstanceState);
-
     if (cameraPosition != null) {
-      moveCamera(CameraUpdateFactory.newCameraPosition(
-        new CameraPosition.Builder(cameraPosition).build())
-      );
+      moveCamera(CameraUpdateFactory.newCameraPosition(new CameraPosition.Builder(cameraPosition).build()));
     }
-
     nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-
     final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
     if (!TextUtils.isEmpty(styleUrl)) {
       nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
@@ -173,21 +143,9 @@ public final class MapboxMap {
   }
 
   /**
-   * Called when the OnMapReadyCallback has finished executing.
-   * <p>
-   * Invalidation of the camera position is required to update the added components in
-   * OnMapReadyCallback with the correct transformation.
-   * </p>
-   */
-  void onPostMapReady() {
-    invalidateCameraPosition();
-  }
-
-  /**
    * Called when the region is changing or has changed.
    */
   void onUpdateRegionChange() {
-    trackingSettings.update();
     annotationManager.update();
   }
 
@@ -555,38 +513,6 @@ public final class MapboxMap {
   }
 
   //
-  // TrackingSettings
-  //
-
-  /**
-   * Gets the tracking interface settings for the map.
-   *
-   * @return the TrackingSettings asssociated with this map
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public TrackingSettings getTrackingSettings() {
-    return trackingSettings;
-  }
-
-  //
-  // MyLocationViewSettings
-  //
-
-  /**
-   * Gets the settings of the user location for the map.
-   *
-   * @return the MyLocationViewSettings associated with this map
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public MyLocationViewSettings getMyLocationViewSettings() {
-    return myLocationViewSettings;
-  }
-
-  //
   // Projection
   //
 
@@ -804,11 +730,6 @@ public final class MapboxMap {
    * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
    * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
    * will return the current location of the camera in flight.
-   * <p>
-   * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
-   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} with false before
-   * invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
-   * </p>
    *
    * @param update             The change that should be applied to the camera.
    * @param durationMs         The duration of the animation in milliseconds. This must be strictly
@@ -830,11 +751,6 @@ public final class MapboxMap {
    * unless specified within {@link CameraUpdate}. A callback can be used to be notified when
    * easing the camera stops. If {@link #getCameraPosition()} is called during the animation, it
    * will return the current location of the camera in flight.
-   * <p>
-   * Note that this will cancel location tracking mode if enabled. You can change this behaviour by calling
-   * {@link com.mapbox.mapboxsdk.maps.TrackingSettings#setDismissLocationTrackingOnGesture(boolean)} with false before
-   * invoking this method and calling it with true in the {@link CancelableCallback#onFinish()}.
-   * </p>
    *
    * @param update             The change that should be applied to the camera.
    * @param durationMs         The duration of the animation in milliseconds. This must be strictly
@@ -925,16 +841,6 @@ public final class MapboxMap {
     }
 
     transform.animateCamera(MapboxMap.this, update, durationMs, callback);
-  }
-
-  /**
-   * Invalidates the current camera position by reconstructing it from mbgl
-   */
-  void invalidateCameraPosition() {
-    CameraPosition cameraPosition = transform.invalidateCameraPosition();
-    if (cameraPosition != null) {
-      transform.updateCameraPosition(cameraPosition);
-    }
   }
 
   //
@@ -1219,77 +1125,6 @@ public final class MapboxMap {
   @NonNull
   public Marker addMarker(@NonNull BaseMarkerOptions markerOptions) {
     return annotationManager.addMarker(markerOptions, this);
-  }
-
-  /**
-   * <p>
-   * Adds a marker to this map.
-   * </p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   *
-   * @param markerOptions A marker options object that defines how to render the marker
-   * @return The {@code Marker} that was added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions) {
-    return annotationManager.addMarker(markerOptions, this, null);
-  }
-
-  /**
-   * <p>
-   * Adds a marker to this map.
-   * </p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   *
-   * @param markerOptions             A marker options object that defines how to render the marker
-   * @param onMarkerViewAddedListener Callback invoked when the View has been added to the map
-   * @return The {@code Marker} that was added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @Deprecated
-  @NonNull
-  public MarkerView addMarker(@NonNull BaseMarkerViewOptions markerOptions,
-                              final MarkerViewManager.OnMarkerViewAddedListener onMarkerViewAddedListener) {
-    return annotationManager.addMarker(markerOptions, this, onMarkerViewAddedListener);
-  }
-
-  /**
-   * Adds multiple markersViews to this map.
-   * <p>
-   * The marker's icon is rendered on the map at the location {@code Marker.position}.
-   * If {@code Marker.title} is defined, the map shows an info box with the marker's title and snippet.
-   * </p>
-   *
-   * @param markerViewOptions A list of markerView options objects that defines how to render the markers
-   * @return A list of the {@code MarkerView}s that were added to the map
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public List<MarkerView> addMarkerViews(@NonNull List<? extends
-    BaseMarkerViewOptions> markerViewOptions) {
-    return annotationManager.addMarkerViews(markerViewOptions, this);
-  }
-
-  /**
-   * Returns markerViews found inside of a rectangle on this map.
-   *
-   * @param rect the rectangular area on the map to query for markerViews
-   * @return A list of the markerViews that were found in the rectangle
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @NonNull
-  @Deprecated
-  public List<MarkerView> getMarkerViewsInRect(@NonNull RectF rect) {
-    return annotationManager.getMarkerViewsInRect(rect);
   }
 
   /**
@@ -1586,15 +1421,6 @@ public final class MapboxMap {
     return annotationManager.getSelectedMarkers();
   }
 
-  /**
-   * Get the MarkerViewManager associated to the MapView.
-   *
-   * @return the associated MarkerViewManager
-   */
-  public MarkerViewManager getMarkerViewManager() {
-    return annotationManager.getMarkerViewManager();
-  }
-
   //
   // InfoWindow
   //
@@ -1670,7 +1496,7 @@ public final class MapboxMap {
     for (int i = 0; i < padding.length; i++) {
       padding[i] = mapPadding[i] + padding[i];
     }
-    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+    projection.setContentPadding(padding);
 
     // get padded camera position from LatLngBounds
     CameraPosition cameraPosition = nativeMapView.getCameraForLatLngBounds(latLngBounds);
@@ -1694,7 +1520,7 @@ public final class MapboxMap {
     for (int i = 0; i < padding.length; i++) {
       padding[i] = mapPadding[i] + padding[i];
     }
-    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+    projection.setContentPadding(padding);
 
     // get padded camera position from LatLngBounds
     CameraPosition cameraPosition = nativeMapView.getCameraForGeometry(geometry, bearing);
@@ -1731,7 +1557,7 @@ public final class MapboxMap {
   }
 
   private void setPadding(int[] padding) {
-    projection.setContentPadding(padding, myLocationViewSettings.getPadding());
+    projection.setContentPadding(padding);
     uiSettings.invalidate();
   }
 
@@ -2078,107 +1904,6 @@ public final class MapboxMap {
    */
   public OnInfoWindowCloseListener getOnInfoWindowCloseListener() {
     return annotationManager.getInfoWindowManager().getOnInfoWindowCloseListener();
-  }
-
-  //
-  // User location
-  //
-
-  /**
-   * Returns the status of the my-location layer.
-   *
-   * @return True if the my-location layer is enabled, false otherwise.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public boolean isMyLocationEnabled() {
-    return trackingSettings.isMyLocationEnabled();
-  }
-
-  /**
-   * <p>
-   * Enables or disables the my-location layer.
-   * While enabled, the my-location layer continuously draws an indication of a user's current
-   * location and bearing.
-   * </p>
-   * In order to use the my-location layer feature you need to request permission for either
-   * android.Manifest.permission#ACCESS_COARSE_LOCATION or android.Manifest.permission#ACCESS_FINE_LOCATION.
-   *
-   * @param enabled True to enable; false to disable.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public void setMyLocationEnabled(boolean enabled) {
-    trackingSettings.setMyLocationEnabled(enabled);
-  }
-
-  /**
-   * Returns the currently displayed user location, or null if there is no location data available.
-   *
-   * @return The currently displayed user location.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Nullable
-  @Deprecated
-  public Location getMyLocation() {
-    return trackingSettings.getMyLocation();
-  }
-
-  /**
-   * Sets a callback that's invoked when the the My Location view
-   * (which signifies the user's location) changes location.
-   *
-   * @param listener The callback that's invoked when the user clicks on a marker.
-   *                 To unset the callback, use null.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public void setOnMyLocationChangeListener(@Nullable MapboxMap.OnMyLocationChangeListener
-                                              listener) {
-    trackingSettings.setOnMyLocationChangeListener(listener);
-  }
-
-  /**
-   * Replaces the location source of the my-location layer.
-   *
-   * @param locationSource A {@link LocationEngine} location source to use in the my-location layer.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public void setLocationSource(@Nullable LocationEngine locationSource) {
-    trackingSettings.setLocationSource(locationSource);
-  }
-
-  /**
-   * Sets a callback that's invoked when the location tracking mode changes.
-   *
-   * @param listener The callback that's invoked when the location tracking mode changes.
-   *                 To unset the callback, use null.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public void setOnMyLocationTrackingModeChangeListener(
-    @Nullable MapboxMap.OnMyLocationTrackingModeChangeListener listener) {
-    trackingSettings.setOnMyLocationTrackingModeChangeListener(listener);
-  }
-
-  /**
-   * Sets a callback that's invoked when the bearing tracking mode changes.
-   *
-   * @param listener The callback that's invoked when the bearing tracking mode changes.
-   *                 To unset the callback, use null.
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugin-locationlayer instead.
-   */
-  @Deprecated
-  public void setOnMyBearingTrackingModeChangeListener(@Nullable OnMyBearingTrackingModeChangeListener listener) {
-    trackingSettings.setOnMyBearingTrackingModeChangeListener(listener);
   }
 
   //
@@ -2546,187 +2271,6 @@ public final class MapboxMap {
      */
     @Nullable
     View getInfoWindow(@NonNull Marker marker);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when an MarkerView will be shown.
-   *
-   * @param <U> the instance type of MarkerView
-   * @deprecated Use a {@link com.mapbox.mapboxsdk.style.layers.SymbolLayer} instead. An example of converting Android
-   * SDK views to be used as a symbol see https://github.com/mapbox/mapbox-gl-native/blob/68f32bc104422207c64da8d90e8411b138d87f04/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/style/SymbolGeneratorActivity.java
-   */
-  @Deprecated
-  public abstract static class MarkerViewAdapter<U extends MarkerView> {
-
-    private Context context;
-    private final Class<U> persistentClass;
-    private final Pools.SimplePool<View> viewReusePool;
-
-    /**
-     * Create an instance of MarkerViewAdapter.
-     *
-     * @param context the context associated to a MapView
-     */
-    @SuppressWarnings("unchecked")
-    public MarkerViewAdapter(Context context) {
-      this.context = context;
-      persistentClass = (Class<U>) ((ParameterizedType) getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-      viewReusePool = new Pools.SimplePool<>(10000);
-    }
-
-    /**
-     * Called when an MarkerView will be added to the MapView.
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     * @param parent      the parent ViewGroup of the convertview
-     * @return the View that is adapted to the contents of MarkerView
-     */
-    @Nullable
-    public abstract View getView(@NonNull U marker, @Nullable View convertView, @NonNull ViewGroup parent);
-
-    /**
-     * Called when an MarkerView is removed from the MapView or the View object is going to be reused.
-     * <p>
-     * This method should be used to reset an animated view back to it's original state for view reuse.
-     * </p>
-     * <p>
-     * Returning true indicates you want to the view reuse to be handled automatically.
-     * Returning false indicates you want to perform an animation and you are required calling
-     * {@link #releaseView(View)} yourself.
-     * </p>
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     * @return true if you want reuse to occur automatically, false if you want to manage this yourself.
-     */
-    public boolean prepareViewForReuse(@NonNull MarkerView marker, @NonNull View convertView) {
-      return true;
-    }
-
-    /**
-     * Called when a MarkerView is selected from the MapView.
-     * <p>
-     * Returning true from this method indicates you want to move the MarkerView to the selected state.
-     * Returning false indicates you want to animate the View first an manually select the MarkerView when appropriate.
-     * </p>
-     *
-     * @param marker                   the model representing the MarkerView
-     * @param convertView              the reusable view
-     * @param reselectionFromRecycling indicates if the onSelect callback is the initial selection
-     *                                 callback or that selection occurs due to recreation of selected marker
-     * @return true if you want to select the Marker immediately, false if you want to manage this yourself.
-     */
-    public boolean onSelect(@NonNull U marker, @NonNull View convertView, boolean reselectionFromRecycling) {
-      return true;
-    }
-
-    /**
-     * Called when a MarkerView is deselected from the MapView.
-     *
-     * @param marker      the model representing the MarkerView
-     * @param convertView the reusable view
-     */
-    public void onDeselect(@NonNull U marker, @NonNull View convertView) {
-    }
-
-    /**
-     * Returns the generic type of the used MarkerView.
-     *
-     * @return the generic type
-     */
-    public final Class<U> getMarkerClass() {
-      return persistentClass;
-    }
-
-    /**
-     * Returns the pool used to store reusable Views.
-     *
-     * @return the pool associated to this adapter
-     */
-    public final Pools.SimplePool<View> getViewReusePool() {
-      return viewReusePool;
-    }
-
-    /**
-     * Returns the context associated to the hosting MapView.
-     *
-     * @return the context used
-     */
-    public final Context getContext() {
-      return context;
-    }
-
-    /**
-     * Release a View to the ViewPool.
-     *
-     * @param view the view to be released
-     */
-    public final void releaseView(View view) {
-      view.setVisibility(View.GONE);
-      viewReusePool.release(view);
-    }
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the user clicks on a MarkerView.
-   */
-  public interface OnMarkerViewClickListener {
-
-    /**
-     * Called when the user clicks on a MarkerView.
-     *
-     * @param marker  the MarkerView associated to the clicked View
-     * @param view    the clicked View
-     * @param adapter the adapter used to adapt the MarkerView to the View
-     * @return If true the listener has consumed the event and the info window will not be shown
-     */
-    boolean onMarkerClick(@NonNull Marker marker, @NonNull View view, @NonNull MarkerViewAdapter adapter);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the the My Location view changes location.
-   *
-   * @see MapboxMap#setOnMyLocationChangeListener(OnMyLocationChangeListener)
-   */
-  public interface OnMyLocationChangeListener {
-    /**
-     * Called when the location of the My Location view has changed
-     * (be it latitude/longitude, bearing or accuracy).
-     *
-     * @param location The current location of the My Location view The type of map change event.
-     */
-    void onMyLocationChange(@Nullable Location location);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
-   *
-   * @see TrackingSettings#setMyLocationTrackingMode(int)
-   */
-  public interface OnMyLocationTrackingModeChangeListener {
-
-    /**
-     * Called when the tracking mode of My Location tracking has changed
-     *
-     * @param myLocationTrackingMode the current active location tracking mode
-     */
-    void onMyLocationTrackingModeChange(@MyLocationTracking.Mode int myLocationTrackingMode);
-  }
-
-  /**
-   * Interface definition for a callback to be invoked when the the My Location tracking mode changes.
-   *
-   * @see TrackingSettings#setMyLocationTrackingMode(int)
-   */
-  public interface OnMyBearingTrackingModeChangeListener {
-
-    /**
-     * Called when the tracking mode of My Bearing tracking has changed
-     *
-     * @param myBearingTrackingMode the current active bearing tracking mode
-     */
-    void onMyBearingTrackingModeChange(@MyBearingTracking.Mode int myBearingTrackingMode);
   }
 
   /**

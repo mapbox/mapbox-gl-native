@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.TextureView;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -30,15 +29,12 @@ import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
@@ -82,7 +78,6 @@ public class MapView extends FrameLayout {
   private boolean destroyed;
   private boolean hasSurface;
 
-  private MyLocationView myLocationView;
   private CompassView compassView;
   private PointF focalPoint;
   private ImageView attrView;
@@ -130,7 +125,6 @@ public class MapView extends FrameLayout {
     // inflate view
     View view = LayoutInflater.from(context).inflate(R.layout.mapbox_mapview_internal, this);
     compassView = (CompassView) view.findViewById(R.id.compassView);
-    myLocationView = (MyLocationView) view.findViewById(R.id.userLocationView);
     attrView = (ImageView) view.findViewById(R.id.attributionView);
     logoView = (ImageView) view.findViewById(R.id.logoView);
 
@@ -152,42 +146,33 @@ public class MapView extends FrameLayout {
     // callback for registering touch listeners
     RegisterTouchListener registerTouchListener = new RegisterTouchListener();
 
-    // callback for zooming in the camera
-    CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
-
     // callback for camera change events
     final CameraChangeDispatcher cameraChangeDispatcher = new CameraChangeDispatcher();
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
     UiSettings uiSettings = new UiSettings(proj, focalPointInvalidator, compassView, attrView, logoView);
-    TrackingSettings trackingSettings = new TrackingSettings(myLocationView, uiSettings, focalPointInvalidator,
-      zoomInvalidator);
-    MyLocationViewSettings myLocationViewSettings = new MyLocationViewSettings(myLocationView, proj,
-      focalPointInvalidator);
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
-    MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     IconManager iconManager = new IconManager(nativeMapView);
     Annotations annotations = new AnnotationContainer(nativeMapView, annotationsArray);
-    Markers markers = new MarkerContainer(nativeMapView, this, annotationsArray, iconManager, markerViewManager);
+    Markers markers = new MarkerContainer(nativeMapView, annotationsArray, iconManager);
     Polygons polygons = new PolygonContainer(nativeMapView, annotationsArray);
     Polylines polylines = new PolylineContainer(nativeMapView, annotationsArray);
     ShapeAnnotations shapeAnnotations = new ShapeAnnotationContainer(nativeMapView, annotationsArray);
-    AnnotationManager annotationManager = new AnnotationManager(nativeMapView, this, annotationsArray,
-      markerViewManager, iconManager, annotations, markers, polygons, polylines, shapeAnnotations);
-    Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(), trackingSettings,
-      cameraChangeDispatcher);
+    AnnotationManager annotationManager = new AnnotationManager(this, annotationsArray, iconManager,
+      annotations, markers, polygons, polylines, shapeAnnotations);
+    Transform transform = new Transform(nativeMapView, cameraChangeDispatcher);
 
-    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, trackingSettings, myLocationViewSettings, proj,
-      registerTouchListener, annotationManager, cameraChangeDispatcher);
+    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
+      annotationManager, cameraChangeDispatcher);
     focalPointInvalidator.addListener(mapboxMap.createFocalPointChangeListener());
 
     mapCallback.attachMapboxMap(mapboxMap);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings,
-      annotationManager, cameraChangeDispatcher);
-    mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
+    mapGestureDetector = new MapGestureDetector(context, transform, proj,
+      uiSettings, annotationManager, cameraChangeDispatcher);
+    mapKeyListener = new MapKeyListener(transform, uiSettings);
 
     // overlain zoom buttons
     mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
@@ -197,8 +182,6 @@ public class MapView extends FrameLayout {
 
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
     compassView.setOnClickListener(createCompassClickListener(cameraChangeDispatcher));
-    // inject widgets with MapboxMap
-    myLocationView.setMapboxMap(mapboxMap);
     attrView.setOnClickListener(new AttributionClickListener(context, mapboxMap));
 
     // Ensure this view is interactable
@@ -1031,27 +1014,6 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private class CameraZoomInvalidator implements TrackingSettings.CameraZoomInvalidator {
-
-    @Override
-    public void zoomTo(double zoomLevel) {
-      Transform transform = mapboxMap.getTransform();
-      double currentZoomLevel = transform.getCameraPosition().zoom;
-      if (currentZoomLevel < zoomLevel) {
-        setZoom(zoomLevel, mapGestureDetector.getFocalPoint(), transform);
-      }
-    }
-
-    private void setZoom(double zoomLevel, @Nullable PointF focalPoint, @NonNull Transform transform) {
-      if (focalPoint != null) {
-        transform.setZoom(zoomLevel, focalPoint);
-      } else {
-        PointF centerPoint = new PointF(getMeasuredWidth() / 2, getMeasuredHeight() / 2);
-        transform.setZoom(zoomLevel, centerPoint);
-      }
-    }
-  }
-
   private static class MapCallback implements OnMapChangedListener {
 
     private MapboxMap mapboxMap;
@@ -1068,7 +1030,6 @@ public class MapView extends FrameLayout {
         initialLoad = false;
         mapboxMap.onPreMapReady();
         onMapReady();
-        mapboxMap.onPostMapReady();
       } else if (change == DID_FINISH_RENDERING_FRAME || change == DID_FINISH_RENDERING_FRAME_FULLY_RENDERED) {
         mapboxMap.onUpdateFullyRendered();
       } else if (change == REGION_IS_CHANGING || change == REGION_DID_CHANGE || change == DID_FINISH_LOADING_MAP) {

@@ -118,7 +118,7 @@ public class IconTest extends BaseActivityTest {
       .position(new LatLng(5, 1))
     );
     mapboxMap.addMarker(new MarkerOptions()
-      .icon(iconFactory.fromResource(R.drawable.ic_android))
+      .icon(iconFactory.fromResource(R.drawable.icon))
       .position(new LatLng(6, 1))
     );
 

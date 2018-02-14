@@ -11,11 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.UiSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
@@ -50,14 +48,6 @@ public class DoubleMapActivity extends AppCompatActivity {
     mapboxMap = map;
     mapboxMap.setStyleUrl(Style.DARK);
     mapboxMap.moveCamera(CameraUpdateFactory.zoomTo(18));
-    try {
-      mapboxMap.setMyLocationEnabled(true);
-      TrackingSettings settings = mapboxMap.getTrackingSettings();
-      settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-    } catch (SecurityException securityException) {
-      // permission is handled in MainActivity
-      finish();
-    }
   }
 
   /**
@@ -105,15 +95,6 @@ public class DoubleMapActivity extends AppCompatActivity {
         uiSettings.setCompassEnabled(false);
         uiSettings.setAttributionEnabled(false);
         uiSettings.setLogoEnabled(false);
-
-        try {
-          mapboxMap.setMyLocationEnabled(true);
-          TrackingSettings settings = mapboxMap.getTrackingSettings();
-          settings.setMyLocationTrackingMode(MyLocationTracking.TRACKING_FOLLOW);
-        } catch (SecurityException securityException) {
-          // permission is handled in MainActivity
-          getActivity().finish();
-        }
 
         mapboxMap.setOnMapClickListener(point -> {
           // test if we can open 2 activities after each other

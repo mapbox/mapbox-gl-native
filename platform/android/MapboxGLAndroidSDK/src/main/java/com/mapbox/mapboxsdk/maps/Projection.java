@@ -24,25 +24,13 @@ public class Projection {
     this.contentPadding = new int[] {0, 0, 0, 0};
   }
 
-  void setContentPadding(int[] contentPadding, int[] userLocationViewPadding) {
+  void setContentPadding(int[] contentPadding) {
     this.contentPadding = contentPadding;
-
-    int[] padding = new int[] {
-      contentPadding[0] + userLocationViewPadding[0],
-      contentPadding[1] + userLocationViewPadding[1],
-      contentPadding[2] + userLocationViewPadding[2],
-      contentPadding[3] + userLocationViewPadding[3]
-    };
-
-    nativeMapView.setContentPadding(padding);
+    nativeMapView.setContentPadding(contentPadding);
   }
 
   int[] getContentPadding() {
     return contentPadding;
-  }
-
-  public void invalidateContentPadding(int[] userLocationViewPadding) {
-    setContentPadding(contentPadding, userLocationViewPadding);
   }
 
   /**

@@ -4,12 +4,10 @@
     <string name="activity_map_fragment">Map Fragment</string>
     <string name="activity_multimap">Multiple Maps on Screen</string>
     <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
-    <string name="activity_animated_marker">Animated Markers</string>
     <string name="activity_dynamic_marker">Dynamic Marker</string>
     <string name="activity_polyline">Polyline</string>
     <string name="activity_polygon">Polygon</string>
     <string name="activity_press_for_marker">Press Map For Marker</string>
-    <string name="activity_view_marker">View Marker API</string>
     <string name="activity_add_remove_markers">Zoom function with SymbolLayer</string>
     <string name="activity_info_window">Standard InfoWindow</string>
     <string name="activity_infowindow_adapter">Custom InfoWindow</string>
@@ -21,11 +19,6 @@
     <string name="activity_scroll_by">Scroll By Method</string>
     <string name="activity_double_map">Double Map Activity</string>
     <string name="activity_snapshot">Snapshot Activity</string>
-    <string name="activity_user_tracking_mode">User tracking mode</string>
-    <string name="activity_user_tracking_customization">User location drawable</string>
-    <string name="activity_user_dot_color">User location tint color</string>
-    <string name="activity_user_location_toggle">User location toggle</string>
-    <string name="activity_custom_location_engine">Custom location engine</string>
     <string name="activity_custom_layer">Custom Layer</string>
     <string name="activity_map_padding">Map Padding</string>
     <string name="activity_debug_mode">Debug Mode</string>
@@ -52,7 +45,6 @@
     <string name="activity_map_change">Map Change Events</string>
     <string name="activity_map_visibility">Visibility Map</string>
     <string name="activity_map_in_dialog">Dialog with map</string>
-    <string name="activity_marker_view_rectangle">Marker views in rectangle</string>
     <string name="activity_url_transform">Url transform</string>
     <string name="activity_restricted_bounds">Restrict camera to a bounds</string>
     <string name="activity_fill_extrusion_layer">Fill extrusions</string>

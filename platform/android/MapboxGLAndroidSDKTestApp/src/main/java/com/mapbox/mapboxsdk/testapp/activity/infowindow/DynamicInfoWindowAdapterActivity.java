@@ -7,8 +7,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
 
 import com.mapbox.mapboxsdk.annotations.InfoWindow;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
+import com.mapbox.mapboxsdk.annotations.Marker;
+import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -50,7 +50,7 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
     mapboxMap.getUiSettings().setDeselectMarkersOnTap(false);
 
     // Add a marker
-    final MarkerView marker = addMarker(mapboxMap);
+    final Marker marker = addMarker(mapboxMap);
     mapboxMap.selectMarker(marker);
 
     // On map click, change the info window contents
@@ -77,9 +77,9 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
     mapboxMap.animateCamera(CameraUpdateFactory.newLatLng(PARIS));
   }
 
-  private MarkerView addMarker(MapboxMap mapboxMap) {
+  private Marker addMarker(MapboxMap mapboxMap) {
     return mapboxMap.addMarker(
-      new MarkerViewOptions()
+      new MarkerOptions()
         .position(PARIS)
         .icon(IconUtils.drawableToIcon(this, R.drawable.ic_location_city,
           ResourcesCompat.getColor(getResources(), R.color.mapbox_blue, getTheme()))

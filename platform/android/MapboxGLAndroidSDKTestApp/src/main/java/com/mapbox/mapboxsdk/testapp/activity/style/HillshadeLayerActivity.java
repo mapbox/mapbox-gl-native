@@ -25,7 +25,7 @@ public class HillshadeLayerActivity extends AppCompatActivity {
   @Override
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    setContentView(R.layout.activity_fill_extrusion_layer);
+    setContentView(R.layout.activity_hillshade_layer);
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
