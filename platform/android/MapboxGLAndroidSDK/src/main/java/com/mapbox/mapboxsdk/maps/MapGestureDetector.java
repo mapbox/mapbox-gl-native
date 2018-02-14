@@ -41,7 +41,6 @@ final class MapGestureDetector {
   private final Transform transform;
   private final Projection projection;
   private final UiSettings uiSettings;
-  private final TrackingSettings trackingSettings;
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
@@ -89,13 +88,11 @@ final class MapGestureDetector {
   private boolean rotateGestureOccurred;
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
-                     TrackingSettings trackingSettings, AnnotationManager annotationManager,
-                     CameraChangeDispatcher cameraChangeDispatcher) {
+                     AnnotationManager annotationManager, CameraChangeDispatcher cameraChangeDispatcher) {
     this.annotationManager = annotationManager;
     this.transform = transform;
     this.projection = projection;
     this.uiSettings = uiSettings;
-    this.trackingSettings = trackingSettings;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
 
     // Touch gesture detectors
@@ -131,10 +128,6 @@ final class MapGestureDetector {
 
   /**
    * Get the current active gesture focal point.
-   * <p>
-   * This could be either the user provided focal point in {@link UiSettings#setFocalPoint(PointF)} or the focal point
-   * defined as a result of {@link TrackingSettings#setMyLocationEnabled(boolean)}.
-   * </p>
    *
    * @return the current active gesture focal point.
    */
@@ -400,7 +393,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      if ((!trackingSettings.isScrollGestureCurrentlyEnabled()) || recentScaleGestureOccurred) {
+      if (recentScaleGestureOccurred) {
         // don't allow a fling is scroll is disabled
         // and ignore when a scale gesture has occurred
         return false;
@@ -414,8 +407,6 @@ final class MapGestureDetector {
         // ignore short flings, these can occur when other gestures just have finished executing
         return false;
       }
-
-      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       // cancel any animation
       transform.cancelTransitions();
@@ -441,10 +432,6 @@ final class MapGestureDetector {
     // Called for drags
     @Override
     public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-      if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
-        return false;
-      }
-
       if (tiltGestureOccurred) {
         return false;
       }
@@ -466,9 +453,6 @@ final class MapGestureDetector {
           Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pan));
         }
       }
-
-      // reset tracking if needed
-      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       // Scroll the map
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
@@ -596,10 +580,6 @@ final class MapGestureDetector {
       }
       quickZoom = !twoTap;
 
-      // make an assumption here; if the zoom center is specified by the gesture, it's NOT going
-      // to be in the center of the map. Therefore the zoom will translate the map center, so tracking
-      // should be disabled.
-      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
       // Scale the map
       if (focalPoint != null) {
         // arround user provided focal point
@@ -711,10 +691,6 @@ final class MapGestureDetector {
     // Called when two fingers first touch the screen
     @Override
     public boolean onRotateBegin(RotateGestureDetector detector) {
-      if (!trackingSettings.isRotateGestureCurrentlyEnabled()) {
-        return false;
-      }
-
       // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
@@ -726,7 +702,7 @@ final class MapGestureDetector {
     // Called for rotation
     @Override
     public boolean onRotate(RotateGestureDetector detector) {
-      if (!trackingSettings.isRotateGestureCurrentlyEnabled() || tiltGestureOccurred) {
+      if (tiltGestureOccurred) {
         return false;
       }
 
@@ -752,10 +728,6 @@ final class MapGestureDetector {
       if (scaleBeginTime != 0) {
         rotateGestureOccurred = true;
       }
-
-      // rotation constitutes translation of anything except the center of
-      // rotation, so cancel both location and bearing tracking if required
-      trackingSettings.resetTrackingModesIfRequired(true, true, false);
 
       // Calculate map bearing value
       double bearing = transform.getRawBearing() + angle;

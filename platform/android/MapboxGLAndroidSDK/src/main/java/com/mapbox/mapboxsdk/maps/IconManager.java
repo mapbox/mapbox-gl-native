@@ -6,7 +6,6 @@ import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.annotations.Icon;
 import com.mapbox.mapboxsdk.annotations.IconFactory;
 import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,8 +14,7 @@ import java.util.Map;
 /**
  * Responsible for managing icons added to the Map.
  * <p>
- * Maintains a {@link List} of {@link Icon} and  is responsible for initialising default markers and
- * setting up {@link MarkerView} annotation ghosting.
+ * Maintains a {@link List} of {@link Icon} and  is responsible for initialising default markers.
  * </p>
  * <p>
  * Keep track of icons added and the resulting average icon size. This is used internally by our
@@ -48,13 +46,6 @@ class IconManager {
     }
     addIcon(icon);
     return icon;
-  }
-
-  void loadIconForMarkerView(MarkerView marker) {
-    Icon icon = marker.getIcon();
-    Bitmap bitmap = icon.getBitmap();
-    updateHighestIconSize(bitmap);
-    addIcon(icon, false);
   }
 
   int getTopOffsetPixelsForIcon(Icon icon) {

@@ -21,7 +21,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     MapGestureDetector mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null, null);
+      null, projection, null, null, null);
 
     MapboxMap.OnMapClickListener listener = mock(MapboxMap.OnMapClickListener.class);
     mapGestureDetector.addOnMapClickListener(listener);
@@ -41,7 +41,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     MapGestureDetector mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null, null);
+      null, projection, null, null, null);
 
     MapboxMap.OnMapLongClickListener listener = mock(MapboxMap.OnMapLongClickListener.class);
     mapGestureDetector.addOnMapLongClickListener(listener);
@@ -61,7 +61,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     MapGestureDetector mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null, null);
+      null, projection, null, null, null);
 
     MapboxMap.OnFlingListener listener = mock(MapboxMap.OnFlingListener.class);
     mapGestureDetector.addOnFlingListener(listener);
@@ -81,7 +81,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     MapGestureDetector mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null, null);
+      null, projection, null, null, null);
 
     MapboxMap.OnScrollListener listener = mock(MapboxMap.OnScrollListener.class);
     mapGestureDetector.addOnScrollListener(listener);

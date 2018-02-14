@@ -5,7 +5,6 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.android.core.location.LocationEngine;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,13 +24,11 @@ public class MapboxTest {
 
   private Context context;
   private Context appContext;
-  private LocationEngine locationSource;
 
   @Before
   public void before() {
     context = mock(Context.class);
     appContext = mock(Context.class);
-    locationSource = mock(LocationEngine.class);
     when(context.getApplicationContext()).thenReturn(appContext);
   }
 
@@ -83,7 +80,7 @@ public class MapboxTest {
   }
 
   private void injectMapboxSingleton(String accessToken) {
-    Mapbox mapbox = new Mapbox(appContext, accessToken, locationSource);
+    Mapbox mapbox = new Mapbox(appContext, accessToken);
     try {
       Field field = Mapbox.class.getDeclaredField("INSTANCE");
       field.setAccessible(true);
