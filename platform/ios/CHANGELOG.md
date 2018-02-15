@@ -29,6 +29,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue preventing `MGLImageSource`s from drawing on the map when the map is zoomed in and tilted. ([#10677](https://github.com/mapbox/mapbox-gl-native/pull/10677))
 * Improved the sharpness of raster tiles on Retina displays. ([#10984](https://github.com/mapbox/mapbox-gl-native/pull/10984))
 * Fixed a crash parsing a malformed style. ([#11001](https://github.com/mapbox/mapbox-gl-native/pull/11001))
+* Reduced memory usage by clearing in-memory tile cache before entering background. ([#11197](https://github.com/mapbox/mapbox-gl-native/pull/11197))
 
 ### Annotations
 
