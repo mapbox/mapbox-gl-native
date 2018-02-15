@@ -78,14 +78,14 @@ public class MapboxConstants {
   public static final double MINIMUM_DIRECTION = 0;
 
   /**
-   * The currently used minimun scale factor to clamp to when a quick zoom gesture occurs
+   * The currently used minimum scale factor to clamp to when a quick zoom gesture occurs
    */
   public static final float MINIMUM_SCALE_FACTOR_CLAMP = 0.00f;
 
   /**
    * The currently used maximum scale factor to clamp to when a quick zoom gesture occurs
    */
-  public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.45f;
+  public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.11f;
 
   /**
    * Fragment Argument Key for MapboxMapOptions
