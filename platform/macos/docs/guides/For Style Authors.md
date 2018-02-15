@@ -179,6 +179,7 @@ In style JSON | In the SDK
 `circle` | `MGLCircleStyleLayer`
 `fill` | `MGLFillStyleLayer`
 `fill-extrusion` | `MGLFillExtrusionStyleLayer`
+`heatmap` | `MGLHeatmapStyleLayer`
 `hillshade` | `MGLHillshadeStyleLayer`
 `line` | `MGLLineStyleLayer`
 `raster` | `MGLRasterStyleLayer`

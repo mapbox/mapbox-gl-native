@@ -308,14 +308,15 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';
+        const inputVariable = property.name === 'heatmap-color' ? '$heatmapDensity' : '$zoomLevel';
         if (property["property-function"]) {
-            doc += '* Interpolation and step functions applied to the `$zoomLevel` variable and/or feature attributes\n';
+            doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable and/or feature attributes\n`;
         } else if (property.function === "interpolated") {
-            doc += '* Interpolation and step functions applied to the `$zoomLevel` variable\n\n' +
+            doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable\n\n` +
                 'This property does not support applying interpolation or step functions to feature attributes.';
         } else {
-            doc += '* Step functions applied to the `$zoomLevel` variable\n\n' +
-                'This property does not support applying interpolation functions to the `$zoomLevel` variable or applying interpolation or step functions to feature attributes.';
+            doc += `* Step functions applied to the \`${inputVariable}\` variable\n\n` +
+                `This property does not support applying interpolation functions to the \`${inputVariable}\` variable or applying interpolation or step functions to feature attributes.`;
         }
     }
     return doc;
@@ -387,7 +388,7 @@ global.describeValue = function (value, property, layerType) {
                 throw new Error(`No description available for ${value[0]} expression in ${property.name} of ${layerType}.`);
         }
     }
-    
+
     switch (property.type) {
         case 'boolean':
             return value ? '`YES`' : '`NO`';

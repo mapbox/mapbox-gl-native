@@ -59,6 +59,7 @@
     MGLTransition transitionTest = MGLTransitionMake(5, 4);
 
 <% for (const property of properties) { -%>
+<%   if (property.name === 'heatmap-color') continue; -%>
 
     // <%- originalPropertyName(property) %>
     {
@@ -151,6 +152,7 @@
 
 - (void)testPropertyNames {
 <% for (const property of properties) { -%>
+<%   if (property.name === 'heatmap-color') continue; -%>
     [self testPropertyName:@"<%- property.getter || property.name %>" isBoolean:<%- property.type === 'boolean' ? 'YES' : 'NO' %>];
 <% } -%>
 }

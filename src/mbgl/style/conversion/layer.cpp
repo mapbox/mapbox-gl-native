@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -165,6 +166,8 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
         converted = convertVectorLayer<SymbolLayer>(*id, value, error);
     } else if (*type == "raster") {
         converted = convertRasterLayer(*id, value, error);
+    } else if (*type == "heatmap") {
+        converted = convertVectorLayer<HeatmapLayer>(*id, value, error);
     } else if (*type == "hillshade") {
         converted = convertHillshadeLayer(*id, value, error);
     } else if (*type == "background") {
