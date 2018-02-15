@@ -5,8 +5,8 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
-#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/heatmap_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
@@ -17,8 +17,8 @@
 #include "custom_layer.hpp"
 #include "fill_extrusion_layer.hpp"
 #include "fill_layer.hpp"
-#include "hillshade_layer.hpp"
 #include "heatmap_layer.hpp"
+#include "hillshade_layer.hpp"
 #include "line_layer.hpp"
 #include "raster_layer.hpp"
 #include "symbol_layer.hpp"
@@ -34,8 +34,8 @@ template <> struct PeerType<style::BackgroundLayer> { using Type = android::Back
 template <> struct PeerType<style::CircleLayer> { using Type = android::CircleLayer; };
 template <> struct PeerType<style::FillExtrusionLayer> { using Type = android::FillExtrusionLayer; };
 template <> struct PeerType<style::FillLayer> { using Type = android::FillLayer; };
-template <> struct PeerType<style::HillshadeLayer> { using Type = android::HillshadeLayer; };
 template <> struct PeerType<style::HeatmapLayer> { using Type = android::HeatmapLayer; };
+template <> struct PeerType<style::HillshadeLayer> { using Type = android::HillshadeLayer; };
 template <> struct PeerType<style::LineLayer> { using Type = android::LineLayer; };
 template <> struct PeerType<style::RasterLayer> { using Type = android::RasterLayer; };
 template <> struct PeerType<style::SymbolLayer> { using Type = android::SymbolLayer; };
@@ -98,8 +98,8 @@ void registerNativeLayers(jni::JNIEnv& env) {
     CustomLayer::registerNative(env);
     FillExtrusionLayer::registerNative(env);
     FillLayer::registerNative(env);
-    HillshadeLayer::registerNative(env);
     HeatmapLayer::registerNative(env);
+    HillshadeLayer::registerNative(env);
     LineLayer::registerNative(env);
     RasterLayer::registerNative(env);
     SymbolLayer::registerNative(env);

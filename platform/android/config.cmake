@@ -158,10 +158,10 @@ add_library(mbgl-android STATIC
     platform/android/src/style/layers/fill_extrusion_layer.hpp
     platform/android/src/style/layers/fill_layer.cpp
     platform/android/src/style/layers/fill_layer.hpp
-    platform/android/src/style/layers/hillshade_layer.cpp
-    platform/android/src/style/layers/hillshade_layer.hpp
     platform/android/src/style/layers/heatmap_layer.cpp
     platform/android/src/style/layers/heatmap_layer.hpp
+    platform/android/src/style/layers/hillshade_layer.cpp
+    platform/android/src/style/layers/hillshade_layer.hpp
     platform/android/src/style/layers/layer.cpp
     platform/android/src/style/layers/layer.hpp
     platform/android/src/style/layers/layers.cpp
