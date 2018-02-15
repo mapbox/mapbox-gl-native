@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## master
+
+ - HeatmapLayer [#11046](https://github.com/mapbox/mapbox-gl-native/pull/11046)
+
 ## 6.0.0-beta.2 - February 13, 2018
  - Deprecate LocationEngine [#11185](https://github.com/mapbox/mapbox-gl-native/pull/11185)
  - Remove LOST from SDK [11186](https://github.com/mapbox/mapbox-gl-native/pull/11186)
