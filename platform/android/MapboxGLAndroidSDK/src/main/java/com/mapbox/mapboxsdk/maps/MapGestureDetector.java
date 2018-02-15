@@ -183,7 +183,7 @@ final class MapGestureDetector {
    * Forwards event to the related gesture detectors.
    * </p>
    *
-   * @param event the MotionEvent
+   * @param motionEvent the MotionEvent
    * @return True if touch event is handled
    *//*
   boolean onTouchEvent(MotionEvent event) {
@@ -298,38 +298,64 @@ final class MapGestureDetector {
   }
 */
   boolean onTouchEvent(MotionEvent motionEvent) {
+    // Framework can return null motion events in edge cases #9432
+    if (motionEvent == null) {
+      return false;
+    }
+
+    // Check and ignore non touch or left clicks
+    if ((motionEvent.getButtonState() != 0) && (motionEvent.getButtonState() != MotionEvent.BUTTON_PRIMARY)) {
+      return false;
+    }
+
     boolean result = gesturesManager.onTouchEvent(motionEvent);
 
     switch (motionEvent.getActionMasked()) {
+      case MotionEvent.ACTION_DOWN:
+        transform.setGestureInProgress(true);
+        break;
       case MotionEvent.ACTION_UP:
-        if (!uiSettings.isZoomGesturesEnabled() || !executeDoubleTap) {
-          break;
-        }
+        transform.setGestureInProgress(false);
 
-        // notify camera change listener
-        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
-        // Single finger double tap
-        if (focalPoint != null) {
-          // User provided focal point
-          transform.zoom(true, focalPoint);
-        } else {
-          // Zoom in on gesture
-          transform.zoom(true, new PointF(motionEvent.getX(), motionEvent.getY()));
+        if (executeDoubleTap(motionEvent)) {
+          return true;
         }
-        if (isZoomValid(transform)) {
-          MapEventFactory mapEventFactory = new MapEventFactory();
-          LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
-          MapState doubleTap = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-          doubleTap.setGesture(Events.DOUBLE_TAP);
-          Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, doubleTap));
-        }
+        break;
 
-        executeDoubleTap = false;
-        return true;
+      case MotionEvent.ACTION_CANCEL:
+        transform.setGestureInProgress(false);
+        break;
     }
 
     return result;
+  }
+
+  private boolean executeDoubleTap(MotionEvent motionEvent) {
+    if (!uiSettings.isZoomGesturesEnabled() || !executeDoubleTap) {
+      return false;
+    }
+
+    // notify camera change listener
+    cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+
+    // Single finger double tap
+    if (focalPoint != null) {
+      // User provided focal point
+      transform.zoom(true, focalPoint);
+    } else {
+      // Zoom in on gesture
+      transform.zoom(true, new PointF(motionEvent.getX(), motionEvent.getY()));
+    }
+    if (isZoomValid(transform)) {
+      MapEventFactory mapEventFactory = new MapEventFactory();
+      LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
+      MapState doubleTap = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
+      doubleTap.setGesture(Events.DOUBLE_TAP);
+      Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, doubleTap));
+    }
+
+    executeDoubleTap = false;
+    return true;
   }
 
   /**
@@ -517,6 +543,11 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
+      quickZoom = detector.getPointersCount() == 1;
+      if (quickZoom) {
+        gesturesManager.getMoveGestureDetector().setEnabled(false);
+      }
+
       if (isZoomValid(transform)) {
         MapEventFactory mapEventFactory = new MapEventFactory();
         LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
@@ -535,7 +566,6 @@ final class MapGestureDetector {
       // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      quickZoom = detector.getPointersCount() == 1;
       trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
 
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
@@ -555,8 +585,10 @@ final class MapGestureDetector {
     }
 
     @Override
-    public void onScaleEnd(StandardScaleGestureDetector detector) {
-
+    public void onScaleEnd(StandardScaleGestureDetector detector, float velocityX, float velocityY) {
+      if (quickZoom) {
+        gesturesManager.getMoveGestureDetector().setEnabled(true);
+      }
     }
 
     private double getNewZoom(float scaleFactor, boolean quickZoom) {
@@ -617,8 +649,8 @@ final class MapGestureDetector {
     }
 
     @Override
-    public void onRotateEnd(RotateGestureDetector detector) {
-      super.onRotateEnd(detector);
+    public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
+
     }
   }
 
@@ -656,8 +688,8 @@ final class MapGestureDetector {
     }
 
     @Override
-    public void onShoveEnd(ShoveGestureDetector detector) {
-      super.onShoveEnd(detector);
+    public void onShoveEnd(ShoveGestureDetector detector, float velocityX, float velocityY) {
+
     }
   }
 
