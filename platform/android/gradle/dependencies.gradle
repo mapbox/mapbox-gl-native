@@ -8,24 +8,26 @@ ext {
     ]
 
     versions = [
-            mapboxServices: '3.0.0-beta.2',
+            mapboxServices : '3.0.0-beta.2',
             mapboxTelemetry: '3.0.0-beta.1',
-            supportLib    : '25.4.0',
-            espresso      : '3.0.1',
-            testRunner    : '1.0.1',
-            leakCanary    : '1.5.1',
-            lost          : '3.0.4',
-            junit         : '4.12',
-            mockito       : '2.10.0',
-            robolectric   : '3.5.1',
-            timber        : '4.5.1',
-            okhttp        : '3.9.1'
+            mapboxGestures : '0.1.0-SNAPSHOT',
+            supportLib     : '25.4.0',
+            espresso       : '3.0.1',
+            testRunner     : '1.0.1',
+            leakCanary     : '1.5.1',
+            lost           : '3.0.4',
+            junit          : '4.12',
+            mockito        : '2.10.0',
+            robolectric    : '3.5.1',
+            timber         : '4.5.1',
+            okhttp         : '3.9.1'
     ]
 
     dependenciesList = [
             mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
             mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
             mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
+            mapboxAndroidGestures : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
 
             // for testApp
             mapboxJavaTurf        : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
