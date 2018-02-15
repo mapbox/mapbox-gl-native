@@ -37,8 +37,13 @@ MBGL_DEFINE_UNIFORM_SCALAR(Size, u_texsize);
 MBGL_DEFINE_UNIFORM_SCALAR(bool, u_pitch_with_map);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_camera_to_center_distance);
 MBGL_DEFINE_UNIFORM_SCALAR(float, u_fade_change);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_weight);
 
 MBGL_DEFINE_UNIFORM_VECTOR(float, 2, u_extrude_scale);
+
+namespace heatmap {
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_extrude_scale);
+} // namespace heatmap
 
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_tl_a);
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_pattern_br_a);
