@@ -374,13 +374,6 @@
     return styleHeader;
 }
 
-- (void)testClasses {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqual(self.style.styleClasses.count, 0);
-#pragma clang diagnostic pop
-}
-
 - (void)testImages {
     NSString *imageName = @"TrackingLocationMask";
 #if TARGET_OS_IPHONE
