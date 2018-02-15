@@ -402,16 +402,6 @@
                                     <action selector="showStyle:" target="-1" id="NTT-Y1-EqU"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Traffic Day" tag="7" keyEquivalent="7" id="m9S-sv-Dch">
-                                <connections>
-                                    <action selector="showStyle:" target="-1" id="lXM-BW-dDw"/>
-                                </connections>
-                            </menuItem>
-                            <menuItem title="Traffic Night" tag="8" keyEquivalent="8" id="yVS-VL-Xsy">
-                                <connections>
-                                    <action selector="showStyle:" target="-1" id="eAD-br-oBB"/>
-                                </connections>
-                            </menuItem>
                             <menuItem title="Custom Style…" id="L0h-86-2cU">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
