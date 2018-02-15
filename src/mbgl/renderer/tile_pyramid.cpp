@@ -303,7 +303,7 @@ void TilePyramid::setCacheSize(size_t size) {
     cache.setSize(size);
 }
 
-void TilePyramid::onLowMemory() {
+void TilePyramid::reduceMemoryUse() {
     cache.clear();
 }
 

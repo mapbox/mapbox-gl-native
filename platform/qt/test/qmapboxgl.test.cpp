@@ -15,8 +15,8 @@ QMapboxGLTest::QMapboxGLTest() : size(512, 512), fbo((assert(widget.context()->i
             this, SLOT(onMapChanged(QMapboxGL::MapChange)));
     connect(&map, SIGNAL(needsRendering()),
             this, SLOT(onNeedsRendering()));
-    map.resize(fbo.size(), fbo.size());
-    map.setFramebufferObject(fbo.handle());
+    map.resize(fbo.size());
+    map.setFramebufferObject(fbo.handle(), fbo.size());
     map.setCoordinateZoom(QMapbox::Coordinate(60.170448, 24.942046), 14);
 }
 

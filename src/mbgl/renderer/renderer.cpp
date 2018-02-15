@@ -94,9 +94,9 @@ void Renderer::dumpDebugLogs() {
     impl->dumDebugLogs();
 }
 
-void Renderer::onLowMemory() {
+void Renderer::reduceMemoryUse() {
     BackendScope guard { impl->backend };
-    impl->onLowMemory();
+    impl->reduceMemoryUse();
 }
 
 } // namespace mbgl

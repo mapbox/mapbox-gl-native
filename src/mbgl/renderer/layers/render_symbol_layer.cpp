@@ -268,9 +268,10 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 gl::DepthMode::disabled(),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                CollisionBoxProgram::UniformValues {
+                CollisionCircleProgram::UniformValues {
                     uniforms::u_matrix::Value{ tile.matrix },
                     uniforms::u_extrude_scale::Value{ extrudeScale },
+                    uniforms::u_overscale_factor::Value{ float(tile.tile.id.overscaleFactor()) },
                     uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() }
                 },
                 *bucket.collisionCircle.vertexBuffer,

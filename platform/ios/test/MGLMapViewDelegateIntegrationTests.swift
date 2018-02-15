@@ -13,6 +13,10 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapViewRegionIsChanging(_ mapView: MGLMapView) {}
 
+    func mapViewRegionIsChanging(_ mapView: MGLMapView, reason: MGLCameraChangeReason) {}
+
+    func mapView(_ mapView: MGLMapView, regionIsChangingWith reason: MGLCameraChangeReason) {}
+
     func mapView(_ mapView: MGLMapView, didChange mode: MGLUserTrackingMode, animated: Bool) {}
 
     func mapViewDidFinishLoadingMap(_ mapView: MGLMapView) {}
@@ -33,9 +37,15 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, didDeselect annotation: MGLAnnotation) {}
 
+    func mapView(_ mapView: MGLMapView, didSingleTapAt coordinate: CLLocationCoordinate2D) {}
+
     func mapView(_ mapView: MGLMapView, regionDidChangeAnimated animated: Bool) {}
 
+    func mapView(_ mapView: MGLMapView, regionDidChangeWith reason: MGLCameraChangeReason, animated: Bool) {}
+
     func mapView(_ mapView: MGLMapView, regionWillChangeAnimated animated: Bool) {}
+
+    func mapView(_ mapView: MGLMapView, regionWillChangeWith reason: MGLCameraChangeReason, animated: Bool) {}
 
     func mapViewDidFailLoadingMap(_ mapView: MGLMapView, withError error: Error) {}
 
@@ -79,4 +89,5 @@ extension MGLMapViewDelegateIntegrationTests: MGLMapViewDelegate {
 
     func mapView(_ mapView: MGLMapView, shouldChangeFrom oldCamera: MGLMapCamera, to newCamera: MGLMapCamera) -> Bool { return false }
 
+    func mapView(_ mapView: MGLMapView, shouldChangeFrom oldCamera: MGLMapCamera, to newCamera: MGLMapCamera, reason: MGLCameraChangeReason) -> Bool { return false }
 }

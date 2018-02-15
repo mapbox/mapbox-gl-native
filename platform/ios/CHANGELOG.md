@@ -11,6 +11,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Styles and rendering
 
+* Added support for a new layer type: `MGLHeatmapStyleLayer`, a powerful way to visualize point data distributions using heatmaps, fully customizable through runtime styling. [#11046](https://github.com/mapbox/mapbox-gl-native/pull/11046)
 * The layout and paint properties on subclasses of `MGLStyleLayer` are now of type `NSExpression` instead of `MGLStyleValue`. A new “Predicates and Expressions” guide provides an overview of the supported operators. ([#10726](https://github.com/mapbox/mapbox-gl-native/pull/10726))
 * Added an `MGLComputedShapeSource` class that allows applications to supply vector data to a style layer on a per-tile basis. ([#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983))
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
@@ -34,14 +35,18 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 ### Map snapshots
 
 * Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))
-* Fixed an issue that caused `MGLMapSnapshotter.pointForCoordinate` to return an incorrect value. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
 
-### Other changes
+## Other changes
 
 * Feature querying results now account for the `MGLSymbolStyleLayer.circleStrokeWidth` property. ([#10897](https://github.com/mapbox/mapbox-gl-native/pull/10897))
 * Fixed an issue preventing labels from being transliterated when VoiceOver was enabled on iOS 10._x_ and below. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Labels are now transliterated from more languages when VoiceOver is enabled. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
+
+## 3.7.4 - February 12, 2018
+
+* Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))
+* Fixed an issue that caused `-[MGLMapSnapshotter pointForCoordinate:]` to return the wrong point. ([#11035](https://github.com/mapbox/mapbox-gl-native/pull/11035))
 
 ## 3.7.3 - January 10, 2018
 

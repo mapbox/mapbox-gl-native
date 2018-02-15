@@ -73,8 +73,8 @@ std::vector<Feature> RenderAnnotationSource::querySourceFeatures(const SourceQue
     return {};
 }
 
-void RenderAnnotationSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderAnnotationSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderAnnotationSource::dumpDebugLogs() const {

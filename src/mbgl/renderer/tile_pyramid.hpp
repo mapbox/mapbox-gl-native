@@ -59,7 +59,7 @@ public:
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 
     void setCacheSize(size_t);
-    void onLowMemory();
+    void reduceMemoryUse();
 
     void setObserver(TileObserver*);
     void dumpDebugLogs() const;

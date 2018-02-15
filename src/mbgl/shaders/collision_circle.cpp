@@ -26,7 +26,10 @@ varying vec2 v_extrude_scale;
 void main() {
     vec4 projectedPoint = u_matrix * vec4(a_anchor_pos, 0, 1);
     highp float camera_to_anchor_distance = projectedPoint.w;
-    highp float collision_perspective_ratio = 0.5 + 0.5 * (u_camera_to_center_distance / camera_to_anchor_distance);
+    highp float collision_perspective_ratio = clamp(
+        0.5 + 0.5 * (u_camera_to_center_distance / camera_to_anchor_distance),
+        0.0, // Prevents oversized near-field circles in pitched/overzoomed tiles
+        4.0);
 
     gl_Position = u_matrix * vec4(a_pos, 0.0, 1.0);
 
@@ -43,6 +46,7 @@ void main() {
 
 )MBGL_SHADER";
 const char* collision_circle::fragmentSource = R"MBGL_SHADER(
+uniform float u_overscale_factor;
 
 varying float v_placed;
 varying float v_notUsed;
@@ -68,7 +72,7 @@ void main() {
 
     float extrude_scale_length = length(v_extrude_scale);
     float extrude_length = length(v_extrude) * extrude_scale_length;
-    float stroke_width = 15.0 * extrude_scale_length;
+    float stroke_width = 15.0 * extrude_scale_length / u_overscale_factor;
     float radius = v_radius * extrude_scale_length;
 
     float distance_to_edge = abs(extrude_length - radius);

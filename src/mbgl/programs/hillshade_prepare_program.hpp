@@ -10,6 +10,7 @@ namespace mbgl {
 
 namespace uniforms {
 MBGL_DEFINE_UNIFORM_VECTOR(uint16_t, 2, u_dimension);
+MBGL_DEFINE_UNIFORM_SCALAR(float, u_maxzoom);
 } // namespace uniforms
 
 class HillshadePrepareProgram : public Program<
@@ -22,6 +23,7 @@ class HillshadePrepareProgram : public Program<
         uniforms::u_matrix,
         uniforms::u_dimension,
         uniforms::u_zoom,
+        uniforms::u_maxzoom,
         uniforms::u_image>,
     style::Properties<>> {
 public:

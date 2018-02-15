@@ -37,18 +37,18 @@ public class CustomGeometrySource extends Source {
    * @param provider The tile provider that returns geometry data for this source.
    */
   public CustomGeometrySource(String id, GeometryTileProvider provider) {
-    this(id, provider, new GeoJsonOptions());
+    this(id, provider, new CustomGeometrySourceOptions());
   }
 
   /**
-   * Create a CustomGeometrySource with non-default GeoJsonOptions.
+   * Create a CustomGeometrySource with non-default CustomGeometrySourceOptions.
    * <p>Supported options are minZoom, maxZoom, buffer, and tolerance.</p>
    *
    * @param id      The source id.
    * @param provider The tile provider that returns geometry data for this source.
-   * @param options GeoJsonOptions.
+   * @param options CustomGeometrySourceOptions.
    */
-  public CustomGeometrySource(String id, GeometryTileProvider provider, GeoJsonOptions options) {
+  public CustomGeometrySource(String id, GeometryTileProvider provider, CustomGeometrySourceOptions options) {
     this.provider = provider;
     executor = Executors.newFixedThreadPool(4);
     initialize(id, options);

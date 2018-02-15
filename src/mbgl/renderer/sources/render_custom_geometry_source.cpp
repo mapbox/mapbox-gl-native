@@ -76,8 +76,8 @@ std::vector<Feature> RenderCustomGeometrySource::querySourceFeatures(const Sourc
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderCustomGeometrySource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderCustomGeometrySource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderCustomGeometrySource::dumpDebugLogs() const {

@@ -538,10 +538,13 @@
                                                       userInfo:@{ @"animated" : @(animated) }];
 }
 
-- (void)mapView:(MGLMapView *)mapView regionDidChangeAnimated:(BOOL)animated {
+- (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated {
+
     [[NSNotificationCenter defaultCenter] postNotificationName:@"regionDidChangeAnimated"
                                                         object:mapView
-                                                      userInfo:@{ @"animated" : @(animated) }];
+                                                      userInfo:@{ @"animated" : @(animated),
+                                                                  @"reason" : @(reason)
+                                                                  }];
 }
 
 - (void)testDelegatesStartStopLocatingUser {
