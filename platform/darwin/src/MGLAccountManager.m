@@ -54,11 +54,6 @@
     return _sharedManager;
 }
 
-+ (BOOL)mapboxMetricsEnabledSettingShownInApp {
-    [NSException raise:NSInternalInconsistencyException format:@"Telemetry settings are now always shown in the ℹ️ menu."];
-    return YES;
-}
-
 + (void)setAccessToken:(NSString *)accessToken {
     accessToken = [accessToken stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]];

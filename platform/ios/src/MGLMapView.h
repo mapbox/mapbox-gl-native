@@ -189,9 +189,6 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
 
-/**
- :nodoc: bundledStyleURLs has been removed.
- */
 @property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((unavailable("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /**
@@ -280,16 +277,12 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (IBAction)showAttribution:(id)sender;
 
-/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
 @property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("This property is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property always returns NO.
 - (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
 - (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
 - (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
 #pragma mark Displaying the User’s Location

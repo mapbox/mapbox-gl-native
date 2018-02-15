@@ -83,12 +83,6 @@ MGL_EXPORT
  */
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/blog/emerald-gl/">Mapbox Emerald</a> style.
-
- Emerald is a tactile style with subtle textures and dramatic hillshading.
- */
 + (NSURL *)emeraldStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
@@ -232,38 +226,13 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style.
 
- */
 + (NSURL *)trafficDayStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
 
-/**
- Returns the URL to the given version of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
 + (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
 
-/**
- Returns the URL to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style.
-
- */
 + (NSURL *)trafficNightStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
-/**
- Returns the URL to to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
 + (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 #pragma mark Accessing Metadata About the Style
