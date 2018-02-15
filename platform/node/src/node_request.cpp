@@ -68,7 +68,23 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
             request->SetErrorMessage(*Nan::Utf8String(
                 Nan::Get(err, msg).ToLocalChecked()));
         }
-    } else if (info[0]->IsString()) {
+    } else if (info[0]->IsNull() && (info.Length() > 1 && info[1]->IsObject())) {
+        auto err = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+        auto msg = Nan::New("message").ToLocalChecked();
+
+        if (Nan::Has(err, msg).FromJust()) {
+            request->SetErrorMessage(*Nan::Utf8String(
+                Nan::Get(err, msg).ToLocalChecked()));
+        }
+    } else if (info[0]->IsNull()) {
+        auto err = Nan::To<v8::Object>(info[0]).ToLocalChecked();
+        auto msg = Nan::New("message").ToLocalChecked();
+
+        if (Nan::Has(err, msg).FromJust()) {
+            request->SetErrorMessage(*Nan::Utf8String(
+                Nan::Get(err, msg).ToLocalChecked()));
+        }
+    }  else if (info[0]->IsString()) {
         request->SetErrorMessage(*Nan::Utf8String(info[0]));
     } else if (info.Length() < 2 || !info[1]->IsObject()) {
         return Nan::ThrowTypeError("Second argument must be a response object");
