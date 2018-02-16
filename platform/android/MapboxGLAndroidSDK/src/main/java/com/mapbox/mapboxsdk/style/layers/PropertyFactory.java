@@ -1615,6 +1615,36 @@ public class PropertyFactory {
   }
 
   /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> heatmapColor(@ColorInt int value) {
+    return new PaintPropertyValue<>("heatmap-color", colorToRgbaString(value));
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> heatmapColor(String value) {
+    return new PaintPropertyValue<>("heatmap-color", value);
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> heatmapColor(Expression expression) {
+    return new PaintPropertyValue<>("heatmap-color", expression);
+  }
+
+  /**
    * The global opacity at which the heatmap layer will be drawn.
    *
    * @param value a Float value

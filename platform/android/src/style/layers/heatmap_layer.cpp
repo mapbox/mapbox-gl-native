@@ -79,6 +79,12 @@ namespace android {
         layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::setHeatmapIntensityTransition(options);
     }
 
+    jni::Object<jni::ObjectTag> HeatmapLayer::getHeatmapColor(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapColor());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
     jni::Object<jni::ObjectTag> HeatmapLayer::getHeatmapOpacity(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
         Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapOpacity());
@@ -125,6 +131,7 @@ namespace android {
             METHOD(&HeatmapLayer::getHeatmapIntensityTransition, "nativeGetHeatmapIntensityTransition"),
             METHOD(&HeatmapLayer::setHeatmapIntensityTransition, "nativeSetHeatmapIntensityTransition"),
             METHOD(&HeatmapLayer::getHeatmapIntensity, "nativeGetHeatmapIntensity"),
+            METHOD(&HeatmapLayer::getHeatmapColor, "nativeGetHeatmapColor"),
             METHOD(&HeatmapLayer::getHeatmapOpacityTransition, "nativeGetHeatmapOpacityTransition"),
             METHOD(&HeatmapLayer::setHeatmapOpacityTransition, "nativeSetHeatmapOpacityTransition"),
             METHOD(&HeatmapLayer::getHeatmapOpacity, "nativeGetHeatmapOpacity"));
