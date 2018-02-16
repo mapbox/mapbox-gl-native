@@ -28,6 +28,7 @@ public:
 
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    std::string getOperator() const override;
 private:
     EvaluationResult (*coerceSingleValue) (const Value& v);
     std::vector<std::unique_ptr<Expression>> inputs;

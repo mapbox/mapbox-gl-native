@@ -185,6 +185,9 @@ public:
         }
         return false;
     }
+    
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "interpolate"; }
 };
 
 } // namespace expression

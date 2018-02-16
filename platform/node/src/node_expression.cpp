@@ -1,5 +1,6 @@
 #include "node_conversion.hpp"
 #include "node_expression.hpp"
+#include "node_feature.hpp"
 
 #include <mbgl/style/expression/parsing_context.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
@@ -24,6 +25,8 @@ void NodeExpression::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "isFeatureConstant", IsFeatureConstant);
     Nan::SetPrototypeMethod(tpl, "isZoomConstant", IsZoomConstant);
 
+    Nan::SetPrototypeMethod(tpl, "serialize", Serialize);
+
     Nan::SetMethod(tpl, "parse", Parse);
 
     constructor.Reset(tpl->GetFunction()); // what is this doing?
@@ -39,31 +42,31 @@ type::Type parseType(v8::Local<v8::Object> type) {
         {"color", type::Color},
         {"value", type::Value}
     };
-    
+
     v8::Local<v8::Value> v8kind = Nan::Get(type, Nan::New("kind").ToLocalChecked()).ToLocalChecked();
     std::string kind(*v8::String::Utf8Value(v8kind));
-    
+
     if (kind == "array") {
         type::Type itemType = parseType(Nan::Get(type, Nan::New("itemType").ToLocalChecked()).ToLocalChecked()->ToObject());
         mbgl::optional<std::size_t> N;
-        
+
         v8::Local<v8::String> Nkey = Nan::New("N").ToLocalChecked();
         if (Nan::Has(type, Nkey).FromMaybe(false)) {
             N = Nan::Get(type, Nkey).ToLocalChecked()->ToInt32()->Value();
         }
         return type::Array(itemType, N);
     }
-    
+
     return types[kind];
 }
 
 void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Function> cons = Nan::New(constructor);
-    
+
     if (info.Length() < 1 || info[0]->IsUndefined()) {
         return Nan::ThrowTypeError("Requires a JSON style expression argument.");
     }
-    
+
     mbgl::optional<type::Type> expected;
     if (info.Length() > 1 && info[1]->IsObject()) {
         expected = parseType(info[1]->ToObject());
@@ -84,7 +87,7 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
             info.GetReturnValue().Set(wrapped);
             return;
         }
-        
+
         v8::Local<v8::Array> result = Nan::New<v8::Array>();
         for (std::size_t i = 0; i < ctx.getErrors().size(); i++) {
             const auto& error = ctx.getErrors()[i];
@@ -140,7 +143,7 @@ struct ToValue {
         }
         return scope.Escape(result);
     }
-    
+
     v8::Local<v8::Value> operator()(const mbgl::Color& color) {
         return operator()(std::vector<Value> {
             static_cast<double>(color.r),
@@ -225,6 +228,14 @@ void NodeExpression::IsZoomConstant(const Nan::FunctionCallbackInfo<v8::Value>& 
     NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
     const std::unique_ptr<Expression>& expression = nodeExpr->expression;
     info.GetReturnValue().Set(Nan::New(isZoomConstant(*expression)));
+}
+
+void NodeExpression::Serialize(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    NodeExpression* nodeExpr = ObjectWrap::Unwrap<NodeExpression>(info.Holder());
+    const std::unique_ptr<Expression>& expression = nodeExpr->expression;
+
+    const mbgl::Value serialized = expression->serialize();
+    info.GetReturnValue().Set(toJS(serialized));
 }
 
 } // namespace node_mbgl

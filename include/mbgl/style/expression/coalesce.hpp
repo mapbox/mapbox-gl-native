@@ -38,6 +38,7 @@ public:
         return args.at(i).get();
     }
     
+    std::string getOperator() const override { return "coalesce"; }
 private:
     Args args;
 };
