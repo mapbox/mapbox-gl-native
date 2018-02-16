@@ -122,7 +122,9 @@ final class MapGestureDetector {
       gesturesManager.setStandardScaleGestureListener(new ScaleGestureListener(
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
       ));
-      gesturesManager.setRotateGestureListener(new RotateGestureListener());
+      gesturesManager.setRotateGestureListener(new RotateGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating)
+      ));
       gesturesManager.setShoveGestureListener(new ShoveGestureListener());
       gesturesManager.setMultiFingerTapGestureListener(new TapGestureListener());
     }
@@ -572,6 +574,11 @@ final class MapGestureDetector {
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
     private PointF rotateFocalPoint;
+    private final float minimumScaleSpanWhenRotating;
+
+    public RotateGestureListener(float minimumScaleSpanWhenRotating) {
+      this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
+    }
 
     @Override
     public boolean onRotateBegin(RotateGestureDetector detector) {
@@ -602,6 +609,9 @@ final class MapGestureDetector {
         Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, rotation));
       }
 
+      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
+      gesturesManager.getStandardScaleGestureDetector().interrupt();
+
       return true;
     }
 
@@ -622,6 +632,7 @@ final class MapGestureDetector {
       Timber.d("angular velocity: " + angularVelocity);
       long animationTime = (long) Math.abs(angularVelocity) * 250;
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
+      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
       scheduleAnimator(rotateAnimator);
     }
 

@@ -9,4 +9,7 @@
 
     <!--Minimum scale velocity required to start animation-->
     <dimen name="mapbox_minimum_scale_velocity">150dp</dimen>
+
+    <!--Minimum scale span delta required to execute scale gesture when rotating-->
+    <dimen name="mapbox_minimum_scale_span_when_rotating">100dp</dimen>
 </resources>
