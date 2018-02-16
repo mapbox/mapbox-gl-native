@@ -23,8 +23,9 @@ mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<j
 
     if (jPointList) {
         auto jPointArray = java::util::List::toArray<Point>(env, jPointList);
-
         auto size = jPointArray.Length(env);
+        lineString.reserve(size);
+
         for (std::size_t i = 0; i < size; i++) {
             auto jPoint = jPointArray.Get(env, i);
             lineString.push_back(Point::convert(env, jPoint));
