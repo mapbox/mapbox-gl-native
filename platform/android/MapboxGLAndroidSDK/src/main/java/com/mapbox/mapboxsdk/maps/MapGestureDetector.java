@@ -96,24 +96,16 @@ final class MapGestureDetector {
       gesturesManager = new AndroidGesturesManager(context);
 
       Set<Integer> set1 = new HashSet<>();
+      set1.add(AndroidGesturesManager.GESTURE_TYPE_SHOVE);
       set1.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
-      set1.add(AndroidGesturesManager.GESTURE_TYPE_DOUBLE_TAP);
 
       Set<Integer> set2 = new HashSet<>();
-      set2.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
-      set2.add(AndroidGesturesManager.GESTURE_TYPE_LONG_PRESS);
+      set2.add(AndroidGesturesManager.GESTURE_TYPE_SHOVE);
+      set2.add(AndroidGesturesManager.GESTURE_TYPE_ROTATE);
 
       Set<Integer> set3 = new HashSet<>();
       set3.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
-      set3.add(AndroidGesturesManager.GESTURE_TYPE_FLING);
-
-      Set<Integer> set4 = new HashSet<>();
-      set4.add(AndroidGesturesManager.GESTURE_TYPE_MOVE);
-      set4.add(AndroidGesturesManager.GESTURE_TYPE_SHOVE);
-
-      Set<Integer> set5 = new HashSet<>();
-      set5.add(AndroidGesturesManager.GESTURE_TYPE_MOVE);
-      set5.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
+      set3.add(AndroidGesturesManager.GESTURE_TYPE_LONG_PRESS);
 
       gesturesManager.setMutuallyExclusiveGestures(set1, set2, set3);
 
@@ -692,6 +684,8 @@ final class MapGestureDetector {
         Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pitch));
       }
 
+      gesturesManager.getMoveGestureDetector().setEnabled(false);
+
       return true;
     }
 
@@ -709,7 +703,7 @@ final class MapGestureDetector {
 
     @Override
     public void onShoveEnd(ShoveGestureDetector detector, float velocityX, float velocityY) {
-
+      gesturesManager.getMoveGestureDetector().setEnabled(true);
     }
   }
 
