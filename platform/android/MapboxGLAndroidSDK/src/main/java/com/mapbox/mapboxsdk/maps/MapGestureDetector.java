@@ -103,7 +103,8 @@ final class MapGestureDetector {
   private boolean executeDoubleTap;
 
   private Animator scaleAnimator;
-  private final List<Animator> animatorsToExecute = new ArrayList<>();
+  private Animator rotateAnimator;
+  private final List<Animator> scheduledAnimators = new ArrayList<>();
   private Handler mainHandler = new Handler();
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
@@ -339,9 +340,11 @@ final class MapGestureDetector {
           return true;
         }
 
-        for (Animator animator : animatorsToExecute) {
+        mainHandler.removeCallbacksAndMessages(null);
+        for (Animator animator : scheduledAnimators) {
           animator.start();
         }
+        scheduledAnimators.clear();
         break;
 
       case MotionEvent.ACTION_CANCEL:
@@ -381,11 +384,15 @@ final class MapGestureDetector {
   }
 
   private void cancelAnimators() {
-    for (Animator animator : animatorsToExecute) {
-      animator.cancel();
+    if (scaleAnimator != null) {
+      scaleAnimator.cancel();
+    }
+    if (rotateAnimator != null) {
+      rotateAnimator.cancel();
     }
 
-    animatorsToExecute.clear();
+    mainHandler.removeCallbacksAndMessages(null);
+    scheduledAnimators.clear();
   }
 
   private Runnable cancelAnimatorsRunnable = new Runnable() {
@@ -396,9 +403,9 @@ final class MapGestureDetector {
   };
 
   private void scheduleAnimator(Animator animator) {
-    animatorsToExecute.add(animator);
+    scheduledAnimators.add(animator);
     mainHandler.removeCallbacksAndMessages(null);
-    mainHandler.postDelayed(cancelAnimatorsRunnable, 250);
+    mainHandler.postDelayed(cancelAnimatorsRunnable, 150);
   }
 
   /**
@@ -647,7 +654,7 @@ final class MapGestureDetector {
         double currentZoom = transform.getRawZoom();
         //long animationTime = TimeUnit.SECONDS.toMillis((long) Math.abs(zoomAddition)) / 4; //todo make divider public
         long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
-        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime, detector.getFocalPoint());
+        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime);
         scheduleAnimator(scaleAnimator);
       }
     }
@@ -660,7 +667,7 @@ final class MapGestureDetector {
       return zoomAddition;
     }
 
-    private Animator createScaleAnimator(double currentZoom, double zoomAddition, long animationTime, PointF focal) {
+    private Animator createScaleAnimator(double currentZoom, double zoomAddition, long animationTime) {
       ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
       animator.setDuration(animationTime);
       animator.setInterpolator(new DecelerateInterpolator());
@@ -668,7 +675,7 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setZoom((Float) animation.getAnimatedValue(), focal, 0, true);
+          transform.setZoom((Float) animation.getAnimatedValue(), scaleFocalPoint, 0, true);
         }
       });
 
@@ -686,7 +693,6 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationEnd(Animator animation) {
-          animatorsToExecute.remove(scaleAnimator);
           cameraChangeDispatcher.onCameraIdle();
         }
       });
@@ -708,10 +714,27 @@ final class MapGestureDetector {
   }
 
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
+    private PointF rotateFocalPoint;
+
     @Override
     public boolean onRotateBegin(RotateGestureDetector detector) {
       if (!trackingSettings.isRotateGestureCurrentlyEnabled()) {
         return false;
+      }
+
+      // rotation constitutes translation of anything except the center of
+      // rotation, so cancel both location and bearing tracking if required
+      trackingSettings.resetTrackingModesIfRequired(true, true, false);
+
+      // notify camera change listener
+      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+
+      if (focalPoint != null) {
+        // User provided focal point
+        rotateFocalPoint = focalPoint;
+      } else {
+        // around gesture
+        rotateFocalPoint = detector.getFocalPoint();
       }
 
       if (isZoomValid(transform)) {
@@ -727,33 +750,60 @@ final class MapGestureDetector {
 
     @Override
     public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast, float rotationDegreesSinceFirst) {
-      // notify camera change listener
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
-      // rotation constitutes translation of anything except the center of
-      // rotation, so cancel both location and bearing tracking if required
-      trackingSettings.resetTrackingModesIfRequired(true, true, false);
-
 
       // Calculate map bearing value
       double bearing = transform.getRawBearing() + rotationDegreesSinceLast;
 
       // Rotate the map
-      if (focalPoint != null) {
-        // User provided focal point
-        transform.setBearing(bearing, focalPoint.x, focalPoint.y);
-      } else {
-        // around gesture
-        transform.setBearing(bearing, detector.getFocalPoint().x, detector.getFocalPoint().y);
-      }
+      transform.setBearing(bearing, rotateFocalPoint.x, rotateFocalPoint.y);
 
       return true;
     }
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
-
+      Timber.d("angular velocity: " + angularVelocity);
+      long animationTime = (long) Math.abs(angularVelocity) * 250;
+      rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
+      scheduleAnimator(rotateAnimator);
     }
+
+    private Animator createRotateAnimator(float angularVelocity, long animationTime) {
+      ValueAnimator animator = ValueAnimator.ofFloat(angularVelocity, 0f);
+      animator.setDuration(animationTime);
+      animator.setInterpolator(new DecelerateInterpolator());
+      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+          transform.setBearing(
+            transform.getRawBearing() + (float) animation.getAnimatedValue(),
+            rotateFocalPoint.x, rotateFocalPoint.y,
+            0L
+          );
+        }
+      });
+
+      animator.addListener(new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+          transform.cancelTransitions();
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          cameraChangeDispatcher.onCameraIdle();
+        }
+      });
+
+      return animator;
+    }
+
   }
 
   private final class ShoveGestureListener extends ShoveGestureDetector.SimpleOnShoveGestureListener {
