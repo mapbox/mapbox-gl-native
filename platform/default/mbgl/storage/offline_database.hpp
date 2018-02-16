@@ -15,6 +15,7 @@ namespace mapbox {
 namespace sqlite {
 class Database;
 class Statement;
+class Transaction;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -34,6 +35,9 @@ public:
 
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
+
+    void beginRegionDownload();
+    void endRegionDownload();
 
     std::vector<OfflineRegion> listRegions();
 
@@ -104,6 +108,8 @@ private:
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
+    std::unique_ptr<::mapbox::sqlite::Transaction> regionTransaction;
+    int64_t pendingRegionResources = 0;
 
     template <class T>
     T getPragma(const char *);

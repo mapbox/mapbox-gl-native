@@ -25,6 +25,7 @@ OfflineDatabase::~OfflineDatabase() {
     // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
     // can't throw anything.
     try {
+        endRegionDownload();
         statements.clear();
         db.reset();
     } catch (mapbox::sqlite::Exception& ex) {
@@ -291,10 +292,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     // We can't use REPLACE because it would change the id value.
 
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     Statement update = getStatement(
         "UPDATE resources "
@@ -327,7 +324,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
 
     update->run();
     if (update->changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -354,7 +350,6 @@ bool OfflineDatabase::putResource(const Resource& resource,
     }
 
     insert->run();
-    transaction.commit();
 
     return true;
 }
@@ -480,10 +475,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     // We can't use REPLACE because it would change the id value.
 
-    // Begin an immediate-mode transaction to ensure that two writers do not attempt
-    // to INSERT a resource at the same moment.
-    mapbox::sqlite::Transaction transaction(*db, mapbox::sqlite::Transaction::Immediate);
-
     // clang-format off
     Statement update = getStatement(
         "UPDATE tiles "
@@ -522,7 +513,6 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
 
     update->run();
     if (update->changes() != 0) {
-        transaction.commit();
         return false;
     }
 
@@ -551,10 +541,24 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
         insert->bind(12, compressed);
     }
 
+
     insert->run();
-    transaction.commit();
 
     return true;
+}
+
+void OfflineDatabase::beginRegionDownload() {
+    if (!regionTransaction) {
+        regionTransaction = std::make_unique<mapbox::sqlite::Transaction>(*db, mapbox::sqlite::Transaction::Immediate);
+    }
+}
+
+void OfflineDatabase::endRegionDownload() {
+    if (regionTransaction) {
+        regionTransaction->commit();
+        regionTransaction.reset();
+        pendingRegionResources = 0;
+    }
 }
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
@@ -640,15 +644,21 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
+    pendingRegionResources++;
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
+    
+    if (pendingRegionResources >= 128) {
+        endRegionDownload();
+        beginRegionDownload();
+    }
 
     if (offlineMapboxTileCount
         && resource.kind == Resource::Kind::Tile
         && util::mapbox::isMapboxURL(resource.url)
         && previouslyUnused) {
         *offlineMapboxTileCount += 1;
-    }
+    }    
 
     return size;
 }
