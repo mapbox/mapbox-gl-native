@@ -485,38 +485,6 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     [self didChangeValueForKey:@"layers"];
 }
 
-#pragma mark Style classes
-
-- (NS_ARRAY_OF(NSString *) *)styleClasses
-{
-    return @[];
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
-{
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
-{
-}
-
-- (NSUInteger)countOfStyleClasses {
-    return 0;
-}
-
-- (BOOL)hasStyleClass:(NSString *)styleClass
-{
-    return NO;
-}
-
-- (void)addStyleClass:(NSString *)styleClass
-{
-}
-
-- (void)removeStyleClass:(NSString *)styleClass
-{
-}
-
 #pragma mark Style images
 
 - (void)setImage:(MGLImage *)image forName:(NSString *)name
