@@ -16,6 +16,7 @@ import java.net.URL;
 import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.heatmapDensity;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
@@ -28,6 +29,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleStrokeWidth;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapIntensity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapOpacity;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.heatmapRadius;
@@ -51,7 +53,6 @@ public class HeatmapLayerActivity extends AppCompatActivity {
   public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_heatmaplayer);
-
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
@@ -76,11 +77,20 @@ public class HeatmapLayerActivity extends AppCompatActivity {
     layer.setSourceLayer(HEATMAP_LAYER_SOURCE);
     layer.setProperties(
 
-      // TODO add heatmap color https://github.com/mapbox/mapbox-gl-native/issues/11172
       // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
       // Begin color ramp at 0-stop with a 0-transparancy color
       // to create a blur-like effect.
-      //heatmapColor(),
+      heatmapColor(
+        interpolate(
+          linear(), heatmapDensity(),
+          literal(0), rgba(33, 102, 172, 0),
+          literal(0.2), rgb(103, 169, 207),
+          literal(0.4), rgb(209, 229, 240),
+          literal(0.6), rgb(253, 219, 199),
+          literal(0.8), rgb(239, 138, 98),
+          literal(1), rgb(178, 24, 43)
+        )
+      ),
 
       // Increase the heatmap weight based on frequency and property magnitude
       heatmapWeight(

@@ -39,6 +39,8 @@ public:
     void setHeatmapIntensityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getHeatmapIntensityTransition(jni::JNIEnv&);
 
+    jni::Object<jni::ObjectTag> getHeatmapColor(jni::JNIEnv&);
+
     jni::Object<jni::ObjectTag> getHeatmapOpacity(jni::JNIEnv&);
     void setHeatmapOpacityTransition(jni::JNIEnv&, jlong duration, jlong delay);
     jni::Object<TransitionOptions> getHeatmapOpacityTransition(jni::JNIEnv&);

@@ -123,6 +123,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
   }
 <% } -%>
 <% for (const property of properties) { -%>
+<% if (property.name != 'heatmap-color') { -%>
 <% if (property.transition) { -%>
 
   @Test
@@ -454,6 +455,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       }
     });
   }
+<% } -%>
 <% } -%>
 <% } -%>
 
