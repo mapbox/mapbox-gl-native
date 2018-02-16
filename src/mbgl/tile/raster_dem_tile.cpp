@@ -21,6 +21,7 @@ RasterDEMTile::RasterDEMTile(const OverscaledTileID& id_,
       worker(parameters.workerScheduler,
              ActorRef<RasterDEMTile>(*this, mailbox)) {
 
+    encoding = tileset.encoding;
     if ( id.canonical.y == 0 ){
         // this tile doesn't have upper neighboring tiles so marked those as backfilled
         neighboringTiles = neighboringTiles | DEMTileNeighbors::NoUpper;
@@ -47,7 +48,7 @@ void RasterDEMTile::setMetadata(optional<Timestamp> modified_, optional<Timestam
 void RasterDEMTile::setData(std::shared_ptr<const std::string> data) {
     pending = true;
     ++correlationID;
-    worker.invoke(&RasterDEMTileWorker::parse, data, correlationID);
+    worker.invoke(&RasterDEMTileWorker::parse, data, correlationID, encoding);
 }
 
 void RasterDEMTile::onParsed(std::unique_ptr<HillshadeBucket> result, const uint64_t resultCorrelationID) {

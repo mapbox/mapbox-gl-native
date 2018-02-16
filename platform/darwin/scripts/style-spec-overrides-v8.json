@@ -23,6 +23,9 @@
         "circle": {
           "doc": "An `MGLCircleStyleLayer` is a style layer that renders one or more filled circles on the map.\n\nUse a circle style layer to configure the visual appearance of point or point collection features in vector tiles loaded by an `MGLVectorSource` object or `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.\n\nA circle style layer renders circles whose radii are measured in screen units. To display circles on the map whose radii correspond to real-world distances, use many-sided regular polygons and configure their appearance using an `MGLFillStyleLayer` object."
         },
+        "heatmap": {
+          "doc": "An `MGLHeatmapStyleLayer` is a style layer that renders a <a href=\"https://en.wikipedia.org/wiki/Heat_map\">heatmap</a>.\n\nA heatmap visualizes the spatial distribution of a large, dense set of point data, using color to avoid cluttering the map with individual points at low zoom levels. The points are weighted by an attribute you specify. Use a heatmap style layer in conjunction with point or point collection features in vector tiles loaded by an `MGLVectorSource` object or `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.\n\nConsider accompanying a heatmap style layer with an `MGLCircleStyleLayer` or `MGLSymbolStyleLayer` at high zoom levels. If you are unsure whether the point data in an `MGLShapeSource` is dense enough to warrant a heatmap, you can alternatively cluster the source using the `MGLShapeSourceOptionClustered` option and render the data using an `MGLCircleStyleLayer` or `MGLSymbolStyleLayer`."
+        },
         "raster": {
           "doc": "An `MGLRasterStyleLayer` is a style layer that renders georeferenced raster imagery on the map, especially raster tiles.\n\nUse a raster style layer to configure the color parameters of raster tiles loaded by an `MGLRasterSource` object or raster images loaded by an `MGLImageSource` object. For example, you could use a raster style layer to render <a href=\"https://www.mapbox.com/satellite/\">Mapbox Satellite</a> imagery, a <a href=\"https://www.mapbox.com/help/define-tileset/#raster-tilesets\">raster tile set</a> uploaded to Mapbox Studio, or a raster map authored in <a href=\"https://tilemill-project.github.io/tilemill/\">TileMill</a>, the classic Mapbox Editor, or Mapbox Studio Classic.\n\nRaster images may also be used as icons or patterns in a style layer. To register an image for use as an icon or pattern, use the `-[MGLStyle setImage:forName:]` method. To configure a point annotation’s image, use the `MGLAnnotationImage` class."
         },
@@ -77,6 +80,11 @@
     },
     "fill-extrusion-color": {
       "doc": "The base color of this layer. The extrusion's surfaces will be shaded differently based on this color in combination with the `light` settings. If this color is specified with an alpha component, the alpha component will be ignored; use `fill-extrusion-opacity` to set layer opacityco."
+    }
+  },
+  "paint_heatmap": {
+    "heatmap-color": {
+      "doc": "Defines the color of each pixel based on its density value in a heatmap. Should be an expression that uses `$heatmapDensity` as input."
     }
   },
   "paint_line": {

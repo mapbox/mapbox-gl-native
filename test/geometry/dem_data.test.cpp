@@ -1,6 +1,7 @@
 #include <mbgl/test/util.hpp>
 
 #include <mbgl/util/image.hpp>
+#include <mbgl/util/tileset.hpp>
 #include <mbgl/geometry/dem_data.hpp>
 
 using namespace mbgl;
@@ -14,30 +15,38 @@ auto fakeImage = [](Size s) {
     return img;
 };
 
-TEST(DEMData, Constructor) {
+TEST(DEMData, ConstructorMapbox) {
     PremultipliedImage image = fakeImage({16, 16});
-    DEMData pyramid(image);
+    DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
 
-    EXPECT_EQ(pyramid.dim, 16);
-    EXPECT_EQ(pyramid.border, 8);
-    EXPECT_EQ(pyramid.stride, 32);
-    EXPECT_EQ(pyramid.getImage()->bytes(), size_t(32*32*4));
-    EXPECT_EQ(pyramid.dim, 16);
-    EXPECT_EQ(pyramid.border, 8);
+    EXPECT_EQ(demdata.dim, 16);
+    EXPECT_EQ(demdata.border, 8);
+    EXPECT_EQ(demdata.stride, 32);
+    EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
+};
+
+TEST(DEMData, ConstructorTerrarium) {
+    PremultipliedImage image = fakeImage({16, 16});
+    DEMData demdata(image, Tileset::DEMEncoding::Terrarium);
+
+    EXPECT_EQ(demdata.dim, 16);
+    EXPECT_EQ(demdata.border, 8);
+    EXPECT_EQ(demdata.stride, 32);
+    EXPECT_EQ(demdata.getImage()->bytes(), size_t(32*32*4));
 };
 
 TEST(DEMData, RoundTrip) {
     PremultipliedImage image = fakeImage({16, 16});
-    DEMData pyramid(image);
+    DEMData demdata(image, Tileset::DEMEncoding::Mapbox);
 
-    pyramid.set(4, 6, 255);
-    EXPECT_EQ(pyramid.get(4, 6), 255);
+    demdata.set(4, 6, 255);
+    EXPECT_EQ(demdata.get(4, 6), 255);
 }
 
 TEST(DEMData, InitialBackfill) {
 
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMData dem1(image1);
+    DEMData dem1(image1, Tileset::DEMEncoding::Mapbox);
 
     bool nonempty = true;
     // checking that a 1 px border around the fake image has been populated
@@ -91,10 +100,10 @@ TEST(DEMData, InitialBackfill) {
 
 TEST(DEMData, BackfillNeighbor) {
     PremultipliedImage image1 = fakeImage({4, 4});
-    DEMData dem0(image1);
+    DEMData dem0(image1, Tileset::DEMEncoding::Mapbox);
 
     PremultipliedImage image2 = fakeImage({4, 4});
-    DEMData dem1(image2);
+    DEMData dem1(image2, Tileset::DEMEncoding::Mapbox);
 
     dem0.backfillBorder(dem1, -1, 0);
     for (int y = 0; y < 4; y++) {

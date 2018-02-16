@@ -77,8 +77,8 @@ void AndroidRendererFrontend::update(std::shared_ptr<UpdateParameters> params) {
     mapRenderer.requestRender();
 }
 
-void AndroidRendererFrontend::onLowMemory() {
-    mapRenderer.actor().invoke(&Renderer::onLowMemory);
+void AndroidRendererFrontend::reduceMemoryUse() {
+    mapRenderer.actor().invoke(&Renderer::reduceMemoryUse);
 }
 
 std::vector<Feature> AndroidRendererFrontend::querySourceFeatures(const std::string& sourceID,

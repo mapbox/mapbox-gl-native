@@ -25,6 +25,8 @@ public:
         double tolerance = 0.375;
         uint16_t tileSize = util::tileSize;
         uint16_t buffer = 128;
+        bool clip = false;
+        bool wrap = false;
     };
 
     struct Options {

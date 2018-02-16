@@ -37,7 +37,7 @@ public:
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void onLowMemory() final {
+    void reduceMemoryUse() final {
     }
     void dumpDebugLogs() const final;
 

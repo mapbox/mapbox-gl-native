@@ -33,14 +33,19 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void onLowMemory() final;
+    void reduceMemoryUse() final;
     void dumpDebugLogs() const final;
+
+    uint8_t getMaxZoom() const {
+        return maxzoom;
+    };
 
 private:
     const style::RasterSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
-    optional<std::vector<std::string>> tileURLTemplates;
+    optional<Tileset> tileset;
+    uint8_t maxzoom = 15;
 
 protected:
     void onTileChanged(Tile&) final;

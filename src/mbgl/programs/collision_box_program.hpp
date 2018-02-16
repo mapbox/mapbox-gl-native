@@ -110,6 +110,7 @@ class CollisionCircleProgram : public Program<
     gl::Uniforms<
         uniforms::u_matrix,
         uniforms::u_extrude_scale,
+        uniforms::u_overscale_factor,
         uniforms::u_camera_to_center_distance>,
     style::Properties<>>
 {

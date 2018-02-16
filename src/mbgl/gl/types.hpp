@@ -64,6 +64,15 @@ enum class TextureFormat : uint32_t {
 #endif // MBGL_USE_GLES2
 };
 
+enum class TextureType : uint32_t {
+    UnsignedByte = 0x1401,
+#if MBGL_USE_GLES2
+    HalfFloat = 0x8D61,
+#else
+    HalfFloat = 0x140B,
+#endif // MBGL_USE_GLES2
+};
+
 enum class PrimitiveType {
     Points = 0x0000,
     Lines = 0x0001,
