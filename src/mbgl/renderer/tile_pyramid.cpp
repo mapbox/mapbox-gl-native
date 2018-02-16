@@ -137,10 +137,13 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         auto it = tiles.find(tileID);
         return it == tiles.end() ? nullptr : it->second.get();
     };
-    
+
+    // The min and max zoom for TileRange are based on the updateRenderables algorithm.
+    // Tiles are created at the ideal tile zoom or at lower zoom levels. Child
+    // tiles are used from the cache, but not created.
     optional<util::TileRange> tileRange = {};
     if (bounds) {
-        tileRange = util::TileRange::fromLatLngBounds(*bounds, std::min(tileZoom, (int32_t)zoomRange.max));
+        tileRange = util::TileRange::fromLatLngBounds(*bounds, zoomRange.min, std::min(tileZoom, (int32_t)zoomRange.max));
     }
     auto createTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
         if (tileRange && !tileRange->contains(tileID.canonical)) {
