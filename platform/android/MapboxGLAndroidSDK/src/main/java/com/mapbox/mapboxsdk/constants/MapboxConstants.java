@@ -85,7 +85,7 @@ public class MapboxConstants {
   /**
    * The currently used maximum scale factor to clamp to when a quick zoom gesture occurs
    */
-  public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.11f;
+  public static final float MAXIMUM_SCALE_FACTOR_CLAMP = 0.15f;
 
   /**
    * Fragment Argument Key for MapboxMapOptions

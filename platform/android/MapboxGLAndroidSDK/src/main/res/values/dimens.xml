@@ -6,4 +6,7 @@
     <dimen name="mapbox_eight_dp">8dp</dimen>
     <dimen name="mapbox_ninety_two_dp">92dp</dimen>
     <dimen name="mapbox_my_locationview_outer_circle">18dp</dimen>
+
+    <!--Minimum scale velocity required to start animation-->
+    <dimen name="mapbox_minimum_scale_velocity">150dp</dimen>
 </resources>

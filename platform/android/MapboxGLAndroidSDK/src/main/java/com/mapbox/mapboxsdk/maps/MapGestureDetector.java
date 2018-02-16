@@ -1,13 +1,18 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.PointF;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.view.GestureDetectorCompat;
 import android.view.InputDevice;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.VelocityTracker;
+import android.view.animation.DecelerateInterpolator;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.gestures.MoveGestureDetector;
@@ -19,14 +24,20 @@ import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
 import com.mapbox.android.telemetry.MapState;
+import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.utils.MathUtils;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import timber.log.Timber;
+
+import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
 /**
@@ -91,6 +102,10 @@ final class MapGestureDetector {
   private AndroidGesturesManager gesturesManager;
   private boolean executeDoubleTap;
 
+  private Animator scaleAnimator;
+  private final List<Animator> animatorsToExecute = new ArrayList<>();
+  private Handler mainHandler = new Handler();
+
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
                      TrackingSettings trackingSettings, AnnotationManager annotationManager,
                      CameraChangeDispatcher cameraChangeDispatcher) {
@@ -129,7 +144,9 @@ final class MapGestureDetector {
 
       gesturesManager.setStandardGestureListener(new StandardGestureListener());
       gesturesManager.setMoveGestureListener(new MoveGestureListener());
-      gesturesManager.setStandardScaleGestureListener(new ScaleGestureListener());
+      gesturesManager.setStandardScaleGestureListener(new ScaleGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
+      ));
       gesturesManager.setRotateGestureListener(new RotateGestureListener());
       gesturesManager.setShoveGestureListener(new ShoveGestureListener());
       gesturesManager.setMultiFingerTapGestureListener(new TapGestureListener());
@@ -312,6 +329,7 @@ final class MapGestureDetector {
 
     switch (motionEvent.getActionMasked()) {
       case MotionEvent.ACTION_DOWN:
+        cancelAnimators();
         transform.setGestureInProgress(true);
         break;
       case MotionEvent.ACTION_UP:
@@ -319,6 +337,10 @@ final class MapGestureDetector {
 
         if (executeDoubleTap(motionEvent)) {
           return true;
+        }
+
+        for (Animator animator : animatorsToExecute) {
+          animator.start();
         }
         break;
 
@@ -356,6 +378,27 @@ final class MapGestureDetector {
 
     executeDoubleTap = false;
     return true;
+  }
+
+  private void cancelAnimators() {
+    for (Animator animator : animatorsToExecute) {
+      animator.cancel();
+    }
+
+    animatorsToExecute.clear();
+  }
+
+  private Runnable cancelAnimatorsRunnable = new Runnable() {
+    @Override
+    public void run() {
+      cancelAnimators();
+    }
+  };
+
+  private void scheduleAnimator(Animator animator) {
+    animatorsToExecute.add(animator);
+    mainHandler.removeCallbacksAndMessages(null);
+    mainHandler.postDelayed(cancelAnimatorsRunnable, 250);
   }
 
   /**
@@ -532,6 +575,15 @@ final class MapGestureDetector {
   }
 
   private final class ScaleGestureListener extends StandardScaleGestureDetector.SimpleStandardOnScaleGestureListener {
+
+    private final float minimumVelocity;
+
+    private PointF scaleFocalPoint;
+
+    public ScaleGestureListener(float minimumVelocity) {
+      this.minimumVelocity = minimumVelocity;
+    }
+
     @Override
     public boolean onScaleBegin(StandardScaleGestureDetector detector) {
       if (!uiSettings.isZoomGesturesEnabled()) {
@@ -541,11 +593,26 @@ final class MapGestureDetector {
       executeDoubleTap = false;
 
       transform.cancelTransitions();
+
+      // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       quickZoom = detector.getPointersCount() == 1;
       if (quickZoom) {
         gesturesManager.getMoveGestureDetector().setEnabled(false);
+      }
+
+      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
+
+      if (focalPoint != null) {
+        // around user provided focal point
+        scaleFocalPoint = focalPoint;
+      } else if (quickZoom) {
+        // around center
+        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+      } else {
+        // around gesture
+        scaleFocalPoint = detector.getFocalPoint();
       }
 
       if (isZoomValid(transform)) {
@@ -562,25 +629,8 @@ final class MapGestureDetector {
     @Override
     public boolean onScale(StandardScaleGestureDetector detector) {
       float scaleFactor = detector.getScaleFactor();
-
-      // notify camera change listener
-      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
-
-      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
-
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
-      if (focalPoint != null) {
-        // around user provided focal point
-        transform.zoomBy(zoomBy, focalPoint.x, focalPoint.y);
-      } else if (quickZoom) {
-        cameraChangeDispatcher.onCameraMove();
-        // around center
-        transform.zoomBy(zoomBy, uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-      } else {
-        // around gesture
-        transform.zoomBy(zoomBy, detector.getFocalPoint().x, detector.getFocalPoint().y);
-      }
-
+      transform.zoomBy(zoomBy, scaleFocalPoint.x, scaleFocalPoint.y);
       return true;
     }
 
@@ -589,6 +639,58 @@ final class MapGestureDetector {
       if (quickZoom) {
         gesturesManager.getMoveGestureDetector().setEnabled(true);
       }
+
+      float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
+      if (velocityXY > minimumVelocity) {
+        double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
+        Timber.d("velocity: " + velocityXY + ", zoom: " + zoomAddition);
+        double currentZoom = transform.getRawZoom();
+        //long animationTime = TimeUnit.SECONDS.toMillis((long) Math.abs(zoomAddition)) / 4; //todo make divider public
+        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
+        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime, detector.getFocalPoint());
+        scheduleAnimator(scaleAnimator);
+      }
+    }
+
+    private double calculateScale(double velocityXY, boolean isScalingOut) {
+      double zoomAddition = (float) Math.log(velocityXY / 1000 + 1);
+      if (isScalingOut) {
+        zoomAddition = -zoomAddition;
+      }
+      return zoomAddition;
+    }
+
+    private Animator createScaleAnimator(double currentZoom, double zoomAddition, long animationTime, PointF focal) {
+      ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
+      animator.setDuration(animationTime);
+      animator.setInterpolator(new DecelerateInterpolator());
+      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+          transform.setZoom((Float) animation.getAnimatedValue(), focal, 0, true);
+        }
+      });
+
+      animator.addListener(new AnimatorListenerAdapter() {
+
+        @Override
+        public void onAnimationStart(Animator animation) {
+          transform.cancelTransitions();
+          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+        }
+
+        @Override
+        public void onAnimationCancel(Animator animation) {
+        }
+
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          animatorsToExecute.remove(scaleAnimator);
+          cameraChangeDispatcher.onCameraIdle();
+        }
+      });
+      return animator;
     }
 
     private double getNewZoom(float scaleFactor, boolean quickZoom) {
