@@ -630,8 +630,28 @@ final class MapGestureDetector {
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
-      Timber.d("angular velocity: " + angularVelocity);
-      long animationTime = (long) Math.abs(angularVelocity) * 250;
+      long animationTime;
+
+      if (angularVelocity != 0) {
+        boolean negative = angularVelocity < 0;
+        angularVelocity = Math.abs(angularVelocity);
+        if (angularVelocity > 0) {
+          angularVelocity = angularVelocity * angularVelocity + 1;
+        } else {
+          angularVelocity = angularVelocity * 2 + 1;
+        }
+        angularVelocity = MathUtils.clamp(
+          angularVelocity, MapboxConstants.MINIMUM_ANGULAR_VELOCITY, MapboxConstants.MAXIMUM_ANGULAR_VELOCITY);
+
+        animationTime = (long) (Math.log(angularVelocity + 1) * 500);
+
+        if (negative) {
+          angularVelocity = -angularVelocity;
+        }
+      } else {
+        animationTime = 0;
+      }
+
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
       scheduleAnimator(rotateAnimator);

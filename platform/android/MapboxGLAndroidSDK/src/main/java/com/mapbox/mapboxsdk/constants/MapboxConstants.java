@@ -53,6 +53,16 @@ public class MapboxConstants {
   public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
 
   /**
+   * Minimum angular velocity for rotation animation
+   */
+  public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
+
+  /**
+   * Maximum angular velocity for rotation animation
+   */
+  public static final float MAXIMUM_ANGULAR_VELOCITY = 20f;
+
+  /**
    * The currently supported minimum zoom level.
    */
   public static final float MINIMUM_ZOOM = 0.0f;
