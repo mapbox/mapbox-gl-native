@@ -13,6 +13,7 @@ import com.mapbox.android.core.location.LocationEnginePriority;
 import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
+import com.mapbox.mapboxsdk.maps.Events;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 
 /**
@@ -52,6 +53,7 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
+      Events.initiliaze();
       ConnectivityReceiver.instance(appContext);
     }
 

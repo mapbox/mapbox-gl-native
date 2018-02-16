@@ -6,7 +6,7 @@ import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 
-class Events {
+public class Events {
   static final String TWO_FINGER_TAP = "TwoFingerTap";
   static final String DOUBLE_TAP = "DoubleTap";
   static final String SINGLE_TAP = "SingleTap";
@@ -24,6 +24,10 @@ class Events {
       || TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       telemetry.enable();
     }
+  }
+
+  public static void initiliaze() {
+    obtainTelemetry();
   }
 
   private static class EventsHolder {
