@@ -185,15 +185,7 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a>
- style.
 
- Satellite Streets combines the high-resolution satellite and aerial imagery of
- Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
- Streets.
- */
 + (NSURL *)hybridStyleURL __attribute__((unavailable("Use -satelliteStreetsStyleURL.")));
 
 /**

@@ -114,7 +114,7 @@ MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
 
 // Make sure all the styles listed in mbgl::util::default_styles::orderedStyles
 // are defined above and also declared in MGLStyle.h.
-static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
+static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
 
 #pragma mark -
