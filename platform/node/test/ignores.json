@@ -34,6 +34,7 @@
   "render-tests/regressions/mapbox-gl-js#5599": "https://github.com/mapbox/mapbox-gl-native/issues/10399",
   "render-tests/regressions/mapbox-gl-js#5740": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/regressions/mapbox-gl-js#5982": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
+  "render-tests/regressions/mapbox-gl-js#6160": "https://github.com/mapbox/mapbox-gl-native/pull/11206",
   "render-tests/regressions/mapbox-gl-native#7357": "https://github.com/mapbox/mapbox-gl-native/issues/7357",
   "render-tests/runtime-styling/image-add-sdf": "https://github.com/mapbox/mapbox-gl-native/issues/9847",
   "render-tests/runtime-styling/paint-property-fill-flat-to-extrude": "https://github.com/mapbox/mapbox-gl-native/issues/6745",
