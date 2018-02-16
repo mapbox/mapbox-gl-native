@@ -48,6 +48,11 @@ public class MapboxConstants {
   public static final long VELOCITY_THRESHOLD_IGNORE_FLING = 1000;
 
   /**
+   * Value by which the default rotation threshold will be increased when scaling
+   */
+  public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
+
+  /**
    * The currently supported minimum zoom level.
    */
   public static final float MINIMUM_ZOOM = 0.0f;

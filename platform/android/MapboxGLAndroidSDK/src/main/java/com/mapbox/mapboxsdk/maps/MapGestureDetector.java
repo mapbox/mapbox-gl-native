@@ -481,6 +481,11 @@ final class MapGestureDetector {
         Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pinch));
       }
 
+      gesturesManager.getRotateGestureDetector().setAngleThreshold(
+        gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+          + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
+      );
+
       return true;
     }
 
@@ -497,6 +502,10 @@ final class MapGestureDetector {
       if (quickZoom) {
         gesturesManager.getMoveGestureDetector().setEnabled(true);
       }
+
+      gesturesManager.getRotateGestureDetector().setAngleThreshold(
+        gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+      );
 
       float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
       if (velocityXY > minimumVelocity) {
@@ -771,6 +780,7 @@ final class MapGestureDetector {
       listener.onScroll();
     }
   }
+
   void setOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
     this.onMapClickListener = onMapClickListener;
   }
