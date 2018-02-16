@@ -27,7 +27,6 @@
   "QueryRenderedFeaturesBoxHighlightActivity",
   "MultiMapActivity",
   "MapInDialogActivity",
-  "SimpleMapActivity",
   "ManualZoomActivity",
   "MaxMinZoomActivity",
   "ScrollByActivity",
