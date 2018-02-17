@@ -189,13 +189,7 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
 
-/**
- URLs of the styles bundled with the library.
-
- @deprecated Call the relevant class method of `MGLStyle` for the URL of a
-    particular default style.
- */
-@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((deprecated("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
+@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((unavailable("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /**
  URL of the style currently displayed in the receiver.
@@ -283,17 +277,13 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (IBAction)showAttribution:(id)sender;
 
-/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("This property is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property always returns NO.
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
 #pragma mark Displaying the User’s Location
 
@@ -1462,11 +1452,11 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 
-@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use -debugMask and -setDebugMask:.")));
 
-- (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
+- (void)toggleDebug __attribute__((unavailable("Use -setDebugMask:.")));
 
-- (void)emptyMemoryCache __attribute__((deprecated));
+- (void)emptyMemoryCache __attribute__((unavailable));
 
 @end
 

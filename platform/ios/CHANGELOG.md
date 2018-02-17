@@ -8,6 +8,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Removed support for 32-bit simulators. ([#10962](https://github.com/mapbox/mapbox-gl-native/pull/10962))
 * Added Danish and Hebrew localizations. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967), [#11136](https://github.com/mapbox/mapbox-gl-native/pull/11134))
+* Removed methods, properties, and constants that had been deprecated as of v3.7.4. ([#11205](https://github.com/mapbox/mapbox-gl-native/pull/11205))
 
 ### Styles and rendering
 

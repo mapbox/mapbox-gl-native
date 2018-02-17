@@ -2288,16 +2288,6 @@ public:
                                     MGLMapDebugCollisionBoxesMask) : 0;
 }
 
-- (BOOL)isDebugActive
-{
-    return self.debugMask;
-}
-
-- (void)toggleDebug
-{
-    self.debugActive = !self.debugActive;
-}
-
 - (void)resetNorth
 {
     [self resetNorthAnimated:YES];
@@ -2318,11 +2308,6 @@ public:
                                                    fromDistance:distance
                                                           pitch:pitch
                                                         heading:heading];
-}
-
-- (void)emptyMemoryCache
-{
-    _rendererFrontend->reduceMemoryUse();
 }
 
 - (void)setZoomEnabled:(BOOL)zoomEnabled
@@ -3517,36 +3502,6 @@ public:
      @"If you previously set this style ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “styleID” entry from the User Defined Runtime Attributes section of the Identity inspector. "
      @"Then go to the Attributes inspector and enter “mapbox://styles/%@” into the “Style URL” field.",
      __PRETTY_FUNCTION__, styleID];
-}
-
-- (NS_ARRAY_OF(NSString *) *)styleClasses
-{
-    return [self.style styleClasses];
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
-{
-    [self setStyleClasses:appliedClasses transitionDuration:0];
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
-{
-    [self.style setStyleClasses:appliedClasses transitionDuration:transitionDuration];
-}
-
-- (BOOL)hasStyleClass:(NSString *)styleClass
-{
-    return [self.style hasStyleClass:styleClass];
-}
-
-- (void)addStyleClass:(NSString *)styleClass
-{
-    [self.style addStyleClass:styleClass];
-}
-
-- (void)removeStyleClass:(NSString *)styleClass
-{
-    [self.style removeStyleClass:styleClass];
 }
 
 #pragma mark - Annotations -

@@ -54,11 +54,6 @@
     return _sharedManager;
 }
 
-+ (BOOL)mapboxMetricsEnabledSettingShownInApp {
-    NSLog(@"mapboxMetricsEnabledSettingShownInApp is no longer necessary; the Mapbox Maps SDK for iOS has changed to always provide a telemetry setting in-app.");
-    return YES;
-}
-
 + (void)setAccessToken:(NSString *)accessToken {
     accessToken = [accessToken stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]];

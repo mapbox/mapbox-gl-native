@@ -116,57 +116,8 @@ MGL_DEFINE_STYLE(satelliteStreets, satellite-streets)
 
 // Make sure all the styles listed in mbgl::util::default_styles::orderedStyles
 // are defined above and also declared in MGLStyle.h.
-static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
+static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
               "mbgl::util::default_styles::orderedStyles and MGLStyle have different numbers of styles.");
-
-// Hybrid has been renamed Satellite Streets, so the last Hybrid version is hard-coded here.
-static NSURL *MGLStyleURL_hybrid;
-+ (NSURL *)hybridStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_hybrid = [NSURL URLWithString:@"mapbox://styles/mapbox/satellite-hybrid-v8"];
-    });
-    return MGLStyleURL_hybrid;
-}
-
-// Emerald is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_emerald;
-+ (NSURL *)emeraldStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_emerald = [NSURL URLWithString:@"mapbox://styles/mapbox/emerald-v8"];
-    });
-    return MGLStyleURL_emerald;
-}
-
-// Traffic Day is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_trafficDay;
-+ (NSURL *)trafficDayStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_trafficDay = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-day-v2"];
-    });
-    return MGLStyleURL_trafficDay;
-}
-
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version {
-    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-day-v" stringByAppendingFormat:@"%li", (long)version]];
-}
-
-// Traffic Night is no longer getting new versions as a default style, so the current version is hard-coded here.
-static NSURL *MGLStyleURL_trafficNight;
-+ (NSURL *)trafficNightStyleURL {
-    static dispatch_once_t onceToken;
-    dispatch_once(&onceToken, ^{
-        MGLStyleURL_trafficNight = [NSURL URLWithString:@"mapbox://styles/mapbox/traffic-night-v2"];
-    });
-    return MGLStyleURL_trafficNight;
-}
-
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version {
-    return [NSURL URLWithString:[@"mapbox://styles/mapbox/traffic-night-v" stringByAppendingFormat:@"%li", (long)version]];
-}
-
 
 #pragma mark -
 
@@ -532,38 +483,6 @@ static NSURL *MGLStyleURL_trafficNight;
         }
     }
     [self didChangeValueForKey:@"layers"];
-}
-
-#pragma mark Style classes
-
-- (NS_ARRAY_OF(NSString *) *)styleClasses
-{
-    return @[];
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses
-{
-}
-
-- (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration
-{
-}
-
-- (NSUInteger)countOfStyleClasses {
-    return 0;
-}
-
-- (BOOL)hasStyleClass:(NSString *)styleClass
-{
-    return NO;
-}
-
-- (void)addStyleClass:(NSString *)styleClass
-{
-}
-
-- (void)removeStyleClass:(NSString *)styleClass
-{
 }
 
 #pragma mark Style images

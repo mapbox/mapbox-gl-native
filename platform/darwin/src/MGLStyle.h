@@ -83,13 +83,7 @@ MGL_EXPORT
  */
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/blog/emerald-gl/">Mapbox Emerald</a> style.
-
- Emerald is a tactile style with subtle textures and dramatic hillshading.
- */
-+ (NSURL *)emeraldStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
++ (NSURL *)emeraldStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
  Returns the URL to the current version of the
@@ -191,16 +185,8 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a>
- style.
 
- Satellite Streets combines the high-resolution satellite and aerial imagery of
- Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
- Streets.
- */
-+ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURL.")));
++ (NSURL *)hybridStyleURL __attribute__((unavailable("Use -satelliteStreetsStyleURL.")));
 
 /**
  Returns the URL to the current version of the
@@ -232,39 +218,14 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style.
 
- */
-+ (NSURL *)trafficDayStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
++ (NSURL *)trafficDayStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
 
-/**
- Returns the URL to the given version of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
++ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
 
-/**
- Returns the URL to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style.
++ (NSURL *)trafficNightStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
- */
-+ (NSURL *)trafficNightStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
-
-/**
- Returns the URL to to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
++ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 #pragma mark Accessing Metadata About the Style
 
@@ -458,22 +419,22 @@ MGL_EXPORT
 /**
  Support for style classes has been removed. This property always returns an empty array.
  */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("This property is non-functional.")));
 
 /**
  Support for style classes has been removed. This method always returns NO.
  */
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
 /**
  Support for style classes has been removed. This method is a no-op.
  */
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
 /**
  Support for style classes has been removed. This method is a no-op.
  */
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
 
 #pragma mark Managing a Style’s Images
 

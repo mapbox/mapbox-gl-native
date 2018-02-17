@@ -64,12 +64,6 @@
     XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @(mbgl::util::default_styles::dark.url));
     XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @(mbgl::util::default_styles::satellite.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURL].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
-    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle emeraldStyleURL].absoluteString, @"mapbox://styles/mapbox/emerald-v8");
-    XCTAssertEqualObjects([MGLStyle hybridStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-hybrid-v8");
-#pragma clang diagnostic pop
 }
 
 - (void)testVersionedStyleURLs {
@@ -99,19 +93,8 @@
                           @(mbgl::util::default_styles::satelliteStreets.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString,
                           @"mapbox://styles/mapbox/satellite-streets-v99");
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:mbgl::util::default_styles::trafficDay.currentVersion].absoluteString,
-                          @(mbgl::util::default_styles::trafficDay.url));
-    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:99].absoluteString,
-                          @"mapbox://styles/mapbox/traffic-day-v99");
-    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:mbgl::util::default_styles::trafficNight.currentVersion].absoluteString,
-                          @(mbgl::util::default_styles::trafficNight.url));
-    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:99].absoluteString,
-                          @"mapbox://styles/mapbox/traffic-night-v99");
-#pragma clang diagnostic pop
 
-    static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
+    static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");
 }
 
@@ -143,7 +126,7 @@
     NSString *styleHeader = self.stringWithContentsOfStyleHeader;
 
     NSError *versionedMethodError;
-    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*\b)RE");
+    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*(?!traffic)\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*\b)RE");
     NSRegularExpression *versionedMethodExpression = [NSRegularExpression regularExpressionWithPattern:versionedMethodExpressionString options:NSRegularExpressionAnchorsMatchLines error:&versionedMethodError];
     XCTAssertNil(versionedMethodError, @"Error compiling regular expression to search for versioned methods.");
     NSUInteger numVersionedMethodDeclarations = [versionedMethodExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
@@ -381,13 +364,6 @@
     NSString *styleHeader = [NSString stringWithContentsOfURL:styleHeaderURL usedEncoding:nil error:&styleHeaderError];
     XCTAssertNil(styleHeaderError, @"Error getting contents of MGLStyle.h.");
     return styleHeader;
-}
-
-- (void)testClasses {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqual(self.style.styleClasses.count, 0);
-#pragma clang diagnostic pop
 }
 
 - (void)testImages {
