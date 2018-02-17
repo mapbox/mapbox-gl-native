@@ -44,7 +44,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Labels are now transliterated from more languages when VoiceOver is enabled. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
 
-## 3.7.5
+## 3.7.5 - February 16, 2018
 
 * Fixed an issue where requesting location services permission would trigger an unrecoverable loop. ([#11229](https://github.com/mapbox/mapbox-gl-native/pull/11229))
 
