@@ -1,6 +1,6 @@
 Pod::Spec.new do |m|
 
-  version = '3.7.4'
+  version = '3.7.5'
 
   m.name    = 'Mapbox-iOS-SDK-nightly-dynamic'
   m.version = "#{version}-nightly"
