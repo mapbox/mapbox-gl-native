@@ -292,9 +292,12 @@ TEST(OfflineDatabase, DeleteRegion) {
 
     Response response;
     response.noContent = true;
-
-    db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
-    db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
+    
+    {
+        auto transaction = db.beginRegionDownload();
+        db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
+        db.putRegionResource(region.getID(), Resource::tile("http://example.com/", 1.0, 0, 0, 0, Tileset::Scheme::XYZ), response);
+    }
 
     db.deleteRegion(std::move(region));
 
@@ -400,8 +403,11 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     Response response;
     response.data = randomString(1024);
 
-    for (uint32_t i = 1; i <= 100; i++) {
-        db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+    {
+        auto transaction = db.beginRegionDownload();
+        for (uint32_t i = 1; i <= 100; i++) {
+            db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+        }
     }
 
     EXPECT_TRUE(bool(db.get(Resource::style("http://example.com/1"))));
@@ -436,7 +442,8 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
 
     Response response;
     response.data = std::make_shared<std::string>("data");
-
+    
+    auto transaction = db.beginRegionDownload();
     uint64_t styleSize = db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
 
     OfflineRegionStatus status2 = db.getRegionCompletedStatus(region.getID());
@@ -467,8 +474,11 @@ TEST(OfflineDatabase, HasRegionResource) {
     Response response;
     response.data = randomString(1024);
 
-    for (uint32_t i = 1; i <= 100; i++) {
-        db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+    {
+        auto transaction = db.beginRegionDownload();
+        for (uint32_t i = 1; i <= 100; i++) {
+            db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
+        }
     }
 
     EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/1"))));
@@ -496,6 +506,7 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
     response.data = std::make_shared<std::string>("first");
 
     EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), resource)));
+    auto transaction = db.beginRegionDownload();
     db.putRegionResource(region.getID(), resource, response);
     EXPECT_TRUE(bool(db.hasRegionResource(region.getID(), resource)));
     EXPECT_EQ(5, *(db.hasRegionResource(region.getID(), resource)));
@@ -526,6 +537,8 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
 
     // Count is initially zero.
     EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
+    
+    auto transaction = db.beginRegionDownload();
 
     // Count stays the same after putting a non-tile resource.
     db.putRegionResource(region1.getID(), Resource::style("http://example.com/"), response);
@@ -558,6 +571,8 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     // Count increases after putting a pre-existing, but non-offline Mapbox tile.
     db.putRegionResource(region1.getID(), mapboxTile2, response);
     EXPECT_EQ(2u, db.getOfflineMapboxTileCount());
+    
+    transaction.reset();
 
     // Count decreases after deleting a region when the tiles are not used by other regions.
     db.deleteRegion(std::move(region1));

@@ -11,39 +11,54 @@
 namespace mbgl {
     
 // Manages transactions for (multiple) region downloads
-class RegionTransaction {
+// and ad-hoc caching
+class TransactionManager {
 public:
-    RegionTransaction(mapbox::sqlite::Database& database_)
+    TransactionManager(mapbox::sqlite::Database& database_)
         : database(database_) {
     }
     
-    ~RegionTransaction() {
+    ~TransactionManager() {
         commitTransaction();
     }
     
-    void start() {
-        runningTransactions++;
+    void startIsolated() {
+        commitTransaction();
+        openTransaction();
+    }
+    
+    void endIsolated() {
+        commitTransaction();
+        if (runningBatches > 0) {
+            openTransaction();
+        }
+    }
+    
+    void startBatch() {
+        runningBatches++;
         openTransaction();
     };
     
-    void end() {
-        runningTransactions--;
-        if (runningTransactions == 0 && pendingRegionResources > 0) {
+    void endBatch() {
+        runningBatches--;
+        if (runningBatches == 0 && pendingResources > 0) {
             commitTransaction();
         }
     };
     
-    void onResourceAdded() {
-        pendingRegionResources++;
-        if (pendingRegionResources >= 128) {
+    void onBatchResourceAdded() {
+        assert (runningBatches > 0);
+        
+        pendingResources++;
+        if (pendingResources >= 128) {
             commitTransaction();
             openTransaction();
         }
     }
+
 private:
     void openTransaction() {
         if (!transaction) {
-            Log::Info(Event::Database, "Starting region transaction");
             transaction = std::make_unique<mapbox::sqlite::Transaction>(database, mapbox::sqlite::Transaction::Immediate);
         }
     }
@@ -52,35 +67,50 @@ private:
         if (!transaction) {
             return;
         }
-        
-        Log::Info(Event::Database, "Committing region transaction");
+
         transaction->commit();
         transaction.reset();
-        pendingRegionResources = 0;
+        pendingResources = 0;
     }
     
     mapbox::sqlite::Database& database;
     std::unique_ptr<mapbox::sqlite::Transaction> transaction;
-    int runningTransactions = 0;
-    int64_t pendingRegionResources = 0;
+    int runningBatches = 0;
+    int64_t pendingResources = 0;
 };
   
-// Enables reference counting on current (region)
+// Enables reference counting on current batch
 // transactions
-class TransactionToken {
+class BatchTransaction {
 public:
     
-    TransactionToken(RegionTransaction& transaction_)
-        : transaction(transaction_) {
-        transaction.start();
+    BatchTransaction(TransactionManager& manager_)
+        : manager(manager_) {
+        manager.startBatch();
     }
     
-    ~TransactionToken() {
-        transaction.end();
+    ~BatchTransaction() {
+        manager.endBatch();
     }
 
 private:
-    RegionTransaction& transaction;
+    TransactionManager& manager;
+};
+  
+// Ensures an isolated transaction.
+// Any current transactions are committed first.
+class IsolatedTransaction {
+public:
+    IsolatedTransaction(TransactionManager& manager_)
+        : manager(manager_) {
+        manager.startIsolated();
+    }
+    
+    ~IsolatedTransaction() {
+        manager.endIsolated();
+    }
+private:
+    TransactionManager& manager;
 };
 
 OfflineDatabase::Statement::~Statement() {
@@ -92,14 +122,13 @@ OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
     : path(std::move(path_)),
       maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
-    regionTransaction = std::make_unique<RegionTransaction>(*db);
 }
 
 OfflineDatabase::~OfflineDatabase() {
     // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
     // can't throw anything.
     try {
-        regionTransaction.reset();
+        transactionManager.reset();
         statements.clear();
         db.reset();
     } catch (mapbox::sqlite::Exception& ex) {
@@ -108,9 +137,11 @@ OfflineDatabase::~OfflineDatabase() {
 }
 
 void OfflineDatabase::connect(int flags) {
+    transactionManager.reset();
     db = std::make_unique<mapbox::sqlite::Database>(path.c_str(), flags);
     db->setBusyTimeout(Milliseconds::max());
     db->exec("PRAGMA foreign_keys = ON");
+    transactionManager = std::make_unique<TransactionManager>(*db);
 }
 
 void OfflineDatabase::ensureSchema() {
@@ -203,11 +234,10 @@ void OfflineDatabase::migrateToVersion5() {
 }
 
 void OfflineDatabase::migrateToVersion6() {
-    mapbox::sqlite::Transaction transaction(*db);
+    IsolatedTransaction transaction(*transactionManager);
     db->exec("ALTER TABLE resources ADD COLUMN must_revalidate INTEGER NOT NULL DEFAULT 0");
     db->exec("ALTER TABLE tiles ADD COLUMN must_revalidate INTEGER NOT NULL DEFAULT 0");
     db->exec("PRAGMA user_version = 6");
-    transaction.commit();
 }
 
 OfflineDatabase::Statement OfflineDatabase::getStatement(const char * sql) {
@@ -244,6 +274,7 @@ optional<int64_t> OfflineDatabase::hasInternal(const Resource& resource) {
 }
 
 std::pair<bool, uint64_t> OfflineDatabase::put(const Resource& resource, const Response& response) {
+    IsolatedTransaction transaction(*transactionManager);
     return putInternal(resource, response, true);
 }
 
@@ -621,8 +652,8 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     return true;
 }
 
-std::shared_ptr<TransactionToken> OfflineDatabase::beginRegionDownload() {
-    return std::make_shared<TransactionToken>(*regionTransaction);
+std::shared_ptr<BatchTransaction> OfflineDatabase::beginRegionDownload() {
+    return std::make_shared<BatchTransaction>(*transactionManager);
 }
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
@@ -645,6 +676,8 @@ std::vector<OfflineRegion> OfflineDatabase::listRegions() {
 
 OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& definition,
                                             const OfflineRegionMetadata& metadata) {
+    IsolatedTransaction transaction(*transactionManager);
+    
     // clang-format off
     Statement stmt = getStatement(
         "INSERT INTO regions (definition, description) "
@@ -659,6 +692,8 @@ OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& defin
 }
 
 OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
+    IsolatedTransaction transaction(*transactionManager);
+
     // clang-format off
     Statement stmt = getStatement(
                                   "UPDATE regions SET description = ?1"
@@ -672,6 +707,8 @@ OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, co
 }
 
 void OfflineDatabase::deleteRegion(OfflineRegion&& region) {
+    IsolatedTransaction transaction(*transactionManager);
+    
     // clang-format off
     Statement stmt = getStatement(
         "DELETE FROM regions WHERE id = ?");
@@ -711,7 +748,7 @@ uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& re
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
     
-    regionTransaction->onResourceAdded();
+    transactionManager->onBatchResourceAdded();
 
     if (offlineMapboxTileCount
         && resource.kind == Resource::Kind::Tile

@@ -62,7 +62,7 @@ private:
     void queueResource(Resource);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);
     
-    std::shared_ptr<TransactionToken> regionTransaction;
+    std::shared_ptr<BatchTransaction> regionTransaction;
 };
 
 } // namespace mbgl
