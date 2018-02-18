@@ -23,6 +23,8 @@ namespace mbgl {
 
 class Response;
 class TileID;
+class TransactionToken;
+class RegionTransaction;
 
 class OfflineDatabase : private util::noncopyable {
 public:
@@ -36,8 +38,7 @@ public:
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
 
-    void beginRegionDownload();
-    void endRegionDownload();
+    std::shared_ptr<TransactionToken> beginRegionDownload();
 
     std::vector<OfflineRegion> listRegions();
 
@@ -108,8 +109,8 @@ private:
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
-    std::unique_ptr<::mapbox::sqlite::Transaction> regionTransaction;
-    int64_t pendingRegionResources = 0;
+    
+    std::unique_ptr<RegionTransaction> regionTransaction;
 
     template <class T>
     T getPragma(const char *);

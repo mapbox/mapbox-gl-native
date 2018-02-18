@@ -9,6 +9,79 @@
 #include "sqlite3.hpp"
 
 namespace mbgl {
+    
+// Manages transactions for (multiple) region downloads
+class RegionTransaction {
+public:
+    RegionTransaction(mapbox::sqlite::Database& database_)
+        : database(database_) {
+    }
+    
+    ~RegionTransaction() {
+        commitTransaction();
+    }
+    
+    void start() {
+        runningTransactions++;
+        openTransaction();
+    };
+    
+    void end() {
+        runningTransactions--;
+        if (runningTransactions == 0 && pendingRegionResources > 0) {
+            commitTransaction();
+        }
+    };
+    
+    void onResourceAdded() {
+        pendingRegionResources++;
+        if (pendingRegionResources >= 128) {
+            commitTransaction();
+            openTransaction();
+        }
+    }
+private:
+    void openTransaction() {
+        if (!transaction) {
+            Log::Info(Event::Database, "Starting region transaction");
+            transaction = std::make_unique<mapbox::sqlite::Transaction>(database, mapbox::sqlite::Transaction::Immediate);
+        }
+    }
+    
+    void commitTransaction() {
+        if (!transaction) {
+            return;
+        }
+        
+        Log::Info(Event::Database, "Committing region transaction");
+        transaction->commit();
+        transaction.reset();
+        pendingRegionResources = 0;
+    }
+    
+    mapbox::sqlite::Database& database;
+    std::unique_ptr<mapbox::sqlite::Transaction> transaction;
+    int runningTransactions = 0;
+    int64_t pendingRegionResources = 0;
+};
+  
+// Enables reference counting on current (region)
+// transactions
+class TransactionToken {
+public:
+    
+    TransactionToken(RegionTransaction& transaction_)
+        : transaction(transaction_) {
+        transaction.start();
+    }
+    
+    ~TransactionToken() {
+        transaction.end();
+    }
+
+private:
+    RegionTransaction& transaction;
+};
 
 OfflineDatabase::Statement::~Statement() {
     stmt.reset();
@@ -19,13 +92,14 @@ OfflineDatabase::OfflineDatabase(std::string path_, uint64_t maximumCacheSize_)
     : path(std::move(path_)),
       maximumCacheSize(maximumCacheSize_) {
     ensureSchema();
+    regionTransaction = std::make_unique<RegionTransaction>(*db);
 }
 
 OfflineDatabase::~OfflineDatabase() {
     // Deleting these SQLite objects may result in exceptions, but we're in a destructor, so we
     // can't throw anything.
     try {
-        endRegionDownload();
+        regionTransaction.reset();
         statements.clear();
         db.reset();
     } catch (mapbox::sqlite::Exception& ex) {
@@ -547,18 +621,8 @@ bool OfflineDatabase::putTile(const Resource::TileData& tile,
     return true;
 }
 
-void OfflineDatabase::beginRegionDownload() {
-    if (!regionTransaction) {
-        regionTransaction = std::make_unique<mapbox::sqlite::Transaction>(*db, mapbox::sqlite::Transaction::Immediate);
-    }
-}
-
-void OfflineDatabase::endRegionDownload() {
-    if (regionTransaction) {
-        regionTransaction->commit();
-        regionTransaction.reset();
-        pendingRegionResources = 0;
-    }
+std::shared_ptr<TransactionToken> OfflineDatabase::beginRegionDownload() {
+    return std::make_shared<TransactionToken>(*regionTransaction);
 }
 
 std::vector<OfflineRegion> OfflineDatabase::listRegions() {
@@ -644,14 +708,10 @@ optional<int64_t> OfflineDatabase::hasRegionResource(int64_t regionID, const Res
 }
 
 uint64_t OfflineDatabase::putRegionResource(int64_t regionID, const Resource& resource, const Response& response) {
-    pendingRegionResources++;
     uint64_t size = putInternal(resource, response, false).second;
     bool previouslyUnused = markUsed(regionID, resource);
     
-    if (pendingRegionResources >= 128) {
-        endRegionDownload();
-        beginRegionDownload();
-    }
+    regionTransaction->onResourceAdded();
 
     if (offlineMapboxTileCount
         && resource.kind == Resource::Kind::Tile

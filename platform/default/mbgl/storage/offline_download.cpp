@@ -156,7 +156,7 @@ void OfflineDownload::activateDownload() {
     status = OfflineRegionStatus();
     status.downloadState = OfflineRegionDownloadState::Active;
     status.requiredResourceCount++;
-    offlineDatabase.beginRegionDownload();
+    regionTransaction = offlineDatabase.beginRegionDownload();
     ensureResource(Resource::style(definition.styleURL), [&](Response styleResponse) {
         status.requiredResourceCountIsPrecise = true;
 
@@ -270,7 +270,7 @@ void OfflineDownload::activateDownload() {
 */
 void OfflineDownload::continueDownload() {
     if (resourcesRemaining.empty() && status.complete()) {
-        offlineDatabase.endRegionDownload();
+        regionTransaction.reset();
         setState(OfflineRegionDownloadState::Inactive);
         return;
     }
@@ -285,7 +285,7 @@ void OfflineDownload::deactivateDownload() {
     requiredSourceURLs.clear();
     resourcesRemaining.clear();
     requests.clear();
-    offlineDatabase.endRegionDownload();
+    regionTransaction.reset();
 }
 
 void OfflineDownload::queueResource(Resource resource) {
