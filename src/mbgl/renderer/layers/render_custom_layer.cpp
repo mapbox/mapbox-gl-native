@@ -5,6 +5,7 @@
 #include <mbgl/renderer/bucket.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 
@@ -46,11 +47,11 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     if (context != impl().context || !initialized) {
         //If the context changed, deinitialize the previous one before initializing the new one.
         if (context && !contextDestroyed && impl().deinitializeFn) {
-            impl().deinitializeFn(context);
+            MBGL_CHECK_ERROR(impl().deinitializeFn(context));
         }
         context = impl().context;
         assert(impl().initializeFn);
-        impl().initializeFn(impl().context);
+        MBGL_CHECK_ERROR(impl().initializeFn(impl().context));
         initialized = true;
     }
 
@@ -75,7 +76,7 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     parameters.fieldOfView = state.getFieldOfView();
 
     assert(impl().renderFn);
-    impl().renderFn(context, parameters);
+    MBGL_CHECK_ERROR(impl().renderFn(context, parameters));
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.
