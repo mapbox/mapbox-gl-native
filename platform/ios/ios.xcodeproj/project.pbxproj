@@ -2122,6 +2122,8 @@
 		DAD165851CF4D08B001FF4B9 /* Telemetry */ = {
 			isa = PBXGroup;
 			children = (
+				AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */,
+				AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */,
 				40834BA21FE05D3100C1BD0D /* Runtime */,
 				40834BA11FE05CFD00C1BD0D /* Development */,
 			);
@@ -2158,7 +2160,6 @@
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
-				1FB7DAAF1F2A4DBD00410606 /* MGLVectorSource+MGLAdditions.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
