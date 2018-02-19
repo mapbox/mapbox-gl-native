@@ -85,11 +85,28 @@ TEST(TileCover, SanFranciscoZ0Wrapped) {
               util::tileCover(sanFranciscoWrapped, 0));
 }
 
+TEST(TileCount, World) {
+    EXPECT_EQ(1u, util::tileCount(LatLngBounds::world(), 0));
+    EXPECT_EQ(4u, util::tileCount(LatLngBounds::world(), 1));
+}
+
 TEST(TileCount, SanFranciscoZ10) {
-    EXPECT_EQ(4u, util::tileCount(sanFrancisco, 10, util::tileSize));
+    EXPECT_EQ(4u, util::tileCount(sanFrancisco, 10));
+}
+
+TEST(TileCount, SanFranciscoWrappedZ10) {
+    EXPECT_EQ(4u, util::tileCount(sanFranciscoWrapped, 10));
 }
 
 TEST(TileCount, SanFranciscoZ22) {
-    EXPECT_EQ(7254450u, util::tileCount(sanFrancisco, 22, util::tileSize));
+    EXPECT_EQ(7254450u, util::tileCount(sanFrancisco, 22));
+}
+
+TEST(TileCount, BoundsCrossingAntimeridian) {
+    auto crossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
+
+    EXPECT_EQ(1u, util::tileCount(crossingBounds, 0));
+    EXPECT_EQ(4u, util::tileCount(crossingBounds, 3));
+    EXPECT_EQ(8u, util::tileCount(crossingBounds, 4));
 }
 

@@ -147,11 +147,11 @@ std::vector<UnwrappedTileID> tileCover(const LatLngBounds& bounds_, int32_t z) {
         { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
 
     return tileCover(
-        TileCoordinate::fromLatLng(z, bounds.northwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.northeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southeast()).p,
-        TileCoordinate::fromLatLng(z, bounds.southwest()).p,
-        TileCoordinate::fromLatLng(z, bounds.center()).p,
+        Projection::project(bounds.northwest(), z),
+        Projection::project(bounds.northeast(), z),
+        Projection::project(bounds.southeast(), z),
+        Projection::project(bounds.southwest(), z),
+        Projection::project(bounds.center(), z),
         z);
 }
 
@@ -172,23 +172,23 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
 // Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
 // Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
-uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom, uint16_t tileSize_){
+uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
+    if (zoom == 0) {
+        return 1;
+    }
+    auto sw = Projection::project(bounds.southwest(), zoom);
+    auto ne = Projection::project(bounds.northeast(), zoom);
+    auto maxTile = std::pow(2.0, zoom);
+    auto x1 = floor(sw.x);
+    auto x2 = ceil(ne.x) - 1;
+    auto y1 = util::clamp(floor(sw.y), 0.0, maxTile - 1);
+    auto y2 = util::clamp(floor(ne.y), 0.0, maxTile - 1);
 
-    auto sw = Projection::project(bounds.southwest().wrapped(), zoom, tileSize_);
-    auto ne = Projection::project(bounds.northeast().wrapped(), zoom, tileSize_);
-
-    auto x1 = floor(sw.x/ tileSize_);
-    auto x2 = floor((ne.x - 1) / tileSize_);
-    auto y1 = floor(sw.y/ tileSize_);
-    auto y2 = floor((ne.y - 1) / tileSize_);
-
-    auto minX = ::fmax(std::min(x1, x2), 0);
-    auto maxX = std::max(x1, x2);
-    auto minY = (std::pow(2, zoom) - 1) - std::max(y1, y2);
-    auto maxY = (std::pow(2, zoom) - 1) - ::fmax(std::min(y1, y2), 0);
-    
-    return (maxX - minX + 1) * (maxY - minY + 1);
+    auto dx = x1 > x2 ? (maxTile - x1) + x2 : x2 - x1;
+    auto dy = y1 - y2;
+    return (dx + 1) * (dy + 1);
 }
+
 
 } // namespace util
 } // namespace mbgl

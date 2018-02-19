@@ -52,14 +52,14 @@ TEST(TileRange, ContainsWrappedBounds) {
 
 TEST(TileRange, ContainsBoundsCrossingAntimeridian) {
     {
-        auto cossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
-        auto range = util::TileRange::fromLatLngBounds(cossingBounds, 1);
+        auto crossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
+        auto range = util::TileRange::fromLatLngBounds(crossingBounds, 1);
         EXPECT_TRUE(range.contains(CanonicalTileID(1, 1, 1)));
         EXPECT_TRUE(range.contains(CanonicalTileID(1, 0, 0)));
     }
     {
-        auto cossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
-        auto range = util::TileRange::fromLatLngBounds(cossingBounds, 6);
+        auto crossingBounds = LatLngBounds::hull({-20.9615, -214.309}, {19.477, -155.830});
+        auto range = util::TileRange::fromLatLngBounds(crossingBounds, 6);
         EXPECT_FALSE(range.contains(CanonicalTileID(6, 55, 34)));
         EXPECT_FALSE(range.contains(CanonicalTileID(6, 5, 28)));
         EXPECT_TRUE(range.contains(CanonicalTileID(6, 63, 28)));
