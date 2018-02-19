@@ -249,10 +249,17 @@ UniqueTexture Context::createTexture() {
 
 bool Context::supportsVertexArrays() const {
     static bool blacklisted = []() {
-        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
         const std::string renderer = reinterpret_cast<const char*>(glGetString(GL_RENDERER));
+
+        Log::Info(Event::General, "GPU Identifier: %s", renderer.c_str());
+
+        // Blacklist Adreno 2xx, 3xx as it crashes on glBuffer(Sub)Data
+        // Blacklist ARM Mali-T720 (in some MT8163 chipsets) as it crashes on glBindVertexArray
         return renderer.find("Adreno (TM) 2") != std::string::npos
-         || renderer.find("Adreno (TM) 3") != std::string::npos;
+            || renderer.find("Adreno (TM) 3") != std::string::npos
+            || renderer.find("Mali-T720") != std::string::npos
+            || renderer.find("Sapphire 650") != std::string::npos;
+
     }();
 
     return !blacklisted &&
