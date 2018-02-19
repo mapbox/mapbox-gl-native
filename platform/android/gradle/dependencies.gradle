@@ -10,7 +10,7 @@ ext {
     versions = [
             mapboxServices : '3.0.0-beta.2',
             mapboxTelemetry: '3.0.0-beta.1',
-            mapboxGestures : '0.1.0-20180216.114335-10',
+            mapboxGestures : '0.1.0-20180219.142215-11',
             supportLib     : '25.4.0',
             espresso       : '3.0.1',
             testRunner     : '1.0.1',
