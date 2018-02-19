@@ -22,8 +22,8 @@ mapbox::geojson::multi_polygon MultiPolygon::convert(jni::JNIEnv &env, jni::Obje
             jni::DeleteLocalRef(env, jPositionListsList);
         }
 
-        jni::DeleteLocalRef(env, jPointListsListList);
         jni::DeleteLocalRef(env, jPointListsListArray);
+        jni::DeleteLocalRef(env, jPointListsListList);
     }
 
     return multiPolygon;
