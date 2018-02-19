@@ -278,8 +278,7 @@ public:
     template <class GeometryTileFeature>
     bool operator()(const GeometryTileFeature&) const;
 
-    template <class PropertyAccessor>
-    bool operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, expression::EvaluationContext context) const;
+    bool operator()(expression::EvaluationContext context) const;
 };
 
 } // namespace style

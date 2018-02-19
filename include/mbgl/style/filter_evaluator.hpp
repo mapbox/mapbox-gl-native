@@ -19,172 +19,35 @@ namespace style {
            // does not match
        }
 */
-template <class PropertyAccessor>
 class FilterEvaluator {
 public:
-    const FeatureType _featureType;
-    const optional<FeatureIdentifier> _featureIdentifier;
-    const PropertyAccessor _propertyAccessor;
     const expression::EvaluationContext context;
 
-    bool operator()(const NullFilter&) const {
-        return true;
-    }
-
-    bool operator()(const EqualsFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return actual && equal(*actual, filter.value);
-    }
-
-    bool operator()(const NotEqualsFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return !actual || !equal(*actual, filter.value);
-    }
-
-    bool operator()(const LessThanFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ < rhs_; });
-    }
-
-    bool operator()(const LessThanEqualsFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ <= rhs_; });
-    }
-
-    bool operator()(const GreaterThanFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ > rhs_; });
-    }
-
-    bool operator()(const GreaterThanEqualsFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        return actual && compare(*actual, filter.value, [] (const auto& lhs_, const auto& rhs_) { return lhs_ >= rhs_; });
-    }
-
-    bool operator()(const InFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        if (!actual)
-            return false;
-        for (const auto& v: filter.values) {
-            if (equal(*actual, v)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool operator()(const NotInFilter& filter) const {
-        optional<Value> actual = context.feature->getValue(filter.key);
-        if (!actual)
-            return true;
-        for (const auto& v: filter.values) {
-            if (equal(*actual, v)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool operator()(const AnyFilter& filter) const {
-        for (const auto& f: filter.filters) {
-            if (Filter::visit(f, *this)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool operator()(const AllFilter& filter) const {
-        for (const auto& f: filter.filters) {
-            if (!Filter::visit(f, *this)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool operator()(const NoneFilter& filter) const {
-        for (const auto& f: filter.filters) {
-            if (Filter::visit(f, *this)) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool operator()(const HasFilter& filter) const {
-        return bool(context.feature->getValue(filter.key));
-    }
-
-    bool operator()(const NotHasFilter& filter) const {
-        return !context.feature->getValue(filter.key);
-    }
-
-
-    bool operator()(const TypeEqualsFilter& filter) const {
-        return context.feature->getType() == filter.value;
-    }
-
-    bool operator()(const TypeNotEqualsFilter& filter) const {
-        return context.feature->getType() != filter.value;
-    }
-
-    bool operator()(const TypeInFilter& filter) const {
-        for (const auto& v: filter.values) {
-            if (context.feature->getType() == v) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool operator()(const TypeNotInFilter& filter) const {
-        for (const auto& v: filter.values) {
-            if (context.feature->getType() == v) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-
-    bool operator()(const IdentifierEqualsFilter& filter) const {
-        return context.feature->getID() == filter.value;
-    }
-
-    bool operator()(const IdentifierNotEqualsFilter& filter) const {
-        return context.feature->getID() != filter.value;
-    }
-
-    bool operator()(const IdentifierInFilter& filter) const {
-        for (const auto& v: filter.values) {
-            if (context.feature->getID() == v) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool operator()(const IdentifierNotInFilter& filter) const {
-        for (const auto& v: filter.values) {
-            if (context.feature->getID() == v) {
-                return false;
-            }
-        }
-        return true;
-    }
-
-    bool operator()(const HasIdentifierFilter&) const {
-        return bool(context.feature->getID());
-    }
-
-    bool operator()(const NotHasIdentifierFilter&) const {
-        return !context.feature->getID();
-    }
-    
-    bool operator()(const ExpressionFilter&) const {
-        return false;
-    }
+    bool operator()(const NullFilter&) const;
+    bool operator()(const EqualsFilter& filter) const;
+    bool operator()(const NotEqualsFilter& filter) const;
+    bool operator()(const LessThanFilter& filter) const;
+    bool operator()(const LessThanEqualsFilter& filter) const;
+    bool operator()(const GreaterThanFilter& filter) const;
+    bool operator()(const GreaterThanEqualsFilter& filter) const;
+    bool operator()(const InFilter& filter) const;
+    bool operator()(const NotInFilter& filter) const;
+    bool operator()(const AnyFilter& filter) const;
+    bool operator()(const AllFilter& filter) const;
+    bool operator()(const NoneFilter& filter) const;
+    bool operator()(const HasFilter& filter) const;
+    bool operator()(const NotHasFilter& filter) const;
+    bool operator()(const TypeEqualsFilter& filter) const;
+    bool operator()(const TypeNotEqualsFilter& filter) const;
+    bool operator()(const TypeInFilter& filter) const;
+    bool operator()(const TypeNotInFilter& filter) const;
+    bool operator()(const IdentifierEqualsFilter& filter) const;
+    bool operator()(const IdentifierNotEqualsFilter& filter) const;
+    bool operator()(const IdentifierInFilter& filter) const;
+    bool operator()(const IdentifierNotInFilter& filter) const;
+    bool operator()(const HasIdentifierFilter&) const;
+    bool operator()(const NotHasIdentifierFilter&) const;
+    bool operator()(const ExpressionFilter&) const;
 
 private:
     template <class Op>
@@ -244,13 +107,7 @@ private:
 
 template <class GeometryTileFeature>
 bool Filter::operator()(const GeometryTileFeature& feature) const {
-    return operator()(feature.getType(), feature.getID(), [&] (const auto& key) { return feature.getValue(key); }, expression::EvaluationContext { &feature });
-}
-
-template <class PropertyAccessor>
-// TODO add zoom & expression-compatible feature reference to this call
-    bool Filter::operator()(FeatureType type, optional<FeatureIdentifier> id, PropertyAccessor accessor, expression::EvaluationContext context) const {
-    return FilterBase::visit(*this, FilterEvaluator<PropertyAccessor> { type, id, accessor, context });
+    return operator()(expression::EvaluationContext { &feature });
 }
 
 } // namespace style
