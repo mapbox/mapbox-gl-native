@@ -81,7 +81,11 @@ namespace android {
 
     jni::Object<jni::ObjectTag> HeatmapLayer::getHeatmapColor(jni::JNIEnv& env) {
         using namespace mbgl::android::conversion;
-        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapColor());
+        auto propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getHeatmapColor();
+        if (propertyValue.isUndefined()) {
+            propertyValue = layer.as<mbgl::style::HeatmapLayer>()->HeatmapLayer::getDefaultHeatmapColor();
+        }
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, propertyValue);
         return jni::Object<jni::ObjectTag>(*converted);
     }
 
