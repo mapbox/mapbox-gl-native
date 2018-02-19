@@ -215,10 +215,6 @@ bool FilterEvaluator::operator()(const NotHasIdentifierFilter&) const {
 bool FilterEvaluator::operator()(const ExpressionFilter&) const {
     return false;
 }
-
-bool Filter::operator()(expression::EvaluationContext context) const {
-    return FilterBase::visit(*this, FilterEvaluator { context });
-}
     
 } // namespace style
 } // namespace mbgl

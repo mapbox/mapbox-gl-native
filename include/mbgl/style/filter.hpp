@@ -275,9 +275,7 @@ class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
 
-    template <class GeometryTileFeature>
     bool operator()(const GeometryTileFeature&) const;
-
     bool operator()(expression::EvaluationContext context) const;
 };
 

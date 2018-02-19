@@ -51,10 +51,5 @@ public:
 
 };
 
-template <class GeometryTileFeature>
-bool Filter::operator()(const GeometryTileFeature& feature) const {
-    return operator()(expression::EvaluationContext { &feature });
-}
-
 } // namespace style
 } // namespace mbgl
