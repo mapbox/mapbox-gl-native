@@ -115,7 +115,8 @@ final class MapGestureDetector {
         context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
       ));
       gesturesManager.setRotateGestureListener(new RotateGestureListener(
-        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating)
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
+        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity)
       ));
       gesturesManager.setShoveGestureListener(new ShoveGestureListener());
       gesturesManager.setMultiFingerTapGestureListener(new TapGestureListener());
@@ -576,9 +577,11 @@ final class MapGestureDetector {
   private final class RotateGestureListener extends RotateGestureDetector.SimpleOnRotateGestureListener {
     private PointF rotateFocalPoint;
     private final float minimumScaleSpanWhenRotating;
+    private final float minimumAngularVelocity;
 
-    public RotateGestureListener(float minimumScaleSpanWhenRotating) {
+    public RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity) {
       this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
+      this.minimumAngularVelocity = minimumAngularVelocity;
     }
 
     @Override
@@ -630,8 +633,13 @@ final class MapGestureDetector {
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
-      long animationTime;
+      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
 
+      if (Math.abs(angularVelocity) < minimumAngularVelocity) {
+        return;
+      }
+
+      long animationTime;
       if (angularVelocity != 0) {
         boolean negative = angularVelocity < 0;
         angularVelocity = Math.abs(angularVelocity);
@@ -653,7 +661,6 @@ final class MapGestureDetector {
       }
 
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
-      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
       scheduleAnimator(rotateAnimator);
     }
 
