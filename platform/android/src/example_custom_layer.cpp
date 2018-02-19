@@ -6,7 +6,7 @@
 #include <mbgl/style/layers/custom_layer.hpp>
 
 static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
-static const GLchar * fragmentShaderSource = "uniform vec4 fill_color; void main() { gl_FragColor = fill_color; }";
+static const GLchar * fragmentShaderSource = "uniform highp vec4 fill_color; void main() { gl_FragColor = fill_color; }";
 
 class ExampleCustomLayer {
 public:
