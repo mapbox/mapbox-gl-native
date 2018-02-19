@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -49,7 +50,17 @@ class AttributionDialogManager implements View.OnClickListener, DialogInterface.
   @Override
   public void onClick(View view) {
     attributionSet = new AttributionBuilder(mapboxMap).build();
-    showAttributionDialog();
+
+    boolean isActivityFinishing = false;
+    if (context instanceof Activity) {
+      isActivityFinishing = ((Activity) context).isFinishing();
+    }
+
+    // check is hosting activity isn't finishing
+    // https://github.com/mapbox/mapbox-gl-native/issues/11238
+    if (!isActivityFinishing) {
+      showAttributionDialog();
+    }
   }
 
   private void showAttributionDialog() {
