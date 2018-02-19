@@ -33,6 +33,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added a Hebrew localization. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
 
+## 3.7.5 - February 16, 2018
+
+* Fixed an issue where requesting location services permission would trigger an unrecoverable loop. ([#11229](https://github.com/mapbox/mapbox-gl-native/pull/11229))
+
 ## 3.7.4 - February 12, 2018
 
 * Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))
