@@ -212,7 +212,12 @@ bool FilterEvaluator::operator()(const NotHasIdentifierFilter&) const {
     return !context.feature->getID();
 }
 
-bool FilterEvaluator::operator()(const ExpressionFilter&) const {
+bool FilterEvaluator::operator()(const ExpressionFilter& filter) const {
+    const expression::EvaluationResult result = filter.expression->evaluate(context);
+    if (result) {
+        const optional<bool> typed = expression::fromExpressionValue<bool>(*result);
+        return typed ? *typed : false;
+    }
     return false;
 }
     
