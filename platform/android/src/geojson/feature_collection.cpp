@@ -7,19 +7,23 @@ namespace android {
 namespace geojson {
 
 mbgl::FeatureCollection FeatureCollection::convert(jni::JNIEnv& env, jni::Object<FeatureCollection> jCollection) {
-    auto jFeatureList = FeatureCollection::features(env, jCollection);
-    auto jFeatures = java::util::List::toArray<Feature>(env, jFeatureList);
-    auto size = size_t(jFeatures.Length(env));
-
     auto collection = mbgl::FeatureCollection();
-    collection.reserve(size);
 
-    for (size_t i = 0; i < size; i++) {
-        auto jFeature = jFeatures.Get(env, i);
-        collection.push_back(Feature::convert(env, jFeature));
-        jni::DeleteLocalRef(env, jFeature);
+    if (jCollection) {
+        auto jFeatureList = FeatureCollection::features(env, jCollection);
+        auto jFeatures = java::util::List::toArray<Feature>(env, jFeatureList);
+        auto size = size_t(jFeatures.Length(env));
+        collection.reserve(size);
+
+        for (size_t i = 0; i < size; i++) {
+            auto jFeature = jFeatures.Get(env, i);
+            collection.push_back(Feature::convert(env, jFeature));
+            jni::DeleteLocalRef(env, jFeature);
+        }
+
+        jni::DeleteLocalRef(env, jFeatures);
+        jni::DeleteLocalRef(env, jFeatureList);
     }
-
     return collection;
 }
 

@@ -1,6 +1,7 @@
 #include "point.hpp"
 #include "../java/util.hpp"
 #include "../java_types.hpp"
+#include "../style/value.hpp"
 
 namespace mbgl {
 namespace android {
@@ -19,17 +20,23 @@ mapbox::geojson::point Point::convert(jni::JNIEnv &env, jni::Object<Point> jPoin
 }
 
 mapbox::geojson::point Point::convert(jni::JNIEnv &env, jni::Object<java::util::List/*<Double>*/> jDoubleList) {
-    auto jDoubleArray = java::util::List::toArray<double>(env, jDoubleList);
+    mapbox::geojson::point point;
 
-    jni::jdouble lon = jni::CallMethod<jni::jdouble>(env,
-                                                     jDoubleArray.Get(env, 0),
-                                                     *java::Number::doubleValueMethodId);
-    jni::jdouble lat = jni::CallMethod<jni::jdouble>(env,
-                                                      jDoubleArray.Get(env, 1),
-                                                      *java::Number::doubleValueMethodId);
-    mapbox::geojson::point point(lon, lat);
-    jni::DeleteLocalRef(env, jDoubleArray);
+    if (jDoubleList) {
+        auto jDoubleArray = java::util::List::toArray<jobject>(env, jDoubleList);
 
+        auto lonObject = jDoubleArray.Get(env, 0);
+        auto latObject = jDoubleArray.Get(env, 1);
+
+        point.x = jni::CallMethod<jni::jdouble>(env, lonObject,
+                                                *java::Number::doubleValueMethodId);
+        point.y = jni::CallMethod<jni::jdouble>(env, latObject,
+                                                *java::Number::doubleValueMethodId);
+
+        jni::DeleteLocalRef(env, lonObject);
+        jni::DeleteLocalRef(env, latObject);
+        jni::DeleteLocalRef(env, jDoubleArray);
+    }
     return point;
 }
 
