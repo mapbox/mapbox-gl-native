@@ -11,7 +11,7 @@ import com.mapbox.mapboxsdk.style.functions.stops.Stops;
 /**
  * Camera function. Functions that take camera properties as input (zoom for now)
  * <p>
- * Zoom functions allow the appearance of a map feature to change with map’s zoom level.
+ * Zoom functions allow the appearance of a map feature to change with map&#x27;s zoom level.
  * Zoom functions can be used to create the illusion of depth and control data density.
  * Each stop is an array with two elements: the first is a zoom level and the second is
  * a function output value.
