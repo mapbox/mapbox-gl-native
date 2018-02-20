@@ -54,6 +54,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsQueryAnnotations,
     MBXSettingsAnnotationsCustomUserDot,
     MBXSettingsAnnotationsRemoveAnnotations,
+    MBXSettingsAnnotationSelectRandomOffscreenAnnotation,
+    MBXSettingsAnnotationCenterSelectedAnnotation
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
@@ -340,6 +342,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Query Annotations",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
                 @"Remove Annotations",
+                @"Select an offscreen annotation",
+                @"Center selected annotation"
             ]];
             break;
         case MBXSettingsRuntimeStyling:
@@ -468,6 +472,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsAnnotationsRemoveAnnotations:
                     [self.mapView removeAnnotations:self.mapView.annotations];
                     break;
+                case MBXSettingsAnnotationSelectRandomOffscreenAnnotation:
+                    [self selectAnOffscreenAnnotation];
+                    break;
+
+                case MBXSettingsAnnotationCenterSelectedAnnotation:
+                    [self centerSelectedAnnotation];
+                    break;
+
                 default:
                     NSAssert(NO, @"All annotations setting rows should be implemented");
                     break;
@@ -1549,6 +1561,51 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     UIAlertController *alertController = [UIAlertController alertControllerWithTitle:@"Visible Annotations" message:message preferredStyle:UIAlertControllerStyleAlert];
     [alertController addAction:[UIAlertAction actionWithTitle:@"Ok" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:alertController animated:YES completion:nil];
+}
+
+- (id<MGLAnnotation>)randomOffscreenAnnotation {
+    NSArray *annotations = self.mapView.annotations;
+
+    if (annotations.count == 0)
+        return nil;
+
+    NSArray *visibleAnnotations = self.mapView.visibleAnnotations;
+
+    if (visibleAnnotations.count == annotations.count)
+        return nil;
+
+    NSMutableArray *invisibleAnnotations = [annotations mutableCopy];
+
+    if (visibleAnnotations.count > 0) {
+        [invisibleAnnotations removeObjectsInArray:visibleAnnotations];
+    }
+
+    // Now pick a random offscreen annotation.
+    uint32_t index = arc4random_uniform((uint32_t)invisibleAnnotations.count);
+    return invisibleAnnotations[index];
+}
+
+- (void)selectAnOffscreenAnnotation {
+    id<MGLAnnotation> annotation = [self randomOffscreenAnnotation];
+    [self.mapView selectAnnotation:annotation animated:NO];
+
+    // Alternative method to select the annotation (NOT ANIMATED). These two should do the same thing.
+    // self.mapView.selectedAnnotations = @[annotation];
+
+    NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
+}
+
+- (void)centerSelectedAnnotation {
+    id<MGLAnnotation> annotation = self.mapView.selectedAnnotations.firstObject;
+
+    if (!annotation)
+        return;
+
+    CGPoint point = [self.mapView convertCoordinate:annotation.coordinate toPointToView:self.mapView];
+
+    // Animate, so that point becomes the the center
+    CLLocationCoordinate2D center = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
+    [self.mapView setCenterCoordinate:center animated:YES];
 }
 
 - (void)printTelemetryLogFile

@@ -2205,10 +2205,7 @@ public:
         return;
     }
 
-    // Select the annotation if it’s visible.
-    if (MGLCoordinateInCoordinateBounds(firstAnnotation.coordinate, self.visibleCoordinateBounds)) {
-        [self selectAnnotation:firstAnnotation];
-    }
+    [self selectAnnotation:firstAnnotation];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation

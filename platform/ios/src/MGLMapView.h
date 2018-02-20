@@ -1206,9 +1206,6 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Selects an annotation and displays a callout view for it.
 
- If the given annotation is not visible within the current viewport, this
- method has no effect.
-
  @param annotation The annotation object to select.
  @param animated If `YES`, the callout view is animated into position.
  */
