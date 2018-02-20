@@ -64,9 +64,7 @@
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    // Update MGLMapboxEvents
-    // NOTE: This is (likely) the initial setup of MGLMapboxEvents
-    [MGLMapboxEvents sharedManager];
+    [MGLMapboxEvents setupWithAccessToken:accessToken];
 #endif
 }
 
