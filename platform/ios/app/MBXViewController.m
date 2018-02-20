@@ -43,6 +43,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotations100Sprites,
     MBXSettingsAnnotations1000Sprites,
     MBXSettingsAnnotations10000Sprites,
+    MBXSettingsAnnotationsPinAnnotations,
     MBXSettingsAnnotationAnimation,
     MBXSettingsAnnotationsTestShapes,
     MBXSettingsAnnotationsCustomCallout,
@@ -94,6 +95,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @end
 
 @implementation MBXDroppedPinAnnotation
+@end
+
+@interface MBXPinAnnotation : MGLPointAnnotation
+@end
+
+@implementation MBXPinAnnotation
 @end
 
 @interface MBXCustomCalloutAnnotation : MGLPointAnnotation
@@ -322,6 +329,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Add 100 Sprites",
                 @"Add 1,000 Sprites",
                 @"Add 10,000 Sprites",
+                @"Add Pin Annotation View",
                 @"Animate an Annotation View",
                 @"Add Test Shapes",
                 @"Add Point With Custom Callout",
@@ -436,6 +444,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsAnnotations10000Sprites:
                     [self parseFeaturesAddingCount:10000 usingViews:NO];
+                    break;
+                case MBXSettingsAnnotationsPinAnnotations:
+                    [self addPinAnnotations];
                     break;
                 case MBXSettingsAnnotationAnimation:
                     [self animateAnnotationView];
@@ -744,6 +755,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             });
         }
     });
+}
+
+- (void)addPinAnnotations
+    {
+        MBXPinAnnotation *pinAnnotation = [[MBXPinAnnotation alloc] init];
+        pinAnnotation.coordinate = self.mapView.centerCoordinate;
+        [self.mapView addAnnotation:pinAnnotation];
 }
 
 - (void)animateAnnotationView
@@ -1736,6 +1754,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     if ([annotation isKindOfClass:[MBXDroppedPinAnnotation class]] || [annotation isKindOfClass:[MBXSpriteBackedAnnotation class]])
     {
         return nil;
+    }
+    
+    if ([annotation isKindOfClass:[MBXPinAnnotation class]]) {
+        
+        MGLPinAnnotationView *annotationView = (MGLPinAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
+        
+        if (!annotationView) {
+            annotationView = [[MGLPinAnnotationView alloc] initWithReuseIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
+            annotationView.frame = CGRectMake(0, 0, 39, 51);
+        }
+        
+        return annotationView;
+        
     }
 
     MBXAnnotationView *annotationView = (MBXAnnotationView *)[mapView dequeueReusableAnnotationViewWithIdentifier:MBXViewControllerAnnotationViewReuseIdentifer];
