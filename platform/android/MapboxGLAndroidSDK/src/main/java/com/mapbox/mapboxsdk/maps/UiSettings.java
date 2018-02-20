@@ -950,12 +950,7 @@ public final class UiSettings {
     initMargins[3] = bottom;
 
     // convert initial margins with padding
-    int[] contentPadding = projection.getContentPadding();
     FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) view.getLayoutParams();
-    left += contentPadding[0];
-    top += contentPadding[1];
-    right += contentPadding[2];
-    bottom += contentPadding[3];
     layoutParams.setMargins(left, top, right, bottom);
 
     // support RTL
