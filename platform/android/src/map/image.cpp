@@ -16,7 +16,9 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     auto width = image.Get(env, widthField);
     auto pixelRatio = image.Get(env, pixelRatioField);
     auto pixels = image.Get(env, bufferField);
-    auto name = jni::Make<std::string>(env, image.Get(env, nameField));
+    auto jName = image.Get(env, nameField);
+    auto name = jni::Make<std::string>(env, jName);
+    jni::DeleteLocalRef(env, jName);
 
     jni::NullCheck(env, &pixels);
     std::size_t size = pixels.Length(env);
