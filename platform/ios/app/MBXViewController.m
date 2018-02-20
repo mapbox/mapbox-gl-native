@@ -1571,11 +1571,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // Alternative method to select the annotation (NOT ANIMATED). These two should do the same thing.
     // self.mapView.selectedAnnotations = @[annotation];
 
-    NSAssert(self.mapViewselectedAnnotations.firstObject, @"The annotation was not selected");
+    NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
 }
 
 - (void)centerSelectedAnnotation {
-    id<MGLAnnotation> annotation = self.mapViewselectedAnnotations.firstObject;
+    id<MGLAnnotation> annotation = self.mapView.selectedAnnotations.firstObject;
 
     if (!annotation)
         return;
