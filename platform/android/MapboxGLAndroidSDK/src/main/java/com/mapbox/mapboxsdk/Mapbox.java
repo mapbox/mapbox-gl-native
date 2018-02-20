@@ -53,7 +53,7 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
-      Events.initiliaze();
+      Events.initialize();
       ConnectivityReceiver.instance(appContext);
     }
 
