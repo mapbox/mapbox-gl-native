@@ -236,7 +236,7 @@ public:
     
 class ExpressionFilter {
 public:
-    std::shared_ptr<expression::Expression> expression;
+    expression::Expression &expression;
     
     friend bool operator==(const ExpressionFilter& lhs, const ExpressionFilter& rhs) {
         return lhs.expression == rhs.expression;
