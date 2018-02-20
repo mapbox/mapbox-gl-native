@@ -71,6 +71,18 @@ final class MapGestureDetector {
   private final CopyOnWriteArrayList<MapboxMap.OnScrollListener> onScrollListenerList
     = new CopyOnWriteArrayList<>();
 
+  private final CopyOnWriteArrayList<MapboxMap.OnMoveListener> onMoveListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnRotateListener> onRotateListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnScaleListener> onScaleListenerList
+    = new CopyOnWriteArrayList<>();
+
+  private final CopyOnWriteArrayList<MapboxMap.OnShoveListener> onShoveListenerList
+    = new CopyOnWriteArrayList<>();
+
   private PointF focalPoint;
 
   private AndroidGesturesManager gesturesManager;
@@ -854,6 +866,46 @@ final class MapGestureDetector {
 
   void removeOnScrollListener(MapboxMap.OnScrollListener onScrollListener) {
     onScrollListenerList.remove(onScrollListener);
+  }
+
+  void addOnMoveListener(MapboxMap.OnMoveListener listener) {
+    onMoveListenerList.add(listener);
+  }
+
+  void removeOnMoveListener(MapboxMap.OnMoveListener listener) {
+    onMoveListenerList.remove(listener);
+  }
+
+  void addOnRotateListener(MapboxMap.OnRotateListener listener) {
+    onRotateListenerList.add(listener);
+  }
+
+  void removeOnRotateListener(MapboxMap.OnRotateListener listener) {
+    onRotateListenerList.remove(listener);
+  }
+
+  void addOnScaleListener(MapboxMap.OnScaleListener listener) {
+    onScaleListenerList.add(listener);
+  }
+
+  void removeOnScaleListener(MapboxMap.OnScaleListener listener) {
+    onScaleListenerList.remove(listener);
+  }
+
+  void addShoveListener(MapboxMap.OnShoveListener listener) {
+    onShoveListenerList.add(listener);
+  }
+
+  void removeShoveListener(MapboxMap.OnShoveListener listener) {
+    onShoveListenerList.remove(listener);
+  }
+
+  AndroidGesturesManager getGesturesManager() {
+    return gesturesManager;
+  }
+
+  void setGesturesManager(AndroidGesturesManager gesturesManager) {
+    this.gesturesManager = gesturesManager;
   }
 
   private boolean isZoomValid(Transform transform) {

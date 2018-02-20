@@ -16,6 +16,12 @@ import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.gestures.AndroidGesturesManager;
+import com.mapbox.android.gestures.MoveGestureDetector;
+import com.mapbox.android.gestures.RotateGestureDetector;
+import com.mapbox.android.gestures.ShoveGestureDetector;
+import com.mapbox.android.gestures.StandardScaleGestureDetector;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.annotations.Annotation;
@@ -43,7 +49,6 @@ import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.android.core.location.LocationEngine;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
@@ -73,13 +78,13 @@ public final class MapboxMap {
   private final MyLocationViewSettings myLocationViewSettings;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
-  private final OnRegisterTouchListener onRegisterTouchListener;
+  private final OnGesturesManagerInteractionListener onGesturesManagerInteractionListener;
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
   private PointF focalPoint;
 
   MapboxMap(NativeMapView map, Transform transform, UiSettings ui, TrackingSettings tracking,
-            MyLocationViewSettings myLocationView, Projection projection, OnRegisterTouchListener listener,
+            MyLocationViewSettings myLocationView, Projection projection, OnGesturesManagerInteractionListener listener,
             AnnotationManager annotations, CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
     this.uiSettings = ui;
@@ -88,7 +93,7 @@ public final class MapboxMap {
     this.myLocationViewSettings = myLocationView;
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
-    this.onRegisterTouchListener = listener;
+    this.onGesturesManagerInteractionListener = listener;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
   }
 
@@ -1882,12 +1887,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnScrollListener(OnScrollListener)} instead.
    */
   @Deprecated
   public void setOnScrollListener(@Nullable OnScrollListener listener) {
-    onRegisterTouchListener.onSetScrollListener(listener);
+    onGesturesManagerInteractionListener.onSetScrollListener(listener);
   }
 
   /**
@@ -1895,10 +1899,9 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void addOnScrollListener(@Nullable OnScrollListener listener) {
-    onRegisterTouchListener.onAddScrollListener(listener);
+    onGesturesManagerInteractionListener.onAddScrollListener(listener);
   }
 
   /**
@@ -1906,10 +1909,9 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scrolled.
    *                 To unset the callback, use null.
-   *
    */
   public void removeOnScrollListener(@Nullable OnScrollListener listener) {
-    onRegisterTouchListener.onRemoveScrollListener(listener);
+    onGesturesManagerInteractionListener.onRemoveScrollListener(listener);
   }
 
   /**
@@ -1917,12 +1919,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is flinged.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnFlingListener(OnFlingListener)} instead.
    */
   @Deprecated
   public void setOnFlingListener(@Nullable OnFlingListener listener) {
-    onRegisterTouchListener.onSetFlingListener(listener);
+    onGesturesManagerInteractionListener.onSetFlingListener(listener);
   }
 
   /**
@@ -1932,7 +1933,7 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void addOnFlingListener(@Nullable OnFlingListener listener) {
-    onRegisterTouchListener.onAddFlingListener(listener);
+    onGesturesManagerInteractionListener.onAddFlingListener(listener);
   }
 
   /**
@@ -1942,7 +1943,47 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void removeOnFlingListener(@Nullable OnFlingListener listener) {
-    onRegisterTouchListener.onRemoveFlingListener(listener);
+    onGesturesManagerInteractionListener.onRemoveFlingListener(listener);
+  }
+
+  public void addOnMoveListener(OnMoveListener listener) {
+    onGesturesManagerInteractionListener.onAddMoveListener(listener);
+  }
+
+  public void removeOnMoveListener(OnMoveListener listener) {
+    onGesturesManagerInteractionListener.onRemoveMoveListener(listener);
+  }
+
+  public void addOnRotateListener(OnRotateListener listener) {
+    onGesturesManagerInteractionListener.onAddRotateListener(listener);
+  }
+
+  public void removeOnRotateListener(OnRotateListener listener) {
+    onGesturesManagerInteractionListener.onRemoveRotateListener(listener);
+  }
+
+  public void addOnScaleListener(OnScaleListener listener) {
+    onGesturesManagerInteractionListener.onAddScaleListener(listener);
+  }
+
+  public void removeOnScaleListener(OnScaleListener listener) {
+    onGesturesManagerInteractionListener.onRemoveScaleListener(listener);
+  }
+
+  public void addShoveListener(OnShoveListener listener) {
+    onGesturesManagerInteractionListener.onAddShoveListener(listener);
+  }
+
+  public void removeShoveListener(OnShoveListener listener) {
+    onGesturesManagerInteractionListener.onRemoveShoveListener(listener);
+  }
+
+  public void setGesturesManager(AndroidGesturesManager androidGesturesManager) {
+    onGesturesManagerInteractionListener.setGesturesManager(androidGesturesManager);
+  }
+
+  public AndroidGesturesManager getGesturesManager() {
+    return onGesturesManagerInteractionListener.getGesturesManager();
   }
 
   /**
@@ -1950,12 +1991,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapClickListener(OnMapClickListener)} instead.
    */
   @Deprecated
   public void setOnMapClickListener(@Nullable OnMapClickListener listener) {
-    onRegisterTouchListener.onSetMapClickListener(listener);
+    onGesturesManagerInteractionListener.onSetMapClickListener(listener);
   }
 
   /**
@@ -1965,7 +2005,7 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void addOnMapClickListener(@Nullable OnMapClickListener listener) {
-    onRegisterTouchListener.onAddMapClickListener(listener);
+    onGesturesManagerInteractionListener.onAddMapClickListener(listener);
   }
 
   /**
@@ -1975,7 +2015,7 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void removeOnMapClickListener(@Nullable OnMapClickListener listener) {
-    onRegisterTouchListener.onRemoveMapClickListener(listener);
+    onGesturesManagerInteractionListener.onRemoveMapClickListener(listener);
   }
 
   /**
@@ -1983,12 +2023,11 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
    *                 To unset the callback, use null.
-   *
    * @deprecated Use {@link #addOnMapLongClickListener(OnMapLongClickListener)} instead.
    */
   @Deprecated
   public void setOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-    onRegisterTouchListener.onSetMapLongClickListener(listener);
+    onGesturesManagerInteractionListener.onSetMapLongClickListener(listener);
   }
 
   /**
@@ -1998,7 +2037,7 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void addOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-    onRegisterTouchListener.onAddMapLongClickListener(listener);
+    onGesturesManagerInteractionListener.onAddMapLongClickListener(listener);
   }
 
   /**
@@ -2008,7 +2047,7 @@ public final class MapboxMap {
    *                 To unset the callback, use null.
    */
   public void removeOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
-    onRegisterTouchListener.onRemoveMapLongClickListener(listener);
+    onGesturesManagerInteractionListener.onRemoveMapLongClickListener(listener);
   }
 
   /**
@@ -2275,6 +2314,38 @@ public final class MapboxMap {
     void onScroll();
   }
 
+  public interface OnMoveListener {
+    void onMoveBegin(MoveGestureDetector detector);
+
+    void onMove(MoveGestureDetector detector);
+
+    void onMoveEnd(MoveGestureDetector detector);
+  }
+
+  public interface OnRotateListener {
+    void onRotateBegin(RotateGestureDetector detector);
+
+    void onRotate(RotateGestureDetector detector);
+
+    void onRotateEnd(RotateGestureDetector detector);
+  }
+
+  public interface OnScaleListener {
+    void onScaleBegin(StandardScaleGestureDetector detector);
+
+    void onScale(StandardScaleGestureDetector detector);
+
+    void onScaleEnd(StandardScaleGestureDetector detector);
+  }
+
+  public interface OnShoveListener {
+    void onShoveBegin(ShoveGestureDetector detector);
+
+    void onShove(ShoveGestureDetector detector);
+
+    void onShoveEnd(ShoveGestureDetector detector);
+  }
+
   /**
    * Interface definition for a callback to be invoked when the camera changes position.
    *
@@ -2377,7 +2448,7 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when a user registers an listener that is
    * related to touch and click events.
    */
-  interface OnRegisterTouchListener {
+  interface OnGesturesManagerInteractionListener {
     void onSetMapClickListener(OnMapClickListener listener);
 
     void onAddMapClickListener(OnMapClickListener listener);
@@ -2401,6 +2472,26 @@ public final class MapboxMap {
     void onAddFlingListener(OnFlingListener listener);
 
     void onRemoveFlingListener(OnFlingListener listener);
+
+    void onAddMoveListener(OnMoveListener listener);
+
+    void onRemoveMoveListener(OnMoveListener listener);
+
+    void onAddRotateListener(OnRotateListener listener);
+
+    void onRemoveRotateListener(OnRotateListener listener);
+
+    void onAddScaleListener(OnScaleListener listener);
+
+    void onRemoveScaleListener(OnScaleListener listener);
+
+    void onAddShoveListener(OnShoveListener listener);
+
+    void onRemoveShoveListener(OnShoveListener listener);
+
+    AndroidGesturesManager getGesturesManager();
+
+    void setGesturesManager(AndroidGesturesManager gesturesManager);
   }
 
   /**

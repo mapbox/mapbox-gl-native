@@ -23,6 +23,7 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 
+import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
@@ -42,8 +43,6 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -51,6 +50,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import timber.log.Timber;
 
@@ -149,7 +151,7 @@ public class MapView extends FrameLayout {
     focalPointInvalidator.addListener(createFocalPointChangeListener());
 
     // callback for registering touch listeners
-    RegisterTouchListener registerTouchListener = new RegisterTouchListener();
+    GesturesManagerInteractionListener registerTouchListener = new GesturesManagerInteractionListener();
 
     // callback for zooming in the camera
     CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
@@ -921,7 +923,7 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private class RegisterTouchListener implements MapboxMap.OnRegisterTouchListener {
+  private class GesturesManagerInteractionListener implements MapboxMap.OnGesturesManagerInteractionListener {
 
     @Override
     public void onSetMapClickListener(MapboxMap.OnMapClickListener listener) {
@@ -981,6 +983,56 @@ public class MapView extends FrameLayout {
     @Override
     public void onRemoveFlingListener(MapboxMap.OnFlingListener listener) {
       mapGestureDetector.removeOnFlingListener(listener);
+    }
+
+    @Override
+    public void onAddMoveListener(MapboxMap.OnMoveListener listener) {
+      mapGestureDetector.addOnMoveListener(listener);
+    }
+
+    @Override
+    public void onRemoveMoveListener(MapboxMap.OnMoveListener listener) {
+      mapGestureDetector.removeOnMoveListener(listener);
+    }
+
+    @Override
+    public void onAddRotateListener(MapboxMap.OnRotateListener listener) {
+      mapGestureDetector.addOnRotateListener(listener);
+    }
+
+    @Override
+    public void onRemoveRotateListener(MapboxMap.OnRotateListener listener) {
+      mapGestureDetector.removeOnRotateListener(listener);
+    }
+
+    @Override
+    public void onAddScaleListener(MapboxMap.OnScaleListener listener) {
+      mapGestureDetector.addOnScaleListener(listener);
+    }
+
+    @Override
+    public void onRemoveScaleListener(MapboxMap.OnScaleListener listener) {
+      mapGestureDetector.removeOnScaleListener(listener);
+    }
+
+    @Override
+    public void onAddShoveListener(MapboxMap.OnShoveListener listener) {
+      mapGestureDetector.addShoveListener(listener);
+    }
+
+    @Override
+    public void onRemoveShoveListener(MapboxMap.OnShoveListener listener) {
+      mapGestureDetector.removeShoveListener(listener);
+    }
+
+    @Override
+    public AndroidGesturesManager getGesturesManager() {
+      return mapGestureDetector.getGesturesManager();
+    }
+
+    @Override
+    public void setGesturesManager(AndroidGesturesManager gesturesManager) {
+      mapGestureDetector.setGesturesManager(gesturesManager);
     }
   }
 
