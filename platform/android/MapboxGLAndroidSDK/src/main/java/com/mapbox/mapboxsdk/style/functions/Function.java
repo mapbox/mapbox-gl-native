@@ -32,7 +32,7 @@ public class Function<I, O> {
   /**
    * Create an exponential {@link CameraFunction}
    * <p>
-   * Zoom functions allow the appearance of a map feature to change with map’s zoom.
+   * Zoom functions allow the appearance of a map feature to change with map&#x27;s zoom.
    * Zoom functions can be used to create the illusion of depth and control data density.
    * Each stop is an array with two elements, the first is a zoom and the second is a function output value.
    *
@@ -53,7 +53,7 @@ public class Function<I, O> {
   /**
    * Create an interval {@link CameraFunction}
    * <p>
-   * Zoom functions allow the appearance of a map feature to change with map’s zoom.
+   * Zoom functions allow the appearance of a map feature to change with map&#x2019;s zoom.
    * Zoom functions can be used to create the illusion of depth and control data density.
    * Each stop is an array with two elements, the first is a zoom and the second is a function output value.
    *

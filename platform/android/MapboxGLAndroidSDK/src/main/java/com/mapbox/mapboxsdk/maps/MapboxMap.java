@@ -1651,13 +1651,13 @@ public final class MapboxMap {
 
   /**
    * <p>
-   * Sets the distance from the edges of the map view’s frame to the edges of the map
-   * view’s logical viewport.
+   * Sets the distance from the edges of the map view&#x27;s frame to the edges of the map
+   * view&#x27s logical viewport.
    * </p>
    * <p>
    * When the value of this property is equal to {0,0,0,0}, viewport
-   * properties such as `centerCoordinate` assume a viewport that matches the map
-   * view’s frame. Otherwise, those properties are inset, excluding part of the
+   * properties such as &#x27;centerCoordinate&#x27; assume a viewport that matches the map
+   * view&#x27;s frame. Otherwise, those properties are inset, excluding part of the
    * frame from the viewport. For instance, if the only the top edge is inset, the
    * map center is effectively shifted downward.
    * </p>

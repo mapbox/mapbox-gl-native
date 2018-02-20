@@ -5,11 +5,11 @@ package com.mapbox.mapboxsdk.style.light;
  * <p>
  * The position is constructed out of a radial coordinate, an azimuthal angle and a polar angle.
  * where the radial coordinate indicates the distance from the center of the base of an object to its light, the
- * azimuthal angle indicates the position of the light relative to 0° (0° when
+ * azimuthal angle indicates the position of the light relative to 0&#xB0; (0&#xB0; when
  * {@link com.mapbox.mapboxsdk.style.layers.Property.ANCHOR} is set to viewport corresponds to the top of the
- * viewport, or 0° when {@link com.mapbox.mapboxsdk.style.layers.Property.ANCHOR} is set to map corresponds to due
+ * viewport, or 0&#xB0; when {@link com.mapbox.mapboxsdk.style.layers.Property.ANCHOR} is set to map corresponds to due
  * north, and degrees proceed clockwise), and polar indicates the height of the light
- * (from 0°, directly above, to 180°, directly below).
+ * (from 0&#xB0;, directly above, to 180&#xB0;, directly below).
  */
 public class Position {
 
@@ -21,7 +21,7 @@ public class Position {
    * Creates a Position from a radial coordinate, an azimuthal angle and a polar angle.
    *
    * @param radialCoordinate the distance from the center of the base of an object to its light
-   * @param azimuthalAngle the position of the light relative to 0°
+   * @param azimuthalAngle the position of the light relative to 0&#xB0;
    * @param polarAngle the height of the light
    */
   public Position(float radialCoordinate, float azimuthalAngle, float polarAngle) {
