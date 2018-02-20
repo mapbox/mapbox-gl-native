@@ -226,8 +226,8 @@ public:
         stringifyUnaryFilter("!has", "$id");
     }
     
-    void operator()(const ExpressionFilter&) {
-        stringifyUnaryFilter("herp", "derp");
+    void operator()(const ExpressionFilter& filter) {
+        stringify(writer, filter.expression.serialize());
     }
 
 private:
