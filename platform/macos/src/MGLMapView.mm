@@ -2717,32 +2717,24 @@ public:
 /// Converts a rectangle in the given view’s coordinate system to a geographic
 /// bounding box.
 - (mbgl::LatLngBounds)convertRect:(NSRect)rect toLatLngBoundsFromView:(nullable NSView *)view {
-    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-    bounds.extend([self convertPoint:rect.origin toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ NSMaxX(rect), NSMinY(rect) } toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ NSMaxX(rect), NSMaxY(rect) } toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ NSMinX(rect), NSMaxY(rect) } toLatLngFromView:view]);
-
-    // The world is wrapping if a point just outside the bounds is also within
-    // the rect.
-    mbgl::LatLng outsideLatLng;
-    if (bounds.west() > -180) {
-        outsideLatLng = {
-            (bounds.south() + bounds.north()) / 2,
-            bounds.west() - 1,
-        };
-    } else if (bounds.northeast().longitude() < 180) {
-        outsideLatLng = {
-            (bounds.south() + bounds.north()) / 2,
-            bounds.east() + 1,
-        };
-    }
-
-    // If the world is wrapping, extend the bounds to cover all longitudes.
-    if (NSPointInRect([self convertLatLng:outsideLatLng toPointToView:view], rect)) {
-        bounds.extend(mbgl::LatLng(bounds.south(), -180));
-        bounds.extend(mbgl::LatLng(bounds.south(),  180));
-    }
+    auto bounds = mbgl::LatLngBounds::empty();
+    auto bottomLeft = [self convertPoint:{ NSMinX(rect), NSMinY(rect) } toLatLngFromView:view];
+    auto bottomRight = [self convertPoint:{ NSMaxX(rect), NSMinY(rect) } toLatLngFromView:view];
+    auto topRight = [self convertPoint:{ NSMaxX(rect), NSMaxY(rect) } toLatLngFromView:view];
+    auto topLeft = [self convertPoint:{ NSMinX(rect), NSMaxY(rect) } toLatLngFromView:view];
+    
+    // If the bounds straddles the antimeridian, unwrap it so that one side
+    // extends beyond ±180° longitude.
+    auto center = [self convertPoint:{ NSMidX(rect), NSMidY(rect) } toLatLngFromView:view];
+    bottomLeft.unwrapForShortestPath(center);
+    bottomRight.unwrapForShortestPath(center);
+    topRight.unwrapForShortestPath(center);
+    topLeft.unwrapForShortestPath(center);
+    
+    bounds.extend(bottomLeft);
+    bounds.extend(bottomRight);
+    bounds.extend(topRight);
+    bounds.extend(topLeft);
 
     return bounds;
 }
