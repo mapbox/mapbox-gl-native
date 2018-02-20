@@ -109,7 +109,7 @@ TEST(Filter, NotHas) {
 }
 
 TEST(Filter, ID) {
-    StubGeometryTileFeature feature1 { FeatureIdentifier{ int64_t{ 1234 } }, {}, {}, {} };
+    StubGeometryTileFeature feature1 { FeatureIdentifier{ uint64_t{ 1234 } }, {}, {}, {} };
 
     ASSERT_TRUE(parse("[\"==\", \"$id\", 1234]")(feature1));
     ASSERT_FALSE(parse("[\"==\", \"$id\", \"1234\"]")(feature1));
