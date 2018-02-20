@@ -45,7 +45,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue preventing labels from being transliterated when VoiceOver was enabled on iOS 10._x_ and below. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Labels are now transliterated from more languages when VoiceOver is enabled. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
-* Improved fallback font loading logic. ([#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055))
+* Reduced offline download size for styles with symbol layers that render only icons, and no text. ([#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055))
 
 ## 3.7.5 - February 16, 2018
 
