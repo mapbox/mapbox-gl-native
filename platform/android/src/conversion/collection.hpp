@@ -28,6 +28,7 @@ inline jni::jobject* toArrayList(JNIEnv& env, jni::jarray<T>& array) {
 inline std::vector<std::string> toVector(JNIEnv& env, jni::jarray<jni::jobject>& array) {
     std::vector<std::string> vector;
     std::size_t len = jni::GetArrayLength(env, array);
+    vector.reserve(len);
 
     for (std::size_t i = 0; i < len; i++) {
         jni::jstring* jstr = reinterpret_cast<jni::jstring*>(jni::GetObjectArrayElement(env, array, i));
