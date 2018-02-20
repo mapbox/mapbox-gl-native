@@ -60,19 +60,24 @@ std::string VectorTileLayer::getName() const {
     return layer.getName();
 }
 
-VectorTileData::VectorTileData(std::shared_ptr<const std::string> data_) : data(std::move(data_)) {
+VectorTileData::VectorTileData(Blob blob_) : blob(std::move(blob_)) {
 }
 
 std::unique_ptr<GeometryTileData> VectorTileData::clone() const {
-    return std::make_unique<VectorTileData>(data);
+    // Always pass on data that is uncompressed, if we have it.
+    return std::make_unique<VectorTileData>(data ? Blob{ data, false } : blob);
 }
 
 std::unique_ptr<GeometryTileLayer> VectorTileData::getLayer(const std::string& name) const {
-    if (!parsed) {
+    if (!blob) {
+        return nullptr;
+    }
+
+    if (!data) {
         // We're parsing this lazily so that we can construct VectorTileData objects on the main
-        // thread without incurring the overhead of parsing immediately.
+        // thread without incurring the overhead of parsing and decompressing immediately.
+        data = blob.uncompressedData();
         layers = mapbox::vector_tile::buffer(*data).getLayers();
-        parsed = true;
     }
 
     auto it = layers.find(name);

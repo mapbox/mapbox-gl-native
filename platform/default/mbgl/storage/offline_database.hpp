@@ -81,7 +81,7 @@ private:
 
     Statement getStatement(const char *);
 
-    optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
+    optional<std::pair<Response, uint64_t>> getTile(const Resource&);
     optional<int64_t> hasTile(const Resource::TileData&);
     bool putTile(const Resource::TileData&, const Response&,
                  const std::string&, bool compressed);

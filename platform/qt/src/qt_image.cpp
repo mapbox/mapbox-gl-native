@@ -6,7 +6,7 @@
 
 namespace mbgl {
 
-std::string encodePNG(const PremultipliedImage& pre) {
+Blob encodePNG(const PremultipliedImage& pre) {
     QImage image(pre.data.get(), pre.size.width, pre.size.height,
         QImage::Format_ARGB32_Premultiplied);
 
@@ -16,7 +16,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     buffer.open(QIODevice::WriteOnly);
     image.rgbSwapped().save(&buffer, "PNG");
 
-    return std::string(array.constData(), array.size());
+    return { std::string(array.constData(), array.size()), false };
 }
 
 #if !defined(QT_IMAGE_DECODERS)
@@ -24,9 +24,10 @@ PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 PremultipliedImage decodeWebP(const uint8_t*, size_t);
 #endif
 
-PremultipliedImage decodeImage(const std::string& string) {
-    const uint8_t* data = reinterpret_cast<const uint8_t*>(string.data());
-    const size_t size = string.size();
+PremultipliedImage decodeImage(Blob blob) {
+    const auto uncompressed = blob.uncompressedData();
+    const uint8_t* data = reinterpret_cast<const uint8_t*>(uncompressed->data());
+    const size_t size = uncompressed->size();
 
 #if !defined(QT_IMAGE_DECODERS)
     if (size >= 12) {

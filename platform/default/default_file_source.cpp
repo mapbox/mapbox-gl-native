@@ -151,8 +151,23 @@ public:
 
             // Get from the online file source
             if (resource.hasLoadingMethod(Resource::LoadingMethod::Network)) {
+                // Always solicit a compressed response so that we can insert it into the database
+                // while still compressed to save on CPU time.
+                const auto compression = resource.compression;
+                resource.compression = Resource::Compression::PreferCompressed;
                 tasks[req] = onlineFileSource.request(resource, [=] (Response onlineResponse) mutable {
                     this->offlineDatabase->put(resource, onlineResponse);
+                    // If the original request expects an uncompressed response, uncompress before
+                    // handing it back.
+                    if (onlineResponse.data && onlineResponse.data.isCompressed() &&
+                        compression == Resource::Compression::Uncompressed) {
+                        try {
+                            onlineResponse.data.uncompress();
+                        } catch (std::exception& ex) {
+                            onlineResponse.error = std::make_unique<Response::Error>(
+                                Response::Error::Reason::Other, ex.what());
+                        }
+                    }
                     callback(onlineResponse);
                 });
             }

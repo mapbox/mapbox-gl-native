@@ -2,6 +2,7 @@
 
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/blob.hpp>
 
 #include <string>
 #include <memory>
@@ -31,7 +32,7 @@ public:
     bool mustRevalidate = false;
 
     // The actual data of the response. Present only for non-error, non-notModified responses.
-    std::shared_ptr<const std::string> data;
+    Blob data;
 
     optional<Timestamp> modified;
     optional<Timestamp> expires;

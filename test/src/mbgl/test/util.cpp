@@ -100,26 +100,26 @@ void checkImage(const std::string& base,
                 double pixelThreshold) {
 #if !TEST_READ_ONLY
     if (getenv("UPDATE")) {
-        util::write_file(base + "/expected.png", encodePNG(actual));
+        util::writeFile(base + "/expected.png", encodePNG(actual));
         return;
     }
 #endif
 
-    std::string expected_image;
+    Blob expectedImage;
     try {
-        expected_image = util::read_file(base + "/expected.png");
+        expectedImage = util::readFile(base + "/expected.png");
     } catch (std::exception& ex) {
         Log::Error(Event::Setup, "Failed to load expected image %s: %s",
                    (base + "/expected.png").c_str(), ex.what());
         throw;
     }
 
-    PremultipliedImage expected = decodeImage(expected_image);
+    PremultipliedImage expected = decodeImage(expectedImage);
     PremultipliedImage diff { expected.size };
 
 
 #if !TEST_READ_ONLY
-    util::write_file(base + "/actual.png", encodePNG(actual));
+    util::writeFile(base + "/actual.png", encodePNG(actual));
 #endif
 
     ASSERT_EQ(expected.size, actual.size);
@@ -134,7 +134,7 @@ void checkImage(const std::string& base,
     EXPECT_LE(pixels / (expected.size.width * expected.size.height), imageThreshold);
 
 #if !TEST_READ_ONLY
-    util::write_file(base + "/diff.png", encodePNG(diff));
+    util::writeFile(base + "/diff.png", encodePNG(diff));
 #endif
 }
 

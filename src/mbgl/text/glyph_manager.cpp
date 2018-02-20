@@ -91,7 +91,7 @@ void GlyphManager::processResponse(const Response& res, const FontStack& fontSta
         std::vector<Glyph> glyphs;
 
         try {
-            glyphs = parseGlyphPBF(range, *res.data);
+            glyphs = parseGlyphPBF(range, res.data);
         } catch (...) {
             observer->onGlyphsError(fontStack, range, std::current_exception());
             return;

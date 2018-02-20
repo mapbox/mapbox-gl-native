@@ -4,11 +4,12 @@
 
 namespace mbgl {
 
-std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, const std::string& data) {
+std::vector<Glyph> parseGlyphPBF(const GlyphRange& glyphRange, Blob blob) {
+    const auto data = blob.uncompressedData();
     std::vector<Glyph> result;
     result.reserve(256);
 
-    protozero::pbf_reader glyphs_pbf(data);
+    protozero::pbf_reader glyphs_pbf(*data);
 
     while (glyphs_pbf.next(1)) {
         auto fontstack_pbf = glyphs_pbf.get_message();

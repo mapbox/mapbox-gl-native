@@ -214,8 +214,8 @@ void NodeMap::Load(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     try {
-        nodeMap->map->getStyle().loadJSON(style);
-    } catch (const std::exception &ex) {
+        nodeMap->map->getStyle().loadJSON(mbgl::Blob{ std::move(style), false });
+    } catch (const std::exception& ex) {
         return Nan::ThrowError(ex.what());
     }
 

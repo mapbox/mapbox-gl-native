@@ -374,6 +374,16 @@ void OnlineFileRequest::completed(Response response) {
         failedRequestReason = Response::Error::Reason::Success;
     }
 
+    // Make sure the data is decompressed when the user explicitly requested uncompressed data.
+    if (response.data && response.data.isCompressed() &&
+        resource.compression == Resource::Compression::Uncompressed) {
+        try {
+            response.data.uncompress();
+        } catch (std::exception& ex) {
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other, ex.what());
+        }
+    }
+
     schedule(response.expires);
 
     // Calling the callback may result in `this` being deleted. It needs to be done last,

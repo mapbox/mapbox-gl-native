@@ -58,14 +58,14 @@ public:
 Response successfulSpriteImageResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.png", resource.url);
     Response response;
-    response.data = std::make_unique<std::string>(util::read_file(resource.url));
+    response.data = util::readFile(resource.url);
     return response;
 }
 
 Response successfulSpriteJSONResponse(const Resource& resource) {
     EXPECT_EQ("test/fixtures/resources/sprite.json", resource.url);
     Response response;
-    response.data = std::make_unique<std::string>(util::read_file(resource.url));
+    response.data = util::readFile(resource.url);
     return response;
 }
 
@@ -79,7 +79,7 @@ Response failedSpriteResponse(const Resource&) {
 
 Response corruptSpriteResponse(const Resource&) {
     Response response;
-    response.data = std::make_unique<std::string>("CORRUPT");
+    response.data = Blob{ "CORRUPT", false };
     return response;
 }
 

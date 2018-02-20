@@ -45,9 +45,7 @@ private:
         if (it != cache.end()) {
             result.data = it->second;
         } else {
-            auto data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/resources/"s + path));
-
+            auto data = util::readFile("test/fixtures/resources/" + path);
             cache.insert(it, std::make_pair(path, data));
             result.data = data;
         }
@@ -63,7 +61,7 @@ private:
         }
     };
 
-    std::unordered_map<std::string, std::shared_ptr<std::string>> cache;
+    std::unordered_map<std::string, Blob> cache;
 };
 
 TEST(Memory, Vector) {

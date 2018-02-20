@@ -34,8 +34,8 @@ void deleteFile(const char* name) {
     }
 }
 
-void writeFile(const char* name, const std::string& data) {
-    mbgl::util::write_file(name, data);
+void writeFile(const char* name, mbgl::Blob&& data) {
+    mbgl::util::writeFile(name, data);
 }
 
 } // namespace
@@ -79,7 +79,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Invalid)) {
 
     createDir("test/fixtures/offline_database");
     deleteFile("test/fixtures/offline_database/invalid.db");
-    writeFile("test/fixtures/offline_database/invalid.db", "this is an invalid file");
+    writeFile("test/fixtures/offline_database/invalid.db", Blob{ "this is an invalid file", false });
 
     Log::setObserver(std::make_unique<FixtureLogObserver>());
 
@@ -124,23 +124,23 @@ TEST(OfflineDatabase, PutResource) {
     Resource resource { Resource::Style, "http://example.com/" };
     Response response;
 
-    response.data = std::make_shared<std::string>("first");
+    response.data = Blob{ "first", false };
     auto insertPutResult = db.put(resource, response);
     EXPECT_TRUE(insertPutResult.first);
     EXPECT_EQ(5u, insertPutResult.second);
 
     auto insertGetResult = db.get(resource);
     EXPECT_EQ(nullptr, insertGetResult->error.get());
-    EXPECT_EQ("first", *insertGetResult->data);
+    EXPECT_EQ("first", *insertGetResult->data.uncompressedData());
 
-    response.data = std::make_shared<std::string>("second");
+    response.data = Blob{ "second", false };
     auto updatePutResult = db.put(resource, response);
     EXPECT_FALSE(updatePutResult.first);
     EXPECT_EQ(6u, updatePutResult.second);
 
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
-    EXPECT_EQ("second", *updateGetResult->data);
+    EXPECT_EQ("second", *updateGetResult->data.uncompressedData());
 }
 
 TEST(OfflineDatabase, PutTile) {
@@ -158,23 +158,23 @@ TEST(OfflineDatabase, PutTile) {
     };
     Response response;
 
-    response.data = std::make_shared<std::string>("first");
+    response.data = Blob{ "first", false };
     auto insertPutResult = db.put(resource, response);
     EXPECT_TRUE(insertPutResult.first);
     EXPECT_EQ(5u, insertPutResult.second);
 
     auto insertGetResult = db.get(resource);
     EXPECT_EQ(nullptr, insertGetResult->error.get());
-    EXPECT_EQ("first", *insertGetResult->data);
+    EXPECT_EQ("first", *insertGetResult->data.uncompressedData());
 
-    response.data = std::make_shared<std::string>("second");
+    response.data = Blob{ "second", false };
     auto updatePutResult = db.put(resource, response);
     EXPECT_FALSE(updatePutResult.first);
     EXPECT_EQ(6u, updatePutResult.second);
 
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
-    EXPECT_EQ("second", *updateGetResult->data);
+    EXPECT_EQ("second", *updateGetResult->data.uncompressedData());
 }
 
 TEST(OfflineDatabase, PutResourceNoContent) {
@@ -190,7 +190,7 @@ TEST(OfflineDatabase, PutResourceNoContent) {
     auto res = db.get(resource);
     EXPECT_EQ(nullptr, res->error);
     EXPECT_TRUE(res->noContent);
-    EXPECT_FALSE(res->data.get());
+    EXPECT_FALSE(res->data);
 }
 
 TEST(OfflineDatabase, PutTileNotFound) {
@@ -213,7 +213,7 @@ TEST(OfflineDatabase, PutTileNotFound) {
     auto res = db.get(resource);
     EXPECT_EQ(nullptr, res->error);
     EXPECT_TRUE(res->noContent);
-    EXPECT_FALSE(res->data.get());
+    EXPECT_FALSE(res->data);
 }
 
 TEST(OfflineDatabase, CreateRegion) {
@@ -344,15 +344,15 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(ConcurrentUse)) {
     thread2.join();
 }
 
-static std::shared_ptr<std::string> randomString(size_t size) {
-    auto result = std::make_shared<std::string>(size, 0);
+static mbgl::Blob randomBlob(size_t size) {
+    auto result = std::string(size, char());
     std::mt19937 random;
 
     for (size_t i = 0; i < size; i++) {
-        (*result)[i] = random();
+        result[i] = random();
     }
 
-    return result;
+    return { std::move(result), false };
 }
 
 TEST(OfflineDatabase, PutReturnsSize) {
@@ -361,11 +361,11 @@ TEST(OfflineDatabase, PutReturnsSize) {
     OfflineDatabase db(":memory:");
 
     Response compressible;
-    compressible.data = std::make_shared<std::string>(1024, 0);
+    compressible.data = Blob{ std::string(1024, char()), false };
     EXPECT_EQ(17u, db.put(Resource::style("http://example.com/compressible"), compressible).second);
 
     Response incompressible;
-    incompressible.data = randomString(1024);
+    incompressible.data = randomBlob(1024);
     EXPECT_EQ(1024u, db.put(Resource::style("http://example.com/incompressible"), incompressible).second);
 
     Response noContent;
@@ -379,7 +379,7 @@ TEST(OfflineDatabase, PutEvictsLeastRecentlyUsedResources) {
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response response;
-    response.data = randomString(1024);
+    response.data = randomBlob(1024);
 
     for (uint32_t i = 1; i <= 100; i++) {
         Resource resource = Resource::style("http://example.com/"s + util::toString(i));
@@ -398,7 +398,7 @@ TEST(OfflineDatabase, PutRegionResourceDoesNotEvict) {
     OfflineRegion region = db.createRegion(definition, OfflineRegionMetadata());
 
     Response response;
-    response.data = randomString(1024);
+    response.data = randomBlob(1024);
 
     for (uint32_t i = 1; i <= 100; i++) {
         db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
@@ -414,7 +414,7 @@ TEST(OfflineDatabase, PutFailsWhenEvictionInsuffices) {
     OfflineDatabase db(":memory:", 1024 * 100);
 
     Response big;
-    big.data = randomString(1024 * 100);
+    big.data = randomBlob(1024 * 100);
 
     EXPECT_FALSE(db.put(Resource::style("http://example.com/big"), big).first);
     EXPECT_FALSE(bool(db.get(Resource::style("http://example.com/big"))));
@@ -435,7 +435,7 @@ TEST(OfflineDatabase, GetRegionCompletedStatus) {
     EXPECT_EQ(0u, status1.completedTileSize);
 
     Response response;
-    response.data = std::make_shared<std::string>("data");
+    response.data = Blob{ "data", false };
 
     uint64_t styleSize = db.putRegionResource(region.getID(), Resource::style("http://example.com/"), response);
 
@@ -465,7 +465,7 @@ TEST(OfflineDatabase, HasRegionResource) {
     EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), Resource::style("http://example.com/20"))));
 
     Response response;
-    response.data = randomString(1024);
+    response.data = randomBlob(1024);
 
     for (uint32_t i = 1; i <= 100; i++) {
         db.putRegionResource(region.getID(), Resource::style("http://example.com/"s + util::toString(i)), response);
@@ -493,7 +493,7 @@ TEST(OfflineDatabase, HasRegionResourceTile) {
     };
     Response response;
 
-    response.data = std::make_shared<std::string>("first");
+    response.data = Blob{ "first", false };
 
     EXPECT_FALSE(bool(db.hasRegionResource(region.getID(), resource)));
     db.putRegionResource(region.getID(), resource, response);
@@ -522,7 +522,7 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
     Resource mapboxTile2 = Resource::tile("mapbox://tiles/2", 1.0, 0, 0, 1, Tileset::Scheme::XYZ);
 
     Response response;
-    response.data = std::make_shared<std::string>("data");
+    response.data = Blob{ "data", false };
 
     // Count is initially zero.
     EXPECT_EQ(0u, db.getOfflineMapboxTileCount());
@@ -609,7 +609,7 @@ TEST(OfflineDatabase, MigrateFromV2Schema) {
     // v2.db is a v2 database containing a single offline region with a small number of resources.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v2.db"));
+    writeFile("test/fixtures/offline_database/migrated.db", util::readFile("test/fixtures/offline_database/v2.db"));
 
     {
         OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
@@ -630,7 +630,7 @@ TEST(OfflineDatabase, MigrateFromV3Schema) {
     // v3.db is a v3 database, migrated from v2.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v3.db"));
+    writeFile("test/fixtures/offline_database/migrated.db", util::readFile("test/fixtures/offline_database/v3.db"));
 
     {
         OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
@@ -649,7 +649,7 @@ TEST(OfflineDatabase, MigrateFromV4Schema) {
     // v4.db is a v4 database, migrated from v2 & v3. This database used `journal_mode = WAL` and `synchronous = NORMAL`.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v4.db"));
+    writeFile("test/fixtures/offline_database/migrated.db", util::readFile("test/fixtures/offline_database/v4.db"));
 
     {
         OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
@@ -675,7 +675,7 @@ TEST(OfflineDatabase, MigrateFromV5Schema) {
     // v5.db is a v5 database, migrated from v2, v3 & v4.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v5.db"));
+    writeFile("test/fixtures/offline_database/migrated.db", util::readFile("test/fixtures/offline_database/v5.db"));
 
     {
         OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);
@@ -703,7 +703,7 @@ TEST(OfflineDatabase, DowngradeSchema) {
     // and recreated with the current schema.
 
     deleteFile("test/fixtures/offline_database/migrated.db");
-    writeFile("test/fixtures/offline_database/migrated.db", util::read_file("test/fixtures/offline_database/v999.db"));
+    writeFile("test/fixtures/offline_database/migrated.db", util::readFile("test/fixtures/offline_database/v999.db"));
 
     {
         OfflineDatabase db("test/fixtures/offline_database/migrated.db", 0);

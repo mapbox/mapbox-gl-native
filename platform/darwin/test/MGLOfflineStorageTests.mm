@@ -182,8 +182,8 @@
     req = fs->request(resource, [&](mbgl::Response res) {
         req.reset();
         XCTAssertFalse(res.error.get(), @"Request should not return an error");
-        XCTAssertTrue(res.data.get(), @"Request should return data");
-        XCTAssertEqual("{\"api\":\"mapbox\"}", *res.data, @"Request did not return expected data");
+        XCTAssertTrue(res.data, @"Request should return data");
+        XCTAssertEqual("{\"api\":\"mapbox\"}", *res.data.uncompressedData(), @"Request did not return expected data");
         CFRunLoopStop(CFRunLoopGetCurrent());
     });
 

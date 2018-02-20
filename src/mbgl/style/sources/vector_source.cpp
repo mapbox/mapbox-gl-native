@@ -54,7 +54,8 @@ void VectorSource::loadDescription(FileSource& fileSource) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty TileJSON")));
         } else {
             conversion::Error error;
-            optional<Tileset> tileset = conversion::convertJSON<Tileset>(*res.data, error);
+            optional<Tileset> tileset =
+                conversion::convertJSON<Tileset>(*res.data.uncompressedData(), error);
             if (!tileset) {
                 observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error(error.message)));
                 return;

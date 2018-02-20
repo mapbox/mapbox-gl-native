@@ -21,7 +21,6 @@
 
 using namespace mbgl;
 using namespace mbgl::style;
-using namespace std::literals::string_literals;
 
 class StubMapObserver : public MapObserver {
 public:
@@ -162,7 +161,7 @@ TEST(Map, Offline) {
 
     auto expiredItem = [] (const std::string& path) {
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/map/offline/"s + path));
+        response.data = util::readFile("test/fixtures/map/offline/" + path);
         response.expires = Timestamp{ Seconds(0) };
         return response;
     };
@@ -188,13 +187,13 @@ TEST(Map, Offline) {
 
 TEST(Map, SetStyleDefaultCamera) {
     MapTest<> test;
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
     EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
     EXPECT_DOUBLE_EQ(test.map.getPitch(), 0.0);
     EXPECT_DOUBLE_EQ(test.map.getBearing(), 0.0);
     EXPECT_EQ(test.map.getLatLng(), LatLng {});
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty-zoomed.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty-zoomed.json"));
     EXPECT_DOUBLE_EQ(test.map.getZoom(), 0.0);
 
     test.map.jumpTo(test.map.getStyle().getDefaultCamera());
@@ -211,7 +210,7 @@ TEST(Map, SetStyleInvalidJSON) {
         test.observer.didFailLoadingMapCallback = [&]() {
             fail = true;
         };
-        test.map.getStyle().loadJSON("invalid");
+        test.map.getStyle().loadJSON(Blob{ "invalid", false });
     }
 
     EXPECT_TRUE(fail);
@@ -247,8 +246,8 @@ TEST(Map, SetStyleInvalidURL) {
 TEST(Map, DoubleStyleLoad) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON("");
-    test.map.getStyle().loadJSON("");
+    test.map.getStyle().loadJSON(Blob{ "", false });
+    test.map.getStyle().loadJSON(Blob{ "", false });
 }
 
 TEST(Map, StyleFresh) {
@@ -260,7 +259,7 @@ TEST(Map, StyleFresh) {
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = util::readFile("test/fixtures/api/empty.json");
     response.expires = Timestamp::max();
 
     test.fileSource.respond(Resource::Style, response);
@@ -278,7 +277,7 @@ TEST(Map, StyleExpired) {
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = util::readFile("test/fixtures/api/empty.json");
     response.expires = util::now() - 1h;
 
     test.fileSource.respond(Resource::Style, response);
@@ -303,7 +302,7 @@ TEST(Map, StyleExpiredWithAnnotations) {
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = util::readFile("test/fixtures/api/empty.json");
     response.expires = util::now() - 1h;
 
     test.fileSource.respond(Resource::Style, response);
@@ -327,7 +326,7 @@ TEST(Map, StyleExpiredWithRender) {
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/empty.json"));
+    response.data = util::readFile("test/fixtures/api/empty.json");
     response.expires = util::now() - 1h;
 
     test.fileSource.respond(Resource::Style, response);
@@ -349,7 +348,7 @@ TEST(Map, StyleEarlyMutation) {
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
 
     Response response;
-    response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
+    response.data = util::readFile("test/fixtures/api/water.json");
     test.fileSource.respond(Resource::Style, response);
 
     EXPECT_EQ(0u, test.fileSource.requests.size());
@@ -363,7 +362,7 @@ TEST(Map, MapLoadingSignal) {
     test.observer.onWillStartLoadingMapCallback = [&]() {
         emitted = true;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 }
 
@@ -374,7 +373,7 @@ TEST(Map, MapLoadedSignal) {
         test.runLoop.stop();
     };
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
     test.runLoop.run();
 }
 
@@ -386,12 +385,12 @@ TEST(Map, StyleLoadedSignal) {
     test.observer.didFinishLoadingStyleCallback = [&]() {
         emitted = true;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
     EXPECT_TRUE(emitted);
 
     // But not when the style couldn't be parsed
     emitted = false;
-    test.map.getStyle().loadJSON("invalid");
+    test.map.getStyle().loadJSON(Blob{ "invalid", false });
     EXPECT_FALSE(emitted);
 }
 
@@ -437,7 +436,7 @@ TEST(Map, TEST_REQUIRES_SERVER(StyleNotFound)) {
 TEST(Map, AddLayer) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({ { 1, 0, 0, 1 } });
@@ -452,7 +451,7 @@ TEST(Map, WithoutVAOExtension) {
     BackendScope scope { *test.frontend.getBackend() };
     test.frontend.getBackend()->getContext().disableVAOExtension = true;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/water.json"));
 
     test::checkImage("test/fixtures/map/no_vao", test.frontend.render(test.map), 0.002);
 }
@@ -460,7 +459,7 @@ TEST(Map, WithoutVAOExtension) {
 TEST(Map, RemoveLayer) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
 
     auto layer = std::make_unique<BackgroundLayer>("background");
     layer->setBackgroundColor({{ 1, 0, 0, 1 }});
@@ -477,8 +476,7 @@ TEST(Map, DisabledSources) {
     test.fileSource.response = [] (const Resource& res) -> optional<Response> {
         if (res.url == "asset://tile.png") {
             Response response;
-            response.data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/map/disabled_layers/tile.png"));
+            response.data = util::readFile("test/fixtures/map/disabled_layers/tile.png");
             return {std::move(response)};
         }
         return {};
@@ -491,7 +489,7 @@ TEST(Map, DisabledSources) {
     // to an opacity of 0.5). Then, we are zooming back out to a zoom level of 0.5 and rerender.
     // The "raster1" layer should not be visible anymore since it has minzoom 1, while "raster2"
     // should still be there. Both layers have a distinct color through "raster-hue-rotate".
-    test.map.getStyle().loadJSON(R"STYLE(
+    test.map.getStyle().loadJSON(Blob{ R"STYLE(
 {
   "version": 8,
   "name": "Test",
@@ -523,7 +521,7 @@ TEST(Map, DisabledSources) {
     }
   }]
 }
-)STYLE");
+)STYLE", false });
 
     test::checkImage("test/fixtures/map/disabled_layers/first", test.frontend.render(test.map));
     test.map.setZoom(0.5);
@@ -533,7 +531,7 @@ TEST(Map, DisabledSources) {
 TEST(Map, DontLoadUnneededTiles) {
     MapTest<> test;
 
-    test.map.getStyle().loadJSON(R"STYLE({
+    test.map.getStyle().loadJSON(Blob{ R"STYLE({
   "sources": {
     "a": { "type": "vector", "tiles": [ "a/{z}/{x}/{y}" ] }
   },
@@ -545,7 +543,7 @@ TEST(Map, DontLoadUnneededTiles) {
     "minzoom": 0.3,
     "maxzoom": 1.6
   }]
-})STYLE");
+})STYLE", false });
 
     using Tiles = std::unordered_set<std::string>;
     Tiles tiles;
@@ -606,7 +604,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     };
 
     Map map(frontend, observer, frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Continuous);
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
+    map.getStyle().loadJSON(util::readFile("test/fixtures/api/water.json"));
 
     runLoop.run();
 }
@@ -624,7 +622,7 @@ TEST(Map, NoContentTiles) {
                                        Tileset::Scheme::XYZ),
                         response);
 
-    test.map.getStyle().loadJSON(R"STYLE({
+    test.map.getStyle().loadJSON(Blob{ R"STYLE({
       "version": 8,
       "name": "Water",
       "sources": {
@@ -645,7 +643,7 @@ TEST(Map, NoContentTiles) {
         "source": "mapbox",
         "source-layer": "water"
       }]
-    })STYLE");
+    })STYLE", false });
 
     test::checkImage("test/fixtures/map/nocontent",
                      test.frontend.render(test.map),

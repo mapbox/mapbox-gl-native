@@ -41,10 +41,10 @@ public:
     Impl(Scheduler&, FileSource&, float pixelRatio);
     ~Impl() override;
 
-    void loadJSON(const std::string&);
+    void loadJSON(Blob);
     void loadURL(const std::string&);
 
-    std::string getJSON() const;
+    Blob getJSON() const;
     std::string getURL() const;
 
     void setObserver(Observer*);
@@ -96,13 +96,13 @@ public:
     bool spriteLoaded = false;
 
 private:
-    void parse(const std::string&);
+    void parse(Blob);
 
     Scheduler& scheduler;
     FileSource& fileSource;
 
     std::string url;
-    std::string json;
+    Blob json;
 
     std::unique_ptr<AsyncRequest> styleRequest;
     std::unique_ptr<SpriteLoader> spriteLoader;

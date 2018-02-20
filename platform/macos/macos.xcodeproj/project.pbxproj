@@ -80,6 +80,7 @@
 		52B5D17F1E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */; };
 		52B5D1801E5E26DF00BBCB48 /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5548BE7B1D0ACBBD005DDE81 /* libmbgl-loop-darwin.a */; };
 		5548BE781D09E718005DDE81 /* libmbgl-core.a in Frameworks */ = {isa = PBXBuildFile; fileRef = DAE6C3451CC31D1200DB3429 /* libmbgl-core.a */; };
+		555CF3EC203DA46F004C828F /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 55D9B4B01D005D3900C1CCE2 /* libz.tbd */; };
 		556660C61E1BEA0100E2C41B /* MGLFoundation.h in Headers */ = {isa = PBXBuildFile; fileRef = 556660C51E1BEA0100E2C41B /* MGLFoundation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		556660D61E1D07E400E2C41B /* MGLVersionNumber.m in Sources */ = {isa = PBXBuildFile; fileRef = 556660D51E1D07E400E2C41B /* MGLVersionNumber.m */; };
 		558DE7A61E56161C00C7916D /* MGLFoundation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 558DE7A41E56161C00C7916D /* MGLFoundation_Private.h */; };
@@ -659,6 +660,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				555CF3EC203DA46F004C828F /* libz.tbd in Frameworks */,
 				DAE0DD7A1D5F015A005A6BB1 /* libmbgl-core.a in Frameworks */,
 				55D120A51F790A0C004B6D81 /* libmbgl-filesource.a in Frameworks */,
 				DAE6C3321CC30DB200DB3429 /* Mapbox.framework in Frameworks */,

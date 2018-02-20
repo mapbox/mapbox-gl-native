@@ -60,10 +60,10 @@ TEST(LocalGlyphRasterizer, PingFang) {
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = util::readFile("test/fixtures/resources/glyphs.pbf");
         return response;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/local_glyphs/mixed.json"));
     test.checkRendering("ping_fang");
 }
 
@@ -77,10 +77,10 @@ TEST(LocalGlyphRasterizer, NoLocal) {
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = util::readFile("test/fixtures/resources/glyphs.pbf");
         return response;
     };
-    test.map.getStyle().loadJSON(util::read_file("test/fixtures/local_glyphs/mixed.json"));
+    test.map.getStyle().loadJSON(util::readFile("test/fixtures/local_glyphs/mixed.json"));
     test.checkRendering("no_local");
 }
 

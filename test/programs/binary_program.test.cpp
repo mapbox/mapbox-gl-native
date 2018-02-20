@@ -35,5 +35,5 @@ TEST(BinaryProgram, ObtainValues) {
     EXPECT_EQ(3, binaryProgram2.uniformLocation("u_ratio"));
     EXPECT_EQ(-1, binaryProgram2.uniformLocation("a_data"));
 
-    EXPECT_THROW(BinaryProgram(""), std::runtime_error);
+    EXPECT_THROW(BinaryProgram(Blob{ "", false }), std::runtime_error);
 }

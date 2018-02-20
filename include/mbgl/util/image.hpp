@@ -2,6 +2,7 @@
 
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/blob.hpp>
 #include <mbgl/util/size.hpp>
 
 #include <string>
@@ -170,8 +171,7 @@ using UnassociatedImage = Image<ImageAlphaMode::Unassociated>;
 using PremultipliedImage = Image<ImageAlphaMode::Premultiplied>;
 using AlphaImage = Image<ImageAlphaMode::Exclusive>;
 
-// TODO: don't use std::string for binary data.
-PremultipliedImage decodeImage(const std::string&);
-std::string encodePNG(const PremultipliedImage&);
+PremultipliedImage decodeImage(Blob);
+Blob encodePNG(const PremultipliedImage&);
 
 } // namespace mbgl

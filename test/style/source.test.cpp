@@ -121,7 +121,7 @@ TEST(Source, LoadingCorrupt) {
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>("CORRUPTED");
+        response.data = Blob{ "CORRUPTED", false };
         return response;
     };
 
@@ -375,7 +375,7 @@ TEST(Source, RasterTileCorrupt) {
 
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
-        response.data = std::make_unique<std::string>("CORRUPTED");
+        response.data = Blob{ "CORRUPTED", false };
         return response;
     };
 
@@ -412,7 +412,7 @@ TEST(Source, RasterDEMTileCorrupt) {
 
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
-        response.data = std::make_unique<std::string>("CORRUPTED");
+        response.data = Blob{ "CORRUPTED", false };
         return response;
     };
 
@@ -449,7 +449,7 @@ TEST(Source, VectorTileCorrupt) {
 
     test.fileSource.tileResponse = [&] (const Resource&) {
         Response response;
-        response.data = std::make_unique<std::string>("CORRUPTED");
+        response.data = Blob{ "CORRUPTED", false };
         return response;
     };
 
@@ -610,9 +610,10 @@ TEST(Source, RasterTileAttribution) {
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" +
-                                                      mapboxOSM +
-                                                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON");
+        response.data =
+            Blob{ R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" + mapboxOSM +
+                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON",
+                  false };
         return response;
     };
 
@@ -653,9 +654,10 @@ TEST(Source, RasterDEMTileAttribution) {
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" +
-                                                      mapbox +
-                                                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON");
+        response.data =
+            Blob{ R"TILEJSON({ "tilejson": "2.1.0", "attribution": ")TILEJSON" + mapbox +
+                      R"TILEJSON(", "tiles": [ "tiles" ] })TILEJSON",
+                  false };
         return response;
     };
 
@@ -684,7 +686,7 @@ TEST(Source, GeoJSonSourceUrlUpdate) {
     test.fileSource.sourceResponse = [&] (const Resource& resource) {
         EXPECT_EQ("url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(R"({"geometry": {"type": "Point", "coordinates": [1.1, 1.1]}, "type": "Feature", "properties": {}})");
+        response.data = Blob{ R"({"geometry": {"type": "Point", "coordinates": [1.1, 1.1]}, "type": "Feature", "properties": {}})", false };
         return response;
     };
 
@@ -714,7 +716,7 @@ TEST(Source, ImageSourceImageUpdate) {
     test.fileSource.response = [&] (const Resource& resource) {
         EXPECT_EQ("http://url", resource.url);
         Response response;
-        response.data = std::make_unique<std::string>(util::read_file("test/fixtures/image/no_profile.png"));
+        response.data = util::readFile("test/fixtures/image/no_profile.png");
         return response;
     };
     test.styleObserver.sourceChanged = [&] (Source&) {

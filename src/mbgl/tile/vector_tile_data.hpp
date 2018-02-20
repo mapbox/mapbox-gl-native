@@ -1,5 +1,7 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 
+#include <mbgl/util/blob.hpp>
+
 #include <mapbox/vector_tile.hpp>
 #include <protozero/pbf_reader.hpp>
 
@@ -38,7 +40,8 @@ private:
 
 class VectorTileData : public GeometryTileData {
 public:
-    VectorTileData(std::shared_ptr<const std::string> data);
+    VectorTileData(const VectorTileData&);
+    VectorTileData(Blob blob);
 
     std::unique_ptr<GeometryTileData> clone() const override;
     std::unique_ptr<GeometryTileLayer> getLayer(const std::string& name) const override;
@@ -46,8 +49,8 @@ public:
     std::vector<std::string> layerNames() const;
 
 private:
-    std::shared_ptr<const std::string> data;
-    mutable bool parsed = false;
+    Blob blob;
+    mutable std::shared_ptr<const std::string> data;
     mutable std::map<std::string, const protozero::data_view> layers;
 };
 

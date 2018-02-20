@@ -71,7 +71,7 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
     }
 
     style::Parser parser;
-    parser.parse(*styleResponse->data);
+    parser.parse(*styleResponse->data.uncompressedData());
 
     result.requiredResourceCountIsPrecise = true;
 
@@ -88,7 +88,8 @@ OfflineRegionStatus OfflineDownload::getStatus() const {
                 optional<Response> sourceResponse = offlineDatabase.get(Resource::source(url));
                 if (sourceResponse) {
                     style::conversion::Error error;
-                    optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse->data, error);
+                    optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(
+                        *sourceResponse->data.uncompressedData(), error);
                     if (tileset) {
                         result.requiredResourceCount +=
                             definition.tileCount(type, tileSize, (*tileset).zoomRange);
@@ -160,7 +161,7 @@ void OfflineDownload::activateDownload() {
         status.requiredResourceCountIsPrecise = true;
 
         style::Parser parser;
-        parser.parse(*styleResponse.data);
+        parser.parse(*styleResponse.data.uncompressedData());
 
         for (const auto& source : parser.sources) {
             SourceType type = source->getType();
@@ -176,7 +177,8 @@ void OfflineDownload::activateDownload() {
 
                     ensureResource(Resource::source(url), [=](Response sourceResponse) {
                         style::conversion::Error error;
-                        optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(*sourceResponse.data, error);
+                        optional<Tileset> tileset = style::conversion::convertJSON<Tileset>(
+                            *sourceResponse.data.uncompressedData(), error);
                         if (tileset) {
                             util::mapbox::canonicalizeTileset(*tileset, url, type, tileSize);
                             queueTiles(type, tileSize, *tileset);
@@ -236,14 +238,18 @@ void OfflineDownload::activateDownload() {
         if (!parser.glyphURL.empty()) {
             for (const auto& fontStack : parser.fontStacks()) {
                 for (char16_t i = 0; i < GLYPH_RANGES_PER_FONT_STACK; i++) {
-                    queueResource(Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE)));
+                    auto resource = Resource::glyphs(parser.glyphURL, fontStack, getGlyphRange(i * GLYPHS_PER_GLYPH_RANGE));
+                    resource.compression = Resource::Compression::PreferCompressed;
+                    queueResource(resource);
                 }
             }
         }
 
         if (!parser.spriteURL.empty()) {
             queueResource(Resource::spriteImage(parser.spriteURL, definition.pixelRatio));
-            queueResource(Resource::spriteJSON(parser.spriteURL, definition.pixelRatio));
+            auto spriteJSON = Resource::spriteJSON(parser.spriteURL, definition.pixelRatio);
+            spriteJSON.compression = Resource::Compression::PreferCompressed;
+            queueResource(spriteJSON);
         }
 
         continueDownload();

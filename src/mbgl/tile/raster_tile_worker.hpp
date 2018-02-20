@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/actor/actor_ref.hpp>
+#include <mbgl/util/blob.hpp>
 
 #include <memory>
 #include <string>
@@ -13,7 +14,7 @@ class RasterTileWorker {
 public:
     RasterTileWorker(ActorRef<RasterTileWorker>, ActorRef<RasterTile>);
 
-    void parse(std::shared_ptr<const std::string> data, uint64_t correlationID);
+    void parse(Blob data, uint64_t correlationID);
 
 private:
     ActorRef<RasterTile> parent;

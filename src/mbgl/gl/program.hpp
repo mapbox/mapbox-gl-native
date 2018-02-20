@@ -62,7 +62,7 @@ public:
 
             try {
                 if (auto cachedBinaryProgram = util::readFile(*cachePath)) {
-                    const BinaryProgram binaryProgram(std::move(*cachedBinaryProgram));
+                    const BinaryProgram binaryProgram(cachedBinaryProgram);
                     if (binaryProgram.identifier() == identifier) {
                         return Program { context, binaryProgram };
                     } else {
@@ -82,7 +82,7 @@ public:
             try {
                 if (const auto binaryProgram =
                         result.template get<BinaryProgram>(context, identifier)) {
-                    util::write_file(*cachePath, binaryProgram->serialize());
+                    util::writeFile(*cachePath, binaryProgram->serialize());
                     Log::Warning(Event::OpenGL, "Caching program in: %s", (*cachePath).c_str());
                 }
             } catch (std::runtime_error& error) {

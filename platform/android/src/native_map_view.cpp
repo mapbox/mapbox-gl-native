@@ -188,11 +188,11 @@ void NativeMapView::setStyleUrl(jni::JNIEnv& env, jni::String url) {
 }
 
 jni::String NativeMapView::getStyleJson(jni::JNIEnv& env) {
-    return jni::Make<jni::String>(env, map->getStyle().getJSON());
+    return jni::Make<jni::String>(env, *map->getStyle().getJSON().uncompressedData());
 }
 
 void NativeMapView::setStyleJson(jni::JNIEnv& env, jni::String json) {
-    map->getStyle().loadJSON(jni::Make<std::string>(env, json));
+    map->getStyle().loadJSON(Blob{ jni::Make<std::string>(env, json), false });
 }
 
 void NativeMapView::setLatLngBounds(jni::JNIEnv& env, jni::Object<mbgl::android::LatLngBounds> jBounds) {

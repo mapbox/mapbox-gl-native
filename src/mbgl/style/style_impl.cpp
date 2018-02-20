@@ -39,7 +39,7 @@ Style::Impl::Impl(Scheduler& scheduler_, FileSource& fileSource_, float pixelRat
 
 Style::Impl::~Impl() = default;
 
-void Style::Impl::loadJSON(const std::string& json_) {
+void Style::Impl::loadJSON(Blob json_) {
     lastError = nullptr;
     observer->onStyleLoading();
 
@@ -73,15 +73,17 @@ void Style::Impl::loadURL(const std::string& url_) {
         } else if (res.notModified || res.noContent) {
             return;
         } else {
-            parse(*res.data);
+            parse(res.data);
         }
     });
 }
 
-void Style::Impl::parse(const std::string& json_) {
+void Style::Impl::parse(Blob json_) {
     Parser parser;
 
-    if (auto error = parser.parse(json_)) {
+    const auto data = json_.uncompressedData();
+
+    if (auto error = parser.parse(*data)) {
         std::string message = "Failed to parse style: " + util::toString(error);
         Log::Error(Event::ParseStyle, message.c_str());
         observer->onStyleError(std::make_exception_ptr(util::StyleParseException(message)));
@@ -124,7 +126,7 @@ void Style::Impl::parse(const std::string& json_) {
     observer->onStyleLoaded();
 }
 
-std::string Style::Impl::getJSON() const {
+Blob Style::Impl::getJSON() const {
     return json;
 }
 

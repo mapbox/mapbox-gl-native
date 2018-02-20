@@ -16,8 +16,9 @@ using namespace mbgl;
 using namespace mbgl::style;
 
 TEST(Expression, IsExpression) {
+    const auto file = util::readFile("mapbox-gl-js/src/style-spec/reference/v8.json").uncompressedData();
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> spec;
-    spec.Parse<0>(util::read_file("mapbox-gl-js/src/style-spec/reference/v8.json").c_str());
+    spec.Parse<0>(file->c_str());
     ASSERT_FALSE(spec.HasParseError());
     ASSERT_TRUE(spec.IsObject() &&
                 spec.HasMember("expression_name") &&
@@ -44,8 +45,9 @@ TEST_P(ExpressionEqualityTest, ExpressionEquality) {
 
     std::string error;
     auto parse = [&](std::string filename, std::string& error_) -> std::unique_ptr<expression::Expression> {
+        const auto file = util::readFile(filename).uncompressedData();
         rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> document;
-        document.Parse<0>(util::read_file(filename).c_str());
+        document.Parse<0>(file->c_str());
         assert(!document.HasParseError());
         const JSValue* expression = &document;
         expression::ParsingContext ctx;

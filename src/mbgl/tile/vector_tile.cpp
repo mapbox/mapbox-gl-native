@@ -21,8 +21,8 @@ void VectorTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> 
     expires = expires_;
 }
 
-void VectorTile::setData(std::shared_ptr<const std::string> data_) {
-    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(data_) : nullptr);
+void VectorTile::setData(Blob data_) {
+    GeometryTile::setData(data_ ? std::make_unique<VectorTileData>(std::move(data_)) : nullptr);
 }
 
 } // namespace mbgl

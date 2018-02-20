@@ -85,11 +85,12 @@ bool getBoolean(const JSValue& value, const char* name, const bool def = false) 
 
 } // namespace
 
-std::vector<std::unique_ptr<style::Image>> parseSprite(const std::string& encodedImage, const std::string& json) {
-    const PremultipliedImage raster = decodeImage(encodedImage);
+std::vector<std::unique_ptr<style::Image>> parseSprite(Blob imageBlob, Blob jsonBlob) {
+    const PremultipliedImage raster = decodeImage(imageBlob);
 
+    const auto json = jsonBlob.uncompressedData();
     JSDocument doc;
-    doc.Parse<0>(json.c_str());
+    doc.Parse<0>(json->c_str());
     if (doc.HasParseError()) {
         std::stringstream message;
         message << "Failed to parse JSON: " << rapidjson::GetParseError_En(doc.GetParseError()) << " at offset " << doc.GetErrorOffset();

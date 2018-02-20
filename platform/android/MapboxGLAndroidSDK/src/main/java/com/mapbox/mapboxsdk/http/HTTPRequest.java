@@ -9,6 +9,7 @@ import android.text.TextUtils;
 import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.Mapbox;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
+import com.mapbox.mapboxsdk.exceptions.UnknownContentEncodingException;
 
 import java.io.IOException;
 import java.io.InterruptedIOException;
@@ -66,7 +67,7 @@ class HTTPRequest implements Callback {
   private native void nativeOnFailure(int type, String message);
 
   private native void nativeOnResponse(int code, String etag, String modified, String cacheControl, String expires,
-                                       String retryAfter, String xRateLimitReset, byte[] body);
+                                       String retryAfter, String xRateLimitReset, byte[] body, boolean gzip);
 
   private HTTPRequest(long nativePtr, String resourceUrl, String etag, String modified) {
     mNativePtr = nativePtr;
@@ -93,6 +94,7 @@ class HTTPRequest implements Callback {
       Request.Builder builder = new Request.Builder()
         .url(resourceUrl)
         .tag(resourceUrl.toLowerCase(MapboxConstants.MAPBOX_LOCALE))
+        .addHeader("Accept-Encoding", "gzip, deflate")
         .addHeader("User-Agent", getUserAgent());
       if (etag.length() > 0) {
         builder = builder.addHeader("If-None-Match", etag);
@@ -149,6 +151,18 @@ class HTTPRequest implements Callback {
 
     mLock.lock();
     if (mNativePtr != 0) {
+      String encoding = response.header("Content-Encoding");
+      boolean compressed = false;
+      if (encoding != null) {
+        if (encoding.equals("gzip") || encoding.equals("deflate")) {
+          compressed = true;
+        } else if (!encoding.equals("identity")) {
+          mLock.unlock();
+          handleFailure(call, new UnknownContentEncodingException(encoding));
+          return;
+        }
+      }
+
       nativeOnResponse(response.code(),
         response.header("ETag"),
         response.header("Last-Modified"),
@@ -156,7 +170,8 @@ class HTTPRequest implements Callback {
         response.header("Expires"),
         response.header("Retry-After"),
         response.header("x-rate-limit-reset"),
-        body);
+        body,
+        compressed);
     }
     mLock.unlock();
   }

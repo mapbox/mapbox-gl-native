@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/util/optional.hpp>
+#include <mbgl/util/blob.hpp>
 
 #include <string>
 #include <stdexcept>
@@ -14,10 +15,8 @@ struct IOException : std::runtime_error {
     const int code = 0;
 };
 
-void write_file(const std::string &filename, const std::string &data);
-std::string read_file(const std::string &filename);
-
-optional<std::string> readFile(const std::string &filename);
+void writeFile(const std::string &filename, Blob blob);
+Blob readFile(const std::string &filename);
 void deleteFile(const std::string& filename);
 
 } // namespace util

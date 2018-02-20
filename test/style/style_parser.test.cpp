@@ -24,16 +24,18 @@ class StyleParserTest : public ::testing::TestWithParam<std::string> {};
 TEST_P(StyleParserTest, ParseStyle) {
     const std::string base = std::string("test/fixtures/style_parser/") + GetParam();
 
+    const auto infoFile = util::readFile(base + ".info.json").uncompressedData();
     rapidjson::GenericDocument<rapidjson::UTF8<>, rapidjson::CrtAllocator> infoDoc;
-    infoDoc.Parse<0>(util::read_file(base + ".info.json").c_str());
+    infoDoc.Parse<0>(infoFile->c_str());
     ASSERT_FALSE(infoDoc.HasParseError());
     ASSERT_TRUE(infoDoc.IsObject());
 
     auto observer = new FixtureLogObserver();
     Log::setObserver(std::unique_ptr<Log::Observer>(observer));
 
+    const auto styleFile = util::readFile(base + ".style.json").uncompressedData();
     style::Parser parser;
-    auto error = parser.parse(util::read_file(base + ".style.json"));
+    auto error = parser.parse(*styleFile);
 
     if (error) {
         Log::Error(Event::ParseStyle, "Failed to parse style: %s", util::toString(error).c_str());
@@ -95,7 +97,7 @@ INSTANTIATE_TEST_CASE_P(StyleParser, StyleParserTest, ::testing::ValuesIn([] {
 
 TEST(StyleParser, FontStacks) {
     style::Parser parser;
-    parser.parse(util::read_file("test/fixtures/style_parser/font_stacks.json"));
+    parser.parse(*util::readFile("test/fixtures/style_parser/font_stacks.json").uncompressedData());
     auto result = parser.fontStacks();
     ASSERT_EQ(3u, result.size());
     ASSERT_EQ(FontStack({"a"}), result[0]);

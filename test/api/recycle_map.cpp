@@ -40,10 +40,10 @@ TEST(API, RecycleMapUpdateImages) {
         auto layer = std::make_unique<SymbolLayer>("geometry", "geometry");
         layer->setIconImage({ markerName });
 
-        map->getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+        map->getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
         map->getStyle().addSource(std::move(source));
         map->getStyle().addLayer(std::move(layer));
-        map->getStyle().addImage(std::make_unique<style::Image>(markerName, decodeImage(util::read_file(markerPath)), 1.0));
+        map->getStyle().addImage(std::make_unique<style::Image>(markerName, decodeImage(util::readFile(markerPath)), 1.0));
     };
 
     // default marker

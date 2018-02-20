@@ -23,8 +23,9 @@ public:
         Response response;
 
         if (AAsset* asset = AAssetManager_open(assetManager, path.c_str(), AASSET_MODE_BUFFER)) {
-            response.data = std::make_shared<std::string>(
-                reinterpret_cast<const char*>(AAsset_getBuffer(asset)), AAsset_getLength64(asset));
+            response.data = { { reinterpret_cast<const char*>(AAsset_getBuffer(asset)),
+                                static_cast<size_t>(AAsset_getLength64(asset)) },
+                              false };
             AAsset_close(asset);
         } else {
             response.error = std::make_unique<Response::Error>(Response::Error::Reason::NotFound,

@@ -71,7 +71,8 @@ std::string decompress(const std::string &raw) {
     memset(&inflate_stream, 0, sizeof(inflate_stream));
 
     // TODO: reuse z_streams
-    if (inflateInit(&inflate_stream) != Z_OK) {
+    // MAX_WBITS + allows decoding gzip in addition to zlib
+    if (inflateInit2(&inflate_stream, MAX_WBITS + 32) != Z_OK) {
         throw std::runtime_error("failed to initialize inflate");
     }
 
@@ -100,5 +101,39 @@ std::string decompress(const std::string &raw) {
 
     return result;
 }
+
+bool isCompressible(const std::string& raw) {
+    // WebP
+    if (raw.size() >= 12 && static_cast<uint8_t>(raw[0]) == 'R' &&
+        static_cast<uint8_t>(raw[1]) == 'I' && static_cast<uint8_t>(raw[2]) == 'F' &&
+        static_cast<uint8_t>(raw[3]) == 'F' && static_cast<uint8_t>(raw[8]) == 'W' &&
+        static_cast<uint8_t>(raw[9]) == 'E' && static_cast<uint8_t>(raw[10]) == 'B' &&
+        static_cast<uint8_t>(raw[11]) == 'P') {
+        // Note: the WebP container format allows uncompressed data as well, but we just assume that
+        // all WebP files are already compressed.
+        return false;
+    }
+
+    // PNG
+    if (raw.size() >= 8 && static_cast<uint8_t>(raw[0]) == 0x89 &&
+        static_cast<uint8_t>(raw[1]) == 'P' && static_cast<uint8_t>(raw[2]) == 'N' &&
+        static_cast<uint8_t>(raw[3]) == 'G' && static_cast<uint8_t>(raw[4]) == '\r' &&
+        static_cast<uint8_t>(raw[5]) == '\n' && static_cast<uint8_t>(raw[6]) == 0x1a &&
+        static_cast<uint8_t>(raw[7]) == '\n') {
+        // Note: this assumes the PNG file itself is compressed. However, it is possible to create
+        // PNG files with uncompressed data in it (zlib compression 0), but they are exceedingly
+        // rare, so we don't care about them.
+        return false;
+    }
+
+    // JPEG
+    if (raw.size() >= 3 && static_cast<uint8_t>(raw[0]) == 0xff &&
+        static_cast<uint8_t>(raw[1]) == 0xd8 && static_cast<uint8_t>(raw[2]) == 0xff) {
+        return false;
+    }
+
+    return true;
+}
+
 } // namespace util
 } // namespace mbgl

@@ -232,8 +232,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
 
                 if (error) {
                     if (data) {
-                        response.data =
-                            std::make_shared<std::string>((const char*)[data bytes], [data length]);
+                        response.data = Blob{ { (const char*)[data bytes], [data length] }, false };
                     }
 
                     switch ([error code]) {
@@ -287,7 +286,7 @@ std::unique_ptr<AsyncRequest> HTTPFileSource::request(const Resource& resource, 
                     }
 
                     if (responseCode == 200) {
-                        response.data = std::make_shared<std::string>((const char *)[data bytes], [data length]);
+                        response.data = { { (const char *)[data bytes], [data length] }, false };
                     } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
                         response.noContent = true;
                     } else if (responseCode == 304) {

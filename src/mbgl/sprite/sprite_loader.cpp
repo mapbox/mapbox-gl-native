@@ -25,8 +25,8 @@ struct SpriteLoader::Loader {
           worker(scheduler, ActorRef<SpriteLoader>(imageManager, mailbox)) {
     }
 
-    std::shared_ptr<const std::string> image;
-    std::shared_ptr<const std::string> json;
+    Blob image;
+    Blob json;
     std::unique_ptr<AsyncRequest> jsonRequest;
     std::unique_ptr<AsyncRequest> spriteRequest;
     std::shared_ptr<Mailbox> mailbox;
@@ -55,7 +55,7 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->json = std::make_shared<const std::string>();
+            loader->json = {};
             emitSpriteLoadedIfComplete();
         } else {
             // Only trigger a sprite loaded event we got new data.
@@ -70,7 +70,7 @@ void SpriteLoader::load(const std::string& url, Scheduler& scheduler, FileSource
         } else if (res.notModified) {
             return;
         } else if (res.noContent) {
-            loader->image = std::make_shared<const std::string>();
+            loader->image = {};
             emitSpriteLoadedIfComplete();
         } else {
             loader->image = res.data;

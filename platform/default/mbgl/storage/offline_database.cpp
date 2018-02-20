@@ -1,10 +1,10 @@
 #include <mbgl/storage/offline_database.hpp>
 #include <mbgl/storage/response.hpp>
-#include <mbgl/util/compression.hpp>
 #include <mbgl/util/io.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/chrono.hpp>
 #include <mbgl/util/logging.hpp>
+#include <mbgl/util/compression.hpp>
 
 #include "sqlite3.hpp"
 
@@ -153,7 +153,7 @@ optional<Response> OfflineDatabase::get(const Resource& resource) {
 optional<std::pair<Response, uint64_t>> OfflineDatabase::getInternal(const Resource& resource) {
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        return getTile(*resource.tileData);
+        return getTile(resource);
     } else {
         return getResource(resource);
     }
@@ -177,14 +177,31 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
         return { false, 0 };
     }
 
-    std::string compressedData;
+    std::shared_ptr<const std::string> data;
     bool compressed = false;
     uint64_t size = 0;
 
     if (response.data) {
-        compressedData = util::compress(*response.data);
-        compressed = compressedData.size() < response.data->size();
-        size = compressed ? compressedData.size() : response.data->size();
+        if (response.data.isCompressed()) {
+            // The response is already compressed; don't try to compare it against the uncompressed size.
+            compressed = true;
+            data = response.data.compressedData();
+        } else {
+            data = response.data.uncompressedData();
+
+            // Only try to compress the data when we have a good chance that the data can actually
+            // be considerably compressed.
+            if (util::isCompressible(*data)) {
+                const auto compressedData = response.data.compressedData();
+                if (compressedData->size() < data->size()) {
+                    compressed = true;
+                    data = compressedData;
+                }
+            }
+        }
+        size = data->size();
+    } else {
+        data = std::make_shared<const std::string>();
     }
 
     if (evict_ && !evict(size)) {
@@ -196,13 +213,9 @@ std::pair<bool, uint64_t> OfflineDatabase::putInternal(const Resource& resource,
 
     if (resource.kind == Resource::Kind::Tile) {
         assert(resource.tileData);
-        inserted = putTile(*resource.tileData, response,
-                compressed ? compressedData : response.data ? *response.data : "",
-                compressed);
+        inserted = putTile(*resource.tileData, response, *data, compressed);
     } else {
-        inserted = putResource(resource, response,
-                compressed ? compressedData : response.data ? *response.data : "",
-                compressed);
+        inserted = putResource(resource, response, *data, compressed);
     }
 
     return { inserted, size };
@@ -243,12 +256,20 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getResource(const Resou
     optional<std::string> data = stmt->get<optional<std::string>>(4);
     if (!data) {
         response.noContent = true;
-    } else if (stmt->get<bool>(5)) {
-        response.data = std::make_shared<std::string>(util::decompress(*data));
-        size = data->length();
     } else {
-        response.data = std::make_shared<std::string>(*data);
+        response.data = { std::move(*data), stmt->get<bool>(5) };
         size = data->length();
+
+        // Make sure the data is decompressed when the user explicitly requested uncompressed data.
+        if (response.data.isCompressed() &&
+            resource.compression == Resource::Compression::Uncompressed) {
+            try {
+                response.data.uncompress();
+            } catch (std::exception& ex) {
+                response.error =
+                    std::make_unique<Response::Error>(Response::Error::Reason::Other, ex.what());
+            }
+        }
     }
 
     return std::make_pair(response, size);
@@ -359,7 +380,9 @@ bool OfflineDatabase::putResource(const Resource& resource,
     return true;
 }
 
-optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource::TileData& tile) {
+optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource& resource) {
+    const auto& tile = *resource.tileData;
+
     // clang-format off
     Statement accessedStmt = getStatement(
         "UPDATE tiles "
@@ -412,12 +435,20 @@ optional<std::pair<Response, uint64_t>> OfflineDatabase::getTile(const Resource:
     optional<std::string> data = stmt->get<optional<std::string>>(4);
     if (!data) {
         response.noContent = true;
-    } else if (stmt->get<bool>(5)) {
-        response.data = std::make_shared<std::string>(util::decompress(*data));
-        size = data->length();
     } else {
-        response.data = std::make_shared<std::string>(*data);
+        response.data = { std::move(*data), stmt->get<bool>(5) };
         size = data->length();
+
+        // Make sure the data is decompressed when the user explicitly requested uncompressed data.
+        if (response.data.isCompressed() &&
+            resource.compression == Resource::Compression::Uncompressed) {
+            try {
+                response.data.uncompress();
+            } catch (std::exception& ex) {
+                response.error =
+                    std::make_unique<Response::Error>(Response::Error::Reason::Other, ex.what());
+            }
+        }
     }
 
     return std::make_pair(response, size);

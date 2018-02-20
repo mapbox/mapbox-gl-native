@@ -371,9 +371,9 @@ void HTTPRequest::handleResult(CURLcode code) {
 
         if (responseCode == 200) {
             if (data) {
-                response->data = std::move(data);
+                response->data = Blob{ std::move(data), false };
             } else {
-                response->data = std::make_shared<std::string>();
+                response->data = Blob{ "", false };
             }
         } else if (responseCode == 204 || (responseCode == 404 && resource.kind == Resource::Kind::Tile)) {
             response->noContent = true;

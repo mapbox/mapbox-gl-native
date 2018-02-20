@@ -26,7 +26,7 @@ public:
 
     void setError(std::exception_ptr);
     void setMetadata(optional<Timestamp> modified, optional<Timestamp> expires);
-    void setData(std::shared_ptr<const std::string> data);
+    void setData(Blob data);
 
     void upload(gl::Context&) override;
     Bucket* getBucket(const style::Layer::Impl&) const override;

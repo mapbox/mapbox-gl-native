@@ -2,6 +2,7 @@
 
 #include <mbgl/actor/actor_ref.hpp>
 #include <mbgl/sprite/sprite_parser.hpp>
+#include <mbgl/storage/response.hpp>
 
 #include <memory>
 #include <string>
@@ -14,7 +15,7 @@ class SpriteLoaderWorker {
 public:
     SpriteLoaderWorker(ActorRef<SpriteLoaderWorker>, ActorRef<SpriteLoader>);
 
-    void parse(std::shared_ptr<const std::string> image, std::shared_ptr<const std::string> json);
+    void parse(Blob image, Blob json);
 
 private:
     ActorRef<SpriteLoader> parent;

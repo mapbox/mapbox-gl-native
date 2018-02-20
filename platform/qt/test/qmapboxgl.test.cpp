@@ -47,7 +47,7 @@ void QMapboxGLTest::onNeedsRendering() {
 
 TEST_F(QMapboxGLTest, TEST_DISABLED_ON_CI(styleJson)) {
     QString json = QString::fromStdString(
-        mbgl::util::read_file("test/fixtures/resources/style_vector.json"));
+        *mbgl::util::readFile("test/fixtures/resources/style_vector.json").uncompressedData());
 
     map.setStyleJson(json);
     ASSERT_EQ(map.styleJson(), json);

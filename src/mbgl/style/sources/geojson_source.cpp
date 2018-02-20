@@ -61,7 +61,8 @@ void GeoJSONSource::loadDescription(FileSource& fileSource) {
                 *this, std::make_exception_ptr(std::runtime_error("unexpectedly empty GeoJSON")));
         } else {
             conversion::Error error;
-            optional<GeoJSON> geoJSON = conversion::convertJSON<GeoJSON>(*res.data, error);
+            optional<GeoJSON> geoJSON =
+                conversion::convertJSON<GeoJSON>(*res.data.uncompressedData(), error);
             if (!geoJSON) {
                 Log::Error(Event::ParseStyle, "Failed to parse GeoJSON data: %s",
                            error.message.c_str());

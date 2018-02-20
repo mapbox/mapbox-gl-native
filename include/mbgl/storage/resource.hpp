@@ -42,12 +42,23 @@ public:
         All         = Cache | Network,
     };
 
+    enum class Compression : bool {
+        // The data will be an uncompressed blob, even if it was obtained in compressed form.
+        Uncompressed = false,
+
+        // The data will be returned compressed if it was already obtained in compressed form,
+        // and uncompressed otherwise.
+        PreferCompressed = true,
+    };
+
     Resource(Kind kind_,
              std::string url_,
              optional<TileData> tileData_ = {},
-             LoadingMethod loadingMethod_ = LoadingMethod::All)
+             LoadingMethod loadingMethod_ = LoadingMethod::All,
+             Compression compression_ = Compression::PreferCompressed)
         : kind(kind_),
           loadingMethod(loadingMethod_),
+          compression(compression_),
           url(std::move(url_)),
           tileData(std::move(tileData_)) {
     }
@@ -72,6 +83,7 @@ public:
     
     Kind kind;
     LoadingMethod loadingMethod;
+    Compression compression;
     std::string url;
 
     // Includes auxiliary data if this is a tile request.
@@ -80,7 +92,7 @@ public:
     optional<Timestamp> priorModified = {};
     optional<Timestamp> priorExpires = {};
     optional<std::string> priorEtag = {};
-    std::shared_ptr<const std::string> priorData;
+    Blob priorData;
 };
 
 

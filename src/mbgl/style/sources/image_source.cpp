@@ -70,7 +70,7 @@ void ImageSource::loadDescription(FileSource& fileSource) {
             observer->onSourceError(*this, std::make_exception_ptr(std::runtime_error("unexpectedly empty image url")));
         } else {
             try {
-                baseImpl = makeMutable<Impl>(impl(), decodeImage(*res.data));
+                baseImpl = makeMutable<Impl>(impl(), decodeImage(res.data));
             } catch (...) {
                 observer->onSourceError(*this, std::current_exception());
             }

@@ -8,6 +8,6 @@
 
 namespace mbgl {
 
-std::vector<Glyph> parseGlyphPBF(const GlyphRange&, const std::string& data);
+std::vector<Glyph> parseGlyphPBF(const GlyphRange&, Blob blob);
 
 } // namespace mbgl

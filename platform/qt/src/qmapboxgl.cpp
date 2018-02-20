@@ -585,12 +585,12 @@ void QMapboxGL::cycleDebugOptions()
 */
 QString QMapboxGL::styleJson() const
 {
-    return QString::fromStdString(d_ptr->mapObj->getStyle().getJSON());
+    return QString::fromStdString(*d_ptr->mapObj->getStyle().getJSON().uncompressedData());
 }
 
 void QMapboxGL::setStyleJson(const QString &style)
 {
-    d_ptr->mapObj->getStyle().loadJSON(style.toStdString());
+    d_ptr->mapObj->getStyle().loadJSON(mbgl::Blob{ style.toStdString(), false });
 }
 
 /*!

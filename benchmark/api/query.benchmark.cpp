@@ -22,10 +22,10 @@ public:
         NetworkStatus::Set(NetworkStatus::Status::Offline);
         fileSource.setAccessToken("foobar");
 
-        map.getStyle().loadJSON(util::read_file("benchmark/fixtures/api/style.json"));
+        map.getStyle().loadJSON(util::readFile("benchmark/fixtures/api/style.json"));
         map.setLatLngZoom({ 40.726989, -73.992857 }, 15); // Manhattan
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
-            decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
+            decodeImage(util::readFile("benchmark/fixtures/api/default_marker.png")), 1.0));
 
         frontend.render(map);
     }

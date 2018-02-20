@@ -30,7 +30,8 @@ public:
                     jni::String etag, jni::String modified,
                     jni::String cacheControl, jni::String expires,
                     jni::String retryAfter, jni::String xRateLimitReset,
-                    jni::Array<jni::jbyte> body);
+                    jni::Array<jni::jbyte> body,
+                    jni::jboolean compressed);
 
     static jni::Class<HTTPRequest> javaClass;
     jni::UniqueObject<HTTPRequest> javaRequest;
@@ -104,7 +105,8 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
                              jni::String etag, jni::String modified,
                              jni::String cacheControl, jni::String expires,
                              jni::String jRetryAfter, jni::String jXRateLimitReset,
-                             jni::Array<jni::jbyte> body) {
+                             jni::Array<jni::jbyte> body,
+                             jni::jboolean compressed) {
 
     using Error = Response::Error;
 
@@ -128,11 +130,11 @@ void HTTPRequest::onResponse(jni::JNIEnv& env, int code,
 
     if (code == 200) {
         if (body) {
-            auto data = std::make_shared<std::string>(body.Length(env), char());
-            jni::GetArrayRegion(env, *body, 0, data->size(), reinterpret_cast<jbyte*>(&(*data)[0]));
-            response.data = data;
+            std::string data(static_cast<size_t>(body.Length(env)), char());
+            jni::GetArrayRegion(env, *body, 0, data.size(), reinterpret_cast<jbyte*>(&data[0]));
+            response.data = Blob{ std::move(data),  static_cast<bool>(compressed) };
         } else {
-            response.data = std::make_shared<std::string>();
+            response.data = {};
         }
     } else if (code == 204 || (code == 404 && resource.kind == Resource::Kind::Tile)) {
         response.noContent = true;

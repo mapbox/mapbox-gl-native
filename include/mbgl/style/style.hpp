@@ -3,6 +3,7 @@
 #include <mbgl/style/transition_options.hpp>
 #include <mbgl/map/camera.hpp>
 #include <mbgl/util/geo.hpp>
+#include <mbgl/util/blob.hpp>
 
 #include <string>
 #include <vector>
@@ -25,10 +26,10 @@ public:
     Style(Scheduler&, FileSource&, float pixelRatio);
     ~Style();
 
-    void loadJSON(const std::string&);
+    void loadJSON(Blob);
     void loadURL(const std::string&);
 
-    std::string getJSON() const;
+    Blob getJSON() const;
     std::string getURL() const;
 
     // Defaults

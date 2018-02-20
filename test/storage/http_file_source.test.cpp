@@ -23,8 +23,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200)) {
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -43,7 +43,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP404)) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ("HTTP status code 404", res.error->message);
-        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -61,7 +61,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTPTile404)) {
     auto req = fs.request({ Resource::Tile, "http://127.0.0.1:3000/doesnotexist" }, [&](Response res) {
         EXPECT_TRUE(res.noContent);
         EXPECT_FALSE(bool(res.error));
-        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -79,7 +79,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP200EmptyData)) {
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/empty-data" }, [&](Response res) {
         EXPECT_FALSE(res.noContent);
         EXPECT_FALSE(bool(res.error));
-        EXPECT_EQ(*res.data, std::string());
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ(0u, res.data.uncompressedData()->size());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -97,7 +98,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP204)) {
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/no-content" }, [&](Response res) {
         EXPECT_TRUE(res.noContent);
         EXPECT_FALSE(bool(res.error));
-        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -116,7 +117,7 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(HTTP500)) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
         EXPECT_EQ("HTTP status code 500", res.error->message);
-        EXPECT_FALSE(bool(res.data));
+        EXPECT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -134,8 +135,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(ExpiresParsing)) {
     auto req = fs.request({ Resource::Unknown,
                  "http://127.0.0.1:3000/test?modified=1420794326&expires=1420797926&etag=foo" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_EQ(Timestamp{ Seconds(1420797926) }, res.expires);
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420794326) }, res.modified);
@@ -152,8 +153,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(CacheControlParsing)) {
 
     auto req = fs.request({ Resource::Unknown, "http://127.0.0.1:3000/test?cachecontrol=max-age=120" }, [&](Response res) {
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_GT(Seconds(2), util::abs(*res.expires - util::now() - Seconds(120))) << "Expiration date isn't about 120 seconds in the future";
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -181,8 +182,8 @@ TEST(HTTPFileSource, TEST_REQUIRES_SERVER(Load)) {
                    [&, i, current](Response res) {
             reqs[i].reset();
             EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
+            ASSERT_TRUE(res.data);
+            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data.uncompressedData());
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));

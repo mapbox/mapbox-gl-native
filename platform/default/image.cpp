@@ -11,9 +11,10 @@ PremultipliedImage decodeWebP(const uint8_t*, size_t);
 PremultipliedImage decodePNG(const uint8_t*, size_t);
 PremultipliedImage decodeJPEG(const uint8_t*, size_t);
 
-PremultipliedImage decodeImage(const std::string& string) {
-    const auto* data = reinterpret_cast<const uint8_t*>(string.data());
-    const size_t size = string.size();
+PremultipliedImage decodeImage(Blob blob) {
+    const auto uncompressed = blob.uncompressedData();
+    const auto* data = reinterpret_cast<const uint8_t*>(uncompressed->data());
+    const size_t size = uncompressed->size();
 
 #if !defined(__ANDROID__) && !defined(__APPLE__)
     if (size >= 12) {

@@ -656,6 +656,7 @@ set(MBGL_CORE_FILES
     # util
     include/mbgl/util/async_request.hpp
     include/mbgl/util/async_task.hpp
+    include/mbgl/util/blob.hpp
     include/mbgl/util/char_array_buffer.hpp
     include/mbgl/util/chrono.hpp
     include/mbgl/util/color.hpp
@@ -698,6 +699,7 @@ set(MBGL_CORE_FILES
     include/mbgl/util/work_request.hpp
     include/mbgl/util/work_task.hpp
     include/mbgl/util/work_task_impl.hpp
+    src/mbgl/util/blob.cpp
     src/mbgl/util/chrono.cpp
     src/mbgl/util/clip_id.cpp
     src/mbgl/util/clip_id.hpp

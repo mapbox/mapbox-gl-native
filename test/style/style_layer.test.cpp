@@ -276,7 +276,7 @@ TEST(Layer, DuplicateLayer) {
     ThreadPool threadPool{ 1 };
     StubFileSource fileSource;
     Style::Impl style { threadPool, fileSource, 1.0 };
-    style.loadJSON(util::read_file("test/fixtures/resources/style-unused-sources.json"));
+    style.loadJSON(util::readFile("test/fixtures/resources/style-unused-sources.json"));
 
     // Add initial layer
     style.addLayer(std::make_unique<LineLayer>("line", "unusedsource"));

@@ -34,7 +34,7 @@ TEST(API, ZoomHistory) {
 
     EXPECT_TRUE(map);
 
-    map->getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
+    map->getStyle().loadJSON(util::readFile("test/fixtures/api/empty.json"));
 
     auto source = std::make_unique<GeoJSONSource>("source");
     source->setGeoJSON({ LineString<double> { { 45, -45 }, { -45, 45 } } });

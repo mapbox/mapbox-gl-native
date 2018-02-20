@@ -99,9 +99,9 @@ void HTTPRequest::handleNetworkReply(QNetworkReply *reply, const QByteArray& dat
     switch(responseCode) {
     case 200: {
         if (data.isEmpty()) {
-            response.data = std::make_shared<std::string>();
+            response.data = Blob{ "", false };
         } else {
-            response.data = std::make_shared<std::string>(data.constData(), data.size());
+            response.data = Blob{ std::string{ data.constData(), static_cast<size_t>(data.size()) }, false };
         }
         break;
     }

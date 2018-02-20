@@ -37,11 +37,9 @@ TEST(Map, PrefetchTiles) {
         // The end rendering result should be all green because the map is only
         // considered fully rendered when only ideal tiles are shown.
         if (zoom == int(map.getZoom()) + 1) {
-            response.data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/map/prefetch/tile_green.png"));
+            response.data = util::readFile("test/fixtures/map/prefetch/tile_green.png");
         } else {
-            response.data = std::make_shared<std::string>(
-                util::read_file("test/fixtures/map/prefetch/tile_red.png"));
+            response.data = util::readFile("test/fixtures/map/prefetch/tile_red.png");
         }
 
         return { std::move(response) };
@@ -51,8 +49,8 @@ TEST(Map, PrefetchTiles) {
         tiles.clear();
 
         // Force tile reloading.
-        map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/empty.json"));
-        map.getStyle().loadJSON(util::read_file("test/fixtures/map/prefetch/style.json"));
+        map.getStyle().loadJSON(util::readFile("test/fixtures/map/prefetch/empty.json"));
+        map.getStyle().loadJSON(util::readFile("test/fixtures/map/prefetch/style.json"));
 
         map.setLatLngZoom({ 40.726989, -73.992857 }, zoom); // Manhattan
 

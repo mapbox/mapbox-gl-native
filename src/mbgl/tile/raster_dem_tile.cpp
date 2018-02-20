@@ -45,7 +45,7 @@ void RasterDEMTile::setMetadata(optional<Timestamp> modified_, optional<Timestam
     expires = expires_;
 }
 
-void RasterDEMTile::setData(std::shared_ptr<const std::string> data) {
+void RasterDEMTile::setData(Blob data) {
     pending = true;
     ++correlationID;
     worker.invoke(&RasterDEMTileWorker::parse, data, correlationID, encoding);

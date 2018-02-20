@@ -34,7 +34,7 @@ void RasterTile::setMetadata(optional<Timestamp> modified_, optional<Timestamp> 
     expires = expires_;
 }
 
-void RasterTile::setData(std::shared_ptr<const std::string> data) {
+void RasterTile::setData(Blob data) {
     pending = true;
     ++correlationID;
     worker.invoke(&RasterTileWorker::parse, data, correlationID);

@@ -32,9 +32,10 @@ static std::pair<const std::string, Binding> parseBinding(protozero::pbf_reader&
 
 namespace mbgl {
 
-BinaryProgram::BinaryProgram(std::string&& data) {
+BinaryProgram::BinaryProgram(Blob blob) {
+    const auto data = blob.uncompressedData();
     bool hasFormat = false, hasCode = false;
-    protozero::pbf_reader pbf(data);
+    protozero::pbf_reader pbf(*data);
     while (pbf.next()) {
         switch (pbf.tag()) {
         case 1: // format
@@ -76,7 +77,7 @@ BinaryProgram::BinaryProgram(
       uniforms(std::move(uniforms_)) {
 }
 
-std::string BinaryProgram::serialize() const {
+Blob BinaryProgram::serialize() const {
     std::string data;
     data.reserve(32 + binaryCode.size() + uniforms.size() * 32 + attributes.size() * 32);
     protozero::pbf_writer pbf(data);
@@ -95,7 +96,7 @@ std::string BinaryProgram::serialize() const {
     if (!binaryIdentifier.empty()) {
         pbf.add_string(5 /* identifier */, binaryIdentifier);
     }
-    return data;
+    return { std::move(data), false };
 }
 
 optional<gl::AttributeLocation> BinaryProgram::attributeLocation(const std::string& name) const {

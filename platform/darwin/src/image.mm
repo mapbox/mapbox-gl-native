@@ -71,9 +71,10 @@ mbgl::PremultipliedImage MGLPremultipliedImageFromCGImage(CGImageRef src) {
 
 namespace mbgl {
 
-PremultipliedImage decodeImage(const std::string& source) {
+PremultipliedImage decodeImage(Blob blob) {
+    const auto source = blob.uncompressedData();
     CFDataHandle data(CFDataCreateWithBytesNoCopy(
-        kCFAllocatorDefault, reinterpret_cast<const unsigned char*>(source.data()), source.size(),
+        kCFAllocatorDefault, reinterpret_cast<const unsigned char*>(source->data()), source->size(),
         kCFAllocatorNull));
     if (!data) {
         throw std::runtime_error("CFDataCreateWithBytesNoCopy failed");

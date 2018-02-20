@@ -33,8 +33,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(CancelMultiple)) {
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -61,7 +61,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
             ASSERT_NE(nullptr, res.error);
             EXPECT_EQ(Response::Error::Reason::Server, res.error->reason);
             EXPECT_EQ("HTTP status code 500", res.error->message);
-            ASSERT_FALSE(bool(res.data));
+            ASSERT_FALSE(res.data);
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
@@ -72,8 +72,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(TemporaryError)) {
             EXPECT_LT(0.99, duration) << "Backoff timer didn't wait 1 second";
             EXPECT_GT(1.2, duration) << "Backoff timer fired too late";
             EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ("Hello World!", *res.data);
+            ASSERT_TRUE(res.data);
+            EXPECT_EQ("Hello World!", *res.data.uncompressedData());
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
@@ -100,7 +100,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(ConnectionError)) {
         EXPECT_GT(wait + 0.2, duration) << "Backoff timer fired too late";
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -127,8 +127,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Timeout)) {
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
         counter++;
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_TRUE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -244,8 +244,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(Load)) {
                    [&, i, current](Response res) {
             reqs[i].reset();
             EXPECT_EQ(nullptr, res.error);
-            ASSERT_TRUE(res.data.get());
-            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data);
+            ASSERT_TRUE(res.data);
+            EXPECT_EQ(std::string("Request ") +  std::to_string(current), *res.data.uncompressedData());
             EXPECT_FALSE(bool(res.expires));
             EXPECT_FALSE(res.mustRevalidate);
             EXPECT_FALSE(bool(res.modified));
@@ -282,8 +282,8 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChange)) {
     std::unique_ptr<AsyncRequest> req = fs.request(resource, [&](Response res) {
          req.reset();
          EXPECT_EQ(nullptr, res.error);
-         ASSERT_TRUE(res.data.get());
-         EXPECT_EQ("Response", *res.data);
+         ASSERT_TRUE(res.data);
+         EXPECT_EQ("Response", *res.data.uncompressedData());
          EXPECT_FALSE(bool(res.expires));
          EXPECT_FALSE(res.mustRevalidate);
          EXPECT_FALSE(bool(res.modified));
@@ -322,7 +322,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusChangePreempt)) {
         }
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Connection, res.error->reason);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -361,7 +361,7 @@ TEST(OnlineFileSource, TEST_REQUIRES_SERVER(NetworkStatusOnlineOffline)) {
         req.reset();
 
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
+        ASSERT_TRUE(res.data);
 
         EXPECT_EQ(NetworkStatus::Get(), NetworkStatus::Status::Online) << "Triggered before set back to Online";
 

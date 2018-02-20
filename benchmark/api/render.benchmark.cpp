@@ -29,11 +29,11 @@ public:
     ThreadPool threadPool { 4 };
 };
     
-static void prepare(Map& map, optional<std::string> json = {}) {
-    map.getStyle().loadJSON(json ? *json : util::read_file("benchmark/fixtures/api/style.json"));
+static void prepare(Map& map, Blob json = {}) {
+    map.getStyle().loadJSON(json ? json : util::readFile("benchmark/fixtures/api/style.json"));
     map.setLatLngZoom({ 40.726989, -73.992857 }, 15); // Manhattan
     map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
-                                                           decodeImage(util::read_file("benchmark/fixtures/api/default_marker.png")), 1.0));
+                                                           decodeImage(util::readFile("benchmark/fixtures/api/default_marker.png")), 1.0));
 }
  
 } // end namespace
@@ -55,7 +55,7 @@ static void API_renderStill_reuse_map_switch_styles(::benchmark::State& state) {
     Map map { frontend, MapObserver::nullObserver(), frontend.getSize(), 1, bench.fileSource, bench.threadPool, MapMode::Static};
     
     while (state.KeepRunning()) {
-        prepare(map, { "{}" });
+        prepare(map, { "{}", false });
         frontend.render(map);
         prepare(map);
         frontend.render(map);

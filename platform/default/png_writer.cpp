@@ -38,7 +38,7 @@ void addChunk(std::string& png, const char* type, const char* data = "", const u
 namespace mbgl {
 
 // Encode PNGs without libpng.
-std::string encodePNG(const PremultipliedImage& pre) {
+Blob encodePNG(const PremultipliedImage& pre) {
     // Make copy of the image so that we can unpremultiply it.
     const auto src = util::unpremultiply(pre.clone());
 
@@ -74,7 +74,7 @@ std::string encodePNG(const PremultipliedImage& pre) {
     addChunk(png, "IHDR", ihdr, 13);
     addChunk(png, "IDAT", idat.data(), static_cast<uint32_t>(idat.size()));
     addChunk(png, "IEND");
-    return png;
+    return { std::move(png), false };
 }
 
 } // namespace mbgl

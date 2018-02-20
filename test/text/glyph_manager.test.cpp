@@ -92,7 +92,7 @@ TEST(GlyphManager, LoadingSuccess) {
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = util::readFile("test/fixtures/resources/glyphs.pbf");
         return response;
     };
 
@@ -163,7 +163,7 @@ TEST(GlyphManager, LoadingCorrupted) {
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
-        response.data = std::make_unique<std::string>("CORRUPTED");
+        response.data = Blob{ "CORRUPTED", false };
         return response;
     };
 
@@ -260,7 +260,7 @@ TEST(GlyphManager, LoadingInvalid) {
     test.fileSource.glyphsResponse = [&] (const Resource& resource) {
         EXPECT_EQ(Resource::Kind::Glyphs, resource.kind);
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/fake_glyphs-0-255.pbf"));
+        response.data = util::readFile("test/fixtures/resources/fake_glyphs-0-255.pbf");
         return response;
     };
 
@@ -320,7 +320,7 @@ TEST(GlyphManager, ImmediateFileSource) {
 
     test.fileSource.glyphsResponse = [&] (const Resource&) {
         Response response;
-        response.data = std::make_shared<std::string>(util::read_file("test/fixtures/resources/glyphs.pbf"));
+        response.data = util::readFile("test/fixtures/resources/glyphs.pbf");
         return response;
     };
 

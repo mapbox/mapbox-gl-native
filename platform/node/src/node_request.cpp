@@ -99,10 +99,8 @@ void NodeRequest::HandleCallback(const Nan::FunctionCallbackInfo<v8::Value>& inf
         if (Nan::Has(res, Nan::New("data").ToLocalChecked()).FromJust()) {
             auto data = Nan::Get(res, Nan::New("data").ToLocalChecked()).ToLocalChecked();
             if (node::Buffer::HasInstance(data)) {
-                response.data = std::make_shared<std::string>(
-                    node::Buffer::Data(data),
-                    node::Buffer::Length(data)
-                );
+                response.data = { std::string{ node::Buffer::Data(data), node::Buffer::Length(data), },
+                                  false };
             } else {
                 return Nan::ThrowTypeError("Response data must be a Buffer");
             }

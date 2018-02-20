@@ -19,9 +19,9 @@ namespace {
 class QueryTest {
 public:
     QueryTest() {
-        map.getStyle().loadJSON(util::read_file("test/fixtures/api/query_style.json"));
+        map.getStyle().loadJSON(util::readFile("test/fixtures/api/query_style.json"));
         map.getStyle().addImage(std::make_unique<style::Image>("test-icon",
-            decodeImage(util::read_file("test/fixtures/sprites/default_marker.png")), 1.0));
+            decodeImage(util::readFile("test/fixtures/sprites/default_marker.png")), 1.0));
 
         frontend.render(map);
     }

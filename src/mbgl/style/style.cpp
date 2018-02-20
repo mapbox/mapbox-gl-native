@@ -14,7 +14,7 @@ Style::Style(Scheduler& scheduler, FileSource& fileSource, float pixelRatio)
 
 Style::~Style() = default;
 
-void Style::loadJSON(const std::string& json) {
+void Style::loadJSON(Blob json) {
     impl->loadJSON(json);
 }
 
@@ -22,7 +22,7 @@ void Style::loadURL(const std::string& url) {
     impl->loadURL(url);
 }
 
-std::string Style::getJSON() const {
+Blob Style::getJSON() const {
     return impl->getJSON();
 }
 

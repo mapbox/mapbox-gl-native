@@ -90,7 +90,7 @@ TEST(GLContextMode, Shared) {
     HeadlessFrontend frontend { pixelRatio, fileSource, threadPool, {}, GLContextMode::Shared };
 
     Map map(frontend, MapObserver::nullObserver(), frontend.getSize(), pixelRatio, fileSource, threadPool, MapMode::Static);
-    map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
+    map.getStyle().loadJSON(util::readFile("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
 
     // Set transparent background layer.

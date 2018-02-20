@@ -42,14 +42,20 @@ static std::string getTileBBox(int32_t x, int32_t y, int8_t z) {
 Resource Resource::style(const std::string& url) {
     return Resource {
         Resource::Kind::Style,
-        url
+        url,
+        {},
+        LoadingMethod::All,
+        Compression::Uncompressed
     };
 }
 
 Resource Resource::source(const std::string& url) {
     return Resource {
         Resource::Kind::Source,
-        url
+        url,
+        {},
+        LoadingMethod::All,
+        Compression::Uncompressed
     };
 }
 
@@ -87,7 +93,10 @@ Resource Resource::glyphs(const std::string& urlTemplate, const FontStack& fontS
             } else {
                 return std::string();
             }
-        })
+        }),
+        {},
+        LoadingMethod::All,
+        Compression::Uncompressed
     };
 }
 
@@ -133,7 +142,8 @@ Resource Resource::tile(const std::string& urlTemplate,
             y,
             z
         },
-        loadingMethod
+        loadingMethod,
+        Compression::PreferCompressed
     };
 }
 

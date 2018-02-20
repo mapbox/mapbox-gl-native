@@ -37,8 +37,8 @@ TEST(LocalFileSource, EmptyFile) {
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("empty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("", *res.data.uncompressedData());
         loop.stop();
     });
 
@@ -53,8 +53,8 @@ TEST(LocalFileSource, NonEmptyFile) {
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("nonempty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("content is here\n", *res.data.uncompressedData());
         loop.stop();
     });
 
@@ -70,7 +70,7 @@ TEST(LocalFileSource, NonExistentFile) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         // Do not assert on platform-specific error message.
         loop.stop();
     });
@@ -88,7 +88,7 @@ TEST(LocalFileSource, InvalidURL) {
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Other, res.error->reason);
         EXPECT_EQ("Invalid file URL", res.error->message);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         loop.stop();
     });
 
@@ -104,7 +104,7 @@ TEST(LocalFileSource, ReadDirectory) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         // Do not assert on platform-specific error message.
         loop.stop();
     });
@@ -120,8 +120,8 @@ TEST(LocalFileSource, URLEncoding) {
     std::unique_ptr<AsyncRequest> req = fs.request({ Resource::Unknown, toAbsoluteURL("%6eonempty") }, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("content is here\n", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("content is here\n", *res.data.uncompressedData());
         loop.stop();
     });
 
@@ -142,7 +142,7 @@ TEST(LocalFileSource, URLLimit) {
         req.reset();
         ASSERT_NE(nullptr, res.error);
         EXPECT_EQ(Response::Error::Reason::Other, res.error->reason);
-        ASSERT_FALSE(res.data.get());
+        ASSERT_FALSE(res.data);
         loop.stop();
     });
 

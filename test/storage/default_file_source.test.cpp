@@ -19,8 +19,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
     req1 = fs.request(resource, [&](Response res) {
         req1.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response 1", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response 1", *res.data.uncompressedData());
         EXPECT_TRUE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -32,8 +32,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheResponse)) {
         req2 = fs.request(resource, [&](Response res2) {
             req2.reset();
             EXPECT_EQ(response.error, res2.error);
-            ASSERT_TRUE(res2.data.get());
-            EXPECT_EQ(*response.data, *res2.data);
+            ASSERT_TRUE(res2.data);
+            EXPECT_EQ(*response.data.uncompressedData(), *res2.data.uncompressedData());
             EXPECT_EQ(response.expires, res2.expires);
             EXPECT_EQ(response.mustRevalidate, res2.mustRevalidate);
             EXPECT_EQ(response.modified, res2.modified);
@@ -61,8 +61,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
 
         EXPECT_EQ(nullptr, res.error);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -81,8 +81,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
                 gotResponse = true;
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_FALSE(res2.notModified);
-                ASSERT_TRUE(res2.data.get());
-                EXPECT_EQ("Response", *res2.data);
+                ASSERT_TRUE(res2.data);
+                EXPECT_EQ("Response", *res2.data.uncompressedData());
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_FALSE(bool(res2.modified));
@@ -95,7 +95,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateSame)) {
                 req2.reset();
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_TRUE(res2.notModified);
-                EXPECT_FALSE(res2.data.get());
+                EXPECT_FALSE(res2.data);
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_FALSE(bool(res2.modified));
@@ -124,8 +124,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
 
         EXPECT_EQ(nullptr, res.error);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
@@ -144,8 +144,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 gotResponse = true;
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_FALSE(res2.notModified);
-                ASSERT_TRUE(res2.data.get());
-                EXPECT_EQ("Response", *res2.data);
+                ASSERT_TRUE(res2.data);
+                EXPECT_EQ("Response", *res2.data.uncompressedData());
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
@@ -158,7 +158,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateModified)) {
                 req2.reset();
                 EXPECT_EQ(nullptr, res2.error);
                 EXPECT_TRUE(res2.notModified);
-                EXPECT_FALSE(res2.data.get());
+                EXPECT_FALSE(res2.data);
                 EXPECT_TRUE(bool(res2.expires));
                 EXPECT_TRUE(res2.mustRevalidate);
                 EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res2.modified);
@@ -184,8 +184,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
         req1.reset();
 
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response 1", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response 1", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -196,9 +196,9 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(CacheRevalidateEtag)) {
             req2.reset();
 
             EXPECT_EQ(nullptr, res2.error);
-            ASSERT_TRUE(res2.data.get());
-            EXPECT_NE(res.data, res2.data);
-            EXPECT_EQ("Response 2", *res2.data);
+            ASSERT_TRUE(res2.data);
+            EXPECT_FALSE(*res.data.uncompressedData() == *res2.data.uncompressedData());
+            EXPECT_EQ("Response 2", *res2.data.uncompressedData());
             EXPECT_FALSE(bool(res2.expires));
             EXPECT_TRUE(res2.mustRevalidate);
             EXPECT_FALSE(bool(res2.modified));
@@ -235,8 +235,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(HTTPIssue1369)) {
     req = fs.request(resource, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -256,7 +256,7 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     using namespace std::chrono_literals;
 
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(optionalResource, response);
 
@@ -264,8 +264,8 @@ TEST(DefaultFileSource, OptionalNonExpired) {
     req = fs.request(optionalResource, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Cached value", *res.data.uncompressedData());
         ASSERT_TRUE(bool(res.expires));
         EXPECT_EQ(*response.expires, *res.expires);
         EXPECT_FALSE(res.mustRevalidate);
@@ -286,7 +286,7 @@ TEST(DefaultFileSource, OptionalExpired) {
     using namespace std::chrono_literals;
 
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() - 1h;
     fs.put(optionalResource, response);
 
@@ -294,8 +294,8 @@ TEST(DefaultFileSource, OptionalExpired) {
     req = fs.request(optionalResource, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Cached value", *res.data.uncompressedData());
         ASSERT_TRUE(bool(res.expires));
         EXPECT_EQ(*response.expires, *res.expires);
         EXPECT_FALSE(res.mustRevalidate);
@@ -361,7 +361,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
 
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(resource, response);
 
@@ -370,7 +370,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagNotModified)) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_TRUE(res.notModified);
-        EXPECT_FALSE(res.data.get());
+        EXPECT_FALSE(res.data);
         ASSERT_TRUE(bool(res.expires));
         EXPECT_LT(util::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
@@ -396,7 +396,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
 
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(resource, response);
 
@@ -405,8 +405,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshEtagModified)) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -430,7 +430,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
 
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(resource, response);
 
@@ -439,8 +439,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheFull)) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -466,7 +466,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
 
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(resource, response);
 
@@ -475,7 +475,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedNotModified))
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_TRUE(res.notModified);
-        EXPECT_FALSE(res.data.get());
+        EXPECT_FALSE(res.data);
         ASSERT_TRUE(bool(res.expires));
         EXPECT_LT(util::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
@@ -502,7 +502,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
 
     // Put a fake value into the cache to make sure we're not retrieving anything from the cache.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.expires = util::now() + 1h;
     fs.put(resource, response);
 
@@ -511,8 +511,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(NoCacheRefreshModifiedModified)) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Response", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Response", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_TRUE(res.mustRevalidate);
         EXPECT_EQ(Timestamp{ Seconds(1420070400) }, *res.modified);
@@ -543,8 +543,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     req = fs.request(resource1, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -560,8 +560,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(SetResourceTransform)) {
     req = fs.request(resource2, [&](Response res) {
         req.reset();
         EXPECT_EQ(nullptr, res.error);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Hello World!", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Hello World!", *res.data.uncompressedData());
         EXPECT_FALSE(bool(res.expires));
         EXPECT_FALSE(res.mustRevalidate);
         EXPECT_FALSE(bool(res.modified));
@@ -584,7 +584,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
 
     // Put an existing value in the cache that has expired, and has must-revalidate set.
     Response response;
-    response.data = std::make_shared<std::string>("Cached value");
+    response.data = Blob{ "Cached value", false };
     response.modified = Timestamp(Seconds(1417392000)); // December 1, 2014
     response.expires = Timestamp(Seconds(1417392000));
     response.mustRevalidate = true;
@@ -598,8 +598,8 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
         EXPECT_EQ(Response::Error::Reason::NotFound, res.error->reason);
         EXPECT_EQ("Cached resource is unusable", res.error->message);
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
-        EXPECT_EQ("Cached value", *res.data);
+        ASSERT_TRUE(res.data);
+        EXPECT_EQ("Cached value", *res.data.uncompressedData());
         ASSERT_TRUE(res.expires);
         EXPECT_EQ(Timestamp{ Seconds(1417392000) }, *res.expires);
         EXPECT_TRUE(res.mustRevalidate);
@@ -622,7 +622,7 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
     // request. We're replacing the data so that we can check that the DefaultFileSource doesn't
     // attempt another database access if we already have the value.
     resource.loadingMethod = Resource::LoadingMethod::NetworkOnly;
-    resource.priorData = std::make_shared<std::string>("Prior value");
+    resource.priorData = Blob{ "Prior value", false };
 
     req = fs.request(resource, [&](Response res) {
         req.reset();
@@ -632,11 +632,11 @@ TEST(DefaultFileSource, TEST_REQUIRES_SERVER(RespondToStaleMustRevalidate)) {
         // OnlineFileSource to ensure that requestors know that this is the first time they're
         // seeing this data.
         EXPECT_FALSE(res.notModified);
-        ASSERT_TRUE(res.data.get());
+        ASSERT_TRUE(res.data);
         // Ensure that it's the value that we manually inserted into the cache rather than the value
         // the server returns, since we should be executing a revalidation request which doesn't
         // return new data, only a 304 Not Modified response.
-        EXPECT_EQ("Prior value", *res.data);
+        EXPECT_EQ("Prior value", *res.data.uncompressedData());
         ASSERT_TRUE(res.expires);
         EXPECT_LE(util::now(), *res.expires);
         EXPECT_TRUE(res.mustRevalidate);

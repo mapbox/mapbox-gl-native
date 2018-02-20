@@ -1,6 +1,7 @@
 #pragma once
 
 #include <mbgl/gl/types.hpp>
+#include <mbgl/util/blob.hpp>
 #include <mbgl/util/optional.hpp>
 
 #include <string>
@@ -11,7 +12,7 @@ namespace mbgl {
 class BinaryProgram {
 public:
     // Initialize a BinaryProgram object from a serialized represenation.
-    BinaryProgram(std::string&& data);
+    BinaryProgram(Blob data);
 
     BinaryProgram(gl::BinaryProgramFormat,
                   std::string&& binaryCode,
@@ -19,7 +20,7 @@ public:
                   std::vector<std::pair<const std::string, gl::AttributeLocation>>&&,
                   std::vector<std::pair<const std::string, gl::UniformLocation>>&&);
 
-    std::string serialize() const;
+    Blob serialize() const;
 
     gl::BinaryProgramFormat format() const {
         return binaryFormat;
