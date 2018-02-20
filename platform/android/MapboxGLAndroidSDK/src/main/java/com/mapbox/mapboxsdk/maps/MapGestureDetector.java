@@ -820,6 +820,78 @@ final class MapGestureDetector {
     }
   }
 
+  void notifyOnMoveBeginListeners(MoveGestureDetector detector) {
+    for (MapboxMap.OnMoveListener listener : onMoveListenerList) {
+      listener.onMoveBegin(detector);
+    }
+  }
+
+  void notifyOnMoveListeners(MoveGestureDetector detector) {
+    for (MapboxMap.OnMoveListener listener : onMoveListenerList) {
+      listener.onMove(detector);
+    }
+  }
+
+  void notifyOnMoveEndListeners(MoveGestureDetector detector) {
+    for (MapboxMap.OnMoveListener listener : onMoveListenerList) {
+      listener.onMoveEnd(detector);
+    }
+  }
+
+  void notifyOnRotateBeginListeners(RotateGestureDetector detector) {
+    for (MapboxMap.OnRotateListener listener : onRotateListenerList) {
+      listener.onRotateBegin(detector);
+    }
+  }
+
+  void notifyOnRotateListeners(RotateGestureDetector detector) {
+    for (MapboxMap.OnRotateListener listener : onRotateListenerList) {
+      listener.onRotate(detector);
+    }
+  }
+
+  void notifyOnRotateEndListeners(RotateGestureDetector detector) {
+    for (MapboxMap.OnRotateListener listener : onRotateListenerList) {
+      listener.onRotateEnd(detector);
+    }
+  }
+
+  void notifyOnScaleBeginListeners(StandardScaleGestureDetector detector) {
+    for (MapboxMap.OnScaleListener listener : onScaleListenerList) {
+      listener.onScaleBegin(detector);
+    }
+  }
+
+  void notifyOnScaleListeners(StandardScaleGestureDetector detector) {
+    for (MapboxMap.OnScaleListener listener : onScaleListenerList) {
+      listener.onScale(detector);
+    }
+  }
+
+  void notifyOnScaleEndListeners(StandardScaleGestureDetector detector) {
+    for (MapboxMap.OnScaleListener listener : onScaleListenerList) {
+      listener.onScaleEnd(detector);
+    }
+  }
+
+  void notifyOnShoveBeginListeners(ShoveGestureDetector detector) {
+    for (MapboxMap.OnShoveListener listener : onShoveListenerList) {
+      listener.onShoveBegin(detector);
+    }
+  }
+
+  void notifyOnShoveListeners(ShoveGestureDetector detector) {
+    for (MapboxMap.OnShoveListener listener : onShoveListenerList) {
+      listener.onShove(detector);
+    }
+  }
+
+  void notifyOnShoveEndListeners(ShoveGestureDetector detector) {
+    for (MapboxMap.OnShoveListener listener : onShoveListenerList) {
+      listener.onShoveEnd(detector);
+    }
+  }
+
   void setOnMapClickListener(MapboxMap.OnMapClickListener onMapClickListener) {
     this.onMapClickListener = onMapClickListener;
   }
