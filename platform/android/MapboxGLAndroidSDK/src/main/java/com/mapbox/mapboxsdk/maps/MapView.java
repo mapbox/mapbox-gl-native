@@ -29,6 +29,7 @@ import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.mapboxsdk.BuildConfig;
+
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -1067,10 +1068,8 @@ public class MapView extends FrameLayout {
     // Called when user pushes a zoom button on the ZoomButtonController
     @Override
     public void onZoom(boolean zoomIn) {
-      if (uiSettings.isZoomGesturesEnabled()) {
-        cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
-        onZoom(zoomIn, mapGestureDetector.getFocalPoint());
-      }
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
+      onZoom(zoomIn, mapGestureDetector.getFocalPoint());
     }
 
     private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {
