@@ -426,6 +426,8 @@ final class MapGestureDetector {
       // reset tracking if needed
       trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
+      notifyOnMoveBeginListeners(detector);
+
       return true;
     }
 
@@ -435,12 +437,13 @@ final class MapGestureDetector {
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
       notifyOnScrollListeners();
+      notifyOnMoveListeners(detector);
       return true;
     }
 
     @Override
     public void onMoveEnd(MoveGestureDetector detector, float velocityX, float velocityY) {
-
+      notifyOnMoveEndListeners(detector);
     }
   }
 
@@ -499,6 +502,8 @@ final class MapGestureDetector {
           + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
       );
 
+      notifyOnScaleBeginListeners(detector);
+
       return true;
     }
 
@@ -507,6 +512,9 @@ final class MapGestureDetector {
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
       transform.zoomBy(zoomBy, scaleFocalPoint.x, scaleFocalPoint.y);
+
+      notifyOnScaleListeners(detector);
+
       return true;
     }
 
@@ -530,6 +538,8 @@ final class MapGestureDetector {
         scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime);
         scheduleAnimator(scaleAnimator);
       }
+
+      notifyOnScaleEndListeners(detector);
     }
 
     private double calculateScale(double velocityXY, boolean isScalingOut) {
@@ -628,6 +638,8 @@ final class MapGestureDetector {
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
       gesturesManager.getStandardScaleGestureDetector().interrupt();
 
+      notifyOnRotateBeginListeners(detector);
+
       return true;
     }
 
@@ -639,6 +651,8 @@ final class MapGestureDetector {
 
       // Rotate the map
       transform.setBearing(bearing, rotateFocalPoint.x, rotateFocalPoint.y);
+
+      notifyOnRotateListeners(detector);
 
       return true;
     }
@@ -674,6 +688,8 @@ final class MapGestureDetector {
 
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
       scheduleAnimator(rotateAnimator);
+
+      notifyOnRotateEndListeners(detector);
     }
 
     private Animator createRotateAnimator(float angularVelocity, long animationTime) {
@@ -734,6 +750,8 @@ final class MapGestureDetector {
 
       gesturesManager.getMoveGestureDetector().setEnabled(false);
 
+      notifyOnShoveBeginListeners(detector);
+
       return true;
     }
 
@@ -746,12 +764,17 @@ final class MapGestureDetector {
 
       // Tilt the map
       transform.setTilt(pitch);
+
+      notifyOnShoveListeners(detector);
+
       return true;
     }
 
     @Override
     public void onShoveEnd(ShoveGestureDetector detector, float velocityX, float velocityY) {
       gesturesManager.getMoveGestureDetector().setEnabled(true);
+
+      notifyOnShoveEndListeners(detector);
     }
   }
 
