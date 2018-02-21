@@ -40,11 +40,6 @@
 #include "offline/offline_region_error.hpp"
 #include "offline/offline_region_status.hpp"
 #include "style/transition_options.hpp"
-#include "style/functions/categorical_stops.hpp"
-#include "style/functions/exponential_stops.hpp"
-#include "style/functions/identity_stops.hpp"
-#include "style/functions/interval_stops.hpp"
-#include "style/functions/stop.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
@@ -163,11 +158,6 @@ void registerNatives(JavaVM *vm) {
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
-    Stop::registerNative(env);
-    CategoricalStops::registerNative(env);
-    ExponentialStops::registerNative(env);
-    IdentityStops::registerNative(env);
-    IntervalStops::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);

@@ -3,7 +3,6 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.NonNull;
 
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.functions.Function;
 
 /**
  * Base class for the different Layer types
@@ -89,12 +88,8 @@ public abstract class Layer {
   }
 
   private Object convertValue(Object value) {
-    if (value != null) {
-      if (value instanceof Function) {
-        return ((Function) value).toValueObject();
-      } else if (value instanceof Expression) {
-        return ((Expression) value).toArray();
-      }
+    if (value != null && value instanceof Expression) {
+      return ((Expression) value).toArray();
     }
     return value;
   }

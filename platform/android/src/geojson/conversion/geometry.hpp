@@ -54,7 +54,7 @@ public:
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, coordinates.get()));
     }
 
-    /**
+    /**§
      * static Polygon fromLngLats(List<List<Point>> coordinates)
      */
     jni::jobject* operator()(const mapbox::geometry::polygon<T> &geometry) const {
@@ -97,7 +97,7 @@ public:
 
         // Create the MultiPolygon
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/MultiPolygon")).release();
-        static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/MultiPolygon;");
+        static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/ArrayList;)Lcom/mapbox/geojson/MultiPolygon;");
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometries, arrayList));
     }
 

@@ -9,15 +9,12 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.light.Light;
-import com.mapbox.mapboxsdk.style.functions.Function;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.FillExtrusionStyleTestActivity;
 
@@ -53,15 +50,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("<%- property.name %>TransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        light.set<%- camelize(property.name) %>Transition(options);
-        assertEquals("Transition options should match", options, light.get<%- camelize(property.name) %>Transition());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      light.set<%- camelize(property.name) %>Transition(options);
+      assertEquals("Transition options should match", options, light.get<%- camelize(property.name) %>Transition());
     });
   }
 <% } -%>
@@ -72,15 +66,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        Position position = new Position(1, 2, 3);
-        light.set<%- camelize(property.name) %>(position);
-        assertEquals("Position should match", position, light.get<%- camelize(property.name) %>());
-      }
+    invoke(mapboxMap,(uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      Position position = new Position(1, 2, 3);
+      light.set<%- camelize(property.name) %>(position);
+      assertEquals("Position should match", position, light.get<%- camelize(property.name) %>());
     });
   }
 <% } else { -%>
@@ -90,18 +81,15 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("<%- property.name %>");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        light.set<%- camelize(property.name) %>(<%- defaultValueJava(property) %>);
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      light.set<%- camelize(property.name) %>(<%- defaultValueJava(property) %>);
 <% if (property.name == 'color') { -%>
-        assertEquals("<%- camelize(property.name) %> should match", <%- defaultValueJava(property) %>.replaceAll("\\s+", ""), light.get<%- camelize(property.name) %>());
+      assertEquals("<%- camelize(property.name) %> should match", <%- defaultValueJava(property) %>.replaceAll("\\s+", ""), light.get<%- camelize(property.name) %>());
 <% } else { -%>
-        assertEquals("<%- camelize(property.name) %> should match", <%- defaultValueJava(property) %>, light.get<%- camelize(property.name) %>());
+      assertEquals("<%- camelize(property.name) %> should match", <%- defaultValueJava(property) %>, light.get<%- camelize(property.name) %>());
 <% } -%>
-      }
     });
   }
 <% } -%>
@@ -128,8 +116,8 @@ public class LightTest extends BaseActivityTest {
         fillExtrusionLayer.setMinZoom(15);
         fillExtrusionLayer.setProperties(
           fillExtrusionColor(Color.LTGRAY),
-          fillExtrusionHeight(Function.property("height", new IdentityStops<Float>())),
-          fillExtrusionBase(Function.property("min_height", new IdentityStops<Float>())),
+          fillExtrusionHeight(Expression.get("height")),
+          fillExtrusionBase(Expression.get("min_height")),
           fillExtrusionOpacity(0.6f)
         );
         mapboxMap.addLayer(fillExtrusionLayer);

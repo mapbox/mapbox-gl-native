@@ -20,6 +20,7 @@ import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -27,8 +28,8 @@ import com.mapbox.mapboxsdk.style.sources.Source;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
 
-
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.List;
 
@@ -39,8 +40,12 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.downcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.number;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.pi;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.product;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.string;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
 import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_TOP;
@@ -50,6 +55,7 @@ import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconOffset;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconSize;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textAnchor;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textField;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.textSize;
 
@@ -196,27 +202,32 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
 
   private static class LoadDataTask extends AsyncTask<Void, Void, FeatureCollection> {
 
-    private SymbolGeneratorActivity activity;
+    private WeakReference<SymbolGeneratorActivity> activity;
 
     LoadDataTask(SymbolGeneratorActivity activity) {
-      this.activity = activity;
+      this.activity = new WeakReference<>(activity);
     }
 
     @Override
     protected FeatureCollection doInBackground(Void... params) {
-      try {
-        // read local geojson from raw folder
-        String tinyCountriesJson = ResourceUtils.readRawResource(activity, R.raw.tiny_countries);
-        return FeatureCollection.fromJson(tinyCountriesJson);
+      Context context = activity.get();
+      if (context != null) {
+        try {
+          // read local geojson from raw folder
+          String tinyCountriesJson = ResourceUtils.readRawResource(context, R.raw.tiny_countries);
+          return FeatureCollection.fromJson(tinyCountriesJson);
 
-      } catch (IOException exception) {
-        return null;
+        } catch (IOException exception) {
+          Timber.e(exception);
+        }
       }
+      return null;
     }
 
     @Override
     protected void onPostExecute(FeatureCollection featureCollection) {
       super.onPostExecute(featureCollection);
+      SymbolGeneratorActivity activity = this.activity.get();
       if (featureCollection == null || activity == null) {
         return;
       }
@@ -226,37 +237,64 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   }
 
   public void onDataLoaded(@NonNull FeatureCollection featureCollection) {
-    // add a geojson to the map
-    Source source = new GeoJsonSource(SOURCE_ID, featureCollection);
-    mapboxMap.addSource(source);
+    // create expressions
+    Expression iconImageExpression = string(get(literal(FEATURE_ID)));
+    Expression iconSizeExpression = division(number(get(literal(FEATURE_RANK))), literal(2.0f));
+    Expression textSizeExpression = product(get(literal(FEATURE_RANK)), pi());
+    Expression textFieldExpression = concat(upcase(literal("a ")), upcase(string(get(literal(FEATURE_TYPE)))),
+      downcase(literal(" IN ")), string(get(literal(FEATURE_REGION)))
+    );
+    Expression textColorExpression = match(get(literal(FEATURE_RANK)),
+      literal(1), rgba(255, 0, 0, 1.0f),
+      literal(2), rgba(0, 0, 255.0f, 1.0f),
+      rgba(0.0f, 255.0f, 0.0f, 1.0f)
+    );
 
-    // create layer use
-    mapboxMap.addLayer(new SymbolLayer(LAYER_ID, SOURCE_ID)
+    rgba(
+      division(literal(255), get(FEATURE_RANK)),
+      literal(0.0f),
+      literal(0.0f),
+      literal(1.0f)
+    );
+
+    // create symbol layer
+    SymbolLayer symbolLayer = new SymbolLayer(LAYER_ID, SOURCE_ID)
       .withProperties(
-
         // icon configuration
-        iconImage(get(literal(FEATURE_ID))),
+        iconImage(iconImageExpression),
         iconAllowOverlap(false),
-        iconSize(
-          division(get(literal(FEATURE_RANK)), literal(2))
-        ),
+        iconSize(iconSizeExpression),
         iconAnchor(ICON_ANCHOR_BOTTOM),
         iconOffset(new Float[] {0.0f, -5.0f}),
 
         // text field configuration
-        textField(
-          concat(
-            upcase(literal("a ")),
-            get(literal(FEATURE_TYPE)),
-            downcase(literal(" IN ")),
-            get(literal(FEATURE_REGION))
-          )
-        ),
-        textSize(
-          product(get(literal(FEATURE_RANK)), pi())
-        ),
-        textAnchor(TEXT_ANCHOR_TOP)
-      )
+        textField(textFieldExpression),
+        textSize(textSizeExpression),
+        textAnchor(TEXT_ANCHOR_TOP),
+        textColor(textColorExpression)
+      );
+
+    // add a geojson source to the map
+    Source source = new GeoJsonSource(SOURCE_ID, featureCollection);
+    mapboxMap.addSource(source);
+
+    // add symbol layer
+    mapboxMap.addLayer(symbolLayer);
+
+    // get expressions
+    Expression iconImageExpressionResult = symbolLayer.getIconImage().getExpression();
+    Expression iconSizeExpressionResult = symbolLayer.getIconSize().getExpression();
+    Expression textSizeExpressionResult = symbolLayer.getTextSize().getExpression();
+    Expression textFieldExpressionResult = symbolLayer.getTextField().getExpression();
+    Expression textColorExpressionResult = symbolLayer.getTextColor().getExpression();
+
+    // reset expressions
+    symbolLayer.setProperties(
+      iconImage(iconImageExpressionResult),
+      iconSize(iconSizeExpressionResult),
+      textSize(textSizeExpressionResult),
+      textField(textFieldExpressionResult),
+      textColor(textColorExpressionResult)
     );
 
     new GenerateSymbolTask(mapboxMap, this).execute(featureCollection);
@@ -265,27 +303,29 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
   private static class GenerateSymbolTask extends AsyncTask<FeatureCollection, Void, HashMap<String, Bitmap>> {
 
     private MapboxMap mapboxMap;
-    private Context context;
+    private WeakReference<Context> context;
 
     GenerateSymbolTask(MapboxMap mapboxMap, Context context) {
       this.mapboxMap = mapboxMap;
-      this.context = context;
+      this.context = new WeakReference<>(context);
     }
 
     @SuppressWarnings("WrongThread")
     @Override
     protected HashMap<String, Bitmap> doInBackground(FeatureCollection... params) {
-      FeatureCollection featureCollection = params[0];
-
       HashMap<String, Bitmap> imagesMap = new HashMap<>();
-      for (Feature feature : featureCollection.features()) {
-        String countryName = feature.getStringProperty(FEATURE_ID);
-        TextView textView = new TextView(context);
-        textView.setBackgroundColor(context.getResources().getColor(R.color.blueAccent));
-        textView.setPadding(10, 5, 10, 5);
-        textView.setTextColor(Color.WHITE);
-        textView.setText(countryName);
-        imagesMap.put(countryName, SymbolGenerator.generate(textView));
+      Context context = this.context.get();
+      List<Feature> features = params[0].features();
+      if (context != null && features != null) {
+        for (Feature feature : features) {
+          String countryName = feature.getStringProperty(FEATURE_ID);
+          TextView textView = new TextView(context);
+          textView.setBackgroundColor(context.getResources().getColor(R.color.blueAccent));
+          textView.setPadding(10, 5, 10, 5);
+          textView.setTextColor(Color.WHITE);
+          textView.setText(countryName);
+          imagesMap.put(countryName, SymbolGenerator.generate(textView));
+        }
       }
       return imagesMap;
     }
