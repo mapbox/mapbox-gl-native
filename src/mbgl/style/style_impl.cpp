@@ -53,11 +53,6 @@ void Style::Impl::loadURL(const std::string& url_) {
     url = url_;
 
     styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
-        // Once we get a fresh style, or the style is mutated, stop revalidating.
-        if (res.isFresh() || mutated) {
-            styleRequest.reset();
-        }
-
         // Don't allow a loaded, mutated style to be overwritten with a new version.
         if (mutated && loaded) {
             return;
