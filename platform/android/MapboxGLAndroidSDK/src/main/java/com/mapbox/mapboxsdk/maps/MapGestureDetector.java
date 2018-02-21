@@ -466,17 +466,6 @@ final class MapGestureDetector {
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
-      if (focalPoint != null) {
-        // around user provided focal point
-        scaleFocalPoint = focalPoint;
-      } else if (quickZoom) {
-        // around center
-        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-      } else {
-        // around gesture
-        scaleFocalPoint = detector.getFocalPoint();
-      }
-
       if (isZoomValid(transform)) {
         MapEventFactory mapEventFactory = new MapEventFactory();
         LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
@@ -497,6 +486,17 @@ final class MapGestureDetector {
 
     @Override
     public boolean onScale(StandardScaleGestureDetector detector) {
+      if (focalPoint != null) {
+        // around user provided focal point
+        scaleFocalPoint = focalPoint;
+      } else if (quickZoom) {
+        // around center
+        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+      } else {
+        // around gesture
+        scaleFocalPoint = detector.getFocalPoint();
+      }
+
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
       transform.zoomBy(zoomBy, scaleFocalPoint.x, scaleFocalPoint.y);
@@ -601,14 +601,6 @@ final class MapGestureDetector {
       // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      if (focalPoint != null) {
-        // User provided focal point
-        rotateFocalPoint = focalPoint;
-      } else {
-        // around gesture
-        rotateFocalPoint = detector.getFocalPoint();
-      }
-
       if (isZoomValid(transform)) {
         MapEventFactory mapEventFactory = new MapEventFactory();
         LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
@@ -627,6 +619,13 @@ final class MapGestureDetector {
 
     @Override
     public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast, float rotationDegreesSinceFirst) {
+      if (focalPoint != null) {
+        // User provided focal point
+        rotateFocalPoint = focalPoint;
+      } else {
+        // around gesture
+        rotateFocalPoint = detector.getFocalPoint();
+      }
 
       // Calculate map bearing value
       double bearing = transform.getRawBearing() + rotationDegreesSinceLast;
@@ -641,7 +640,8 @@ final class MapGestureDetector {
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
-      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
+      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
+        gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
 
       if (Math.abs(angularVelocity) < minimumAngularVelocity) {
         return;
