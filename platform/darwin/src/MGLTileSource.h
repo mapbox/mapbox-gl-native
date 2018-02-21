@@ -117,6 +117,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
+
 /**
  Tile coordinate systems that determine how tile coordinates in tile URLs are
  interpreted.
@@ -139,6 +140,37 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
      <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">Tile Map Service Specification</a>.
      */
     MGLTileCoordinateSystemTMS
+};
+
+
+/**
+ An `NSNumber` object containing an unsigned integer that specifies the encoding
+ formula for raster-dem tilesets. The integer corresponds to one of
+ the constants described in `MGLDEMEncoding`.
+
+ The default value for this option is `MGLDEMEncodingMapbox`.
+
+ This option is not supported by the TileJSON spec.
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
+
+/**
+ The encoding formula used to generate the raster-dem tileset
+*/
+
+typedef NS_ENUM(NSUInteger, MGLDEMEncoding) {
+
+    /**
+     Raster tiles generated with the Mapbox encoding formula where
+     elevaion = -10000 + ((R * 256 * 256 + G * 256 + B) * 0.1)
+    */
+    MGLDEMEncodingMapbox = 0,
+
+    /**
+     Raster tiles generated with the Mapzen Terrarium encoding formula where
+     elevaion = (R * 256 + G + B / 256) - 32768
+    */
+    MGLDEMEncodingTerrarium
 };
 
 /**

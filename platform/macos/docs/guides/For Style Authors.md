@@ -141,6 +141,7 @@ In style JSON | In TileJSON   | In the SDK
 `tileSize`    | —             | `MGLTileSourceOptionTileSize`
 `attribution` | `attribution` | `MGLTileSourceOptionAttributionHTMLString` (but consider specifying `MGLTileSourceOptionAttributionInfos` instead for improved security)
 `scheme`      | `scheme`      | `MGLTileSourceOptionTileCoordinateSystem`
+`encoding`    | `encoding`    | `MGLTileSourceOptionDEMEncoding`
 
 ### Shape sources
 
