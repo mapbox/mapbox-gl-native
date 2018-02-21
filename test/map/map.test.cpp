@@ -252,7 +252,7 @@ TEST(Map, DoubleStyleLoad) {
 }
 
 TEST(Map, StyleFresh) {
-    // The map should not revalidate fresh styles.
+    // The map should continue to revalidate fresh styles.
 
     MapTest<FakeFileSource> test;
 
@@ -264,11 +264,11 @@ TEST(Map, StyleFresh) {
     response.expires = Timestamp::max();
 
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
 TEST(Map, StyleExpired) {
-    // The map should allow expired styles to be revalidated, so long as no mutations are made.
+    // The map should allow expired styles to be revalidated until we get a fresh style.
 
     using namespace std::chrono_literals;
 
@@ -284,11 +284,22 @@ TEST(Map, StyleExpired) {
     test.fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Mutate layer. From now on, sending a response to the style won't overwrite it anymore, but
+    // we should continue to wait for a fresh response.
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Send another expired response, and confirm that we didn't overwrite the style, but continue
+    // to wait for a fresh response.
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
+
+    // Send a fresh response, and confirm that we didn't overwrite the style, but continue to wait
+    // for a fresh response.
+    response.expires = util::now() + 1h;
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
 
@@ -352,7 +363,7 @@ TEST(Map, StyleEarlyMutation) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
     test.fileSource.respond(Resource::Style, response);
 
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));
 }
 
