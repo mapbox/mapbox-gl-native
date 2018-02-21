@@ -2,8 +2,10 @@
 #include <mbgl/util/constants.hpp>
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/map/transform_state.hpp>
+#include <mbgl/util/tile_cover_impl.hpp>
 
 #include <functional>
+#include <list>
 
 namespace mbgl {
 
@@ -26,8 +28,6 @@ struct edge {
         dy = b.y - a.y;
     }
 };
-
-using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
 // scan-line conversion
 static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
@@ -169,6 +169,41 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
         z);
 }
 
+std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
+    struct ID {
+        int32_t x, y;
+    };
+
+    std::list<ID> t;
+    auto scanCover = [&](int32_t x0, int32_t x1, int32_t y) {
+        for (auto x = x0; x < x1; x++) {
+            t.emplace_back(ID{ x, y });
+        }
+    };
+
+    TileCover tc(geometry, z, true);
+    while (tc.next()) {
+        tc.getTiles(scanCover);
+    };
+
+    // Sort by y/x.
+    t.sort([](const ID& a, const ID& b) {
+        return std::tie(a.y, a.x) < std::tie(b.y, b.x);
+    });
+
+    // Erase duplicate tile IDs.
+    t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
+        return a.x == b.x && a.y == b.y;
+    }), t.end());
+
+    std::vector<UnwrappedTileID> result;
+    result.reserve(t.size());
+    for (const auto& id : t) {
+        result.emplace_back(z, id.x, id.y);
+    }
+    return result;
+}
+
 // Taken from https://github.com/mapbox/sphericalmercator#xyzbbox-zoom-tms_style-srs
 // Computes the projected tiles for the lower left and upper right points of the bounds
 // and uses that to compute the tile cover count
@@ -189,6 +224,56 @@ uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
     return (dx + 1) * (dy + 1);
 }
 
+uint64_t tileCount(const Geometry<double>& geometry, uint8_t z) {
+    uint64_t tileCount;
+    auto scanCover = [&](int32_t x0, int32_t x1, int32_t) {
+        for (auto x = x0; x < x1; x++) {
+            tileCount+= (x1 - x0);
+        }
+    };
+
+    TileCover tc(geometry, z, true);
+    while (tc.next()) {
+        tc.getTiles(scanCover);
+    };
+    return tileCount;
+}
+
+TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
+    LatLngBounds bounds = LatLngBounds::hull(
+        { std::max(bounds_.south(), -util::LATITUDE_MAX), bounds_.west() },
+        { std::min(bounds_.north(),  util::LATITUDE_MAX), bounds_.east() });
+
+    if (bounds.isEmpty() ||
+        bounds.south() >  util::LATITUDE_MAX ||
+        bounds.north() < -util::LATITUDE_MAX) {
+        bounds = LatLngBounds::world();
+    }
+
+    auto sw = Projection::project(bounds.southwest(), z);
+    auto ne = Projection::project(bounds.northeast(), z);
+    auto se = Projection::project(bounds.southeast(), z);
+    auto nw = Projection::project(bounds.northwest(), z);
+
+    Polygon<double> p({ {sw, nw, ne, se, sw} });
+    impl = new TileCoverImpl(z, p, false);
+}
+
+TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/) {
+    impl = new TileCoverImpl(z, geom, project);
+}
+
+TileCover::~TileCover() {
+    delete impl;
+}
+
+bool TileCover::next() {
+    return impl->next();
+}
+
+bool TileCover::getTiles(ScanLine& scanCover) {
+    return impl->scanRow(scanCover);
+}
 
 } // namespace util
 } // namespace mbgl
