@@ -67,7 +67,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 }
             }
 
-            if (!renderTexture) {
+            if (!parameters.context.supportsHalfFloatTextures || !renderTexture) {
                 renderTexture = OffscreenTexture(parameters.context, size, gl::TextureType::UnsignedByte);
                 renderTexture->bind();
             }
