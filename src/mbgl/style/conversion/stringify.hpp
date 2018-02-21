@@ -227,7 +227,7 @@ public:
     }
     
     void operator()(const ExpressionFilter& filter) {
-        stringify(writer, filter.expression.serialize());
+        stringify(writer, filter.expression->serialize());
     }
 
 private:
