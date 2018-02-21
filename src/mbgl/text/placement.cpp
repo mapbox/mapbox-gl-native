@@ -95,9 +95,6 @@ void Placement::placeLayerBucket(
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
-    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<style::TextOptional>();
-    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<style::IconOptional>();
-
     for (auto& symbolInstance : bucket.symbolInstances) {
 
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
@@ -139,6 +136,9 @@ void Placement::placeLayerBucket(
                 placeIcon = placed.first;
                 offscreen &= placed.second;
             }
+
+            const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
+            const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
 
             // combine placements for icon and text
             if (!iconWithoutText && !textWithoutIcon) {
