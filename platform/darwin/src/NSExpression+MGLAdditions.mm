@@ -13,6 +13,13 @@
 
 #import <mbgl/style/expression/expression.hpp>
 
+const MGLExpressionStyleFunction MGLExpressionStyleFunctionZoomLevel = @"$zoomLevel";
+const MGLExpressionStyleFunction MGLExpressionStyleFunctionHeatmapDensity = @"$heatmapDensity";
+
+const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear = @"linear";
+const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential = @"exponential";
+const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier = @"cubic-bezier";
+
 @implementation NSExpression (MGLPrivateAdditions)
 
 - (std::vector<mbgl::Value>)mgl_aggregateMBGLValue {
@@ -297,6 +304,55 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     return subexpressions;
 }
 
++ (instancetype)mgl_expressionForString:(NSString *)string {
+    return [NSExpression expressionForConstantValue:string];
+}
+
++ (instancetype)mgl_expressionForColor:(MGLColor *)color {
+    return [NSExpression expressionForConstantValue:color];
+}
++ (instancetype)mgl_expressionForValue:(NSValue *)value {
+    return [NSExpression expressionForConstantValue:value];
+}
+
++ (instancetype)mgl_expressionForTernaryFunction:(NSString *)conditionString trueExpression:(NSExpression *)trueExpression falseExpresssion:(NSExpression *)falseExpression {
+    NSString *funtionFormat = [NSString stringWithFormat:@"TERNARY(%@, %%@, %%@)", conditionString];
+    return [NSExpression expressionWithFormat:funtionFormat, trueExpression, falseExpression];
+}
+
++ (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultValue:(NSValue *)value stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
+    return [NSExpression mgl_expressionForStepFunction:function
+                                     defaultExpression:[NSExpression mgl_expressionForValue:value]
+                                                 stops:stops];
+}
+
++ (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultString:(NSString *)string stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
+    return [NSExpression mgl_expressionForStepFunction:function
+                                     defaultExpression:[NSExpression mgl_expressionForString:string]
+                                                 stops:stops];
+}
+
++ (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultColor:(MGLColor *)color stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
+    return [NSExpression mgl_expressionForStepFunction:function
+                                     defaultExpression:[NSExpression mgl_expressionForColor:color]
+                                                 stops:stops];
+}
+
++ (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultExpression:(NSExpression *)expression stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
+    NSString *functionFormat = [NSString stringWithFormat:@"FUNCTION(%@, 'mgl_stepWithMinimum:stops:', %%@, %%@, %%@)", function];
+    return [NSExpression expressionWithFormat:functionFormat, expression, stops];
+}
+
++ (instancetype)mgl_expressionForInterpolateFunction:(MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps; {
+    return [NSExpression mgl_expressionForInterpolateFunction:function curveType:curveType parameters:nil steps:steps];
+}
+
++ (instancetype)mgl_expressionForInterpolateFunction:(MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps {
+    NSString *functionFormat = [NSString stringWithFormat:@"FUNCTION(%@, 'mgl_interpolateWithCurveType:parameters:stops:', %%@, %%@, %%@)", function];
+    return [NSExpression expressionWithFormat:functionFormat, curveType, parameters, steps];
+}
+
+
 + (instancetype)mgl_expressionWithJSONObject:(id)object {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -485,6 +541,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 format:@"Unable to convert JSON object %@ to an NSExpression.", object];
     
     return nil;
+}
+
+
+
+- (instancetype)mgl_appendingString:(NSString *)string {
+    return [self mgl_appendingExpression:[NSExpression mgl_expressionForString:string]];
+}
+- (instancetype)mgl_appendingExpression:(NSExpression *)expression {
+    return [NSExpression expressionForFunction:self selectorName:@"stringByAppendingString:" arguments:@[expression]];
 }
 
 - (id)mgl_jsonExpressionObject {

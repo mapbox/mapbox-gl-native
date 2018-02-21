@@ -945,14 +945,20 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleWaterLayer
 {
     MGLFillStyleLayer *waterLayer = (MGLFillStyleLayer *)[self.mapView.style layerWithIdentifier:@"water"];
+    
     NSDictionary *waterColorStops = @{@6.0f: [UIColor yellowColor],
                                       @8.0f: [UIColor blueColor],
                                       @10.0f: [UIColor redColor],
                                       @12.0f: [UIColor greenColor],
                                       @14.0f: [UIColor blueColor]};
-    waterLayer.fillColor = [NSExpression expressionWithFormat:
-                            @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
-                            waterColorStops];
+    MGLNSExpressionBuilder *expressionBuilder = [MGLNSExpressionBuilder expressionBuilderWithFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                                 interpolateCurveType:MGLInterpolateCurveTypeLinear
+                                                                                           parameters:nil
+                                                                                                steps:waterColorStops];
+//    waterLayer.fillColor = [NSExpression expressionWithFormat:
+//                            @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+//                            waterColorStops];
+    waterLayer.fillColor = expressionBuilder.expression;
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
                                            @12: @NO,
