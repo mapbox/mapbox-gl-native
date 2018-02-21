@@ -39,16 +39,12 @@ import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.RE
 
 /**
  * Manages gestures events on a MapView.
- * <p>
- * Relies on gesture detection code in almeros.android.multitouch.gesturedetectors.
- * </p>
  */
 final class MapGestureDetector {
 
   private final Transform transform;
   private final Projection projection;
   private final UiSettings uiSettings;
-  private final TrackingSettings trackingSettings;
   private final AnnotationManager annotationManager;
   private final CameraChangeDispatcher cameraChangeDispatcher;
 
@@ -94,13 +90,11 @@ final class MapGestureDetector {
   private Handler mainHandler = new Handler();
 
   MapGestureDetector(Context context, Transform transform, Projection projection, UiSettings uiSettings,
-                     TrackingSettings trackingSettings, AnnotationManager annotationManager,
-                     CameraChangeDispatcher cameraChangeDispatcher) {
+                     AnnotationManager annotationManager, CameraChangeDispatcher cameraChangeDispatcher) {
     this.annotationManager = annotationManager;
     this.transform = transform;
     this.projection = projection;
     this.uiSettings = uiSettings;
-    this.trackingSettings = trackingSettings;
     this.cameraChangeDispatcher = cameraChangeDispatcher;
 
     // Touch gesture detectors
@@ -158,8 +152,8 @@ final class MapGestureDetector {
   /**
    * Get the current active gesture focal point.
    * <p>
-   * This could be either the user provided focal point in {@link UiSettings#setFocalPoint(PointF)} or the focal point
-   * defined as a result of {@link TrackingSettings#setMyLocationEnabled(boolean)}.
+   * This could be either the user provided focal point in {@link UiSettings#setFocalPoint(PointF)} or <code>null</code>.
+   * If it's <code>null</code>, gestures will use focal pointed returned by the detector.
    * </p>
    *
    * @return the current active gesture focal point.
@@ -234,6 +228,7 @@ final class MapGestureDetector {
       // Zoom in on gesture
       transform.zoom(true, new PointF(motionEvent.getX(), motionEvent.getY()));
     }
+
     if (isZoomValid(transform)) {
       MapEventFactory mapEventFactory = new MapEventFactory();
       LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
@@ -277,7 +272,7 @@ final class MapGestureDetector {
    * Examples of such events are mouse scroll events, mouse moves, joystick & trackpad.
    * </p>
    *
-   * @param event The MotionEvent occured
+   * @param event The MotionEvent occurred
    * @return True is the event is handled
    */
   boolean onGenericMotionEvent(MotionEvent event) {
@@ -369,7 +364,7 @@ final class MapGestureDetector {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      if ((!trackingSettings.isScrollGestureCurrentlyEnabled())) {
+      if ((!uiSettings.isScrollGesturesEnabled())) {
         // don't allow a fling is scroll is disabled
         return false;
       }
@@ -382,8 +377,6 @@ final class MapGestureDetector {
         // ignore short flings, these can occur when other gestures just have finished executing
         return false;
       }
-
-      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
@@ -408,7 +401,7 @@ final class MapGestureDetector {
   private final class MoveGestureListener extends MoveGestureDetector.SimpleOnMoveGestureListener {
     @Override
     public boolean onMoveBegin(MoveGestureDetector detector) {
-      if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+      if (!uiSettings.isScrollGesturesEnabled()) {
         return false;
       }
 
@@ -422,9 +415,6 @@ final class MapGestureDetector {
         pan.setGesture(Events.PAN);
         Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pan));
       }
-
-      // reset tracking if needed
-      trackingSettings.resetTrackingModesIfRequired(true, false, false);
 
       notifyOnMoveBeginListeners(detector);
 
@@ -454,7 +444,7 @@ final class MapGestureDetector {
     private PointF scaleFocalPoint;
     private boolean quickZoom;
 
-    public ScaleGestureListener(float minimumVelocity) {
+    ScaleGestureListener(float minimumVelocity) {
       this.minimumVelocity = minimumVelocity;
     }
 
@@ -475,8 +465,6 @@ final class MapGestureDetector {
       if (quickZoom) {
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
-
-      trackingSettings.resetTrackingModesIfRequired(!quickZoom, false, false);
 
       if (focalPoint != null) {
         // around user provided focal point
@@ -531,10 +519,8 @@ final class MapGestureDetector {
       float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
       if (velocityXY > minimumVelocity) {
         double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
-        Timber.d("velocity: " + velocityXY + ", zoom: " + zoomAddition);
         double currentZoom = transform.getRawZoom();
-        //long animationTime = TimeUnit.SECONDS.toMillis((long) Math.abs(zoomAddition)) / 4; //todo make divider public
-        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
+        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4); //todo make divider public
         scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime);
         scheduleAnimator(scaleAnimator);
       }
@@ -601,20 +587,16 @@ final class MapGestureDetector {
     private final float minimumScaleSpanWhenRotating;
     private final float minimumAngularVelocity;
 
-    public RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity) {
+    RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity) {
       this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
       this.minimumAngularVelocity = minimumAngularVelocity;
     }
 
     @Override
     public boolean onRotateBegin(RotateGestureDetector detector) {
-      if (!trackingSettings.isRotateGestureCurrentlyEnabled()) {
+      if (!uiSettings.isRotateGesturesEnabled()) {
         return false;
       }
-
-      // rotation constitutes translation of anything except the center of
-      // rotation, so cancel both location and bearing tracking if required
-      trackingSettings.resetTrackingModesIfRequired(true, true, false);
 
       // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
