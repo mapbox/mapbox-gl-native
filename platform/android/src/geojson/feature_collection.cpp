@@ -1,4 +1,3 @@
-#include <android/log.h>
 #include "feature_collection.hpp"
 
 #include "feature.hpp"

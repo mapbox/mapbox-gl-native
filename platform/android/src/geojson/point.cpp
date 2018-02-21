@@ -1,4 +1,3 @@
-#include <android/log.h>
 #include "point.hpp"
 #include "../java/util.hpp"
 #include "../java_types.hpp"

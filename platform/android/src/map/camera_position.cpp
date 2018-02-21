@@ -33,7 +33,9 @@ mbgl::CameraOptions CameraPosition::getCameraOptions(jni::JNIEnv& env, jni::Obje
     static auto tilt = CameraPosition::javaClass.GetField<jni::jdouble>(env, "tilt");
     static auto zoom = CameraPosition::javaClass.GetField<jni::jdouble>(env, "zoom");
 
-    auto center = LatLng::getLatLng(env, position.Get(env, target));
+    auto jtarget = position.Get(env, target);
+    auto center = LatLng::getLatLng(env, jtarget);
+    jni::DeleteLocalRef(env, jtarget);
 
     return mbgl::CameraOptions {
             center,
