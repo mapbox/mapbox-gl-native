@@ -217,16 +217,16 @@ final class MapGestureDetector {
       return false;
     }
 
-    // notify camera change listener
+    transform.cancelTransitions();
     cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
     // Single finger double tap
     if (focalPoint != null) {
       // User provided focal point
-      transform.zoom(true, focalPoint);
+      transform.zoomIn(focalPoint);
     } else {
       // Zoom in on gesture
-      transform.zoom(true, new PointF(motionEvent.getX(), motionEvent.getY()));
+      transform.zoomIn(new PointF(motionEvent.getX(), motionEvent.getY()));
     }
 
     if (isZoomValid(transform)) {
@@ -294,7 +294,7 @@ final class MapGestureDetector {
           float scrollDist = event.getAxisValue(MotionEvent.AXIS_VSCROLL);
 
           // Scale the map by the appropriate power of two factor
-          transform.zoomBy(scrollDist, event.getX(), event.getY());
+          transform.zoomBy(scrollDist, new PointF(event.getX(), event.getY()));
 
           return true;
 
@@ -378,6 +378,7 @@ final class MapGestureDetector {
         return false;
       }
 
+      transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       // tilt results in a bigger translation, limiting input for #5281
@@ -423,6 +424,8 @@ final class MapGestureDetector {
 
     @Override
     public boolean onMove(MoveGestureDetector detector, float distanceX, float distanceY) {
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+
       // Scroll the map
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
@@ -433,6 +436,7 @@ final class MapGestureDetector {
 
     @Override
     public void onMoveEnd(MoveGestureDetector detector, float velocityX, float velocityY) {
+      cameraChangeDispatcher.onCameraIdle();
       notifyOnMoveEndListeners(detector);
     }
   }
@@ -457,8 +461,6 @@ final class MapGestureDetector {
       executeDoubleTap = false;
 
       transform.cancelTransitions();
-
-      // notify camera change listener
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       quickZoom = detector.getPointersCount() == 1;
@@ -486,6 +488,8 @@ final class MapGestureDetector {
 
     @Override
     public boolean onScale(StandardScaleGestureDetector detector) {
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+
       if (focalPoint != null) {
         // around user provided focal point
         scaleFocalPoint = focalPoint;
@@ -499,7 +503,7 @@ final class MapGestureDetector {
 
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
-      transform.zoomBy(zoomBy, scaleFocalPoint.x, scaleFocalPoint.y);
+      transform.zoomBy(zoomBy, scaleFocalPoint);
 
       notifyOnScaleListeners(detector);
 
@@ -508,6 +512,8 @@ final class MapGestureDetector {
 
     @Override
     public void onScaleEnd(StandardScaleGestureDetector detector, float velocityX, float velocityY) {
+      cameraChangeDispatcher.onCameraIdle();
+
       if (quickZoom) {
         gesturesManager.getMoveGestureDetector().setEnabled(true);
       }
@@ -544,7 +550,7 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setZoom((Float) animation.getAnimatedValue(), scaleFocalPoint, 0, true);
+          transform.setZoom((Float) animation.getAnimatedValue(), scaleFocalPoint, 0);
         }
       });
 
@@ -558,6 +564,7 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationCancel(Animator animation) {
+          transform.cancelTransitions();
         }
 
         @Override
@@ -598,7 +605,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      // notify camera change listener
+      transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       if (isZoomValid(transform)) {
@@ -619,6 +626,8 @@ final class MapGestureDetector {
 
     @Override
     public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast, float rotationDegreesSinceFirst) {
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+
       if (focalPoint != null) {
         // User provided focal point
         rotateFocalPoint = focalPoint;
@@ -640,6 +649,8 @@ final class MapGestureDetector {
 
     @Override
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
+      cameraChangeDispatcher.onCameraIdle();
+
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
         gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
 
@@ -699,6 +710,7 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationCancel(Animator animation) {
+          cameraChangeDispatcher.onCameraIdle();
         }
 
         @Override
@@ -719,7 +731,7 @@ final class MapGestureDetector {
         return false;
       }
 
-      // notify camera change listener
+      transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
       if (isZoomValid(transform)) {
@@ -739,6 +751,8 @@ final class MapGestureDetector {
 
     @Override
     public boolean onShove(ShoveGestureDetector detector, float deltaPixelsSinceLast, float deltaPixelsSinceStart) {
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
+
       // Get tilt value (scale and clamp)
       double pitch = transform.getTilt();
       pitch -= 0.1 * deltaPixelsSinceLast;
@@ -754,6 +768,8 @@ final class MapGestureDetector {
 
     @Override
     public void onShoveEnd(ShoveGestureDetector detector, float velocityX, float velocityY) {
+      cameraChangeDispatcher.onCameraIdle();
+
       gesturesManager.getMoveGestureDetector().setEnabled(true);
 
       notifyOnShoveEndListeners(detector);
@@ -767,10 +783,13 @@ final class MapGestureDetector {
         return false;
       }
 
+      transform.cancelTransitions();
+      cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
+
       if (focalPoint != null) {
-        transform.zoom(false, focalPoint);
+        transform.zoomOut(focalPoint);
       } else {
-        transform.zoom(false, detector.getFocalPoint());
+        transform.zoomOut(detector.getFocalPoint());
       }
 
       return true;

@@ -1071,11 +1071,13 @@ public class MapView extends FrameLayout {
     }
 
     private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {
-      if (focalPoint != null) {
-        transform.zoom(zoomIn, focalPoint);
+      if (focalPoint == null) {
+        focalPoint = new PointF(mapWidth / 2, mapHeight / 2);
+      }
+      if (zoomIn) {
+        transform.zoomIn(focalPoint);
       } else {
-        PointF centerPoint = new PointF(mapWidth / 2, mapHeight / 2);
-        transform.zoom(zoomIn, centerPoint);
+        transform.zoomOut(focalPoint);
       }
     }
   }
