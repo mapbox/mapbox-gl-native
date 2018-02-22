@@ -1,12 +1,12 @@
 #include <jni.h>
 #include <GLES2/gl2.h>
-
-#include <mbgl/util/logging.hpp>
-#include <mbgl/util/string.hpp>
+#include <sstream>
+#include <android/log.h>
 #include <mbgl/style/layers/custom_layer.hpp>
-#include <vector>
 
 // DEBUGGING
+
+const char* LOG_TAG = "Custom Layer Example";
 
 const char* stringFromError(GLenum err) {
     switch (err) {
@@ -58,16 +58,17 @@ void checkError(const char *cmd, const char *file, int line) {
 
     GLenum err = GL_NO_ERROR;
     if ((err = glGetError()) != GL_NO_ERROR) {
-        std::string message = std::string(cmd) + ": Error " + stringFromError(err);
+        std::ostringstream message;
+        message << cmd  << ": Error " << stringFromError(err);
 
         // Check for further errors
         while ((err = glGetError()) != GL_NO_ERROR) {
-            message += ", ";
-            message += stringFromError(err);
+            message << ", " << stringFromError(err);
         }
 
-        mbgl::Log::Error(mbgl::Event::General, message + " at " + file + ":" + mbgl::util::toString(line));
-        throw Error(message + " at " + file + ":" + mbgl::util::toString(line));
+        message << " at " << file << ":" << line;
+        __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, message.str().c_str());
+        throw Error(message.str());
     }
 }
 
@@ -85,7 +86,7 @@ void checkLinkStatus(GLuint program) {
         glGetProgramiv(program, GL_INFO_LOG_LENGTH, &maxLength);
         GLchar infoLog[maxLength];
         glGetProgramInfoLog(program, maxLength, &maxLength, &infoLog[0]);
-        mbgl::Log::Info(mbgl::Event::General, &infoLog[0]);
+        __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, &infoLog[0]);
         throw Error(infoLog);
     }
 
@@ -101,7 +102,7 @@ void checkCompileStatus(GLuint shader) {
         // The maxLength includes the NULL character
         GLchar errorLog[maxLength];
         glGetShaderInfoLog(shader, maxLength, &maxLength, &errorLog[0]);
-        mbgl::Log::Error(mbgl::Event::General, &errorLog[0]);
+        __android_log_write(ANDROID_LOG_ERROR, LOG_TAG, &errorLog[0]);
         throw Error(errorLog);
     }
 }
@@ -114,7 +115,7 @@ static const GLchar * fragmentShaderSource = "uniform highp vec4 fill_color; voi
 class ExampleCustomLayer {
 public:
     ~ExampleCustomLayer() {
-        mbgl::Log::Info(mbgl::Event::General, "~ExampleCustomLayer");
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "~ExampleCustomLayer");
         if (program) {
             glDeleteBuffers(1, &buffer);
             glDetachShader(program, vertexShader);
@@ -126,12 +127,12 @@ public:
     }
 
     void initialize() {
-        mbgl::Log::Info(mbgl::Event::General, "Initialize");
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "Initialize");
 
         // Debug info
         int maxAttrib;
         GL_CHECK_ERROR(glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxAttrib));
-        mbgl::Log::Info(mbgl::Event::General, "Max vertex attributes: %i", maxAttrib);
+        __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "Max vertex attributes: %i", maxAttrib);
 
         program = GL_CHECK_ERROR(glCreateProgram());
         vertexShader = GL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
@@ -158,7 +159,7 @@ public:
     }
 
     void render() {
-        mbgl::Log::Info(mbgl::Event::General, "Render");
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "Render");
 
         GL_CHECK_ERROR(glUseProgram(program));
         GL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
@@ -184,12 +185,12 @@ public:
 GLfloat ExampleCustomLayer::color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 jlong JNICALL nativeCreateContext(JNIEnv*, jobject) {
-     mbgl::Log::Info(mbgl::Event::General, "nativeCreateContext");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeCreateContext");
      return reinterpret_cast<jlong>(new ExampleCustomLayer());
 }
 
 void JNICALL nativeSetColor(JNIEnv*, jobject, jfloat red, jfloat green, jfloat blue, jfloat alpha) {
-    mbgl::Log::Info(mbgl::Event::General, "nativeSetColor: %.2f, %.2f, %.2f, %.2f", red, green, blue, alpha);
+    __android_log_print(ANDROID_LOG_INFO, LOG_TAG, "nativeSetColor: %.2f, %.2f, %.2f, %.2f", red, green, blue, alpha);
     ExampleCustomLayer::color[0] = red;
     ExampleCustomLayer::color[1] = green;
     ExampleCustomLayer::color[2] = blue;
@@ -197,26 +198,27 @@ void JNICALL nativeSetColor(JNIEnv*, jobject, jfloat red, jfloat green, jfloat b
 }
 
 void nativeInitialize(void *context) {
-    mbgl::Log::Info(mbgl::Event::General, "nativeInitialize");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeInitialize");
     reinterpret_cast<ExampleCustomLayer*>(context)->initialize();
 }
 
 void nativeRender(void *context, const mbgl::style::CustomLayerRenderParameters& /*parameters*/) {
-    mbgl::Log::Info(mbgl::Event::General, "nativeRender");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeRender");
     reinterpret_cast<ExampleCustomLayer*>(context)->render();
 }
 
 void nativeContextLost(void */*context*/) {
-    mbgl::Log::Info(mbgl::Event::General, "nativeContextLost");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeContextLost");
 }
 
 void nativeDeinitialize(void *context) {
-    mbgl::Log::Info(mbgl::Event::General, "nativeDeinitialize");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeDeinitialize");
     delete reinterpret_cast<ExampleCustomLayer*>(context);
 }
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
-    mbgl::Log::Info(mbgl::Event::General, "OnLoad");
+    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "OnLoad");
+
     JNIEnv *env = nullptr;
     vm->GetEnv(reinterpret_cast<void **>(&env), JNI_VERSION_1_6);
 
