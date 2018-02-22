@@ -1434,8 +1434,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // source, identity function that sets any feature with an "opacity" attribute to use that value and anything without to 1.0
     fillStyleLayer.fillOpacity = [NSExpression expressionWithFormat:@"TERNARY(opacity != nil, opacity, 1.0)"];
     [self.mapView.style addLayer:fillStyleLayer];
-    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(37.75741564287944, -122.44640350341795)];
-    self.mapView.zoomLevel = 15;
 }
 
 - (void)addLatLonGrid
