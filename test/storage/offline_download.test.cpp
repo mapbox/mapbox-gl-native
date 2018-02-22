@@ -295,6 +295,7 @@ TEST(OfflineDownload, GetStatusStyleComplete) {
         OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
         test.db, test.fileSource);
 
+    auto transaction = test.db.beginRegionDownload();
     test.db.putRegionResource(1,
         Resource::style("http://127.0.0.1:3000/style.json"),
         test.response("style.json"));
@@ -317,6 +318,8 @@ TEST(OfflineDownload, GetStatusStyleAndSourceComplete) {
         OfflineTilePyramidRegionDefinition("http://127.0.0.1:3000/style.json", LatLngBounds::world(), 0.0, 0.0, 1.0),
         test.db, test.fileSource);
 
+    auto transaction = test.db.beginRegionDownload();
+    
     test.db.putRegionResource(1,
         Resource::style("http://127.0.0.1:3000/style.json"),
         test.response("style.json"));

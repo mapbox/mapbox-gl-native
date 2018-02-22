@@ -15,6 +15,7 @@ namespace mapbox {
 namespace sqlite {
 class Database;
 class Statement;
+class Transaction;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -22,6 +23,8 @@ namespace mbgl {
 
 class Response;
 class TileID;
+class BatchTransaction;
+class TransactionManager;
 
 class OfflineDatabase : private util::noncopyable {
 public:
@@ -34,6 +37,8 @@ public:
 
     // Return value is (inserted, stored size)
     std::pair<bool, uint64_t> put(const Resource&, const Response&);
+
+    std::shared_ptr<BatchTransaction> beginRegionDownload();
 
     std::vector<OfflineRegion> listRegions();
 
@@ -104,6 +109,8 @@ private:
     const std::string path;
     std::unique_ptr<::mapbox::sqlite::Database> db;
     std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
+    
+    std::unique_ptr<TransactionManager> transactionManager;
 
     template <class T>
     T getPragma(const char *);
