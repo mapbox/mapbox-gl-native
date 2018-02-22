@@ -124,6 +124,15 @@ public class ImageSource extends Source {
     return nativeGetUrl();
   }
 
+  /**
+   * Updates the latitude and longitude of the four corners of the image
+   *
+   * @param latLngQuad latitude and longitude of the four corners of the image
+   */
+  public void setCoordinates(LatLngQuad latLngQuad) {
+    nativeSetCoordinates(latLngQuad);
+  }
+
   protected native void initialize(String layerId, LatLngQuad payload);
 
   protected native void nativeSetUrl(String url);
@@ -131,6 +140,8 @@ public class ImageSource extends Source {
   protected native String nativeGetUrl();
 
   protected native void nativeSetImage(Bitmap bitmap);
+
+  protected native void nativeSetCoordinates(LatLngQuad latLngQuad);
 
   @Override
   protected native void finalize() throws Throwable;
