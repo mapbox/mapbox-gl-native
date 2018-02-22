@@ -34,20 +34,25 @@ struct Converter<DataDrivenPropertyValue<T>> {
                 return {};
             }
             
-            if (auto literal = dynamic_cast<Literal*>(expression->get())) {
+            bool featureConstant = isFeatureConstant(**expression);
+            bool zoomConstant = isZoomConstant(**expression);
+            
+            if (featureConstant && !zoomConstant) {
+                return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
+            } else if (!featureConstant && zoomConstant) {
+                return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
+            } else if (!featureConstant && !zoomConstant) {
+                return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
+            } else {
+                // If an expression is neither zoom- nor feature-dependent, it
+                // should have been reduced to a Literal when it was parsed.
+                auto literal = dynamic_cast<Literal*>(expression->get());
+                assert(literal);
                 optional<T> constant = fromExpressionValue<T>(literal->getValue());
                 if (!constant) {
                     return {};
                 }
                 return DataDrivenPropertyValue<T>(*constant);
-            }
-            
-            if (isFeatureConstant(**expression)) {
-                return DataDrivenPropertyValue<T>(CameraFunction<T>(std::move(*expression)));
-            } else if (isZoomConstant(**expression)) {
-                return DataDrivenPropertyValue<T>(SourceFunction<T>(std::move(*expression)));
-            } else {
-                return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
             }
         } else if (!isObject(value)) {
             optional<T> constant = convert<T>(value, error);
