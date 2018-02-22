@@ -38,6 +38,10 @@ void writeFile(const char* name, const std::string& data) {
     mbgl::util::write_file(name, data);
 }
 
+void copyFile(const char* orig, const char* dest) {
+    mbgl::util::write_file(dest, mbgl::util::read_file(orig));
+}
+
 } // namespace
 
 TEST(OfflineDatabase, TEST_REQUIRES_WRITE(Create)) {
@@ -141,6 +145,36 @@ TEST(OfflineDatabase, PutResource) {
     auto updateGetResult = db.get(resource);
     EXPECT_EQ(nullptr, updateGetResult->error.get());
     EXPECT_EQ("second", *updateGetResult->data);
+}
+
+TEST(OfflineDatabase, TEST_REQUIRES_WRITE(GetResourceFromOfflineRegion)) {
+    using namespace mbgl;
+
+    createDir("test/fixtures/offline_database");
+    deleteFile("test/fixtures/offline_database/satellite.db");
+    copyFile("test/fixtures/offline_database/satellite_test.db", "test/fixtures/offline_database/satellite.db");
+
+    OfflineDatabase db("test/fixtures/offline_database/satellite.db", mapbox::sqlite::ReadOnly);
+
+    Resource resource = Resource::style("mapbox://styles/mapbox/satellite-v9");
+    ASSERT_TRUE(db.get(resource));
+}
+
+TEST(OfflineDatabase, PutAndGetResource) {
+    using namespace mbgl;
+
+    OfflineDatabase db(":memory:");
+
+    Response response1;
+    response1.data = std::make_shared<std::string>("foobar");
+
+    Resource resource = Resource::style("mapbox://example.com/style");
+
+    db.put(resource, response1);
+
+    auto response2 = db.get(resource);
+
+    ASSERT_EQ(*response1.data, *(*response2).data);
 }
 
 TEST(OfflineDatabase, PutTile) {
