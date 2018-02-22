@@ -259,6 +259,11 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       )
     );
 
+    // debug log getters
+    SymbolLayer symbolLayer = mapboxMap.getLayerAs(LAYER_ID);
+    Timber.e("Property value for %s: %s","iconImage", symbolLayer.getIconImage().getExpression());
+    Timber.e("Property value for %s: %s","iconAllowOverlap", symbolLayer.getIconAllowOverlap().getValue());
+
     new GenerateSymbolTask(mapboxMap, this).execute(featureCollection);
   }
 
