@@ -475,6 +475,55 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     self.displayName = [NSString stringWithFormat:@"%@ @ %f", coordinateString, _mapView.zoomLevel];
 }
 
+#pragma mark Format methods
+
+- (void)changeFont:(id)sender {
+    NSInteger clickedRow = self.styleLayersTableView.clickedRow;
+    NSIndexSet *rows;
+    if (clickedRow != -1) {
+        rows = [NSIndexSet indexSetWithIndex:clickedRow];
+    } else {
+        rows = self.styleLayersTableView.selectedRowIndexes;
+    }
+    
+    [rows enumerateIndexesUsingBlock:^(NSUInteger idx, BOOL * _Nonnull stop) {
+        [self changeFont:sender atRow:idx];
+    }];
+}
+
+- (void)changeFont:(id)sender atRow:(NSInteger)row {
+    MGLSymbolStyleLayer *layer = self.mapView.style.reversedLayers[row];
+    NSString *fontName;
+    CGFloat fontSize = -1;
+    if ([layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
+        NSExpression *fontNamesExpression = layer.textFontNames;
+        if (fontNamesExpression.expressionType == NSConstantValueExpressionType) {
+            fontName = fontNamesExpression.constantValue;
+        }
+        
+        NSExpression *fontSizeExpression = layer.textFontSize;
+        if (fontSizeExpression.expressionType == NSConstantValueExpressionType) {
+            fontSize = [fontSizeExpression.constantValue doubleValue];
+        }
+    }
+    
+    if (layer) {
+        NSFont *oldFont;
+        if (fontSize == -1) {
+            fontSize = [NSFont systemFontSize];
+        }
+        if (fontName) {
+            oldFont = [NSFont fontWithName:fontName size:fontSize];
+        } else {
+            oldFont = [NSFont systemFontOfSize:fontSize];
+        }
+        
+        NSFont *newFont = [sender convertFont:oldFont];
+        layer.textFontNames = [NSExpression expressionWithFormat:@"{%@}", newFont.fontName];
+//        layer.textFontSize = [NSExpression expressionForConstantValue:@(newFont.pointSize)];
+    }
+}
+
 #pragma mark Debug methods
 
 - (IBAction)toggleTileBoundaries:(id)sender {
