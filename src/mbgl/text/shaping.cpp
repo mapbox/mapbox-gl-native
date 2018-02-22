@@ -257,7 +257,8 @@ void shapeLines(Shaping& shaping,
                           const style::TextJustifyType textJustify,
                           const float,
                           const WritingModeType,
-                          const Glyphs& glyphs) {
+                          const Glyphs& glyphs,
+                          const FontStack& fontStack) {
     
     // the y offset *should* be part of the font metadata
     const int32_t yOffset = 0;//-17;
@@ -281,7 +282,7 @@ void shapeLines(Shaping& shaping,
         }
         
         std::size_t lineStartIndex = shaping.positionedGlyphs.size();
-        const float lineLength = shapeLine(shaping, line, y);
+        const float lineLength = shapeLine(shaping, line, y, fontStack);
 
         // Only justify if we placed at least one glyph
         if (shaping.positionedGlyphs.size() != lineStartIndex) {
@@ -318,7 +319,8 @@ const Shaping getShaping(const std::u16string& logicalInput,
                          const float verticalHeight,
                          const WritingModeType writingMode,
                          BiDi& bidi,
-                         const Glyphs& glyphs) {
+                         const Glyphs& glyphs,
+                         const FontStack& fontStack) {
     Shaping shaping(translate.x, translate.y, writingMode);
     
     std::vector<std::u16string> reorderedLines =
@@ -326,7 +328,7 @@ const Shaping getShaping(const std::u16string& logicalInput,
                      determineLineBreaks(logicalInput, spacing, maxWidth, writingMode, glyphs));
     
     shapeLines(shaping, reorderedLines, spacing, lineHeight, textAnchor,
-               textJustify, verticalHeight, writingMode, glyphs);
+               textJustify, verticalHeight, writingMode, glyphs, fontStack);
     
     return shaping;
 }

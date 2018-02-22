@@ -66,7 +66,7 @@ public:
         
         if (fontHandles.find(fontName) == fontHandles.end()) {
             // TODO: Make sure these are the right attributes
-          NSDictionary *fontAttributes = @{
+            NSDictionary *fontAttributes = @{
                 (NSString *)kCTFontSizeAttribute: [NSNumber numberWithFloat:24.0],
                 (NSString *)kCTFontFamilyNameAttribute: [NSString stringWithCharacters:(UniChar*)fontName.data() length:fontName.length()]
             };

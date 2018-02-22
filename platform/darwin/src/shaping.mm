@@ -17,25 +17,38 @@ using CTLineRefHandle = CFHandle<CTLineRef, CFTypeRef, CFRelease>;
 
 #define PTR_OR_ARRAY(name) (name##Ptr ?: name)
 
-float shapeLine(Shaping& shaping, const std::u16string& text, const float y) {
+NSDictionary *getAttributes(const FontStack& fontStack) {
+    NSDictionary *baseFontAttributes = @{
+        (NSString *)kCTFontNameAttribute: @(fontStack.front().c_str()),
+    };
+    CTFontDescriptorRef baseDescriptor = CTFontDescriptorCreateWithAttributes((CFDictionaryRef)baseFontAttributes);
+//    CTFontRef baseFont = CTFontCreateWithFontDescriptor(baseDescriptor, 0.0, NULL);
+    CTFontRef font = CTFontCreateWithFontDescriptor(baseDescriptor, 0.0, NULL);
+    return @{
+        (NSString *)kCTFontSizeAttribute: @24.0,
+        (NSString *)kCTFontAttributeName: (__bridge NSFont *)font,
+        // TODO: Fall back to the rest of the font stack, then the default cascade list.
+//        (NSString *)kCTFontCascadeListAttribute: (__bridge NSArray *)CTFontCopyDefaultCascadeListForLanguages(baseFont, NULL),
+    };
+}
+
+float shapeLine(Shaping& shaping, const std::u16string& text, const float y, const FontStack& fontStack) {
     float maxLineLength = 0;
 
-    NSDictionary *fontAttributes = @{
-        (NSString *)kCTFontSizeAttribute: @24.0
-    };
+    NSDictionary *attrs = getAttributes(fontStack);
 
     CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(const_cast<char16_t*>(text.c_str())), text.length()));
-    CFAttributedStringRef attrStr = CFAttributedStringCreate(NULL, *string, (CFDictionaryRef)fontAttributes);
+    CFAttributedStringRef attrStr = CFAttributedStringCreate(NULL, *string, (CFDictionaryRef)attrs);
     CTLineRef line = CTLineCreateWithAttributedString(attrStr);
     CFArrayRef runs = CTLineGetGlyphRuns(line);
     
     CGSize runAdvance = CGSizeZero;
     
-     for (CFIndex i = 0; i < CFArrayGetCount(runs); i++) {
+    for (CFIndex i = 0; i < CFArrayGetCount(runs); i++) {
         CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, i);
-        CFDictionaryRef attrs = CTRunGetAttributes(run);
+        CFDictionaryRef runAttrs = CTRunGetAttributes(run);
         
-        CTFontRef fontRef = (CTFontRef)CFDictionaryGetValue(attrs, CFSTR("NSFont"));
+        CTFontRef fontRef = (CTFontRef)CFDictionaryGetValue(runAttrs, CFSTR("NSFont"));
         CFStringRef fontNameRef = CTFontCopyName(fontRef, kCTFontFamilyNameKey);
         CFIndex length = CFStringGetLength(fontNameRef);
         UniChar* buffer = (UniChar*)malloc(length * sizeof(UniChar));
@@ -52,7 +65,7 @@ float shapeLine(Shaping& shaping, const std::u16string& text, const float y) {
             CTRunGetGlyphs(run, CFRangeMake(0, 0), runGlyphs);
         }
 
-        NSDictionary* nsAttrs = (__bridge NSDictionary*)attrs;
+        NSDictionary* nsAttrs = (__bridge NSDictionary*)runAttrs;
         CTFontRef runFont = CTFontCreateWithName(fontNameRef, [nsAttrs[@"NSFontSizeAttribute"] doubleValue], NULL);
 
         CGRect boundingRects[runGlyphCount];
@@ -67,7 +80,7 @@ float shapeLine(Shaping& shaping, const std::u16string& text, const float y) {
             shaping.positionedGlyphs.emplace_back(GlyphID(fontName, PTR_OR_ARRAY(runGlyphs)[j]), runAdvance.width, y - CGRectGetHeight(frame), false);
             runAdvance.width += advances[j].width;
             runAdvance.height += advances[j].height;
-            maxLineLength = std::max<float>(maxLineLength, frame.origin.x + frame.size.width);
+            maxLineLength = std::max<float>(maxLineLength, CGRectGetMaxX(frame));
         }
         free(runGlyphs);
 
@@ -75,23 +88,21 @@ float shapeLine(Shaping& shaping, const std::u16string& text, const float y) {
     return maxLineLength;
 }
 
-GlyphIDs getGlyphDependencies(const std::u16string& text) {
+GlyphIDs getGlyphDependencies(const FontStack& fontStack, const std::u16string& text) {
     GlyphIDs dependencies;
 
-    NSDictionary *fontAttributes = @{
-        (NSString *)kCTFontSizeAttribute: @24.0
-    };
+    NSDictionary *attrs = getAttributes(fontStack);
 
     CFStringRefHandle string(CFStringCreateWithCharacters(NULL, reinterpret_cast<UniChar*>(const_cast<char16_t*>(text.c_str())), text.length()));
-    CFAttributedStringRef attrStr = CFAttributedStringCreate(NULL, *string, (CFDictionaryRef)fontAttributes);
+    CFAttributedStringRef attrStr = CFAttributedStringCreate(NULL, *string, (CFDictionaryRef)attrs);
     CTLineRef line = CTLineCreateWithAttributedString(attrStr);
     CFArrayRef runs = CTLineGetGlyphRuns(line);
     
-     for (CFIndex i = 0; i < CFArrayGetCount(runs); i++) {
+    for (CFIndex i = 0; i < CFArrayGetCount(runs); i++) {
         CTRunRef run = (CTRunRef)CFArrayGetValueAtIndex(runs, i);
-        CFDictionaryRef attrs = CTRunGetAttributes(run);
+        CFDictionaryRef runAttrs = CTRunGetAttributes(run);
         
-        CTFontRef fontRef = (CTFontRef)CFDictionaryGetValue(attrs, CFSTR("NSFont"));
+        CTFontRef fontRef = (CTFontRef)CFDictionaryGetValue(runAttrs, CFSTR("NSFont"));
         CFStringRef fontNameRef = CTFontCopyName(fontRef, kCTFontFamilyNameKey);
         CFIndex length = CFStringGetLength(fontNameRef);
         UniChar* buffer = (UniChar*)malloc(length * sizeof(UniChar));

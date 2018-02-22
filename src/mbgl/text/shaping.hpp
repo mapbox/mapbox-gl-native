@@ -55,10 +55,11 @@ const Shaping getShaping(const std::u16string& string,
                          float verticalHeight,
                          const WritingModeType,
                          BiDi& bidi,
-                         const Glyphs& glyphs);
+                         const Glyphs& glyphs,
+                         const FontStack& fontStack);
 
 // implemented in shaping.mm
-GlyphIDs getGlyphDependencies(const std::u16string& string);
-float shapeLine(Shaping&, const std::u16string&, const float y);
+GlyphIDs getGlyphDependencies(const FontStack& fontStack, const std::u16string& string);
+float shapeLine(Shaping&, const std::u16string&, const float y, const FontStack& fontStack);
 
 } // namespace mbgl

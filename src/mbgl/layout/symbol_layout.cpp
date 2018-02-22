@@ -145,7 +145,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
             FontStack fontStack = layout.evaluate<TextFont>(zoom, ft);
             GlyphIDs& dependencies = glyphDependencies[fontStack];
-            for (GlyphID glyph : getGlyphDependencies(*ft.text)) {
+            for (GlyphID glyph : getGlyphDependencies(fontStack, *ft.text)) {
                 dependencies.insert(glyph);
             }
 
@@ -222,7 +222,8 @@ void SymbolLayout::prepare(const GlyphMap& glyphMap, const GlyphPositions& glyph
                     /* verticalHeight */ oneEm,
                     /* writingMode */ writingMode,
                     /* bidirectional algorithm object */ bidi,
-                    /* glyphs */ glyphs);
+                    /* glyphs */ glyphs,
+                    /* fontStack */ fontStack);
 
                 return result;
             };
