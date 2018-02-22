@@ -43,6 +43,11 @@ namespace android {
         source.as<mbgl::style::ImageSource>()->setImage(Bitmap::GetImage(env, bitmap));
     }
 
+    void ImageSource::setCoordinates(jni::JNIEnv& env, jni::Object<LatLngQuad> coordinatesObject) {
+        source.as<mbgl::style::ImageSource>()->setCoordinates(
+                LatLngQuad::getLatLngArray(env, coordinatesObject));
+    }
+
     jni::Class<ImageSource> ImageSource::javaClass;
 
     jni::jobject* ImageSource::createJavaPeer(jni::JNIEnv& env) {
@@ -64,7 +69,8 @@ namespace android {
                 "finalize",
                 METHOD(&ImageSource::setURL, "nativeSetUrl"),
                 METHOD(&ImageSource::getURL, "nativeGetUrl"),
-                METHOD(&ImageSource::setImage, "nativeSetImage")
+                METHOD(&ImageSource::setImage, "nativeSetImage"),
+                METHOD(&ImageSource::setCoordinates, "nativeSetCoordinates")
         );
     }
 
