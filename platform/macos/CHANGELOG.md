@@ -1,5 +1,9 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## v0.6.3 - TBD
+
+* Fixed an issue where the `MGLTileSourceOptionCoordinateBounds` option was incorrectly blocking tiles. ([#11248](https://github.com/mapbox/mapbox-gl-native/pull/11248))
+
 ## v0.6.2
 
 * Added the `MGLTileSourceOptionTileCoordinateBounds` option to create an `MGLTileSource` that only supplies tiles within a specific geographic bounding box. ([#11141](https://github.com/mapbox/mapbox-gl-native/pull/11141))

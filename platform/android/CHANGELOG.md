@@ -2,6 +2,9 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.4.2 - TBD
+- Fixed an issue where the `TileJSON.bounds` was incorrectly blocking tiles. ([#11248](https://github.co\m/mapbox/mapbox-gl-native/pull/11248))
+
 ## 5.4.1 - February 9, 2018
  - Don't recreate TextureView surface as part of view resizing, solves OOM crashes [#11148](https://github.com/mapbox/mapbox-gl-native/pull/11148)
  - Don't invoke OnLowMemory before map is ready, solves startup crash on low memory devices [#11109](https://github.com/mapbox/mapbox-gl-native/pull/11109)
