@@ -10,29 +10,29 @@ optional<TransitionOptions> Converter<TransitionOptions>::operator()(const Conve
         return {};
     }
 
-    TransitionOptions result;
-
-    auto duration = objectMember(value, "duration");
-    if (duration) {
-        auto number = toNumber(*duration);
+    auto objectDuration = objectMember(value, "duration");
+    optional<Duration> duration;
+    if (objectDuration) {
+        auto number = toNumber(*objectDuration);
         if (!number) {
             error = { "duration must be a number" };
             return {};
         }
-        result.duration = { std::chrono::milliseconds(int64_t(*number)) };
+        duration = Duration(std::chrono::milliseconds(int64_t(*number)));
     }
 
-    auto delay = objectMember(value, "delay");
-    if (delay) {
-        auto number = toNumber(*delay);
+    auto objectDelay = objectMember(value, "delay");
+    optional<Duration> delay;
+    if (objectDelay) {
+        auto number = toNumber(*objectDelay);
         if (!number) {
             error = { "delay must be a number" };
             return {};
         }
-        result.delay = { std::chrono::milliseconds(int64_t(*number)) };
+        delay = Duration(std::chrono::milliseconds(int64_t(*number)));
     }
 
-    return result;
+    return TransitionOptions{duration, delay};
 }
 
 } // namespace conversion
