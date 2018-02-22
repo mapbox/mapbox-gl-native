@@ -8,6 +8,8 @@
 #include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
+#include <mbgl/style/expression/literal.hpp>
+#include <mbgl/style/expression/value.hpp>
 
 #include <unordered_set>
 
@@ -30,6 +32,14 @@ struct Converter<DataDrivenPropertyValue<T>> {
             
             if (!expression) {
                 return {};
+            }
+            
+            if (auto literal = dynamic_cast<Literal*>(expression->get())) {
+                optional<T> constant = fromExpressionValue<T>(literal->getValue());
+                if (!constant) {
+                    return {};
+                }
+                return DataDrivenPropertyValue<T>(*constant);
             }
             
             if (isFeatureConstant(**expression)) {

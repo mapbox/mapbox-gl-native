@@ -32,6 +32,10 @@ public:
     std::vector<optional<Value>> possibleOutputs() const override {
         return {{ value }};
     }
+    
+    Value getValue() const {
+        return value;
+    }
 
 private:
     Value value;
