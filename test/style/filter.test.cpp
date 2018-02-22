@@ -45,15 +45,15 @@ TEST(Filter, EqualsNumber) {
 
 TEST(Filter, EqualsType) {
     Filter f = parse(R"(["==", "$type", "LineString"])");
-    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {})));
+    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {{}})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {{}})));
 }
 
 TEST(Filter, InType) {
     Filter f = parse(R"(["in", "$type", "LineString", "Polygon"])");
-    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::Polygon, {}, {})));
+    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {{}})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {{}})));
+    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::Polygon, {}, {{}})));
 }
 
 TEST(Filter, Any) {
