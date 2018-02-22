@@ -1429,11 +1429,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     // source, categorical function that sets any feature with a "fill" attribute value of true to red color and anything without to green
     MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:shapeSource];
-    fillStyleLayer.fillColor = [NSExpression expressionWithFormat:@"TERNARY(fill, %@, %@)", [UIColor greenColor], [UIColor redColor]];
+    fillStyleLayer.fillColor = [NSExpression expressionWithFormat:@"TERNARY(fill == YES, %@, %@)", [UIColor greenColor], [UIColor redColor]];
 
     // source, identity function that sets any feature with an "opacity" attribute to use that value and anything without to 1.0
     fillStyleLayer.fillOpacity = [NSExpression expressionWithFormat:@"TERNARY(opacity != nil, opacity, 1.0)"];
     [self.mapView.style addLayer:fillStyleLayer];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(37.75741564287944, -122.44640350341795)];
+    self.mapView.zoomLevel = 15;
 }
 
 - (void)addLatLonGrid
