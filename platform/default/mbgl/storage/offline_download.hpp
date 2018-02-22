@@ -46,7 +46,8 @@ private:
      * is deactivated, all in progress requests are cancelled.
      */
     void ensureResource(const Resource&, std::function<void (Response)> = {});
-    bool checkTileCountLimit(const Resource& resource);
+
+    void onMapboxTileCountLimitExceeded();
 
     int64_t id;
     OfflineRegionDefinition definition;
@@ -58,6 +59,7 @@ private:
     std::list<std::unique_ptr<AsyncRequest>> requests;
     std::unordered_set<std::string> requiredSourceURLs;
     std::deque<Resource> resourcesRemaining;
+    std::list<std::tuple<Resource, Response>> buffer;
 
     void queueResource(Resource);
     void queueTiles(style::SourceType, uint16_t tileSize, const Tileset&);

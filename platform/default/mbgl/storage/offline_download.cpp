@@ -330,7 +330,8 @@ void OfflineDownload::ensureResource(const Resource& resource,
             return;
         }
 
-        if (checkTileCountLimit(resource)) {
+        if (offlineDatabase.exceedsOfflineMapboxTileCountLimit(resource)) {
+            onMapboxTileCountLimitExceeded();
             return;
         }
 
@@ -347,17 +348,24 @@ void OfflineDownload::ensureResource(const Resource& resource,
                 callback(onlineResponse);
             }
 
-            status.completedResourceCount++;
-            uint64_t resourceSize = offlineDatabase.putRegionResource(id, resource, onlineResponse);
-            status.completedResourceSize += resourceSize;
-            if (resource.kind == Resource::Kind::Tile) {
-                status.completedTileCount += 1;
-                status.completedTileSize += resourceSize;
+            // Queue up for batched insertion
+            buffer.emplace_back(resource, onlineResponse);
+
+            // Flush buffer periodically
+            if (buffer.size() == 64 || resourcesRemaining.size() == 0) {
+                try {
+                    offlineDatabase.putRegionResources(id, buffer, status);
+                } catch (MapboxTileLimitExceededException) {
+                    onMapboxTileCountLimitExceeded();
+                    return;
+                }
+
+                buffer.clear();
+                observer->statusChanged(status);
             }
 
-            observer->statusChanged(status);
-
-            if (checkTileCountLimit(resource)) {
+            if (offlineDatabase.exceedsOfflineMapboxTileCountLimit(resource)) {
+                onMapboxTileCountLimitExceeded();
                 return;
             }
 
@@ -366,15 +374,9 @@ void OfflineDownload::ensureResource(const Resource& resource,
     });
 }
 
-bool OfflineDownload::checkTileCountLimit(const Resource& resource) {
-    if (resource.kind == Resource::Kind::Tile && util::mapbox::isMapboxURL(resource.url) &&
-        offlineDatabase.offlineMapboxTileCountLimitExceeded()) {
-        observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
-        setState(OfflineRegionDownloadState::Inactive);
-        return true;
-    }
-
-    return false;
+void OfflineDownload::onMapboxTileCountLimitExceeded() {
+    observer->mapboxTileCountLimitExceeded(offlineDatabase.getOfflineMapboxTileCountLimit());
+    setState(OfflineRegionDownloadState::Inactive);
 }
 
 } // namespace mbgl

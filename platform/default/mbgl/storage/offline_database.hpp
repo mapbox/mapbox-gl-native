@@ -2,6 +2,7 @@
 
 #include <mbgl/storage/resource.hpp>
 #include <mbgl/storage/offline.hpp>
+#include <mbgl/util/exception.hpp>
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/constants.hpp>
@@ -10,6 +11,7 @@
 #include <unordered_map>
 #include <memory>
 #include <string>
+#include <list>
 
 namespace mapbox {
 namespace sqlite {
@@ -23,6 +25,10 @@ namespace mbgl {
 
 class Response;
 class TileID;
+
+struct MapboxTileLimitExceededException :  util::Exception {
+    MapboxTileLimitExceededException() : util::Exception("Mapbox tile limit exceeded") {}
+};
 
 class OfflineDatabase : private util::noncopyable {
 public:
@@ -49,6 +55,7 @@ public:
     optional<std::pair<Response, uint64_t>> getRegionResource(int64_t regionID, const Resource&);
     optional<int64_t> hasRegionResource(int64_t regionID, const Resource&);
     uint64_t putRegionResource(int64_t regionID, const Resource&, const Response&);
+    void putRegionResources(int64_t regionID, const std::list<std::tuple<Resource, Response>>&, OfflineRegionStatus&);
 
     OfflineRegionDefinition getRegionDefinition(int64_t regionID);
     OfflineRegionStatus getRegionCompletedStatus(int64_t regionID);
@@ -57,6 +64,7 @@ public:
     uint64_t getOfflineMapboxTileCountLimit();
     bool offlineMapboxTileCountLimitExceeded();
     uint64_t getOfflineMapboxTileCount();
+    bool exceedsOfflineMapboxTileCountLimit(const Resource&);
 
 private:
     int userVersion();
@@ -77,6 +85,8 @@ private:
     optional<int64_t> hasResource(const Resource&);
     bool putResource(const Resource&, const Response&,
                      const std::string&, bool compressed);
+
+    uint64_t putRegionResourceInternal(int64_t regionID, const Resource&, const Response&);
 
     optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     optional<int64_t> hasInternal(const Resource&);
