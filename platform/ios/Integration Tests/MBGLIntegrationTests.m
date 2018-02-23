@@ -70,8 +70,34 @@
     addRemoveGLLayer();
 }
 
-//- (void)testOpenGLLayerDoesNotLeakWhenCreatedAndDestroyedWithoutAddingToStyle {
-//    XCTFail(@"Not yet implemented");
-//}
+- (void)testReusingOpenGLLayer {
+    NSTimeInterval waitInterval = 0.01;
+
+    MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+    [self.style insertLayer:layer atIndex:0];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+    [self.style removeLayer:layer];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+    [self.style insertLayer:layer atIndex:0];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+    [self.style removeLayer:layer];
+
+    [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+}
+
+// This test does not strictly need to be in this test file/target. Including here for convenience.
+- (void)testOpenGLLayerDoesNotLeakWhenCreatedAndDestroyedWithoutAddingToStyle {
+    MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+    __weak id weakLayer = layer;
+    layer = nil;
+    
+    XCTAssertNil(weakLayer);
+}
 
 @end
