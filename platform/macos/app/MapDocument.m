@@ -563,6 +563,12 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     _isShowingAnimatedAnnotation = NO;
 }
 
+- (IBAction)showVisibleAnnotationCount:(id)sender {
+    NSArray *visibleAnnotations = self.mapView.visibleAnnotations;
+    NSLog(@"Number of visible annotations = %ld", visibleAnnotations.count);
+}
+
+
 - (IBAction)startWorldTour:(id)sender {
     _isTouringWorld = YES;
 
@@ -1122,6 +1128,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(insertGraticuleLayer:)) {
         return ![self.mapView.style sourceWithIdentifier:@"graticule"];
+    }
+    if (menuItem.action == @selector(showVisibleAnnotationCount:)) {
+        return YES;
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
