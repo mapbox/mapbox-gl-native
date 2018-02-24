@@ -102,10 +102,16 @@ public:
         );
     }
 
+    std::vector<optional<T>> possibleOutputs() const {
+        return expression::fromExpressionValues<T>(expression->possibleOutputs());
+    }
+
     friend bool operator==(const CompositeFunction& lhs,
                            const CompositeFunction& rhs) {
         return *lhs.expression == *rhs.expression;
     }
+
+    const expression::Expression& getExpression() const { return *expression; }
 
     std::string property;
     Stops stops;

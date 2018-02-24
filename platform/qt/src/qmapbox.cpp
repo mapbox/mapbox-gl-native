@@ -206,7 +206,7 @@ namespace QMapbox {
 
     Returns the current QMapbox::NetworkMode.
 */
-Q_DECL_EXPORT NetworkMode networkMode()
+NetworkMode networkMode()
 {
     return static_cast<NetworkMode>(mbgl::NetworkStatus::Get());
 }
@@ -219,7 +219,7 @@ Q_DECL_EXPORT NetworkMode networkMode()
     File source requests uses the available network when \a mode is set to \b
     Online, otherwise scoped to the local cache.
 */
-Q_DECL_EXPORT void setNetworkMode(NetworkMode mode)
+void setNetworkMode(NetworkMode mode)
 {
     mbgl::NetworkStatus::Set(static_cast<mbgl::NetworkStatus::Status>(mode));
 }
@@ -230,7 +230,7 @@ Q_DECL_EXPORT void setNetworkMode(NetworkMode mode)
     Returns a list containing a pair of string objects, representing the style
     URL and name, respectively.
 */
-Q_DECL_EXPORT QList<QPair<QString, QString> >& defaultStyles()
+QList<QPair<QString, QString> >& defaultStyles()
 {
     static QList<QPair<QString, QString>> styles;
 

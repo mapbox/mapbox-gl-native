@@ -1,6 +1,7 @@
 #include <mbgl/util/http_timeout.hpp>
 #include <mbgl/util/constants.hpp>
 
+#include <algorithm>
 #include <cassert>
 
 namespace mbgl {

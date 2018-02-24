@@ -14,6 +14,8 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
+#include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
 #include <mbgl/renderer/backend_scope.hpp>
@@ -42,7 +44,8 @@ Renderer::Impl::Impl(RendererBackend& backend_,
                      FileSource& fileSource_,
                      Scheduler& scheduler_,
                      GLContextMode contextMode_,
-                     const optional<std::string> programCacheDir_)
+                     const optional<std::string> programCacheDir_,
+                     const optional<std::string> localFontFamily_)
     : backend(backend_)
     , scheduler(scheduler_)
     , fileSource(fileSource_)
@@ -50,7 +53,7 @@ Renderer::Impl::Impl(RendererBackend& backend_,
     , contextMode(contextMode_)
     , pixelRatio(pixelRatio_)
     , programCacheDir(programCacheDir_)
-    , glyphManager(std::make_unique<GlyphManager>(fileSource))
+    , glyphManager(std::make_unique<GlyphManager>(fileSource, std::make_unique<LocalGlyphRasterizer>(localFontFamily_)))
     , imageManager(std::make_unique<ImageManager>())
     , lineAtlas(std::make_unique<LineAtlas>(Size{ 256, 512 }))
     , imageImpls(makeMutable<std::vector<Immutable<style::Image::Impl>>>())
@@ -183,6 +186,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (layerAdded || layerChanged) {
             layer.transition(transitionParameters);
+
+            if (layer.is<RenderHeatmapLayer>()) {
+                layer.as<RenderHeatmapLayer>()->updateColorRamp();
+            }
         }
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
@@ -288,7 +295,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && layer->is<RenderFillExtrusionLayer>()) {
+        if (!parameters.staticData.has3D && (
+                layer->is<RenderFillExtrusionLayer>() ||
+                layer->is<RenderHillshadeLayer>() ||
+                layer->is<RenderHeatmapLayer>())) {
+
             parameters.staticData.has3D = true;
         }
 
@@ -381,13 +392,20 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     bool placementChanged = false;
     if (!placement->stillRecent(parameters.timePoint)) {
         auto newPlacement = std::make_unique<Placement>(parameters.state, parameters.mapMode);
+        std::set<std::string> usedSymbolLayers;
         for (auto it = order.rbegin(); it != order.rend(); ++it) {
             if (it->layer.is<RenderSymbolLayer>()) {
+                usedSymbolLayers.insert(it->layer.getID());
                 newPlacement->placeLayer(*it->layer.as<RenderSymbolLayer>(), parameters.projMatrix, parameters.debugOptions & MapDebugOptions::Collision);
             }
         }
 
         placementChanged = newPlacement->commit(*placement, parameters.timePoint);
+        // commitFeatureIndexes depends on the assumption that no new FeatureIndex has been loaded since placement
+        // started. If we violate this assumption, then we need to either make CollisionIndex completely independendent of
+        // FeatureIndex, or find a way for its entries to point to multiple FeatureIndexes.
+        commitFeatureIndexes();
+        crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
         if (placementChanged || symbolBucketsChanged) {
             placement = std::move(newPlacement);
         }
@@ -473,11 +491,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     {
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
-        static const style::FillPaintProperties::PossiblyEvaluated properties {};
-        static const FillProgram::PaintPropertyBinders paintAttibuteData(properties, 0);
+        static const Properties<>::PossiblyEvaluated properties {};
+        static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            parameters.staticData.programs.fill.get(properties).draw(
+            parameters.staticData.programs.clippingMask.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
@@ -490,14 +508,13 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
-                FillProgram::UniformValues {
+                ClippingMaskProgram::UniformValues {
                     uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
-                    uniforms::u_world::Value{ parameters.context.viewport.getCurrentValue().size },
                 },
                 parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttibuteData,
+                paintAttributeData,
                 properties,
                 parameters.state.getZoom(),
                 "clipping"
@@ -714,12 +731,12 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
     return source->querySourceFeatures(options);
 }
 
-void Renderer::Impl::onLowMemory() {
+void Renderer::Impl::reduceMemoryUse() {
     assert(BackendScope::exists());
-    backend.getContext().performCleanup();
     for (const auto& entry : renderSources) {
-        entry.second->onLowMemory();
+        entry.second->reduceMemoryUse();
     }
+    backend.getContext().performCleanup();
     observer->onInvalidate();
 }
 
@@ -766,6 +783,15 @@ bool Renderer::Impl::hasTransitions(TimePoint timePoint) const {
     }
 
     return false;
+}
+
+void Renderer::Impl::commitFeatureIndexes() {
+    for (auto& source : renderSources) {
+        for (auto& renderTile : source.second->getRenderTiles()) {
+            Tile& tile = renderTile.get().tile;
+            tile.commitFeatureIndex();
+        }
+    }
 }
 
 void Renderer::Impl::updateFadingTiles() {

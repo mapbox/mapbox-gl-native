@@ -57,12 +57,18 @@ public:
         return defaultValue ? *defaultValue : finalDefaultValue;
     }
 
+    std::vector<optional<T>> possibleOutputs() const {
+        return expression::fromExpressionValues<T>(expression->possibleOutputs());
+    }
+
     friend bool operator==(const SourceFunction& lhs,
                            const SourceFunction& rhs) {
         return *lhs.expression == *rhs.expression;
     }
 
     bool useIntegerZoom = false;
+
+    const expression::Expression& getExpression() const { return *expression; }
 
     // retained for compatibility with pre-expression function API
     std::string property;

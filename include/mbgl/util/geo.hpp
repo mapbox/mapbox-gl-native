@@ -154,26 +154,15 @@ public:
                sw.longitude() > ne.longitude();
     }
 
-    bool contains(const LatLng& point) const {
-        return (point.latitude()  >= sw.latitude()  &&
-                point.latitude()  <= ne.latitude()  &&
-                point.longitude() >= sw.longitude() &&
-                point.longitude() <= ne.longitude());
+    bool crossesAntimeridian() const {
+        return (sw.wrapped().longitude() > ne.wrapped().longitude());
     }
 
-    bool contains(const LatLngBounds& area) const {
-        return (area.ne.latitude()  <= ne.latitude()  &&
-                area.sw.latitude()  >= sw.latitude()  &&
-                area.ne.longitude() <= ne.longitude() &&
-                area.sw.longitude() >= sw.longitude());
-    }
+    bool contains(const CanonicalTileID& tileID) const;
+    bool contains(const LatLng& point, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
+    bool contains(const LatLngBounds& area, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
 
-    bool intersects(const LatLngBounds area) const {
-        return (area.ne.latitude()  > sw.latitude()  &&
-                area.sw.latitude()  < ne.latitude()  &&
-                area.ne.longitude() > sw.longitude() &&
-                area.sw.longitude() < ne.longitude());
-    }
+    bool intersects(const LatLngBounds area, LatLng::WrapMode wrap = LatLng::Unwrapped) const;
 
 private:
     LatLng sw;

@@ -62,6 +62,7 @@ void RenderGeoJSONSource::update(Immutable<style::Source::Impl> baseImpl_,
                        SourceType::GeoJSON,
                        util::tileSize,
                        impl().getZoomRange(),
+                       optional<LatLngBounds>{},
                        [&] (const OverscaledTileID& tileID) {
                            return std::make_unique<GeoJSONTile>(tileID, impl().id, parameters, data->getTile(tileID.canonical));
                        });
@@ -93,8 +94,8 @@ std::vector<Feature> RenderGeoJSONSource::querySourceFeatures(const SourceQueryO
     return tilePyramid.querySourceFeatures(options);
 }
 
-void RenderGeoJSONSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderGeoJSONSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderGeoJSONSource::dumpDebugLogs() const {

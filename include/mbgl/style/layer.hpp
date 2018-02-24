@@ -19,9 +19,11 @@ class LineLayer;
 class CircleLayer;
 class SymbolLayer;
 class RasterLayer;
+class HillshadeLayer;
 class BackgroundLayer;
 class CustomLayer;
 class FillExtrusionLayer;
+class HeatmapLayer;
 class LayerObserver;
 
 /**
@@ -86,10 +88,14 @@ public:
             return std::forward<V>(visitor)(*as<RasterLayer>());
         case LayerType::Background:
             return std::forward<V>(visitor)(*as<BackgroundLayer>());
+        case LayerType::Hillshade:
+            return std::forward<V>(visitor)(*as<HillshadeLayer>());
         case LayerType::Custom:
             return std::forward<V>(visitor)(*as<CustomLayer>());
         case LayerType::FillExtrusion:
             return std::forward<V>(visitor)(*as<FillExtrusionLayer>());
+        case LayerType::Heatmap:
+            return std::forward<V>(visitor)(*as<HeatmapLayer>());
         }
 
 

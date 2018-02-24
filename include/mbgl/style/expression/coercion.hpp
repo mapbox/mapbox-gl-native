@@ -1,6 +1,8 @@
 #pragma once
+
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/conversion.hpp>
+
 #include <memory>
 #include <vector>
 
@@ -23,6 +25,10 @@ public:
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
 
     bool operator==(const Expression& e) const override;
+
+    std::vector<optional<Value>> possibleOutputs() const override;
+
+    std::string getOperator() const override;
 private:
     EvaluationResult (*coerceSingleValue) (const Value& v);
     std::vector<std::unique_ptr<Expression>> inputs;

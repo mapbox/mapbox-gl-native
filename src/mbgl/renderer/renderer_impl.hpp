@@ -38,7 +38,7 @@ class Renderer::Impl : public GlyphManagerObserver,
                        public RenderSourceObserver{
 public:
     Impl(RendererBackend&, float pixelRatio_, FileSource&, Scheduler&, GLContextMode,
-         const optional<std::string> programCacheDir);
+         const optional<std::string> programCacheDir, const optional<std::string> localFontFamily);
     ~Impl() final;
 
     void markContextLost() {
@@ -53,7 +53,7 @@ public:
     std::vector<Feature> querySourceFeatures(const std::string& sourceID, const SourceQueryOptions&) const;
     std::vector<Feature> queryShapeAnnotations(const ScreenLineString&) const;
 
-    void onLowMemory();
+    void reduceMemoryUse();
     void dumDebugLogs();
 
 private:
@@ -74,6 +74,7 @@ private:
     void onTileChanged(RenderSource&, const OverscaledTileID&) override;
     void onTileError(RenderSource&, const OverscaledTileID&, std::exception_ptr) override;
 
+    void commitFeatureIndexes();
     void updateFadingTiles();
 
     friend class Renderer;

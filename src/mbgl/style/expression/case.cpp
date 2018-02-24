@@ -34,6 +34,19 @@ bool Case::operator==(const Expression& e) const {
     return false;
 }
 
+std::vector<optional<Value>> Case::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& branch : branches) {
+        for (auto& output : branch.second->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    for (auto& output : otherwise->possibleOutputs()) {
+        result.push_back(std::move(output));
+    }
+    return result;
+}
+
 using namespace mbgl::style::conversion;
 ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     assert(isArray(value));

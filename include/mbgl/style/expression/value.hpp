@@ -110,6 +110,7 @@ struct ValueConverter<float> {
 template<>
 struct ValueConverter<mbgl::Value> {
     static Value toExpressionValue(const mbgl::Value& value);
+    static mbgl::Value fromExpressionValue(const Value& value);
 };
 
 template <typename T, std::size_t N>
@@ -147,6 +148,15 @@ struct ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >> {
     static Value toExpressionValue(const T& value);
     static optional<T> fromExpressionValue(const Value& value);
 };
+
+template <typename T>
+std::vector<optional<T>> fromExpressionValues(const std::vector<optional<Value>>& values) {
+    std::vector<optional<T>> result;
+    for (const auto& value : values) {
+        result.push_back(value ? fromExpressionValue<T>(*value) : nullopt);
+    }
+    return result;
+}
 
 } // namespace expression
 } // namespace style

@@ -27,14 +27,19 @@ public:
 
     EvaluationResult evaluate(const EvaluationContext& params) const override;
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
+    void eachStop(const std::function<void(double, const Expression&)>& visit) const;
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
     Range<float> getCoveringStops(const double lower, const double upper) const;
 
     bool operator==(const Expression& e) const override;
 
+    std::vector<optional<Value>> possibleOutputs() const override;
+
     static ParseResult parse(const mbgl::style::conversion::Convertible& value, ParsingContext& ctx);
 
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "step"; }
 private:
     const std::unique_ptr<Expression> input;
     const std::map<double, std::unique_ptr<Expression>> stops;

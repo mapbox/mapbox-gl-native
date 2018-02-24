@@ -95,12 +95,12 @@ public:
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
-    void resetCrossTileIDs() override;
-    
     bool holdForFade() const override;
     void markRenderedIdeal() override;
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
+    
+    void commitFeatureIndex() override;
     
 protected:
     const GeometryTileData* getData() {
@@ -125,7 +125,9 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
+    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
     std::unique_ptr<const GeometryTileData> data;
+    std::unique_ptr<const GeometryTileData> pendingData;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;

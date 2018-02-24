@@ -35,6 +35,10 @@ ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
     return ParseResult(std::make_unique<Assertion>(it->second, std::move(parsed)));
 }
 
+std::string Assertion::getOperator() const {
+    return type::toString(getType());
+}
+
 EvaluationResult Assertion::evaluate(const EvaluationContext& params) const {
     for (std::size_t i = 0; i < inputs.size(); i++) {
         EvaluationResult value = inputs[i]->evaluate(params);
@@ -64,6 +68,16 @@ bool Assertion::operator==(const Expression& e) const {
         return getType() == rhs->getType() && Expression::childrenEqual(inputs, rhs->inputs);
     }
     return false;
+}
+
+std::vector<optional<Value>> Assertion::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& input : inputs) {
+        for (auto& output : input->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
 }
 
 } // namespace expression

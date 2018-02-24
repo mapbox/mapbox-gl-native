@@ -1,9 +1,9 @@
 #pragma once
 
 #include <mbgl/util/type_list.hpp>
+#include <mbgl/util/tuple.hpp>
 
 #include <type_traits>
-#include <tuple>
 
 namespace mbgl {
 
@@ -24,20 +24,20 @@ template <class...> class IndexedTuple;
 // for motivation.
 //
 template <class... Is, class... Ts>
-class IndexedTuple<TypeList<Is...>, TypeList<Ts...>> : public std::tuple<Ts...> {
+class IndexedTuple<TypeList<Is...>, TypeList<Ts...>> : public tuple_polyfill<Ts...> {
 public:
     static_assert(sizeof...(Is) == sizeof...(Ts), "IndexedTuple size mismatch");
 
-    using std::tuple<Ts...>::tuple;
+    using tuple_polyfill<Ts...>::tuple;
 
     template <class I>
     auto& get() {
-        return std::get<TypeIndex<I, Is...>::value>(*this);
+        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class I>
     const auto& get() const {
-        return std::get<TypeIndex<I, Is...>::value>(*this);
+        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class... Js, class... Us>

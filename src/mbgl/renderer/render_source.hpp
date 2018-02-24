@@ -70,7 +70,7 @@ public:
     virtual std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const = 0;
 
-    virtual void onLowMemory() = 0;
+    virtual void reduceMemoryUse() = 0;
 
     virtual void dumpDebugLogs() const = 0;
 
@@ -84,7 +84,7 @@ protected:
 
     bool enabled = false;
 
-    void onTileChanged(Tile&) final;
+    void onTileChanged(Tile&) override;
     void onTileError(Tile&, std::exception_ptr) final;
 };
 

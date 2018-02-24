@@ -18,6 +18,9 @@ void Tile::setObserver(TileObserver* observer_) {
     observer = observer_;
 }
 
+void Tile::cancel() {
+}
+
 void Tile::setTriedCache() {
     triedOptional = true;
     observer->onTileChanged(*this);

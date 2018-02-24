@@ -1,4 +1,6 @@
 #include <mbgl/style/custom_tile_loader.hpp>
+#include <mbgl/tile/custom_geometry_tile.hpp>
+#include <mbgl/util/tile_range.hpp>
 
 namespace mbgl {
 namespace style {
@@ -8,23 +10,23 @@ CustomTileLoader::CustomTileLoader(const TileFunction& fetchTileFn, const TileFu
     cancelTileFunction = cancelTileFn;
 }
 
-void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<SetTileDataFunction> callbackRef) {
+void CustomTileLoader::fetchTile(const OverscaledTileID& tileID, ActorRef<CustomGeometryTile> tileRef) {
     auto cachedTileData = dataCache.find(tileID.canonical);
     if (cachedTileData != dataCache.end()) {
-        callbackRef.invoke(&SetTileDataFunction::operator(), *(cachedTileData->second));
+        tileRef.invoke(&CustomGeometryTile::setTileData, *(cachedTileData->second));
     }
     auto tileCallbacks = tileCallbackMap.find(tileID.canonical);
     if (tileCallbacks == tileCallbackMap.end()) {
-        auto tuple = std::make_tuple(tileID.overscaledZ, tileID.wrap, callbackRef);
+        auto tuple = std::make_tuple(tileID.overscaledZ, tileID.wrap, tileRef);
         tileCallbackMap.insert({ tileID.canonical, std::vector<OverscaledIDFunctionTuple>(1, tuple) });
     } else {
         for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
             if (std::get<0>(*iter) == tileID.overscaledZ && std::get<1>(*iter) == tileID.wrap ) {
-                std::get<2>(*iter) = callbackRef;
+                std::get<2>(*iter) = tileRef;
                 return;
             }
         }
-        tileCallbacks->second.emplace_back(std::make_tuple(tileID.overscaledZ, tileID.wrap, callbackRef));
+        tileCallbacks->second.emplace_back(std::make_tuple(tileID.overscaledZ, tileID.wrap, tileRef));
     }
     if (cachedTileData == dataCache.end()) {
         invokeTileFetch(tileID.canonical);
@@ -57,11 +59,12 @@ void CustomTileLoader::setTileData(const CanonicalTileID& tileID, const GeoJSON&
 
     auto iter = tileCallbackMap.find(tileID);
     if (iter == tileCallbackMap.end()) return;
-    dataCache[tileID] = std::make_unique<mapbox::geojson::geojson>(std::move(data));;
+    auto dataPtr = std::make_unique<mapbox::geojson::geojson>(std::move(data));
     for (auto tuple : iter->second) {
         auto actor = std::get<2>(tuple);
-        actor.invoke(&SetTileDataFunction::operator(), data);
+        actor.invoke(&CustomGeometryTile::setTileData, *dataPtr);
     }
+    dataCache[tileID] = std::move(dataPtr);
 }
 
 void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
@@ -69,7 +72,7 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
     if (tileCallbacks == tileCallbackMap.end()) { return; }
     for (auto iter = tileCallbacks->second.begin(); iter != tileCallbacks->second.end(); iter++) {
         auto actor = std::get<2>(*iter);
-        actor.invoke(&SetTileDataFunction::operator(), mapbox::geojson::feature_collection());
+        actor.invoke(&CustomGeometryTile::invalidateTileData);
         invokeTileCancel(tileID);
     }
     tileCallbackMap.erase(tileCallbacks);
@@ -77,12 +80,18 @@ void CustomTileLoader::invalidateTile(const CanonicalTileID& tileID) {
 }
 
 void CustomTileLoader::invalidateRegion(const LatLngBounds& bounds, Range<uint8_t> ) {
+    std::map<uint8_t, util::TileRange> tileRanges;
+
     for (auto idtuple= tileCallbackMap.begin(); idtuple != tileCallbackMap.end(); idtuple++) {
-        const LatLngBounds tileBounds(idtuple->first);
-        if (tileBounds.intersects(bounds) || bounds.contains(tileBounds) || tileBounds.contains(bounds)) {
+        auto zoom = idtuple->first.z;
+        auto tileRange = tileRanges.find(zoom);
+        if(tileRange == tileRanges.end()) {
+            tileRange = tileRanges.emplace(std::make_pair(zoom, util::TileRange::fromLatLngBounds(bounds, zoom))).first;
+        }
+        if (tileRange->second.contains(idtuple->first)) {
             for (auto iter = idtuple->second.begin(); iter != idtuple->second.end(); iter++) {
                 auto actor = std::get<2>(*iter);
-                actor.invoke(&SetTileDataFunction::operator(), mapbox::geojson::feature_collection());
+                actor.invoke(&CustomGeometryTile::invalidateTileData);
                 invokeTileCancel(idtuple->first);
                 dataCache.erase(idtuple->first);
             }

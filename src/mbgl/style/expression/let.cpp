@@ -17,6 +17,10 @@ void Let::eachChild(const std::function<void(const Expression&)>& visit) const {
     visit(*result);
 }
 
+std::vector<optional<Value>> Let::possibleOutputs() const {
+    return result->possibleOutputs();
+}
+
 using namespace mbgl::style::conversion;
 
 ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
@@ -38,7 +42,7 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
         }
         
         bool isValidName = std::all_of(name->begin(), name->end(), [](unsigned char c) {
-            return std::isalnum(c) || c == '_';
+            return ::isalnum(c) || c == '_';
         });
         if (!isValidName) {
             ctx.error("Variable names must contain only alphanumeric characters or '_'.", 1);
@@ -61,11 +65,26 @@ ParseResult Let::parse(const Convertible& value, ParsingContext& ctx) {
     return ParseResult(std::make_unique<Let>(std::move(bindings_), std::move(*result_)));
 }
 
+mbgl::Value Let::serialize() const {
+    std::vector<mbgl::Value> serialized;
+    serialized.emplace_back(getOperator());
+    for (auto entry : bindings) {
+        serialized.emplace_back(entry.first);
+        serialized.emplace_back(entry.second->serialize());
+    }
+    serialized.emplace_back(result->serialize());
+    return serialized;
+}
+
 EvaluationResult Var::evaluate(const EvaluationContext& params) const {
     return value->evaluate(params);
 }
 
 void Var::eachChild(const std::function<void(const Expression&)>&) const {}
+
+std::vector<optional<Value>> Var::possibleOutputs() const {
+    return { nullopt };
+}
 
 ParseResult Var::parse(const Convertible& value_, ParsingContext& ctx) {
     assert(isArray(value_));
@@ -85,6 +104,10 @@ ParseResult Var::parse(const Convertible& value_, ParsingContext& ctx) {
     }
 
     return ParseResult(std::make_unique<Var>(name_, std::move(*bindingValue)));
+}
+
+mbgl::Value Var::serialize() const {
+    return std::vector<mbgl::Value>{{ getOperator(), name }};
 }
 
 } // namespace expression

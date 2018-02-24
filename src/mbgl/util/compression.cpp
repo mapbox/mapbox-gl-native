@@ -1,6 +1,10 @@
 #include <mbgl/util/compression.hpp>
 
+#if defined(__QT__) && defined(_WINDOWS)
+#include <QtZlib/zlib.h>
+#else
 #include <zlib.h>
+#endif
 
 #include <cstdio>
 #include <cstring>

@@ -130,8 +130,8 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     //  replacing a tile at a different zoom that _did_ have symbols.
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
-    featureIndex = std::move(result.featureIndex);
-    data = std::move(result.tileData);
+    pendingFeatureIndex = std::move(result.featureIndex);
+    pendingData = std::move(result.tileData);
     observer->onTileChanged(*this);
 }
 
@@ -213,6 +213,15 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     return it->second.get();
 }
 
+void GeometryTile::commitFeatureIndex() {
+    if (pendingFeatureIndex) {
+        featureIndex = std::move(pendingFeatureIndex);
+    }
+    if (pendingData) {
+        data = std::move(pendingData);
+    }
+}
+
 void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
@@ -277,18 +286,6 @@ void GeometryTile::querySourceFeatures(
                 }
 
                 result.push_back(convertFeature(*feature, id.canonical));
-            }
-        }
-    }
-}
-
-void GeometryTile::resetCrossTileIDs() {
-    for (auto& bucket : symbolBuckets) {
-        auto symbolBucket = dynamic_cast<SymbolBucket*>(bucket.second.get());
-        if (symbolBucket && symbolBucket->bucketInstanceId) {
-            symbolBucket->bucketInstanceId = 0;
-            for (auto& symbolInstance : symbolBucket->symbolInstances) {
-                symbolInstance.crossTileID = 0;
             }
         }
     }

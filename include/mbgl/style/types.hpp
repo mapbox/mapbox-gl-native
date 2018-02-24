@@ -10,6 +10,7 @@ namespace style {
 enum class SourceType : uint8_t {
     Vector,
     Raster,
+    RasterDEM,
     GeoJSON,
     Video,
     Annotations,
@@ -35,6 +36,11 @@ enum class LineJoinType : uint8_t {
     // the following two types are for internal use only
     FakeRound,
     FlipBevel
+};
+
+enum class HillshadeIlluminationAnchorType : bool {
+    Map,
+    Viewport
 };
 
 enum class TranslateAnchorType : bool {

@@ -10,9 +10,10 @@ Renderer::Renderer(RendererBackend& backend,
                    FileSource& fileSource_,
                    Scheduler& scheduler_,
                    GLContextMode contextMode_,
-                   const optional<std::string> programCacheDir_)
+                   const optional<std::string> programCacheDir_,
+                   const optional<std::string> localFontFamily_)
         : impl(std::make_unique<Impl>(backend, pixelRatio_, fileSource_, scheduler_,
-                                      contextMode_, std::move(programCacheDir_))) {
+                                      contextMode_, std::move(programCacheDir_), std::move(localFontFamily_))) {
 }
 
 Renderer::~Renderer() {
@@ -93,9 +94,9 @@ void Renderer::dumpDebugLogs() {
     impl->dumDebugLogs();
 }
 
-void Renderer::onLowMemory() {
+void Renderer::reduceMemoryUse() {
     BackendScope guard { impl->backend };
-    impl->onLowMemory();
+    impl->reduceMemoryUse();
 }
 
 } // namespace mbgl

@@ -7,6 +7,7 @@
 #include <mbgl/map/transform.hpp>
 #include <mbgl/math/clamp.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/util/tile_range.hpp>
 #include <mbgl/util/enum.hpp>
 #include <mbgl/util/logging.hpp>
 
@@ -14,6 +15,7 @@
 
 #include <mapbox/geometry/envelope.hpp>
 
+#include <cmath>
 #include <algorithm>
 
 namespace mbgl {
@@ -54,6 +56,11 @@ std::vector<std::reference_wrapper<RenderTile>> TilePyramid::getRenderTiles() {
     return { renderTiles.begin(), renderTiles.end() };
 }
 
+Tile* TilePyramid::getTile(const OverscaledTileID& tileID){
+        auto it = tiles.find(tileID);
+        return it == tiles.end() ? cache.get(tileID) : it->second.get();
+}
+
 void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layers,
                          const bool needsRendering,
                          const bool needsRelayout,
@@ -61,6 +68,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
                          const SourceType type,
                          const uint16_t tileSize,
                          const Range<uint8_t> zoomRange,
+                         optional<LatLngBounds> bounds,
                          std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile) {
     // If we need a relayout, abandon any cached tiles; they're now stale.
     if (needsRelayout) {
@@ -93,20 +101,21 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
     if (overscaledZoom >= zoomRange.min) {
         int32_t idealZoom = std::min<int32_t>(zoomRange.max, overscaledZoom);
 
+
         // Make sure we're not reparsing overzoomed raster tiles.
         if (type == SourceType::Raster) {
             tileZoom = idealZoom;
+        }
 
-            // FIXME: Prefetching is only enabled for raster
-            // tiles until we fix #7026.
-
-            // Request lower zoom level tiles (if configure to do so) in an attempt
+        // Only attempt prefetching in continuous mode.
+        if (parameters.mode == MapMode::Continuous) {
+            // Request lower zoom level tiles (if configured to do so) in an attempt
             // to show something on the screen faster at the cost of a little of bandwidth.
             if (parameters.prefetchZoomDelta) {
                 panZoom = std::max<int32_t>(tileZoom - parameters.prefetchZoomDelta, zoomRange.min);
             }
 
-            if (panZoom < tileZoom) {
+            if (panZoom < idealZoom) {
                 panTiles = util::tileCover(parameters.transformState, panZoom);
             }
         }
@@ -134,8 +143,19 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         auto it = tiles.find(tileID);
         return it == tiles.end() ? nullptr : it->second.get();
     };
+
+    // The min and max zoom for TileRange are based on the updateRenderables algorithm.
+    // Tiles are created at the ideal tile zoom or at lower zoom levels. Child
+    // tiles are used from the cache, but not created.
+    optional<util::TileRange> tileRange = {};
+    if (bounds) {
+        tileRange = util::TileRange::fromLatLngBounds(*bounds, zoomRange.min, std::min(tileZoom, (int32_t)zoomRange.max));
+    }
     auto createTileFn = [&](const OverscaledTileID& tileID) -> Tile* {
-        std::unique_ptr<Tile> tile = cache.get(tileID);
+        if (tileRange && !tileRange->contains(tileID.canonical)) {
+            return nullptr;
+        }
+        std::unique_ptr<Tile> tile = cache.pop(tileID);
         if (!tile) {
             tile = createTile(tileID);
             if (tile) {
@@ -198,13 +218,6 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
         auto tilesIt = tiles.begin();
         auto retainIt = retain.begin();
         while (tilesIt != tiles.end()) {
-            auto renderedIt = rendered.find(tilesIt->first.toUnwrapped());
-            if (renderedIt == rendered.end()) {
-                // Since this tile isn't in the render set, crossTileIDs won't be kept
-                // updated by CrossTileSymbolIndex. We need to reset the stored crossTileIDs
-                // so they're not reused if/when this tile is re-added to the render set
-                tilesIt->second->resetCrossTileIDs();
-            }
             if (retainIt == retain.end() || tilesIt->first < *retainIt) {
                 if (!needsRelayout) {
                     tilesIt->second->setNecessity(TileNecessity::Optional);
@@ -293,7 +306,7 @@ void TilePyramid::setCacheSize(size_t size) {
     cache.setSize(size);
 }
 
-void TilePyramid::onLowMemory() {
+void TilePyramid::reduceMemoryUse() {
     cache.clear();
 }
 

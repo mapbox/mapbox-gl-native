@@ -16,7 +16,7 @@ class QMapboxGLPrivate;
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
-class Q_DECL_EXPORT QMapboxGLSettings
+class Q_MAPBOXGL_EXPORT QMapboxGLSettings
 {
 public:
     QMapboxGLSettings();
@@ -24,6 +24,11 @@ public:
     enum GLContextMode {
         UniqueGLContext = 0,
         SharedGLContext
+    };
+
+    enum MapMode {
+        Continuous = 0,
+        Static
     };
 
     enum ConstrainMode {
@@ -39,6 +44,9 @@ public:
 
     GLContextMode contextMode() const;
     void setContextMode(GLContextMode);
+
+    MapMode mapMode() const;
+    void setMapMode(MapMode);
 
     ConstrainMode constrainMode() const;
     void setConstrainMode(ConstrainMode);
@@ -66,6 +74,7 @@ public:
 
 private:
     GLContextMode m_contextMode;
+    MapMode m_mapMode;
     ConstrainMode m_constrainMode;
     ViewportMode m_viewportMode;
 
@@ -77,7 +86,7 @@ private:
     std::function<std::string(const std::string &&)> m_resourceTransform;
 };
 
-struct Q_DECL_EXPORT QMapboxGLCameraOptions {
+struct Q_MAPBOXGL_EXPORT QMapboxGLCameraOptions {
     QVariant center;  // Coordinate
     QVariant anchor;  // QPointF
     QVariant zoom;    // double
@@ -85,7 +94,7 @@ struct Q_DECL_EXPORT QMapboxGLCameraOptions {
     QVariant pitch;   // double
 };
 
-class Q_DECL_EXPORT QMapboxGL : public QObject
+class Q_MAPBOXGL_EXPORT QMapboxGL : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(double latitude READ latitude WRITE setLatitude)
@@ -191,8 +200,7 @@ public:
     void scaleBy(double scale, const QPointF &center = QPointF());
     void rotateBy(const QPointF &first, const QPointF &second);
 
-    void resize(const QSize &size, const QSize &framebufferSize);
-    void setFramebufferObject(quint32 fbo);
+    void resize(const QSize &size);
 
     double metersPerPixelAtLatitude(double latitude, double zoom) const;
     QMapbox::ProjectedMeters projectedMetersForCoordinate(const QMapbox::Coordinate &) const;
@@ -226,14 +234,26 @@ public:
 
     void setFilter(const QString &layer, const QVariant &filter);
 
+    // When rendering on a different thread,
+    // should be called on the render thread.
+    void createRenderer();
+    void destroyRenderer();
+    void setFramebufferObject(quint32 fbo, const QSize &size);
+
 public slots:
     void render();
     void connectionEstablished();
+
+    // Commit changes, load all the resources
+    // and renders the map when completed.
+    void startStaticRender();
 
 signals:
     void needsRendering();
     void mapChanged(QMapboxGL::MapChange);
     void copyrightsChanged(const QString &copyrightsHtml);
+
+    void staticRenderFinished(const QString &error);
 
 private:
     Q_DISABLE_COPY(QMapboxGL)

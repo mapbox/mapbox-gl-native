@@ -49,7 +49,7 @@ public:
     struct Replace {
         static constexpr BlendEquation equation = BlendEquation::Add;
         static constexpr BlendFactor srcFactor = One;
-        static constexpr BlendFactor dstFactor = One;
+        static constexpr BlendFactor dstFactor = Zero;
     };
 
     using Add              = LinearBlend<BlendEquation::Add>;
@@ -84,6 +84,10 @@ public:
 
     static ColorMode alphaBlended() {
         return ColorMode { Add { One, OneMinusSrcAlpha }, {}, { true, true, true, true } };
+    }
+
+    static ColorMode additive() {
+        return ColorMode { Add { One, One }, {}, { true, true, true, true } };
     }
 };
 

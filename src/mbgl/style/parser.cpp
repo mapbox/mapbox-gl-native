@@ -119,6 +119,9 @@ StyleParseResult Parser::parse(const std::string& json) {
         }
     }
 
+    // Call for side effect of logging warnings for invalid values.
+    fontStacks();
+
     return nullptr;
 }
 
@@ -271,28 +274,32 @@ void Parser::parseLayer(const std::string& id, const JSValue& value, std::unique
 }
 
 std::vector<FontStack> Parser::fontStacks() const {
-    std::set<FontStack> optional;
+    std::set<FontStack> result;
 
     for (const auto& layer : layers) {
-        if (layer->is<SymbolLayer>()) {
-            PropertyValue<FontStack> textFont = layer->as<SymbolLayer>()->getTextFont();
-            if (textFont.isUndefined()) {
-                optional.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
-            } else if (textFont.isConstant()) {
-                optional.insert(textFont.asConstant());
-            } else if (textFont.isCameraFunction()) {
-                textFont.asCameraFunction().stops.match(
-                    [&] (const auto& stops) {
-                        for (const auto& stop : stops.stops) {
-                            optional.insert(stop.second);
+        if (layer->is<SymbolLayer>() && !layer->as<SymbolLayer>()->getTextField().isUndefined()) {
+            layer->as<SymbolLayer>()->getTextFont().match(
+                [&] (Undefined) {
+                    result.insert({"Open Sans Regular", "Arial Unicode MS Regular"});
+                },
+                [&] (const FontStack& constant) {
+                    result.insert(constant);
+                },
+                [&] (const auto& function) {
+                    for (const auto& value : function.possibleOutputs()) {
+                        if (value) {
+                            result.insert(*value);
+                        } else {
+                            Log::Warning(Event::ParseStyle, "Layer '%s' has an invalid value for text-font and will not work offline. Output values must be contained as literals within the expression.", layer->getID().c_str());
+                            break;
                         }
                     }
-                );
-            }
+                }
+            );
         }
     }
 
-    return std::vector<FontStack>(optional.begin(), optional.end());
+    return std::vector<FontStack>(result.begin(), result.end());
 }
 
 } // namespace style

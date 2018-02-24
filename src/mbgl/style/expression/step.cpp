@@ -2,6 +2,7 @@
 #include <mbgl/style/expression/get_covering_stops.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -9,8 +10,14 @@ namespace expression {
 
 EvaluationResult Step::evaluate(const EvaluationContext& params) const {
     const EvaluationResult evaluatedInput = input->evaluate(params);
-    if (!evaluatedInput) { return evaluatedInput.error(); }
+    if (!evaluatedInput) {
+        return evaluatedInput.error();
+    }
+
     float x = *fromExpressionValue<float>(*evaluatedInput);
+    if (std::isnan(x)) {
+        return EvaluationError { "Input is not a number." };
+    }
 
     if (stops.empty()) {
         return EvaluationError { "No stops in step curve." };
@@ -33,11 +40,27 @@ void Step::eachChild(const std::function<void(const Expression&)>& visit) const 
     }
 }
 
+void Step::eachStop(const std::function<void(double, const Expression&)>& visit) const {
+    for (const auto &stop : stops) {
+        visit(stop.first, *stop.second);
+    }
+}
+
 bool Step::operator==(const Expression& e) const {
     if (auto rhs = dynamic_cast<const Step*>(&e)) {
         return *input == *(rhs->input) && Expression::childrenEqual(stops, rhs->stops);
     }
     return false;
+}
+
+std::vector<optional<Value>> Step::possibleOutputs() const {
+    std::vector<optional<Value>> result;
+    for (const auto& stop : stops) {
+        for (auto& output : stop.second->possibleOutputs()) {
+            result.push_back(std::move(output));
+        }
+    }
+    return result;
 }
 
 Range<float> Step::getCoveringStops(const double lower, const double upper) const {
@@ -145,6 +168,18 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
     return ParseResult(std::make_unique<Step>(*outputType, std::move(*input), std::move(stops)));
 }
 
+mbgl::Value Step::serialize() const {
+    std::vector<mbgl::Value> serialized;
+    serialized.emplace_back(getOperator());
+    serialized.emplace_back(input->serialize());
+    for (auto& entry : stops) {
+        if (entry.first > -std::numeric_limits<double>::infinity()) {
+            serialized.emplace_back(entry.first);
+        }
+        serialized.emplace_back(entry.second->serialize());
+    }
+    return serialized;
+}
 
 } // namespace expression
 } // namespace style

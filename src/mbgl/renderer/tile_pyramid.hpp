@@ -40,12 +40,14 @@ public:
                 style::SourceType type,
                 uint16_t tileSize,
                 Range<uint8_t> zoomRange,
+                optional<LatLngBounds> bounds,
                 std::function<std::unique_ptr<Tile> (const OverscaledTileID&)> createTile);
 
     void startRender(PaintParameters&);
     void finishRender(PaintParameters&);
 
     std::vector<std::reference_wrapper<RenderTile>> getRenderTiles();
+    Tile* getTile(const OverscaledTileID&);
 
     std::unordered_map<std::string, std::vector<Feature>>
     queryRenderedFeatures(const ScreenLineString& geometry,
@@ -57,7 +59,7 @@ public:
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 
     void setCacheSize(size_t);
-    void onLowMemory();
+    void reduceMemoryUse();
 
     void setObserver(TileObserver*);
     void dumpDebugLogs() const;

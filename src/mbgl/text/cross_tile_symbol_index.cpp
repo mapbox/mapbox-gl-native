@@ -24,7 +24,7 @@ Point<int64_t> TileLayerIndex::getScaledCoordinates(SymbolInstance& symbolInstan
     };
 }
 
-void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, const OverscaledTileID& newCoord) {
+void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, const OverscaledTileID& newCoord, std::set<uint32_t>& zoomCrossTileIDs) {
     float tolerance = coord.canonical.z < newCoord.canonical.z ? 1 : std::pow(2, coord.canonical.z - newCoord.canonical.z);
 
     for (auto& symbolInstance : symbolInstances) {
@@ -45,8 +45,12 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
             // Return any symbol with the same keys whose coordinates are within 1
             // grid unit. (with a 4px grid, this covers a 12px by 12px area)
             if (std::abs(thisTileSymbol.coord.x - scaledSymbolCoord.x) <= tolerance &&
-                std::abs(thisTileSymbol.coord.y - scaledSymbolCoord.y) <= tolerance) {
-
+                std::abs(thisTileSymbol.coord.y - scaledSymbolCoord.y) <= tolerance &&
+                zoomCrossTileIDs.find(thisTileSymbol.crossTileID) == zoomCrossTileIDs.end()) {
+                // Once we've marked ourselves duplicate against this parent symbol,
+                // don't let any other symbols at the same zoom level duplicate against
+                // the same parent (see issue #10844)
+                zoomCrossTileIDs.insert(thisTileSymbol.crossTileID);
                 symbolInstance.crossTileID = thisTileSymbol.crossTileID;
                 break;
             }
@@ -57,58 +61,63 @@ void TileLayerIndex::findMatches(std::vector<SymbolInstance>& symbolInstances, c
 CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
-void CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& coord, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
-    if (bucket.bucketInstanceId) return;
-    bucket.bucketInstanceId = ++maxBucketInstanceId;
+bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
+    auto thisZoomIndexes = indexes[tileID.overscaledZ];
+    auto previousIndex = thisZoomIndexes.find(tileID);
+    if (previousIndex != thisZoomIndexes.end()) {
+        if (previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
+            return false;
+        } else {
+            // We're replacing this bucket with an updated version
+            // Remove the old bucket's "used crossTileIDs" now so that the new bucket can claim them.
+            // We have to keep the old index entries themselves until the end of 'addBucket' so
+            // that we can copy them with 'findMatches'.
+            removeBucketCrossTileIDs(tileID.overscaledZ, previousIndex->second);
+        }
+    }
 
-    uint8_t minZoom = 25;
-    uint8_t maxZoom = 0;
+    for (auto& symbolInstance: bucket.symbolInstances) {
+        symbolInstance.crossTileID = 0;
+    }
+
     for (auto& it : indexes) {
-        auto z = it.first;
-        minZoom = std::min(minZoom, z);
-        maxZoom = std::max(maxZoom, z);
-    }
-
-
-    // make all higher-res child tiles block duplicate labels in this tile
-    for (auto z = maxZoom; z > coord.overscaledZ; z--) {
-        auto zoomIndexes = indexes.find(z);
-        if (zoomIndexes != indexes.end()) {
-            for (auto& childIndex : zoomIndexes->second) {
-                if (!childIndex.second.coord.isChildOf(coord)) {
-                    continue;
+        auto zoom = it.first;
+        auto zoomIndexes = it.second;
+        if (zoom > tileID.overscaledZ) {
+            for (auto& childIndex : zoomIndexes) {
+                if (childIndex.second.coord.isChildOf(tileID)) {
+                    childIndex.second.findMatches(bucket.symbolInstances, tileID, usedCrossTileIDs[tileID.overscaledZ]);
                 }
-                childIndex.second.findMatches(bucket.symbolInstances, coord);
             }
-        }
-        if (z == 0) {
-            break;
+        } else {
+            auto parentTileID = tileID.scaledTo(zoom);
+            auto parentIndex = zoomIndexes.find(parentTileID);
+            if (parentIndex != zoomIndexes.end()) {
+                parentIndex->second.findMatches(bucket.symbolInstances, tileID, usedCrossTileIDs[tileID.overscaledZ]);
+            }
         }
     }
 
-    // make this tile block duplicate labels in lower-res parent tiles
-    for (auto z = coord.overscaledZ; z >= minZoom; z--) {
-        auto parentCoord = coord.scaledTo(z);
-        auto zoomIndexes = indexes.find(z);
-        if (zoomIndexes != indexes.end()) {
-            auto parentIndex = zoomIndexes->second.find(parentCoord);
-            if (parentIndex != zoomIndexes->second.end()) {
-                parentIndex->second.findMatches(bucket.symbolInstances, coord);
-            }
-        }
-        if (z == 0) {
-            break;
-        }
-    }
-    
     for (auto& symbolInstance : bucket.symbolInstances) {
         if (!symbolInstance.crossTileID) {
             // symbol did not match any known symbol, assign a new id
             symbolInstance.crossTileID = ++maxCrossTileID;
+            usedCrossTileIDs[tileID.overscaledZ].insert(symbolInstance.crossTileID);
         }
     }
 
-    indexes[coord.overscaledZ].emplace(coord, TileLayerIndex(coord, bucket.symbolInstances, bucket.bucketInstanceId));
+
+    indexes[tileID.overscaledZ].erase(tileID);
+    indexes[tileID.overscaledZ].emplace(tileID, TileLayerIndex(tileID, bucket.symbolInstances, bucket.bucketInstanceId));
+    return true;
+}
+
+void CrossTileSymbolLayerIndex::removeBucketCrossTileIDs(uint8_t zoom, const TileLayerIndex& removedBucket) {
+    for (auto key : removedBucket.indexedSymbolInstances) {
+        for (auto indexedSymbolInstance : key.second) {
+            usedCrossTileIDs[zoom].erase(indexedSymbolInstance.crossTileID);
+        }
+    }
 }
 
 bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint32_t>& currentIDs) {
@@ -116,6 +125,7 @@ bool CrossTileSymbolLayerIndex::removeStaleBuckets(const std::unordered_set<uint
     for (auto& zoomIndexes : indexes) {
         for (auto it = zoomIndexes.second.begin(); it != zoomIndexes.second.end();) {
             if (!currentIDs.count(it->second.bucketInstanceId)) {
+                removeBucketCrossTileIDs(zoomIndexes.first, it->second);
                 it = zoomIndexes.second.erase(it);
                 tilesChanged = true;
             } else {
@@ -145,9 +155,11 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
         if (!symbolBucket.bucketInstanceId) {
-            symbolBucketsChanged = true;
+            symbolBucket.bucketInstanceId = ++maxBucketInstanceId;
         }
-        layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
+
+        const bool bucketAdded = layerIndex.addBucket(renderTile.tile.id, symbolBucket, maxCrossTileID);
+        symbolBucketsChanged = symbolBucketsChanged || bucketAdded;
         currentBucketIDs.insert(symbolBucket.bucketInstanceId);
     }
 
@@ -155,6 +167,18 @@ bool CrossTileSymbolIndex::addLayer(RenderSymbolLayer& symbolLayer) {
         symbolBucketsChanged = true;
     }
     return symbolBucketsChanged;
+}
+
+void CrossTileSymbolIndex::pruneUnusedLayers(const std::set<std::string>& usedLayers) {
+    std::vector<std::string> unusedLayers;
+    for (auto layerIndex : layerIndexes) {
+        if (usedLayers.find(layerIndex.first) == usedLayers.end()) {
+            unusedLayers.push_back(layerIndex.first);
+        }
+    }
+    for (auto unusedLayer : unusedLayers) {
+        layerIndexes.erase(unusedLayer);
+    }
 }
 
 void CrossTileSymbolIndex::reset() {

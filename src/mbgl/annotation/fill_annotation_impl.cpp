@@ -7,8 +7,8 @@ namespace mbgl {
 
 using namespace style;
 
-FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotation_, uint8_t maxZoom_)
-    : ShapeAnnotationImpl(id_, maxZoom_),
+FillAnnotationImpl::FillAnnotationImpl(AnnotationID id_, FillAnnotation annotation_)
+    : ShapeAnnotationImpl(id_),
       annotation(ShapeAnnotationGeometry::visit(annotation_.geometry, CloseShapeAnnotation{}), annotation_.opacity, annotation_.color, annotation_.outlineColor) {
 }
 

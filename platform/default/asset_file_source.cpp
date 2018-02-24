@@ -10,6 +10,12 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
+namespace {
+
+const std::string assetProtocol = "asset://";
+
+} // namespace
+
 namespace mbgl {
 
 class AssetFileSource::Impl {
@@ -19,18 +25,17 @@ public:
     }
 
     void request(const std::string& url, ActorRef<FileSourceRequest> req) {
-        std::string path;
-
-        if (url.size() <= 8 || url[8] == '/') {
-            // This is an empty or absolute path.
-            path = mbgl::util::percentDecode(url.substr(8));
-        } else {
-            // This is a relative path. Prefix with the application root.
-            path = root + "/" + mbgl::util::percentDecode(url.substr(8));
-        }
-
         Response response;
 
+        if (!acceptsURL(url)) {
+            response.error = std::make_unique<Response::Error>(Response::Error::Reason::Other,
+                                                               "Invalid asset URL");
+            req.invoke(&FileSourceRequest::setResponse, response);
+            return;
+        }
+
+        // Cut off the protocol and prefix with path.
+        const auto path = root + "/" + mbgl::util::percentDecode(url.substr(assetProtocol.size()));
         struct stat buf;
         int result = stat(path.c_str(), &buf);
 
@@ -67,6 +72,10 @@ std::unique_ptr<AsyncRequest> AssetFileSource::request(const Resource& resource,
     impl->actor().invoke(&Impl::request, resource.url, req->actor());
 
     return std::move(req);
+}
+
+bool AssetFileSource::acceptsURL(const std::string& url) {
+    return std::equal(assetProtocol.begin(), assetProtocol.end(), url.begin());
 }
 
 } // namespace mbgl

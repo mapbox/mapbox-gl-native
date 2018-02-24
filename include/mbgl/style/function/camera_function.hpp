@@ -12,7 +12,6 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/util/variant.hpp>
 
-
 namespace mbgl {
 namespace style {
 
@@ -66,14 +65,20 @@ public:
             [&](auto z) { return z->getCoveringStops(lower, upper); }
         );
     }
-    
+
+    std::vector<optional<T>> possibleOutputs() const {
+        return expression::fromExpressionValues<T>(expression->possibleOutputs());
+    }
+
     friend bool operator==(const CameraFunction& lhs,
                            const CameraFunction& rhs) {
         return *lhs.expression == *rhs.expression;
     }
 
     bool useIntegerZoom = false;
-    
+
+    const expression::Expression& getExpression() const { return *expression; }
+
     // retained for compatibility with pre-expression function API
     Stops stops;
 

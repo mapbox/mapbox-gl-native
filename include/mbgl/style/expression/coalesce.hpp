@@ -27,7 +27,9 @@ public:
     void eachChild(const std::function<void(const Expression&)>& visit) const override;
 
     bool operator==(const Expression& e) const override;
-    
+
+    std::vector<optional<Value>> possibleOutputs() const override;
+
     std::size_t getLength() const {
         return args.size();
     }
@@ -36,6 +38,7 @@ public:
         return args.at(i).get();
     }
     
+    std::string getOperator() const override { return "coalesce"; }
 private:
     Args args;
 };

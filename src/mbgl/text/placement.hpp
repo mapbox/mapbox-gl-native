@@ -14,7 +14,7 @@ class SymbolBucket;
 
 class OpacityState {
 public:
-    OpacityState(bool placed, bool offscreen);
+    OpacityState(bool placed, bool skipFade);
     OpacityState(const OpacityState& prevOpacityState, float increment, bool placed);
     bool isHidden() const;
     float opacity;
@@ -23,7 +23,7 @@ public:
 
 class JointOpacityState {
 public:
-    JointOpacityState(bool placedIcon, bool placedText, bool offscreen);
+    JointOpacityState(bool placedIcon, bool placedText, bool skipFade);
     JointOpacityState(const JointOpacityState& prevOpacityState, float increment, bool placedIcon, bool placedText);
     bool isHidden() const;
     OpacityState icon;
@@ -32,17 +32,17 @@ public:
 
 class JointPlacement {
 public:
-    JointPlacement(bool text_, bool icon_, bool offscreen_)
-        : text(text_), icon(icon_), offscreen(offscreen_)
+    JointPlacement(bool text_, bool icon_, bool skipFade_)
+        : text(text_), icon(icon_), skipFade(skipFade_)
     {}
 
     const bool text;
     const bool icon;
-    // offscreen = outside viewport, but within CollisionIndex::viewportPadding px of the edge
+    // skipFade = outside viewport, but within CollisionIndex::viewportPadding px of the edge
     // Because these symbols aren't onscreen yet, we can skip the "fade in" animation,
     // and if a subsequent viewport change brings them into view, they'll be fully
     // visible right away.
-    const bool offscreen;
+    const bool skipFade;
 };
 
 class Placement {
@@ -51,7 +51,6 @@ public:
     void placeLayer(RenderSymbolLayer&, const mat4&, bool showCollisionBoxes);
     bool commit(const Placement& prevPlacement, TimePoint);
     void updateLayerOpacities(RenderSymbolLayer&);
-    JointOpacityState getOpacity(uint32_t crossTileSymbolID) const;
     float symbolFadeChange(TimePoint now) const;
     bool hasTransitions(TimePoint now) const;
 

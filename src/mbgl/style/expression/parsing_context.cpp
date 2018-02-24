@@ -13,6 +13,7 @@
 #include <mbgl/style/expression/coalesce.hpp>
 #include <mbgl/style/expression/coercion.hpp>
 #include <mbgl/style/expression/compound_expression.hpp>
+#include <mbgl/style/expression/equals.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
@@ -56,12 +57,15 @@ bool isConstant(const Expression& expression) {
 
 using namespace mbgl::style::conversion;
 
-ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_) {
+ParseResult ParsingContext::parse(const Convertible& value,
+                                  std::size_t index_,
+                                  optional<type::Type> expected_,
+                                  TypeAnnotationOption typeAnnotationOption) {
     ParsingContext child(key + "[" + util::toString(index_) + "]",
                          errors,
                          std::move(expected_),
                          scope);
-    return child.parse(value);
+    return child.parse(value, typeAnnotationOption);
 }
 
 ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, optional<type::Type> expected_,
@@ -75,6 +79,8 @@ ParseResult ParsingContext::parse(const Convertible& value, std::size_t index_, 
 
 const ExpressionRegistry& getExpressionRegistry() {
     static ExpressionRegistry registry {{
+        {"==", Equals::parse},
+        {"!=", Equals::parse},
         {"all", All::parse},
         {"any", Any::parse},
         {"array", ArrayAssertion::parse},
@@ -97,8 +103,7 @@ const ExpressionRegistry& getExpressionRegistry() {
     return registry;
 }
 
-ParseResult ParsingContext::parse(const Convertible& value)
-{
+ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption typeAnnotationOption) {
     ParseResult parsed;
     
     if (isArray(value)) {
@@ -128,37 +133,44 @@ ParseResult ParsingContext::parse(const Convertible& value)
     } else {
         parsed = Literal::parse(value, *this);
     }
-    
+
     if (!parsed) {
         assert(errors->size() > 0);
-    } else if (expected) {
-        auto wrapForType = [&](const type::Type& target, std::unique_ptr<Expression> expression) -> std::unique_ptr<Expression> {
+        return parsed;
+    }
+
+    if (expected) {
+        auto array = [&](std::unique_ptr<Expression> expression) {
             std::vector<std::unique_ptr<Expression>> args;
             args.push_back(std::move(expression));
-            if (target == type::Color) {
-                return std::make_unique<Coercion>(target, std::move(args));
-            } else {
-                return std::make_unique<Assertion>(target, std::move(args));
-            }
+            return args;
         };
-        
+
         const type::Type actual = (*parsed)->getType();
-        if (*expected == type::Color && (actual == type::String || actual == type::Value)) {
-            parsed = wrapForType(type::Color, std::move(*parsed));
-        } else if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
-            parsed = wrapForType(*expected, std::move(*parsed));
-        }
-    
-        checkType((*parsed)->getType());
-        if (errors->size() > 0) {
-            return ParseResult();
+        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
+            if (typeAnnotationOption == includeTypeAnnotations) {
+                parsed = { std::make_unique<Assertion>(*expected, array(std::move(*parsed))) };
+            }
+        } else if (expected->is<type::Array>() && actual == type::Value) {
+            if (typeAnnotationOption == includeTypeAnnotations) {
+                parsed = { std::make_unique<ArrayAssertion>(expected->get<type::Array>(), std::move(*parsed)) };
+            }
+        } else if (*expected == type::Color && (actual == type::Value || actual == type::String)) {
+            if (typeAnnotationOption == includeTypeAnnotations) {
+                parsed = { std::make_unique<Coercion>(*expected, array(std::move(*parsed))) };
+            }
+        } else {
+            checkType((*parsed)->getType());
+            if (errors->size() > 0) {
+                return ParseResult();
+            }
         }
     }
-    
+
     // If an expression's arguments are all literals, we can evaluate
     // it immediately and replace it with a literal value in the
     // parsed result.
-    if (parsed && !dynamic_cast<Literal *>(parsed->get()) && isConstant(**parsed)) {
+    if (!dynamic_cast<Literal *>(parsed->get()) && isConstant(**parsed)) {
         EvaluationContext params(nullptr);
         EvaluationResult evaluated((*parsed)->evaluate(params));
         if (!evaluated) {
@@ -180,7 +192,7 @@ ParseResult ParsingContext::parse(const Convertible& value)
     }
 
     // if this is the root expression, enforce constraints on the use ["zoom"].
-    if (key.size() == 0 && parsed && !isZoomConstant(**parsed)) {
+    if (key.size() == 0 && !isZoomConstant(**parsed)) {
         optional<variant<const InterpolateBase*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
         if (!zoomCurve) {
             error(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)");

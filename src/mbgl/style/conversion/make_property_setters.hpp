@@ -8,8 +8,10 @@
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/symbol_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
+#include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/background_layer.hpp>
 
 #include <unordered_map>
@@ -49,7 +51,7 @@ inline auto makeLayoutPropertySetters() {
     result["text-pitch-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextPitchAlignment>;
     result["text-rotation-alignment"] = &setProperty<SymbolLayer, PropertyValue<AlignmentType>, &SymbolLayer::setTextRotationAlignment>;
     result["text-field"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::string>, &SymbolLayer::setTextField>;
-    result["text-font"] = &setProperty<SymbolLayer, PropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
+    result["text-font"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<std::vector<std::string>>, &SymbolLayer::setTextFont>;
     result["text-size"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextSize>;
     result["text-max-width"] = &setProperty<SymbolLayer, DataDrivenPropertyValue<float>, &SymbolLayer::setTextMaxWidth>;
     result["text-line-height"] = &setProperty<SymbolLayer, PropertyValue<float>, &SymbolLayer::setTextLineHeight>;
@@ -65,6 +67,8 @@ inline auto makeLayoutPropertySetters() {
     result["text-allow-overlap"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextAllowOverlap>;
     result["text-ignore-placement"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextIgnorePlacement>;
     result["text-optional"] = &setProperty<SymbolLayer, PropertyValue<bool>, &SymbolLayer::setTextOptional>;
+
+
 
 
 
@@ -164,6 +168,17 @@ inline auto makePaintPropertySetters() {
     result["circle-stroke-opacity"] = &setProperty<CircleLayer, DataDrivenPropertyValue<float>, &CircleLayer::setCircleStrokeOpacity>;
     result["circle-stroke-opacity-transition"] = &setTransition<CircleLayer, &CircleLayer::setCircleStrokeOpacityTransition>;
 
+    result["heatmap-radius"] = &setProperty<HeatmapLayer, DataDrivenPropertyValue<float>, &HeatmapLayer::setHeatmapRadius>;
+    result["heatmap-radius-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapRadiusTransition>;
+    result["heatmap-weight"] = &setProperty<HeatmapLayer, DataDrivenPropertyValue<float>, &HeatmapLayer::setHeatmapWeight>;
+    result["heatmap-weight-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapWeightTransition>;
+    result["heatmap-intensity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapIntensity>;
+    result["heatmap-intensity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapIntensityTransition>;
+    result["heatmap-color"] = &setProperty<HeatmapLayer, HeatmapColorPropertyValue, &HeatmapLayer::setHeatmapColor>;
+    result["heatmap-color-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapColorTransition>;
+    result["heatmap-opacity"] = &setProperty<HeatmapLayer, PropertyValue<float>, &HeatmapLayer::setHeatmapOpacity>;
+    result["heatmap-opacity-transition"] = &setTransition<HeatmapLayer, &HeatmapLayer::setHeatmapOpacityTransition>;
+
     result["fill-extrusion-opacity"] = &setProperty<FillExtrusionLayer, PropertyValue<float>, &FillExtrusionLayer::setFillExtrusionOpacity>;
     result["fill-extrusion-opacity-transition"] = &setTransition<FillExtrusionLayer, &FillExtrusionLayer::setFillExtrusionOpacityTransition>;
     result["fill-extrusion-color"] = &setProperty<FillExtrusionLayer, DataDrivenPropertyValue<Color>, &FillExtrusionLayer::setFillExtrusionColor>;
@@ -193,6 +208,19 @@ inline auto makePaintPropertySetters() {
     result["raster-contrast-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterContrastTransition>;
     result["raster-fade-duration"] = &setProperty<RasterLayer, PropertyValue<float>, &RasterLayer::setRasterFadeDuration>;
     result["raster-fade-duration-transition"] = &setTransition<RasterLayer, &RasterLayer::setRasterFadeDurationTransition>;
+
+    result["hillshade-illumination-direction"] = &setProperty<HillshadeLayer, PropertyValue<float>, &HillshadeLayer::setHillshadeIlluminationDirection>;
+    result["hillshade-illumination-direction-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeIlluminationDirectionTransition>;
+    result["hillshade-illumination-anchor"] = &setProperty<HillshadeLayer, PropertyValue<HillshadeIlluminationAnchorType>, &HillshadeLayer::setHillshadeIlluminationAnchor>;
+    result["hillshade-illumination-anchor-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeIlluminationAnchorTransition>;
+    result["hillshade-exaggeration"] = &setProperty<HillshadeLayer, PropertyValue<float>, &HillshadeLayer::setHillshadeExaggeration>;
+    result["hillshade-exaggeration-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeExaggerationTransition>;
+    result["hillshade-shadow-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeShadowColor>;
+    result["hillshade-shadow-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeShadowColorTransition>;
+    result["hillshade-highlight-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeHighlightColor>;
+    result["hillshade-highlight-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeHighlightColorTransition>;
+    result["hillshade-accent-color"] = &setProperty<HillshadeLayer, PropertyValue<Color>, &HillshadeLayer::setHillshadeAccentColor>;
+    result["hillshade-accent-color-transition"] = &setTransition<HillshadeLayer, &HillshadeLayer::setHillshadeAccentColorTransition>;
 
     result["background-color"] = &setProperty<BackgroundLayer, PropertyValue<Color>, &BackgroundLayer::setBackgroundColor>;
     result["background-color-transition"] = &setTransition<BackgroundLayer, &BackgroundLayer::setBackgroundColorTransition>;

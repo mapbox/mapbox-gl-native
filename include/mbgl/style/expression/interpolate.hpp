@@ -11,7 +11,7 @@
 
 #include <memory>
 #include <map>
-
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -70,11 +70,18 @@ public:
     {}
 
     const std::unique_ptr<Expression>& getInput() const { return input; }
+    const Interpolator& getInterpolator() const { return interpolator; }
 
     void eachChild(const std::function<void(const Expression&)>& visit) const override {
         visit(*input);
-        for (const std::pair<const double, const std::unique_ptr<Expression>&>& stop : stops) {
+        for (const auto& stop : stops) {
             visit(*stop.second);
+        }
+    }
+
+    void eachStop(const std::function<void(double, const Expression&)>& visit) const {
+        for (const auto& stop : stops) {
+            visit(stop.first, *stop.second);
         }
     }
     
@@ -88,6 +95,8 @@ public:
             [&](const auto& interp) { return interp.interpolationFactor(inputLevels, inputValue); }
         );
     }
+
+    std::vector<optional<Value>> possibleOutputs() const override;
 
 protected:
     const Interpolator interpolator;
@@ -109,9 +118,15 @@ public:
     
     EvaluationResult evaluate(const EvaluationContext& params) const override {
         const EvaluationResult evaluatedInput = input->evaluate(params);
-        if (!evaluatedInput) { return evaluatedInput.error(); }
+        if (!evaluatedInput) {
+            return evaluatedInput.error();
+        }
+
         float x = *fromExpressionValue<float>(*evaluatedInput);
-        
+        if (std::isnan(x)) {
+            return EvaluationError { "Input is not a number." };
+        }
+
         if (stops.empty()) {
             return EvaluationError { "No stops in exponential curve." };
         }
@@ -170,6 +185,9 @@ public:
         }
         return false;
     }
+    
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "interpolate"; }
 };
 
 } // namespace expression
