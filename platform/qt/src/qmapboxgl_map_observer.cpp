@@ -65,7 +65,7 @@ void QMapboxGLMapObserver::onDidFinishRenderingFrame(mbgl::MapObserver::RenderMo
 
 void QMapboxGLMapObserver::onWillStartRenderingMap()
 {
-    emit mapChanged(QMapboxGL::MapChangeWillStartLoadingMap);
+    emit mapChanged(QMapboxGL::MapChangeWillStartRenderingMap);
 }
 
 void QMapboxGLMapObserver::onDidFinishRenderingMap(mbgl::MapObserver::RenderMode mode)
