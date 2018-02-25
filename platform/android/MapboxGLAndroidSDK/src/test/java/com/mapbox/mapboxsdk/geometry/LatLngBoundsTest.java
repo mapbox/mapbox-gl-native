@@ -365,4 +365,11 @@ public class LatLngBoundsTest {
     exception.expectMessage("longitude must not be infinite");
     LatLngBounds.from(20, 20, 0, Double.POSITIVE_INFINITY);
   }
+
+  @Test
+  public void testConstructorCheckLatSouthGreaterLatNorth() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("LatSouth cannot be less than latNorth");
+    LatLngBounds.from(0, 20, 20, 0);
+  }
 }

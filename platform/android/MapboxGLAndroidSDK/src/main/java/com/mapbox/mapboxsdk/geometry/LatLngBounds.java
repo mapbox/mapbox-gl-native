@@ -228,6 +228,8 @@ public class LatLngBounds implements Parcelable {
    * This values of latNorth and latSouth should be in the range of [-90, 90],
    * see {@link GeometryConstants#MIN_LATITUDE} and {@link GeometryConstants#MAX_LATITUDE},
    * otherwise IllegalArgumentException will be thrown.
+   * latNorth should be greater or equal latSouth, otherwise  IllegalArgumentException will be thrown.
+   *
    * <p>
    * This method doesn't recalculate most east or most west boundaries.
    * Note that lonEast and lonWest will be wrapped to be in the range of [-180, 180],
@@ -255,6 +257,10 @@ public class LatLngBounds implements Parcelable {
     if (latNorth > GeometryConstants.MAX_LATITUDE || latNorth < GeometryConstants.MIN_LATITUDE
       || latSouth > GeometryConstants.MAX_LATITUDE || latSouth < GeometryConstants.MIN_LATITUDE) {
       throw new IllegalArgumentException("latitude must be between -90 and 90");
+    }
+
+    if (latNorth < latSouth) {
+      throw new IllegalArgumentException("LatSouth cannot be less than latNorth");
     }
 
     lonEast = LatLng.wrap(lonEast, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
