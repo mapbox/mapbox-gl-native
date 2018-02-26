@@ -318,14 +318,8 @@ final class MapGestureDetector {
 
         notifyOnMapClickListeners(tapPoint);
       }
-      // TODO: 26.02.18 extract telemetry events
-      if (isZoomValid(transform)) {
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
-        MapState singleTap = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-        singleTap.setGesture(Events.SINGLE_TAP);
-        Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, singleTap));
-      }
+
+      sendTelemetryEvent(Events.SINGLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
 
       return true;
     }
@@ -353,13 +347,8 @@ final class MapGestureDetector {
           transform.zoomIn(new PointF(motionEvent.getX(), motionEvent.getY()));
         }
 
-        if (isZoomValid(transform)) {
-          MapEventFactory mapEventFactory = new MapEventFactory();
-          LatLng latLng = projection.fromScreenLocation(new PointF(motionEvent.getX(), motionEvent.getY()));
-          MapState doubleTap = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-          doubleTap.setGesture(Events.DOUBLE_TAP);
-          Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, doubleTap));
-        }
+        sendTelemetryEvent(Events.DOUBLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
+
         return true;
       }
       return super.onDoubleTapEvent(motionEvent);
@@ -418,13 +407,7 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      if (isZoomValid(transform)) {
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
-        MapState pan = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-        pan.setGesture(Events.PAN);
-        Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pan));
-      }
+      sendTelemetryEvent(Events.PAN, detector.getFocalPoint());
 
       notifyOnMoveBeginListeners(detector);
 
@@ -478,14 +461,6 @@ final class MapGestureDetector {
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
-      if (isZoomValid(transform)) {
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
-        MapState pinch = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-        pinch.setGesture(Events.PINCH);
-        Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pinch));
-      }
-
       // increase rotate angle threshold when scale is detected first
       gesturesManager.getRotateGestureDetector().setAngleThreshold(
         gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
@@ -494,6 +469,8 @@ final class MapGestureDetector {
 
       // setting focalPoint in #onScaleBegin() as well, because #onScale() might not get called before #onScaleEnd()
       setScaleFocalPoint(detector);
+
+      sendTelemetryEvent(Events.PINCH, scaleFocalPoint);
 
       notifyOnScaleBeginListeners(detector);
 
@@ -629,14 +606,6 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      if (isZoomValid(transform)) {
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
-        MapState rotation = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-        rotation.setGesture(Events.ROTATION);
-        Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, rotation));
-      }
-
       // when rotation starts, interrupting scale and increasing the threshold
       // to make rotation without scaling easier
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
@@ -644,6 +613,8 @@ final class MapGestureDetector {
 
       // setting in #onRotateBegin() as well, because #onRotate() might not get called before #onRotateEnd()
       setRotateFocalPoint(detector);
+
+      sendTelemetryEvent(Events.ROTATION, rotateFocalPoint);
 
       notifyOnRotateBeginListeners(detector);
 
@@ -767,13 +738,7 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      if (isZoomValid(transform)) {
-        MapEventFactory mapEventFactory = new MapEventFactory();
-        LatLng latLng = projection.fromScreenLocation(detector.getFocalPoint());
-        MapState pitch = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
-        pitch.setGesture(Events.PITCH);
-        Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, pitch));
-      }
+      sendTelemetryEvent(Events.PITCH, detector.getFocalPoint());
 
       // disabling move gesture during shove
       gesturesManager.getMoveGestureDetector().setEnabled(false);
@@ -830,6 +795,24 @@ final class MapGestureDetector {
 
       return true;
     }
+  }
+
+  private void sendTelemetryEvent(String eventType, PointF focalPoint) {
+    if (isZoomValid(transform)) {
+      MapEventFactory mapEventFactory = new MapEventFactory();
+      LatLng latLng = projection.fromScreenLocation(focalPoint);
+      MapState state = new MapState(latLng.getLatitude(), latLng.getLongitude(), transform.getZoom());
+      state.setGesture(eventType);
+      Events.obtainTelemetry().push(mapEventFactory.createMapGestureEvent(Event.Type.MAP_CLICK, state));
+    }
+  }
+
+  private boolean isZoomValid(Transform transform) {
+    if (transform == null) {
+      return false;
+    }
+    double mapZoom = transform.getZoom();
+    return mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM;
   }
 
   void notifyOnMapClickListeners(PointF tapPoint) {
@@ -1038,13 +1021,5 @@ final class MapGestureDetector {
 
   void setGesturesManager(AndroidGesturesManager gesturesManager) {
     this.gesturesManager = gesturesManager;
-  }
-
-  private boolean isZoomValid(Transform transform) {
-    if (transform == null) {
-      return false;
-    }
-    double mapZoom = transform.getZoom();
-    return mapZoom >= MapboxConstants.MINIMUM_ZOOM && mapZoom <= MapboxConstants.MAXIMUM_ZOOM;
   }
 }
