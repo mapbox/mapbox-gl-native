@@ -53,6 +53,11 @@ public class MapboxConstants {
   public static final float ROTATION_THRESHOLD_INCREASE_WHEN_SCALING = 25f;
 
   /**
+   * Time within which user needs to lift fingers for velocity animation to start.
+   */
+  public static final long SCHEDULED_ANIMATION_TIMEOUT = 150L;
+
+  /**
    * Minimum angular velocity for rotation animation
    */
   public static final float MINIMUM_ANGULAR_VELOCITY = 1.5f;
@@ -61,6 +66,11 @@ public class MapboxConstants {
    * Maximum angular velocity for rotation animation
    */
   public static final float MAXIMUM_ANGULAR_VELOCITY = 20f;
+
+  /**
+   * Factor to calculate tilt change based on pixel change during shove gesture.
+   */
+  public static final float SHOVE_PIXEL_CHANGE_FACTOR = 0.1f;
 
   /**
    * The currently supported minimum zoom level.
