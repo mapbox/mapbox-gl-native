@@ -136,7 +136,7 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
     \class QMapboxGLSettings
     \brief The QMapboxGLSettings class stores the initial configuration for QMapboxGL.
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
     Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
@@ -454,7 +454,7 @@ void QMapboxGLSettings::setResourceTransform(const std::function<std::string(con
     \class QMapboxGL
     \brief The QMapboxGL class is a Qt wrapper for the Mapbox GL Native engine.
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     QMapboxGL is a Qt friendly version the Mapbox GL Native engine using Qt types
     and deep integration with Qt event loop. QMapboxGL relies as much as possible

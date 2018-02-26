@@ -47,7 +47,7 @@ See the relevant SDK documentation for next steps:
 * [Maps SDK for Android](platform/android/)
 * [Maps SDK for iOS](platform/ios/)
 * [Maps SDK for macOS](platform/macos/)
-* [Mapbox Qt SDK](platform/qt/)
+* [Maps SDK for Qt](platform/qt/)
 * [Mapbox GL Native on Linux](platform/linux/)
 * [node-mapbox-gl-native](platform/node/)
 
