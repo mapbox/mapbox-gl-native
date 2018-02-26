@@ -578,6 +578,13 @@
 			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
 			remoteInfo = dynamic;
 		};
+		CAA55225204486D7004D1B8E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16376B2E1FFDB4B40000563E;
+			remoteInfo = "Integration Test Harness";
+		};
 		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -2186,6 +2193,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CAA55226204486D7004D1B8E /* PBXTargetDependency */,
 				165D0CE620005351009A3C66 /* PBXTargetDependency */,
 			);
 			name = integration;
@@ -2822,6 +2830,11 @@
 			isa = PBXTargetDependency;
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
 			targetProxy = 165D0CE520005351009A3C66 /* PBXContainerItemProxy */;
+		};
+		CAA55226204486D7004D1B8E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16376B2E1FFDB4B40000563E /* Integration Test Harness */;
+			targetProxy = CAA55225204486D7004D1B8E /* PBXContainerItemProxy */;
 		};
 		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
