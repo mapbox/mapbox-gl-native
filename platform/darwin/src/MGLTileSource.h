@@ -161,14 +161,12 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
 typedef NS_ENUM(NSUInteger, MGLDEMEncoding) {
 
     /**
-     Raster tiles generated with the Mapbox encoding formula. 
-     See more details here: https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb 
+     Raster tiles generated with the [Mapbox encoding formula](https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb).
     */
     MGLDEMEncodingMapbox = 0,
 
     /**
-     Raster tiles generated with the Mapzen Terrarium encoding formula.
-     See more details here: https://aws.amazon.com/public-datasets/terrain/
+     Raster tiles generated with the [Mapzen Terrarium encoding formula](https://aws.amazon.com/public-datasets/terrain/).
     */
     MGLDEMEncodingTerrarium
 };
