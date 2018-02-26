@@ -54,11 +54,11 @@
 {
     if (self.rawLayer == style.rawStyle->getLayer(self.identifier.UTF8String)) {
         _pendingLayer = style.rawStyle->removeLayer(self.identifier.UTF8String);
-    }
 
-    // Pair the retain above, and release self, since we're now removed from the collection
-    CFTypeRef toRelease = (__bridge CFTypeRef)self;
-    CFBridgingRelease(toRelease);
+        // Pair the retain above, and release self, since we're now removed from the collection
+        CFTypeRef toRelease = (__bridge CFTypeRef)self;
+        CFBridgingRelease(toRelease);
+    }
 }
 
 - (void)setVisible:(BOOL)visible

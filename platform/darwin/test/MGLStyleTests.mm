@@ -359,19 +359,40 @@
 }
 
 - (void)testAddingLayerOfTypeABeforeRemovingLayerOfTypeBWithSameIdentifier {
-    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-identifier" shape:nil options:nil];
-    [self.style addSource:source];
 
-    // Add a fill layer
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"some-identifier" source:source];
-    [self.style addLayer:fillLayer];
+    __weak MGLFillStyleLayer *weakFillLayer = nil;
+    __weak MGLLineStyleLayer *weakLineLayer = nil;
 
-    // Attempt to remove a line layer with the same identifier as the fill layer
-    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:fillLayer.identifier source:source];
-    [self.style removeLayer:lineLayer];
+    @autoreleasepool {
 
-    XCTAssertTrue([[self.style layerWithIdentifier:fillLayer.identifier] isMemberOfClass:[MGLFillStyleLayer class]]);
+        MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source-identifier" shape:nil options:nil];
+        [self.style addSource:source];
+
+        // Add a fill layer
+        MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"some-identifier" source:source];
+        weakFillLayer = fillLayer;
+
+        [self.style addLayer:fillLayer];
+
+        // Attempt to remove a line layer with the same identifier as the fill layer
+        MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:fillLayer.identifier source:source];
+        weakLineLayer = lineLayer;
+        [self.style removeLayer:lineLayer];
+
+        // The above remove should fail, and the fill layer should still be there.
+        XCTAssertTrue([[self.style layerWithIdentifier:fillLayer.identifier] isMemberOfClass:[MGLFillStyleLayer class]]);
+
+        // Finally remove the fill layer.
+        [self.style removeLayer:fillLayer];
+
+        fillLayer = nil;
+        lineLayer = nil;
+    }
+
+    XCTAssertNil(weakFillLayer, @"");
+    XCTAssertNil(weakLineLayer, @"");
 }
+
 
 - (NSString *)stringWithContentsOfStyleHeader {
     NSURL *styleHeaderURL = [[[NSBundle mgl_frameworkBundle].bundleURL
