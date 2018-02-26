@@ -19,6 +19,7 @@ const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds = @"MGLTileSourceO
 const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString = @"MGLTileSourceOptionAttributionHTMLString";
 const MGLTileSourceOption MGLTileSourceOptionAttributionInfos = @"MGLTileSourceOptionAttributionInfos";
 const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSourceOptionTileCoordinateSystem";
+const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOptionDEMEncoding";
 
 @implementation MGLTileSource
 
@@ -125,6 +126,23 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
                 break;
             case MGLTileCoordinateSystemTMS:
                 tileSet.scheme = mbgl::Tileset::Scheme::TMS;
+                break;
+        }
+    }
+
+    if (NSNumber *demEncodingNumber = options[MGLTileSourceOptionDEMEncoding]) {
+        if (![demEncodingNumber isKindOfClass:[NSValue class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionDEMEncoding must be set to an NSValue or NSNumber."];
+        }
+        MGLDEMEncoding demEncoding;
+        [demEncodingNumber getValue:&demEncoding];
+        switch (demEncoding) {
+            case MGLDEMEncodingMapbox:
+                tileSet.encoding = mbgl::Tileset::DEMEncoding::Mapbox;
+                break;
+            case MGLDEMEncodingTerrarium:
+                tileSet.encoding = mbgl::Tileset::DEMEncoding::Terrarium;
                 break;
         }
     }
