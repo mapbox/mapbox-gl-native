@@ -652,26 +652,15 @@ final class MapGestureDetector {
         return;
       }
 
-      long animationTime;
-      if (angularVelocity != 0) {
-        boolean negative = angularVelocity < 0;
-        angularVelocity = Math.abs(angularVelocity);
-        // TODO: 26.02.18 just go with x^2?
-        if (angularVelocity > 0) {
-          angularVelocity = angularVelocity * angularVelocity + 1;
-        } else {
-          angularVelocity = angularVelocity * 2 + 1;
-        }
-        angularVelocity = MathUtils.clamp(
-          angularVelocity, MapboxConstants.MINIMUM_ANGULAR_VELOCITY, MapboxConstants.MAXIMUM_ANGULAR_VELOCITY);
+      boolean negative = angularVelocity < 0;
+      angularVelocity = (float) Math.pow(angularVelocity, 2);
+      angularVelocity = MathUtils.clamp(
+        angularVelocity, MapboxConstants.MINIMUM_ANGULAR_VELOCITY, MapboxConstants.MAXIMUM_ANGULAR_VELOCITY);
 
-        animationTime = (long) (Math.log(angularVelocity + 1) * 500);
+      long animationTime = (long) (Math.log(angularVelocity + 1) * 500);
 
-        if (negative) {
-          angularVelocity = -angularVelocity;
-        }
-      } else {
-        animationTime = 0;
+      if (negative) {
+        angularVelocity = -angularVelocity;
       }
 
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
