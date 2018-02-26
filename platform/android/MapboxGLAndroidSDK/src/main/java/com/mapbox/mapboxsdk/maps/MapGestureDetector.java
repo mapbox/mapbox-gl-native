@@ -32,8 +32,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import timber.log.Timber;
-
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.MapboxMap.OnCameraMoveStartedListener.REASON_API_GESTURE;
 
@@ -152,7 +150,8 @@ final class MapGestureDetector {
   /**
    * Get the current active gesture focal point.
    * <p>
-   * This could be either the user provided focal point in {@link UiSettings#setFocalPoint(PointF)} or <code>null</code>.
+   * This could be either the user provided focal point in
+   * {@link UiSettings#setFocalPoint(PointF)}or <code>null</code>.
    * If it's <code>null</code>, gestures will use focal pointed returned by the detector.
    * </p>
    *
@@ -635,7 +634,8 @@ final class MapGestureDetector {
     }
 
     @Override
-    public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast, float rotationDegreesSinceFirst) {
+    public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast,
+                            float rotationDegreesSinceFirst) {
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
       establishRotateFocalPoint(detector);
