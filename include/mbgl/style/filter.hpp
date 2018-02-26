@@ -274,8 +274,6 @@ using FilterBase = variant<
 class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
-
-    bool operator()(const GeometryTileFeature&) const;
     bool operator()(expression::EvaluationContext context) const;
 };
 

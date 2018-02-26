@@ -11,110 +11,91 @@
 using namespace mbgl;
 using namespace mbgl::style;
 
-Filter parse(const char * expression) {
+bool filter(const char * json, const PropertyMap& featureProperties = {{}}, optional<FeatureIdentifier> featureId = {}, FeatureType featureType = FeatureType::Point, GeometryCollection featureGeometry = {}) {
     conversion::Error error;
-    optional<Filter> filter = conversion::convertJSON<Filter>(expression, error);
+    optional<Filter> filter = conversion::convertJSON<Filter>(json, error);
     EXPECT_TRUE(bool(filter));
-    return *filter;
-}
-
-StubGeometryTileFeature feature(const PropertyMap& properties) {
-    return StubGeometryTileFeature { properties };
+    EXPECT_EQ(error.message, "");
+    
+    StubGeometryTileFeature feature { featureId, featureType, featureGeometry, featureProperties };
+    expression::EvaluationContext context = { &feature };
+    
+    return (*filter)(context);
 }
 
 TEST(Filter, EqualsString) {
-    Filter f = parse(R"(["==", "foo", "bar"])");
-    ASSERT_TRUE(f(feature({{ "foo", std::string("bar") }})));
-    ASSERT_FALSE(f(feature({{ "foo", std::string("baz") }})));
+    auto f = R"(["==", "foo", "bar"])";
+    ASSERT_TRUE(filter(f, {{ "foo", std::string("bar") }}));
+    ASSERT_FALSE(filter(f, {{ "foo", std::string("baz") }}));
 }
 
 TEST(Filter, EqualsNumber) {
-    Filter f = parse(R"(["==", "foo", 0])");
-    ASSERT_TRUE(f(feature({{ "foo", int64_t(0) }})));
-    ASSERT_TRUE(f(feature({{ "foo", uint64_t(0) }})));
-    ASSERT_TRUE(f(feature({{ "foo", double(0) }})));
-    ASSERT_FALSE(f(feature({{ "foo", int64_t(1) }})));
-    ASSERT_FALSE(f(feature({{ "foo", uint64_t(1) }})));
-    ASSERT_FALSE(f(feature({{ "foo", double(1) }})));
-    ASSERT_FALSE(f(feature({{ "foo", std::string("0") }})));
-    ASSERT_FALSE(f(feature({{ "foo", false }})));
-    ASSERT_FALSE(f(feature({{ "foo", true }})));
-    ASSERT_FALSE(f(feature({{ "foo", mapbox::geometry::null_value }})));
-    ASSERT_FALSE(f(feature({{}})));
+    auto f = R"(["==", "foo", 0])";
+    ASSERT_TRUE(filter(f, {{ "foo", int64_t(0) }}));
+    ASSERT_TRUE(filter(f, {{ "foo", uint64_t(0) }}));
+    ASSERT_TRUE(filter(f, {{ "foo", double(0) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", int64_t(1) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", uint64_t(1) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", double(1) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", std::string("0") }}));
+    ASSERT_FALSE(filter(f, {{ "foo", false }}));
+    ASSERT_FALSE(filter(f, {{ "foo", true }}));
+    ASSERT_FALSE(filter(f, {{ "foo", mapbox::geometry::null_value }}));
+    ASSERT_FALSE(filter(f, {{}}));
 }
 
 TEST(Filter, EqualsType) {
-    Filter f = parse(R"(["==", "$type", "LineString"])");
-    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {{}})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {{}})));
+    auto f = R"(["==", "$type", "LineString"])";
+    ASSERT_FALSE(filter(f, {{}}, {}, FeatureType::Point, {}));
+    ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::LineString, {}));
 }
 
 TEST(Filter, InType) {
-    Filter f = parse(R"(["in", "$type", "LineString", "Polygon"])");
-    ASSERT_FALSE(f(StubGeometryTileFeature({}, FeatureType::Point, {}, {{}})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::LineString, {}, {{}})));
-    ASSERT_TRUE(f(StubGeometryTileFeature({}, FeatureType::Polygon, {}, {{}})));
+    auto f = R"(["in", "$type", "LineString", "Polygon"])";
+    ASSERT_FALSE(filter(f, {{}}, {}, FeatureType::Point));
+    ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::LineString));
+    ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::Polygon));
 }
 
 TEST(Filter, Any) {
-    ASSERT_FALSE(parse("[\"any\"]")(feature({{}})));
-    ASSERT_TRUE(parse("[\"any\", [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_FALSE(parse("[\"any\", [\"==\", \"foo\", 0]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_TRUE(parse("[\"any\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
+    ASSERT_FALSE(filter("[\"any\"]"));
+    ASSERT_TRUE(filter("[\"any\", [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"any\", [\"==\", \"foo\", 0]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(filter("[\"any\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
 TEST(Filter, All) {
-    ASSERT_TRUE(parse("[\"all\"]")(feature({{}})));
-    ASSERT_TRUE(parse("[\"all\", [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_FALSE(parse("[\"all\", [\"==\", \"foo\", 0]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_FALSE(parse("[\"all\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
+    ASSERT_TRUE(filter("[\"all\"]", {{}}));
+    ASSERT_TRUE(filter("[\"all\", [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"all\", [\"==\", \"foo\", 0]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"all\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
 TEST(Filter, None) {
-    ASSERT_TRUE(parse("[\"none\"]")(feature({{}})));
-    ASSERT_FALSE(parse("[\"none\", [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_TRUE(parse("[\"none\", [\"==\", \"foo\", 0]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_FALSE(parse("[\"none\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]")(
-                         feature({{ std::string("foo"), int64_t(1) }})));
+    ASSERT_TRUE(filter("[\"none\"]"));
+    ASSERT_FALSE(filter("[\"none\", [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(filter("[\"none\", [\"==\", \"foo\", 0]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"none\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
 TEST(Filter, Has) {
-    ASSERT_TRUE(parse("[\"has\", \"foo\"]")(
-                          feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_TRUE(parse("[\"has\", \"foo\"]")(
-                          feature({{ std::string("foo"), int64_t(0) }})));
-    ASSERT_TRUE(parse("[\"has\", \"foo\"]")(
-                          feature({{ std::string("foo"), false }})));
-    ASSERT_FALSE(parse("[\"has\", \"foo\"]")(
-                          feature({{}})));
+    ASSERT_TRUE(filter("[\"has\", \"foo\"]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(filter("[\"has\", \"foo\"]", {{ std::string("foo"), int64_t(0) }}));
+    ASSERT_TRUE(filter("[\"has\", \"foo\"]", {{ std::string("foo"), false }}));
+    ASSERT_FALSE(filter("[\"has\", \"foo\"]"));
 }
 
 TEST(Filter, NotHas) {
-    ASSERT_FALSE(parse("[\"!has\", \"foo\"]")(
-                          feature({{ std::string("foo"), int64_t(1) }})));
-    ASSERT_FALSE(parse("[\"!has\", \"foo\"]")(
-                          feature({{ std::string("foo"), int64_t(0) }})));
-    ASSERT_FALSE(parse("[\"!has\", \"foo\"]")(
-                          feature({{ std::string("foo"), false }})));
-    ASSERT_TRUE(parse("[\"!has\", \"foo\"]")(
-                          feature({{}})));
+    ASSERT_FALSE(filter("[\"!has\", \"foo\"]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"!has\", \"foo\"]", {{ std::string("foo"), int64_t(0) }}));
+    ASSERT_FALSE(filter("[\"!has\", \"foo\"]", {{ std::string("foo"), false }}));
+    ASSERT_TRUE(filter("[\"!has\", \"foo\"]"));
 }
 
 TEST(Filter, ID) {
-    StubGeometryTileFeature feature1 { FeatureIdentifier{ uint64_t{ 1234 } }, {}, {}, {{}}};
-
-    ASSERT_TRUE(parse("[\"==\", \"$id\", 1234]")(feature1));
-    ASSERT_FALSE(parse("[\"==\", \"$id\", \"1234\"]")(feature1));
+    FeatureIdentifier id1 { uint64_t{ 1234 } };
+    ASSERT_TRUE(filter("[\"==\", \"$id\", 1234]", {{}}, id1));
+    ASSERT_FALSE(filter("[\"==\", \"$id\", \"1234\"]", {{}}, id1));
     
-    StubGeometryTileFeature feature2 { {{ "id", uint64_t(1234) }} };
-
-    ASSERT_FALSE(parse("[\"==\", \"$id\", 1234]")(feature2));
+    ASSERT_FALSE(filter("[\"==\", \"$id\", 1234]", {{ "id", uint64_t(1234) }}));
 }

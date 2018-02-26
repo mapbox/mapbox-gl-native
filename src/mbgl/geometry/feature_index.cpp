@@ -125,7 +125,7 @@ void FeatureIndex::addFeature(
             continue;
         }
 
-        if (options.filter && !(*options.filter)(*geometryTileFeature)) {
+        if (options.filter && !(*options.filter)(style::expression::EvaluationContext { geometryTileFeature.get() })) {
             continue;
         }
 
