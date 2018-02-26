@@ -88,6 +88,30 @@
     addRemoveGLLayer();
 }
 
+- (void)testAddingRemovingOpenGLLayerWithoutRendering {
+    XCTAssertNotNil(self.style);
+
+    void(^addRemoveGLLayer)(void) = ^{
+        MGLOpenGLStyleLayer *layer = nil;
+        __weak id weakLayer = nil;
+        
+        @autoreleasepool {
+
+            layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+            [self.style insertLayer:layer atIndex:0];
+            weakLayer = layer;
+            layer = nil;
+            [self.style removeLayer:weakLayer];
+        }
+        
+        XCTAssertNil(weakLayer);
+    };
+
+    addRemoveGLLayer();
+    addRemoveGLLayer();
+    addRemoveGLLayer();
+}
+
 - (void)testReusingOpenGLLayer {
     NSTimeInterval waitInterval = 0.02;
 
@@ -116,6 +140,75 @@
     layer = nil;
     
     XCTAssertNil(weakLayer);
+}
+
+- (void)testOpenGLLayerDoesNotLeakWhenRemovedFromStyle {
+    NSTimeInterval waitInterval = 0.02;
+
+    MGLOpenGLStyleLayer *layer;
+    __weak id weakLayer;
+    @autoreleasepool {
+        layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+        weakLayer = layer;
+        [self.style insertLayer:layer atIndex:0];
+        layer = nil;
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+        [self.style removeLayer:[self.style layerWithIdentifier:@"gl-layer"]];
+        [self.mapView setNeedsDisplay];
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+    }
+    XCTAssertNil(weakLayer);
+}
+
+- (void)testOpenGLLayerDoesNotLeakWhenStyleChanged {
+    NSTimeInterval waitInterval = 0.02;
+    __weak id weakLayer;
+
+    @autoreleasepool {
+        MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+        weakLayer = layer;
+        [self.style insertLayer:layer atIndex:0];
+        layer = nil;
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+        NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        [self.mapView setStyleURL:styleURL];
+    
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+    }
+    XCTAssertNil(weakLayer);
+}
+
+- (void)testReusingOpenGLLayerIdentifier {
+    NSTimeInterval waitInterval = 0.02;
+    MGLOpenGLStyleLayer *layer1, *layer2;
+    @autoreleasepool {
+        layer1 = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+        [self.style insertLayer:layer1 atIndex:0];
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+        [self.style removeLayer:layer1];
+
+        layer2 = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+        [self.style insertLayer:layer2 atIndex:0];
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+
+        [self.style removeLayer:layer2];
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+    }
+    XCTAssertNotNil(layer1);
+    XCTAssertNotNil(layer2);
+    XCTAssertNil([layer1 style]);
+    XCTAssertNil([layer2 style]);
 }
 
 @end
