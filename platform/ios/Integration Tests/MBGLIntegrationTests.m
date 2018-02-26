@@ -53,16 +53,33 @@
 - (void)testAddingRemovingOpenGLLayer {
     XCTAssertNotNil(self.style);
 
+    // Test fails with 0.1 (presumably because it's < one frame, ie. 1/60)
+    NSTimeInterval waitInterval = 0.02;
+
     void(^addRemoveGLLayer)(void) = ^{
-        MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
-        [self.style insertLayer:layer atIndex:0];
-        layer = nil;
 
-        [[NSRunLoop currentRunLoop] runUntilDate:[NSDate date]];
+        MGLOpenGLStyleLayer *layer = nil;
+        __weak id retrievedLayer = nil;
+        
+        @autoreleasepool {
+            layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+            [self.style insertLayer:layer atIndex:0];
+            layer = nil;
+            
+            [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+            
+            retrievedLayer = [self.style layerWithIdentifier:@"gl-layer"];
+            XCTAssertNotNil(retrievedLayer);
+            [self.style removeLayer:retrievedLayer];
 
-        id retrievedLayer = [self.style layerWithIdentifier:@"gl-layer"];
-        XCTAssertNotNil(retrievedLayer);
-        [self.style removeLayer:retrievedLayer];
+            // We need to run the runloop for a little while so that the following assert will be correct
+            // this is because although the layer has been removed from the style, there's still a pending
+            // render (deinitialize) call, that will needs to be handled, which will finally release the
+            // layer (and then the layer will be dealloc'd when the autorelease pool drains)
+            [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+        }
+        
+        XCTAssertNil(retrievedLayer);
     };
 
     addRemoveGLLayer();
@@ -71,7 +88,7 @@
 }
 
 - (void)testReusingOpenGLLayer {
-    NSTimeInterval waitInterval = 0.01;
+    NSTimeInterval waitInterval = 0.02;
 
     MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
     [self.style insertLayer:layer atIndex:0];
