@@ -241,7 +241,7 @@ final class MapGestureDetector {
     return true;
   }
 
-  private void cancelAnimators() {
+  void cancelAnimators() {
     if (scaleAnimator != null) {
       scaleAnimator.cancel();
     }
@@ -481,6 +481,9 @@ final class MapGestureDetector {
           + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
       );
 
+      // setting in #onScaleBegin() as well, because #onScale() might not get called before #onScaleEnd()
+      establishScaleFocalPoint(detector);
+
       notifyOnScaleBeginListeners(detector);
 
       return true;
@@ -490,16 +493,7 @@ final class MapGestureDetector {
     public boolean onScale(StandardScaleGestureDetector detector) {
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      if (focalPoint != null) {
-        // around user provided focal point
-        scaleFocalPoint = focalPoint;
-      } else if (quickZoom) {
-        // around center
-        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-      } else {
-        // around gesture
-        scaleFocalPoint = detector.getFocalPoint();
-      }
+      establishScaleFocalPoint(detector);
 
       float scaleFactor = detector.getScaleFactor();
       double zoomBy = getNewZoom(scaleFactor, quickZoom);
@@ -532,6 +526,19 @@ final class MapGestureDetector {
       }
 
       notifyOnScaleEndListeners(detector);
+    }
+
+    private void establishScaleFocalPoint(StandardScaleGestureDetector detector) {
+      if (focalPoint != null) {
+        // around user provided focal point
+        scaleFocalPoint = focalPoint;
+      } else if (quickZoom) {
+        // around center
+        scaleFocalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
+      } else {
+        // around gesture
+        scaleFocalPoint = detector.getFocalPoint();
+      }
     }
 
     private double calculateScale(double velocityXY, boolean isScalingOut) {
@@ -619,6 +626,9 @@ final class MapGestureDetector {
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
       gesturesManager.getStandardScaleGestureDetector().interrupt();
 
+      // setting in #onRotateBegin() as well, because #onRotate() might not get called before #onRotateEnd()
+      establishRotateFocalPoint(detector);
+
       notifyOnRotateBeginListeners(detector);
 
       return true;
@@ -628,13 +638,7 @@ final class MapGestureDetector {
     public boolean onRotate(RotateGestureDetector detector, float rotationDegreesSinceLast, float rotationDegreesSinceFirst) {
       cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_GESTURE);
 
-      if (focalPoint != null) {
-        // User provided focal point
-        rotateFocalPoint = focalPoint;
-      } else {
-        // around gesture
-        rotateFocalPoint = detector.getFocalPoint();
-      }
+      establishRotateFocalPoint(detector);
 
       // Calculate map bearing value
       double bearing = transform.getRawBearing() + rotationDegreesSinceLast;
@@ -683,6 +687,16 @@ final class MapGestureDetector {
       scheduleAnimator(rotateAnimator);
 
       notifyOnRotateEndListeners(detector);
+    }
+
+    private void establishRotateFocalPoint(RotateGestureDetector detector) {
+      if (focalPoint != null) {
+        // User provided focal point
+        rotateFocalPoint = focalPoint;
+      } else {
+        // around gesture
+        rotateFocalPoint = detector.getFocalPoint();
+      }
     }
 
     private Animator createRotateAnimator(float angularVelocity, long animationTime) {

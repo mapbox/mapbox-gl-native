@@ -388,6 +388,7 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onStop() {
+    mapGestureDetector.cancelAnimators();
     if (mapboxMap != null) {
       // map was destroyed before it was started
       mapboxMap.onStop();
