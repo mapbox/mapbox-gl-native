@@ -42,6 +42,7 @@
 - (void)tearDown {
     _styleLoadingExpectation = nil;
     self.mapView = nil;
+    self.style = nil;
 
     [super tearDown];
 }
