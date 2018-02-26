@@ -13,8 +13,8 @@
   },
   "license": "BSD-2-Clause",
   "dependencies": {
-    "nan": "^2.4.0",
-    "node-pre-gyp": "^0.6.36",
+    "nan": "~2.8",
+    "node-pre-gyp": "^0.6.37",
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
