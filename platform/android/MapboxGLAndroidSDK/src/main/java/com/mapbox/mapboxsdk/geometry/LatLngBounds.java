@@ -444,10 +444,21 @@ public class LatLngBounds implements Parcelable {
    * @return BoundingBox
    */
   public LatLngBounds union(final double latNorth, final double lonEast, final double latSouth, final double lonWest) {
-    return new LatLngBounds((this.latitudeNorth < latNorth) ? latNorth : this.latitudeNorth,
-      (this.longitudeEast < lonEast) ? lonEast : this.longitudeEast,
-      (this.latitudeSouth > latSouth) ? latSouth : this.latitudeSouth,
-      (this.longitudeWest > lonWest) ? lonWest : this.longitudeWest);
+    double north = (this.latitudeNorth < latNorth) ? latNorth : this.latitudeNorth;
+    double south = (this.latitudeSouth > latSouth) ? latSouth : this.latitudeSouth;
+
+    if (LatLngSpan.getLongitudeSpan(lonEast, this.longitudeWest)
+      < LatLngSpan.getLongitudeSpan(this.longitudeEast, lonWest)) {
+      return new LatLngBounds(north,
+        lonEast,
+        south,
+        this.longitudeWest);
+    }
+
+    return new LatLngBounds(north,
+      this.longitudeEast,
+      south,
+      lonWest);
   }
 
   /**

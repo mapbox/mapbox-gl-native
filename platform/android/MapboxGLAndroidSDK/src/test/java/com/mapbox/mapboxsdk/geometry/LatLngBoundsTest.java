@@ -338,6 +338,27 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void unionOverDateLine() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, 170))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, -170))
+      .include(new LatLng(-10, -160))
+      .build();
+
+    assertEquals("outer union should match",
+      latLngBounds1.union(latLngBounds2),
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+  }
+
+
+  @Test
   public void northWest() {
     double minLat = 5;
     double minLon = 6;
