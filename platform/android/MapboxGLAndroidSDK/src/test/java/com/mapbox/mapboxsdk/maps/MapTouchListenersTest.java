@@ -30,7 +30,7 @@ public class MapTouchListenersTest {
     Projection projection = mock(Projection.class);
     when(projection.fromScreenLocation(pointF)).thenReturn(latLng);
     mapGestureDetector = new MapGestureDetector(null,
-      null, projection, null, null, null, null);
+      null, projection, null, null, null);
   }
 
   @Test
