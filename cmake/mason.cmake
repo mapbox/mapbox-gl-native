@@ -90,17 +90,15 @@ function(mason_use _PACKAGE)
                 set(_URL "${MASON_REPOSITORY}/${_SLUG}.tar.gz")
                 message("[Mason] Downloading package ${_URL}...")
 
-                set(_FAILED)
-                set(_ERROR)
-                # Note: some CMake versions are compiled without SSL support
+                set(_STATUS)
                 get_filename_component(_CACHE_DIR "${_CACHE_PATH}" DIRECTORY)
                 file(MAKE_DIRECTORY "${_CACHE_DIR}")
-                execute_process(
-                    COMMAND curl --retry 3 -s -f -S -L "${_URL}" -o "${_CACHE_PATH}.tmp"
-                    RESULT_VARIABLE _FAILED
-                    ERROR_VARIABLE _ERROR)
-                if(_FAILED)
-                    message(FATAL_ERROR "[Mason] Failed to download ${_URL}: ${_ERROR}")
+                file(DOWNLOAD "${_URL}" "${_CACHE_PATH}.tmp" STATUS _STATUS)
+                
+                list(GET _STATUS 0 _STATUS_CODE)
+                list(GET _STATUS 1 _STATUS_STRING)
+                if(NOT _STATUS_CODE EQUAL 0)
+                    message(FATAL_ERROR "[Mason] Failed to download ${_URL}: ${_STATUS_STRING}")
                 else()
                     # We downloaded to a temporary file to prevent half-finished downloads
                     file(RENAME "${_CACHE_PATH}.tmp" "${_CACHE_PATH}")
