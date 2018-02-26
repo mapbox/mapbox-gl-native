@@ -270,20 +270,15 @@ void Statement::bind(int offset, optional<mbgl::Timestamp> value) {
     }
 }
 
-void Statement::bind(int offset, const char* value, std::size_t length, bool retain) {
+void Statement::bind(int offset, const char* value, std::size_t length, bool /* retain */) {
     assert(impl);
     if (length > std::numeric_limits<int>::max()) {
         // Kept for consistence with the default implementation.
         throw std::range_error("value too long");
     }
 
-    // Qt SQLite driver treats QByteArray as blob: we need to explicitly
-    // declare the variant type as string.
-    QVariant text(QVariant::Type::String);
-    text.setValue(retain ? QByteArray(value, length) : QByteArray::fromRawData(value, length));
-
     // Field numbering starts at 0.
-    impl->query.bindValue(offset - 1, std::move(text), QSql::In);
+    impl->query.bindValue(offset - 1, QString(QByteArray(value, length)), QSql::In);
 
     checkQueryError(impl->query);
 }
