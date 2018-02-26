@@ -102,6 +102,23 @@
 
     // the scheme is reflected by the mbgl tileset
     XCTAssertEqual(tileSet.scheme, mbgl::Tileset::Scheme::TMS);
+
+    // when the dem enciding is changed using an NSNumber
+    tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
+        MGLTileSourceOptionDEMEncoding: @(MGLDEMEncodingTerrarium),
+    });
+
+    // the encoding is reflected by the mbgl tileset
+    XCTAssertEqual(tileSet.encoding, mbgl::Tileset::DEMEncoding::Terrarium);
+
+    // when the dem enciding is changed using an NSValue
+    MGLDEMEncoding terrarium = MGLDEMEncodingTerrarium;
+    tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, @{
+        MGLTileSourceOptionDEMEncoding: [NSValue value:&terrarium withObjCType:@encode(MGLDEMEncoding)],
+    });
+
+    // the encoding is reflected by the mbgl tileset
+    XCTAssertEqual(tileSet.encoding, mbgl::Tileset::DEMEncoding::Terrarium);
 }
 
 - (void)testInvalidTileSet {
