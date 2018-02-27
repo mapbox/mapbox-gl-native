@@ -340,8 +340,8 @@ MGL_EXPORT
 @property (nonatomic) MGLTransition lineGapWidthTransition;
 
 /**
- ¡ EXPERIMENTAL, UNSUPPORTED ! Defines the color of a point of a line based on
- its progress along the line, if using gradient lines.
+ Defines a gradient with which to color a line feature. Can only be used with
+ GeoJSON sources.
  
  This property is only applied to the style if `lineDasharray` is set to `nil`,
  and `linePattern` is set to `nil`. Otherwise, it is ignored.

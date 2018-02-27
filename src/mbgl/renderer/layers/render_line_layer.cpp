@@ -62,12 +62,12 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(dynamic_cast<LineBucket*>(tile.tile.getBucket(*baseImpl)));
         LineBucket& bucket = *reinterpret_cast<LineBucket*>(tile.tile.getBucket(*baseImpl));
 
-        auto draw = [&] (auto& program, const auto& stencilMode, auto&& uniformValues) {
+        auto draw = [&] (auto& program, auto&& uniformValues) {
             program.get(evaluated).draw(
                 parameters.context,
                 gl::Triangles(),
                 parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-                stencilMode,
+                parameters.stencilModeForClipping(tile.clip),
                 parameters.colorModeForRenderPass(),
                 std::move(uniformValues),
                 *bucket.vertexBuffer,
@@ -89,7 +89,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.lineAtlas.bind(parameters.context, 0);
 
             draw(parameters.programs.lineSDF,
-                 parameters.stencilModeForClipping(tile.clip),
                  LineSDFProgram::uniformValues(
                      evaluated,
                      parameters.pixelRatio,
@@ -110,7 +109,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.imageManager.bind(parameters.context, 0);
 
             draw(parameters.programs.linePattern,
-                 parameters.stencilModeForClipping(tile.clip),
                  LinePatternProgram::uniformValues(
                      evaluated,
                      tile,
@@ -126,7 +124,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
             }
 
             draw(parameters.programs.lineGradient,
-                 gl::StencilMode::disabled(),
                  LineGradientProgram::uniformValues(
                     evaluated,
                     tile,
@@ -135,7 +132,6 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
         } else {
             draw(parameters.programs.line,
-                 parameters.stencilModeForClipping(tile.clip),
                  LineProgram::uniformValues(
                      evaluated,
                      tile,
