@@ -37,6 +37,20 @@ public class GeometryConstants {
   public static final double MIN_LATITUDE = -90;
 
   /**
+   * This constant represents the latitude span when representing a geolocation.
+   *
+   * @since 6.0.0
+   */
+  public static final double LATITUDE_SPAN = 180;
+
+  /**
+   * This constant represents the longitude span when representing a geolocation.
+   *
+   * @since 6.0.0
+   */
+  public static final double LONGITUDE_SPAN = 360;
+
+  /**
    * This constant represents the highest latitude value available to represent a geolocation.
    *
    * @since 6.0.0
