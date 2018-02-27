@@ -18,7 +18,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
 * The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
 * Added `MGLShapeSourceOptionWrapsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be wrapped to accommodate coordinates with longitudes beyond −180 and 180; and `MGLShapeSourceOptionClipsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be clipped at the edge of each tile. ([#11041](https://github.com/mapbox/mapbox-gl-native/pull/11041))
-* Added support for Mapzen Terrarium DEM encoding. ([#11154](https://github.com/mapbox/mapbox-gl-native/pull/11154))
+* Added support for Mapzen Terrarium DEM encoding. ([#11274](https://github.com/mapbox/mapbox-gl-native/pull/11274))
 
 ### Map rendering
 
