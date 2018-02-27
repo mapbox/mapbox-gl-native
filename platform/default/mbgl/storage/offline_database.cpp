@@ -593,7 +593,7 @@ OfflineRegion OfflineDatabase::createRegion(const OfflineRegionDefinition& defin
 OfflineRegionMetadata OfflineDatabase::updateMetadata(const int64_t regionID, const OfflineRegionMetadata& metadata) {
     // clang-format off
     Statement stmt = getStatement(
-                                  "UPDATE regions SET description = ?1"
+                                  "UPDATE regions SET description = ?1 "
                                   "WHERE id = ?2");
     // clang-format on
     stmt->bindBlob(1, metadata);
