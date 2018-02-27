@@ -1946,42 +1946,92 @@ public final class MapboxMap {
     onGesturesManagerInteractionListener.onRemoveFlingListener(listener);
   }
 
+  /**
+   * Adds a callback that's invoked when the map is moved.
+   *
+   * @param listener The callback that's invoked when the map is moved.
+   */
   public void addOnMoveListener(OnMoveListener listener) {
     onGesturesManagerInteractionListener.onAddMoveListener(listener);
   }
 
+  /**
+   * Removes a callback that's invoked when the map is moved.
+   *
+   * @param listener The callback that's invoked when the map is moved.
+   */
   public void removeOnMoveListener(OnMoveListener listener) {
     onGesturesManagerInteractionListener.onRemoveMoveListener(listener);
   }
 
+  /**
+   * Adds a callback that's invoked when the map is rotated.
+   *
+   * @param listener The callback that's invoked when the map is rotated.
+   */
   public void addOnRotateListener(OnRotateListener listener) {
     onGesturesManagerInteractionListener.onAddRotateListener(listener);
   }
 
+  /**
+   * Removes a callback that's invoked when the map is rotated.
+   *
+   * @param listener The callback that's invoked when the map is rotated.
+   */
   public void removeOnRotateListener(OnRotateListener listener) {
     onGesturesManagerInteractionListener.onRemoveRotateListener(listener);
   }
 
+  /**
+   * Adds a callback that's invoked when the map is scaled.
+   *
+   * @param listener The callback that's invoked when the map is scaled.
+   */
   public void addOnScaleListener(OnScaleListener listener) {
     onGesturesManagerInteractionListener.onAddScaleListener(listener);
   }
 
+  /**
+   * Removes a callback that's invoked when the map is scaled.
+   *
+   * @param listener The callback that's invoked when the map is scaled.
+   */
   public void removeOnScaleListener(OnScaleListener listener) {
     onGesturesManagerInteractionListener.onRemoveScaleListener(listener);
   }
 
+  /**
+   * Adds a callback that's invoked when the map is tilted.
+   *
+   * @param listener The callback that's invoked when the map is tilted.
+   */
   public void addShoveListener(OnShoveListener listener) {
     onGesturesManagerInteractionListener.onAddShoveListener(listener);
   }
 
+  /**
+   * Remove a callback that's invoked when the map is tilted.
+   *
+   * @param listener The callback that's invoked when the map is tilted.
+   */
   public void removeShoveListener(OnShoveListener listener) {
     onGesturesManagerInteractionListener.onRemoveShoveListener(listener);
   }
 
+  /**
+   * Sets a custom {@link AndroidGesturesManager} to handle {@link android.view.MotionEvent}s registered by the map.
+   *
+   * @param androidGesturesManager Gestures manager that interprets gestures based on the motion events.
+   * @see <a href="https://github.com/mapbox/mapbox-gestures-android">mapbox-gestures-android library</a>
+   */
   public void setGesturesManager(AndroidGesturesManager androidGesturesManager) {
     onGesturesManagerInteractionListener.setGesturesManager(androidGesturesManager);
   }
 
+  /**
+   * Get current {@link AndroidGesturesManager} that handles {@link android.view.MotionEvent}s registered by the map.
+   * @return Current gestures manager.
+   */
   public AndroidGesturesManager getGesturesManager() {
     return onGesturesManagerInteractionListener.getGesturesManager();
   }
