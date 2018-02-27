@@ -422,7 +422,7 @@ final class MapGestureDetector {
       // Scroll the map
       transform.moveBy(-distanceX, -distanceY, 0 /*no duration*/);
 
-      notifyOnScrollListeners(); // TODO: 26.02.18 deprecate scroll listeners
+      notifyOnScrollListeners();
       notifyOnMoveListeners(detector);
       return true;
     }

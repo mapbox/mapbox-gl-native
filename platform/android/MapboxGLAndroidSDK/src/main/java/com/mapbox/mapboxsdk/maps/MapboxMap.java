@@ -2030,6 +2030,7 @@ public final class MapboxMap {
 
   /**
    * Get current {@link AndroidGesturesManager} that handles {@link android.view.MotionEvent}s registered by the map.
+   *
    * @return Current gestures manager.
    */
   public AndroidGesturesManager getGesturesManager() {
@@ -2356,7 +2357,9 @@ public final class MapboxMap {
    * Interface definition for a callback to be invoked when the map is scrolled.
    *
    * @see MapboxMap#setOnScrollListener(OnScrollListener)
+   * @deprecated Use {@link OnMoveListener} instead.
    */
+  @Deprecated
   public interface OnScrollListener {
     /**
      * Called when the map is scrolled.
@@ -2364,6 +2367,11 @@ public final class MapboxMap {
     void onScroll();
   }
 
+  /**
+   * Interface definition for a callback to be invoked when the map is moved.
+   *
+   * @see MapboxMap#addOnMoveListener(OnMoveListener)
+   */
   public interface OnMoveListener {
     void onMoveBegin(MoveGestureDetector detector);
 
@@ -2372,6 +2380,11 @@ public final class MapboxMap {
     void onMoveEnd(MoveGestureDetector detector);
   }
 
+  /**
+   * Interface definition for a callback to be invoked when the map is rotated.
+   *
+   * @see MapboxMap#addOnRotateListener(OnRotateListener)
+   */
   public interface OnRotateListener {
     void onRotateBegin(RotateGestureDetector detector);
 
@@ -2380,6 +2393,11 @@ public final class MapboxMap {
     void onRotateEnd(RotateGestureDetector detector);
   }
 
+  /**
+   * Interface definition for a callback to be invoked when the map is scaled.
+   *
+   * @see MapboxMap#addOnScaleListener(OnScaleListener)
+   */
   public interface OnScaleListener {
     void onScaleBegin(StandardScaleGestureDetector detector);
 
@@ -2388,6 +2406,11 @@ public final class MapboxMap {
     void onScaleEnd(StandardScaleGestureDetector detector);
   }
 
+  /**
+   * Interface definition for a callback to be invoked when the map is tilted.
+   *
+   * @see MapboxMap#addShoveListener(OnShoveListener)
+   */
   public interface OnShoveListener {
     void onShoveBegin(ShoveGestureDetector detector);
 
