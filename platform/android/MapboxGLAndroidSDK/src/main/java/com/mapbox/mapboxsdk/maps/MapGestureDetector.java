@@ -511,7 +511,7 @@ final class MapGestureDetector {
       if (velocityXY > minimumVelocity) {
         double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
         double currentZoom = transform.getRawZoom();
-        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4); //todo make divider public
+        long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
         scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime);
         scheduleAnimator(scaleAnimator);
       }
