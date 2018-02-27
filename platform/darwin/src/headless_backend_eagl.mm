@@ -7,9 +7,13 @@
 namespace mbgl {
 
 struct EAGLImpl : public HeadlessBackend::Impl {
-    EAGLImpl(EAGLContext* glContext_) : glContext(glContext_) {
-        [reinterpret_cast<EAGLContext*>(glContext) retain];
-        reinterpret_cast<EAGLContext*>(glContext).multiThreaded = YES;
+    EAGLImpl() {
+        glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
+        
+        if (glContext == nil) {
+            throw std::runtime_error("Error creating GL context object");
+        }
+        glContext.multiThreaded = YES;
     }
 
     ~EAGLImpl() {
@@ -45,12 +49,9 @@ bool HeadlessBackend::hasDisplay() {
 }
 
 void HeadlessBackend::createContext() {
-    EAGLContext* glContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES2];
-    if (glContext == nil) {
-        throw std::runtime_error("Error creating GL context object");
-    }
-
-    impl.reset(new EAGLImpl(glContext));
+    impl.reset();
+    impl = std::make_unique<EAGLImpl>();
+    
 }
 
 } // namespace mbgl
