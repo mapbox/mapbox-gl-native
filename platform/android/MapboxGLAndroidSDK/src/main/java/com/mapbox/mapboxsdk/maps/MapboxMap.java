@@ -2005,7 +2005,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is tilted.
    */
-  public void addShoveListener(OnShoveListener listener) {
+  public void addOnShoveListener(OnShoveListener listener) {
     onGesturesManagerInteractionListener.onAddShoveListener(listener);
   }
 
@@ -2014,7 +2014,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is tilted.
    */
-  public void removeShoveListener(OnShoveListener listener) {
+  public void removeOnShoveListener(OnShoveListener listener) {
     onGesturesManagerInteractionListener.onRemoveShoveListener(listener);
   }
 
@@ -2409,7 +2409,7 @@ public final class MapboxMap {
   /**
    * Interface definition for a callback to be invoked when the map is tilted.
    *
-   * @see MapboxMap#addShoveListener(OnShoveListener)
+   * @see MapboxMap#addOnShoveListener(OnShoveListener)
    */
   public interface OnShoveListener {
     void onShoveBegin(ShoveGestureDetector detector);
