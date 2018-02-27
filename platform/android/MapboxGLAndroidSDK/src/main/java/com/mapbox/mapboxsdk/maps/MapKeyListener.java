@@ -128,7 +128,7 @@ final class MapKeyListener {
 
         // Zoom out
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(false, focalPoint);
+        transform.zoomOut(focalPoint);
         return true;
 
       default:
@@ -164,7 +164,7 @@ final class MapKeyListener {
 
         // Zoom in
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(true, focalPoint);
+        transform.zoomIn(focalPoint);
         return true;
     }
 
@@ -219,7 +219,7 @@ final class MapKeyListener {
         if (currentTrackballLongPressTimeOut != null) {
           // Zoom in
           PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-          transform.zoom(true, focalPoint);
+          transform.zoomIn(focalPoint);
         }
         return true;
 
@@ -261,7 +261,7 @@ final class MapKeyListener {
       if (!cancelled) {
         // Zoom out
         PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(false, pointF);
+        transform.zoomOut(pointF);
 
         // Ensure the up action is not run
         currentTrackballLongPressTimeOut = null;
