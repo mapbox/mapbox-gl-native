@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.http;
 
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
@@ -27,8 +26,9 @@ import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import okhttp3.internal.Util;
 import timber.log.Timber;
+
+import static com.mapbox.services.android.telemetry.utils.TelemetryUtils.toHumanReadableAscii;
 
 import static android.util.Log.DEBUG;
 import static android.util.Log.INFO;
@@ -204,7 +204,7 @@ class HTTPRequest implements Callback {
 
   private String getUserAgent() {
     if (USER_AGENT_STRING == null) {
-      return USER_AGENT_STRING = Util.toHumanReadableAscii(
+      return USER_AGENT_STRING = toHumanReadableAscii(
         String.format("%s %s (%s) Android/%s (%s)",
           getApplicationIdentifier(),
           BuildConfig.MAPBOX_VERSION_STRING,
