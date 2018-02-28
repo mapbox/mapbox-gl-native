@@ -882,6 +882,8 @@ public:
         return;
     }
 
+    [self.style retainLayersUsedDuringRendering];
+
     if ([self.delegate respondsToSelector:@selector(mapViewWillStartRenderingFrame:)]) {
         [self.delegate mapViewWillStartRenderingFrame:self];
     }
@@ -899,6 +901,8 @@ public:
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)]) {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
     }
+
+    [self.style releaseLayersUsedDuringRendering];
 }
 
 - (void)mapViewWillStartRenderingMap {

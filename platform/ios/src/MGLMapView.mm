@@ -361,7 +361,6 @@ public:
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
 
-//  [self.layers removeAllObjects];
     self.style = nil;
 
     _mbglMap->getStyle().loadURL([[styleURL absoluteString] UTF8String]);
