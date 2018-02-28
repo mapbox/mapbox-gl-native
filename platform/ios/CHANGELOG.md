@@ -29,7 +29,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved performance of `MGLAnnotationView`-backed annotations that have `scalesWithViewingDistance` enabled. ([#10951](https://github.com/mapbox/mapbox-gl-native/pull/10951))
 
 ### Other changes
-
+* Added MidTop and MidBottom to MGLAnnotationVerticalAlignment. ([#11342](https://github.com/mapbox/mapbox-gl-native/pull/11342))
 * Added a Hebrew localization. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
 
