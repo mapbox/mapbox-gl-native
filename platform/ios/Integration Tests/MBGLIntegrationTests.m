@@ -175,10 +175,6 @@
     XCTAssertNil(weakLayer);
 }
 
-
-
-
-
 - (void)testOpenGLLayerDoesNotLeakWhenRemovedFromStyle {
     NSTimeInterval waitInterval = 0.02;
 
