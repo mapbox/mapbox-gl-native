@@ -99,3 +99,13 @@ TEST(Filter, ID) {
     
     ASSERT_FALSE(filter("[\"==\", \"$id\", 1234]", {{ "id", uint64_t(1234) }}));
 }
+
+TEST(Filter, Expression) {
+    ASSERT_TRUE(filter("[\"==\", [\"+\", 1, 1], 2]"));
+    ASSERT_FALSE(filter("[\"==\", [\"+\", 1, 1], 4]"));
+}
+
+TEST(Filter, PropertyExpression) {
+    ASSERT_TRUE(filter("[\"==\", [\"get\", \"two\"], 2]", {{"two", int64_t(2)}}));
+    ASSERT_FALSE(filter("[\"==\", [\"get\", \"two\"], 4]", {{"two", int64_t(2)}}));
+}
