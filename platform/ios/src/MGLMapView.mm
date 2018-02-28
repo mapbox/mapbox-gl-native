@@ -5878,6 +5878,12 @@ public:
         case MGLAnnotationVerticalAlignmentBottom:
             center.y = CGRectGetMaxY(contentFrame);
             break;
+        case MGLAnnotationVerticalAlignmentMidBottom:
+            center.y = CGRectGetMaxY(contentFrame) - (CGRectGetMidY(contentFrame) / 2);
+            break;
+        case MGLAnnotationVerticalAlignmentMidTop:
+            center.y = CGRectGetMidY(contentFrame) / 2;
+            break;
     }
 
     return center;
