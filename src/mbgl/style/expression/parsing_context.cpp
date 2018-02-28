@@ -147,7 +147,7 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
         };
 
         const type::Type actual = (*parsed)->getType();
-        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
+        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object) && actual == type::Value) {
             if (typeAnnotationOption == includeTypeAnnotations) {
                 parsed = { std::make_unique<Assertion>(*expected, array(std::move(*parsed))) };
             }
