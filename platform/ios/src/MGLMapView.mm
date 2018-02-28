@@ -201,6 +201,7 @@ public:
 
 @property (nonatomic, readwrite) MGLStyle *style;
 
+
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UITapGestureRecognizer *doubleTap;
 @property (nonatomic) UITapGestureRecognizer *twoFingerTap;
@@ -359,7 +360,10 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
+
+//  [self.layers removeAllObjects];
     self.style = nil;
+
     _mbglMap->getStyle().loadURL([[styleURL absoluteString] UTF8String]);
 }
 
@@ -5549,9 +5553,12 @@ public:
 }
 
 - (void)mapViewWillStartRenderingFrame {
+
     if (!_mbglMap) {
         return;
     }
+
+    [self.style retainLayersUsedDuringRendering];
 
     if ([self.delegate respondsToSelector:@selector(mapViewWillStartRenderingFrame:)])
     {
@@ -5575,6 +5582,9 @@ public:
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
     }
+
+    [self.style releaseLayersUsedDuringRendering];
+
 }
 
 - (void)mapViewWillStartRenderingMap {

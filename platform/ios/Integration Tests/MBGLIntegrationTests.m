@@ -142,6 +142,43 @@
     XCTAssertNil(weakLayer);
 }
 
+- (void)testOpenGLLayerDoesNotLeakWhenMapViewDeallocs {
+    NSTimeInterval waitInterval = 0.02;
+    __weak id weakLayer;
+
+    @autoreleasepool {
+
+        NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+        MGLMapView *mapView2 = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
+        mapView2.delegate = self;
+
+        XCTAssertNil(mapView2.style);
+
+        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        [self waitForExpectationsWithTimeout:1 handler:nil];
+
+//        UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
+//        [superView addSubview:self.mapView];
+//        UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
+//        [window addSubview:superView];
+//        [window makeKeyAndVisible];
+
+        MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
+        weakLayer = layer;
+        [mapView2.style insertLayer:layer atIndex:0];
+        layer = nil;
+
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+        [self.mapView setNeedsDisplay];
+        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
+    }
+    XCTAssertNil(weakLayer);
+}
+
+
+
+
+
 - (void)testOpenGLLayerDoesNotLeakWhenRemovedFromStyle {
     NSTimeInterval waitInterval = 0.02;
 

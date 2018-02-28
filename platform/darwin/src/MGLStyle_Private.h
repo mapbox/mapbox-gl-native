@@ -28,6 +28,10 @@ namespace mbgl {
 
 - (void)setStyleClasses:(NS_ARRAY_OF(NSString *) *)appliedClasses transitionDuration:(NSTimeInterval)transitionDuration;
 
+- (void)addToManagedLayers:(MGLStyleLayer*)layer;
+- (void)removeFromManagedLayers:(MGLStyleLayer*)layer;
+- (void)retainLayersUsedDuringRendering;
+- (void)releaseLayersUsedDuringRendering;
 @end
 
 @interface MGLStyle (MGLStreetsAdditions)

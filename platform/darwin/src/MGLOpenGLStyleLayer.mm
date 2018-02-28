@@ -15,10 +15,9 @@
     when creating an OpenGL style layer.
  */
 void MGLPrepareCustomStyleLayer(void *context) {
-
-    // Pair retain/release during rendering (see MGLFinishCustomStyleLayer)
-    id retaineee = (__bridge id)context;
-    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)CFBridgingRetain(retaineee);
+    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
+    // is alive during rendering
+    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
 
     [layer didMoveToMapView:layer.style.mapView];
 }
@@ -51,8 +50,10 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
     when creating an OpenGL style layer.
  */
 void MGLFinishCustomStyleLayer(void *context) {
-    // Release the layer (since we retained it in the initialization)
-    MGLOpenGLStyleLayer *layer = CFBridgingRelease(context);
+
+    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
+    // is alive during rendering
+    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
     [layer willMoveFromMapView:layer.style.mapView];
 }
 
