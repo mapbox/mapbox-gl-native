@@ -37,11 +37,11 @@ public abstract class MapRenderer implements MapRendererScheduler {
   }
 
   public void onPause() {
-    // Implement if needed
+    nativeOnPause();
   }
 
   public void onResume() {
-    // Implement if needed
+    nativeOnResume();
   }
 
   public void onStop() {
@@ -123,6 +123,10 @@ public abstract class MapRenderer implements MapRendererScheduler {
   private native void nativeOnSurfaceChanged(int width, int height);
 
   private native void nativeRender();
+
+  private native void nativeOnResume();
+
+  private native void nativeOnPause();
 
   private long frames;
   private long timeElapsed;
