@@ -14,7 +14,7 @@
 }
 
 - (void)drawRect:(CGRect)rect {
-    [self drawMarkerWithFrame:rect innerColor:_innerColor shadowColor:_shadowColor pinColor:_pinColor strokeColor:_strokeColor];
+    [self drawMarkerWithInnerColor:_innerColor shadowColor:_shadowColor pinColor:_pinColor strokeColor:_strokeColor size:rect.size strokeWidth:3];
 }
 
 - (void)setShadowColor:(UIColor *)shadowColor {
@@ -37,60 +37,65 @@
     [self setNeedsDisplay];
 }
 
-- (void)drawMarkerWithFrame:(CGRect)frame innerColor:(UIColor*)innerColor shadowColor:(UIColor*)shadowColor pinColor:(UIColor*)pinColor strokeColor:(UIColor*)strokeColor
+- (void)drawMarkerWithInnerColor: (UIColor*)innerColor shadowColor: (UIColor*)shadowColor pinColor: (UIColor*)pinColor strokeColor: (UIColor*)strokeColor size: (CGSize)size strokeWidth: (CGFloat)strokeWidth
 {
     //// General Declarations
     CGContextRef context = UIGraphicsGetCurrentContext();
     
-    //// Group
+    //// Frames
+    CGRect frame = CGRectMake(0, 0, size.width, size.height);
+    
+    //// Subframes
+    CGRect pin = CGRectMake(CGRectGetMinX(frame) + 1.5, CGRectGetMinY(frame) + 1.5, floor((frame.size.width - 1.5) * 0.98667 + 0.5), floor((frame.size.height - 1.5) * 1.00216 + 1.89) - 1.39);
+    
+    
+    //// Pin
     {
-        //// Oval 2 Drawing
+        //// Pin shadow Drawing
         CGContextSaveGState(context);
         CGContextSetAlpha(context, 0.1);
         
-        UIBezierPath* oval2Path = [UIBezierPath bezierPathWithOvalInRect: CGRectMake(CGRectGetMinX(frame) + 10, CGRectGetMinY(frame) + 40.61, 19, 8)];
+        UIBezierPath* pinShadowPath = [UIBezierPath bezierPathWithOvalInRect: CGRectMake(CGRectGetMinX(pin) + floor(pin.size.width * 0.24324 + 0.5), CGRectGetMinY(pin) + floor(pin.size.height * 0.83873 - 0.11) + 0.61, floor(pin.size.width * 0.75676 + 0.5) - floor(pin.size.width * 0.24324 + 0.5), floor(pin.size.height * 1.00000 - 0.11) - floor(pin.size.height * 0.83873 - 0.11))];
         [shadowColor setFill];
-        [oval2Path fill];
+        [pinShadowPath fill];
         
         CGContextRestoreGState(context);
         
         
-        //// Group 2
-        {
-            //// Bezier 2 Drawing
-            UIBezierPath* bezier2Path = [UIBezierPath bezierPath];
-            [bezier2Path moveToPoint: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43)];
-            [bezier2Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 20.96, CGRectGetMinY(frame) + 43.43) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 18.85, CGRectGetMinY(frame) + 44.18) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 20.16, CGRectGetMinY(frame) + 44.17)];
-            [bezier2Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 19.55) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 20.96, CGRectGetMinY(frame) + 43.43) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 29.24)];
-            [bezier2Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 19.5, CGRectGetMinY(frame) + 2) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 9.86) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 29.16, CGRectGetMinY(frame) + 2)];
-            [bezier2Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 19.55) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 9.84, CGRectGetMinY(frame) + 2) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 9.86)];
-            [bezier2Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 29.24) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43)];
-            [bezier2Path closePath];
-            bezier2Path.usesEvenOddFillRule = YES;
-            [pinColor setFill];
-            [bezier2Path fill];
-            
-            
-            //// Bezier 3 Drawing
-            UIBezierPath* bezier3Path = [UIBezierPath bezierPath];
-            [bezier3Path moveToPoint: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43)];
-            [bezier3Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 20.96, CGRectGetMinY(frame) + 43.43) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 18.85, CGRectGetMinY(frame) + 44.18) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 20.16, CGRectGetMinY(frame) + 44.17)];
-            [bezier3Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 19.55) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 20.96, CGRectGetMinY(frame) + 43.43) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 29.24)];
-            [bezier3Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 19.5, CGRectGetMinY(frame) + 2) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 37, CGRectGetMinY(frame) + 9.86) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 29.16, CGRectGetMinY(frame) + 2)];
-            [bezier3Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 19.55) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 9.84, CGRectGetMinY(frame) + 2) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 9.86)];
-            [bezier3Path addCurveToPoint: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43) controlPoint1: CGPointMake(CGRectGetMinX(frame) + 2, CGRectGetMinY(frame) + 29.24) controlPoint2: CGPointMake(CGRectGetMinX(frame) + 18.04, CGRectGetMinY(frame) + 43.43)];
-            [bezier3Path closePath];
-            [strokeColor setStroke];
-            bezier3Path.lineWidth = 3;
-            [bezier3Path stroke];
-            
-            
-            //// Oval Drawing
-            UIBezierPath* ovalPath = [UIBezierPath bezierPathWithOvalInRect: CGRectMake(CGRectGetMinX(frame) + 12.5, CGRectGetMinY(frame) + 12.16, 14, 14)];
-            [innerColor setFill];
-            [ovalPath fill];
-        }
+        //// Fill Drawing
+        UIBezierPath* fillPath = [UIBezierPath bezierPath];
+        [fillPath moveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height)];
+        [fillPath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.54177 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.48130 * pin.size.width, CGRectGetMinY(pin) + 0.90492 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.51899 * pin.size.width, CGRectGetMinY(pin) + 0.90491 * pin.size.height)];
+        [fillPath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.37658 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.54177 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.58455 * pin.size.height)];
+        [fillPath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.50000 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.16860 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.77614 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height)];
+        [fillPath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.37658 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.22386 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.16860 * pin.size.height)];
+        [fillPath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.58455 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height)];
+        [fillPath closePath];
+        fillPath.usesEvenOddFillRule = YES;
+        [pinColor setFill];
+        [fillPath fill];
+        
+        
+        //// Stroke Drawing
+        UIBezierPath* strokePath = [UIBezierPath bezierPath];
+        [strokePath moveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height)];
+        [strokePath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.54177 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.48130 * pin.size.width, CGRectGetMinY(pin) + 0.90492 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.51899 * pin.size.width, CGRectGetMinY(pin) + 0.90491 * pin.size.height)];
+        [strokePath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.37658 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.54177 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.58455 * pin.size.height)];
+        [strokePath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.50000 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 1.00000 * pin.size.width, CGRectGetMinY(pin) + 0.16860 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.77614 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height)];
+        [strokePath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.37658 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.22386 * pin.size.width, CGRectGetMinY(pin) + 0.00000 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.16860 * pin.size.height)];
+        [strokePath addCurveToPoint: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height) controlPoint1: CGPointMake(CGRectGetMinX(pin) + 0.00000 * pin.size.width, CGRectGetMinY(pin) + 0.58455 * pin.size.height) controlPoint2: CGPointMake(CGRectGetMinX(pin) + 0.45823 * pin.size.width, CGRectGetMinY(pin) + 0.88889 * pin.size.height)];
+        [strokePath closePath];
+        [strokeColor setStroke];
+        strokePath.lineWidth = strokeWidth;
+        [strokePath stroke];
+        
+        
+        //// Inner Drawing
+        UIBezierPath* innerPath = [UIBezierPath bezierPathWithOvalInRect: CGRectMake(CGRectGetMinX(pin) + floor(pin.size.width * 0.29730 + 0.5), CGRectGetMinY(pin) + floor(pin.size.height * 0.22174 - 0.5) + 1, floor(pin.size.width * 0.70270 + 0.5) - floor(pin.size.width * 0.29730 + 0.5), floor(pin.size.height * 0.52412 - 0.5) - floor(pin.size.height * 0.22174 - 0.5))];
+        [innerColor setFill];
+        [innerPath fill];
     }
 }
+
 
 @end
