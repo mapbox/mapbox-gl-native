@@ -249,7 +249,7 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
 
     env->SetStaticLongField(customLayerClass,
         env->GetStaticFieldID(customLayerClass, "DeinitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeDenitialize));
+        reinterpret_cast<jlong>(nativeDeinitialize));
 
     return JNI_VERSION_1_6;
 }
