@@ -2,6 +2,18 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.5.0 - March 1, 2018
+ - TileJSON Bounds allows values inclusive of world extents [#11178](https://github.com/mapbox/mapbox-gl-native/pull/11178)
+ - LatLngBounds returned by VisibleRegion when map is rotated [#11226](https://github.com/mapbox/mapbox-gl-native/pull/11226)
+ - Custom Layer fixes & black list VAO on mali t720 [#11239](https://github.com/mapbox/mapbox-gl-native/pull/11239)
+ - Check if Activity isn't finishing before showing dialog [#11244](https://github.com/mapbox/mapbox-gl-native/pull/11244)
+ - Decouple MapPadding from overlain views [#11258](https://github.com/mapbox/mapbox-gl-native/pull/11258)
+ - Don't disable zoom button controller zooming with gesture disabled zoom [#11259](https://github.com/mapbox/mapbox-gl-native/pull/11259)
+ - Expose ImageSource coordinates setter [#11262](https://github.com/mapbox/mapbox-gl-native/pull/11262)
+ - Add missing DeleteLocalRefs [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
+ - Continue loading style even if we mutate it [#11294](https://github.com/mapbox/mapbox-gl-native/pull/11294)
+ - Update telemetry version for OkHttp [#11338](https://github.com/mapbox/mapbox-gl-native/pull/11338)
+ 
 ## 5.4.1 - February 9, 2018
  - Don't recreate TextureView surface as part of view resizing, solves OOM crashes [#11148](https://github.com/mapbox/mapbox-gl-native/pull/11148)
  - Don't invoke OnLowMemory before map is ready, solves startup crash on low memory devices [#11109](https://github.com/mapbox/mapbox-gl-native/pull/11109)
