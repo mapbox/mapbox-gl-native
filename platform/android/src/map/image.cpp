@@ -29,7 +29,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     }
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
-
+    jni::DeleteLocalRef(env, pixels);
     return mbgl::style::Image {name, std::move(premultipliedImage), pixelRatio};
 }
 
