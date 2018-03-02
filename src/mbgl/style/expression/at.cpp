@@ -21,19 +21,19 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     
     if (i < 0) {
         return EvaluationError {
-            "Array index out of bounds: " + stringify(i) + " < 0."
+            "Array index out of bounds: " + util::toString(i) + " < 0."
         };
     }
     
     if (i >= inputArray.size()) {
         return EvaluationError {
-            "Array index out of bounds: " + stringify(i) +
+            "Array index out of bounds: " + util::toString(i) +
             " > " + util::toString(inputArray.size() - 1) + "."
         };
     }
     if (i != std::floor(i)) {
         return EvaluationError {
-            "Array index must be an integer, but found " + stringify(i) + " instead."
+            "Array index must be an integer, but found " + util::toString(i) + " instead."
         };
     }
     return inputArray[static_cast<std::size_t>(i)];
