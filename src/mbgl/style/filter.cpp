@@ -5,7 +5,7 @@
 namespace mbgl {
 namespace style {
 
-bool Filter::operator()(expression::EvaluationContext context) const {
+bool Filter::operator()(const expression::EvaluationContext &context) const {
     return FilterBase::visit(*this, FilterEvaluator { context });
 }
 

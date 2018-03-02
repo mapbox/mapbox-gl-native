@@ -18,9 +18,13 @@ static bool isExpressionFilter(const Convertible& filter) {
     
     optional<std::string> op = toString(arrayMember(filter, 0));
     
-    if (*op == "has") {
-        auto operand = toString(arrayMember(filter, 1));
-        return arrayLength(filter) >= 2 && operand && *operand != "$id" && *operand != "$type";
+    if (!op) {
+        return false;
+
+    } else if (*op == "has") {
+        if (arrayLength(filter) < 2) return false;
+        optional<std::string> operand = toString(arrayMember(filter, 1));
+        return operand && *operand != "$id" && *operand != "$type";
         
     } else if (*op == "in" || *op == "!in" || *op == "!has" || *op == "none") {
         return false;

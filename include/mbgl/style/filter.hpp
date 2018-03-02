@@ -236,7 +236,7 @@ public:
     
 class ExpressionFilter {
 public:
-    std::shared_ptr<expression::Expression> expression;
+    std::shared_ptr<const expression::Expression> expression;
     
     friend bool operator==(const ExpressionFilter& lhs, const ExpressionFilter& rhs) {
         return *(lhs.expression) == *(rhs.expression);
@@ -274,7 +274,7 @@ using FilterBase = variant<
 class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
-    bool operator()(expression::EvaluationContext context) const;
+    bool operator()(const expression::EvaluationContext &context) const;
 };
 
 } // namespace style
