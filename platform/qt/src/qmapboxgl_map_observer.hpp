@@ -36,6 +36,7 @@ public:
 
 signals:
     void mapChanged(QMapboxGL::MapChange);
+    void mapLoadingFailed(const QString &reason);
     void copyrightsChanged(const QString &copyrightsHtml);
 
 private:
