@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.mapbox.mapboxsdk.testapp">
 
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
@@ -208,62 +207,6 @@
             <meta-data
                 android:name="@string/category"
                 android:value="@string/category_custom_layer"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
-        </activity>
-        <activity
-            android:name=".activity.userlocation.MyLocationTrackingModeActivity"
-            android:description="@string/description_user_location_tracking"
-            android:label="@string/activity_user_tracking_mode"
-            android:theme="@style/NoActionBar">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_userlocation"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
-        </activity>
-        <activity
-            android:name=".activity.userlocation.MyLocationDrawableActivity"
-            android:description="@string/description_user_location_customization"
-            android:label="@string/activity_user_tracking_customization">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_userlocation"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
-        </activity>
-        <activity
-            android:name=".activity.userlocation.MyLocationTintActivity"
-            android:description="@string/description_user_location_dot_color"
-            android:label="@string/activity_user_dot_color">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_userlocation"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
-        </activity>
-        <activity
-            android:name=".activity.userlocation.MyLocationToggleActivity"
-            android:description="@string/description_user_location_toggle"
-            android:label="@string/activity_user_location_toggle">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_userlocation"/>
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activity.FeatureOverviewActivity"/>
-        </activity>
-        <activity
-            android:name=".activity.userlocation.CustomLocationEngineActivity"
-            android:description="@string/description_custom_location_engine"
-            android:label="@string/activity_custom_location_engine">
-            <meta-data
-                android:name="@string/category"
-                android:value="@string/category_userlocation"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>

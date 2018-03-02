@@ -8,9 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 
-import com.mapbox.android.core.location.LocationEngine;
-import com.mapbox.android.core.location.LocationEnginePriority;
-import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
 import com.mapbox.mapboxsdk.maps.Events;
@@ -32,7 +29,6 @@ public final class Mapbox {
   private Context context;
   private String accessToken;
   private Boolean connected;
-  private LocationEngine locationEngine;
 
   /**
    * Get an instance of Mapbox.
@@ -48,10 +44,7 @@ public final class Mapbox {
   public static synchronized Mapbox getInstance(@NonNull Context context, @NonNull String accessToken) {
     if (INSTANCE == null) {
       Context appContext = context.getApplicationContext();
-      LocationEngineProvider locationEngineProvider = new LocationEngineProvider(context);
-      LocationEngine locationEngine = locationEngineProvider.obtainBestLocationEngineAvailable();
-      INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
-      locationEngine.setPriority(LocationEnginePriority.NO_POWER);
+      INSTANCE = new Mapbox(appContext, accessToken);
 
       Events.initialize();
       ConnectivityReceiver.instance(appContext);
@@ -60,10 +53,9 @@ public final class Mapbox {
     return INSTANCE;
   }
 
-  Mapbox(@NonNull Context context, @NonNull String accessToken, LocationEngine locationEngine) {
+  Mapbox(@NonNull Context context, @NonNull String accessToken) {
     this.context = context;
     this.accessToken = accessToken;
-    this.locationEngine = locationEngine;
   }
 
   /**
@@ -135,17 +127,5 @@ public final class Mapbox {
     ConnectivityManager cm = (ConnectivityManager) INSTANCE.context.getSystemService(Context.CONNECTIVITY_SERVICE);
     NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
     return (activeNetwork != null && activeNetwork.isConnected());
-  }
-
-  /**
-   * Returns the location engine used by the SDK.
-   *
-   * @return the location engine configured
-   * @deprecated use location layer plugin from
-   * https://github.com/mapbox/mapbox-plugins-android/tree/master/plugins/locationlayer instead.
-   */
-  @Deprecated
-  public static LocationEngine getLocationEngine() {
-    return INSTANCE.locationEngine;
   }
 }

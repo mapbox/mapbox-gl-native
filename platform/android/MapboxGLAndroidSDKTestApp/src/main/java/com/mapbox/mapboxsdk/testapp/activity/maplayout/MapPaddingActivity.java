@@ -8,18 +8,13 @@ import android.view.MenuItem;
 import com.mapbox.mapboxsdk.annotations.MarkerOptions;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MyLocationTracking;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.testapp.R;
 
 /**
  * Test activity showcasing using the map padding API.
- * <p>
- * This activity tests for correct padding around a marker (Bangalore) and correct padding around MyLocationView.
- * </p>
  */
 public class MapPaddingActivity extends AppCompatActivity {
 
@@ -96,24 +91,7 @@ public class MapPaddingActivity extends AppCompatActivity {
     return true;
   }
 
-  private void toggleGps(boolean enable) {
-    try {
-      // Enable user location
-      mapboxMap.setMyLocationEnabled(enable);
-
-      TrackingSettings trackingSettings = mapboxMap.getTrackingSettings();
-      trackingSettings.setDismissLocationTrackingOnGesture(false);
-      trackingSettings.setMyLocationTrackingMode(
-        enable ? MyLocationTracking.TRACKING_FOLLOW : MyLocationTracking.TRACKING_NONE);
-    } catch (SecurityException securityException) {
-      // permission not granted is handled in FeatureOverviewActivity
-      finish();
-    }
-  }
-
   private void moveToBangalore() {
-    toggleGps(false);
-
     LatLng bangalore = new LatLng(12.9810816, 77.6368034);
     CameraPosition cameraPosition = new CameraPosition.Builder()
       .zoom(16)
@@ -129,11 +107,6 @@ public class MapPaddingActivity extends AppCompatActivity {
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
     switch (item.getItemId()) {
-      case R.id.action_user_tracking:
-        if (mapboxMap != null) {
-          toggleGps(true);
-        }
-        return true;
 
       case R.id.action_bangalore:
         if (mapboxMap != null) {

@@ -119,13 +119,6 @@ public class MapboxMapOptionsTest {
   }
 
   @Test
-  public void testLocationEnabled() {
-    assertFalse(new MapboxMapOptions().getLocationEnabled());
-    assertTrue(new MapboxMapOptions().locationEnabled(true).getLocationEnabled());
-    assertFalse(new MapboxMapOptions().locationEnabled(false).getLocationEnabled());
-  }
-
-  @Test
   public void testTiltGesturesEnabled() {
     assertTrue(new MapboxMapOptions().getTiltGesturesEnabled());
     assertTrue(new MapboxMapOptions().tiltGesturesEnabled(true).getTiltGesturesEnabled());
@@ -173,18 +166,6 @@ public class MapboxMapOptionsTest {
     assertEquals(new CameraPosition.Builder(position).build(), new MapboxMapOptions().camera(position).getCamera());
     assertNotEquals(new CameraPosition.Builder().target(new LatLng(1, 1)), new MapboxMapOptions().camera(position));
     assertNull(new MapboxMapOptions().getCamera());
-  }
-
-  @Test
-  public void testMyLocationForegroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions()
-      .myLocationForegroundTintColor(Color.BLUE).getMyLocationForegroundTintColor());
-  }
-
-  @Test
-  public void testMyLocationBackgroundTint() {
-    assertEquals(Color.BLUE, new MapboxMapOptions()
-      .myLocationBackgroundTintColor(Color.BLUE).getMyLocationBackgroundTintColor());
   }
 
   @Test
