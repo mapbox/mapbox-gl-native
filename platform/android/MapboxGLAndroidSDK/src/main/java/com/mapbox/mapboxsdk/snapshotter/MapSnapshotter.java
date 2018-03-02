@@ -95,6 +95,9 @@ public class MapSnapshotter {
      * @param height the height of the image
      */
     public Options(int width, int height) {
+      if (width == 0 || height == 0) {
+        throw new IllegalArgumentException("Unable to create a snapshot with width or height set to 0");
+      }
       this.width = width;
       this.height = height;
     }
