@@ -251,6 +251,7 @@ public slots:
 signals:
     void needsRendering();
     void mapChanged(QMapboxGL::MapChange);
+    void mapLoadingFailed(const QString &reason);
     void copyrightsChanged(const QString &copyrightsHtml);
 
     void staticRenderFinished(const QString &error);

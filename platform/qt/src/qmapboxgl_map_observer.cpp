@@ -2,6 +2,10 @@
 
 #include "qmapboxgl_p.hpp"
 
+#include <mbgl/util/string.hpp>
+
+#include <exception>
+
 QMapboxGLMapObserver::QMapboxGLMapObserver(QMapboxGLPrivate *d)
     : d_ptr(d)
 {
@@ -44,9 +48,10 @@ void QMapboxGLMapObserver::onDidFinishLoadingMap()
     emit mapChanged(QMapboxGL::MapChangeDidFinishLoadingMap);
 }
 
-void QMapboxGLMapObserver::onDidFailLoadingMap(std::exception_ptr)
+void QMapboxGLMapObserver::onDidFailLoadingMap(std::exception_ptr exception)
 {
     emit mapChanged(QMapboxGL::MapChangeDidFailLoadingMap);
+    emit mapLoadingFailed(QString::fromStdString(mbgl::util::toString(exception)));
 }
 
 void QMapboxGLMapObserver::onWillStartRenderingFrame()

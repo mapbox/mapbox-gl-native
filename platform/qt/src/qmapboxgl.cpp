@@ -1649,6 +1649,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
     connect(m_mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(m_mapObserver.get(), SIGNAL(mapLoadingFailed(QString)), q, SIGNAL(mapLoadingFailed(QString)));
     connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
     // Setup the Map object
