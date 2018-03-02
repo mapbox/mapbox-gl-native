@@ -19,10 +19,16 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     const auto i = evaluatedIndex->get<double>();
     const auto inputArray = evaluatedInput->get<std::vector<Value>>();
     
-    if (i < 0 || i >= inputArray.size()) {
+    if (i < 0) {
+        return EvaluationError {
+            "Array index out of bounds: " + stringify(i) + " < 0."
+        };
+    }
+    
+    if (i >= inputArray.size()) {
         return EvaluationError {
             "Array index out of bounds: " + stringify(i) +
-            " > " + util::toString(inputArray.size()) + "."
+            " > " + util::toString(inputArray.size() - 1) + "."
         };
     }
     if (i != std::floor(i)) {
