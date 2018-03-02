@@ -271,13 +271,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return object.at(key);
     });
     
-    define("length", [](const std::vector<Value>& arr) -> Result<double> {
-        return arr.size();
-    });
-    define("length", [] (const std::string s) -> Result<double> {
-        return s.size();
-    });
-    
     define("properties", [](const EvaluationContext& params) -> Result<std::unordered_map<std::string, Value>> {
         if (!params.feature) {
             return EvaluationError {
