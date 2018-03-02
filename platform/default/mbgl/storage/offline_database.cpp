@@ -93,6 +93,7 @@ int OfflineDatabase::userVersion() {
 void OfflineDatabase::removeExisting() {
     Log::Warning(Event::Database, "Removing existing incompatible offline database");
 
+    statements.clear();
     db.reset();
 
     try {

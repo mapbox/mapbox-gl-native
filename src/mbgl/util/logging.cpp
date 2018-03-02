@@ -43,8 +43,7 @@ void Log::record(EventSeverity severity, Event event, int64_t code) {
 }
 
 void Log::record(EventSeverity severity, Event event, int64_t code, const std::string &msg) {
-    if (currentObserver && severity != EventSeverity::Debug &&
-        currentObserver->onRecord(severity, event, code, msg)) {
+    if (currentObserver && currentObserver->onRecord(severity, event, code, msg)) {
         return;
     }
 
