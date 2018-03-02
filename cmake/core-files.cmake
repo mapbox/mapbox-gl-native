@@ -456,6 +456,7 @@ set(MBGL_CORE_FILES
     include/mbgl/style/expression/interpolate.hpp
     include/mbgl/style/expression/is_constant.hpp
     include/mbgl/style/expression/is_expression.hpp
+    include/mbgl/style/expression/length.hpp
     include/mbgl/style/expression/let.hpp
     include/mbgl/style/expression/literal.hpp
     include/mbgl/style/expression/match.hpp
@@ -478,6 +479,7 @@ set(MBGL_CORE_FILES
     src/mbgl/style/expression/interpolate.cpp
     src/mbgl/style/expression/is_constant.cpp
     src/mbgl/style/expression/is_expression.cpp
+    src/mbgl/style/expression/length.cpp
     src/mbgl/style/expression/let.cpp
     src/mbgl/style/expression/literal.cpp
     src/mbgl/style/expression/match.cpp
