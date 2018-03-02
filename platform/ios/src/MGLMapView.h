@@ -221,8 +221,17 @@ MGL_EXPORT IB_DESIGNABLE
 - (IBAction)reloadStyle:(id)sender;
 
 /**
+ A Boolean value indicating whether the map may display scale information.
+
+ The scale bar may not be shown at all zoom levels. The view controlled by this
+ property is available at `scaleBar`. The default value of this property is
+ `NO`.
+ */
+@property (nonatomic, assign) BOOL showsScale;
+
+/**
  A control indicating the scale of the map. The scale bar is positioned in the
- upper-left corner. The scale bar is hidden by default.
+ upper-left corner. Enable the scale bar via `showsScale`.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 

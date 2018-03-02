@@ -975,8 +975,8 @@ public:
 - (void)layoutSubviews
 {
     // Calling this here instead of in the scale bar itself because if this is done in the
-    // scale bar instance, it triggers a call to this this `layoutSubviews` method that
-    // calls `_mbglMap->setSize()` just below that triggers rendering update which triggers
+    // scale bar instance, it triggers a call to this `layoutSubviews` method that calls
+    // `_mbglMap->setSize()` just below that triggers rendering update which triggers
     // another scale bar update which causes a rendering update loop and a major performace
     // degradation. The only time the scale bar's intrinsic content size _must_ invalidated
     // is here as a reaction to this object's view dimension changes.
@@ -2360,6 +2360,17 @@ public:
 {
     _pitchEnabled = pitchEnabled;
     self.twoFingerDrag.enabled = pitchEnabled;
+}
+
+- (void)setShowsScale:(BOOL)showsScale
+{
+    _showsScale = showsScale;
+    self.scaleBar.hidden = !showsScale;
+
+    if (showsScale)
+    {
+        [self updateScaleBar];
+    }
 }
 
 #pragma mark - Accessibility -
@@ -5413,10 +5424,7 @@ public:
     }
 
     [self updateCompass];
-    
-    if (!self.scaleBar.hidden) {
-        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
-    }
+    [self updateScaleBar];
 
     if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
     {
@@ -5434,6 +5442,7 @@ public:
     }
 
     [self updateCompass];
+    [self updateScaleBar];
 
     if ( ! [self isSuppressingChangeDelimiters])
     {
@@ -5875,6 +5884,17 @@ public:
                              self.compassView.alpha = 0;
                          }
                          completion:nil];
+    }
+}
+
+- (void)updateScaleBar
+{
+    // Use the `hidden` property (instead of `self.showsScale`) so that we don't
+    // break developers who still rely on the <4.0.0 approach of directly
+    // setting this property.
+    if ( ! self.scaleBar.hidden)
+    {
+        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
     }
 }
 
