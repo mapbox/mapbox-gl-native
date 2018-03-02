@@ -82,7 +82,7 @@ public class MapSnapshotter {
    * MapSnapshotter options
    */
   public static class Options {
-    private int pixelRatio = 1;
+    private float pixelRatio = 1;
     private int width;
     private int height;
     private String styleUrl = Style.MAPBOX_STREETS;
@@ -125,7 +125,7 @@ public class MapSnapshotter {
      * @param pixelRatio the pixel ratio to use (default: 1)
      * @return the mutated {@link Options}
      */
-    public Options withPixelRatio(int pixelRatio) {
+    public Options withPixelRatio(float pixelRatio) {
       this.pixelRatio = pixelRatio;
       return this;
     }
@@ -167,7 +167,7 @@ public class MapSnapshotter {
     /**
      * @return the pixel ratio
      */
-    public int getPixelRatio() {
+    public float getPixelRatio() {
       return pixelRatio;
     }
 
