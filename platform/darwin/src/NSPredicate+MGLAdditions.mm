@@ -1,6 +1,7 @@
 #import "NSPredicate+MGLAdditions.h"
 
 #import "MGLValueEvaluator.h"
+#import "MGLStyleValue_Private.h"
 
 class FilterEvaluator {
 public:
@@ -196,7 +197,8 @@ public:
     }
     
     NSPredicate *operator()(mbgl::style::ExpressionFilter filter) {
-        return nil;
+        id jsonObject = MGLJSONObjectFromMBGLExpression(*filter.expression);
+        return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
     }
 };
 
