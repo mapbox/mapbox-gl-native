@@ -193,6 +193,19 @@
         "Copyright": "Copyright (c) 2016 Mapbox"
     },
     {
+        "Id": "mapboxgl-tao_tuple",
+        "Name": "tao_tuple",
+        "QDocModule": "qtlocation",
+        "QtUsage": "Used in the Mapbox GL plugin of Qt Location.",
+
+        "Path": "deps/tao_tuple",
+        "Description": "The Art of C++ implementation of std::tuple and std::integer_sequence.",
+        "Homepage": "https://github.com/taocpp/",
+        "LicenseId": "MIT",
+        "License": "MIT License",
+        "Copyright": "Copyright (c) 2015-2017 Daniel Frey"
+    },
+    {
         "Id": "mapboxgl-unique_resource",
         "Name": "unique_resource",
         "QDocModule": "qtlocation",
