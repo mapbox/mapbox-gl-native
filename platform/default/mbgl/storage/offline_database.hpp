@@ -15,6 +15,7 @@ namespace mapbox {
 namespace sqlite {
 class Database;
 class Statement;
+class Query;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -66,20 +67,7 @@ private:
     void migrateToVersion5();
     void migrateToVersion6();
 
-    class Statement {
-    public:
-        explicit Statement(mapbox::sqlite::Statement& stmt_) : stmt(stmt_) {}
-        Statement(Statement&&) = default;
-        Statement(const Statement&) = delete;
-        ~Statement();
-
-        mapbox::sqlite::Statement* operator->() { return &stmt; };
-
-    private:
-        mapbox::sqlite::Statement& stmt;
-    };
-
-    Statement getStatement(const char *);
+    mapbox::sqlite::Statement& getStatement(const char *);
 
     optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
     optional<int64_t> hasTile(const Resource::TileData&);
@@ -102,8 +90,8 @@ private:
     std::pair<int64_t, int64_t> getCompletedTileCountAndSize(int64_t regionID);
 
     const std::string path;
-    std::unique_ptr<::mapbox::sqlite::Database> db;
-    std::unordered_map<const char *, std::unique_ptr<::mapbox::sqlite::Statement>> statements;
+    std::unique_ptr<mapbox::sqlite::Database> db;
+    std::unordered_map<const char *, const std::unique_ptr<mapbox::sqlite::Statement>> statements;
 
     template <class T>
     T getPragma(const char *);

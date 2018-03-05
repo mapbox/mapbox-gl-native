@@ -95,7 +95,7 @@ AlphaImage transformRasterToSDF(const AlphaImage& rasterInput, double radius, do
 
     for (uint32_t i = 0; i < size; i++) {
         double distance = gridOuter[i] - gridInner[i];
-        sdf.data[i] = std::max(0l, std::min(255l, std::lround(255.0 - 255.0 * (distance / radius + cutoff))));
+        sdf.data[i] = std::max(0l, std::min(255l, ::lround(255.0 - 255.0 * (distance / radius + cutoff))));
     }
 
     return sdf;
