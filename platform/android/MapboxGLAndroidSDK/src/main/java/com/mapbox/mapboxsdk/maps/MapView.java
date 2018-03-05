@@ -29,7 +29,6 @@ import com.mapbox.android.telemetry.Event;
 import com.mapbox.android.telemetry.MapEventFactory;
 import com.mapbox.android.telemetry.MapboxTelemetry;
 import com.mapbox.mapboxsdk.BuildConfig;
-
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -177,12 +176,12 @@ public class MapView extends FrameLayout {
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
       annotationManager, cameraChangeDispatcher);
-    mapKeyListener = new MapKeyListener(transform, uiSettings);
+    mapKeyListener = new MapKeyListener(transform, uiSettings, mapGestureDetector);
 
     // overlain zoom buttons
     mapZoomButtonController = new MapZoomButtonController(new ZoomButtonsController(this));
-    MapZoomControllerListener zoomListener = new MapZoomControllerListener(mapGestureDetector, uiSettings, transform,
-      cameraChangeDispatcher, getWidth(), getHeight());
+    MapZoomControllerListener zoomListener = new MapZoomControllerListener(
+      mapGestureDetector, cameraChangeDispatcher, getWidth(), getHeight());
     mapZoomButtonController.bind(uiSettings, zoomListener);
 
     compassView.injectCompassAnimationListener(createCompassAnimationListener(cameraChangeDispatcher));
@@ -1030,17 +1029,13 @@ public class MapView extends FrameLayout {
   private static class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
 
     private final MapGestureDetector mapGestureDetector;
-    private final UiSettings uiSettings;
-    private final Transform transform;
     private final CameraChangeDispatcher cameraChangeDispatcher;
     private final float mapWidth;
     private final float mapHeight;
 
-    MapZoomControllerListener(MapGestureDetector detector, UiSettings uiSettings, Transform transform,
-                              CameraChangeDispatcher dispatcher, float mapWidth, float mapHeight) {
+    MapZoomControllerListener(MapGestureDetector detector, CameraChangeDispatcher dispatcher,
+                              float mapWidth, float mapHeight) {
       this.mapGestureDetector = detector;
-      this.uiSettings = uiSettings;
-      this.transform = transform;
       this.cameraChangeDispatcher = dispatcher;
       this.mapWidth = mapWidth;
       this.mapHeight = mapHeight;
@@ -1064,9 +1059,9 @@ public class MapView extends FrameLayout {
         focalPoint = new PointF(mapWidth / 2, mapHeight / 2);
       }
       if (zoomIn) {
-        transform.zoomIn(focalPoint);
+        mapGestureDetector.zoomInAnimated(focalPoint, true);
       } else {
-        transform.zoomOut(focalPoint);
+        mapGestureDetector.zoomOutAnimated(focalPoint, true);
       }
     }
   }

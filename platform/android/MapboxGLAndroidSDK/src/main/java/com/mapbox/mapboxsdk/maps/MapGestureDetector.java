@@ -218,15 +218,17 @@ final class MapGestureDetector {
   }
 
   void cancelAnimators() {
-    if (scaleAnimator != null) {
-      scaleAnimator.cancel();
-    }
-    if (rotateAnimator != null) {
-      rotateAnimator.cancel();
-    }
-
     animationsTimeoutHandler.removeCallbacksAndMessages(null);
     scheduledAnimators.clear();
+
+    cancelAnimator(scaleAnimator);
+    cancelAnimator(rotateAnimator);
+  }
+
+  private void cancelAnimator(Animator animator) {
+    if (animator != null && animator.isStarted()) {
+      animator.cancel();
+    }
   }
 
   /**
@@ -338,14 +340,17 @@ final class MapGestureDetector {
         transform.cancelTransitions();
         cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
+        PointF zoomFocalPoint;
         // Single finger double tap
         if (focalPoint != null) {
           // User provided focal point
-          transform.zoomIn(focalPoint);
+          zoomFocalPoint = focalPoint;
         } else {
           // Zoom in on gesture
-          transform.zoomIn(new PointF(motionEvent.getX(), motionEvent.getY()));
+          zoomFocalPoint = new PointF(motionEvent.getX(), motionEvent.getY());
         }
+
+        zoomInAnimated(zoomFocalPoint, false);
 
         sendTelemetryEvent(Events.DOUBLE_TAP, new PointF(motionEvent.getX(), motionEvent.getY()));
 
@@ -512,7 +517,7 @@ final class MapGestureDetector {
         double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
         double currentZoom = transform.getRawZoom();
         long animationTime = (long) (Math.abs(zoomAddition) * 1000 / 4);
-        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, animationTime);
+        scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, scaleFocalPoint, animationTime);
         scheduleAnimator(scaleAnimator);
       }
 
@@ -538,39 +543,6 @@ final class MapGestureDetector {
         zoomAddition = -zoomAddition;
       }
       return zoomAddition;
-    }
-
-    private Animator createScaleAnimator(double currentZoom, double zoomAddition, long animationTime) {
-      ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
-      animator.setDuration(animationTime);
-      animator.setInterpolator(new DecelerateInterpolator());
-      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setZoom((Float) animation.getAnimatedValue(), scaleFocalPoint, 0);
-        }
-      });
-
-      animator.addListener(new AnimatorListenerAdapter() {
-
-        @Override
-        public void onAnimationStart(Animator animation) {
-          transform.cancelTransitions();
-          cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
-        }
-
-        @Override
-        public void onAnimationCancel(Animator animation) {
-          transform.cancelTransitions();
-        }
-
-        @Override
-        public void onAnimationEnd(Animator animation) {
-          cameraChangeDispatcher.onCameraIdle();
-        }
-      });
-      return animator;
     }
 
     private double getNewZoom(float scaleFactor, boolean quickZoom) {
@@ -776,13 +748,92 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
+      PointF zoomFocalPoint;
+      // Single finger double tap
       if (focalPoint != null) {
-        transform.zoomOut(focalPoint);
+        // User provided focal point
+        zoomFocalPoint = focalPoint;
       } else {
-        transform.zoomOut(detector.getFocalPoint());
+        // Zoom in on gesture
+        zoomFocalPoint = detector.getFocalPoint();
       }
 
+      zoomOutAnimated(zoomFocalPoint, false);
+
       return true;
+    }
+  }
+
+  private Animator createScaleAnimator(double currentZoom, double zoomAddition, PointF animationFocalPoint,
+                                       long animationTime) {
+    ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
+    animator.setDuration(animationTime);
+    animator.setInterpolator(new DecelerateInterpolator());
+    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        transform.setZoom((Float) animation.getAnimatedValue(), animationFocalPoint);
+      }
+    });
+
+    animator.addListener(new AnimatorListenerAdapter() {
+
+      @Override
+      public void onAnimationStart(Animator animation) {
+        transform.cancelTransitions();
+        cameraChangeDispatcher.onCameraMoveStarted(REASON_API_ANIMATION);
+      }
+
+      @Override
+      public void onAnimationCancel(Animator animation) {
+        transform.cancelTransitions();
+      }
+
+      @Override
+      public void onAnimationEnd(Animator animation) {
+        cameraChangeDispatcher.onCameraIdle();
+      }
+    });
+    return animator;
+  }
+
+  /**
+   * Zoom in by 1.
+   *
+   * @param zoomFocalPoint focal point of zoom animation
+   * @param runImmediately if true, animation will be started right away, otherwise it will wait until
+   *                       {@link MotionEvent#ACTION_UP} is registered.
+   */
+  void zoomInAnimated(PointF zoomFocalPoint, boolean runImmediately) {
+    zoomAnimated(true, zoomFocalPoint, runImmediately);
+  }
+
+  /**
+   * Zoom out by 1.
+   *
+   * @param zoomFocalPoint focal point of zoom animation
+   * @param runImmediately if true, animation will be started right away, otherwise it will wait until
+   *                       {@link MotionEvent#ACTION_UP} is registered.
+   */
+  void zoomOutAnimated(PointF zoomFocalPoint, boolean runImmediately) {
+    zoomAnimated(false, zoomFocalPoint, runImmediately);
+  }
+
+  private void zoomAnimated(boolean zoomIn, PointF zoomFocalPoint, boolean runImmediately) {
+    //canceling here as well, because when using a button it will not be canceled automatically by onDown()
+    cancelAnimator(scaleAnimator);
+
+    double currentZoom = transform.getRawZoom();
+    scaleAnimator = createScaleAnimator(
+      currentZoom,
+      zoomIn ? 1 : -1,
+      zoomFocalPoint,
+      MapboxConstants.ANIMATION_DURATION);
+    if (runImmediately) {
+      scaleAnimator.start();
+    } else {
+      scheduleAnimator(scaleAnimator);
     }
   }
 

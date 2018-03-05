@@ -21,12 +21,14 @@ final class MapKeyListener {
 
   private final Transform transform;
   private final UiSettings uiSettings;
+  private final MapGestureDetector mapGestureDetector;
 
   private TrackballLongPressTimeOut currentTrackballLongPressTimeOut;
 
-  MapKeyListener(@NonNull Transform transform, @NonNull UiSettings uiSettings) {
+  MapKeyListener(Transform transform, UiSettings uiSettings, MapGestureDetector mapGestureDetector) {
     this.transform = transform;
     this.uiSettings = uiSettings;
+    this.mapGestureDetector = mapGestureDetector;
   }
 
   /**
@@ -124,7 +126,7 @@ final class MapKeyListener {
 
         // Zoom out
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoomOut(focalPoint);
+        mapGestureDetector.zoomOutAnimated(focalPoint, true);
         return true;
 
       default:
@@ -160,7 +162,7 @@ final class MapKeyListener {
 
         // Zoom in
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoomIn(focalPoint);
+        mapGestureDetector.zoomInAnimated(focalPoint, true);
         return true;
     }
 
@@ -215,7 +217,7 @@ final class MapKeyListener {
         if (currentTrackballLongPressTimeOut != null) {
           // Zoom in
           PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-          transform.zoomIn(focalPoint);
+          mapGestureDetector.zoomInAnimated(focalPoint, true);
         }
         return true;
 
@@ -257,7 +259,7 @@ final class MapKeyListener {
       if (!cancelled) {
         // Zoom out
         PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoomOut(pointF);
+        mapGestureDetector.zoomOutAnimated(pointF, true);
 
         // Ensure the up action is not run
         currentTrackballLongPressTimeOut = null;
