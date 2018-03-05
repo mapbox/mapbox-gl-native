@@ -29,13 +29,13 @@ id MGLJSONObjectFromMBGLValue(const mbgl::Value &value) {
         for (auto value : vector) {
             [array addObject:MGLJSONObjectFromMBGLValue(value)];
         }
-        return @[@"literal", array];
+        return array;
     }, [&](const std::unordered_map<std::string, mbgl::Value> &map) {
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:map.size()];
         for (auto &item : map) {
             dictionary[@(item.first.c_str())] = MGLJSONObjectFromMBGLValue(item.second);
         }
-        return @[@"literal", dictionary];
+        return dictionary;
     }, [](const auto &) -> id {
         return nil;
     });
@@ -44,4 +44,3 @@ id MGLJSONObjectFromMBGLValue(const mbgl::Value &value) {
 id MGLJSONObjectFromMBGLExpression(const mbgl::style::expression::Expression &mbglExpression) {
     return MGLJSONObjectFromMBGLValue(mbglExpression.serialize());
 }
-
