@@ -96,14 +96,16 @@ TEST(CustomLayer, Basic) {
     map.getStyle().addLayer(std::make_unique<CustomLayer>(
         "custom",
         [] (void* context) {
-            reinterpret_cast<TestLayer*>(context)->initialize();
+          reinterpret_cast<TestLayer*>(context)->initialize();
         },
         [] (void* context, const CustomLayerRenderParameters&) {
-            reinterpret_cast<TestLayer*>(context)->render();
+          reinterpret_cast<TestLayer*>(context)->render();
         },
         [] (void* context) {
-            delete reinterpret_cast<TestLayer*>(context);
-        }, new TestLayer()));
+          delete reinterpret_cast<TestLayer*>(context);
+        },
+        nullptr,
+        new TestLayer()));
 
     auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
     layer->setSourceLayer("landcover");
