@@ -23,6 +23,7 @@ namespace mbgl {
 
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
+@property (nonatomic, readonly) NSMutableSet *managedLayers;
 
 - (nullable NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
@@ -30,8 +31,6 @@ namespace mbgl {
 
 - (void)addToManagedLayers:(MGLStyleLayer*)layer;
 - (void)removeFromManagedLayers:(MGLStyleLayer*)layer;
-- (void)retainLayersUsedDuringRendering;
-- (void)releaseLayersUsedDuringRendering;
 @end
 
 @interface MGLStyle (MGLStreetsAdditions)

@@ -5,9 +5,7 @@
 #include <mbgl/style/layer.hpp>
 
 @interface MGLStyleLayer ()
-
-@property (nonatomic, readonly) mbgl::style::Layer *rawLayer;
-
+@property (nonatomic, readwrite, nullable) mbgl::style::Layer *rawLayer;
 @end
 
 @implementation MGLStyleLayer {
@@ -38,10 +36,6 @@
                     "to the style more than once is invalid.", self, style];
     }
 
-    // We need to ensure that this layer is retained, so that any references from layer impl's
-    // e.g. contexts) are still valid
-    [style addToManagedLayers:self];
-
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
         style.rawStyle->addLayer(std::move(_pendingLayer), belowLayerId);
@@ -54,10 +48,6 @@
 {
     if (self.rawLayer == style.rawStyle->getLayer(self.identifier.UTF8String)) {
         _pendingLayer = style.rawStyle->removeLayer(self.identifier.UTF8String);
-
-        // We need to ensure that this layer is now released (however, if this layer is about to be
-        // used by the renderer then it will released once rendering is complete)
-        [style removeFromManagedLayers:self];
     }
 }
 
@@ -111,7 +101,14 @@
 {
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = %@>",
             NSStringFromClass([self class]), (void *)self, self.identifier,
-            self.visible ? @"YES" : @"NO"];
+            self.rawLayer ? (self.visible ? @"YES" : @"NO") : @"(No raw layer)"];
+}
+
+#pragma mark - Debug methods
+
+- (void)debugResetRawLayerPeer {
+    MGLAssertStyleLayerIsValid();
+    self.rawLayer->peer.reset();
 }
 
 @end

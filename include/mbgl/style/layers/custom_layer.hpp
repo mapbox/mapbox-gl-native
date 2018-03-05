@@ -54,6 +54,17 @@ using CustomLayerContextLostFunction = void (*)(void* context);
  */
 using CustomLayerDeinitializeFunction = void (*)(void* context);
 
+/**
+ * Called from `CustomLayer`'s destructor.
+ * This provides a mechanism to handle any necessary clean-up using the provided `peer` object.
+ * For example, if a platform-native peer object has a raw pointer to the CustomLayer it could be
+ * set to NULL.
+ *
+ * This function is called from CustomLayer, unlike the above functions that are passed into the
+ * private implementation.
+ */
+using CustomLayerDeallocationFunction = void (*)(util::unique_any *peer);
+
 class CustomLayer : public Layer {
 public:
     CustomLayer(const std::string& id,
@@ -61,12 +72,14 @@ public:
                 CustomLayerRenderFunction,
                 CustomLayerContextLostFunction,
                 CustomLayerDeinitializeFunction,
+                CustomLayerDeallocationFunction,
                 void* context);
 
     CustomLayer(const std::string& id,
                 CustomLayerInitializeFunction,
                 CustomLayerRenderFunction,
                 CustomLayerDeinitializeFunction,
+                CustomLayerDeallocationFunction,
                 void* context);
 
     ~CustomLayer() final;
@@ -87,6 +100,8 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
     CustomLayer(const CustomLayer&) = delete;
+
+    CustomLayerDeallocationFunction deallocationFn = nullptr;
 };
 
 template <>

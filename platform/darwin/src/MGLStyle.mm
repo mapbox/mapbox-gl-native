@@ -84,10 +84,7 @@
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 @property (readonly, copy, nullable) NSURL *URL;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
-
-// Used for retain/release management
-@property (nonatomic) NSMutableSet *layersForUpdating;
-@property (nonatomic) NSSet *layersForRendering;
+@property (nonatomic, readwrite) NSMutableSet *managedLayers;
 
 @end
 
@@ -176,8 +173,7 @@ static NSURL *MGLStyleURL_trafficNight;
 
 - (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView {
     if (self = [super init]) {
-        _layersForUpdating = [NSMutableSet set];
-
+        _managedLayers = [NSMutableSet set];
         _mapView = mapView;
         _rawStyle = rawStyle;
         _localizedLayersByIdentifier = [NSMutableDictionary dictionary];
@@ -543,21 +539,12 @@ static NSURL *MGLStyleURL_trafficNight;
 #pragma mark - Layer retain/release management
 
 - (void)addToManagedLayers:(MGLStyleLayer*)layer {
-    [self.layersForUpdating addObject:layer];
+    [self.managedLayers addObject:layer];
 }
 
 - (void)removeFromManagedLayers:(MGLStyleLayer*)layer {
-    [self.layersForUpdating removeObject:layer];
+    [self.managedLayers removeObject:layer];
 }
-
-- (void)retainLayersUsedDuringRendering {
-    self.layersForRendering = [self.layersForUpdating copy];
-}
-
-- (void)releaseLayersUsedDuringRendering {
-    self.layersForRendering = nil;
-}
-
 
 #pragma mark Style classes
 

@@ -5,6 +5,8 @@ namespace mbgl {
     class Renderer;
 }
 
+@class MGLStyleLayer;
+
 /// Minimum size of an annotation’s accessibility element.
 extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 
@@ -26,4 +28,6 @@ extern const CGSize MGLAnnotationAccessibilityElementMinimumSize;
 /** Empties the in-memory tile cache. */
 - (void)didReceiveMemoryWarning;
 
+/** Debug method, used in testing, to check if a layer's retain/release is being managed */
+- (BOOL)debugIsStyleLayerBeingManaged:(MGLStyleLayer*)layer;
 @end
