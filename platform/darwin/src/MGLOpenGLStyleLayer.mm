@@ -15,10 +15,9 @@
     when creating an OpenGL style layer.
  */
 void MGLPrepareCustomStyleLayer(void *context) {
-
-    // Pair retain/release during rendering (see MGLFinishCustomStyleLayer)
-    id retaineee = (__bridge id)context;
-    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)CFBridgingRetain(retaineee);
+    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
+    // is alive during rendering
+    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
 
     [layer didMoveToMapView:layer.style.mapView];
 }
@@ -51,10 +50,42 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
     when creating an OpenGL style layer.
  */
 void MGLFinishCustomStyleLayer(void *context) {
-    // Release the layer (since we retained it in the initialization)
-    MGLOpenGLStyleLayer *layer = CFBridgingRelease(context);
+    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
+    // is alive during rendering
+    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
+
     [layer willMoveFromMapView:layer.style.mapView];
 }
+
+
+/**
+ Function to be called when the core `CustomLayer` (not the Impl) gets deallocated.
+ It's possible taht at this stage the Obj-C style layer is being deallocated (but that case is detected).
+ */
+void MGLDeallocateCustomStyleLayer(mbgl::util::unique_any *peer) {
+
+    // We know that the peer object contains a LayerWrapper with a weak pointer to
+    // our custom layer. We can use this to safely access the layer, and clear out the
+    // raw pointer.
+    //
+    // If we don't do this rawLayer can become a dangling pointer (which was previously being
+    // accessed via the description method)
+    
+    if (!(peer && peer->has_value()))
+        return;
+
+    LayerWrapper *wrapper = mbgl::util::any_cast<LayerWrapper>(peer);
+
+    if (!wrapper)
+        return;
+
+    // If the MGLStyleLayer is currently being dealloc'd (and trigger the CustomLayer destructor, and
+    // this function) then layer here will be nil (even though wrapper->layer may appear to be non-nil)
+    MGLStyleLayer *layer = wrapper->layer;
+
+    layer.rawLayer = NULL;
+}
+
 
 /**
  An `MGLOpenGLStyleLayer` is a style layer that is rendered by OpenGL code that
@@ -107,7 +138,9 @@ void MGLFinishCustomStyleLayer(void *context) {
                                                             MGLPrepareCustomStyleLayer,
                                                             MGLDrawCustomStyleLayer,
                                                             MGLFinishCustomStyleLayer,
+                                                            MGLDeallocateCustomStyleLayer,
                                                             (__bridge void*)self);
+
     return self = [super initWithPendingLayer:std::move(layer)];
 }
 
@@ -127,11 +160,21 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 - (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer {
     self.style = style;
+
+    // We need to ensure that this layer is retained, so that any references from layer impl's
+    // e.g. contexts) are still valid
+    [style addToManagedLayers:self];
+
     [super addToStyle:style belowLayer:otherLayer];
 }
 
 - (void)removeFromStyle:(MGLStyle *)style {
     [super removeFromStyle:style];
+
+    // We need to ensure that this layer is now released (however, if this layer is about to be
+    // used by the renderer then it will released once rendering is complete)
+    [style removeFromManagedLayers:self];
+
     self.style = nil;
 }
 

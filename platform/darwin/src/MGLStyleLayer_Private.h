@@ -59,7 +59,7 @@ struct LayerWrapper {
  pointer value stays even after ownership of the object is transferred via
  `mbgl::Map addLayer`.
  */
-@property (nonatomic, readonly) mbgl::style::Layer *rawLayer;
+@property (nonatomic, readwrite, nullable) mbgl::style::Layer *rawLayer;
 
 /**
  Adds the mbgl style layer that this object represents to the mbgl map below the
@@ -80,6 +80,12 @@ struct LayerWrapper {
  */
 - (void)removeFromStyle:(MGLStyle *)style;
 
+
+/**
+ Debug method used for testing - it resets the peer object, essentially disconnecting the raw Layer
+ from the peer MGLStyleLayer.
+ */
+- (void)debugResetRawLayerPeer;
 @end
 
 NS_ASSUME_NONNULL_END

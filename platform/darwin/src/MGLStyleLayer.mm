@@ -5,9 +5,7 @@
 #include <mbgl/style/layer.hpp>
 
 @interface MGLStyleLayer ()
-
-@property (nonatomic, readonly) mbgl::style::Layer *rawLayer;
-
+@property (nonatomic, readwrite, nullable) mbgl::style::Layer *rawLayer;
 @end
 
 @implementation MGLStyleLayer {
@@ -38,10 +36,6 @@
                     "to the style more than once is invalid.", self, style];
     }
 
-    // Since we're adding self to a C++ collection, we need to retain ourselves, so that we don't
-    // end up with a dangling pointer
-    CFBridgingRetain(self);
-
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
         style.rawStyle->addLayer(std::move(_pendingLayer), belowLayerId);
@@ -54,10 +48,6 @@
 {
     if (self.rawLayer == style.rawStyle->getLayer(self.identifier.UTF8String)) {
         _pendingLayer = style.rawStyle->removeLayer(self.identifier.UTF8String);
-
-        // Pair the retain above, and release self, since we're now removed from the collection
-        CFTypeRef toRelease = (__bridge CFTypeRef)self;
-        CFBridgingRelease(toRelease);
     }
 }
 
@@ -111,7 +101,14 @@
 {
     return [NSString stringWithFormat:@"<%@: %p; identifier = %@; visible = %@>",
             NSStringFromClass([self class]), (void *)self, self.identifier,
-            self.visible ? @"YES" : @"NO"];
+            self.rawLayer ? (self.visible ? @"YES" : @"NO") : @"(No raw layer)"];
+}
+
+#pragma mark - Debug methods
+
+- (void)debugResetRawLayerPeer {
+    MGLAssertStyleLayerIsValid();
+    self.rawLayer->peer.reset();
 }
 
 @end

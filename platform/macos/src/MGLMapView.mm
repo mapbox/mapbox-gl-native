@@ -15,6 +15,7 @@
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
 #import "MGLStyle_Private.h"
+#import "MGLStyleLayerRetentionManager_Private.h"
 #import "MGLShape_Private.h"
 
 #import "MGLAccountManager.h"
@@ -144,6 +145,7 @@ public:
 @property (nonatomic, readwrite) NSView *attributionView;
 
 @property (nonatomic, readwrite) MGLStyle *style;
+@property (nonatomic) MGLStyleLayerRetentionManager* styleLayerRetentionManager;
 
 /// Mapping from reusable identifiers to annotation images.
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
@@ -255,6 +257,8 @@ public:
 
 - (void)commonInit {
     _isTargetingInterfaceBuilder = NSProcessInfo.processInfo.mgl_isInterfaceBuilderDesignablesAgent;
+
+    _styleLayerRetentionManager = [[MGLStyleLayerRetentionManager alloc] init];
 
     // Set up cross-platform controllers and resources.
     _mbglView = new MGLMapViewImpl(self);
@@ -882,6 +886,8 @@ public:
         return;
     }
 
+    [self.styleLayerRetentionManager updateRetainedLayers:self.style.managedLayers];
+
     if ([self.delegate respondsToSelector:@selector(mapViewWillStartRenderingFrame:)]) {
         [self.delegate mapViewWillStartRenderingFrame:self];
     }
@@ -896,6 +902,9 @@ public:
         _isChangingAnnotationLayers = NO;
         [self.style didChangeValueForKey:@"layers"];
     }
+
+    [self.styleLayerRetentionManager decrementLifetimes];
+
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)]) {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
     }

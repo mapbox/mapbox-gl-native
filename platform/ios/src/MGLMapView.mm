@@ -65,6 +65,7 @@
 #import "MGLScaleBar.h"
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
+#import "MGLStyleLayerRetentionManager_Private.h"
 #import "MGLMapboxEvents.h"
 #import "MGLSDKUpdateChecker.h"
 #import "MGLCompactCalloutView.h"
@@ -200,6 +201,8 @@ public:
 @property (nonatomic) NS_MUTABLE_ARRAY_OF(NSLayoutConstraint *) *attributionButtonConstraints;
 
 @property (nonatomic, readwrite) MGLStyle *style;
+@property (nonatomic) MGLStyleLayerRetentionManager* styleLayerRetentionManager;
+
 
 @property (nonatomic) UITapGestureRecognizer *singleTapGestureRecognizer;
 @property (nonatomic) UITapGestureRecognizer *doubleTap;
@@ -359,7 +362,9 @@ public:
     }
 
     styleURL = styleURL.mgl_URLByStandardizingScheme;
+
     self.style = nil;
+
     _mbglMap->getStyle().loadURL([[styleURL absoluteString] UTF8String]);
 }
 
@@ -389,6 +394,8 @@ public:
     {
         [self createGLView];
     }
+
+    _styleLayerRetentionManager = [[MGLStyleLayerRetentionManager alloc] init];
 
     // setup accessibility
     //
@@ -5549,9 +5556,12 @@ public:
 }
 
 - (void)mapViewWillStartRenderingFrame {
+
     if (!_mbglMap) {
         return;
     }
+
+    [self.styleLayerRetentionManager updateRetainedLayers:self.style.managedLayers];
 
     if ([self.delegate respondsToSelector:@selector(mapViewWillStartRenderingFrame:)])
     {
@@ -5571,6 +5581,8 @@ public:
     }
     [self updateAnnotationViews];
     [self updateCalloutView];
+    [self.styleLayerRetentionManager decrementLifetimes];
+
     if ([self.delegate respondsToSelector:@selector(mapViewDidFinishRenderingFrame:fullyRendered:)])
     {
         [self.delegate mapViewDidFinishRenderingFrame:self fullyRendered:fullyRendered];
@@ -6345,5 +6357,10 @@ private:
 {
     self.showsUserHeadingIndicator = showsHeading;
 }
+
+- (BOOL)debugIsStyleLayerBeingManaged:(MGLStyleLayer*)layer {
+    return [self.styleLayerRetentionManager isManagedLayer:layer];
+}
+
 
 @end

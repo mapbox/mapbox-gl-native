@@ -10,19 +10,27 @@ CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerRenderFunction render,
                          CustomLayerContextLostFunction contextLost,
                          CustomLayerDeinitializeFunction deinit,
+                         CustomLayerDeallocationFunction deallocation,
                          void* context)
-        : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)) {
+    : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)),
+    deallocationFn(deallocation) {
 }
 
 CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerInitializeFunction init,
                          CustomLayerRenderFunction render,
                          CustomLayerDeinitializeFunction deinit,
+                         CustomLayerDeallocationFunction deallocation,
                          void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)) {
+    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)),
+    deallocationFn(deallocation) {
 }
 
-CustomLayer::~CustomLayer() = default;
+CustomLayer::~CustomLayer() {
+    if (deallocationFn) {
+        deallocationFn(&peer);
+    }
+};
 
 const CustomLayer::Impl& CustomLayer::impl() const {
     return static_cast<const Impl&>(*baseImpl);
