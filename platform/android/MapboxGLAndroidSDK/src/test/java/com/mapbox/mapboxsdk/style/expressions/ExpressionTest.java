@@ -264,12 +264,46 @@ public class ExpressionTest {
 
   @Test
   public void testMatch() throws Exception {
-    Object[] labelZero = new Object[] {"a", "output"};
-    Object[] labelOne = new Object[] {"b", "output2"};
-    Object[] labelTwo = new Object[] {"c", "output3"};
+    String input = "input";
+    String[] labels = new String[] {"a", "b", "c"};
+    String[] outputs = new String[] {"1", "2", "3"};
+    String defaultOutput = "0";
 
-    Object[] expected = new Object[] {"match", labelZero, labelOne, labelTwo};
-    Object[] actual = match(literal(labelZero), literal(labelOne), literal(labelTwo)).toArray();
+    Object[] expected = new Object[] {"match", input,
+      labels[0], outputs[0],
+      labels[1], outputs[1],
+      labels[2], outputs[2],
+      defaultOutput};
+
+    Object[] actual = match(literal(input),
+      literal(labels[0]), literal(outputs[0]),
+      literal(labels[1]), literal(outputs[1]),
+      literal(labels[2]), literal(outputs[2]),
+      literal(defaultOutput)
+    ).toArray();
+
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testMatchWithStops() throws Exception {
+    String input = "input";
+    String[] labels = new String[] {"a", "b", "c"};
+    String[] outputs = new String[] {"1", "2", "3"};
+    String defaultOutput = "0";
+
+    Object[] expected = new Object[] {"match", input,
+      labels[0], outputs[0],
+      labels[1], outputs[1],
+      labels[2], outputs[2],
+      defaultOutput};
+
+    Object[] actual = match(literal(input), literal(defaultOutput),
+      stop(labels[0], outputs[0]),
+      stop(labels[1], outputs[1]),
+      stop(labels[2], outputs[2]))
+      .toArray();
+
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
