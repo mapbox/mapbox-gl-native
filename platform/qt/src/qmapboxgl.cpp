@@ -518,6 +518,19 @@ void QMapboxGLSettings::setResourceTransform(const std::function<std::string(con
 */
 
 /*!
+    \enum QMapboxGL::MapLoadingFailure
+
+    This enum represents map loading failure type.
+
+    \value StyleParseFailure                             Failure to parse the style.
+    \value StyleLoadFailure                              Failure to load the style data.
+    \value NotFoundFailure                               Failure to obtain style resource file.
+    \value UnknownFailure                                Unknown map loading failure.
+
+    \sa mapLoadingFailed()
+*/
+
+/*!
     \enum QMapboxGL::NorthOrientation
 
     This enum sets the orientation of the north bearing. It will directly affect bearing when
@@ -1613,6 +1626,13 @@ void QMapboxGL::connectionEstablished()
 */
 
 /*!
+    \fn void QMapboxGL::mapLoadingFailed(QMapboxGL::MapLoadingFailure type, const QString &description)
+
+    This signal is emitted when a map loading failure happens. Details of the
+    failures are provided, including its \a type and textual \a description.
+*/
+
+/*!
     \fn void QMapboxGL::copyrightsChanged(const QString &copyrightsHtml);
 
     This signal is emitted when the copyrights of the current content of the map
@@ -1649,6 +1669,7 @@ QMapboxGLPrivate::QMapboxGLPrivate(QMapboxGL *q, const QMapboxGLSettings &settin
     qRegisterMetaType<QMapboxGL::MapChange>("QMapboxGL::MapChange");
 
     connect(m_mapObserver.get(), SIGNAL(mapChanged(QMapboxGL::MapChange)), q, SIGNAL(mapChanged(QMapboxGL::MapChange)));
+    connect(m_mapObserver.get(), SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)), q, SIGNAL(mapLoadingFailed(QMapboxGL::MapLoadingFailure,QString)));
     connect(m_mapObserver.get(), SIGNAL(copyrightsChanged(QString)), q, SIGNAL(copyrightsChanged(QString)));
 
     // Setup the Map object

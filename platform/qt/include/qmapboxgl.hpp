@@ -128,6 +128,13 @@ public:
         MapChangeSourceDidChange
     };
 
+    enum MapLoadingFailure {
+        StyleParseFailure,
+        StyleLoadFailure,
+        NotFoundFailure,
+        UnknownFailure
+    };
+
     // Determines the orientation of the map.
     enum NorthOrientation {
         NorthUpwards, // Default
@@ -251,6 +258,7 @@ public slots:
 signals:
     void needsRendering();
     void mapChanged(QMapboxGL::MapChange);
+    void mapLoadingFailed(QMapboxGL::MapLoadingFailure, const QString &reason);
     void copyrightsChanged(const QString &copyrightsHtml);
 
     void staticRenderFinished(const QString &error);
@@ -262,5 +270,6 @@ private:
 };
 
 Q_DECLARE_METATYPE(QMapboxGL::MapChange);
+Q_DECLARE_METATYPE(QMapboxGL::MapLoadingFailure);
 
 #endif // QMAPBOXGL_H
