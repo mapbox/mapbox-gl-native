@@ -84,9 +84,13 @@
     
     // The Mapbox Style Specification does not specify a color space, but it is
     // assumed to be sRGB for consistency with CSS.
-    return [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace]
-                             components:&components[0]
-                                  count:components.size()];
+    NSColor *color = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace]
+                                       components:&components[0]
+                                            count:components.size()];
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101300
+    color = [color colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+#endif
+    return color;
 }
 
 @end
