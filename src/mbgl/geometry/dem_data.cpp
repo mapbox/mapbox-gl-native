@@ -3,7 +3,7 @@
 
 namespace mbgl {
 
-DEMData::DEMData(const PremultipliedImage& _image):
+DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding):
     dim(_image.size.height),
     border(std::max<int32_t>(std::ceil(_image.size.height / 2), 1)),
     stride(dim + 2 * border),
@@ -13,13 +13,25 @@ DEMData::DEMData(const PremultipliedImage& _image):
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
+    auto decodeMapbox = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+        // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
+        return (r * 256 * 256 + g * 256 + b)/10 - 10000;
+    };
+
+    auto decodeTerrarium = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+        // https://aws.amazon.com/public-datasets/terrain/
+        return ((r * 256 + g + b / 256) - 32768);
+    };
+
+    auto decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
+
     std::memset(image.data.get(), 0, image.bytes());
 
     for (int32_t y = 0; y < dim; y++) {
         for (int32_t x = 0; x < dim; x++) {
             const int32_t i = y * dim + x;
             const int32_t j = i * 4;
-            set(x, y, (_image.data[j] * 256 * 256 + _image.data[j+1] * 256 + _image.data[j+2])/10 - 10000);
+            set(x, y, decodeRGB(_image.data[j], _image.data[j+1], _image.data[j+2]));
         }
     }
     

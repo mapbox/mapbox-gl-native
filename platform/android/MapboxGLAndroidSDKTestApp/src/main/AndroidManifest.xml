@@ -69,12 +69,12 @@
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
         <activity
-            android:name=".activity.annotation.AnimatedMarkerActivity"
-            android:description="@string/description_animated_marker"
-            android:label="@string/activity_animated_marker">
+            android:name=".activity.annotation.AnimatedSymbolLayerActivity"
+            android:description="@string/description_animated_symbollayer"
+            android:label="@string/activity_animated_symbollayer">
             <meta-data
                 android:name="@string/category"
-                android:value="@string/category_annotation"/>
+                android:value="@string/category_style"/>
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
@@ -789,6 +789,17 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".activity.FeatureOverviewActivity"/>
         </activity>
+        <activity
+            android:name=".activity.style.HeatmapLayerActivity"
+            android:description="@string/description_heatmaplayer"
+            android:label="@string/activity_heatmaplayer">
+            <meta-data
+                android:name="@string/category"
+                android:value="@string/category_style"/>
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activity.FeatureOverviewActivity"/>
+        </activity>
 
         <!-- For Instrumentation tests -->
         <activity
@@ -806,7 +817,7 @@
         <!-- Configuration Settings -->
         <meta-data
             android:name="com.mapbox.TestEventsServer"
-            android:value="https://cloudfront-staging.tilestream.net"/>
+            android:value="api-events-staging.tilestream.net"/>
         <meta-data
             android:name="com.mapbox.TestEventsAccessToken"
             android:value="pk.eyJ1IjoiYmxzdGFnaW5nIiwiYSI6ImNpdDF3OHpoaTAwMDcyeXA5Y3Z0Nmk2dzEifQ.0IfB7v5Qbm2MGVYt8Kb8fg"/>

@@ -230,6 +230,24 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         
         XCTAssertNotNil(mapView.style?.layer(withIdentifier: "buildings"))
     }
+    
+    func testMGLHeatmapStyleLayer() {
+        let earthquakes = MGLShapeSource(identifier: "earthquakes", url: URL(string: "https://example.com/earthquakes.json")!, options: [:])
+        mapView.style?.addSource(earthquakes)
+        
+        //#-example-code
+        let layer = MGLHeatmapStyleLayer(identifier: "earthquake-heat", source: earthquakes)
+        layer.heatmapWeight = NSExpression(format: "FUNCTION(magnitude, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                           [0: 0,
+                                            6: 1])
+        layer.heatmapIntensity = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                              [0: 1,
+                                               9: 3])
+        mapView.style?.addLayer(layer)
+        //#-end-example-code
+        
+        XCTAssertNotNil(mapView.style?.layer(withIdentifier: "earthquake-heat"))
+    }
 
     func testMGLSymbolStyleLayer() {
         let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
@@ -373,7 +391,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         }
         //#-end-example-code
         
-        wait(for: [expectation], timeout: 1)
+        wait(for: [expectation], timeout: 5)
     }
     
     // For testMGLMapView().

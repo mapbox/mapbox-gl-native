@@ -52,16 +52,17 @@ android {
 }
 
 dependencies {
-    implementation(project(':MapboxGLAndroidSDK'))
-    implementation(dependenciesList.mapboxJavaServices) {
-        transitive = true
-    }
+    api(project(':MapboxGLAndroidSDK'))
+    implementation dependenciesList.mapboxJavaServices
+
+    implementation dependenciesList.mapboxJavaTurf
 
     implementation dependenciesList.supportAppcompatV7
     implementation dependenciesList.supportRecyclerView
     implementation dependenciesList.supportDesign
 
-    implementation dependenciesList.lost
+    // implementation dependenciesList.lost
+    implementation dependenciesList.gmsLocation
     implementation dependenciesList.timber
     debugImplementation dependenciesList.leakCanaryDebug
     releaseImplementation dependenciesList.leakCanaryRelease
@@ -71,6 +72,7 @@ dependencies {
     androidTestImplementation dependenciesList.testRules
     androidTestImplementation dependenciesList.testEspressoCore
     androidTestImplementation dependenciesList.testEspressoIntents
+    androidTestImplementation dependenciesList.testEspressoContrib
 }
 
 apply from: "${rootDir}/gradle/gradle-make.gradle"

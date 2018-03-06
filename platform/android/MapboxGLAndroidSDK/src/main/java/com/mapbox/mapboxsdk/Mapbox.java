@@ -8,16 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.UiThread;
 import android.text.TextUtils;
 
+import com.mapbox.android.core.location.LocationEngine;
+import com.mapbox.android.core.location.LocationEnginePriority;
+import com.mapbox.android.core.location.LocationEngineProvider;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.mapboxsdk.location.LocationSource;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
-import com.mapbox.services.android.telemetry.MapboxTelemetry;
-import com.mapbox.services.android.telemetry.location.LocationEngine;
-import com.mapbox.services.android.telemetry.location.LocationEnginePriority;
-import com.mapbox.services.android.telemetry.location.LocationEngineProvider;
-
-import timber.log.Timber;
 
 /**
  * The entry point to initialize the Mapbox Android SDK.
@@ -56,15 +52,9 @@ public final class Mapbox {
       INSTANCE = new Mapbox(appContext, accessToken, locationEngine);
       locationEngine.setPriority(LocationEnginePriority.NO_POWER);
 
-      try {
-        MapboxTelemetry.getInstance().initialize(
-          appContext, accessToken, BuildConfig.MAPBOX_EVENTS_USER_AGENT, locationEngine);
-      } catch (Exception exception) {
-        Timber.e(exception, "Unable to instantiate Mapbox telemetry");
-      }
-
       ConnectivityReceiver.instance(appContext);
     }
+
     return INSTANCE;
   }
 
@@ -146,22 +136,11 @@ public final class Mapbox {
   }
 
   /**
-   * Returns a location source instance with empty methods.
-   *
-   * @return an empty location source implementation
-   * @deprecated Replaced by {@link Mapbox#getLocationEngine()}
-   */
-  @Deprecated
-  public static LocationSource getLocationSource() {
-    return new EmptyLocationSource();
-  }
-
-
-  /**
    * Returns the location engine used by the SDK.
    *
    * @return the location engine configured
    */
+  // TODO Do we need to expose this?
   public static LocationEngine getLocationEngine() {
     return INSTANCE.locationEngine;
   }

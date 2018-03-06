@@ -6,6 +6,7 @@
 #import "NSException+MGLAdditions.h"
 #import "MGLAPIClient.h"
 #import "MGLLocationManager.h"
+#import "MGLTelemetryConfig.h"
 
 #include <mbgl/storage/reachability.h>
 #include <sys/sysctl.h>
@@ -172,6 +173,8 @@ const NSTimeInterval MGLFlushInterval = 180;
 - (instancetype) init {
     self = [super init];
     if (self) {
+        [MGLTelemetryConfig.sharedConfig configurationFromKey:[[NSUserDefaults standardUserDefaults] objectForKey:MGLMapboxMetricsProfile]];
+        
         _currentAccountTypeValue = @0;
         _currentMetricsEnabledValue = YES;
         

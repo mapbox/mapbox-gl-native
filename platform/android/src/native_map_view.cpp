@@ -450,7 +450,7 @@ jni::Array<jni::jlong> NativeMapView::addMarkers(jni::JNIEnv& env, jni::Array<jn
 }
 
 void NativeMapView::onLowMemory(JNIEnv&) {
-    rendererFrontend->onLowMemory();
+    rendererFrontend->reduceMemoryUse();
 }
 
 using DebugOptions = mbgl::MapDebugOptions;

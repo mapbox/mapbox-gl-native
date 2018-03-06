@@ -8,6 +8,8 @@ const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevel = @"MGLShapeSour
 const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @"MGLShapeSourceOptionMaximumZoomLevelForClustering";
 const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel = @"MGLShapeSourceOptionMinimumZoomLevel";
 const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
+const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
+const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
 
 @interface MGLAbstractShapeSource ()
 
@@ -113,5 +115,22 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
         }
         sourceOptions.tileOptions.tolerance = value.doubleValue;
     }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionWrapsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionWrapsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.wrap = value.boolValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionClipsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionClipsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.clip = value.boolValue;
+    }
+
     return sourceOptions;
 }

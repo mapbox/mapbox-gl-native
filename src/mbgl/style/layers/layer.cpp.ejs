@@ -8,6 +8,12 @@
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer.hpp>
 #include <mbgl/style/layers/<%- type.replace('-', '_') %>_layer_impl.hpp>
 #include <mbgl/style/layer_observer.hpp>
+<% if (type === 'heatmap') { -%>
+// for constructing default heatmap-color ramp expression from style JSON
+#include <mbgl/style/conversion.hpp>
+#include <mbgl/style/conversion/json.hpp>
+#include <mbgl/style/conversion/heatmap_color_property_value.hpp>
+<% } -%>
 
 namespace mbgl {
 namespace style {
@@ -134,7 +140,13 @@ void <%- camelize(type) %>Layer::set<%- camelize(property.name) %>(<%- propertyV
 // Paint properties
 <% for (const property of paintProperties) { %>
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::getDefault<%- camelize(property.name) %>() {
+<% if (property.name === 'heatmap-color') { -%>
+    conversion::Error error;
+    std::string rawValue = R"JSON(<%- JSON.stringify(property.default) %>)JSON";
+    return *conversion::convertJSON<<%- propertyValueType(property)%>>(rawValue, error);
+<% } else { -%>
     return { <%- defaultValue(property) %> };
+<% } -%>
 }
 
 <%- propertyValueType(property) %> <%- camelize(type) %>Layer::get<%- camelize(property.name) %>() const {

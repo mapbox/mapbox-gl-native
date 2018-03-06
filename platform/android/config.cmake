@@ -158,6 +158,8 @@ add_library(mbgl-android STATIC
     platform/android/src/style/layers/fill_extrusion_layer.hpp
     platform/android/src/style/layers/fill_layer.cpp
     platform/android/src/style/layers/fill_layer.hpp
+    platform/android/src/style/layers/heatmap_layer.cpp
+    platform/android/src/style/layers/heatmap_layer.hpp
     platform/android/src/style/layers/hillshade_layer.cpp
     platform/android/src/style/layers/hillshade_layer.hpp
     platform/android/src/style/layers/layer.cpp
@@ -248,8 +250,6 @@ add_library(mbgl-android STATIC
     platform/android/src/geojson/point.hpp
     platform/android/src/geojson/polygon.cpp
     platform/android/src/geojson/polygon.hpp
-    platform/android/src/geojson/position.cpp
-    platform/android/src/geojson/position.hpp
 
     # Geometry
     platform/android/src/geometry/lat_lng.cpp

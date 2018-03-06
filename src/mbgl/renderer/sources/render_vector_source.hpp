@@ -33,14 +33,14 @@ public:
     std::vector<Feature>
     querySourceFeatures(const SourceQueryOptions&) const final;
 
-    void onLowMemory() final;
+    void reduceMemoryUse() final;
     void dumpDebugLogs() const final;
 
 private:
     const style::VectorSource::Impl& impl() const;
 
     TilePyramid tilePyramid;
-    optional<std::vector<std::string>> tileURLTemplates;
+    optional<Tileset> tileset;
 };
 
 template <>

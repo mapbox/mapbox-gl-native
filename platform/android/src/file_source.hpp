@@ -45,6 +45,8 @@ public:
 
     void pause(jni::JNIEnv&);
 
+    jni::jboolean isResumed(jni::JNIEnv&);
+
     static jni::Class<FileSource> javaClass;
 
     static FileSource* getNativePeer(jni::JNIEnv&, jni::Object<FileSource>);

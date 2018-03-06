@@ -24,7 +24,7 @@
     <string name="description_offline">Offline Map example</string>
     <string name="description_update_metadata">Update metadata example</string>
     <string name="description_offline_region_delete">Delete region example</string>
-    <string name="description_animated_marker">Animate the position change of a marker</string>
+    <string name="description_animated_symbollayer">Animate the position change of a symbol layer</string>
     <string name="description_polyline">Add a polyline to a map</string>
     <string name="description_polygon">Add a polygon to a map</string>
     <string name="description_scroll_by">Scroll with pixels in x,y direction</string>
@@ -70,4 +70,5 @@
     <string name="description_grid_source">Example Custom Geometry Source</string>
     <string name="description_local_glyph">Suzhou using Droid Sans for Chinese glyphs</string>
     <string name="description_hillshade">Example raster-dem source and hillshade layer</string>
+    <string name="description_heatmaplayer">Use HeatmapLayer to visualise earthquakes</string>
 </resources>

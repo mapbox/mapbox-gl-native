@@ -14,6 +14,7 @@
 #include <mbgl/renderer/layers/render_background_layer.hpp>
 #include <mbgl/renderer/layers/render_custom_layer.hpp>
 #include <mbgl/renderer/layers/render_fill_extrusion_layer.hpp>
+#include <mbgl/renderer/layers/render_heatmap_layer.hpp>
 #include <mbgl/renderer/layers/render_hillshade_layer.hpp>
 #include <mbgl/renderer/style_diff.hpp>
 #include <mbgl/renderer/query.hpp>
@@ -185,6 +186,10 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
 
         if (layerAdded || layerChanged) {
             layer.transition(transitionParameters);
+
+            if (layer.is<RenderHeatmapLayer>()) {
+                layer.as<RenderHeatmapLayer>()->updateColorRamp();
+            }
         }
 
         if (layerAdded || layerChanged || zoomChanged || layer.hasTransition()) {
@@ -290,7 +295,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         RenderLayer* layer = getRenderLayer(layerImpl->id);
         assert(layer);
 
-        if (!parameters.staticData.has3D && (layer->is<RenderFillExtrusionLayer>() || layer->is<RenderHillshadeLayer>())) {
+        if (!parameters.staticData.has3D && (
+                layer->is<RenderFillExtrusionLayer>() ||
+                layer->is<RenderHillshadeLayer>() ||
+                layer->is<RenderHeatmapLayer>())) {
+
             parameters.staticData.has3D = true;
         }
 
@@ -722,12 +731,12 @@ std::vector<Feature> Renderer::Impl::querySourceFeatures(const std::string& sour
     return source->querySourceFeatures(options);
 }
 
-void Renderer::Impl::onLowMemory() {
+void Renderer::Impl::reduceMemoryUse() {
     assert(BackendScope::exists());
-    backend.getContext().performCleanup();
     for (const auto& entry : renderSources) {
-        entry.second->onLowMemory();
+        entry.second->reduceMemoryUse();
     }
+    backend.getContext().performCleanup();
     observer->onInvalidate();
 }
 

@@ -23,6 +23,12 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
 
+import com.mapbox.android.gestures.AndroidGesturesManager;
+import com.mapbox.android.telemetry.AppUserTurnstile;
+import com.mapbox.android.telemetry.Event;
+import com.mapbox.android.telemetry.MapEventFactory;
+import com.mapbox.android.telemetry.MapboxTelemetry;
+import com.mapbox.mapboxsdk.BuildConfig;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
@@ -36,10 +42,10 @@ import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
-import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -133,17 +139,7 @@ public class MapView extends FrameLayout {
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
     setWillNotDraw(false);
 
-    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-      @Override
-      public void onGlobalLayout() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-          getViewTreeObserver().removeOnGlobalLayoutListener(this);
-        } else {
-          getViewTreeObserver().removeGlobalOnLayoutListener(this);
-        }
-        initialiseDrawingSurface(options);
-      }
-    });
+    getViewTreeObserver().addOnGlobalLayoutListener(new MapViewLayoutListener(this, options));
   }
 
   private void initialiseMap() {
@@ -155,7 +151,7 @@ public class MapView extends FrameLayout {
     focalPointInvalidator.addListener(createFocalPointChangeListener());
 
     // callback for registering touch listeners
-    RegisterTouchListener registerTouchListener = new RegisterTouchListener();
+    GesturesManagerInteractionListener registerTouchListener = new GesturesManagerInteractionListener();
 
     // callback for zooming in the camera
     CameraZoomInvalidator zoomInvalidator = new CameraZoomInvalidator();
@@ -190,7 +186,7 @@ public class MapView extends FrameLayout {
     mapCallback.attachMapboxMap(mapboxMap);
 
     // user input
-    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings, trackingSettings,
+    mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
       annotationManager, cameraChangeDispatcher);
     mapKeyListener = new MapKeyListener(transform, trackingSettings, uiSettings);
 
@@ -285,7 +281,12 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
     if (savedInstanceState == null) {
-      MapboxTelemetry.getInstance().pushEvent(MapboxEventWrapper.buildMapLoadEvent());
+      MapboxTelemetry telemetry = Events.obtainTelemetry();
+      AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
+        BuildConfig.MAPBOX_SDK_VERSION);
+      telemetry.push(turnstileEvent);
+      MapEventFactory mapEventFactory = new MapEventFactory();
+      telemetry.push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
     } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
       this.savedInstanceState = savedInstanceState;
     }
@@ -304,7 +305,7 @@ public class MapView extends FrameLayout {
 
       addView(textureView, 0);
     } else {
-      GLSurfaceView glSurfaceView = (GLSurfaceView) findViewById(R.id.surfaceView);
+      GLSurfaceView glSurfaceView = new GLSurfaceView(getContext());
       glSurfaceView.setZOrderMediaOverlay(mapboxMapOptions.getRenderSurfaceOnTop());
       mapRenderer = new GLSurfaceViewMapRenderer(getContext(), glSurfaceView, options.getLocalIdeographFontFamily()) {
         @Override
@@ -314,7 +315,7 @@ public class MapView extends FrameLayout {
         }
       };
 
-      glSurfaceView.setVisibility(View.VISIBLE);
+      addView(glSurfaceView, 0);
     }
 
     nativeMapView = new NativeMapView(this, mapRenderer);
@@ -389,6 +390,7 @@ public class MapView extends FrameLayout {
   public void onStop() {
     if (mapboxMap != null) {
       // map was destroyed before it was started
+      mapGestureDetector.cancelAnimators();
       mapboxMap.onStop();
     }
 
@@ -486,7 +488,9 @@ public class MapView extends FrameLayout {
    */
   @UiThread
   public void onLowMemory() {
-    nativeMapView.onLowMemory();
+    if (nativeMapView != null) {
+      nativeMapView.onLowMemory();
+    }
   }
 
   /**
@@ -879,6 +883,30 @@ public class MapView extends FrameLayout {
     void onMapChanged(@MapChange int change);
   }
 
+  private static class MapViewLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+
+    private WeakReference<MapView> mapViewWeakReference;
+    private MapboxMapOptions options;
+
+    MapViewLayoutListener(MapView mapView, MapboxMapOptions options) {
+      this.mapViewWeakReference = new WeakReference<>(mapView);
+      this.options = options;
+    }
+
+    @Override
+    public void onGlobalLayout() {
+      MapView mapView = mapViewWeakReference.get();
+      if (mapView != null) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+          mapView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+        } else {
+          mapView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+        }
+        mapView.initialiseDrawingSurface(options);
+      }
+    }
+  }
+
   private class FocalPointInvalidator implements FocalPointChangeListener {
 
     private final List<FocalPointChangeListener> focalPointChangeListeners = new ArrayList<>();
@@ -896,7 +924,7 @@ public class MapView extends FrameLayout {
     }
   }
 
-  private class RegisterTouchListener implements MapboxMap.OnRegisterTouchListener {
+  private class GesturesManagerInteractionListener implements MapboxMap.OnGesturesManagerInteractionListener {
 
     @Override
     public void onSetMapClickListener(MapboxMap.OnMapClickListener listener) {
@@ -957,6 +985,56 @@ public class MapView extends FrameLayout {
     public void onRemoveFlingListener(MapboxMap.OnFlingListener listener) {
       mapGestureDetector.removeOnFlingListener(listener);
     }
+
+    @Override
+    public void onAddMoveListener(MapboxMap.OnMoveListener listener) {
+      mapGestureDetector.addOnMoveListener(listener);
+    }
+
+    @Override
+    public void onRemoveMoveListener(MapboxMap.OnMoveListener listener) {
+      mapGestureDetector.removeOnMoveListener(listener);
+    }
+
+    @Override
+    public void onAddRotateListener(MapboxMap.OnRotateListener listener) {
+      mapGestureDetector.addOnRotateListener(listener);
+    }
+
+    @Override
+    public void onRemoveRotateListener(MapboxMap.OnRotateListener listener) {
+      mapGestureDetector.removeOnRotateListener(listener);
+    }
+
+    @Override
+    public void onAddScaleListener(MapboxMap.OnScaleListener listener) {
+      mapGestureDetector.addOnScaleListener(listener);
+    }
+
+    @Override
+    public void onRemoveScaleListener(MapboxMap.OnScaleListener listener) {
+      mapGestureDetector.removeOnScaleListener(listener);
+    }
+
+    @Override
+    public void onAddShoveListener(MapboxMap.OnShoveListener listener) {
+      mapGestureDetector.addShoveListener(listener);
+    }
+
+    @Override
+    public void onRemoveShoveListener(MapboxMap.OnShoveListener listener) {
+      mapGestureDetector.removeShoveListener(listener);
+    }
+
+    @Override
+    public AndroidGesturesManager getGesturesManager() {
+      return mapGestureDetector.getGesturesManager();
+    }
+
+    @Override
+    public void setGesturesManager(AndroidGesturesManager gesturesManager) {
+      mapGestureDetector.setGesturesManager(gesturesManager);
+    }
   }
 
   private static class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {
@@ -994,11 +1072,13 @@ public class MapView extends FrameLayout {
     }
 
     private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {
-      if (focalPoint != null) {
-        transform.zoom(zoomIn, focalPoint);
+      if (focalPoint == null) {
+        focalPoint = new PointF(mapWidth / 2, mapHeight / 2);
+      }
+      if (zoomIn) {
+        transform.zoomIn(focalPoint);
       } else {
-        PointF centerPoint = new PointF(mapWidth / 2, mapHeight / 2);
-        transform.zoom(zoomIn, centerPoint);
+        transform.zoomOut(focalPoint);
       }
     }
   }

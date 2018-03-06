@@ -95,9 +95,6 @@ void Placement::placeLayerBucket(
     auto partiallyEvaluatedTextSize = bucket.textSizeBinder->evaluateForZoom(state.getZoom());
     auto partiallyEvaluatedIconSize = bucket.iconSizeBinder->evaluateForZoom(state.getZoom());
 
-    const bool iconWithoutText = !bucket.hasTextData() || bucket.layout.get<style::TextOptional>();
-    const bool textWithoutIcon = !bucket.hasIconData() || bucket.layout.get<style::IconOptional>();
-
     for (auto& symbolInstance : bucket.symbolInstances) {
 
         if (seenCrossTileIDs.count(symbolInstance.crossTileID) == 0) {
@@ -139,6 +136,9 @@ void Placement::placeLayerBucket(
                 placeIcon = placed.first;
                 offscreen &= placed.second;
             }
+
+            const bool iconWithoutText = !symbolInstance.hasText || bucket.layout.get<style::TextOptional>();
+            const bool textWithoutIcon = !symbolInstance.hasIcon || bucket.layout.get<style::IconOptional>();
 
             // combine placements for icon and text
             if (!iconWithoutText && !textWithoutIcon) {
@@ -230,6 +230,8 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
     if (bucket.hasCollisionBoxData()) bucket.collisionBox.dynamicVertices.clear();
     if (bucket.hasCollisionCircleData()) bucket.collisionCircle.dynamicVertices.clear();
 
+    JointOpacityState duplicateOpacityState(false, false, true);
+
     JointOpacityState defaultOpacityState(
             bucket.layout.get<style::TextAllowOverlap>(),
             bucket.layout.get<style::IconAllowOverlap>(),
@@ -239,9 +241,12 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
         bool isDuplicate = seenCrossTileIDs.count(symbolInstance.crossTileID) > 0;
 
         auto it = opacities.find(symbolInstance.crossTileID);
-        auto opacityState = it != opacities.end() && !isDuplicate ?
-            it->second :
-            defaultOpacityState;
+        auto opacityState = defaultOpacityState;
+        if (isDuplicate) {
+            opacityState = duplicateOpacityState;
+        } else if (it != opacities.end()) {
+            opacityState = it->second;
+        }
 
         if (it == opacities.end()) {
             opacities.emplace(symbolInstance.crossTileID, defaultOpacityState);

@@ -6,6 +6,7 @@
 #include <mbgl/style/layers/background_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -54,11 +55,6 @@ void Style::Impl::loadURL(const std::string& url_) {
     url = url_;
 
     styleRequest = fileSource.request(Resource::style(url), [this](Response res) {
-        // Once we get a fresh style, or the style is mutated, stop revalidating.
-        if (res.isFresh() || mutated) {
-            styleRequest.reset();
-        }
-
         // Don't allow a loaded, mutated style to be overwritten with a new version.
         if (mutated && loaded) {
             return;

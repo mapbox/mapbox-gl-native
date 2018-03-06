@@ -110,6 +110,7 @@ struct ValueConverter<float> {
 template<>
 struct ValueConverter<mbgl::Value> {
     static Value toExpressionValue(const mbgl::Value& value);
+    static mbgl::Value fromExpressionValue(const Value& value);
 };
 
 template <typename T, std::size_t N>

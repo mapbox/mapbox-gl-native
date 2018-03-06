@@ -29,20 +29,21 @@ void RenderRasterSource::update(Immutable<style::Source::Impl> baseImpl_,
 
     enabled = needsRendering;
 
-    optional<Tileset> tileset = impl().getTileset();
+    optional<Tileset> _tileset = impl().getTileset();
 
-    if (!tileset) {
-        return;
-    }
-
-    if (tileURLTemplates != tileset->tiles) {
-        tileURLTemplates = tileset->tiles;
+    if (tileset != _tileset) {
+        tileset = _tileset;
 
         // TODO: this removes existing buckets, and will cause flickering.
         // Should instead refresh tile data in place.
         tilePyramid.tiles.clear();
         tilePyramid.renderTiles.clear();
         tilePyramid.cache.clear();
+    }
+    // Allow clearing the tile pyramid first, before the early return in case
+    //  the new tileset is not yet available or has an error in loading
+    if (!_tileset) {
+        return;
     }
 
     tilePyramid.update(layers,
@@ -84,8 +85,8 @@ std::vector<Feature> RenderRasterSource::querySourceFeatures(const SourceQueryOp
     return {};
 }
 
-void RenderRasterSource::onLowMemory() {
-    tilePyramid.onLowMemory();
+void RenderRasterSource::reduceMemoryUse() {
+    tilePyramid.reduceMemoryUse();
 }
 
 void RenderRasterSource::dumpDebugLogs() const {

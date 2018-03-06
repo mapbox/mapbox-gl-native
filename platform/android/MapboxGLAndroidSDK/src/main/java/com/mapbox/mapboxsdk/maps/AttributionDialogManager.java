@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
@@ -16,7 +17,6 @@ import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.style.sources.Source;
-import com.mapbox.services.android.telemetry.MapboxTelemetry;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,7 +49,17 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
   @Override
   public void onClick(View view) {
     attributionSet = new AttributionBuilder(mapboxMap).build();
-    showAttributionDialog(getAttributionTitles());
+
+    boolean isActivityFinishing = false;
+    if (context instanceof Activity) {
+      isActivityFinishing = ((Activity) context).isFinishing();
+    }
+
+    // check is hosting activity isn't finishing
+    // https://github.com/mapbox/mapbox-gl-native/issues/11238
+    if (!isActivityFinishing) {
+      showAttributionDialog(getAttributionTitles());
+    }
   }
 
   protected void showAttributionDialog(String[] attributionTitles) {
@@ -88,7 +98,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        MapboxTelemetry.getInstance().setTelemetryEnabled(true);
+        Events.obtainTelemetry().enable();
         dialog.cancel();
       }
     });
@@ -102,7 +112,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
-        MapboxTelemetry.getInstance().setTelemetryEnabled(false);
+        Events.obtainTelemetry().disable();
         dialog.cancel();
       }
     });

@@ -33,6 +33,9 @@ public:
     std::vector<optional<Value>> possibleOutputs() const override {
         return input->possibleOutputs();
     }
+    
+    mbgl::Value serialize() const override;
+    std::string getOperator() const override { return "array"; }
 
 private:
     std::unique_ptr<Expression> input;

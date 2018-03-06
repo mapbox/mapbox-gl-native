@@ -4,7 +4,7 @@
     <string name="activity_map_fragment">Map Fragment</string>
     <string name="activity_multimap">Multiple Maps on Screen</string>
     <string name="activity_add_bulk_markers">Add Markers In Bulk</string>
-    <string name="activity_animated_marker">Animated Markers</string>
+    <string name="activity_animated_symbollayer">Animated SymbolLayer</string>
     <string name="activity_dynamic_marker">Dynamic Marker</string>
     <string name="activity_polyline">Polyline</string>
     <string name="activity_polygon">Polygon</string>
@@ -70,4 +70,5 @@
     <string name="activity_grid_source">Grid Source</string>
     <string name="activity_local_glyph">Local CJK glyph generation</string>
     <string name="activity_hillshade">Hillshade</string>
+    <string name="activity_heatmaplayer">Heatmap layer</string>
 </resources>

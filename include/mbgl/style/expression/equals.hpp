@@ -21,6 +21,7 @@ public:
     EvaluationResult evaluate(const EvaluationContext&) const override;
     std::vector<optional<Value>> possibleOutputs() const override;
 
+    std::string getOperator() const override { return negate ? "!=" : "=="; }
 private:
     std::unique_ptr<Expression> lhs;
     std::unique_ptr<Expression> rhs;

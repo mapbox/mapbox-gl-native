@@ -24,7 +24,7 @@ namespace QMapbox {
 
 /*!
     \namespace QMapbox
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     Contains miscellaneous Mapbox bindings used throughout QMapboxGL.
 */
@@ -74,7 +74,7 @@ namespace QMapbox {
 /*!
     \class QMapbox::Feature
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     Represents \l {https://www.mapbox.com/help/define-features/}{map features}
     via its \a type (PointType, LineStringType or PolygonType), \a geometry, \a
@@ -94,7 +94,7 @@ namespace QMapbox {
 /*!
     \class QMapbox::ShapeAnnotationGeometry
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     Represents a shape annotation geometry.
 */
@@ -113,7 +113,7 @@ namespace QMapbox {
 /*!
     \class QMapbox::SymbolAnnotation
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     A symbol annotation comprises of its geometry and an icon identifier.
 */
@@ -121,7 +121,7 @@ namespace QMapbox {
 /*!
     \class QMapbox::LineAnnotation
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     Represents a line annotation object, along with its properties.
 
@@ -131,7 +131,7 @@ namespace QMapbox {
 /*!
     \class QMapbox::FillAnnotation
 
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     Represents a fill annotation object, along with its properties.
 
@@ -195,7 +195,7 @@ namespace QMapbox {
 
 /*!
     \class QMapbox::CustomLayerRenderParameters
-    \inmodule Mapbox Qt SDK
+    \inmodule Mapbox Maps SDK for Qt
 
     QMapbox::CustomLayerRenderParameters provides the data passed on each render
     pass for a custom layer.

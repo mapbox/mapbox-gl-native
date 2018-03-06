@@ -81,6 +81,13 @@ Coercion::Coercion(type::Type type_, std::vector<std::unique_ptr<Expression>> in
     }
 }
 
+std::string Coercion::getOperator() const {
+    return getType().match(
+      [](const type::NumberType&) { return "to-number"; },
+      [](const type::ColorType&) { return "to-color"; },
+      [](const auto&) { assert(false); return ""; });
+}
+
 using namespace mbgl::style::conversion;
 ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
     static std::unordered_map<std::string, type::Type> types {

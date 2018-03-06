@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 #include <mbgl/test/stub_file_source.hpp>
+#include <mbgl/test/stub_map_observer.hpp>
 #include <mbgl/test/fake_file_source.hpp>
 #include <mbgl/test/fixture_log_observer.hpp>
 
@@ -22,45 +23,6 @@
 using namespace mbgl;
 using namespace mbgl::style;
 using namespace std::literals::string_literals;
-
-class StubMapObserver : public MapObserver {
-public:
-    void onWillStartLoadingMap() final {
-        if (onWillStartLoadingMapCallback) {
-            onWillStartLoadingMapCallback();
-        }
-    }
-    
-    void onDidFinishLoadingMap() final {
-        if (onDidFinishLoadingMapCallback) {
-            onDidFinishLoadingMapCallback();
-        }
-    }
-    
-    void onDidFailLoadingMap(std::exception_ptr) final {
-        if (didFailLoadingMapCallback) {
-            didFailLoadingMapCallback();
-        }
-    }
-    
-    void onDidFinishLoadingStyle() final {
-        if (didFinishLoadingStyleCallback) {
-            didFinishLoadingStyleCallback();
-        }
-    }
-
-    void onDidFinishRenderingFrame(RenderMode mode) final {
-        if (didFinishRenderingFrame) {
-            didFinishRenderingFrame(mode);
-        }
-    }
-
-    std::function<void()> onWillStartLoadingMapCallback;
-    std::function<void()> onDidFinishLoadingMapCallback;
-    std::function<void()> didFailLoadingMapCallback;
-    std::function<void()> didFinishLoadingStyleCallback;
-    std::function<void(RenderMode)> didFinishRenderingFrame;
-};
 
 template <class FileSource = StubFileSource>
 class MapTest {
@@ -252,7 +214,7 @@ TEST(Map, DoubleStyleLoad) {
 }
 
 TEST(Map, StyleFresh) {
-    // The map should not revalidate fresh styles.
+    // The map should continue to revalidate fresh styles.
 
     MapTest<FakeFileSource> test;
 
@@ -264,11 +226,11 @@ TEST(Map, StyleFresh) {
     response.expires = Timestamp::max();
 
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
 }
 
 TEST(Map, StyleExpired) {
-    // The map should allow expired styles to be revalidated, so long as no mutations are made.
+    // The map should allow expired styles to be revalidated until we get a fresh style.
 
     using namespace std::chrono_literals;
 
@@ -284,11 +246,22 @@ TEST(Map, StyleExpired) {
     test.fileSource.respond(Resource::Style, response);
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Mutate layer. From now on, sending a response to the style won't overwrite it anymore, but
+    // we should continue to wait for a fresh response.
     test.map.getStyle().addLayer(std::make_unique<style::BackgroundLayer>("bg"));
     EXPECT_EQ(1u, test.fileSource.requests.size());
 
+    // Send another expired response, and confirm that we didn't overwrite the style, but continue
+    // to wait for a fresh response.
     test.fileSource.respond(Resource::Style, response);
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
+    EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
+
+    // Send a fresh response, and confirm that we didn't overwrite the style, but continue to wait
+    // for a fresh response.
+    response.expires = util::now() + 1h;
+    test.fileSource.respond(Resource::Style, response);
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("bg"));
 }
 
@@ -352,7 +325,7 @@ TEST(Map, StyleEarlyMutation) {
     response.data = std::make_shared<std::string>(util::read_file("test/fixtures/api/water.json"));
     test.fileSource.respond(Resource::Style, response);
 
-    EXPECT_EQ(0u, test.fileSource.requests.size());
+    EXPECT_EQ(1u, test.fileSource.requests.size());
     EXPECT_NE(nullptr, test.map.getStyle().getLayer("water"));
 }
 
@@ -360,7 +333,7 @@ TEST(Map, MapLoadingSignal) {
     MapTest<> test;
 
     bool emitted = false;
-    test.observer.onWillStartLoadingMapCallback = [&]() {
+    test.observer.willStartLoadingMapCallback = [&]() {
         emitted = true;
     };
     test.map.getStyle().loadJSON(util::read_file("test/fixtures/api/empty.json"));
@@ -370,7 +343,7 @@ TEST(Map, MapLoadingSignal) {
 TEST(Map, MapLoadedSignal) {
     MapTest<> test { 1, MapMode::Continuous };
 
-    test.observer.onDidFinishLoadingMapCallback = [&]() {
+    test.observer.didFinishLoadingMapCallback = [&]() {
         test.runLoop.stop();
     };
 
@@ -596,7 +569,7 @@ TEST(Map, TEST_DISABLED_ON_CI(ContinuousRendering)) {
     HeadlessFrontend frontend(pixelRatio, fileSource, threadPool);
 
     StubMapObserver observer;
-    observer.didFinishRenderingFrame = [&] (MapObserver::RenderMode) {
+    observer.didFinishRenderingFrameCallback = [&] (MapObserver::RenderMode) {
         // Start a timer that ends the test one second from now. If we are continuing to render
         // indefinitely, the timer will be constantly restarted and never trigger. Instead, the
         // emergency shutoff above will trigger, failing the test.

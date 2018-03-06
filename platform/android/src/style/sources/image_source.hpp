@@ -30,6 +30,8 @@ public:
 
     void setImage(jni::JNIEnv&, jni::Object<Bitmap>);
 
+    void setCoordinates(jni::JNIEnv&, jni::Object<LatLngQuad>);
+
 private:
     jni::Object<Source> createJavaPeer(jni::JNIEnv&);
 

@@ -23,7 +23,7 @@ public class MapboxMapTest {
       mock(TrackingSettings.class),
       mock(MyLocationViewSettings.class),
       mock(Projection.class),
-      mock(MapboxMap.OnRegisterTouchListener.class),
+      mock(MapboxMap.OnGesturesManagerInteractionListener.class),
       mock(AnnotationManager.class),
       mock(CameraChangeDispatcher.class));
   }

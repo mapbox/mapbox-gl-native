@@ -4,10 +4,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
+import com.mapbox.geojson.Geometry;
 import com.mapbox.mapboxsdk.style.layers.Filter;
-import com.mapbox.services.commons.geojson.Feature;
-import com.mapbox.services.commons.geojson.FeatureCollection;
-import com.mapbox.services.commons.geojson.Geometry;
 
 import java.net.URL;
 import java.util.ArrayList;

@@ -13,13 +13,13 @@ namespace geojson {
 
 class MultiPoint : private mbgl::util::noncopyable {
 public:
-    static constexpr auto Name() { return "com/mapbox/services/commons/geojson/MultiPoint"; };
+    static constexpr auto Name() { return "com/mapbox/geojson/MultiPoint"; };
 
     static constexpr auto Type() { return "MultiPoint"; };
 
     static mapbox::geojson::multi_point convert(jni::JNIEnv&, jni::Object<MultiPoint>);
 
-    static jni::Object<java::util::List> getCoordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
+    static jni::Object<java::util::List> coordinates(jni::JNIEnv&, jni::Object<MultiPoint>);
 
     static jni::Class<MultiPoint> javaClass;
 

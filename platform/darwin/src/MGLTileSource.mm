@@ -1,7 +1,9 @@
 #import "MGLTileSource_Private.h"
 
 #import "MGLAttributionInfo_Private.h"
+#import "MGLGeometry_Private.h"
 #import "NSString+MGLAdditions.h"
+#import "NSValue+MGLAdditions.h"
 
 #if TARGET_OS_IPHONE
     #import <UIKit/UIKit.h>
@@ -13,9 +15,11 @@
 
 const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel = @"MGLTileSourceOptionMinimumZoomLevel";
 const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel = @"MGLTileSourceOptionMaximumZoomLevel";
+const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds = @"MGLTileSourceOptionCoordinateBounds";
 const MGLTileSourceOption MGLTileSourceOptionAttributionHTMLString = @"MGLTileSourceOptionAttributionHTMLString";
 const MGLTileSourceOption MGLTileSourceOptionAttributionInfos = @"MGLTileSourceOptionAttributionInfos";
 const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem = @"MGLTileSourceOptionTileCoordinateSystem";
+const MGLTileSourceOption MGLTileSourceOptionDEMEncoding = @"MGLTileSourceOptionDEMEncoding";
 
 @implementation MGLTileSource
 
@@ -70,6 +74,15 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
         [NSException raise:NSInvalidArgumentException
                     format:@"MGLTileSourceOptionMinimumZoomLevel must be less than MGLTileSourceOptionMaximumZoomLevel."];
     }
+    
+    if (NSValue *coordinateBounds = options[MGLTileSourceOptionCoordinateBounds]) {
+        if (![coordinateBounds isKindOfClass:[NSValue class]]
+            && strcmp(coordinateBounds.objCType, @encode(MGLCoordinateBounds)) == 0) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionCoordinateBounds must be set to an NSValue containing an MGLCoordinateBounds."];
+        }
+        tileSet.bounds = MGLLatLngBoundsFromCoordinateBounds(coordinateBounds.MGLCoordinateBoundsValue);
+    }
 
     if (NSString *attribution = options[MGLTileSourceOptionAttributionHTMLString]) {
         if (![attribution isKindOfClass:[NSString class]]) {
@@ -113,6 +126,23 @@ mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTem
                 break;
             case MGLTileCoordinateSystemTMS:
                 tileSet.scheme = mbgl::Tileset::Scheme::TMS;
+                break;
+        }
+    }
+
+    if (NSNumber *demEncodingNumber = options[MGLTileSourceOptionDEMEncoding]) {
+        if (![demEncodingNumber isKindOfClass:[NSValue class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLTileSourceOptionDEMEncoding must be set to an NSValue or NSNumber."];
+        }
+        MGLDEMEncoding demEncoding;
+        [demEncodingNumber getValue:&demEncoding];
+        switch (demEncoding) {
+            case MGLDEMEncodingMapbox:
+                tileSet.encoding = mbgl::Tileset::DEMEncoding::Mapbox;
+                break;
+            case MGLDEMEncodingTerrarium:
+                tileSet.encoding = mbgl::Tileset::DEMEncoding::Terrarium;
                 break;
         }
     }

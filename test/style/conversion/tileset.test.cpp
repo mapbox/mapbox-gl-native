@@ -52,6 +52,16 @@ TEST(Tileset, InvalidBounds) {
     }
 }
 
+TEST(Tileset, ValidWorldBounds) {
+    Error error;
+    mbgl::optional<Tileset> converted = convertJSON<Tileset>(R"JSON({
+        "tiles": ["http://mytiles"],
+        "bounds": [-180, -90, 180, 90]
+    })JSON", error);
+    EXPECT_TRUE((bool) converted);
+    EXPECT_EQ(converted->bounds, LatLngBounds::hull({90, -180}, {-90, 180}));
+}
+
 TEST(Tileset, FullConversion) {
     Error error;
     Tileset converted = *convertJSON<Tileset>(R"JSON({

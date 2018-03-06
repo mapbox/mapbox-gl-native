@@ -2,6 +2,52 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0-beta.3 - March 2, 2018
+ - Added missing local reference deletes [#11243](https://github.com/mapbox/mapbox-gl-native/pull/11243), [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
+ - Remove obsolete camera api [#11201](https://github.com/mapbox/mapbox-gl-native/pull/11201)
+ - Fix UTF-8 encoding, add missing package-info.java files [#11261](https://github.com/mapbox/mapbox-gl-native/pull/11261)
+ - Rework expression api [#11210](https://github.com/mapbox/mapbox-gl-native/pull/11210)
+ - LatLngBounds fixes [#11333](https://github.com/mapbox/mapbox-gl-native/pull/11333), [#11307](https://github.com/mapbox/mapbox-gl-native/pull/11307), [#11308](https://github.com/mapbox/mapbox-gl-native/pull/11308), [#11309](https://github.com/mapbox/mapbox-gl-native/pull/11309), [#11226](https://github.com/mapbox/mapbox-gl-native/pull/11226)
+ - New gestures library [#11221](https://github.com/mapbox/mapbox-gl-native/pull/11221)
+ - Expose ImageSource coordinates setter [#11262](https://github.com/mapbox/mapbox-gl-native/pull/11262)
+ - Add heatmap color property [#11220](https://github.com/mapbox/mapbox-gl-native/pull/11220)
+ - Add support for mapzen terrarium raster-dem encoding [#11339](https://github.com/mapbox/mapbox-gl-native/pull/11339)
+
+## 5.5.0 - March 1, 2018
+ - TileJSON Bounds allows values inclusive of world extents [#11178](https://github.com/mapbox/mapbox-gl-native/pull/11178)
+ - LatLngBounds returned by VisibleRegion when map is rotated [#11226](https://github.com/mapbox/mapbox-gl-native/pull/11226)
+ - Custom Layer fixes & black list VAO on mali t720 [#11239](https://github.com/mapbox/mapbox-gl-native/pull/11239)
+ - Check if Activity isn't finishing before showing dialog [#11244](https://github.com/mapbox/mapbox-gl-native/pull/11244)
+ - Decouple MapPadding from overlain views [#11258](https://github.com/mapbox/mapbox-gl-native/pull/11258)
+ - Don't disable zoom button controller zooming with gesture disabled zoom [#11259](https://github.com/mapbox/mapbox-gl-native/pull/11259)
+ - Expose ImageSource coordinates setter [#11262](https://github.com/mapbox/mapbox-gl-native/pull/11262)
+ - Add missing DeleteLocalRefs [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
+ - Continue loading style even if we mutate it [#11294](https://github.com/mapbox/mapbox-gl-native/pull/11294)
+ - Update telemetry version for OkHttp [#11338](https://github.com/mapbox/mapbox-gl-native/pull/11338)
+ 
+## 6.0.0-beta.2 - February 13, 2018
+ - Deprecate LocationEngine [#11185](https://github.com/mapbox/mapbox-gl-native/pull/11185)
+ - Remove LOST from SDK [11186](https://github.com/mapbox/mapbox-gl-native/pull/11186)
+ - Transparent surface configuration on TextureView [#11065](https://github.com/mapbox/mapbox-gl-native/pull/11065)
+ - Constrained setLatLng documentation, expose setLatLngZoom method [#11184](https://github.com/mapbox/mapbox-gl-native/pull/11184)
+ - Integration of new events library [#10999](https://github.com/mapbox/mapbox-gl-native/pull/10999)
+ - AddImage performance improvement [#11111](https://github.com/mapbox/mapbox-gl-native/pull/11111)
+ - Migrate MAS to 3.0.0, refactor GeoJson integration [#11149](https://github.com/mapbox/mapbox-gl-native/pull/11149)
+ - Remove @jar and @aar dependency suffixes [#11161](https://github.com/mapbox/mapbox-gl-native/pull/11161)
+ 
+## 5.4.1 - February 9, 2018
+ - Don't recreate TextureView surface as part of view resizing, solves OOM crashes [#11148](https://github.com/mapbox/mapbox-gl-native/pull/11148)
+ - Don't invoke OnLowMemory before map is ready, solves startup crash on low memory devices [#11109](https://github.com/mapbox/mapbox-gl-native/pull/11109)
+ - Programmatically create GLSurfaceView, solves fragment bug [#11124](https://github.com/mapbox/mapbox-gl-native/pull/11124)
+ - Proguard config for optional location provider, solves obfuscation warnings [#11127](https://github.com/mapbox/mapbox-gl-native/pull/11127)
+ - MapView weak reference in global layout listener, solves memory leak [#11128](https://github.com/mapbox/mapbox-gl-native/pull/11128)
+
+## 5.4.0 - January 30, 2018
+ - Blacklist Adreno 2xx GPU for VAO support [#11047](https://github.com/mapbox/mapbox-gl-native/pull/11047)
+ - Bearing tracking mode GPS_NORTH_FACING [#11095](https://github.com/mapbox/mapbox-gl-native/pull/11095)
+ - Disable logging for missing location permissions when location is disabled [#11084](https://github.com/mapbox/mapbox-gl-native/pull/11084)
+ - Create offline handler using the main thread looper [#11021](https://github.com/mapbox/mapbox-gl-native/pull/11021)
+
 ## 6.0.0-beta.1 - January 26, 2018
  - Binding integration for expressions [#10654](https://github.com/mapbox/mapbox-gl-native/pull/10654)
  - CustomGeometrySource [#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983)

@@ -15,6 +15,7 @@
 #include <mbgl/style/layers/circle_layer.hpp>
 #include <mbgl/style/layers/fill_layer.hpp>
 #include <mbgl/style/layers/fill_extrusion_layer.hpp>
+#include <mbgl/style/layers/heatmap_layer.hpp>
 #include <mbgl/style/layers/hillshade_layer.hpp>
 #include <mbgl/style/layers/line_layer.hpp>
 #include <mbgl/style/layers/raster_layer.hpp>
@@ -1153,6 +1154,10 @@ NodeMap::~NodeMap() {
 
 std::unique_ptr<mbgl::AsyncRequest> NodeMap::request(const mbgl::Resource& resource, mbgl::FileSource::Callback callback_) {
     Nan::HandleScope scope;
+    // Because this method may be called while this NodeMap is already eligible for garbage collection,
+    // we need to explicitly hold onto our own handle here so that GC during a v8 call doesn't destroy
+    // *this while we're still executing code.
+    handle();
 
     v8::Local<v8::Value> argv[] = {
         Nan::New<v8::External>(this),

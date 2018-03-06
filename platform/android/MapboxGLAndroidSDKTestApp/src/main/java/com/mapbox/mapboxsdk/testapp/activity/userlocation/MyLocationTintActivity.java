@@ -18,7 +18,7 @@ import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.TrackingSettings;
 import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.services.android.telemetry.location.LocationEngineListener;
+import com.mapbox.android.core.location.LocationEngineListener;
 
 /**
  * Test activity showcasing how to tint the MyLocationView.

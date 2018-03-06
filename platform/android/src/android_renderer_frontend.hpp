@@ -39,7 +39,7 @@ public:
     AnnotationIDs queryShapeAnnotations(const ScreenBox& box) const;
 
     // Memory
-    void onLowMemory();
+    void reduceMemoryUse();
 
 private:
     MapRenderer& mapRenderer;

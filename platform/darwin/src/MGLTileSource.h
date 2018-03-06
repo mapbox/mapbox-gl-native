@@ -41,6 +41,20 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMinimumZoomLevel;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionMaximumZoomLevel;
 
+/**
+ An `NSValue` object containing an `MGLCoordinateBounds` struct that specifies
+ the geographic extent of the source.
+ 
+ If this option is specified, the SDK avoids requesting any tile that falls
+ outside of the coordinate bounds. Otherwise, the SDK requests any tile needed
+ to cover the viewport, as it does by default.
+
+ This option corresponds to the `bounds` key in the
+ <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">TileJSON</a>
+ specification.
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionCoordinateBounds;
+
 #if TARGET_OS_IPHONE
 /**
  An HTML string defining the buttons to be displayed in an action sheet when the
@@ -103,6 +117,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
+
 /**
  Tile coordinate systems that determine how tile coordinates in tile URLs are
  interpreted.
@@ -125,6 +140,35 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
      <a href="http://wiki.osgeo.org/wiki/Tile_Map_Service_Specification">Tile Map Service Specification</a>.
      */
     MGLTileCoordinateSystemTMS
+};
+
+
+/**
+ An `NSNumber` object containing an unsigned integer that specifies the encoding
+ formula for raster-dem tilesets. The integer corresponds to one of
+ the constants described in `MGLDEMEncoding`.
+
+ The default value for this option is `MGLDEMEncodingMapbox`.
+
+ This option is not supported by the TileJSON spec.
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
+
+/**
+ The encoding formula used to generate the raster-dem tileset
+*/
+
+typedef NS_ENUM(NSUInteger, MGLDEMEncoding) {
+
+    /**
+     Raster tiles generated with the [Mapbox encoding formula](https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb).
+    */
+    MGLDEMEncodingMapbox = 0,
+
+    /**
+     Raster tiles generated with the [Mapzen Terrarium encoding formula](https://aws.amazon.com/public-datasets/terrain/).
+    */
+    MGLDEMEncodingTerrarium
 };
 
 /**
