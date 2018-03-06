@@ -641,6 +641,63 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
                                     repeats:YES];
 }
 
+
+- (id<MGLAnnotation>)randomOffscreenAnnotation {
+    NSArray *annotations = self.mapView.annotations;
+
+    if (annotations.count == 0)
+        return nil;
+
+    // NOTE: This occasionally returns nil - see
+    // https://github.com/mapbox/mapbox-gl-native/issues/11296
+    NSArray *visibleAnnotations = self.mapView.visibleAnnotations;
+
+    NSLog(@"Number of visible annotations = %d", visibleAnnotations.count);
+
+    if (visibleAnnotations.count == annotations.count)
+        return nil;
+
+    NSMutableArray *invisibleAnnotations = [annotations mutableCopy];
+
+    if (visibleAnnotations.count > 0) {
+        [invisibleAnnotations removeObjectsInArray:visibleAnnotations];
+    }
+
+    // Now pick a random offscreen annotation.
+    uint32_t index = arc4random_uniform((uint32_t)invisibleAnnotations.count);
+    return invisibleAnnotations[index];
+}
+
+- (void)selectAnOffscreenAnnotation {
+    id<MGLAnnotation> annotation = [self randomOffscreenAnnotation];
+    [self.mapView selectAnnotation:annotation];
+
+    // Alternative method to select the annotation. These two should do the same thing.
+//     self.mapView.selectedAnnotations = @[annotation];
+
+    NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
+}
+
+- (void)centerSelectedAnnotation {
+    id<MGLAnnotation> annotation = self.mapView.selectedAnnotations.firstObject;
+
+    if (!annotation)
+        return;
+
+    CGPoint point = [self.mapView convertCoordinate:annotation.coordinate toPointToView:self.mapView];
+
+    // Animate, so that point becomes the the center
+    CLLocationCoordinate2D center = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
+    [self.mapView setCenterCoordinate:center animated:YES];
+}
+
+- (IBAction)selectAndCenterOffscreenAnnotation:(id)sender {
+    [self selectAnOffscreenAnnotation];
+    [self centerSelectedAnnotation];
+}
+
+
+
 - (void)updateAnimatedAnnotation:(NSTimer *)timer {
     DroppedPinAnnotation *annotation = timer.userInfo;
     double angle = timer.fireDate.timeIntervalSinceReferenceDate;
@@ -1110,6 +1167,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     }
     if (menuItem.action == @selector(insertGraticuleLayer:)) {
         return ![self.mapView.style sourceWithIdentifier:@"graticule"];
+    }
+    if (menuItem.action == @selector(selectAndCenterOffscreenAnnotation:)) {
+        return YES;
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {
         return self.mapView.annotations.count > 0;
