@@ -20,6 +20,8 @@ class OfflineTilePyramidRegionDefinition: public OfflineRegionDefinition {
 public:
     static constexpr auto Name() { return "com/mapbox/mapboxsdk/offline/OfflineTilePyramidRegionDefinition"; };
 
+    OfflineTilePyramidRegionDefinition(jni::JNIEnv&);
+
     static jni::Object<OfflineTilePyramidRegionDefinition> New(jni::JNIEnv&, mbgl::OfflineTilePyramidRegionDefinition);
 
     static mbgl::OfflineTilePyramidRegionDefinition getDefinition(jni::JNIEnv&, jni::Object<OfflineTilePyramidRegionDefinition>);
@@ -27,6 +29,8 @@ public:
     static jni::Class<OfflineTilePyramidRegionDefinition> javaClass;
 
     static void registerNative(jni::JNIEnv&);
+
+    jni::jint getTileCount(jni::JNIEnv&);
 
 };
 

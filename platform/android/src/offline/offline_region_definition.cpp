@@ -15,6 +15,10 @@ void OfflineRegionDefinition::registerNative(jni::JNIEnv& env) {
 
 // OfflineTilePyramidRegionDefinition //
 
+OfflineTilePyramidRegionDefinition::OfflineTilePyramidRegionDefinition(jni::JNIEnv&) {
+
+}
+
 jni::Object<OfflineTilePyramidRegionDefinition> OfflineTilePyramidRegionDefinition::New(jni::JNIEnv& env, mbgl::OfflineTilePyramidRegionDefinition definition) {
 
     //Convert objects
@@ -59,10 +63,23 @@ mbgl::OfflineTilePyramidRegionDefinition OfflineTilePyramidRegionDefinition::get
     return definition;
 }
 
+jni::jint OfflineTilePyramidRegionDefinition::getTileCount(jni::JNIEnv&) {
+    return 123456789; //todo implement tileCount
+}
+
 jni::Class<OfflineTilePyramidRegionDefinition> OfflineTilePyramidRegionDefinition::javaClass;
 
 void OfflineTilePyramidRegionDefinition::registerNative(jni::JNIEnv& env) {
     javaClass = *jni::Class<OfflineTilePyramidRegionDefinition>::Find(env).NewGlobalRef(env).release();
+
+#define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
+
+    // Register the peer
+    jni::RegisterNativePeer<OfflineTilePyramidRegionDefinition>(env, OfflineTilePyramidRegionDefinition::javaClass, "nativePtr",
+                                         std::make_unique<OfflineTilePyramidRegionDefinition, JNIEnv&>,
+                                         "initialize", "finalize",
+                                         METHOD(&OfflineTilePyramidRegionDefinition::getTileCount,
+                                                "nativeGetTileCount"));
 }
 
 } // namespace android

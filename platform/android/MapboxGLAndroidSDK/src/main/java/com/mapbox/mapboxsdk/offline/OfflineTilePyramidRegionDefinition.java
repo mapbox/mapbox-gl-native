@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.offline;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.CallSuper;
 
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
@@ -19,11 +20,23 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
  */
 public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefinition, Parcelable {
 
+  // Holds the pointer to the native peer after initialisation
+  private long nativePtr = 0;
+
   private String styleURL;
   private LatLngBounds bounds;
   private double minZoom;
   private double maxZoom;
   private float pixelRatio;
+
+  /**
+   * Internal use
+   *
+   * @param nativePtr - pointer to native peer
+   */
+  public OfflineTilePyramidRegionDefinition(long nativePtr) {
+    this.nativePtr = nativePtr;
+  }
 
   /**
    * Constructor to create an OfflineTilePyramidDefinition from parameters.
@@ -42,6 +55,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.minZoom = minZoom;
     this.maxZoom = maxZoom;
     this.pixelRatio = pixelRatio;
+    initialize();
   }
 
   /**
@@ -58,6 +72,7 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
     this.minZoom = parcel.readDouble();
     this.maxZoom = parcel.readDouble();
     this.pixelRatio = parcel.readFloat();
+    initialize();
   }
 
   /*
@@ -82,6 +97,10 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
 
   public float getPixelRatio() {
     return pixelRatio;
+  }
+
+  public int getTileCount() {
+    return nativeGetTileCount();
   }
 
   /*
@@ -114,4 +133,16 @@ public class OfflineTilePyramidRegionDefinition implements OfflineRegionDefiniti
       return new OfflineTilePyramidRegionDefinition[size];
     }
   };
+
+  /*
+   * Native
+   */
+
+  protected native void initialize();
+
+  @CallSuper
+  @Override
+  protected native void finalize() throws Throwable;
+
+  private native int nativeGetTileCount();
 }
