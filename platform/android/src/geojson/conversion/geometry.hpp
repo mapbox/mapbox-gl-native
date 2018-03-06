@@ -31,74 +31,76 @@ public:
     }
 
     /**
-     * static LineString fromLngLats(List<Point> points)
+     * static LineString fromLngLats(double [][])
      */
     jni::jobject* operator()(const mapbox::geometry::line_string<T> &geometry) const {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/LineString")).release();
-        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/LineString;");
+        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "([[D)Lcom/mapbox/geojson/LineString;");
 
         // Create
-        jni::LocalObject<jni::jobject> listOfPoints = jni::NewLocalObject(env, toGeoJsonListOfPoints(env, geometry));
-        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, listOfPoints.get()));
+        jni::LocalObject<jni::jarray<jni::jobject>> lngLatsArray =
+                jni::NewLocalObject(env, toLngLatArray(env, geometry));
+        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, lngLatsArray.get()));
     }
 
     /**
-     * static MultiPoint fromLngLats(List<Point> points)
+     * static MultiPoint fromLngLats(double [][])
      */
     jni::jobject* operator()(const mapbox::geometry::multi_point<T> &geometry) const {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/MultiPoint")).release();
-        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/MultiPoint;");
+        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "([[D)Lcom/mapbox/geojson/MultiPoint;");
 
         // Create
-        jni::LocalObject<jni::jobject> coordinates = jni::NewLocalObject(env, toGeoJsonListOfPoints(env, geometry));
-        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, coordinates.get()));
+        jni::LocalObject<jni::jarray<jni::jobject>> lngLatsArray =
+                jni::NewLocalObject(env, toLngLatArray(env, geometry));
+        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, lngLatsArray.get()));
     }
 
     /**
-     * static Polygon fromLngLats(List<List<Point>> coordinates)
+     * static Polygon fromLngLats(double [][][])
      */
     jni::jobject* operator()(const mapbox::geometry::polygon<T> &geometry) const {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/Polygon")).release();
-        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/Polygon;");
+        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "([[[D)Lcom/mapbox/geojson/Polygon;");
 
         // Create
-        jni::LocalObject<jni::jobject> shape = jni::NewLocalObject(env, toShape<>(env, geometry));
+        jni::LocalObject<jni::jarray<jni::jobject>> shape =
+                jni::NewLocalObject(env, shapeToLngLatArray<>(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, shape.get()));
     }
 
     /**
-     * static MultiLineString fromLngLats(List<List<Point>> points)
+     * static MultiLineString fromLngLats(double [][][])
      */
     jni::jobject*  operator()(const mapbox::geometry::multi_line_string<T> &geometry) const {
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/MultiLineString")).release();
-        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/MultiLineString;");
+        static jni::jmethodID* fromLngLats = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "([[[D)Lcom/mapbox/geojson/MultiLineString;");
 
         // Create
-        jni::LocalObject<jni::jobject> shape = jni::NewLocalObject(env, toShape<>(env, geometry));
+        jni::LocalObject<jni::jarray<jni::jobject>> shape =
+                jni::NewLocalObject(env,shapeToLngLatArray<>(env, geometry));
         return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromLngLats, shape.get()));
     }
 
     /**
      * MultiPolygon (double[][][][]) -> [[[D + Object array ==  [[[[D
-     *
-     * static MultiPolygon fromLngLats(List<List<List<Point>>> points)
      */
     jni::jobject*  operator()(const mapbox::geometry::multi_polygon<T> &geometry) const {
-        // ArrayList
-        static jni::jclass* arrayListClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/ArrayList")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *arrayListClass, "<init>", "(I)V");
-        static jni::jmethodID* add = &jni::GetMethodID(env, *arrayListClass, "add", "(ILjava/lang/Object;)V");
-        jni::jobject* arrayList = &jni::NewObject(env, *arrayListClass, *constructor, geometry.size());
+
+        static jni::jclass* arrayClass = jni::NewGlobalRef(env, &jni::FindClass(env, "[[[D")).release();
+        jni::LocalObject<jni::jarray<jni::jobject>> jarray =
+                jni::NewLocalObject(env, &jni::NewObjectArray(env, geometry.size(), *arrayClass));
 
         for(size_t i = 0; i < geometry.size(); i = i + 1) {
-            jni::LocalObject<jni::jobject> shape = jni::NewLocalObject(env, toShape<>(env, geometry.at(i)));
-            jni::CallMethod<void>(env, arrayList, *add, i, shape.get());
+            jni::LocalObject<jni::jarray<jni::jobject>> shape =
+                    jni::NewLocalObject(env, shapeToLngLatArray<>(env, geometry.at(i)));
+            jni::SetObjectArrayElement(env, *jarray, i, shape.get());
         }
 
         // Create the MultiPolygon
         static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/MultiPolygon")).release();
-        static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "(Ljava/util/List;)Lcom/mapbox/geojson/MultiPolygon;");
-        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometries, arrayList));
+        static jni::jmethodID* fromGeometries = &jni::GetStaticMethodID(env, *javaClass, "fromLngLats", "([[[[D)Lcom/mapbox/geojson/MultiPolygon;");
+        return reinterpret_cast<jni::jobject*>(jni::CallStaticMethod<jni::jobject*>(env, *javaClass, *fromGeometries, jarray.get()));
     }
 
     /**
@@ -125,50 +127,50 @@ public:
 private:
 
     /**
-     * vector<point<T>> -> List<Point>
-   */
-    static jni::jobject* toGeoJsonListOfPoints(JNIEnv& env, std::vector<mapbox::geometry::point<T>> points) {
-
-        // ArrayList
-        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/ArrayList")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(I)V");
-        static jni::jmethodID* add = &jni::GetMethodID(env, *javaClass, "add", "(ILjava/lang/Object;)V");
-        jni::jobject* arrayList = &jni::NewObject(env, *javaClass, *constructor, points.size());
-
-
-        // Point
-        static jni::jclass* pointJavaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "com/mapbox/geojson/Point")).release();
-        static jni::jmethodID* fromLngLat = &jni::GetStaticMethodID(env, *pointJavaClass, "fromLngLat", "(DD)Lcom/mapbox/geojson/Point;");
-
-        for(size_t i = 0; i < points.size(); i = i + 1) {
-            mapbox::geometry::point<T> point = points.at(i);
-            jni::LocalObject<jni::jobject> pointObject =
-                    jni::NewLocalObject(env, jni::CallStaticMethod<jni::jobject*>(env, *pointJavaClass, *fromLngLat, point.x, point.y));
-            jni::CallMethod<void>(env, arrayList, *add, i, pointObject.get());
-        }
-
-        return arrayList;
+     * x, y -> jarray<jdouble> ([x,y])
+     *
+    */
+    static jni::jarray<jni::jdouble> *toLngLatArray(JNIEnv &env, double x, double y) {
+        jni::jarray<jni::jdouble> &jarray = jni::NewArray<jni::jdouble>(env, 2);
+        jni::jdouble array[] = {x, y};
+        jni::SetArrayRegion(env, jarray, 0, 2, array);
+        return &jarray;
     }
 
     /**
-     *  geometry -> List<List<Point>>
-     */
-    template <class SHAPE>
-    static jni::jobject* toShape(JNIEnv& env, SHAPE value) {
+     * vector<point<T>> ->  jarray<jobject>  -> [D + Object array == [[D (double[][])
+   */
+    static jni::jarray<jni::jobject>* toLngLatArray(JNIEnv &env,
+                                                    std::vector<mapbox::geometry::point<T>> points) {
 
-        // ArrayList
-        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "java/util/ArrayList")).release();
-        static jni::jmethodID* constructor = &jni::GetMethodID(env, *javaClass, "<init>", "(I)V");
-        static jni::jmethodID* add = &jni::GetMethodID(env, *javaClass, "add", "(ILjava/lang/Object;)V");
-        jni::jobject* arrayList = &jni::NewObject(env, *javaClass, *constructor, value.size());
+        static jni::jclass* javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "[D")).release();
+        jni::jarray<jni::jobject >& jarray = jni::NewObjectArray(env, points.size(), *javaClass);
 
-
-        for(size_t i = 0; i < value.size(); i = i + 1) {
-            jni::LocalObject<jni::jobject> listOfPoints = jni::NewLocalObject(env, toGeoJsonListOfPoints(env, value.at(i)));
-            jni::CallMethod<void>(env, arrayList, *add, i, listOfPoints.get());
+        for(size_t i = 0; i < points.size(); i = i + 1) {
+            mapbox::geometry::point<T> point = points.at(i);
+            jni::jarray<jni::jdouble> *lngLatArray = toLngLatArray(env, point.x, point.y);
+            jni::SetObjectArrayElement(env, jarray, i, lngLatArray);
         }
 
-        return arrayList;
+        return &jarray;
+    }
+
+    /**
+     *  polygon<T>
+     *  multi_line_string<T> -> jarray<jobject>  -> [[D + Object array ==  [[[D (double[][][])
+     */
+    template <class SHAPE>
+    static jni::jarray<jni::jobject>* shapeToLngLatArray(JNIEnv &env, SHAPE value) {
+        static jni::jclass *javaClass = jni::NewGlobalRef(env, &jni::FindClass(env, "[[D")).release();
+        jni::jarray<jni::jobject> &jarray = jni::NewObjectArray(env, value.size(), *javaClass);
+
+        for (size_t i = 0; i < value.size(); i = i + 1) {
+            jni::LocalObject<jni::jarray<jni::jobject>> lngLatsArray =
+                    jni::NewLocalObject(env, toLngLatArray(env, value.at(i)));
+            jni::SetObjectArrayElement(env, jarray, i, lngLatsArray.get());
+        }
+
+        return &jarray;
     }
 };
 

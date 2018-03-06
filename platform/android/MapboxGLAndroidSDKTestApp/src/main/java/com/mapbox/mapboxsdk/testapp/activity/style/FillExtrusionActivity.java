@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
@@ -13,6 +14,9 @@ import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.geojson.Polygon;
+
+import java.util.Arrays;
+import java.util.List;
 
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionHeight;
@@ -35,30 +39,17 @@ public class FillExtrusionActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(map -> {
       mapboxMap = map;
-      Polygon domTower = Polygon.fromLngLats(new double[][][] {
-        new double[][] {
-          new double[] {
-            5.12112557888031,
-            52.09071040847704
-          },
-          new double[] {
-            5.121227502822875,
-            52.09053901776669
-          },
-          new double[] {
-            5.121484994888306,
-            52.090601641371805
-          },
-          new double[] {
-            5.1213884353637695,
-            52.090766439912635
-          },
-          new double[] {
-            5.12112557888031,
-            52.09071040847704
-          }
-        }
-      });
+      List<List<Point>> lngLats = Arrays.asList(
+        Arrays.asList(
+          Point.fromLngLat(5.12112557888031, 52.09071040847704),
+          Point.fromLngLat(5.121227502822875, 52.09053901776669),
+          Point.fromLngLat(5.121484994888306, 52.090601641371805),
+          Point.fromLngLat(5.1213884353637695, 52.090766439912635),
+          Point.fromLngLat(5.12112557888031, 52.09071040847704)
+          )
+      );
+
+      Polygon domTower = Polygon.fromLngLats(lngLats);
 
       GeoJsonSource source = new GeoJsonSource("extrusion-source", domTower);
       map.addSource(source);
