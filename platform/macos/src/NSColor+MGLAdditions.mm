@@ -2,22 +2,32 @@
 
 @implementation NSColor (MGLAdditions)
 
-- (mbgl::Color)mgl_color
-{
+- (mbgl::Color)mgl_color {
     CGFloat r, g, b, a;
 
-    [[self colorUsingColorSpaceName:NSCalibratedRGBColorSpace] getRed:&r green:&g blue:&b alpha:&a];
+    // The Mapbox Style Specification does not specify a color space, but it is
+    // assumed to be sRGB for consistency with CSS.
+    NSColor *srgbColor = self;
+    if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+        srgbColor = [srgbColor colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+    } else {
+        srgbColor = [srgbColor colorUsingColorSpace:[NSColorSpace sRGBColorSpace]];
+    }
+    [srgbColor getRed:&r green:&g blue:&b alpha:&a];
 
     return { (float)r, (float)g, (float)b, (float)a };
 }
 
-+ (NSColor *)mgl_colorWithColor:(mbgl::Color)color
-{
-    return [NSColor colorWithCalibratedRed:color.r green:color.g blue:color.b alpha:color.a];
++ (NSColor *)mgl_colorWithColor:(mbgl::Color)color {
+    // macOS 10.12 Sierra and below uses calibrated RGB by default.
+    if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+        return [NSColor colorWithCalibratedRed:color.r green:color.g blue:color.b alpha:color.a];
+    } else {
+        return [NSColor colorWithRed:color.r green:color.g blue:color.b alpha:color.a];
+    }
 }
 
-- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue
-{
+- (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue {
     mbgl::Color color = self.mgl_color;
     return {{ color.r, color.g, color.b, color.a }};
 }
