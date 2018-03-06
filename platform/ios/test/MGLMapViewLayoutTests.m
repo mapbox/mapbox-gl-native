@@ -37,14 +37,15 @@
     self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self waitForExpectationsWithTimeout:1 handler:nil];
 
+    self.mapView.showsScale = YES;
+
     //set zoom and heading so that scale bar and compass will be shown
-    [self.mapView setZoomLevel:4.5 animated:NO];
+    [self.mapView setZoomLevel:10.0 animated:NO];
     [self.mapView.camera setHeading:12.0];
 
     //invoke layout
     [self.superView setNeedsLayout];
     [self.superView layoutIfNeeded];
-
 }
 
 - (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
@@ -67,7 +68,7 @@
     CGFloat bottomSafeAreaInset = 0.0;
     double accuracy = 0.01;
 
-    if ( [self.mapView respondsToSelector:@selector(safeAreaInsets)] ) {
+    if (@available(iOS 11.0, *)) {
         bottomSafeAreaInset = self.mapView.safeAreaInsets.bottom;
     }
     

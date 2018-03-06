@@ -168,6 +168,32 @@ public class HeatmapLayer extends Layer {
   }
 
   /**
+   * Get the HeatmapColor property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getHeatmapColor() {
+    return (PropertyValue<String>) new PropertyValue("heatmap-color", nativeGetHeatmapColor());
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @return int representation of a rgba string color
+   * @throws RuntimeException thrown if property isn't a value
+   */
+  @ColorInt
+  public int getHeatmapColorAsInt() {
+    PropertyValue<String> value = getHeatmapColor();
+    if (value.isValue()) {
+      return rgbaToColor(value.getValue());
+    } else {
+      throw new RuntimeException("heatmap-color was set as a Function");
+    }
+  }
+
+  /**
    * Get the HeatmapOpacity property
    *
    * @return property wrapper value around Float
@@ -208,6 +234,8 @@ public class HeatmapLayer extends Layer {
   private native TransitionOptions nativeGetHeatmapIntensityTransition();
 
   private native void nativeSetHeatmapIntensityTransition(long duration, long delay);
+
+  private native Object nativeGetHeatmapColor();
 
   private native Object nativeGetHeatmapOpacity();
 

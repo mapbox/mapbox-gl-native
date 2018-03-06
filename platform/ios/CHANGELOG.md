@@ -17,6 +17,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added an `MGLComputedShapeSource` class that allows applications to supply vector data to a style layer on a per-tile basis. ([#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983))
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
 * The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
+* Added `MGLShapeSourceOptionWrapsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be wrapped to accommodate coordinates with longitudes beyond −180 and 180; and `MGLShapeSourceOptionClipsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be clipped at the edge of each tile. ([#11041](https://github.com/mapbox/mapbox-gl-native/pull/11041))
+* Added support for Mapzen Terrarium DEM encoding. ([#11274](https://github.com/mapbox/mapbox-gl-native/pull/11274))
 
 ### Map rendering
 
@@ -27,6 +29,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue preventing `MGLImageSource`s from drawing on the map when the map is zoomed in and tilted. ([#10677](https://github.com/mapbox/mapbox-gl-native/pull/10677))
 * Improved the sharpness of raster tiles on Retina displays. ([#10984](https://github.com/mapbox/mapbox-gl-native/pull/10984))
 * Fixed a crash parsing a malformed style. ([#11001](https://github.com/mapbox/mapbox-gl-native/pull/11001))
+* Reduced memory usage by clearing in-memory tile cache before entering background. ([#11197](https://github.com/mapbox/mapbox-gl-native/pull/11197))
 
 ### Annotations
 
@@ -39,10 +42,19 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ### Other changes
 
+* The `-[MGLMapView convertRect:toCoordinateBoundsFromView:]` method and the `MGLMapView.visibleCoordinateBounds` property’s getter now indicate that the coordinate bounds straddles the antimeridian by extending one side beyond ±180 degrees longitude. ([#11265](https://github.com/mapbox/mapbox-gl-native/pull/11265))
 * Feature querying results now account for the `MGLSymbolStyleLayer.circleStrokeWidth` property. ([#10897](https://github.com/mapbox/mapbox-gl-native/pull/10897))
 * Fixed an issue preventing labels from being transliterated when VoiceOver was enabled on iOS 10._x_ and below. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Labels are now transliterated from more languages when VoiceOver is enabled. ([#10881](https://github.com/mapbox/mapbox-gl-native/pull/10881))
 * Long-pressing the attribution button causes the SDK’s version number to be displayed in the action sheet that appears. ([#10650](https://github.com/mapbox/mapbox-gl-native/pull/10650))
+* Reduced offline download size for styles with symbol layers that render only icons, and no text. ([#11055](https://github.com/mapbox/mapbox-gl-native/pull/11055))
+* Added haptic feedback that occurs when the user rotates the map to due north, configurable via `MGLMapView.hapticFeedbackEnabled`. ([#10847](https://github.com/mapbox/mapbox-gl-native/pull/10847))
+* Added `MGLMapView.showsScale` as the recommended way to show the scale bar. This property can be set directly in Interface Builder. ([#11335](https://github.com/mapbox/mapbox-gl-native/pull/11335))
+* Fixed an issue where the scale bar would not appear until the map had moved. ([#11335](https://github.com/mapbox/mapbox-gl-native/pull/11335))
+
+## 3.7.5 - February 16, 2018
+
+* Fixed an issue where requesting location services permission would trigger an unrecoverable loop. ([#11229](https://github.com/mapbox/mapbox-gl-native/pull/11229))
 
 ## 3.7.4 - February 12, 2018
 

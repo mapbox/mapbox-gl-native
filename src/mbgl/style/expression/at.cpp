@@ -19,15 +19,21 @@ EvaluationResult At::evaluate(const EvaluationContext& params) const {
     const auto i = evaluatedIndex->get<double>();
     const auto inputArray = evaluatedInput->get<std::vector<Value>>();
     
-    if (i < 0 || i >= inputArray.size()) {
+    if (i < 0) {
         return EvaluationError {
-            "Array index out of bounds: " + stringify(i) +
-            " > " + util::toString(inputArray.size()) + "."
+            "Array index out of bounds: " + util::toString(i) + " < 0."
+        };
+    }
+    
+    if (i >= inputArray.size()) {
+        return EvaluationError {
+            "Array index out of bounds: " + util::toString(i) +
+            " > " + util::toString(inputArray.size() - 1) + "."
         };
     }
     if (i != std::floor(i)) {
         return EvaluationError {
-            "Array index must be an integer, but found " + stringify(i) + " instead."
+            "Array index must be an integer, but found " + util::toString(i) + " instead."
         };
     }
     return inputArray[static_cast<std::size_t>(i)];

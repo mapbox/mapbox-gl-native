@@ -16,7 +16,9 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     auto width = image.Get(env, widthField);
     auto pixelRatio = image.Get(env, pixelRatioField);
     auto pixels = image.Get(env, bufferField);
-    auto name = jni::Make<std::string>(env, image.Get(env, nameField));
+    auto jName = image.Get(env, nameField);
+    auto name = jni::Make<std::string>(env, jName);
+    jni::DeleteLocalRef(env, jName);
 
     jni::NullCheck(env, &pixels);
     std::size_t size = pixels.Length(env);
@@ -27,7 +29,7 @@ mbgl::style::Image Image::getImage(jni::JNIEnv& env, jni::Object<Image> image) {
     }
 
     jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
-
+    jni::DeleteLocalRef(env, pixels);
     return mbgl::style::Image {name, std::move(premultipliedImage), pixelRatio};
 }
 

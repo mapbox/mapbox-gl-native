@@ -4,6 +4,8 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
+import com.mapbox.mapboxsdk.constants.GeometryConstants;
+
 /**
  * A geographical span defined by its latitude and longitude span.
  */
@@ -135,5 +137,21 @@ public class LatLngSpan implements Parcelable {
     temp = Double.doubleToLongBits(mLongitudeSpan);
     result = 31 * result + (int) (temp ^ (temp >>> 32));
     return result;
+  }
+
+  /**
+   * Get the absolute distance, in degrees, between the west and
+   * east boundaries of this LatLngBounds
+   *
+   * @return Span distance
+   */
+  static double getLongitudeSpan(double east, double west) {
+    double longSpan = Math.abs(east - west);
+    if (east > west) {
+      return longSpan;
+    }
+
+    // shortest span contains antimeridian
+    return GeometryConstants.LONGITUDE_SPAN - longSpan;
   }
 }

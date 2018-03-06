@@ -221,8 +221,17 @@ MGL_EXPORT IB_DESIGNABLE
 - (IBAction)reloadStyle:(id)sender;
 
 /**
+ A Boolean value indicating whether the map may display scale information.
+
+ The scale bar may not be shown at all zoom levels. The view controlled by this
+ property is available at `scaleBar`. The default value of this property is
+ `NO`.
+ */
+@property (nonatomic, assign) BOOL showsScale;
+
+/**
  A control indicating the scale of the map. The scale bar is positioned in the
- upper-left corner. The scale bar is hidden by default.
+ upper-left corner. Enable the scale bar via `showsScale`.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 
@@ -484,6 +493,19 @@ MGL_EXPORT IB_DESIGNABLE
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
 /**
+ A Boolean value that determines whether the user will receive haptic feedback
+ for certain interactions with the map.
+
+ When this property is set to `YES`, the default, a `UIImpactFeedbackStyleLight`
+ haptic feedback event be played when the user rotates the map to due north
+ (0°).
+
+ This feature requires a device that supports haptic feedback, running iOS 10 or
+ newer.
+ */
+@property(nonatomic, getter=isHapticFeedbackEnabled) BOOL hapticFeedbackEnabled;
+
+/**
  A floating-point value that determines the rate of deceleration after the user
  lifts their finger.
 
@@ -659,11 +681,10 @@ MGL_EXPORT IB_DESIGNABLE
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
  instead.
  
- If a longitude is less than −180 degrees or greater than 180 degrees, the visible
- bounds straddles the antimeridian or international date line.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ visible bounds straddles the antimeridian or international date line. For
+ example, if both Tokyo and San Francisco are visible, the visible bounds might
+ extend from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
@@ -671,11 +692,10 @@ MGL_EXPORT IB_DESIGNABLE
  Changes the receiver’s viewport to fit the given coordinate bounds,
  optionally animating the change.
  
- To make the visible bounds go across the antimeridian or international date line,
- specify some longitudes less than −180 degrees or greater than 180 degrees.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling
@@ -686,6 +706,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param insets The minimum padding (in screen points) that will be visible
@@ -698,6 +723,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -712,6 +742,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -994,6 +1029,9 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
+ 
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ bounding box straddles the antimeridian or international date line.
 
  @param rect The rectangle to convert.
  @param view The view in whose coordinate system the rectangle is expressed.

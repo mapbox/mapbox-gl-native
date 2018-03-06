@@ -124,8 +124,11 @@ jni::Class<FileSource::ResourceTransformCallback> FileSource::ResourceTransformC
 std::string FileSource::ResourceTransformCallback::onURL(jni::JNIEnv& env, jni::Object<FileSource::ResourceTransformCallback> callback, int kind, std::string url_) {
     static auto method = FileSource::ResourceTransformCallback::javaClass.GetMethod<jni::String (jni::jint, jni::String)>(env, "onURL");
     auto url = jni::Make<jni::String>(env, url_);
+
     url = callback.Call(env, method, kind, url);
-    return jni::Make<std::string>(env, url);
+    auto urlStr = jni::Make<std::string>(env, url);
+    jni::DeleteLocalRef(env, url);
+    return urlStr;
 }
 
 } // namespace android

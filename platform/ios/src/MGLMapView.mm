@@ -66,6 +66,7 @@
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
 #import "MGLMapboxEvents.h"
+#import "MMEConstants.h"
 #import "MGLSDKUpdateChecker.h"
 #import "MGLCompactCalloutView.h"
 #import "MGLAnnotationContainerView.h"
@@ -227,6 +228,7 @@ public:
 @property (nonatomic) CGFloat quickZoomStart;
 @property (nonatomic, getter=isDormant) BOOL dormant;
 @property (nonatomic, readonly, getter=isRotationAllowed) BOOL rotationAllowed;
+@property (nonatomic) BOOL shouldTriggerHapticFeedbackForCompass;
 @property (nonatomic) MGLMapViewProxyAccessibilityElement *mapViewProxyAccessibilityElement;
 @property (nonatomic) MGLAnnotationContainerView *annotationContainerView;
 @property (nonatomic) MGLUserLocation *userLocation;
@@ -524,6 +526,8 @@ public:
     [_twoFingerTap requireGestureRecognizerToFail:_twoFingerDrag];
     [self addGestureRecognizer:_twoFingerTap];
 
+    _hapticFeedbackEnabled = YES;
+
     _decelerationRate = MGLMapViewDecelerationRateNormal;
 
     _quickZoom = [[UILongPressGestureRecognizer alloc] initWithTarget:self action:@selector(handleQuickZoomGesture:)];
@@ -543,8 +547,9 @@ public:
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willTerminate) name:UIApplicationWillTerminateNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationDidEnterBackgroundNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationWillEnterForegroundNotification object:nil];
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sleepGL:) name:UIApplicationWillResignActiveNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(wakeGL:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    // As of 3.7.5, we intentionally do not listen for `UIApplicationWillResignActiveNotification` or call `sleepGL:` in response to it, as doing
+    // so causes a loop when asking for location permission. See: https://github.com/mapbox/mapbox-gl-native/issues/11225
 
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(didReceiveMemoryWarning) name:UIApplicationDidReceiveMemoryWarningNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationDidChange:) name:UIDeviceOrientationDidChangeNotification object:nil];
@@ -567,7 +572,8 @@ public:
     _targetCoordinate = kCLLocationCoordinate2DInvalid;
 
     if ([UIApplication sharedApplication].applicationState != UIApplicationStateBackground) {
-        [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
+        [MGLMapboxEvents pushTurnstileEvent];
+        [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
 }
 
@@ -969,8 +975,8 @@ public:
 - (void)layoutSubviews
 {
     // Calling this here instead of in the scale bar itself because if this is done in the
-    // scale bar instance, it triggers a call to this this `layoutSubviews` method that
-    // calls `_mbglMap->setSize()` just below that triggers rendering update which triggers
+    // scale bar instance, it triggers a call to this `layoutSubviews` method that calls
+    // `_mbglMap->setSize()` just below that triggers rendering update which triggers
     // another scale bar update which causes a rendering update loop and a major performace
     // degradation. The only time the scale bar's intrinsic content size _must_ invalidated
     // is here as a reaction to this object's view dimension changes.
@@ -1219,7 +1225,8 @@ public:
 
         [self validateLocationServices];
 
-        [MGLMapboxEvents pushEvent:MGLEventTypeMapLoad withAttributes:@{}];
+        [MGLMapboxEvents pushTurnstileEvent];
+        [MGLMapboxEvents pushEvent:MMEEventTypeMapLoad withAttributes:@{}];
     }
 }
 
@@ -1331,7 +1338,7 @@ public:
 
     if (pan.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePanStart forRecognizer:pan];
+        [self trackGestureEvent:MMEEventGesturePanStart forRecognizer:pan];
 
         self.userTrackingMode = MGLUserTrackingModeNone;
 
@@ -1379,10 +1386,10 @@ public:
         CLLocationCoordinate2D panCoordinate = [self convertPoint:pointInView toCoordinateFromView:pan.view];
         int zoom = round([self zoomLevel]);
 
-        [MGLMapboxEvents pushEvent:MGLEventTypeMapDragEnd withAttributes:@{
-            MGLEventKeyLatitude: @(panCoordinate.latitude),
-            MGLEventKeyLongitude: @(panCoordinate.longitude),
-            MGLEventKeyZoomLevel: @(zoom)
+        [MGLMapboxEvents pushEvent:MMEEventTypeMapDragEnd withAttributes:@{
+            MMEEventKeyLatitude: @(panCoordinate.latitude),
+            MMEEventKeyLongitude: @(panCoordinate.longitude),
+            MMEEventKeyZoomLevel: @(zoom)
         }];
     }
 
@@ -1401,7 +1408,7 @@ public:
 
     if (pinch.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePinchStart forRecognizer:pinch];
+        [self trackGestureEvent:MMEEventGesturePinchStart forRecognizer:pinch];
 
         self.scale = powf(2, _mbglMap->getZoom());
 
@@ -1500,7 +1507,7 @@ public:
 
     if (rotate.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureRotateStart forRecognizer:rotate];
+        [self trackGestureEvent:MMEEventGestureRotateStart forRecognizer:rotate];
 
         self.angle = MGLRadiansFromDegrees(_mbglMap->getBearing()) * -1;
 
@@ -1508,6 +1515,8 @@ public:
         {
             self.userTrackingMode = MGLUserTrackingModeFollow;
         }
+
+        self.shouldTriggerHapticFeedbackForCompass = NO;
 
         [self notifyGestureDidBegin];
     }
@@ -1531,6 +1540,22 @@ public:
         }
 
         [self cameraIsChanging];
+
+        // Trigger a light haptic feedback event when the user rotates to due north.
+        if (@available(iOS 10.0, *))
+        {
+            if (self.isHapticFeedbackEnabled && fabs(newDegrees) <= 1 && self.shouldTriggerHapticFeedbackForCompass)
+            {
+                UIImpactFeedbackGenerator *hapticFeedback = [[UIImpactFeedbackGenerator alloc] initWithStyle:UIImpactFeedbackStyleLight];
+                [hapticFeedback impactOccurred];
+
+                self.shouldTriggerHapticFeedbackForCompass = NO;
+            }
+            else if (fabs(newDegrees) > 1)
+            {
+                self.shouldTriggerHapticFeedbackForCompass = YES;
+            }
+        }
     }
     else if (rotate.state == UIGestureRecognizerStateEnded || rotate.state == UIGestureRecognizerStateCancelled)
     {
@@ -1572,7 +1597,7 @@ public:
     {
         return;
     }
-    [self trackGestureEvent:MGLEventGestureSingleTap forRecognizer:singleTap];
+    [self trackGestureEvent:MMEEventGestureSingleTap forRecognizer:singleTap];
 
     if (self.mapViewProxyAccessibilityElement.accessibilityElementIsFocused)
     {
@@ -1694,7 +1719,7 @@ public:
 
         if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
-            [self trackGestureEvent:MGLEventGestureDoubleTap forRecognizer:doubleTap];
+            [self trackGestureEvent:MMEEventGestureDoubleTap forRecognizer:doubleTap];
             
             mbgl::ScreenCoordinate center(gesturePoint.x, gesturePoint.y);
             _mbglMap->setZoom(newZoom, center, MGLDurationFromTimeInterval(MGLAnimationDuration));
@@ -1723,7 +1748,7 @@ public:
 
     if (twoFingerTap.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
+        [self trackGestureEvent:MMEEventGestureTwoFingerSingleTap forRecognizer:twoFingerTap];
 
         [self notifyGestureDidBegin];
     }
@@ -1762,7 +1787,7 @@ public:
 
     if (quickZoom.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGestureQuickZoom forRecognizer:quickZoom];
+        [self trackGestureEvent:MMEEventGestureQuickZoom forRecognizer:quickZoom];
 
         self.scale = powf(2, _mbglMap->getZoom());
 
@@ -1807,7 +1832,7 @@ public:
 
     if (twoFingerDrag.state == UIGestureRecognizerStateBegan)
     {
-        [self trackGestureEvent:MGLEventGesturePitchStart forRecognizer:twoFingerDrag];
+        [self trackGestureEvent:MMEEventGesturePitchStart forRecognizer:twoFingerDrag];
         [self notifyGestureDidBegin];
     }
 
@@ -2012,11 +2037,11 @@ public:
     CLLocationCoordinate2D gestureCoordinate = [self convertPoint:pointInView toCoordinateFromView:recognizer.view];
     int zoom = round([self zoomLevel]);
 
-    [MGLMapboxEvents pushEvent:MGLEventTypeMapTap withAttributes:@{
-        MGLEventKeyLatitude: @(gestureCoordinate.latitude),
-        MGLEventKeyLongitude: @(gestureCoordinate.longitude),
-        MGLEventKeyZoomLevel: @(zoom),
-        MGLEventKeyGestureID: gestureID
+    [MGLMapboxEvents pushEvent:MMEEventTypeMapTap withAttributes:@{
+        MMEEventKeyLatitude: @(gestureCoordinate.latitude),
+        MMEEventKeyLongitude: @(gestureCoordinate.longitude),
+        MMEEventKeyZoomLevel: @(zoom),
+        MMEEventKeyGestureID: gestureID
     }];
 }
 
@@ -2335,6 +2360,17 @@ public:
 {
     _pitchEnabled = pitchEnabled;
     self.twoFingerDrag.enabled = pitchEnabled;
+}
+
+- (void)setShowsScale:(BOOL)showsScale
+{
+    _showsScale = showsScale;
+    self.scaleBar.hidden = !showsScale;
+
+    if (showsScale)
+    {
+        [self updateScaleBar];
+    }
 }
 
 #pragma mark - Accessibility -
@@ -3419,36 +3455,24 @@ public:
 /// bounding box.
 - (mbgl::LatLngBounds)convertRect:(CGRect)rect toLatLngBoundsFromView:(nullable UIView *)view
 {
-    mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
-    bounds.extend([self convertPoint:rect.origin toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ CGRectGetMaxX(rect), CGRectGetMinY(rect) } toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ CGRectGetMaxX(rect), CGRectGetMaxY(rect) } toLatLngFromView:view]);
-    bounds.extend([self convertPoint:{ CGRectGetMinX(rect), CGRectGetMaxY(rect) } toLatLngFromView:view]);
-
-    // The world is wrapping if a point just outside the bounds is also within
-    // the rect.
-    mbgl::LatLng outsideLatLng;
-    if (bounds.west() > -180)
-    {
-        outsideLatLng = {
-            (bounds.south() + bounds.north()) / 2,
-            bounds.west() - 1,
-        };
-    }
-    else if (bounds.east() < 180)
-    {
-        outsideLatLng = {
-            (bounds.south() + bounds.north()) / 2,
-            bounds.east() + 1,
-        };
-    }
-
-    // If the world is wrapping, extend the bounds to cover all longitudes.
-    if (CGRectContainsPoint(rect, [self convertLatLng:outsideLatLng toPointToView:view]))
-    {
-        bounds.extend(mbgl::LatLng(bounds.south(), -180));
-        bounds.extend(mbgl::LatLng(bounds.south(),  180));
-    }
+    auto bounds = mbgl::LatLngBounds::empty();
+    auto topLeft = [self convertPoint:{ CGRectGetMinX(rect), CGRectGetMinY(rect) } toLatLngFromView:view];
+    auto topRight = [self convertPoint:{ CGRectGetMaxX(rect), CGRectGetMinY(rect) } toLatLngFromView:view];
+    auto bottomRight = [self convertPoint:{ CGRectGetMaxX(rect), CGRectGetMaxY(rect) } toLatLngFromView:view];
+    auto bottomLeft = [self convertPoint:{ CGRectGetMinX(rect), CGRectGetMaxY(rect) } toLatLngFromView:view];
+    
+    // If the bounds straddles the antimeridian, unwrap it so that one side
+    // extends beyond ±180° longitude.
+    auto center = [self convertPoint:{ CGRectGetMidX(rect), CGRectGetMidY(rect) } toLatLngFromView:view];
+    topLeft.unwrapForShortestPath(center);
+    topRight.unwrapForShortestPath(center);
+    bottomRight.unwrapForShortestPath(center);
+    bottomLeft.unwrapForShortestPath(center);
+    
+    bounds.extend(topLeft);
+    bounds.extend(topRight);
+    bounds.extend(bottomRight);
+    bounds.extend(bottomLeft);
 
     return bounds;
 }
@@ -5396,10 +5420,7 @@ public:
     }
 
     [self updateCompass];
-    
-    if (!self.scaleBar.hidden) {
-        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
-    }
+    [self updateScaleBar];
 
     if ([self.delegate respondsToSelector:@selector(mapView:regionIsChangingWithReason:)])
     {
@@ -5417,6 +5438,7 @@ public:
     }
 
     [self updateCompass];
+    [self updateScaleBar];
 
     if ( ! [self isSuppressingChangeDelimiters])
     {
@@ -5858,6 +5880,17 @@ public:
                              self.compassView.alpha = 0;
                          }
                          completion:nil];
+    }
+}
+
+- (void)updateScaleBar
+{
+    // Use the `hidden` property (instead of `self.showsScale`) so that we don't
+    // break developers who still rely on the <4.0.0 approach of directly
+    // setting this property.
+    if ( ! self.scaleBar.hidden)
+    {
+        [(MGLScaleBar *)self.scaleBar setMetersPerPoint:[self metersPerPointAtLatitude:self.centerCoordinate.latitude]];
     }
 }
 

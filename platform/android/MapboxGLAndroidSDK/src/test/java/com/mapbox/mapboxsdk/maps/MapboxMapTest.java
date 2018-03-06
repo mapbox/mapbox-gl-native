@@ -2,7 +2,6 @@ package com.mapbox.mapboxsdk.maps;
 
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationViewSettings;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,10 +19,8 @@ public class MapboxMapTest {
     mapboxMap = new MapboxMap(mock(NativeMapView.class),
       mock(Transform.class),
       mock(UiSettings.class),
-      mock(TrackingSettings.class),
-      mock(MyLocationViewSettings.class),
       mock(Projection.class),
-      mock(MapboxMap.OnRegisterTouchListener.class),
+      mock(MapboxMap.OnGesturesManagerInteractionListener.class),
       mock(AnnotationManager.class),
       mock(CameraChangeDispatcher.class));
   }

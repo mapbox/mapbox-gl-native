@@ -15,6 +15,7 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/equals.hpp>
 #include <mbgl/style/expression/interpolate.hpp>
+#include <mbgl/style/expression/length.hpp>
 #include <mbgl/style/expression/let.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/match.hpp>
@@ -89,6 +90,7 @@ const ExpressionRegistry& getExpressionRegistry() {
         {"case", Case::parse},
         {"coalesce", Coalesce::parse},
         {"interpolate", parseInterpolate},
+        {"length", Length::parse},
         {"let", Let::parse},
         {"literal", Literal::parse},
         {"match", parseMatch},
@@ -147,7 +149,7 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
         };
 
         const type::Type actual = (*parsed)->getType();
-        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean) && actual == type::Value) {
+        if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object) && actual == type::Value) {
             if (typeAnnotationOption == includeTypeAnnotations) {
                 parsed = { std::make_unique<Assertion>(*expected, array(std::move(*parsed))) };
             }

@@ -26,7 +26,7 @@ public class Events {
     }
   }
 
-  public static void initiliaze() {
+  public static void initialize() {
     obtainTelemetry();
   }
 

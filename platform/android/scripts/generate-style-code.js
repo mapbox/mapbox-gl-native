@@ -13,6 +13,7 @@ const lightProperties = Object.keys(spec[`light`]).reduce((memo, name) => {
   var property = spec[`light`][name];
   property.name = name;
   property['light-property'] = true;
+  property.doc = property.doc.replace(/°/g,'&#xB0;');
   memo.push(property);
   return memo;
 }, []);
@@ -28,9 +29,6 @@ var layers = Object.keys(spec.layer.type.values).map((type) => {
   }, []);
 
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
-    // disabled for now, see https://github.com/mapbox/mapbox-gl-native/issues/11172
-    if (name === 'heatmap-color') return memo;
-
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
     return memo;

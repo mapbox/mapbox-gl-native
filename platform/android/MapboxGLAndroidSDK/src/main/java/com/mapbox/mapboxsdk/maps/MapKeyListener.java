@@ -13,24 +13,22 @@ import android.view.ViewConfiguration;
  * <p>
  * <ul>
  * <li> Uses {@link Transform} to change the map state</li>
- * <li> Uses {@link TrackingSettings} to verify validity of the current tracking mode.</li>
  * <li> Uses {@link UiSettings} to verify validity of user restricted movement.</li>
  * </ul>
  * <p>
  */
 final class MapKeyListener {
 
-  private final TrackingSettings trackingSettings;
   private final Transform transform;
   private final UiSettings uiSettings;
+  private final MapGestureDetector mapGestureDetector;
 
   private TrackballLongPressTimeOut currentTrackballLongPressTimeOut;
 
-  MapKeyListener(@NonNull Transform transform, @NonNull TrackingSettings trackingSettings,
-                 @NonNull UiSettings uiSettings) {
+  MapKeyListener(Transform transform, UiSettings uiSettings, MapGestureDetector mapGestureDetector) {
     this.transform = transform;
-    this.trackingSettings = trackingSettings;
     this.uiSettings = uiSettings;
+    this.mapGestureDetector = mapGestureDetector;
   }
 
   /**
@@ -55,7 +53,7 @@ final class MapKeyListener {
         return true;
 
       case KeyEvent.KEYCODE_DPAD_LEFT:
-        if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        if (!uiSettings.isScrollGesturesEnabled()) {
           return false;
         }
 
@@ -67,7 +65,7 @@ final class MapKeyListener {
         return true;
 
       case KeyEvent.KEYCODE_DPAD_RIGHT:
-        if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        if (!uiSettings.isScrollGesturesEnabled()) {
           return false;
         }
 
@@ -79,7 +77,7 @@ final class MapKeyListener {
         return true;
 
       case KeyEvent.KEYCODE_DPAD_UP:
-        if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        if (!uiSettings.isScrollGesturesEnabled()) {
           return false;
         }
 
@@ -91,7 +89,7 @@ final class MapKeyListener {
         return true;
 
       case KeyEvent.KEYCODE_DPAD_DOWN:
-        if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        if (!uiSettings.isScrollGesturesEnabled()) {
           return false;
         }
 
@@ -128,7 +126,7 @@ final class MapKeyListener {
 
         // Zoom out
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(false, focalPoint);
+        mapGestureDetector.zoomOutAnimated(focalPoint, true);
         return true;
 
       default:
@@ -164,7 +162,7 @@ final class MapKeyListener {
 
         // Zoom in
         PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(true, focalPoint);
+        mapGestureDetector.zoomInAnimated(focalPoint, true);
         return true;
     }
 
@@ -183,7 +181,7 @@ final class MapKeyListener {
     switch (event.getActionMasked()) {
       // The trackball was rotated
       case MotionEvent.ACTION_MOVE:
-        if (!trackingSettings.isScrollGestureCurrentlyEnabled()) {
+        if (!uiSettings.isScrollGesturesEnabled()) {
           return false;
         }
 
@@ -219,7 +217,7 @@ final class MapKeyListener {
         if (currentTrackballLongPressTimeOut != null) {
           // Zoom in
           PointF focalPoint = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-          transform.zoom(true, focalPoint);
+          mapGestureDetector.zoomInAnimated(focalPoint, true);
         }
         return true;
 
@@ -261,7 +259,7 @@ final class MapKeyListener {
       if (!cancelled) {
         // Zoom out
         PointF pointF = new PointF(uiSettings.getWidth() / 2, uiSettings.getHeight() / 2);
-        transform.zoom(false, pointF);
+        mapGestureDetector.zoomOutAnimated(pointF, true);
 
         // Ensure the up action is not run
         currentTrackballLongPressTimeOut = null;
