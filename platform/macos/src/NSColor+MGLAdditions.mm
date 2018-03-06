@@ -33,3 +33,17 @@
 }
 
 @end
+
+@implementation NSExpression (MGLColorAdditions)
+
++ (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components {
+    NSExpression *color = [NSExpression expressionForConstantValue:[NSColor class]];
+    return [NSExpression expressionForFunction:color selectorName:@"colorWithCalibratedRed:green:blue:" arguments:components];
+}
+
++ (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components {
+    NSExpression *color = [NSExpression expressionForConstantValue:[NSColor class]];
+    return [NSExpression expressionForFunction:color selectorName:@"colorWithCalibratedRed:green:blue:alpha:" arguments:components];
+}
+
+@end

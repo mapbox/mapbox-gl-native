@@ -541,7 +541,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"to-boolean"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
-        } else if ([op isEqualToString:@"to-number"]) {
+        } else if ([op isEqualToString:@"to-number"] || [op isEqualToString:@"number"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
             if (argumentObjects.count == 1) {
                 return [NSExpression expressionWithFormat:@"CAST(%@, 'NSNumber')", operand];
@@ -570,6 +570,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 function = @"length:";
             }
             return [NSExpression expressionForFunction:function arguments:@[subexpressions.firstObject]];
+        } else if ([op isEqualToString:@"rgb"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            return [NSExpression mgl_expressionForRGBComponents:subexpressions];
+        } else if ([op isEqualToString:@"rgba"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            return [NSExpression mgl_expressionForRGBAComponents:subexpressions];
         } else if ([op isEqualToString:@"min"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *subexpression = [NSExpression expressionForAggregate:subexpressions];
@@ -895,6 +901,16 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                             format:@"Casting expression to %@ not yet implemented.", type];
             } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
                 return self.arguments.mgl_jsonExpressionObject;
+            } else if (op == [MGLColor class]) {
+                if ([function isEqualToString:@"colorWithRed:green:blue:"]
+                    || [function isEqualToString:@"colorWithCalibratedRed:green:blue:"]) {
+                    NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
+                    return [@[@"rgb"] arrayByAddingObjectsFromArray:arguments];
+                } else if ([function isEqualToString:@"colorWithRed:green:blue:alpha:"]
+                           || [function isEqualToString:@"colorWithCalibratedRed:green:blue:alpha:"]) {
+                    NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
+                    return [@[@"rgba"] arrayByAddingObjectsFromArray:arguments];
+                }
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||

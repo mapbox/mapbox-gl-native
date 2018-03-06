@@ -21,3 +21,17 @@
 }
 
 @end
+
+@implementation NSExpression (MGLColorAdditions)
+
++ (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components {
+    NSExpression *color = [NSExpression expressionForConstantValue:[UIColor class]];
+    return [NSExpression expressionForFunction:color selectorName:@"colorWithRed:green:blue:" arguments:components];
+}
+
++ (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components {
+    NSExpression *color = [NSExpression expressionForConstantValue:[UIColor class]];
+    return [NSExpression expressionForFunction:color selectorName:@"colorWithRed:green:blue:alpha:" arguments:components];
+}
+
+@end
