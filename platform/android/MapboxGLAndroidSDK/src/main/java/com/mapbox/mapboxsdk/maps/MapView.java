@@ -313,11 +313,14 @@ public class MapView extends FrameLayout {
 
   private void onSurfaceCreated() {
     hasSurface = true;
-    post(() -> {
-      // Initialise only when not destroyed and only once
-      if (!destroyed && mapboxMap == null) {
-        initialiseMap();
-        mapboxMap.onStart();
+    post(new Runnable() {
+      @Override
+      public void run() {
+        // Initialise only when not destroyed and only once
+        if (!destroyed && mapboxMap == null) {
+          MapView.this.initialiseMap();
+          mapboxMap.onStart();
+        }
       }
     });
   }
