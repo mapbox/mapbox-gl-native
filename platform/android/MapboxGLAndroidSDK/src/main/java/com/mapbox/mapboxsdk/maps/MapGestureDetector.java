@@ -764,7 +764,7 @@ final class MapGestureDetector {
     }
   }
 
-  private Animator createScaleAnimator(double currentZoom, double zoomAddition, PointF animationFocalPoint,
+  private Animator createScaleAnimator(double currentZoom, double zoomAddition, final PointF animationFocalPoint,
                                        long animationTime) {
     ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
     animator.setDuration(animationTime);
