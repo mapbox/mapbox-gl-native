@@ -77,6 +77,13 @@ final class MapGestureDetector {
   private final CopyOnWriteArrayList<MapboxMap.OnShoveListener> onShoveListenerList
     = new CopyOnWriteArrayList<>();
 
+  private StandardGestureListener standardGestureListener;
+  private MoveGestureListener moveGestureListener;
+  private ScaleGestureListener scaleGestureListener;
+  private RotateGestureListener rotateGestureListener;
+  private ShoveGestureListener shoveGestureListener;
+  private TapGestureListener tapGestureListener;
+
   /**
    * User-set focal point.
    */
@@ -105,8 +112,30 @@ final class MapGestureDetector {
 
     // Checking for context != null for testing purposes
     if (context != null) {
-      gesturesManager = new AndroidGesturesManager(context);
+      // Initialize gesture listeners
+      initializeGestureListeners(context);
 
+      // Initialize gestures manager
+      AndroidGesturesManager androidGesturesManager = new AndroidGesturesManager(context);
+      initializeGesturesManager(androidGesturesManager, true, true);
+    }
+  }
+
+  private void initializeGestureListeners(Context context) {
+    standardGestureListener = new StandardGestureListener();
+    moveGestureListener = new MoveGestureListener();
+    scaleGestureListener = new ScaleGestureListener(
+      context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity));
+    rotateGestureListener = new RotateGestureListener(
+      context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
+      context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity));
+    shoveGestureListener = new ShoveGestureListener();
+    tapGestureListener = new TapGestureListener();
+  }
+
+  private void initializeGesturesManager(AndroidGesturesManager androidGesturesManager,
+                                         boolean attachDefaultListeners, boolean setDefaultMutuallyExclusives) {
+    if (setDefaultMutuallyExclusives) {
       Set<Integer> shoveScaleSet = new HashSet<>();
       shoveScaleSet.add(AndroidGesturesManager.GESTURE_TYPE_SHOVE);
       shoveScaleSet.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
@@ -119,20 +148,19 @@ final class MapGestureDetector {
       ScaleLongPressSet.add(AndroidGesturesManager.GESTURE_TYPE_SCALE);
       ScaleLongPressSet.add(AndroidGesturesManager.GESTURE_TYPE_LONG_PRESS);
 
-      gesturesManager.setMutuallyExclusiveGestures(shoveScaleSet, shoveRotateSet, ScaleLongPressSet);
-
-      gesturesManager.setStandardGestureListener(new StandardGestureListener());
-      gesturesManager.setMoveGestureListener(new MoveGestureListener());
-      gesturesManager.setStandardScaleGestureListener(new ScaleGestureListener(
-        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity)
-      ));
-      gesturesManager.setRotateGestureListener(new RotateGestureListener(
-        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
-        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity)
-      ));
-      gesturesManager.setShoveGestureListener(new ShoveGestureListener());
-      gesturesManager.setMultiFingerTapGestureListener(new TapGestureListener());
+      androidGesturesManager.setMutuallyExclusiveGestures(shoveScaleSet, shoveRotateSet, ScaleLongPressSet);
     }
+
+    if (attachDefaultListeners) {
+      androidGesturesManager.setStandardGestureListener(standardGestureListener);
+      androidGesturesManager.setMoveGestureListener(moveGestureListener);
+      androidGesturesManager.setStandardScaleGestureListener(scaleGestureListener);
+      androidGesturesManager.setRotateGestureListener(rotateGestureListener);
+      androidGesturesManager.setShoveGestureListener(shoveGestureListener);
+      androidGesturesManager.setMultiFingerTapGestureListener(tapGestureListener);
+    }
+
+    gesturesManager = androidGesturesManager;
   }
 
   /**
@@ -368,7 +396,7 @@ final class MapGestureDetector {
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
       if (!uiSettings.isScrollGesturesEnabled()) {
-        // don't allow a fling is scroll is disabled
+        // don't allow a fling if scroll is disabled
         return false;
       }
 
@@ -1071,7 +1099,8 @@ final class MapGestureDetector {
     return gesturesManager;
   }
 
-  void setGesturesManager(AndroidGesturesManager gesturesManager) {
-    this.gesturesManager = gesturesManager;
+  void setGesturesManager(AndroidGesturesManager gesturesManager, boolean attachDefaultListeners,
+                          boolean setDefaultMutuallyExclusives) {
+    initializeGesturesManager(gesturesManager, attachDefaultListeners, setDefaultMutuallyExclusives);
   }
 }

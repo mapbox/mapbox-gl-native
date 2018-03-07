@@ -1024,8 +1024,9 @@ public class MapView extends FrameLayout {
     }
 
     @Override
-    public void setGesturesManager(AndroidGesturesManager gesturesManager) {
-      mapGestureDetector.setGesturesManager(gesturesManager);
+    public void setGesturesManager(AndroidGesturesManager gesturesManager, boolean attachDefaultListeners,
+                                   boolean setDefaultMutuallyExclusives) {
+      mapGestureDetector.setGesturesManager(gesturesManager, attachDefaultListeners, setDefaultMutuallyExclusives);
     }
 
     @Override
