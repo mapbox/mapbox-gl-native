@@ -274,7 +274,7 @@ using FilterBase = variant<
 class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
-    bool operator()(const expression::EvaluationContext &context) const;
+    bool operator()(const expression::EvaluationContext& context) const;
 };
 
 } // namespace style
