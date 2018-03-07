@@ -60,6 +60,9 @@ public final class UiSettings {
   private boolean rotateVelocityAnimationEnabled = true;
   private boolean flingVelocityAnimationEnabled = true;
 
+  private boolean increaseRotateThresholdWhenScaling = true;
+  private boolean increaseScaleThresholdWhenRotating = true;
+
   private boolean deselectMarkersOnTap = true;
 
   private PointF userProvidedFocalPoint;
@@ -871,6 +874,42 @@ public final class UiSettings {
     setScaleVelocityAnimationEnabled(allVelocityAnimationsEnabled);
     setRotateVelocityAnimationEnabled(allVelocityAnimationsEnabled);
     setFlingVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+  }
+
+  /**
+   * Returns whether rotation threshold should be increase whenever scale is detected.
+   *
+   * @return If true, rotation threshold will be increased.
+   */
+  public boolean isIncreaseRotateThresholdWhenScaling() {
+    return increaseRotateThresholdWhenScaling;
+  }
+
+  /**
+   * Set whether rotation threshold should be increase whenever scale is detected.
+   *
+   * @param increaseRotateThresholdWhenScaling If true, rotation threshold will be increased.
+   */
+  public void setIncreaseRotateThresholdWhenScaling(boolean increaseRotateThresholdWhenScaling) {
+    this.increaseRotateThresholdWhenScaling = increaseRotateThresholdWhenScaling;
+  }
+
+  /**
+   * Returns whether scale threshold should be increase whenever rotation is detected.
+   *
+   * @return If true, scale threshold will be increased.
+   */
+  public boolean isIncreaseScaleThresholdWhenRotating() {
+    return increaseScaleThresholdWhenRotating;
+  }
+
+  /**
+   * set whether scale threshold should be increase whenever rotation is detected.
+   *
+   * @param increaseScaleThresholdWhenRotating If true, scale threshold will be increased.
+   */
+  public void setIncreaseScaleThresholdWhenRotating(boolean increaseScaleThresholdWhenRotating) {
+    this.increaseScaleThresholdWhenRotating = increaseScaleThresholdWhenRotating;
   }
 
   /**

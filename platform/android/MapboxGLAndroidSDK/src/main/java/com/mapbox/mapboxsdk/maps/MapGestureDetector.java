@@ -498,11 +498,13 @@ final class MapGestureDetector {
         gesturesManager.getMoveGestureDetector().setEnabled(false);
       }
 
-      // increase rotate angle threshold when scale is detected first
-      gesturesManager.getRotateGestureDetector().setAngleThreshold(
-        gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
-          + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
-      );
+      if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
+        // increase rotate angle threshold when scale is detected first
+        gesturesManager.getRotateGestureDetector().setAngleThreshold(
+          gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+            + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
+        );
+      }
 
       // setting focalPoint in #onScaleBegin() as well, because #onScale() might not get called before #onScaleEnd()
       setScaleFocalPoint(detector);
@@ -539,10 +541,12 @@ final class MapGestureDetector {
         gesturesManager.getMoveGestureDetector().setEnabled(true);
       }
 
-      // resetting default angle threshold
-      gesturesManager.getRotateGestureDetector().setAngleThreshold(
-        gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
-      );
+      if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
+        // resetting default angle threshold
+        gesturesManager.getRotateGestureDetector().setAngleThreshold(
+          gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+        );
+      }
 
       notifyOnScaleEndListeners(detector);
 
@@ -614,10 +618,12 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
-      // when rotation starts, interrupting scale and increasing the threshold
-      // to make rotation without scaling easier
-      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
-      gesturesManager.getStandardScaleGestureDetector().interrupt();
+      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
+        // when rotation starts, interrupting scale and increasing the threshold
+        // to make rotation without scaling easier
+        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(minimumScaleSpanWhenRotating);
+        gesturesManager.getStandardScaleGestureDetector().interrupt();
+      }
 
       // setting in #onRotateBegin() as well, because #onRotate() might not get called before #onRotateEnd()
       setRotateFocalPoint(detector);
@@ -652,9 +658,11 @@ final class MapGestureDetector {
     public void onRotateEnd(RotateGestureDetector detector, float velocityX, float velocityY, float angularVelocity) {
       cameraChangeDispatcher.onCameraIdle();
 
-      // resetting default scale threshold values
-      gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
-        gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
+      if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
+        // resetting default scale threshold values
+        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
+          gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
+      }
 
       notifyOnRotateEndListeners(detector);
 

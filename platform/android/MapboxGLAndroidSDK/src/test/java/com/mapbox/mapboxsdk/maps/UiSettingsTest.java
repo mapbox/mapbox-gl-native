@@ -333,6 +333,30 @@ public class UiSettingsTest {
   }
 
   @Test
+  public void testIncreaseRotateThresholdWhenScalingEnabled() {
+    uiSettings.setIncreaseRotateThresholdWhenScaling(true);
+    assertEquals("Rotate threshold increase should be enabled", true, uiSettings.isIncreaseRotateThresholdWhenScaling());
+  }
+
+  @Test
+  public void testIncreaseRotateThresholdWhenScalingDisabled() {
+    uiSettings.setIncreaseRotateThresholdWhenScaling(false);
+    assertEquals("Rotate threshold increase should be disabled", false, uiSettings.isIncreaseRotateThresholdWhenScaling());
+  }
+
+  @Test
+  public void testIncreaseScaleThresholdWhenRotatingEnabled() {
+    uiSettings.setIncreaseScaleThresholdWhenRotating(true);
+    assertEquals("Scale threshold increase should be enabled", true, uiSettings.isIncreaseScaleThresholdWhenRotating());
+  }
+
+  @Test
+  public void testIncreaseScaleThresholdWhenRotatingDisabled() {
+    uiSettings.setIncreaseScaleThresholdWhenRotating(false);
+    assertEquals("Scale threshold increase should be disabled", false, uiSettings.isIncreaseScaleThresholdWhenRotating());
+  }
+
+  @Test
   public void testAllGesturesEnabled() {
     uiSettings.setAllGesturesEnabled(true);
     assertEquals("Rotate gesture should be enabled", true, uiSettings.isRotateGesturesEnabled());
