@@ -45,21 +45,16 @@ public final class UiSettings {
   private float pixelRatio;
 
   private boolean rotateGesturesEnabled = true;
-  private boolean rotateGestureChangeAllowed = true;
 
   private boolean tiltGesturesEnabled = true;
-  private boolean tiltGestureChangeAllowed = true;
 
   private boolean zoomGesturesEnabled = true;
-  private boolean zoomGestureChangeAllowed = true;
 
   private boolean scrollGesturesEnabled = true;
-  private boolean scrollGestureChangeAllowed = true;
 
   private boolean zoomControlsEnabled;
 
   private boolean doubleTapGesturesEnabled = true;
-  private boolean doubleTapGestureChangeAllowed = true;
 
   private boolean scaleVelocityAnimationEnabled = true;
   private boolean rotateVelocityAnimationEnabled = true;
@@ -112,42 +107,27 @@ public final class UiSettings {
 
   private void initialiseGestures(MapboxMapOptions options) {
     setZoomGesturesEnabled(options.getZoomGesturesEnabled());
-    setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
     setScrollGesturesEnabled(options.getScrollGesturesEnabled());
-    setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
     setRotateGesturesEnabled(options.getRotateGesturesEnabled());
-    setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
-    setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
     setZoomControlsEnabled(options.getZoomControlsEnabled());
     setDoubleTapGesturesEnabled(options.getDoubleTapGesturesEnabled());
-    setDoubleTapGestureChangeAllowed(options.getDoubleTapGesturesEnabled());
   }
 
   private void saveGestures(Bundle outState) {
     outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, isZoomGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE, isZoomGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, isScrollGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE, isScrollGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, isRotateGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE, isRotateGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, isTiltGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE, isTiltGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED, isDoubleTapGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE, isDoubleTapGestureChangeAllowed());
   }
 
   private void restoreGestures(Bundle savedInstanceState) {
     setZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED));
-    setZoomGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE));
     setScrollGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED));
-    setScrollGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE));
     setRotateGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED));
-    setRotateGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE));
     setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
-    setTiltGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE));
     setDoubleTapGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED));
-    setDoubleTapGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE));
   }
 
   private void initialiseCompass(MapboxMapOptions options, Resources resources) {
@@ -662,9 +642,7 @@ public final class UiSettings {
    * @param rotateGesturesEnabled If true, rotating is enabled.
    */
   public void setRotateGesturesEnabled(boolean rotateGesturesEnabled) {
-    if (rotateGestureChangeAllowed) {
-      this.rotateGesturesEnabled = rotateGesturesEnabled;
-    }
+    this.rotateGesturesEnabled = rotateGesturesEnabled;
   }
 
   /**
@@ -674,14 +652,6 @@ public final class UiSettings {
    */
   public boolean isRotateGesturesEnabled() {
     return rotateGesturesEnabled;
-  }
-
-  void setRotateGestureChangeAllowed(boolean rotateGestureChangeAllowed) {
-    this.rotateGestureChangeAllowed = rotateGestureChangeAllowed;
-  }
-
-  boolean isRotateGestureChangeAllowed() {
-    return rotateGestureChangeAllowed;
   }
 
   /**
@@ -697,9 +667,8 @@ public final class UiSettings {
    * @param tiltGesturesEnabled If true, tilting is enabled.
    */
   public void setTiltGesturesEnabled(boolean tiltGesturesEnabled) {
-    if (tiltGestureChangeAllowed) {
-      this.tiltGesturesEnabled = tiltGesturesEnabled;
-    }
+    this.tiltGesturesEnabled = tiltGesturesEnabled;
+
   }
 
   /**
@@ -709,14 +678,6 @@ public final class UiSettings {
    */
   public boolean isTiltGesturesEnabled() {
     return tiltGesturesEnabled;
-  }
-
-  void setTiltGestureChangeAllowed(boolean tiltGestureChangeAllowed) {
-    this.tiltGestureChangeAllowed = tiltGestureChangeAllowed;
-  }
-
-  boolean isTiltGestureChangeAllowed() {
-    return tiltGestureChangeAllowed;
   }
 
   /**
@@ -732,9 +693,7 @@ public final class UiSettings {
    * @param zoomGesturesEnabled If true, zooming is enabled.
    */
   public void setZoomGesturesEnabled(boolean zoomGesturesEnabled) {
-    if (zoomGestureChangeAllowed) {
-      this.zoomGesturesEnabled = zoomGesturesEnabled;
-    }
+    this.zoomGesturesEnabled = zoomGesturesEnabled;
   }
 
   /**
@@ -744,14 +703,6 @@ public final class UiSettings {
    */
   public boolean isZoomGesturesEnabled() {
     return zoomGesturesEnabled;
-  }
-
-  void setZoomGestureChangeAllowed(boolean zoomGestureChangeAllowed) {
-    this.zoomGestureChangeAllowed = zoomGestureChangeAllowed;
-  }
-
-  boolean isZoomGestureChangeAllowed() {
-    return zoomGestureChangeAllowed;
   }
 
   /**
@@ -792,9 +743,7 @@ public final class UiSettings {
    * @param doubleTapGesturesEnabled If true, zooming with a double tap is enabled.
    */
   public void setDoubleTapGesturesEnabled(boolean doubleTapGesturesEnabled) {
-    if (doubleTapGestureChangeAllowed) {
-      this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
-    }
+    this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
   }
 
   /**
@@ -804,14 +753,6 @@ public final class UiSettings {
    */
   public boolean isDoubleTapGesturesEnabled() {
     return doubleTapGesturesEnabled;
-  }
-
-  void setDoubleTapGestureChangeAllowed(boolean doubleTapGestureChangeAllowed) {
-    this.doubleTapGestureChangeAllowed = doubleTapGestureChangeAllowed;
-  }
-
-  boolean isDoubleTapGestureChangeAllowed() {
-    return doubleTapGestureChangeAllowed;
   }
 
   private void restoreDeselectMarkersOnTap(Bundle savedInstanceState) {
@@ -855,9 +796,7 @@ public final class UiSettings {
    * @param scrollGesturesEnabled If true, scrolling is enabled.
    */
   public void setScrollGesturesEnabled(boolean scrollGesturesEnabled) {
-    if (scrollGestureChangeAllowed) {
-      this.scrollGesturesEnabled = scrollGesturesEnabled;
-    }
+    this.scrollGesturesEnabled = scrollGesturesEnabled;
   }
 
   /**
@@ -867,14 +806,6 @@ public final class UiSettings {
    */
   public boolean isScrollGesturesEnabled() {
     return scrollGesturesEnabled;
-  }
-
-  void setScrollGestureChangeAllowed(boolean scrollGestureChangeAllowed) {
-    this.scrollGestureChangeAllowed = scrollGestureChangeAllowed;
-  }
-
-  boolean isScrollGestureChangeAllowed() {
-    return scrollGestureChangeAllowed;
   }
 
   /**

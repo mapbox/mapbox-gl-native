@@ -181,26 +181,11 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testRotateGestureChange() {
-    assertEquals("Default state should be true", true, uiSettings.isRotateGestureChangeAllowed());
-    uiSettings.setRotateGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isRotateGestureChangeAllowed());
-  }
-
-  @Test
   public void testRotateGestureChangeAllowed() {
     uiSettings.setRotateGesturesEnabled(false);
     assertEquals("Rotate gesture should be false", false, uiSettings.isRotateGesturesEnabled());
     uiSettings.setRotateGesturesEnabled(true);
     assertEquals("Rotate gesture should be true", true, uiSettings.isRotateGesturesEnabled());
-  }
-
-  @Test
-  public void testRotateGestureChangeDisallowed() {
-    assertEquals("Rotate gesture should be true", true, uiSettings.isRotateGesturesEnabled());
-    uiSettings.setRotateGestureChangeAllowed(false);
-    uiSettings.setRotateGesturesEnabled(false);
-    assertEquals("Rotate gesture change should be ignored", true, uiSettings.isRotateGesturesEnabled());
   }
 
   @Test
@@ -216,26 +201,11 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testTiltGestureChange() {
-    assertEquals("Default state should be true", true, uiSettings.isTiltGestureChangeAllowed());
-    uiSettings.setTiltGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isTiltGestureChangeAllowed());
-  }
-
-  @Test
   public void testTiltGestureChangeAllowed() {
     uiSettings.setTiltGesturesEnabled(false);
     assertEquals("Tilt gesture should be false", false, uiSettings.isTiltGesturesEnabled());
     uiSettings.setTiltGesturesEnabled(true);
     assertEquals("Tilt gesture should be true", true, uiSettings.isTiltGesturesEnabled());
-  }
-
-  @Test
-  public void testTiltGestureChangeDisallowed() {
-    assertEquals("Tilt gesture should be true", true, uiSettings.isTiltGesturesEnabled());
-    uiSettings.setTiltGestureChangeAllowed(false);
-    uiSettings.setTiltGesturesEnabled(false);
-    assertEquals("Tilt gesture change should be ignored", true, uiSettings.isTiltGesturesEnabled());
   }
 
   @Test
@@ -251,26 +221,11 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testZoomGestureChange() {
-    assertEquals("Default state should be true", true, uiSettings.isZoomGestureChangeAllowed());
-    uiSettings.setZoomGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isZoomGestureChangeAllowed());
-  }
-
-  @Test
   public void testZoomGestureChangeAllowed() {
     uiSettings.setZoomGesturesEnabled(false);
     assertEquals("Zoom gesture should be false", false, uiSettings.isZoomGesturesEnabled());
     uiSettings.setZoomGesturesEnabled(true);
     assertEquals("Zoom gesture should be true", true, uiSettings.isZoomGesturesEnabled());
-  }
-
-  @Test
-  public void testZoomGestureChangeDisallowed() {
-    assertEquals("Zoom gesture should be true", true, uiSettings.isZoomGesturesEnabled());
-    uiSettings.setZoomGestureChangeAllowed(false);
-    uiSettings.setZoomGesturesEnabled(false);
-    assertEquals("Zooom gesture change should be ignored", true, uiSettings.isZoomGesturesEnabled());
   }
 
   @Test
@@ -298,26 +253,11 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testDoubleTapGestureChange() {
-    assertEquals("Default state should be true", true, uiSettings.isDoubleTapGestureChangeAllowed());
-    uiSettings.setDoubleTapGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isDoubleTapGestureChangeAllowed());
-  }
-
-  @Test
   public void testDoubleTapGestureChangeAllowed() {
     uiSettings.setDoubleTapGesturesEnabled(false);
     assertEquals("DoubleTap gesture should be false", false, uiSettings.isDoubleTapGesturesEnabled());
     uiSettings.setDoubleTapGesturesEnabled(true);
     assertEquals("DoubleTap gesture should be true", true, uiSettings.isDoubleTapGesturesEnabled());
-  }
-
-  @Test
-  public void testDoubleTapGestureChangeDisallowed() {
-    assertEquals("DoubleTap gesture should be true", true, uiSettings.isDoubleTapGesturesEnabled());
-    uiSettings.setDoubleTapGestureChangeAllowed(false);
-    uiSettings.setDoubleTapGesturesEnabled(false);
-    assertEquals("DoubleTap gesture change should be ignored", true, uiSettings.isDoubleTapGesturesEnabled());
   }
 
   @Test
@@ -333,26 +273,11 @@ public class UiSettingsTest {
   }
 
   @Test
-  public void testScrollGestureChange() {
-    assertEquals("Default state should be true", true, uiSettings.isScrollGestureChangeAllowed());
-    uiSettings.setScrollGestureChangeAllowed(false);
-    assertEquals("State should have been changed", false, uiSettings.isScrollGestureChangeAllowed());
-  }
-
-  @Test
   public void testScrollGestureChangeAllowed() {
     uiSettings.setScrollGesturesEnabled(false);
     assertEquals("Scroll gesture should be false", false, uiSettings.isScrollGesturesEnabled());
     uiSettings.setScrollGesturesEnabled(true);
     assertEquals("Scroll gesture should be true", true, uiSettings.isScrollGesturesEnabled());
-  }
-
-  @Test
-  public void testScrollGestureChangeDisallowed() {
-    assertEquals("Scroll gesture should be true", true, uiSettings.isScrollGesturesEnabled());
-    uiSettings.setScrollGestureChangeAllowed(false);
-    uiSettings.setScrollGesturesEnabled(false);
-    assertEquals("Scroll gesture change should be ignored", true, uiSettings.isScrollGesturesEnabled());
   }
 
   @Test
