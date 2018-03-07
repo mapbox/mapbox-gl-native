@@ -85,11 +85,6 @@ void Renderer::Impl::setObserver(RendererObserver* observer_) {
 
 void Renderer::Impl::render(const UpdateParameters& updateParameters) {
     if (updateParameters.mode != MapMode::Continuous) {
-        // Don't load/render anyting in still mode until explicitly requested.
-        if (!updateParameters.stillImageRequest) {
-            return;
-        }
-
         // Reset zoom history state.
         zoomHistory.first = true;
     }
