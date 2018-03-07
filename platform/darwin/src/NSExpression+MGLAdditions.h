@@ -117,7 +117,35 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  */
 + (instancetype)mgl_expressionForValue:(nonnull NSValue *)value;
 
-+ (instancetype)mgl_expressionForTernaryFunction:(nonnull NSString *)conditionString trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression;
+/**
+ Returns a conditional function expression specifying the string predicate, and
+ colors for each condition.
+ 
+ @param conditionPredicate The predicate to get evaluated.
+ @param trueColor The color for conditions equal to true.
+ @param falseColor The color value if the condition is equal to false.
+ */
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueColor:(nonnull MGLColor*)trueColor falseColor:(nonnull MGLColor *)falseColor;
+
+/**
+ Returns a conditional function expression specifying the string predicate, and
+ values for each condition.
+ 
+ @param conditionPredicate The predicate to get evaluated.
+ @param trueValue The value for conditions equal to true.
+ @param falseValue The value for conditions equal to false.
+ */
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueValue:(nonnull NSValue *)trueValue falseValue:(nonnull NSValue *)falseValue;
+
+/**
+ Returns a conditional function expression specifying the string predicate, and
+ expressions for each condition.
+ 
+ @param conditionPredicate The predicate to get evaluated.
+ @param trueExpression The expression for conditions equal to true.
+ @param falseExpression The expression for conditions equal to false.
+ */
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression;
 
 /**
  Returns a step function expression specifying the function operator, default value
@@ -143,11 +171,11 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  Returns a step function expression specifying the function operator, default expression
  and stops.
  
- @param function The operator type in which this expression is applied.
+ @param operatorExpression The operator expression.
  @param expression The expression which could be a constant or function expression.
  @param stops The stops dictionay must be numeric literals in strictly ascending order.
  */
-+ (instancetype)mgl_expressionForStepFunction:(nonnull MGLExpressionStyleFunction)function defaultExpression:(nonnull NSExpression *)expression stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops;
++ (instancetype)mgl_expressionForStepFunction:(nonnull NSExpression*)operatorExpression defaultExpression:(nonnull NSExpression *)expression stops:(nonnull NSExpression*)stops;
 
 /**
  Returns an interpolated function expression specifying the function operator, curve type
@@ -157,7 +185,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param curveType The curve type could be `MGLExpressionInterpolationModeLinear`,
                     `MGLExpressionInterpolationModeExponential` and
                     `MGLExpressionInterpolationModeCubicBezier`.
- @param steps The stops dictionay must be numeric literals in strictly ascending order.
+ @param steps The steps dictionay must be numeric literals in strictly ascending order.
  */
 + (instancetype)mgl_expressionForInterpolateFunction:(nonnull MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps;
 
@@ -165,14 +193,14 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  Returns an interpolated function expression specifying the function operator, curve type,
  parameters and steps.
  
- @param function The operator type in which this expression is applied.
+ @param expressionOperator The expression operator.
  @param curveType The curve type could be `MGLExpressionInterpolationModeLinear`,
  `MGLExpressionInterpolationModeExponential` and
  `MGLExpressionInterpolationModeCubicBezier`.
  @param parameters The parameters expression.
- @param steps The stops dictionay must be numeric literals in strictly ascending order.
+ @param steps The steps expression.
  */
-+ (instancetype)mgl_expressionForInterpolateFunction:(nonnull MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps;
++ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)expressionOperator curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps;
 
 /**
  Returns a string constant expression appending the passed string.

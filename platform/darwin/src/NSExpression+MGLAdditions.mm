@@ -305,7 +305,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 + (instancetype)mgl_expressionForString:(NSString *)string {
-    return [NSExpression expressionForConstantValue:string];
+    return [NSExpression expressionWithFormat:string];
 }
 
 + (instancetype)mgl_expressionForColor:(MGLColor *)color {
@@ -315,41 +315,57 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     return [NSExpression expressionForConstantValue:value];
 }
 
-+ (instancetype)mgl_expressionForTernaryFunction:(NSString *)conditionString trueExpression:(NSExpression *)trueExpression falseExpresssion:(NSExpression *)falseExpression {
-    NSString *funtionFormat = [NSString stringWithFormat:@"TERNARY(%@, %%@, %%@)", conditionString];
-    return [NSExpression expressionWithFormat:funtionFormat, trueExpression, falseExpression];
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueColor:(nonnull MGLColor*)trueColor falseColor:(nonnull MGLColor *)falseColor {
+    return [NSExpression mgl_expressionForConditional:conditionPredicate
+                                       trueExpression:[NSExpression mgl_expressionForColor:trueColor]
+                                     falseExpresssion:[NSExpression mgl_expressionForColor:falseColor]];
+}
+
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueValue:(nonnull NSValue *)trueValue falseValue:(nonnull NSValue *)falseValue {
+    return [NSExpression mgl_expressionForConditional:conditionPredicate
+                                       trueExpression:[NSExpression mgl_expressionForValue:trueValue]
+                                     falseExpresssion:[NSExpression mgl_expressionForValue:falseValue]];
+}
+
++ (instancetype)mgl_expressionForConditional:(nonnull NSString *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
+    NSPredicate *conditional = [NSPredicate predicateWithFormat:conditionPredicate];
+    return [NSExpression expressionForConditional:conditional trueExpression:trueExpression falseExpression:falseExpression];
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultValue:(NSValue *)value stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:function
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
                                      defaultExpression:[NSExpression mgl_expressionForValue:value]
-                                                 stops:stops];
+                                                 stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultString:(NSString *)string stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:function
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
                                      defaultExpression:[NSExpression mgl_expressionForString:string]
-                                                 stops:stops];
+                                                 stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultColor:(MGLColor *)color stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:function
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
                                      defaultExpression:[NSExpression mgl_expressionForColor:color]
-                                                 stops:stops];
+                                                 stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
 
-+ (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultExpression:(NSExpression *)expression stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    NSString *functionFormat = [NSString stringWithFormat:@"FUNCTION(%@, 'mgl_stepWithMinimum:stops:', %%@, %%@, %%@)", function];
-    return [NSExpression expressionWithFormat:functionFormat, expression, stops];
++ (instancetype)mgl_expressionForStepFunction:(NSExpression *)operatorExpression defaultExpression:(NSExpression *)expression stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
+    return [NSExpression expressionForFunction:operatorExpression selectorName:@"mgl_stepWithMinimum:stops:" arguments:@[expression, stops]];
 }
 
 + (instancetype)mgl_expressionForInterpolateFunction:(MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps; {
-    return [NSExpression mgl_expressionForInterpolateFunction:function curveType:curveType parameters:nil steps:steps];
+    return [NSExpression mgl_expressionForInterpolateFunction:[NSExpression mgl_expressionForString:function]
+                                                    curveType:curveType
+                                                   parameters:nil
+                                                        steps:[NSExpression expressionWithFormat:@"%@", steps]];
 }
 
-+ (instancetype)mgl_expressionForInterpolateFunction:(MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps {
-    NSString *functionFormat = [NSString stringWithFormat:@"FUNCTION(%@, 'mgl_interpolateWithCurveType:parameters:stops:', %%@, %%@, %%@)", function];
-    return [NSExpression expressionWithFormat:functionFormat, curveType, parameters, steps];
++ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)expressionOperator curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps {
+    NSExpression *sanitizeParams = parameters ? parameters : [NSExpression expressionWithFormat:@"%@", parameters];
+    return [NSExpression expressionForFunction:expressionOperator
+                                  selectorName:@"mgl_interpolateWithCurveType:parameters:stops:"
+                                     arguments:@[[NSExpression expressionForConstantValue:curveType], sanitizeParams, steps]];
 }
 
 
