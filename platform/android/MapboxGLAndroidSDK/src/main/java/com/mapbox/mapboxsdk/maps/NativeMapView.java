@@ -229,18 +229,28 @@ final class NativeMapView {
     return nativeGetLatLng().wrap();
   }
 
-  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds) {
+  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds, int[] padding) {
     if (isDestroyedOn("getCameraForLatLngBounds")) {
       return null;
     }
-    return nativeGetCameraForLatLngBounds(latLngBounds);
+    return nativeGetCameraForLatLngBounds(
+      latLngBounds,
+      padding[1] / pixelRatio,
+      padding[0] / pixelRatio,
+      padding[3] / pixelRatio,
+      padding[2] / pixelRatio);
   }
 
-  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing) {
+  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
     if (isDestroyedOn("getCameraForGeometry")) {
       return null;
     }
-    return nativeGetCameraForGeometry(geometry, bearing);
+    return nativeGetCameraForGeometry(
+      geometry, bearing,
+      padding[1] / pixelRatio,
+      padding[0] / pixelRatio,
+      padding[3] / pixelRatio,
+      padding[2] / pixelRatio);
   }
 
   public void resetPosition() {
@@ -896,9 +906,11 @@ final class NativeMapView {
 
   private native LatLng nativeGetLatLng();
 
-  private native CameraPosition nativeGetCameraForLatLngBounds(LatLngBounds latLngBounds);
+  private native CameraPosition nativeGetCameraForLatLngBounds(
+    LatLngBounds latLngBounds, double top, double left, double bottom, double right);
 
-  private native CameraPosition nativeGetCameraForGeometry(Geometry geometry, double bearing);
+  private native CameraPosition nativeGetCameraForGeometry(
+    Geometry geometry, double bearing, double top, double left, double bottom, double right);
 
   private native void nativeResetPosition();
 

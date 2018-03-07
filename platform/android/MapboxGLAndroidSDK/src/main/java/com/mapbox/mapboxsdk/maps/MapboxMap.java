@@ -1550,19 +1550,8 @@ public final class MapboxMap {
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForLatLngBounds(@Nullable LatLngBounds latLngBounds, int[] padding) {
-    // calculate and set additional bounds padding
-    int[] mapPadding = getPadding();
-    for (int i = 0; i < padding.length; i++) {
-      padding[i] = mapPadding[i] + padding[i];
-    }
-    projection.setContentPadding(padding);
-
     // get padded camera position from LatLngBounds
-    CameraPosition cameraPosition = nativeMapView.getCameraForLatLngBounds(latLngBounds);
-
-    // reset map padding
-    setPadding(mapPadding);
-    return cameraPosition;
+    return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding);
   }
 
   /**
@@ -1574,19 +1563,8 @@ public final class MapboxMap {
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
-    // calculate and set additional bounds padding
-    int[] mapPadding = getPadding();
-    for (int i = 0; i < padding.length; i++) {
-      padding[i] = mapPadding[i] + padding[i];
-    }
-    projection.setContentPadding(padding);
-
-    // get padded camera position from LatLngBounds
-    CameraPosition cameraPosition = nativeMapView.getCameraForGeometry(geometry, bearing);
-
-    // reset map padding
-    setPadding(mapPadding);
-    return cameraPosition;
+    // get padded camera position from Geometry
+    return nativeMapView.getCameraForGeometry(geometry, bearing, padding);
   }
 
   //
