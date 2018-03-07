@@ -150,5 +150,10 @@ public class MapboxConstants {
   public static final String STATE_ATTRIBUTION_ENABLED = "mapbox_atrrEnabled";
   public static final String STATE_DESELECT_MARKER_ON_TAP = "mapbox_deselectMarkerOnTap";
   public static final String STATE_USER_FOCAL_POINT = "mapbox_userFocalPoint";
+  public static final String STATE_SCALE_ANIMATION_ENABLED = "mapbox_scaleAnimationEnabled";
+  public static final String STATE_ROTATE_ANIMATION_ENABLED = "mapbox_rotateAnimationEnabled";
+  public static final String STATE_FLING_ANIMATION_ENABLED = "mapbox_flingAnimationEnabled";
+  public static final String STATE_INCREASE_ROTATE_THRESHOLD = "mapbox_increaseRotateThreshold";
+  public static final String STATE_INCREASE_SCALE_THRESHOLD = "mapbox_increaseScaleThreshold";
 
 }
