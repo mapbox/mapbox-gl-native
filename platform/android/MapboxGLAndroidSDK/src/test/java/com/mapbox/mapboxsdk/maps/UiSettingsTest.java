@@ -335,13 +335,15 @@ public class UiSettingsTest {
   @Test
   public void testIncreaseRotateThresholdWhenScalingEnabled() {
     uiSettings.setIncreaseRotateThresholdWhenScaling(true);
-    assertEquals("Rotate threshold increase should be enabled", true, uiSettings.isIncreaseRotateThresholdWhenScaling());
+    assertEquals("Rotate threshold increase should be enabled", true,
+      uiSettings.isIncreaseRotateThresholdWhenScaling());
   }
 
   @Test
   public void testIncreaseRotateThresholdWhenScalingDisabled() {
     uiSettings.setIncreaseRotateThresholdWhenScaling(false);
-    assertEquals("Rotate threshold increase should be disabled", false, uiSettings.isIncreaseRotateThresholdWhenScaling());
+    assertEquals("Rotate threshold increase should be disabled", false,
+      uiSettings.isIncreaseRotateThresholdWhenScaling());
   }
 
   @Test
@@ -353,7 +355,8 @@ public class UiSettingsTest {
   @Test
   public void testIncreaseScaleThresholdWhenRotatingDisabled() {
     uiSettings.setIncreaseScaleThresholdWhenRotating(false);
-    assertEquals("Scale threshold increase should be disabled", false, uiSettings.isIncreaseScaleThresholdWhenRotating());
+    assertEquals("Scale threshold increase should be disabled", false,
+      uiSettings.isIncreaseScaleThresholdWhenRotating());
   }
 
   @Test
