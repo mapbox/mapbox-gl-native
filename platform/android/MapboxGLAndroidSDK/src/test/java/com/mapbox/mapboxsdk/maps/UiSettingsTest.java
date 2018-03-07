@@ -356,6 +356,58 @@ public class UiSettingsTest {
   }
 
   @Test
+  public void testScaleVelocityAnimationEnabled() {
+    uiSettings.setScaleVelocityAnimationEnabled(true);
+    assertEquals("Scale velocity animation should be enabled", true, uiSettings.isScaleVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testScaleVelocityAnimationDisabled() {
+    uiSettings.setScaleVelocityAnimationEnabled(false);
+    assertEquals("Scale velocity animation should be disabled", false, uiSettings.isScaleVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testRotateVelocityAnimationEnabled() {
+    uiSettings.setRotateVelocityAnimationEnabled(true);
+    assertEquals("Rotate velocity animation should be enabled", true, uiSettings.isRotateVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testRotateVelocityAnimationDisabled() {
+    uiSettings.setRotateVelocityAnimationEnabled(false);
+    assertEquals("Rotate velocity animation should be disabled", false, uiSettings.isRotateVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testFlingVelocityAnimationEnabled() {
+    uiSettings.setFlingVelocityAnimationEnabled(true);
+    assertEquals("Fling velocity animation should be enabled", true, uiSettings.isFlingVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testFlingVelocityAnimationDisabled() {
+    uiSettings.setFlingVelocityAnimationEnabled(false);
+    assertEquals("Fling velocity animation should be disabled", false, uiSettings.isFlingVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testAllVelocityAnimationsEnabled() {
+    uiSettings.setAllVelocityAnimationsEnabled(true);
+    assertEquals("Scale velocity animation should be enabled", true, uiSettings.isScaleVelocityAnimationEnabled());
+    assertEquals("Rotate velocity animation should be enabled", true, uiSettings.isRotateVelocityAnimationEnabled());
+    assertEquals("Fling velocity animation should be enabled", true, uiSettings.isFlingVelocityAnimationEnabled());
+  }
+
+  @Test
+  public void testAllVelocityAnimationsDisabled() {
+    uiSettings.setAllVelocityAnimationsEnabled(false);
+    assertEquals("Scale velocity animation should be disabled", false, uiSettings.isScaleVelocityAnimationEnabled());
+    assertEquals("Rotate velocity animation should be disabled", false, uiSettings.isRotateVelocityAnimationEnabled());
+    assertEquals("Fling velocity animation should be disabled", false, uiSettings.isFlingVelocityAnimationEnabled());
+  }
+
+  @Test
   public void testAllGesturesEnabled() {
     uiSettings.setAllGesturesEnabled(true);
     assertEquals("Rotate gesture should be enabled", true, uiSettings.isRotateGesturesEnabled());

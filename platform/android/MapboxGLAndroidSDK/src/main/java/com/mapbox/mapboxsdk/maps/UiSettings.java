@@ -61,6 +61,10 @@ public final class UiSettings {
   private boolean doubleTapGesturesEnabled = true;
   private boolean doubleTapGestureChangeAllowed = true;
 
+  private boolean scaleVelocityAnimationEnabled = true;
+  private boolean rotateVelocityAnimationEnabled = true;
+  private boolean flingVelocityAnimationEnabled = true;
+
   private boolean deselectMarkersOnTap = true;
 
   private PointF userProvidedFocalPoint;
@@ -871,6 +875,71 @@ public final class UiSettings {
 
   boolean isScrollGestureChangeAllowed() {
     return scrollGestureChangeAllowed;
+  }
+
+  /**
+   * Returns whether scale velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, scale velocity animation is enabled.
+   */
+  public boolean isScaleVelocityAnimationEnabled() {
+    return scaleVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether scale velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param scaleVelocityAnimationEnabled If true, scale velocity animation will be enabled.
+   */
+  public void setScaleVelocityAnimationEnabled(boolean scaleVelocityAnimationEnabled) {
+    this.scaleVelocityAnimationEnabled = scaleVelocityAnimationEnabled;
+  }
+
+  /**
+   * Returns whether rotate velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, rotate velocity animation is enabled.
+   */
+  public boolean isRotateVelocityAnimationEnabled() {
+    return rotateVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether rotate velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param rotateVelocityAnimationEnabled If true, rotate velocity animation will be enabled.
+   */
+  public void setRotateVelocityAnimationEnabled(boolean rotateVelocityAnimationEnabled) {
+    this.rotateVelocityAnimationEnabled = rotateVelocityAnimationEnabled;
+  }
+
+  /**
+   * Returns whether fling velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, fling velocity animation is enabled.
+   */
+  public boolean isFlingVelocityAnimationEnabled() {
+    return flingVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether fling velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param flingVelocityAnimationEnabled If true, fling velocity animation will be enabled.
+   */
+  public void setFlingVelocityAnimationEnabled(boolean flingVelocityAnimationEnabled) {
+    this.flingVelocityAnimationEnabled = flingVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether all velocity animations should execute after users finishes a gesture.
+   *
+   * @param allVelocityAnimationsEnabled If true, all velocity animations will be enabled.
+   */
+  public void setAllVelocityAnimationsEnabled(boolean allVelocityAnimationsEnabled) {
+    setScaleVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+    setRotateVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+    setFlingVelocityAnimationEnabled(allVelocityAnimationsEnabled);
   }
 
   /**

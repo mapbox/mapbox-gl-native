@@ -367,8 +367,14 @@ final class MapGestureDetector {
 
     @Override
     public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-      if ((!uiSettings.isScrollGesturesEnabled())) {
+      if (!uiSettings.isScrollGesturesEnabled()) {
         // don't allow a fling is scroll is disabled
+        return false;
+      }
+
+      notifyOnFlingListeners();
+
+      if (!uiSettings.isFlingVelocityAnimationEnabled()) {
         return false;
       }
 
@@ -395,8 +401,6 @@ final class MapGestureDetector {
 
       // update transformation
       transform.moveBy(offsetX, offsetY, animationTime);
-
-      notifyOnFlingListeners();
 
       return true;
     }
@@ -512,6 +516,12 @@ final class MapGestureDetector {
         gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
       );
 
+      notifyOnScaleEndListeners(detector);
+
+      if (!uiSettings.isScaleVelocityAnimationEnabled()) {
+        return;
+      }
+
       float velocityXY = Math.abs(velocityX) + Math.abs(velocityY);
       if (velocityXY > minimumVelocity) {
         double zoomAddition = calculateScale(velocityXY, detector.isScalingOut());
@@ -520,8 +530,6 @@ final class MapGestureDetector {
         scaleAnimator = createScaleAnimator(currentZoom, zoomAddition, scaleFocalPoint, animationTime);
         scheduleAnimator(scaleAnimator);
       }
-
-      notifyOnScaleEndListeners(detector);
     }
 
     private void setScaleFocalPoint(StandardScaleGestureDetector detector) {
@@ -620,6 +628,12 @@ final class MapGestureDetector {
       gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
         gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
 
+      notifyOnRotateEndListeners(detector);
+
+      if (!uiSettings.isRotateVelocityAnimationEnabled()) {
+        return;
+      }
+
       if (Math.abs(angularVelocity) < minimumAngularVelocity) {
         return;
       }
@@ -637,8 +651,6 @@ final class MapGestureDetector {
 
       rotateAnimator = createRotateAnimator(angularVelocity, animationTime);
       scheduleAnimator(rotateAnimator);
-
-      notifyOnRotateEndListeners(detector);
     }
 
     private void setRotateFocalPoint(RotateGestureDetector detector) {
