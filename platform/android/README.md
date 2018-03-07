@@ -12,7 +12,7 @@ Alright. So, actually, you may be in the wrong place. From here on in, this READ
 
 **To install and use the Mapbox Maps SDK for Android in an application, see the [Mapbox Maps SDK for Android website](https://www.mapbox.com/install/android/).**
 
-[![](https://www.mapbox.com/android-sdk/images/splash.png)](https://www.mapbox.com/android-sdk/)
+[![](https://www.mapbox.com/android-docs/assets/overview-map-sdk-322-9abe118316efb5910b6101e222a2e57c.png)](https://www.mapbox.com/android-sdk/)
 
 ### Setup environment
 
