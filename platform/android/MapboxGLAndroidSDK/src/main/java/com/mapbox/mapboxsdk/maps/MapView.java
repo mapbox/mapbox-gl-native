@@ -1027,6 +1027,11 @@ public class MapView extends FrameLayout {
     public void setGesturesManager(AndroidGesturesManager gesturesManager) {
       mapGestureDetector.setGesturesManager(gesturesManager);
     }
+
+    @Override
+    public void cancelAllVelocityAnimations() {
+      mapGestureDetector.cancelAnimators();
+    }
   }
 
   private static class MapZoomControllerListener implements ZoomButtonsController.OnZoomListener {

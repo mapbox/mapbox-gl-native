@@ -1936,6 +1936,13 @@ public final class MapboxMap {
   }
 
   /**
+   * Interrupts any ongoing gesture velocity animations.
+   */
+  public void cancelAllVelocityAnimations() {
+    onGesturesManagerInteractionListener.cancelAllVelocityAnimations();
+  }
+
+  /**
    * Sets a callback that's invoked when the user clicks on the map view.
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
@@ -2353,6 +2360,8 @@ public final class MapboxMap {
     AndroidGesturesManager getGesturesManager();
 
     void setGesturesManager(AndroidGesturesManager gesturesManager);
+
+    void cancelAllVelocityAnimations();
   }
 
   /**
