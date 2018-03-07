@@ -16,6 +16,7 @@ namespace sqlite {
 class Database;
 class Statement;
 class Query;
+class Exception;
 } // namespace sqlite
 } // namespace mapbox
 
@@ -59,9 +60,12 @@ public:
     uint64_t getOfflineMapboxTileCount();
 
 private:
-    void connect(int flags);
+    void handleError(const mapbox::sqlite::Exception&);
+    bool initialize();
+    void openDatabase();
+    void createSchema();
+    void closeDatabase();
     int userVersion();
-    void ensureSchema();
     void removeExisting();
     void migrateToVersion3();
     void migrateToVersion5();
@@ -71,13 +75,13 @@ private:
 
     optional<std::pair<Response, uint64_t>> getTile(const Resource::TileData&);
     optional<int64_t> hasTile(const Resource::TileData&);
-    bool putTile(const Resource::TileData&, const Response&,
-                 const std::string&, bool compressed);
+    std::pair<bool, uint64_t>
+    putTile(const Resource::TileData&, const Response&, const std::shared_ptr<const std::string>&, bool compressed);
 
     optional<std::pair<Response, uint64_t>> getResource(const Resource&);
     optional<int64_t> hasResource(const Resource&);
-    bool putResource(const Resource&, const Response&,
-                     const std::string&, bool compressed);
+    std::pair<bool, uint64_t>
+    putResource(const Resource&, const Response&, const std::shared_ptr<const std::string>&, bool compressed);
 
     optional<std::pair<Response, uint64_t>> getInternal(const Resource&);
     optional<int64_t> hasInternal(const Resource&);
@@ -85,6 +89,8 @@ private:
 
     // Return value is true iff the resource was previously unused by any other regions.
     bool markUsed(int64_t regionID, const Resource&);
+    bool markTileUsed(int64_t regionID, const Resource&);
+    bool markResourceUsed(int64_t regionID, const Resource&);
 
     std::pair<int64_t, int64_t> getCompletedResourceCountAndSize(int64_t regionID);
     std::pair<int64_t, int64_t> getCompletedTileCountAndSize(int64_t regionID);

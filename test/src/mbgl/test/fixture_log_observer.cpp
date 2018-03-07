@@ -48,7 +48,7 @@ size_t FixtureLog::Observer::count(const Message& message, bool substring) const
 
     size_t message_count = 0;
     for (const auto& msg : messages) {
-        if (msg.matches(message, substring)) {
+        if (!msg.checked && msg.matches(message, substring)) {
             message_count++;
             msg.checked = true;
         }

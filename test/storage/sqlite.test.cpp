@@ -6,7 +6,7 @@
 TEST(SQLite, Statement) {
     using namespace mbgl;
 
-    mapbox::sqlite::Database db(":memory:", mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
+    mapbox::sqlite::Database db(":memory:", mapbox::sqlite::ReadWriteCreate);
     db.exec("CREATE TABLE test (id INTEGER);");
 
     mapbox::sqlite::Statement stmt1{ db, "INSERT INTO test (id) VALUES (?1);" };

@@ -23,11 +23,30 @@
 namespace mapbox {
 namespace sqlite {
 
-// https://www.sqlite.org/rescode.html#ok
 static_assert(mbgl::underlying_type(ResultCode::OK) == 0, "error");
-// https://www.sqlite.org/rescode.html#cantopen
+static_assert(mbgl::underlying_type(ResultCode::Error) == 1, "error");
+static_assert(mbgl::underlying_type(ResultCode::Internal) == 2, "error");
+static_assert(mbgl::underlying_type(ResultCode::Perm) == 3, "error");
+static_assert(mbgl::underlying_type(ResultCode::Abort) == 4, "error");
+static_assert(mbgl::underlying_type(ResultCode::Busy) == 5, "error");
+static_assert(mbgl::underlying_type(ResultCode::Locked) == 6, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoMem) == 7, "error");
+static_assert(mbgl::underlying_type(ResultCode::ReadOnly) == 8, "error");
+static_assert(mbgl::underlying_type(ResultCode::Interrupt) == 9, "error");
+static_assert(mbgl::underlying_type(ResultCode::IOErr) == 10, "error");
+static_assert(mbgl::underlying_type(ResultCode::Corrupt) == 11, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotFound) == 12, "error");
+static_assert(mbgl::underlying_type(ResultCode::Full) == 13, "error");
 static_assert(mbgl::underlying_type(ResultCode::CantOpen) == 14, "error");
-// https://www.sqlite.org/rescode.html#notadb
+static_assert(mbgl::underlying_type(ResultCode::Protocol) == 15, "error");
+static_assert(mbgl::underlying_type(ResultCode::Schema) == 17, "error");
+static_assert(mbgl::underlying_type(ResultCode::TooBig) == 18, "error");
+static_assert(mbgl::underlying_type(ResultCode::Constraint) == 19, "error");
+static_assert(mbgl::underlying_type(ResultCode::Mismatch) == 20, "error");
+static_assert(mbgl::underlying_type(ResultCode::Misuse) == 21, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoLFS) == 22, "error");
+static_assert(mbgl::underlying_type(ResultCode::Auth) == 23, "error");
+static_assert(mbgl::underlying_type(ResultCode::Range) == 25, "error");
 static_assert(mbgl::underlying_type(ResultCode::NotADB) == 26, "error");
 
 void checkQueryError(const QSqlQuery& query) {
@@ -84,10 +103,6 @@ public:
         if (flags & OpenFlag::ReadOnly) {
             if (!connectOptions.isEmpty()) connectOptions.append(';');
             connectOptions.append("QSQLITE_OPEN_READONLY");
-        }
-        if (flags & OpenFlag::SharedCache) {
-            if (!connectOptions.isEmpty()) connectOptions.append(';');
-            connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
         }
 
         db.setConnectOptions(connectOptions);

@@ -1,5 +1,7 @@
 #include "sqlite3.hpp"
-#include <sqlite3.h>
+
+#include <mbgl/util/logging.hpp>
+#include <mbgl/util/traits.hpp>
 
 #include <cassert>
 #include <cstring>
@@ -7,10 +9,36 @@
 #include <chrono>
 #include <experimental/optional>
 
-#include <mbgl/util/logging.hpp>
+#include <sqlite3.h>
 
 namespace mapbox {
 namespace sqlite {
+
+static_assert(mbgl::underlying_type(ResultCode::OK) == SQLITE_OK, "error");
+static_assert(mbgl::underlying_type(ResultCode::Error) == SQLITE_ERROR, "error");
+static_assert(mbgl::underlying_type(ResultCode::Internal) == SQLITE_INTERNAL, "error");
+static_assert(mbgl::underlying_type(ResultCode::Perm) == SQLITE_PERM, "error");
+static_assert(mbgl::underlying_type(ResultCode::Abort) == SQLITE_ABORT, "error");
+static_assert(mbgl::underlying_type(ResultCode::Busy) == SQLITE_BUSY, "error");
+static_assert(mbgl::underlying_type(ResultCode::Locked) == SQLITE_LOCKED, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoMem) == SQLITE_NOMEM, "error");
+static_assert(mbgl::underlying_type(ResultCode::ReadOnly) == SQLITE_READONLY, "error");
+static_assert(mbgl::underlying_type(ResultCode::Interrupt) == SQLITE_INTERRUPT, "error");
+static_assert(mbgl::underlying_type(ResultCode::IOErr) == SQLITE_IOERR, "error");
+static_assert(mbgl::underlying_type(ResultCode::Corrupt) == SQLITE_CORRUPT, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotFound) == SQLITE_NOTFOUND, "error");
+static_assert(mbgl::underlying_type(ResultCode::Full) == SQLITE_FULL, "error");
+static_assert(mbgl::underlying_type(ResultCode::CantOpen) == SQLITE_CANTOPEN, "error");
+static_assert(mbgl::underlying_type(ResultCode::Protocol) == SQLITE_PROTOCOL, "error");
+static_assert(mbgl::underlying_type(ResultCode::Schema) == SQLITE_SCHEMA, "error");
+static_assert(mbgl::underlying_type(ResultCode::TooBig) == SQLITE_TOOBIG, "error");
+static_assert(mbgl::underlying_type(ResultCode::Constraint) == SQLITE_CONSTRAINT, "error");
+static_assert(mbgl::underlying_type(ResultCode::Mismatch) == SQLITE_MISMATCH, "error");
+static_assert(mbgl::underlying_type(ResultCode::Misuse) == SQLITE_MISUSE, "error");
+static_assert(mbgl::underlying_type(ResultCode::NoLFS) == SQLITE_NOLFS, "error");
+static_assert(mbgl::underlying_type(ResultCode::Auth) == SQLITE_AUTH, "error");
+static_assert(mbgl::underlying_type(ResultCode::Range) == SQLITE_RANGE, "error");
+static_assert(mbgl::underlying_type(ResultCode::NotADB) == SQLITE_NOTADB, "error");
 
 class DatabaseImpl {
 public:
@@ -69,84 +97,8 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
-static const char* codeToString(const int err) {
-    switch (err) {
-    case SQLITE_OK: return "SQLITE_OK";
-    case SQLITE_ERROR: return "SQLITE_ERROR";
-    case SQLITE_INTERNAL: return "SQLITE_INTERNAL";
-    case SQLITE_PERM: return "SQLITE_PERM";
-    case SQLITE_ABORT: return "SQLITE_ABORT";
-    case SQLITE_BUSY: return "SQLITE_BUSY";
-    case SQLITE_LOCKED: return "SQLITE_LOCKED";
-    case SQLITE_NOMEM: return "SQLITE_NOMEM";
-    case SQLITE_READONLY: return "SQLITE_READONLY";
-    case SQLITE_INTERRUPT: return "SQLITE_INTERRUPT";
-    case SQLITE_IOERR: return "SQLITE_IOERR";
-    case SQLITE_CORRUPT: return "SQLITE_CORRUPT";
-    case SQLITE_NOTFOUND: return "SQLITE_NOTFOUND";
-    case SQLITE_FULL: return "SQLITE_FULL";
-    case SQLITE_CANTOPEN: return "SQLITE_CANTOPEN";
-    case SQLITE_PROTOCOL: return "SQLITE_PROTOCOL";
-    case SQLITE_EMPTY: return "SQLITE_EMPTY";
-    case SQLITE_SCHEMA: return "SQLITE_SCHEMA";
-    case SQLITE_TOOBIG: return "SQLITE_TOOBIG";
-    case SQLITE_CONSTRAINT: return "SQLITE_CONSTRAINT";
-    case SQLITE_MISMATCH: return "SQLITE_MISMATCH";
-    case SQLITE_MISUSE: return "SQLITE_MISUSE";
-    case SQLITE_NOLFS: return "SQLITE_NOLFS";
-    case SQLITE_AUTH: return "SQLITE_AUTH";
-    case SQLITE_FORMAT: return "SQLITE_FORMAT";
-    case SQLITE_RANGE: return "SQLITE_RANGE";
-    case SQLITE_NOTADB: return "SQLITE_NOTADB";
-    case SQLITE_NOTICE: return "SQLITE_NOTICE";
-    case SQLITE_WARNING: return "SQLITE_WARNING";
-    case SQLITE_ROW: return "SQLITE_ROW";
-    case SQLITE_DONE: return "SQLITE_DONE";
-    default: return "<unknown>";
-    }
-}
-
 static void errorLogCallback(void *, const int err, const char *msg) {
-    auto severity = mbgl::EventSeverity::Info;
-
-    switch (err) {
-        case SQLITE_ERROR:      // Generic error
-        case SQLITE_INTERNAL:   // Internal logic error in SQLite
-        case SQLITE_PERM:       // Access permission denied
-        case SQLITE_ABORT:      // Callback routine requested an abort
-        case SQLITE_BUSY:       // The database file is locked
-        case SQLITE_LOCKED:     // A table in the database is locked
-        case SQLITE_NOMEM:      // A malloc() failed
-        case SQLITE_READONLY:   // Attempt to write a readonly database
-        case SQLITE_INTERRUPT:  // Operation terminated by sqlite3_interrupt(
-        case SQLITE_IOERR:      // Some kind of disk I/O error occurred
-        case SQLITE_CORRUPT:    // The database disk image is malformed
-        case SQLITE_NOTFOUND:   // Unknown opcode in sqlite3_file_control()
-        case SQLITE_FULL:       // Insertion failed because database is full
-        case SQLITE_CANTOPEN:   // Unable to open the database file
-        case SQLITE_PROTOCOL:   // Database lock protocol error
-        case SQLITE_EMPTY:      // Internal use only
-        case SQLITE_SCHEMA:     // The database schema changed
-        case SQLITE_TOOBIG:     // String or BLOB exceeds size limit
-        case SQLITE_CONSTRAINT: // Abort due to constraint violation
-        case SQLITE_MISMATCH:   // Data type mismatch
-        case SQLITE_MISUSE:     // Library used incorrectly
-        case SQLITE_NOLFS:      // Uses OS features not supported on host
-        case SQLITE_AUTH:       // Authorization denied
-        case SQLITE_FORMAT:     // Not used
-        case SQLITE_RANGE:      // 2nd parameter to sqlite3_bind out of range
-        case SQLITE_NOTADB:     // File opened that is not a database file
-            severity = mbgl::EventSeverity::Error;
-            break;
-        case SQLITE_WARNING:    // Warnings from sqlite3_log()
-            severity = mbgl::EventSeverity::Warning;
-            break;
-        case SQLITE_NOTICE:     // Notifications from sqlite3_log()
-        default:
-            break;
-    }
-
-    mbgl::Log::Record(severity, mbgl::Event::Database, "%s (%s)", msg, codeToString(err));
+    mbgl::Log::Record(mbgl::EventSeverity::Debug, mbgl::Event::Database, err, "%s", msg);
 }
 
 const static bool sqliteVersionCheck __attribute__((unused)) = []() {
