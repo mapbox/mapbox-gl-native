@@ -339,7 +339,7 @@ void GeometryTileWorker::redoLayout() {
             for (std::size_t i = 0; !obsolete && i < geometryLayer->featureCount(); i++) {
                 std::unique_ptr<GeometryTileFeature> feature = geometryLayer->getFeature(i);
 
-                if (!filter(feature->getType(), feature->getID(), [&] (const auto& key) { return feature->getValue(key); }))
+                if (!filter(expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() }))
                     continue;
 
                 GeometryCollection geometries = feature->getGeometries();
