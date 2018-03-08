@@ -389,6 +389,9 @@ jobs:
       - run:
           name: Build package
           command: make apackage
+      - run:
+          name: Build release Test App
+          command: make android
       - *show-ccache-stats
       - *save-cache
       - *save-gradle-cache
