@@ -1,11 +1,52 @@
 #include <mbgl/style/conversion/filter.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/style/expression/expression.hpp>
+#include <mbgl/style/expression/type.hpp>
+#include <mbgl/style/conversion/expression.hpp>
 
 namespace mbgl {
 namespace style {
 namespace conversion {
+    
+using GeometryValue = mapbox::geometry::value;
 
-static optional<Value> normalizeValue(const optional<Value>& value, Error& error) {
+// This is a port from https://github.com/mapbox/mapbox-gl-js/blob/master/src/style-spec/feature_filter/index.js
+static bool isExpressionFilter(const Convertible& filter) {
+    if (!isArray(filter) || arrayLength(filter) == 0) {
+        return false;
+    }
+    
+    optional<std::string> op = toString(arrayMember(filter, 0));
+    
+    if (!op) {
+        return false;
+
+    } else if (*op == "has") {
+        if (arrayLength(filter) < 2) return false;
+        optional<std::string> operand = toString(arrayMember(filter, 1));
+        return operand && *operand != "$id" && *operand != "$type";
+        
+    } else if (*op == "in" || *op == "!in" || *op == "!has" || *op == "none") {
+        return false;
+        
+    } else if (*op == "==" || *op == "!=" || *op == ">" || *op == ">=" || *op == "<" || *op == "<=") {
+        return arrayLength(filter) == 3 && (isArray(arrayMember(filter, 1)) || isArray(arrayMember(filter, 2)));
+        
+    } else if (*op == "any" || *op == "all") {
+        for (std::size_t i = 1; i < arrayLength(filter); i++) {
+            Convertible f = arrayMember(filter, i);
+            if (!isExpressionFilter(f) && !toBool(f)) {
+                return false;
+            }
+        }
+        return true;
+        
+    } else {
+        return true;
+    }
+}
+    
+static optional<GeometryValue> normalizeValue(const optional<GeometryValue>& value, Error& error) {
     if (!value) {
         error = { "filter expression value must be a boolean, number, or string" };
         return {};
@@ -32,7 +73,7 @@ static optional<FeatureType> toFeatureType(const Convertible& value, Error& erro
 }
 
 static optional<FeatureIdentifier> toFeatureIdentifier(const Convertible& value, Error& error) {
-    optional<Value> identifier = toValue(value);
+    optional<GeometryValue> identifier = toValue(value);
     if (!identifier) {
         error = { "filter expression value must be a boolean, number, or string" };
         return {};
@@ -99,7 +140,7 @@ optional<Filter> convertEqualityFilter(const Convertible& value, Error& error) {
         return { IdentifierFilterType { *filterValue } };
 
     } else {
-        optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
+        optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
         if (!filterValue) {
             return {};
         }
@@ -121,7 +162,7 @@ optional<Filter> convertBinaryFilter(const Convertible& value, Error& error) {
         return {};
     }
 
-    optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
+    optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
     if (!filterValue) {
         return {};
     }
@@ -167,9 +208,9 @@ optional<Filter> convertSetFilter(const Convertible& value, Error& error) {
         return { IdentifierFilterType { std::move(values) } };
 
     } else {
-        std::vector<Value> values;
+        std::vector<GeometryValue> values;
         for (std::size_t i = 2; i < arrayLength(value); ++i) {
-            optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
+            optional<GeometryValue> filterValue = normalizeValue(toValue(arrayMember(value, i)), error);
             if (!filterValue) {
                 return {};
             }
@@ -193,8 +234,20 @@ optional<Filter> convertCompoundFilter(const Convertible& value, Error& error) {
 
     return { FilterType { std::move(filters) } };
 }
+    
+optional<Filter> convertExpressionFilter(const Convertible& value, Error& error) {
+    optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(value, error, expression::type::Boolean);
+    if (!expression) {
+        return {};
+    }
+    return { ExpressionFilter { std::move(*expression) } };
+}
 
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
+    if (isExpressionFilter(value)) {
+        return convertExpressionFilter(value, error);
+    }
+    
     if (!isArray(value)) {
         error = { "filter expression must be an array" };
         return {};
