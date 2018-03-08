@@ -104,9 +104,9 @@ public:
 
     void setLatLng(jni::JNIEnv&, jni::jdouble, jni::jdouble, jni::jlong);
 
-    jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>);
+    jni::Object<CameraPosition> getCameraForLatLngBounds(jni::JNIEnv&, jni::Object<mbgl::android::LatLngBounds>, double top, double left, double bottom, double right);
 
-    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double bearing);
+    jni::Object<CameraPosition> getCameraForGeometry(jni::JNIEnv&, jni::Object<geojson::Geometry>, double bearing, double top, double left, double bottom, double right);
 
     void setReachability(jni::JNIEnv&, jni::jboolean);
 

@@ -288,13 +288,15 @@ void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble 
     map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds) {
-    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), insets));
+jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds, double top, double left, double bottom, double right) {
+    mbgl::EdgeInsets padding = {top, left, bottom, right};
+    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding));
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double bearing) {
+jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double bearing, double top, double left, double bottom, double right) {
     auto geometry = geojson::Geometry::convert(env, jGeometry);
-    return CameraPosition::New(env, map->cameraForGeometry(geometry, insets, bearing));
+    mbgl::EdgeInsets padding = {top, left, bottom, right};
+    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing));
 }
 
 void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
