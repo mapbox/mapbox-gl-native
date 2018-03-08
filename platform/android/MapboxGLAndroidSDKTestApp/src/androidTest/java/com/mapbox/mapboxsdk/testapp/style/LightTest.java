@@ -6,15 +6,12 @@ import android.support.test.espresso.ViewAction;
 import android.support.test.runner.AndroidJUnit4;
 import android.view.View;
 
-import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.light.Light;
-import com.mapbox.mapboxsdk.style.functions.Function;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.action.MapboxMapAction;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.style.FillExtrusionStyleTestActivity;
 
@@ -48,14 +45,11 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("anchor");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        light.setAnchor(ANCHOR_MAP);
-        assertEquals("Anchor should match", ANCHOR_MAP, light.getAnchor());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      light.setAnchor(ANCHOR_MAP);
+      assertEquals("Anchor should match", ANCHOR_MAP, light.getAnchor());
     });
   }
 
@@ -64,15 +58,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("positionTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        light.setPositionTransition(options);
-        assertEquals("Transition options should match", options, light.getPositionTransition());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      light.setPositionTransition(options);
+      assertEquals("Transition options should match", options, light.getPositionTransition());
     });
   }
 
@@ -81,15 +72,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("position");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        Position position = new Position(1, 2, 3);
-        light.setPosition(position);
-        assertEquals("Position should match", position, light.getPosition());
-      }
+    invoke(mapboxMap,(uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      Position position = new Position(1, 2, 3);
+      light.setPosition(position);
+      assertEquals("Position should match", position, light.getPosition());
     });
   }
 
@@ -98,15 +86,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("colorTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        light.setColorTransition(options);
-        assertEquals("Transition options should match", options, light.getColorTransition());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      light.setColorTransition(options);
+      assertEquals("Transition options should match", options, light.getColorTransition());
     });
   }
 
@@ -115,14 +100,11 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("color");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        light.setColor("rgba(0, 0, 0, 1)");
-        assertEquals("Color should match", "rgba(0, 0, 0, 1)".replaceAll("\\s+", ""), light.getColor());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      light.setColor("rgba(0, 0, 0, 1)");
+      assertEquals("Color should match", "rgba(0, 0, 0, 1)".replaceAll("\\s+", ""), light.getColor());
     });
   }
 
@@ -131,15 +113,12 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("intensityTransitionOptions");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        TransitionOptions options = new TransitionOptions(300, 100);
-        light.setIntensityTransition(options);
-        assertEquals("Transition options should match", options, light.getIntensityTransition());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      TransitionOptions options = new TransitionOptions(300, 100);
+      light.setIntensityTransition(options);
+      assertEquals("Transition options should match", options, light.getIntensityTransition());
     });
   }
 
@@ -148,14 +127,11 @@ public class LightTest extends BaseActivityTest {
     validateTestSetup();
     setupLight();
     Timber.i("intensity");
-    invoke(mapboxMap, new MapboxMapAction.OnInvokeActionListener() {
-      @Override
-      public void onInvokeAction(UiController uiController, MapboxMap mapboxMap) {
-        assertNotNull(light);
-        // Set and Get
-        light.setIntensity(0.3f);
-        assertEquals("Intensity should match", 0.3f, light.getIntensity());
-      }
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(light);
+      // Set and Get
+      light.setIntensity(0.3f);
+      assertEquals("Intensity should match", 0.3f, light.getIntensity());
     });
   }
 
@@ -180,8 +156,8 @@ public class LightTest extends BaseActivityTest {
         fillExtrusionLayer.setMinZoom(15);
         fillExtrusionLayer.setProperties(
           fillExtrusionColor(Color.LTGRAY),
-          fillExtrusionHeight(Function.property("height", new IdentityStops<Float>())),
-          fillExtrusionBase(Function.property("min_height", new IdentityStops<Float>())),
+          fillExtrusionHeight(Expression.get("height")),
+          fillExtrusionBase(Expression.get("min_height")),
           fillExtrusionOpacity(0.6f)
         );
         mapboxMap.addLayer(fillExtrusionLayer);

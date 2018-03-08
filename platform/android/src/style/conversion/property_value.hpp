@@ -7,6 +7,7 @@
 #include "../../conversion/constant.hpp"
 #include "types.hpp"
 #include "function.hpp"
+#include "gson.hpp"
 
 namespace mbgl {
 namespace android {
@@ -39,7 +40,7 @@ public:
     }
 
     jni::jobject* operator()(const mbgl::style::CompositeFunction<T> &value) const {
-      return *convert<jni::jobject*, mbgl::style::CompositeFunction<T>>(env, value);
+        return *convert<jni::jobject*, mbgl::style::CompositeFunction<T>>(env, value);
     }
 
 private:

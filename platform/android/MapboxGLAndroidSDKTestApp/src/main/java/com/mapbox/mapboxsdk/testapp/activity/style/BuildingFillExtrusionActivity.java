@@ -8,8 +8,7 @@ import android.view.MenuItem;
 
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.style.functions.Function;
-import com.mapbox.mapboxsdk.style.functions.stops.IdentityStops;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.FillExtrusionLayer;
 import com.mapbox.mapboxsdk.style.layers.Property;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
@@ -57,8 +56,8 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
     fillExtrusionLayer.setMinZoom(15);
     fillExtrusionLayer.setProperties(
       fillExtrusionColor(Color.LTGRAY),
-      fillExtrusionHeight(Function.property("height", new IdentityStops<Float>())),
-      fillExtrusionBase(Function.property("min_height", new IdentityStops<Float>())),
+      fillExtrusionHeight(Expression.get("height")),
+      fillExtrusionBase(Expression.get("min_height")),
       fillExtrusionOpacity(0.9f)
     );
     mapboxMap.addLayer(fillExtrusionLayer);

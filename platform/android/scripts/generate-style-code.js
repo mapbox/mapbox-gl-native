@@ -149,6 +149,24 @@ global.propertyTypeAnnotation = function propertyTypeAnnotation(property) {
   }
 };
 
+global.defaultExpressionJava = function(property) {
+    switch (property.type) {
+      case 'boolean':
+        return 'boolean';
+      case 'number':
+        return 'number';
+      case 'string':
+        return "string";
+      case 'enum':
+        return "string";
+      case 'color':
+        return 'toColor';
+      case 'array':
+        return "array";
+      default: return "string";
+      }
+}
+
 global.defaultValueJava = function(property) {
     if(property.name.endsWith("-pattern")) {
         return '"pedestrian-polygon"';
