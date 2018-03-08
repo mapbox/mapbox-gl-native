@@ -55,6 +55,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.7.6
 
+* Fixed an issue where the pinch gesture could drift beyond bounds imposed by `-[MGLMapViewDelegate mapView:shouldChangeFromCamera:toCamera:]`. ([#11423](https://github.com/mapbox/mapbox-gl-native/pull/11423))
 * Improved the visibility of the heading indicator arrow. ([#11337](https://github.com/mapbox/mapbox-gl-native/pull/11337))
 
 ## 3.7.5 - February 16, 2018
