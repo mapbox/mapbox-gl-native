@@ -103,6 +103,8 @@ optional<Tileset> Converter<Tileset>::operator()(const Convertible& value, Error
             error = { "bounds left longitude should be less than right longitude" };
             return {};
         }
+	*left = util::max(-180.0, *left);
+	*right = util::min(180.0, *right);
         result.bounds = LatLngBounds::hull({ *bottom, *left }, { *top, *right });
     }
 
