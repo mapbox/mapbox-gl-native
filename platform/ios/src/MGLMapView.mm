@@ -1459,10 +1459,12 @@ public:
         double zoom = log2(newScale);
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:centerPoint];
 
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
+        if ( ! [self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             drift = NO;
-        } else {
+        }
+        else
+        {
             if (drift)
             {
                 _mbglMap->setZoom(zoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(duration));
@@ -1695,7 +1697,9 @@ public:
              {
                  [weakSelf unrotateIfNeededForGesture];
              }];
-        } else {
+        }
+        else
+        {
             [self unrotateIfNeededForGesture];
         }
     }
