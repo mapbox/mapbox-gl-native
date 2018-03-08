@@ -61,7 +61,7 @@ void RegisterNativeHTTPRequest(jni::JNIEnv& env) {
 
     #define METHOD(MethodPtr, name) jni::MakeNativePeerMethod<decltype(MethodPtr), (MethodPtr)>(name)
 
-    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "mNativePtr",
+    jni::RegisterNativePeer<HTTPRequest>(env, HTTPRequest::javaClass, "nativePtr",
         METHOD(&HTTPRequest::onFailure, "nativeOnFailure"),
         METHOD(&HTTPRequest::onResponse, "nativeOnResponse"));
 }
