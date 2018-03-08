@@ -23,9 +23,9 @@ extension MGLSDKTestHelpers {
     class func protocolMethodDescriptions(_ p: Protocol) -> Set<String> {
         var methods = Set<String>()
         var methodCount = UInt32()
-        let methodDescriptionList: UnsafeMutablePointer<objc_method_description>! = protocol_copyMethodDescriptionList(p, false, true, &methodCount)
+        let methodDescriptionList = protocol_copyMethodDescriptionList(p, false, true, &methodCount)
         for i in 0..<Int(methodCount) {
-            let description: objc_method_description = methodDescriptionList[i]
+            let description = methodDescriptionList![i]
             XCTAssertNotNil(description.name?.description)
             methods.insert(description.name!.description)
         }
@@ -36,11 +36,16 @@ extension MGLSDKTestHelpers {
     class func classMethodDescriptions(_ cls: Swift.AnyClass) -> Set<String> {
         var methods = Set<String>()
         var methodCount = UInt32()
-        let methodList: UnsafeMutablePointer<Method?>! = class_copyMethodList(cls, &methodCount)
+        let methodList = class_copyMethodList(cls, &methodCount)
         for i in 0..<Int(methodCount) {
-            let method = methodList[i]
-            let selector : Selector = method_getName(method)
-            methods.insert(selector.description)
+            let method = methodList![i]
+            let selector = method_getName(method)
+            #if os(macOS)
+                methods.insert(selector.description)
+            #else
+                XCTAssertNotNil(selector)
+                methods.insert(selector!.description)
+            #endif
         }
         free(methodList)
         return methods

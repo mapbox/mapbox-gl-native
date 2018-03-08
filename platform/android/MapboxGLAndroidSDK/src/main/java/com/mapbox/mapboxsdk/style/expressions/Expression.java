@@ -544,13 +544,13 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match">Style specification</a>
    */
-  public static Expression match(@NonNull Expression input, @NonNull Stop... stops) {
-    Expression[] expressions = new Expression[stops.length * 2];
+  public static Expression match(@NonNull Expression input, @NonNull Expression defaultOutput, @NonNull Stop... stops) {
+    Expression[] expressionStops = new Expression[stops.length * 2];
     for (int i = 0; i < stops.length; i++) {
-      expressions[i * 2] = literal(stops[i].value);
-      expressions[i * 2 + 1] = literal(stops[i].output);
+      expressionStops[i * 2] = literal(stops[i].value);
+      expressionStops[i * 2 + 1] = literal(stops[i].output);
     }
-    return match(join(new Expression[] {input}, expressions));
+    return match(join(join(new Expression[] {input}, expressionStops), new Expression[] {defaultOutput}));
   }
 
   /**
@@ -1600,7 +1600,7 @@ public class Expression {
                                        @NonNull Expression number, Stop... stops) {
     return interpolate(interpolation, number, Stop.toExpressionArray(stops));
   }
-
+  
   /**
    * interpolates linearly between the pair of stops just less than and just greater than the input.
    *
