@@ -429,4 +429,4 @@ INCLUDEPATH += \
     src
 
 QMAKE_CXXFLAGS += \
-    -DMBGL_VERSION_REV=\\\"qt-v1.2.0\\\"
+    -DMBGL_VERSION_REV=\\\"qt-v1.3.0\\\"
