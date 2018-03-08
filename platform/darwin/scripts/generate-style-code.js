@@ -552,6 +552,48 @@ global.valueTransformerArguments = function (property) {
     }
 };
 
+global.describeExpressionType = function (property) {
+    switch (property.type) {
+        case 'boolean':
+        case 'number':
+            return 'Value';
+        case 'string':
+            return 'String';
+        case 'color':
+            return 'Color';
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
+}
+
+global.isExpressionAdditionsSupported = function (property) {
+    switch (property.type) {
+        case 'boolean':
+        case 'number':
+        case 'string':
+        case 'color':
+            return true;
+        default:
+            return false;
+    }
+};
+
+global.objCExpressionAdditionsTestValue = function (property) {
+    let propertyName = originalPropertyName(property);
+    switch (property.type) {
+        case 'boolean':
+            return property.default ? '@NO' : '@YES';
+        case 'number':
+            return '@0xff';
+        case 'string':
+            return `@"'${_.startCase(propertyName)}'"`;
+        case 'color':
+            return '[MGLColor redColor]';
+        default:
+            throw new Error(`unknown type for ${property.name}`);
+    }
+};
+
 global.mbglType = function(property) {
     switch (property.type) {
         case 'boolean':

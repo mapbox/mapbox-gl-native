@@ -33,7 +33,7 @@
                       @"background-color should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundColor;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
         layer.backgroundColor = constantExpression;
         mbgl::style::PropertyValue<mbgl::Color> propertyValue = { { 1, 0, 0, 1 } };
         XCTAssertEqual(rawLayer->getBackgroundColor(), propertyValue,
@@ -41,8 +41,10 @@
         XCTAssertEqualObjects(layer.backgroundColor, constantExpression,
                               @"backgroundColor should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+                                                                     defaultExpression:constantExpression
+                                                                                 stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundColor = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
@@ -66,8 +68,11 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.backgroundColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForKeyPath:@"bogus"]
+                                                       defaultExpression:constantExpression
+                                                                   stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                      curveType:MGLExpressionInterpolationModeLinear                                                                                    steps:@{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.backgroundColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.backgroundColorTransition = transitionTest;
@@ -86,7 +91,7 @@
                       @"background-opacity should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundOpacity;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"0xff"];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForValue:@0xff];
         layer.backgroundOpacity = constantExpression;
         mbgl::style::PropertyValue<float> propertyValue = { 0xff };
         XCTAssertEqual(rawLayer->getBackgroundOpacity(), propertyValue,
@@ -94,8 +99,10 @@
         XCTAssertEqualObjects(layer.backgroundOpacity, constantExpression,
                               @"backgroundOpacity should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression mgl_expressionForValue:@0xff];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+                                                                     defaultExpression:constantExpression
+                                                                                 stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundOpacity = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -119,8 +126,11 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.backgroundOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForKeyPath:@"bogus"]
+                                                       defaultExpression:constantExpression
+                                                                   stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                      curveType:MGLExpressionInterpolationModeLinear                                                                                    steps:@{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.backgroundOpacity = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.backgroundOpacityTransition = transitionTest;
@@ -139,7 +149,7 @@
                       @"background-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundPattern;
 
-        NSExpression *constantExpression = [NSExpression expressionWithFormat:@"'Background Pattern'"];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"'Background Pattern'"];
         layer.backgroundPattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Background Pattern" };
         XCTAssertEqual(rawLayer->getBackgroundPattern(), propertyValue,
@@ -147,8 +157,10 @@
         XCTAssertEqualObjects(layer.backgroundPattern, constantExpression,
                               @"backgroundPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression expressionWithFormat:@"'Background Pattern'"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        constantExpression = [NSExpression mgl_expressionForString:@"'Background Pattern'"];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+                                                                     defaultExpression:constantExpression
+                                                                                 stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundPattern = functionExpression;
 
         mbgl::style::IntervalStops<std::string> intervalStops = {{
@@ -172,8 +184,11 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForKeyPath:@"bogus"]
+                                                       defaultExpression:constantExpression
+                                                                   stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                      curveType:MGLExpressionInterpolationModeLinear                                                                                    steps:@{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.backgroundPattern = functionExpression, NSException, NSInvalidArgumentException, @"MGLBackgroundLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
         // Transition property test
         layer.backgroundPatternTransition = transitionTest;

@@ -67,7 +67,11 @@
                       @"<%- originalPropertyName(property) %> should be unset initially.");
         NSExpression *defaultExpression = layer.<%- objCName(property) %>;
 
+<% if (isExpressionAdditionsSupported(property)) { -%>
+        NSExpression *constantExpression = [NSExpression mgl_expressionFor<%- describeExpressionType(property) %>:<%- objCExpressionAdditionsTestValue(property) %>];
+<% } else { -%>
         NSExpression *constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, true, 3) %>];
+<% } -%>
         layer.<%- objCName(property) %> = constantExpression;
 <% if (property["property-function"]) { -%>
         mbgl::style::DataDrivenPropertyValue<<%- mbglType(property) %>> propertyValue = { <%- mbglTestValue(property, type) %> };
@@ -79,8 +83,14 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, constantExpression,
                               @"<%- objCName(property) %> should round-trip constant value expressions.");
 
+<% if (isExpressionAdditionsSupported(property)) { -%>
+        constantExpression = [NSExpression mgl_expressionFor<%- describeExpressionType(property) %>:<%- objCExpressionAdditionsTestValue(property) %>];
+<% } else { -%>
         constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, false, 3) %>];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+<% } -%>
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+                                                                     defaultExpression:constantExpression
+                                                                                 stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.<%- objCName(property) %> = functionExpression;
 
         mbgl::style::IntervalStops<<%- mbglType(property) %>> intervalStops = {{
@@ -95,7 +105,11 @@
                               @"<%- objCName(property) %> should round-trip camera expressions.");
 
 <% if (property["property-function"] && isInterpolatable(property)) { -%>
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:[NSExpression expressionForKeyPath:@"keyName"]
+                                                                      curveType:MGLExpressionInterpolationModeLinear
+                                                                     parameters:nil
+                                                                          steps:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
+
         layer.<%- objCName(property) %> = functionExpression;
 
         mbgl::style::ExponentialStops<<%- mbglType(property) %>> exponentialStops = { {{18, <%- mbglTestValue(property, type) %>}}, 1.0 };
@@ -106,7 +120,8 @@
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
                               @"<%- objCName(property) %> should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                      curveType:MGLExpressionInterpolationModeLinear                                                                                    steps:@{@10: functionExpression}];
         layer.<%- objCName(property) %> = functionExpression;
 
         std::map<float, <%- mbglType(property) %>> innerStops { {18, <%- mbglTestValue(property, type) %>} };
@@ -131,8 +146,11 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionExpression, NSException, NSInvalidArgumentException, @"MGL<%- camelize(type) %>Layer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForKeyPath:@"bogus"]
+                                                       defaultExpression:constantExpression
+                                                                   stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
+        functionExpression = [NSExpression mgl_expressionForInterpolateFunction:MGLExpressionStyleFunctionZoomLevel
+                                                                      curveType:MGLExpressionInterpolationModeLinear                                                                                    steps:@{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.<%- objCName(property) %> = functionExpression, NSException, NSInvalidArgumentException, @"MGL<%- camelize(type) %>Layer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
 <% } -%>
 <% if (property["transition"] && !property.original) { -%>
