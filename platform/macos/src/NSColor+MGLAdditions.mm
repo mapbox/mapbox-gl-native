@@ -87,9 +87,9 @@
     NSColor *color = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace]
                                        components:&components[0]
                                             count:components.size()];
-#if __MAC_OS_X_VERSION_MAX_ALLOWED < 101300
-    color = [color colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-#endif
+    if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+        color = [color colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
+    }
     return color;
 }
 
