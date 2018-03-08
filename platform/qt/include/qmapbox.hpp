@@ -9,14 +9,10 @@
 
 // This header follows the Qt coding style: https://wiki.qt.io/Qt_Coding_Style
 
-#if !defined(QT_MAPBOXGL_STATIC)
-#  if defined(QT_BUILD_MAPBOXGL_LIB)
-#    define Q_MAPBOXGL_EXPORT Q_DECL_EXPORT
-#  else
-#    define Q_MAPBOXGL_EXPORT Q_DECL_IMPORT
-#  endif
+#if defined(QT_BUILD_MAPBOXGL_LIB)
+    #define Q_MAPBOXGL_EXPORT Q_DECL_EXPORT
 #else
-#  define Q_MAPBOXGL_EXPORT
+    #define Q_MAPBOXGL_EXPORT Q_DECL_IMPORT
 #endif
 
 namespace QMapbox {
@@ -116,12 +112,16 @@ struct Q_MAPBOXGL_EXPORT CustomLayerRenderParameters {
     double zoom;
     double bearing;
     double pitch;
-    double altitude;
+    double fieldOfView;
 };
 
-typedef void (*CustomLayerInitializeFunction)(void* context) ;
-typedef void (*CustomLayerRenderFunction)(void* context, const CustomLayerRenderParameters&);
-typedef void (*CustomLayerDeinitializeFunction)(void* context);
+class Q_MAPBOXGL_EXPORT CustomLayerHostInterface {
+public:
+    virtual ~CustomLayerHostInterface() = default;
+    virtual void initialize() = 0;
+    virtual void render(const CustomLayerRenderParameters&) = 0;
+    virtual void deinitialize() = 0;
+};
 
 } // namespace QMapbox
 

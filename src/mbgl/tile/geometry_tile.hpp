@@ -5,7 +5,6 @@
 #include <mbgl/renderer/image_manager.hpp>
 #include <mbgl/text/glyph_manager.hpp>
 #include <mbgl/util/feature.hpp>
-#include <mbgl/util/throttler.hpp>
 #include <mbgl/actor/actor.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 
@@ -55,43 +54,33 @@ public:
             const TransformState&,
             const std::vector<const RenderLayer*>& layers,
             const RenderedQueryOptions& options,
-            const CollisionIndex& collisionIndex) override;
+            const mat4& projMatrix) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
 
+    float getQueryPadding(const std::vector<const RenderLayer*>&) override;
+
     void cancel() override;
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
         std::unique_ptr<FeatureIndex> featureIndex;
-        std::unique_ptr<GeometryTileData> tileData;
-
-        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
-                     std::unique_ptr<FeatureIndex> featureIndex_,
-                     std::unique_ptr<GeometryTileData> tileData_)
-            : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
-              featureIndex(std::move(featureIndex_)),
-              tileData(std::move(tileData_)) {}
-    };
-    void onLayout(LayoutResult, uint64_t correlationID);
-
-    class PlacementResult {
-    public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
-        PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
-                        optional<AlphaImage> glyphAtlasImage_,
-                        optional<PremultipliedImage> iconAtlasImage_)
-            : symbolBuckets(std::move(symbolBuckets_)),
+        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
+                     std::unique_ptr<FeatureIndex> featureIndex_,
+                     optional<AlphaImage> glyphAtlasImage_,
+                     optional<PremultipliedImage> iconAtlasImage_)
+            : buckets(std::move(buckets_)),
+              featureIndex(std::move(featureIndex_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
-    void onPlacement(PlacementResult, uint64_t correlationID);
+    void onLayout(LayoutResult, uint64_t correlationID);
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
@@ -100,11 +89,11 @@ public:
     void markRenderedPreviously() override;
     void performedFadePlacement() override;
     
-    void commitFeatureIndex() override;
+    const std::shared_ptr<FeatureIndex> getFeatureIndex() const { return latestFeatureIndex; }
     
 protected:
     const GeometryTileData* getData() {
-        return data.get();
+        return latestFeatureIndex ? latestFeatureIndex->getData() : nullptr;
     }
 
 private:
@@ -123,16 +112,12 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
-    std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
-    std::unique_ptr<const GeometryTileData> data;
-    std::unique_ptr<const GeometryTileData> pendingData;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    
+    std::shared_ptr<FeatureIndex> latestFeatureIndex;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
-
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
 
     const MapMode mode;
     

@@ -47,6 +47,7 @@ public:
                  bool sdfIcons,
                  bool iconsNeedLinear,
                  bool sortFeaturesByY,
+                 const std::string bucketLeaderID,
                  const std::vector<SymbolInstance>&&);
 
     void upload(gl::Context&) override;
@@ -63,6 +64,8 @@ public:
     const bool sdfIcons;
     const bool iconsNeedLinear;
     const bool sortFeaturesByY;
+    
+    const std::string bucketLeaderID;
     
     optional<float> sortedAngle;
 
@@ -131,6 +134,8 @@ public:
 
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
+    
+    std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
 
 } // namespace mbgl

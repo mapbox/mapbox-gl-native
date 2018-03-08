@@ -125,23 +125,16 @@ void GeometryTile::setShowCollisionBoxes(const bool showCollisionBoxes_) {
 }
 
 void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelationID) {
-    // Don't mark ourselves loaded or renderable until the first successful placement
-    // TODO: Ideally we'd render this tile without symbols as long as this tile wasn't
-    //  replacing a tile at a different zoom that _did_ have symbols.
-    (void)resultCorrelationID;
-    nonSymbolBuckets = std::move(result.nonSymbolBuckets);
-    pendingFeatureIndex = std::move(result.featureIndex);
-    pendingData = std::move(result.tileData);
-    observer->onTileChanged(*this);
-}
-
-void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorrelationID) {
     loaded = true;
     renderable = true;
     if (resultCorrelationID == correlationID) {
         pending = false;
     }
-    symbolBuckets = std::move(result.symbolBuckets);
+    
+    buckets = std::move(result.buckets);
+    
+    latestFeatureIndex = std::move(result.featureIndex);
+
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
     }
@@ -183,11 +176,7 @@ void GeometryTile::upload(gl::Context& context) {
         }
     };
 
-    for (auto& entry : nonSymbolBuckets) {
-        uploadFn(*entry.second);
-    }
-
-    for (auto& entry : symbolBuckets) {
+    for (auto& entry : buckets) {
         uploadFn(*entry.second);
     }
 
@@ -203,7 +192,6 @@ void GeometryTile::upload(gl::Context& context) {
 }
 
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
-    const auto& buckets = layer.type == LayerType::Symbol ? symbolBuckets : nonSymbolBuckets;
     const auto it = buckets.find(layer.id);
     if (it == buckets.end()) {
         return nullptr;
@@ -213,13 +201,15 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     return it->second.get();
 }
 
-void GeometryTile::commitFeatureIndex() {
-    if (pendingFeatureIndex) {
-        featureIndex = std::move(pendingFeatureIndex);
+float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
+    float queryPadding = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket && bucket->hasData()) {
+            queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
+        }
     }
-    if (pendingData) {
-        data = std::move(pendingData);
-    }
+    return queryPadding;
 }
 
 void GeometryTile::queryRenderedFeatures(
@@ -228,39 +218,34 @@ void GeometryTile::queryRenderedFeatures(
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
     const RenderedQueryOptions& options,
-    const CollisionIndex& collisionIndex) {
+    const mat4& projMatrix) {
 
-    if (!featureIndex || !data) return;
+    if (!getData()) return;
 
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-    for (const RenderLayer* layer : layers) {
-        auto bucket = getBucket(*layer->baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
-        }
-    }
+    const float queryPadding = getQueryPadding(layers);
 
-    featureIndex->query(result,
-                        queryGeometry,
-                        transformState.getAngle(),
-                        util::tileSize * id.overscaleFactor(),
-                        std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        options,
-                        *data,
-                        id.toUnwrapped(),
-                        sourceID,
-                        layers,
-                        collisionIndex,
-                        additionalRadius);
+    mat4 posMatrix;
+    transformState.matrixFor(posMatrix, id.toUnwrapped());
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
+
+    latestFeatureIndex->query(result,
+                              queryGeometry,
+                              transformState,
+                              posMatrix,
+                              util::tileSize * id.overscaleFactor(),
+                              std::pow(2, transformState.getZoom() - id.overscaledZ),
+                              options,
+                              id.toUnwrapped(),
+                              layers,
+                              queryPadding * transformState.maxPitchScaleFactor());
 }
 
 void GeometryTile::querySourceFeatures(
     std::vector<Feature>& result,
     const SourceQueryOptions& options) {
 
-    // Data not yet available
-    if (!data) {
+    // Data not yet available, or tile is empty
+    if (!getData()) {
         return;
     }
     
@@ -273,7 +258,7 @@ void GeometryTile::querySourceFeatures(
     for (auto sourceLayer : *options.sourceLayers) {
         // Go throught all sourceLayers, if any
         // to gather all the features
-        auto layer = data->getLayer(sourceLayer);
+        auto layer = getData()->getLayer(sourceLayer);
         
         if (layer) {
             auto featureCount = layer->featureCount();
@@ -281,7 +266,7 @@ void GeometryTile::querySourceFeatures(
                 auto feature = layer->getFeature(i);
 
                 // Apply filter, if any
-                if (options.filter && !(*options.filter)(*feature)) {
+                if (options.filter && !(*options.filter)(style::expression::EvaluationContext { static_cast<float>(this->id.overscaledZ), feature.get() })) {
                     continue;
                 }
 

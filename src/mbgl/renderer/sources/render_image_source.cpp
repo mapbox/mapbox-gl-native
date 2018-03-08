@@ -85,7 +85,7 @@ RenderImageSource::queryRenderedFeatures(const ScreenLineString&,
                                          const TransformState&,
                                          const std::vector<const RenderLayer*>&,
                                          const RenderedQueryOptions&,
-                                         const CollisionIndex&) const {
+                                         const mat4&) const {
     return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 

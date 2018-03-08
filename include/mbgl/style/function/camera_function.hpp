@@ -27,15 +27,16 @@ public:
             IntervalStops<T>>>;
     
     CameraFunction(std::unique_ptr<expression::Expression> expression_)
-         : expression(std::move(expression_)),
+         : isExpression(true),
+           expression(std::move(expression_)),
            zoomCurve(expression::findZoomCurveChecked(expression.get()))
     {
         assert(!expression::isZoomConstant(*expression));
         assert(expression::isFeatureConstant(*expression));
     }
 
-    CameraFunction(Stops stops_)
-        : stops(std::move(stops_)),
+    CameraFunction(const Stops& stops)
+        : isExpression(false),
           expression(stops.match([&] (const auto& s) {
             return expression::Convert::toExpression(s);
           })),
@@ -76,11 +77,9 @@ public:
     }
 
     bool useIntegerZoom = false;
+    bool isExpression;
 
     const expression::Expression& getExpression() const { return *expression; }
-
-    // retained for compatibility with pre-expression function API
-    Stops stops;
 
 private:
     std::shared_ptr<expression::Expression> expression;

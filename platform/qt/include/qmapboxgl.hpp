@@ -230,10 +230,7 @@ public:
     void removeImage(const QString &name);
 
     void addCustomLayer(const QString &id,
-        QMapbox::CustomLayerInitializeFunction,
-        QMapbox::CustomLayerRenderFunction,
-        QMapbox::CustomLayerDeinitializeFunction,
-        void* context,
+        QScopedPointer<QMapbox::CustomLayerHostInterface>& host,
         const QString& before = QString());
     void addLayer(const QVariantMap &params, const QString& before = QString());
     bool layerExists(const QString &id);

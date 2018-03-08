@@ -225,6 +225,10 @@ public:
     void operator()(const NotHasIdentifierFilter&) {
         stringifyUnaryFilter("!has", "$id");
     }
+    
+    void operator()(const ExpressionFilter& filter) {
+        stringify(writer, filter.expression->serialize());
+    }
 
 private:
     template <class F>
@@ -286,138 +290,19 @@ void stringify(Writer& writer, const Undefined&) {
     writer.Null();
 }
 
-template <class Writer>
-void stringify(Writer& writer, const CategoricalValue& v) {
-    CategoricalValue::visit(v, [&] (const auto& v_) { stringify(writer, v_); });
-}
-
-template <class Writer>
-class StringifyStops {
-public:
-    Writer& writer;
-
-    template <class T>
-    void operator()(const ExponentialStops<T>& f) {
-        writer.Key("type");
-        writer.String("exponential");
-        writer.Key("base");
-        writer.Double(f.base);
-        writer.Key("stops");
-        stringifyStops(f.stops);
-    }
-
-    template <class T>
-    void operator()(const IntervalStops<T>& f) {
-        writer.Key("type");
-        writer.String("interval");
-        writer.Key("stops");
-        stringifyStops(f.stops);
-    }
-
-    template <class T>
-    void operator()(const CategoricalStops<T>& f) {
-        writer.Key("type");
-        writer.String("categorical");
-        writer.Key("stops");
-        stringifyStops(f.stops);
-    }
-
-    template <class T>
-    void operator()(const IdentityStops<T>&) {
-        writer.Key("type");
-        writer.String("identity");
-    }
-
-    template <class T>
-    void operator()(const CompositeExponentialStops<T>& f) {
-        writer.Key("type");
-        writer.String("exponential");
-        writer.Key("base");
-        writer.Double(f.base);
-        writer.Key("stops");
-        stringifyCompositeStops(f.stops);
-    }
-
-    template <class T>
-    void operator()(const CompositeIntervalStops<T>& f) {
-        writer.Key("type");
-        writer.String("interval");
-        writer.Key("stops");
-        stringifyCompositeStops(f.stops);
-    }
-
-    template <class T>
-    void operator()(const CompositeCategoricalStops<T>& f) {
-        writer.Key("type");
-        writer.String("categorical");
-        writer.Key("stops");
-        stringifyCompositeStops(f.stops);
-    }
-
-private:
-    template <class K, class V>
-    void stringifyStops(const std::map<K, V>& stops) {
-        writer.StartArray();
-        for (const auto& stop : stops) {
-            writer.StartArray();
-            stringify(writer, stop.first);
-            stringify(writer, stop.second);
-            writer.EndArray();
-        }
-        writer.EndArray();
-    }
-
-    template <class InnerStops>
-    void stringifyCompositeStops(const std::map<float, InnerStops>& stops) {
-        writer.StartArray();
-        for (const auto& outer : stops) {
-            for (const auto& inner : outer.second) {
-                writer.StartArray();
-                writer.StartObject();
-                writer.Key("zoom");
-                writer.Double(outer.first);
-                writer.Key("value");
-                stringify(writer, inner.first);
-                writer.EndObject();
-                stringify(writer, inner.second);
-                writer.EndArray();
-            }
-        }
-        writer.EndArray();
-    }
-};
-
 template <class Writer, class T>
-void stringify(Writer& writer, const CameraFunction<T>& f) {
-    writer.StartObject();
-    CameraFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
-    writer.EndObject();
+void stringify(Writer& writer, const CameraFunction<T>& fn) {
+    stringify(writer, fn.getExpression().serialize());
 }
 
 template <class Writer, class T>
-void stringify(Writer& writer, const SourceFunction<T>& f) {
-    writer.StartObject();
-    writer.Key("property");
-    writer.String(f.property);
-    SourceFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
-    if (f.defaultValue) {
-        writer.Key("default");
-        stringify(writer, *f.defaultValue);
-    }
-    writer.EndObject();
+void stringify(Writer& writer, const SourceFunction<T>& fn) {
+    stringify(writer, fn.getExpression().serialize());
 }
 
 template <class Writer, class T>
-void stringify(Writer& writer, const CompositeFunction<T>& f) {
-    writer.StartObject();
-    writer.Key("property");
-    writer.String(f.property);
-    CompositeFunction<T>::Stops::visit(f.stops, StringifyStops<Writer> { writer });
-    if (f.defaultValue) {
-        writer.Key("default");
-        stringify(writer, *f.defaultValue);
-    }
-    writer.EndObject();
+void stringify(Writer& writer, const CompositeFunction<T>& fn) {
+    stringify(writer, fn.getExpression().serialize());
 }
 
 template <class Writer, class T>

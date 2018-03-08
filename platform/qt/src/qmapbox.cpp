@@ -158,27 +158,9 @@ namespace QMapbox {
 */
 
 /*!
-    \typedef QMapbox::CustomLayerDeinitializeFunction
+    \class QMapbox::CustomLayerHostInterface
 
-    Represents a callback to be called when destroying a custom layer.
-
-    \warning This is used for delegating the rendering of a layer to the user of
-    this API and is not officially supported. Use at your own risk.
-*/
-
-/*!
-    \typedef QMapbox::CustomLayerInitializeFunction
-
-    Represents a callback to be called when initializing a custom layer.
-
-    \warning This is used for delegating the rendering of a layer to the user of
-    this API and is not officially supported. Use at your own risk.
-*/
-
-/*!
-    \typedef QMapbox::CustomLayerRenderFunction
-
-    Represents a callback to be called on each render pass for a custom layer.
+    Represents a host interface to be implemented for rendering custom layers.
 
     \warning This is used for delegating the rendering of a layer to the user of
     this API and is not officially supported. Use at your own risk.

@@ -47,10 +47,10 @@ protected:
     // as a matched pair, exclusively through BackendScope, in two situations:
     //
     //   1. When releasing GL resources during Renderer destruction
-    //      (Including calling CustomLayerDeinitializeFunction during RenderCustomLayer destruction)
+    //      (Including calling CustomLayerHost::deinitialize during RenderCustomLayer destruction)
     //   2. When renderering through Renderer::render()
-    //      (Including calling CustomLayerDeinitializeFunction for newly added custom layers and
-    //       CustomLayerDeinitializeFunction on layer removal)
+    //      (Including calling CustomLayerHost::initialize for newly added custom layers and
+    //       CustomLayerHost::deinitialize on layer removal)
     virtual void activate() = 0;
     virtual void deactivate() = 0;
 

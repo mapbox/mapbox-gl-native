@@ -89,15 +89,33 @@ QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
 std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
         const std::string& cachePath, const std::string& assetRoot, uint64_t maximumCacheSize) {
-    static std::weak_ptr<mbgl::DefaultFileSource> weak;
-    auto fs = weak.lock();
+    static std::mutex mutex;
+    static std::unordered_map<std::string, std::weak_ptr<mbgl::DefaultFileSource>> fileSources;
 
-    if (!fs) {
-        weak = fs = std::make_shared<mbgl::DefaultFileSource>(
-                cachePath, assetRoot, maximumCacheSize);
+    std::lock_guard<std::mutex> lock(mutex);
+
+    // Purge entries no longer in use.
+    for (auto it = fileSources.begin(); it != fileSources.end();) {
+        if (!it->second.lock()) {
+            it = fileSources.erase(it);
+        } else {
+            ++it;
+        }
     }
 
-    return fs;
+    // Return an existing FileSource if available.
+    auto sharedFileSource = fileSources.find(cachePath);
+    if (sharedFileSource != fileSources.end()) {
+        return sharedFileSource->second.lock();
+    }
+
+    // New path, create a new FileSource.
+    auto newFileSource = std::make_shared<mbgl::DefaultFileSource>(
+        cachePath, assetRoot, maximumCacheSize);
+
+    fileSources[cachePath] = newFileSource;
+
+    return newFileSource;
 }
 
 // Conversion helper functions.
@@ -141,10 +159,9 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
     QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
     Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
 
-    Cache-related settings are shared between all QMapboxGL instances because different
-    maps will share the same cache database file. The first map to configure cache properties
-    such as size and path will force the configuration to all newly instantiated QMapboxGL
-    objects.
+    Cache-related settings are shared between all QMapboxGL instances using the same cache path.
+    The first map to configure cache properties such as size will force the configuration
+    to all newly instantiated QMapboxGL objects using the same cache in the same process.
 
     \since 4.7
 */
@@ -1356,20 +1373,43 @@ void QMapboxGL::removeSource(const QString& id)
     this API and is not officially supported. Use at your own risk.
 */
 void QMapboxGL::addCustomLayer(const QString &id,
-        QMapbox::CustomLayerInitializeFunction initFn,
-        QMapbox::CustomLayerRenderFunction renderFn,
-        QMapbox::CustomLayerDeinitializeFunction deinitFn,
-        void *context,
+        QScopedPointer<QMapbox::CustomLayerHostInterface>& host,
         const QString& before)
 {
+    class HostWrapper : public mbgl::style::CustomLayerHost {
+        public:
+        QScopedPointer<QMapbox::CustomLayerHostInterface> ptr;
+        HostWrapper(QScopedPointer<QMapbox::CustomLayerHostInterface>& p)
+         : ptr(p.take()) {
+         }
+
+        void initialize() {
+            ptr->initialize(); 
+        }
+
+        void render(const mbgl::style::CustomLayerRenderParameters& params) {
+            QMapbox::CustomLayerRenderParameters renderParams;
+            renderParams.width = params.width;
+            renderParams.height = params.height;
+            renderParams.latitude = params.latitude;
+            renderParams.longitude = params.longitude;
+            renderParams.zoom = params.zoom;
+            renderParams.bearing = params.bearing;
+            renderParams.pitch = params.pitch;
+            renderParams.fieldOfView = params.fieldOfView;
+            ptr->render(renderParams);
+        }
+
+        void contextLost() { }
+
+        void deinitialize() {
+            ptr->deinitialize();
+        }
+    };
+
     d_ptr->mapObj->getStyle().addLayer(std::make_unique<mbgl::style::CustomLayer>(
             id.toStdString(),
-            reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initFn),
-            // This cast is safe as long as both mbgl:: and QMapbox::
-            // CustomLayerRenderParameters members remains the same.
-            (mbgl::style::CustomLayerRenderFunction)renderFn,
-            reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitFn),
-            context),
+            std::make_unique<HostWrapper>(host)),
             before.isEmpty() ? mbgl::optional<std::string>() : mbgl::optional<std::string>(before.toStdString()));
 }
 

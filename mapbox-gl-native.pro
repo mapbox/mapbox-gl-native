@@ -232,6 +232,7 @@ SOURCES += \
     src/mbgl/style/expression/interpolate.cpp \
     src/mbgl/style/expression/is_constant.cpp \
     src/mbgl/style/expression/is_expression.cpp \
+    src/mbgl/style/expression/length.cpp \
     src/mbgl/style/expression/let.cpp \
     src/mbgl/style/expression/literal.cpp \
     src/mbgl/style/expression/match.cpp \
@@ -239,6 +240,8 @@ SOURCES += \
     src/mbgl/style/expression/step.cpp \
     src/mbgl/style/expression/util.cpp \
     src/mbgl/style/expression/value.cpp \
+    src/mbgl/style/filter.cpp \
+    src/mbgl/style/filter_evaluator.cpp \
     src/mbgl/style/function/categorical_stops.cpp \
     src/mbgl/style/function/expression.cpp \
     src/mbgl/style/function/identity_stops.cpp \
@@ -348,8 +351,8 @@ SOURCES += \
     src/mbgl/util/premultiply.cpp \
     src/mbgl/util/stopwatch.cpp \
     src/mbgl/util/string.cpp \
-    src/mbgl/util/throttler.cpp \
     src/mbgl/util/tile_cover.cpp \
+    src/mbgl/util/tile_cover_impl.cpp \
     src/mbgl/util/tiny_sdf.cpp \
     src/mbgl/util/url.cpp \
     src/mbgl/util/version.cpp \
@@ -429,4 +432,4 @@ INCLUDEPATH += \
     src
 
 QMAKE_CXXFLAGS += \
-    -DMBGL_VERSION_REV=\\\"qt-v1.3.0\\\"
+    -DMBGL_VERSION_REV=\\\"qt-v1.4.0\\\"
