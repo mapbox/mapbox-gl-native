@@ -376,6 +376,8 @@ set(MBGL_CORE_FILES
     src/mbgl/style/collection.hpp
     src/mbgl/style/custom_tile_loader.cpp
     src/mbgl/style/custom_tile_loader.hpp
+    src/mbgl/style/filter.cpp
+    src/mbgl/style/filter_evaluator.cpp
     src/mbgl/style/image.cpp
     src/mbgl/style/image_impl.cpp
     src/mbgl/style/image_impl.hpp

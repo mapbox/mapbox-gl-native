@@ -225,6 +225,10 @@ public:
     void operator()(const NotHasIdentifierFilter&) {
         stringifyUnaryFilter("!has", "$id");
     }
+    
+    void operator()(const ExpressionFilter& filter) {
+        stringify(writer, filter.expression->serialize());
+    }
 
 private:
     template <class F>
