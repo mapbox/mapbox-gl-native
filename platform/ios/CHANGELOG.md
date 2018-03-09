@@ -105,6 +105,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Added support selection of shape and polyline annotations.([#9984](https://github.com/mapbox/mapbox-gl-native/pull/9984))
 * Fixed an issue where view annotations could be slightly misaligned. View annotation placement is now rounded to the nearest pixel. ([#10219](https://github.com/mapbox/mapbox-gl-native/pull/10219))
 * Fixed an issue where a shape annotation callout was not displayed if the centroid was not visible. ([#10255](https://github.com/mapbox/mapbox-gl-native/pull/10255))
+* Fixed an issue may potentially caused `NSInvalidArgumentException`. ([#11366](https://github.com/mapbox/mapbox-gl-native/pull/11366))
 
 ### User interaction
 
