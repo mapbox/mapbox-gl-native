@@ -68,6 +68,8 @@ public:
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 
+    jni::Object<jni::ObjectTag> getFilter(jni::JNIEnv&);
+
     void setSourceLayer(jni::JNIEnv&, jni::String);
 
     jni::String getSourceLayer(jni::JNIEnv&);

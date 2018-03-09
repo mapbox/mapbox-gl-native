@@ -71,6 +71,8 @@ public abstract class Layer {
 
   protected native void nativeSetFilter(Object[] filter);
 
+  protected native Object nativeGetFilter();
+
   protected native void nativeSetSourceLayer(String sourceLayer);
 
   protected native String nativeGetSourceLayer();

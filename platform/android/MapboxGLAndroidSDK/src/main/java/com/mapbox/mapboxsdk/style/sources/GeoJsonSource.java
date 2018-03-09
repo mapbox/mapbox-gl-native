@@ -7,7 +7,7 @@ import android.support.annotation.UiThread;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Geometry;
-import com.mapbox.mapboxsdk.style.layers.Filter;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -238,11 +238,11 @@ public class GeoJsonSource extends Source {
   /**
    * Queries the source for features.
    *
-   * @param filter an optional filter statement to filter the returned Features
+   * @param filter an optional filter expression to filter the returned Features
    * @return the features
    */
   @NonNull
-  public List<Feature> querySourceFeatures(@Nullable Filter.Statement filter) {
+  public List<Feature> querySourceFeatures(@Nullable Expression filter) {
     Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }
