@@ -13,8 +13,8 @@
 
 #import <mbgl/style/expression/expression.hpp>
 
-const MGLExpressionStyleFunction MGLExpressionStyleFunctionZoomLevel = @"$zoomLevel";
-const MGLExpressionStyleFunction MGLExpressionStyleFunctionHeatmapDensity = @"$heatmapDensity";
+const MGLExpressionStyleFunction MGLExpressionStyleFunctionZoomLevel = @"zoomLevel";
+const MGLExpressionStyleFunction MGLExpressionStyleFunctionHeatmapDensity = @"heatmapDensity";
 
 const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear = @"linear";
 const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential = @"exponential";
@@ -305,7 +305,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 + (instancetype)mgl_expressionForString:(NSString *)string {
-    return [NSExpression expressionWithFormat:string];
+    return [NSExpression expressionForConstantValue:string];
 }
 
 + (instancetype)mgl_expressionForColor:(MGLColor *)color {
@@ -333,19 +333,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultValue:(NSValue *)value stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:function]
                                      defaultExpression:[NSExpression mgl_expressionForValue:value]
                                                  stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultString:(NSString *)string stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:function]
                                      defaultExpression:[NSExpression mgl_expressionForString:string]
                                                  stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
 
 + (instancetype)mgl_expressionForStepFunction:(MGLExpressionStyleFunction)function defaultColor:(MGLColor *)color stops:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)stops {
-    return [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:function]
+    return [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:function]
                                      defaultExpression:[NSExpression mgl_expressionForColor:color]
                                                  stops:[NSExpression expressionWithFormat:@"%@", stops]];
 }
@@ -355,7 +355,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 + (instancetype)mgl_expressionForInterpolateFunction:(MGLExpressionStyleFunction)function curveType:(nonnull MGLExpressionInterpolationMode)curveType steps:(nonnull NS_DICTIONARY_OF(NSNumber *, id) *)steps; {
-    return [NSExpression mgl_expressionForInterpolateFunction:[NSExpression mgl_expressionForString:function]
+    return [NSExpression mgl_expressionForInterpolateFunction:[NSExpression expressionForVariable:function]
                                                     curveType:curveType
                                                    parameters:nil
                                                         steps:[NSExpression expressionWithFormat:@"%@", steps]];

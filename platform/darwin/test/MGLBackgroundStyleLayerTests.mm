@@ -42,7 +42,7 @@
                               @"backgroundColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundColor = functionExpression;
@@ -100,7 +100,7 @@
                               @"backgroundOpacity should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundOpacity = functionExpression;
@@ -149,7 +149,7 @@
                       @"background-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.backgroundPattern;
 
-        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"'Background Pattern'"];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"Background Pattern"];
         layer.backgroundPattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Background Pattern" };
         XCTAssertEqual(rawLayer->getBackgroundPattern(), propertyValue,
@@ -157,8 +157,8 @@
         XCTAssertEqualObjects(layer.backgroundPattern, constantExpression,
                               @"backgroundPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression mgl_expressionForString:@"'Background Pattern'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        constantExpression = [NSExpression mgl_expressionForString:@"Background Pattern"];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.backgroundPattern = functionExpression;

@@ -1462,7 +1462,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     // source, identity function that sets any feature with an "opacity" attribute to use that value and anything without to 1.0
     fillStyleLayer.fillOpacity = [NSExpression mgl_expressionForConditional:@"opacity != nil"
-                                                             trueExpression:[NSExpression expressionForKeyPath:@"opacity"]
+                                                             trueExpression:[NSExpression expressionForKeyPath:@"opacity"] 
                                                            falseExpresssion:[NSExpression mgl_expressionForValue:@1.0]];
     [self.mapView.style addLayer:fillStyleLayer];
 }

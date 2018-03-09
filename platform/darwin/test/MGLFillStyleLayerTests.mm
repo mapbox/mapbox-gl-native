@@ -63,7 +63,7 @@
                               @"fillAntialiased should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@NO];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillAntialiased = functionExpression;
@@ -112,7 +112,7 @@
                               @"fillColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillColor = functionExpression;
@@ -189,7 +189,7 @@
                               @"fillOpacity should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillOpacity = functionExpression;
@@ -266,7 +266,7 @@
                               @"fillOutlineColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillOutlineColor = functionExpression;
@@ -334,7 +334,7 @@
                       @"fill-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.fillPattern;
 
-        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"'Fill Pattern'"];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"Fill Pattern"];
         layer.fillPattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Fill Pattern" };
         XCTAssertEqual(rawLayer->getFillPattern(), propertyValue,
@@ -342,8 +342,8 @@
         XCTAssertEqualObjects(layer.fillPattern, constantExpression,
                               @"fillPattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression mgl_expressionForString:@"'Fill Pattern'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        constantExpression = [NSExpression mgl_expressionForString:@"Fill Pattern"];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillPattern = functionExpression;
@@ -407,7 +407,7 @@
                               @"fillTranslation should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"{1, 1}"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillTranslation = functionExpression;
@@ -456,7 +456,7 @@
                               @"fillTranslationAnchor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.fillTranslationAnchor = functionExpression;

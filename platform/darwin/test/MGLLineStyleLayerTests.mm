@@ -63,7 +63,7 @@
                               @"lineCap should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'square'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineCap = functionExpression;
@@ -112,7 +112,7 @@
                               @"lineJoin should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'miter'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineJoin = functionExpression;
@@ -152,7 +152,7 @@
                               @"lineMiterLimit should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineMiterLimit = functionExpression;
@@ -201,7 +201,7 @@
                               @"lineRoundLimit should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineRoundLimit = functionExpression;
@@ -250,7 +250,7 @@
                               @"lineBlur should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineBlur = functionExpression;
@@ -327,7 +327,7 @@
                               @"lineColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineColor = functionExpression;
@@ -404,7 +404,7 @@
                               @"lineDashPattern should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"{1, 2}"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineDashPattern = functionExpression;
@@ -453,7 +453,7 @@
                               @"lineGapWidth should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineGapWidth = functionExpression;
@@ -530,7 +530,7 @@
                               @"lineOffset should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineOffset = functionExpression;
@@ -607,7 +607,7 @@
                               @"lineOpacity should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineOpacity = functionExpression;
@@ -675,7 +675,7 @@
                       @"line-pattern should be unset initially.");
         NSExpression *defaultExpression = layer.linePattern;
 
-        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"'Line Pattern'"];
+        NSExpression *constantExpression = [NSExpression mgl_expressionForString:@"Line Pattern"];
         layer.linePattern = constantExpression;
         mbgl::style::PropertyValue<std::string> propertyValue = { "Line Pattern" };
         XCTAssertEqual(rawLayer->getLinePattern(), propertyValue,
@@ -683,8 +683,8 @@
         XCTAssertEqualObjects(layer.linePattern, constantExpression,
                               @"linePattern should round-trip constant value expressions.");
 
-        constantExpression = [NSExpression mgl_expressionForString:@"'Line Pattern'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        constantExpression = [NSExpression mgl_expressionForString:@"Line Pattern"];
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.linePattern = functionExpression;
@@ -748,7 +748,7 @@
                               @"lineTranslation should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"{1, 1}"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineTranslation = functionExpression;
@@ -797,7 +797,7 @@
                               @"lineTranslationAnchor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineTranslationAnchor = functionExpression;
@@ -846,7 +846,7 @@
                               @"lineWidth should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.lineWidth = functionExpression;

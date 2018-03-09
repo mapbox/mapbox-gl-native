@@ -88,7 +88,7 @@
 <% } else { -%>
         constantExpression = [NSExpression expressionWithFormat:<%- objCTestValue(property, type, false, 3) %>];
 <% } -%>
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.<%- objCName(property) %> = functionExpression;

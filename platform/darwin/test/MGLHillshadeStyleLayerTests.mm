@@ -45,7 +45,7 @@
                               @"hillshadeAccentColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeAccentColor = functionExpression;
@@ -103,7 +103,7 @@
                               @"hillshadeExaggeration should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeExaggeration = functionExpression;
@@ -161,7 +161,7 @@
                               @"hillshadeHighlightColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeHighlightColor = functionExpression;
@@ -219,7 +219,7 @@
                               @"hillshadeIlluminationAnchor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeIlluminationAnchor = functionExpression;
@@ -268,7 +268,7 @@
                               @"hillshadeIlluminationDirection should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForValue:@0xff];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeIlluminationDirection = functionExpression;
@@ -317,7 +317,7 @@
                               @"hillshadeShadowColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression mgl_expressionForColor:[MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression mgl_expressionForString:MGLExpressionStyleFunctionZoomLevel]
+        NSExpression *functionExpression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForVariable:MGLExpressionStyleFunctionZoomLevel]
                                                                      defaultExpression:constantExpression
                                                                                  stops:[NSExpression expressionWithFormat:@"%@", @{@18: constantExpression}]];
         layer.hillshadeShadowColor = functionExpression;

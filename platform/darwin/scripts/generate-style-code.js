@@ -586,7 +586,7 @@ global.objCExpressionAdditionsTestValue = function (property) {
         case 'number':
             return '@0xff';
         case 'string':
-            return `@"'${_.startCase(propertyName)}'"`;
+            return `@"${_.startCase(propertyName)}"`;
         case 'color':
             return '[MGLColor redColor]';
         default:
