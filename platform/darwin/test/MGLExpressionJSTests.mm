@@ -1,4 +1,3 @@
-
 #import <XCTest/XCTest.h>
 
 #import "MGLTypes.h"
@@ -10,15 +9,22 @@
 
 @implementation MGLExpressionJSTests
 
-- (void)setUp {
-    [super setUp];
-    // Put setup code here. This method is called before the invocation of each test method in the class.
+- (void)runTestsWithDictionary:(NSDictionary *)testcase {
+    NSArray *inputs = testcase[@"inputs"];
+
+    NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:testcase[@"expression"]];
+
+    for (int i = 0; i < inputs.count; i++) {
+        NSArray *input = inputs[i];
+        NSDictionary *actualInput = [input[1] objectForKey:@"properties"];
+        id expIn = [exp expressionValueWithObject:actualInput context:[NSMutableDictionary dictionary]];
+        id expOut = testcase[@"expected"][@"outputs"][i];
+        XCTAssertEqualObjects(expIn, expOut);
+    }
+
 }
 
-- (void)tearDown {
-    // Put teardown code here. This method is called after the invocation of each test method in the class.
-    [super tearDown];
-}
+// TODO: load these from the filesystem
 
 - (void)testSqrt {
     NSString *json = @"{\
@@ -41,26 +47,13 @@
     NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
 
     if (!jsonDict && error != nil) {
-        NSLog(@"=====>e error %@", error);
+        XCTFail(@"Failed to parse: %@", error.localizedDescription);
     }
 
-    NSArray *inputs = jsonDict[@"inputs"];
-
-    NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:jsonDict[@"expression"]];
-
-    //    for (NSArray *inputArray in inputs) {
-    for (int i = 0; i < inputs.count; i++) {
-        NSArray *input = inputs[i];
-        //TODO: context is the input[1]
-        id expIn = [exp expressionValueWithObject:input[0] context:[NSMutableDictionary dictionary]];//[input[1] mutableCopy]];
-        // TODO: get the correct output for this input
-        id expOut = jsonDict[@"expected"][@"outputs"][i];
-        XCTAssertEqualObjects(expIn, expOut);
-    }
+    [self runTestsWithDictionary:jsonDict];
 }
 
 - (void)testUpcase {
-    // TODO: load this from file
     NSString *json = @"{\
         \"expression\": [\"upcase\", \"string\"],\
         \"inputs\": [[{}, {}]],\
@@ -84,19 +77,7 @@
         NSLog(@"=====>e error %@", error);
     }
 
-    NSArray *inputs = jsonDict[@"inputs"];
-
-    NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:jsonDict[@"expression"]];
-
-    //    for (NSArray *inputArray in inputs) {
-    for (int i = 0; i < inputs.count; i++) {
-        NSArray *input = inputs[i];
-        //TODO: context is the input[1]
-        id expIn = [exp expressionValueWithObject:input[0] context:[input[1] mutableCopy]];
-        // TODO: get the correct output for this input
-        id expOut = jsonDict[@"expected"][@"outputs"][i];
-        XCTAssertEqualObjects(expIn, expOut);
-    }
+    [self runTestsWithDictionary:jsonDict];
 }
 
 - (void)testEqualsString {
@@ -132,6 +113,7 @@
 
 - (void)testZoomInterpolate {
 
+    //TODO: this test case has a different format from the others we've looked at so far.
     NSString *json = @"{\
         \"expression\": [\"interpolate\", [\"linear\"], [\"zoom\"], 0, 0, 30, 30],\
         \"inputs\": [[{\"zoomLevel\": 5}, {}]],\
@@ -156,17 +138,15 @@
     }
 
     NSArray *inputs = jsonDict[@"inputs"];
-
+    
     NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:jsonDict[@"expression"]];
 
     for (NSArray *inputArray in inputs) {
-        for (NSDictionary *input in inputArray) {
-            NSMutableDictionary *md = [input mutableCopy];
-            [exp expressionValueWithObject:input context:md];
+        for (NSArray *input in inputArray) {
+            NSDictionary *actualInput = input[0];
+            [exp expressionValueWithObject:actualInput context:[NSMutableDictionary dictionary]];
         }
     }
-
-
 
     //NSArray *jsonObject = @[@"==", @{@"get": @"x"}];
     //NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:jsonObject];
