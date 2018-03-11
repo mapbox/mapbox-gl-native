@@ -5741,6 +5741,8 @@ public:
     if (annotationContext.viewReuseIdentifier)
     {
         annotationView.annotation = nil;
+        [annotationView removeFromSuperview];
+        [self.annotationContainerView.annotationViews removeObject:annotationView];
         NSMutableArray *annotationViewReuseQueue = [self annotationViewReuseQueueForIdentifier:annotationContext.viewReuseIdentifier];
         if (![annotationViewReuseQueue containsObject:annotationView])
         {
