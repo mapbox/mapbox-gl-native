@@ -10,16 +10,6 @@
 @implementation MGLExpressionJSTests
 
 - (void)testAllJavascriptTests {
-
-    NSSet *crashes = [NSSet setWithObjects:
-                      @"to-boolean",
-                      @"concat/arity-1",
-                      @"plus/arity-1",
-                      @"minus/arity-0",
-                      @"minus/arity-1",
-                      @"times/arity-1",
-                      nil];
-
     NSString *testRootPath = @"expression-tests";
 
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
@@ -30,38 +20,48 @@
                                           includingPropertiesForKeys:@[NSURLIsDirectoryKey]
                                                              options:0
                                                         errorHandler:nil];
-
     for (NSURL *fileURL in enumerator) {
-        NSPredicate *blacklistPredicate = [NSPredicate predicateWithBlock:^BOOL( NSString * _Nullable evaluatedString, NSDictionary<NSString *,id> * _Nullable bindings) {
-            return [fileURL.absoluteString containsString:evaluatedString];
-        }];
-
-        NSSet *possibleCrash = [crashes filteredSetUsingPredicate:blacklistPredicate];
-
-        if (possibleCrash.count > 0) {
-            NSLog(@"================> Skipping test due to blacklist: %@", fileURL);
-            continue;
-        }
-
-        if ([[fileURL lastPathComponent] isEqual:@"test.json"]) {
+        if ([[fileURL lastPathComponent] isEqual:@"test.json"] && ![self shouldSkipTest:fileURL] ) {
             NSData *data = [NSData dataWithContentsOfURL:fileURL];
             NSError *error = nil;
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
 
             if (!jsonDict && error) {
-                NSLog(@"================> JSON parse failed with error: %@", error.localizedDescription);
+                XCTFail(@"================> JSON parse failed with error: %@", error.localizedDescription);
                 continue;
             }
 
             try {
                 [self runTestsWithDictionary:jsonDict];
             } catch (NSException *e) {
-                NSLog(@"================> File URL: %@", fileURL);
-                NSLog(@"================> Exception: %@", e.reason);
+                XCTFail(@"================> File at URL: %@ failed with reason: %@", fileURL, e.reason);
                 continue;
             }
         }
     }
+}
+
+NSSet *testsToSkip = [NSSet setWithObjects:
+                      @"to-boolean",
+                      @"concat/arity-1",
+                      @"plus/arity-1",
+                      @"minus/arity-0",
+                      @"minus/arity-1",
+                      @"times/arity-1",
+                      nil];
+
+- (BOOL)shouldSkipTest:(NSURL *)fileURL {
+    NSPredicate *blacklistPredicate = [NSPredicate predicateWithBlock:^BOOL( NSString * _Nullable evaluatedString, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [fileURL.absoluteString containsString:evaluatedString];
+    }];
+
+    BOOL shouldSkip = [testsToSkip filteredSetUsingPredicate:blacklistPredicate].count > 0;
+
+    if (shouldSkip) {
+        XCTFail(@"================> Skipping test due to blacklisted file URL: %@", fileURL);
+    }
+
+    return shouldSkip;
 }
 
 - (void)runTestsWithDictionary:(NSDictionary *)testcase {
@@ -72,9 +72,10 @@
     for (int i = 0; i < inputs.count; i++) {
         NSArray *input = inputs[i];
         NSDictionary *actualInput = [input[1] objectForKey:@"properties"];
-        id expIn = [exp expressionValueWithObject:actualInput context:[NSMutableDictionary dictionary]];
-        id expOut = testcase[@"expected"][@"outputs"][i];
-        XCTAssertEqualObjects(expIn, expOut);
+
+        id expressionValue = [exp expressionValueWithObject:actualInput context:[NSMutableDictionary dictionary]];
+        id expectedValue = testcase[@"expected"][@"outputs"][i];
+        XCTAssertEqualObjects(expressionValue, expectedValue);
     }
 }
 
