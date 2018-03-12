@@ -54,6 +54,7 @@ android {
 dependencies {
     api(project(':MapboxGLAndroidSDK'))
     implementation dependenciesList.mapboxJavaServices
+    implementation dependenciesList.mapboxJavaCore
 
     implementation dependenciesList.mapboxJavaTurf
 

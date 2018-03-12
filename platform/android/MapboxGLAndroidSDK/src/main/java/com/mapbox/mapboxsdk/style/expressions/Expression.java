@@ -18,7 +18,7 @@ import java.util.List;
  * The value for any layout property, paint property, or filter may be specified as an expression.
  * An expression defines a formula for computing the value of the property using the operators described below.
  * The set of expression operators provided by Mapbox GL includes:
- * <p>
+ * <p></p>
  * <ul>
  * <li>Element</li>
  * <li>Mathematical operators for performing arithmetic and other operations on numeric values</li>
@@ -27,7 +27,7 @@ import java.util.List;
  * <li>Data operators, providing access to the properties of source features</li>
  * <li>Camera operators, providing access to the parameters defining the current map view</li>
  * </ul>
- * </p>
+ * <p></p>
  * <p>
  * Expressions are represented as JSON arrays.
  * The first element of an expression array is a string naming the expression operator,
@@ -312,7 +312,7 @@ public class Expression {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression(">", compareOne, compareTwo);
@@ -324,7 +324,7 @@ public class Expression {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;">Style specification</a>
    */
   public static Expression gt(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
@@ -336,7 +336,7 @@ public class Expression {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;">Style specification</a>
    */
   public static Expression gt(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
@@ -349,7 +349,7 @@ public class Expression {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression("<", compareOne, compareTwo);
@@ -361,7 +361,7 @@ public class Expression {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;">Style specification</a>
    */
   public static Expression lt(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
@@ -373,7 +373,7 @@ public class Expression {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;">Style specification</a>
    */
   public static Expression lt(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
@@ -386,7 +386,7 @@ public class Expression {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;=">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression(">=", compareOne, compareTwo);
@@ -398,7 +398,7 @@ public class Expression {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;=">Style specification</a>
    */
   public static Expression gte(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
@@ -410,7 +410,7 @@ public class Expression {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&gt;=">Style specification</a>
    */
   public static Expression gte(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
@@ -423,7 +423,7 @@ public class Expression {
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;=">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression("<=", compareOne, compareTwo);
@@ -435,7 +435,7 @@ public class Expression {
    * @param compareOne the first number
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;=">Style specification</a>
    */
   public static Expression lte(@NonNull Number compareOne, @NonNull Number compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
@@ -447,7 +447,7 @@ public class Expression {
    * @param compareOne the first string
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&lt;=">Style specification</a>
    */
   public static Expression lte(@NonNull String compareOne, @NonNull String compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
@@ -911,7 +911,7 @@ public class Expression {
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&percnt;">Style specification</a>
    */
   public static Expression mod(@NonNull Expression first, @NonNull Expression second) {
     return new Expression("%", first, second);
@@ -923,7 +923,7 @@ public class Expression {
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&percnt;">Style specification</a>
    */
   public static Expression mod(@NonNull Number first, @NonNull Number second) {
     return mod(literal(first), literal(second));
@@ -935,7 +935,7 @@ public class Expression {
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&sup2;">Style specification</a>
    */
   public static Expression pow(@NonNull Expression first, @NonNull Expression second) {
     return new Expression("^", first, second);
@@ -947,7 +947,7 @@ public class Expression {
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-&sup2;">Style specification</a>
    */
   public static Expression pow(@NonNull Number first, @NonNull Number second) {
     return pow(literal(first), literal(second));

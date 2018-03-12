@@ -403,7 +403,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "release-boba" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "pg-mapbox-android-sdk-boba-snapshot" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------

@@ -1574,7 +1574,7 @@ public final class MapboxMap {
   /**
    * <p>
    * Sets the distance from the edges of the map view&#x27;s frame to the edges of the map
-   * view&#x27s logical viewport.
+   * view&#x27;s logical viewport.
    * </p>
    * <p>
    * When the value of this property is equal to {0,0,0,0}, viewport

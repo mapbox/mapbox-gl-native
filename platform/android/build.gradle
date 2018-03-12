@@ -11,10 +11,10 @@ buildscript {
 
 allprojects {
     repositories {
+        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
         mavenCentral()
         jcenter()
         google()
-        maven { url "http://oss.sonatype.org/content/repositories/snapshots/" }
     }
 }
 
