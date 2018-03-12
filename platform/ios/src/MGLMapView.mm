@@ -272,7 +272,7 @@ public:
     CADisplayLink *_displayLink;
     BOOL _needsDisplayRefresh;
 
-    NSUInteger _changeDelimiterSuppressionDepth;
+    NSInteger _changeDelimiterSuppressionDepth;
 
     /// Center coordinate of the pinch gesture on the previous iteration of the gesture.
     CLLocationCoordinate2D _previousPinchCenterCoordinate;
@@ -4273,11 +4273,7 @@ public:
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
-    // Select the annotation if it’s visible.
-    if (MGLCoordinateInCoordinateBounds(firstAnnotation.coordinate, self.visibleCoordinateBounds))
-    {
-        [self selectAnnotation:firstAnnotation animated:NO];
-    }
+    [self selectAnnotation:firstAnnotation animated:NO];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated

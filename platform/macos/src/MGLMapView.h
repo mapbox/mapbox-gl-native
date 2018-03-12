@@ -727,9 +727,6 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Selects an annotation and displays a callout popover for it.
 
- If the given annotation is not visible within the current viewport, this method
- has no effect.
-
  @param annotation The annotation object to select.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation;
