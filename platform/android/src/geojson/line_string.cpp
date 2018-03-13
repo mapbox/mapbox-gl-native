@@ -1,10 +1,21 @@
 #include "line_string.hpp"
-
 #include "point.hpp"
+#include "util.hpp"
+#include "../java/util.hpp"
 
 namespace mbgl {
 namespace android {
 namespace geojson {
+
+jni::Object<LineString> LineString::New(jni::JNIEnv& env, const mbgl::LineString<double>& lineString) {
+    auto jList = asPointsList(env, lineString);
+
+    static auto method = javaClass.GetStaticMethod<jni::Object<LineString>(jni::Object<java::util::List>)>(env, "fromLngLats");
+    auto jLineString = javaClass.Call(env, method, jList);
+
+    jni::DeleteLocalRef(env, jList);
+    return jLineString;
+}
 
 mapbox::geojson::line_string LineString::convert(jni::JNIEnv &env, jni::Object<LineString> jLineString) {
     mapbox::geojson::line_string lineString;

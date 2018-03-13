@@ -182,7 +182,7 @@ struct Converter<jni::Object<android::geojson::Feature>, mbgl::Feature> {
         auto properties = jni::Object<gson::JsonObject>(*convert<jni::jobject*>(env, value.properties));
 
         // Convert geometry
-        auto geometry = jni::Object<android::geojson::Geometry>(*convert<jni::jobject*>(env, value.geometry));
+        auto geometry = *convert<jni::Object<android::geojson::Geometry>>(env, value.geometry);
 
         // Create feature
         auto feature = android::geojson::Feature::fromGeometry(env, geometry, properties, jid);

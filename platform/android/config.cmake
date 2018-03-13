@@ -229,6 +229,8 @@ add_library(mbgl-android STATIC
     platform/android/src/geojson/feature_collection.hpp
     platform/android/src/geojson/geometry.cpp
     platform/android/src/geojson/geometry.hpp
+    platform/android/src/geojson/geometry_collection.cpp
+    platform/android/src/geojson/geometry_collection.hpp
     platform/android/src/geojson/line_string.cpp
     platform/android/src/geojson/line_string.hpp
     platform/android/src/geojson/multi_line_string.cpp
