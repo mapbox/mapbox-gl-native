@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
 import android.support.annotation.RawRes;
+import android.util.TypedValue;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -28,6 +29,11 @@ public class ResourceUtils {
       json = writer.toString();
     }
     return json;
+  }
+
+  public static float convertDpToPx(Context context, float dp) {
+    return TypedValue.applyDimension(
+      TypedValue.COMPLEX_UNIT_DIP, dp, context.getResources().getDisplayMetrics());
   }
 }
 
