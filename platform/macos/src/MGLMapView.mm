@@ -2101,7 +2101,7 @@ public:
     if (nearbyAnnotations.size()) {
         // The first selection in the cycle should be the one nearest to the
         // tap. Also the annotation tags need to be stable in order to compare them with
-        // the remembered tags _annotationsNearbyLastTap.
+        // the remembered tags _annotationsNearbyLastClick.
         CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
         std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
             CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
