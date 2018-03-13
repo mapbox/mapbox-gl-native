@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.testapp.activity.camera;
 
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
 import android.support.v4.content.ContextCompat;
@@ -40,7 +41,7 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public class GestureDetectorActivity extends AppCompatActivity {
 
-  private static final int MAX_NUMBER_OF_ALERTS = 100;
+  private static final int MAX_NUMBER_OF_ALERTS = 30;
 
   private MapView mapView;
   private MapboxMap mapboxMap;
@@ -51,6 +52,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
   private Marker marker = null;
   private LatLng focalPointLatLng = null;
+  private boolean animationsEnabled = true;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +60,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
     setContentView(R.layout.activity_gesture_detector);
 
     mapView = (MapView) findViewById(R.id.mapView);
+    mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(new OnMapReadyCallback() {
       @Override
       public void onMapReady(MapboxMap mapboxMap) {
@@ -73,11 +76,55 @@ public class GestureDetectorActivity extends AppCompatActivity {
     recyclerView.setAdapter(gestureAlertsAdapter);
   }
 
+  @Override
+  protected void onResume() {
+    super.onResume();
+    mapView.onResume();
+  }
+
+  @Override
+  protected void onPause() {
+    super.onPause();
+    gestureAlertsAdapter.cancelUpdates();
+    mapView.onPause();
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    mapView.onStart();
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    mapView.onStop();
+  }
+
+  @Override
+  public void onLowMemory() {
+    super.onLowMemory();
+    mapView.onLowMemory();
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+    mapView.onDestroy();
+  }
+
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    mapView.onSaveInstanceState(outState);
+  }
+
   private void initializeMap() {
     gesturesManager = mapboxMap.getGesturesManager();
 
     RelativeLayout.LayoutParams layoutParams = (RelativeLayout.LayoutParams) recyclerView.getLayoutParams();
     layoutParams.height = (int) (mapView.getHeight() / 1.75);
+    layoutParams.width = (mapView.getWidth() / 3);
     recyclerView.setLayoutParams(layoutParams);
 
     attachListeners();
@@ -93,7 +140,6 @@ public class GestureDetectorActivity extends AppCompatActivity {
       @Override
       public void onMove(MoveGestureDetector detector) {
         gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_PROGRESS, "MOVE PROGRESS"));
-        recalculateFocalPoint();
       }
 
       @Override
@@ -189,6 +235,9 @@ public class GestureDetectorActivity extends AppCompatActivity {
         mapboxMap.easeCamera(CameraUpdateFactory.newLatLngZoom(focalPointLatLng, 16));
         mapboxMap.getUiSettings().setFocalPoint(mapboxMap.getProjection().toScreenLocation(focalPointLatLng));
         return true;
+      case R.id.menu_gesture_animation:
+        animationsEnabled = !animationsEnabled;
+        mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(animationsEnabled);
     }
     return super.onOptionsItemSelected(item);
   }
@@ -217,6 +266,8 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
   private static class GestureAlertsAdapter extends RecyclerView.Adapter<GestureAlertsAdapter.ViewHolder> {
 
+    private boolean isUpdating;
+    private final Handler updateHandler = new Handler();
     private final List<GestureAlert> alerts = new ArrayList<>();
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
@@ -233,6 +284,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
         alertMessageTv.setTypeface(typeface);
       }
     }
+
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -269,8 +321,22 @@ public class GestureDetectorActivity extends AppCompatActivity {
       }
 
       alerts.add(0, alert);
+      if (!isUpdating) {
+        isUpdating = true;
+        updateHandler.postDelayed(updateRunnable, 250);
+      }
+    }
 
-      notifyDataSetChanged();
+    private Runnable updateRunnable = new Runnable() {
+      @Override
+      public void run() {
+        notifyDataSetChanged();
+        isUpdating = false;
+      }
+    };
+
+    void cancelUpdates() {
+      updateHandler.removeCallbacksAndMessages(null);
     }
   }
 

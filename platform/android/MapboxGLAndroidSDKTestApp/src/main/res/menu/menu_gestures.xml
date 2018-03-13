@@ -6,4 +6,7 @@
     <item
         android:id="@+id/menu_gesture_focus_point"
         android:title="Focus on a point" />
+    <item
+        android:id="@+id/menu_gesture_animation"
+        android:title="Toggle velocity animations" />
 </menu>
