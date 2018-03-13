@@ -23,6 +23,9 @@
 * Improved the sharpness of raster tiles on Retina displays. ([#10984](https://github.com/mapbox/mapbox-gl-native/pull/10984))
 * Fixed a crash parsing a malformed style. ([#11001](https://github.com/mapbox/mapbox-gl-native/pull/11001))
 
+### Annotations
+* Fix an issue where a wrong annotation may selected if annotations were set close together. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
+
 ### Map snapshots
 
 * Fixed a memory leak that occurred when creating a map snapshot. ([#10585](https://github.com/mapbox/mapbox-gl-native/pull/10585))

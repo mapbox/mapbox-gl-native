@@ -35,6 +35,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue preventing `MGLAnnotationImage.image` from being updated. ([#10372](https://github.com/mapbox/mapbox-gl-native/pull/10372))
 * Improved performance of `MGLAnnotationView`-backed annotations that have `scalesWithViewingDistance` enabled. ([#10951](https://github.com/mapbox/mapbox-gl-native/pull/10951))
+* Fix an issue where a wrong annotation may selected if annotations were set close together. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
 
 ### Map snapshots
 
