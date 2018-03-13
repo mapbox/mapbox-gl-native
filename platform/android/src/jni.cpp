@@ -14,6 +14,7 @@
 #include "geojson/feature.hpp"
 #include "geojson/feature_collection.hpp"
 #include "geojson/geometry.hpp"
+#include "geojson/geometry_collection.hpp"
 #include "geojson/line_string.hpp"
 #include "geojson/multi_line_string.hpp"
 #include "geojson/multi_point.hpp"
@@ -116,6 +117,7 @@ void registerNatives(JavaVM *vm) {
     geojson::Feature::registerNative(env);
     geojson::FeatureCollection::registerNative(env);
     geojson::Geometry::registerNative(env);
+    geojson::GeometryCollection::registerNative(env);
     geojson::LineString::registerNative(env);
     geojson::MultiLineString::registerNative(env);
     geojson::MultiPoint::registerNative(env);

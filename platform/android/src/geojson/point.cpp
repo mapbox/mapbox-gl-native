@@ -7,6 +7,11 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
+jni::Object<Point> Point::New(jni::JNIEnv& env, const mbgl::Point<double>& point) {
+    static auto method = javaClass.GetStaticMethod<jni::Object<Point> (jni::jdouble, jni::jdouble)>(env, "fromLngLat");
+    return javaClass.Call(env, method, point.x, point.y);
+}
+
 mapbox::geojson::point Point::convert(jni::JNIEnv &env, jni::Object<Point> jPoint) {
     mapbox::geojson::point point;
 

@@ -8,6 +8,16 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
+jni::Object<MultiPoint> MultiPoint::New(JNIEnv& env, const mbgl::MultiPoint<double>& multiPoint) {
+    auto jList = asPointsList(env, multiPoint);
+
+    static auto method = javaClass.GetStaticMethod<jni::Object<MultiPoint>(jni::Object<java::util::List>)>(env, "fromLngLats");
+    auto jMultiPoint = javaClass.Call(env, method, jList);
+
+    jni::DeleteLocalRef(env, jList);
+    return jMultiPoint;
+}
+
 mapbox::geojson::multi_point MultiPoint::convert(jni::JNIEnv &env, jni::Object<MultiPoint> jMultiPoint) {
     mapbox::geojson::multi_point multiPoint;
 
