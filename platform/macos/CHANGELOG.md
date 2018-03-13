@@ -38,6 +38,8 @@
 * Feature querying results now account for the `MGLSymbolStyleLayer.circleStrokeWidth` property. ([#10897](https://github.com/mapbox/mapbox-gl-native/pull/10897))
 * Removed methods, properties, and constants that had been deprecated as of v0.6.1. ([#11205](https://github.com/mapbox/mapbox-gl-native/pull/11205))
 * The `MGLMapView.selectedAnnotations` property (backed by `-[MGLMapView setSelectedAnnotations:]`) now selects annotations that are off-screen. ([#9790](https://github.com/mapbox/mapbox-gl-native/issues/9790))
+* The `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` now controls whether the annotation and its callout are brought on-screen. If `animated` is `NO` then the annotation is selected if offscreen, but the map is not panned. Currently only point annotations are supported.([#3249](https://github.com/mapbox/mapbox-gl-native/issues/3249))
+
 
 ## v0.6.1 - January 16, 2018
 

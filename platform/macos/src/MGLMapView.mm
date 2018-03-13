@@ -97,6 +97,9 @@ const CGFloat MGLAnnotationImagePaddingForHitTest = 4;
 /// Distance from the callout’s anchor point to the annotation it points to.
 const CGFloat MGLAnnotationImagePaddingForCallout = 4;
 
+/// Padding to edge of view that an offscreen annotation must have when being brought onscreen (by being selected)
+const NSEdgeInsets MGLMapViewOffscreenAnnotationPadding = NSEdgeInsetsMake(-30.0f, -30.0f, -30.0f, -30.0f);
+
 /// Unique identifier representing a single annotation in mbgl.
 typedef uint32_t MGLAnnotationTag;
 
@@ -2208,12 +2211,22 @@ public:
     [self selectAnnotation:firstAnnotation];
 }
 
+- (BOOL)isBringingAnnotationOnscreenSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
+    // Consider delegating
+    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+}
+
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation
 {
     [self selectAnnotation:annotation atPoint:NSZeroPoint];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
+{
+    [self selectAnnotation:annotation atPoint:gesturePoint animated:YES];
+}
+
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint animated:(BOOL)animated
 {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
@@ -2229,9 +2242,12 @@ public:
         [self addAnnotation:annotation];
     }
 
+    BOOL checkOffscreenAnnotation = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animated];
+
     // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
-    if (NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+
+    if (!checkOffscreenAnnotation && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
         positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
     }
 
@@ -2251,10 +2267,64 @@ public:
         // alignment rect, or off the left edge in a right-to-left UI.
         callout.delegate = self;
         self.calloutForSelectedAnnotation = callout;
+
         NSRectEdge edge = (self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft
                            ? NSMinXEdge
                            : NSMaxXEdge);
+
+        // The following will do nothing if the positioning rect is not on-screen. See
+        // `-[MGLMapView updateAnnotationCallouts]` for presenting the callout when the selected
+        // annotation comes back on-screen.
         [callout showRelativeToRect:positioningRect ofView:self preferredEdge:edge];
+    }
+
+    if (checkOffscreenAnnotation)
+    {
+        NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
+            return NSMakeRect(rect.origin.x + insets.left,
+                              rect.origin.y + insets.top,
+                              rect.size.width - insets.left - insets.right,
+                              rect.size.height - insets.top - insets.bottom);
+        };
+
+        // Add padding around the positioning rect (in essence an inset from the edge of the viewport
+        NSRect expandedPositioningRect = edgeInsetsInsetRect(positioningRect, MGLMapViewOffscreenAnnotationPadding);
+
+        // Used for callout positioning, and moving offscreen annotations onscreen.
+        CGRect constrainedRect = edgeInsetsInsetRect(self.bounds, self.contentInsets);
+        CGRect bounds          = constrainedRect;
+
+        BOOL moveOffscreenAnnotation = NO;
+
+        // Any one of these cases should trigger a move onscreen
+        if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
+        {
+            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+            moveOffscreenAnnotation = YES;
+        }
+        else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
+        {
+            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
+            moveOffscreenAnnotation = YES;
+        }
+
+        if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
+        {
+            constrainedRect.origin.y = expandedPositioningRect.origin.y;
+            moveOffscreenAnnotation = YES;
+        }
+        else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
+        {
+            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
+            moveOffscreenAnnotation = YES;
+        }
+
+        if (moveOffscreenAnnotation)
+        {
+            CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
+            CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
+            [self setCenterCoordinate:centerCoord animated:animated];
+        }
     }
 }
 
@@ -2390,7 +2460,25 @@ public:
 - (void)updateAnnotationCallouts {
     NSPopover *callout = self.calloutForSelectedAnnotation;
     if (callout) {
-        callout.positioningRect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
+        NSRect rect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
+
+        if (!NSIsEmptyRect(NSIntersectionRect(rect, self.bounds))) {
+
+            // It's possible that the current callout hasn't been presented (since the original
+            // positioningRect was offscreen). We can check that the callout has a valid window
+            // This results in the callout being presented just as the annotation comes on screen
+            // which matches MapKit, but (currently) not iOS.
+            if (!callout.contentViewController.view.window) {
+                NSRectEdge edge = (self.userInterfaceLayoutDirection == NSUserInterfaceLayoutDirectionRightToLeft
+                                   ? NSMinXEdge
+                                   : NSMaxXEdge);
+                // Re-present the callout
+                [callout showRelativeToRect:rect ofView:self preferredEdge:edge];
+            }
+            else {
+                callout.positioningRect = rect;
+            }
+        }
     }
 }
 

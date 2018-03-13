@@ -545,10 +545,10 @@
                                     <action selector="drawAnimatedAnnotation:" target="-1" id="CYM-WB-s97"/>
                                 </connections>
                             </menuItem>
-                            <menuItem title="Select and Center Offscreen Annotation" id="Xy2-Cc-RUB">
+                            <menuItem title="Select an Offscreen Annotation" id="Xy2-Cc-RUB">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="selectAndCenterOffscreenAnnotation:" target="-1" id="W0A-AH-NqK"/>
+                                    <action selector="selectOffscreenAnnotation:" target="-1" id="AHm-rf-mG4"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Show All Annotations" keyEquivalent="A" id="yMj-uM-8SN">

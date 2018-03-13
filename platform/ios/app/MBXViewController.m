@@ -55,7 +55,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsCustomUserDot,
     MBXSettingsAnnotationsRemoveAnnotations,
     MBXSettingsAnnotationSelectRandomOffscreenAnnotation,
-    MBXSettingsAnnotationCenterSelectedAnnotation
+    MBXSettingsAnnotationCenterSelectedAnnotation,
+    MBXSettingsAnnotationAddVisibleAreaPolyline
 };
 
 typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
@@ -343,7 +344,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
                 @"Remove Annotations",
                 @"Select an offscreen annotation",
-                @"Center selected annotation"
+                @"Center selected annotation",
+                @"Add visible area polyline"
             ]];
             break;
         case MBXSettingsRuntimeStyling:
@@ -478,6 +480,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
                 case MBXSettingsAnnotationCenterSelectedAnnotation:
                     [self centerSelectedAnnotation];
+                    break;
+
+                case MBXSettingsAnnotationAddVisibleAreaPolyline:
+                    [self addVisibleAreaPolyline];
                     break;
 
                 default:
@@ -1587,12 +1593,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)selectAnOffscreenAnnotation {
     id<MGLAnnotation> annotation = [self randomOffscreenAnnotation];
-    [self.mapView selectAnnotation:annotation animated:NO];
+    if (annotation) {
+        [self.mapView selectAnnotation:annotation animated:YES];
 
-    // Alternative method to select the annotation (NOT ANIMATED). These two should do the same thing.
-    // self.mapView.selectedAnnotations = @[annotation];
-
-    NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
+        NSAssert(self.mapView.selectedAnnotations.firstObject, @"The annotation was not selected");
+    }
 }
 
 - (void)centerSelectedAnnotation {
@@ -1606,6 +1611,22 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // Animate, so that point becomes the the center
     CLLocationCoordinate2D center = [self.mapView convertPoint:point toCoordinateFromView:self.mapView];
     [self.mapView setCenterCoordinate:center animated:YES];
+}
+
+- (void)addVisibleAreaPolyline {
+    CGRect constrainedRect = UIEdgeInsetsInsetRect(self.mapView.bounds, self.mapView.contentInset);
+
+    CLLocationCoordinate2D lineCoords[5];
+
+    lineCoords[0] = [self.mapView convertPoint: CGPointMake(CGRectGetMinX(constrainedRect), CGRectGetMinY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[1] = [self.mapView convertPoint: CGPointMake(CGRectGetMaxX(constrainedRect), CGRectGetMinY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[2] = [self.mapView convertPoint: CGPointMake(CGRectGetMaxX(constrainedRect), CGRectGetMaxY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[3] = [self.mapView convertPoint: CGPointMake(CGRectGetMinX(constrainedRect), CGRectGetMaxY(constrainedRect)) toCoordinateFromView:self.mapView];
+    lineCoords[4] = lineCoords[0];
+
+    MGLPolyline *line = [MGLPolyline polylineWithCoordinates:lineCoords
+                                                       count:sizeof(lineCoords)/sizeof(lineCoords[0])];
+    [self.mapView addAnnotation:line];
 }
 
 - (void)printTelemetryLogFile
@@ -1659,7 +1680,13 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                  toCoordinateFromView:self.mapView];
         pin.title = title ?: @"Dropped Pin";
         pin.subtitle = [[[MGLCoordinateFormatter alloc] init] stringFromCoordinate:pin.coordinate];
-        // Calling `addAnnotation:` on mapView is not required since `selectAnnotation:animated` has the side effect of adding the annotation if required
+
+
+        // Calling `addAnnotation:` on mapView is required here (since `selectAnnotation:animated` has
+        // the side effect of adding the annotation if required, but returning an incorrect callout
+        // positioning rect)
+
+        [self.mapView addAnnotation:pin];
         [self.mapView selectAnnotation:pin animated:YES];
     }
 }

@@ -41,12 +41,32 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated;
 
+
+/**
+ Presents a callout view by adding it to `view` and pointing at the given rect
+ of `view`’s bounds. Constrains the callout to the rect in the space of `view`.
+ */
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated;
+
 /**
  Dismisses the callout view.
  */
 - (void)dismissCalloutAnimated:(BOOL)animated;
 
 @optional
+
+/**
+ If implemented, should provide margins to expand the rect the callout is presented from.
+
+ These are used to determine positioning. Currently only the top and bottom properties of the return
+ value are used. For example, `{ .top = -50.0, .left = 0.0, .bottom = 0.0, .right = 0.0 }` indicates
+ a 50 point margin above the presentation origin rect, in which the callout is assumed to be displayed.
+
+ @param rect rect that the callout is presented from. This should be the same as the one passed in
+ `-presentCalloutFromRect:inView:constrainedToRect:animated:`
+ @return margins. Since this is a UIEdgeInsets, values should be negative.
+ */
+- (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect;
 
 /**
  A Boolean value indicating whether the callout view should be anchored to
