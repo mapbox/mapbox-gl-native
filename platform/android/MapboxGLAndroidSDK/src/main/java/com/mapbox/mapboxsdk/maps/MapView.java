@@ -1065,10 +1065,8 @@ public class MapView extends FrameLayout {
     // Called when user pushes a zoom button on the ZoomButtonController
     @Override
     public void onZoom(boolean zoomIn) {
-      if (uiSettings.isZoomGesturesEnabled()) {
-        cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
-        onZoom(zoomIn, mapGestureDetector.getFocalPoint());
-      }
+      cameraChangeDispatcher.onCameraMoveStarted(CameraChangeDispatcher.REASON_API_ANIMATION);
+      onZoom(zoomIn, mapGestureDetector.getFocalPoint());
     }
 
     private void onZoom(boolean zoomIn, @Nullable PointF focalPoint) {

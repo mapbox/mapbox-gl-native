@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.http;
 
-
 import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Build;
