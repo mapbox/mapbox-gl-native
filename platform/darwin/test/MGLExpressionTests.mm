@@ -577,10 +577,6 @@ using namespace std::string_literals;
     // https://github.com/mapbox/mapbox-gl-native/issues/11007
     if (@available(iOS 9.0, *)) {
         {
-            
-            NSExpression *nested = [NSExpression expressionWithFormat:@"TERNARY( 1== 2, TERNARY(0==1, FALSE, TERNARY(4==5, FALSE, FALSE)), TERNARY(1==1, TRUE, FALSE))"];
-            NSLog(@"%@", nested.mgl_jsonExpressionObject);
-            
             NSPredicate *conditional = [NSPredicate predicateWithFormat:@"1 = 2"];
             NSExpression *trueExpression = [NSExpression expressionForConstantValue:@YES];
             NSExpression *falseExpression = [NSExpression expressionForConstantValue:@NO];
@@ -597,6 +593,20 @@ using namespace std::string_literals;
             XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
             XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
             XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        }
+        {
+            NSExpression *expression = [NSExpression expressionWithFormat:@"TERNARY(0 = 1, TERNARY(1 = 2, TRUE, FALSE), TRUE)"];
+            NSArray *jsonExpression = @[@"case", @[@"==", @0, @1], @[@"==", @1, @2], @YES, @NO, @YES];
+            XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+            XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @YES);
+            XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        }
+        {
+            NSExpression *nestedExpression = [NSExpression expressionWithFormat:@"TERNARY(1 == 2, TERNARY(0 == 1, FALSE, TERNARY(4 == 5, FALSE, FALSE)), TERNARY(1 == 1, TRUE, FALSE))"];
+            NSArray *nestedJSONExpression = @[@"case", @[@"==", @1, @2], @[@"==", @0, @1], @NO,  @[@"==", @4, @5], @NO, @NO,  @[@"==", @1, @1], @YES, @NO];
+            XCTAssertEqualObjects(nestedExpression.mgl_jsonExpressionObject, nestedJSONExpression);
+            XCTAssertEqualObjects([nestedExpression expressionValueWithObject:nil context:nil], @YES);
+            XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:nestedJSONExpression], nestedExpression);
         }
     }
 }
