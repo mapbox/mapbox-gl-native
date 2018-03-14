@@ -465,15 +465,34 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
             NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
-            NSExpression *trueExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[1]];
+            NSExpression *trueExpression;
+            NSInteger rightBranchIndex = 2;
+
+            if ([argumentObjects[1] isKindOfClass:[NSArray class]] ) {
+                NSInteger length = 1;
+                for (NSInteger index = 1; index < argumentObjects.count - 2; index++) {
+                    length++;
+                    if (![argumentObjects[index] isKindOfClass:[NSArray class]] && ![argumentObjects[index + 1] isKindOfClass:[NSArray class]]) {
+                        break;
+                    }
+                }
+                NSArray *trueObjects = [@[@"case"] arrayByAddingObjectsFromArray:
+                                         [argumentObjects subarrayWithRange:NSMakeRange(1, length)]];
+                trueExpression = [NSExpression mgl_expressionWithJSONObject:trueObjects];
+                rightBranchIndex = length + 1;
+            } else {
+                trueExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[1]];
+            }
+            
             NSExpression *falseExpression;
-            if (argumentObjects.count > 3) {
+            if ([argumentObjects[rightBranchIndex] isKindOfClass:[NSArray class]] ) {
                 NSArray *falseObjects = [@[@"case"] arrayByAddingObjectsFromArray:
-                                         [argumentObjects subarrayWithRange:NSMakeRange(2, argumentObjects.count - 2)]];
+                                         [argumentObjects subarrayWithRange:NSMakeRange(rightBranchIndex, argumentObjects.count - rightBranchIndex)]];
                 falseExpression = [NSExpression mgl_expressionWithJSONObject:falseObjects];
             } else {
-                falseExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[2]];
+                falseExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[rightBranchIndex]];
             }
+            
             return [NSExpression expressionForConditional:conditional trueExpression:trueExpression falseExpression:falseExpression];
         } else {
             [NSException raise:NSInvalidArgumentException
