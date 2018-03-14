@@ -577,6 +577,10 @@ using namespace std::string_literals;
     // https://github.com/mapbox/mapbox-gl-native/issues/11007
     if (@available(iOS 9.0, *)) {
         {
+            
+            NSExpression *nested = [NSExpression expressionWithFormat:@"TERNARY( 1== 2, TERNARY(0==1, FALSE, TERNARY(4==5, FALSE, FALSE)), TERNARY(1==1, TRUE, FALSE))"];
+            NSLog(@"%@", nested.mgl_jsonExpressionObject);
+            
             NSPredicate *conditional = [NSPredicate predicateWithFormat:@"1 = 2"];
             NSExpression *trueExpression = [NSExpression expressionForConstantValue:@YES];
             NSExpression *falseExpression = [NSExpression expressionForConstantValue:@NO];
