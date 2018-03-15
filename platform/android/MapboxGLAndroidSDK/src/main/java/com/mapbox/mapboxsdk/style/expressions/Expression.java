@@ -116,6 +116,16 @@ public class Expression {
   }
 
   /**
+   * Create a literal array expression
+   *
+   * @param array the array
+   * @return the expression
+   */
+  public static Expression literal(@NonNull Object[] array) {
+    return new ExpressionArray(array);
+  }
+
+  /**
    * Expression literal utility method to convert a color int to an color expression
    *
    * @param color the int color
@@ -1600,7 +1610,7 @@ public class Expression {
                                        @NonNull Expression number, Stop... stops) {
     return interpolate(interpolation, number, Stop.toExpressionArray(stops));
   }
-  
+
   /**
    * interpolates linearly between the pair of stops just less than and just greater than the input.
    *
@@ -2004,6 +2014,43 @@ public class Expression {
       } else {
         throw new RuntimeException("Unsupported literal expression conversion for " + jsonPrimitive.getClass());
       }
+    }
+  }
+
+  private static class ExpressionArray extends Expression {
+
+    private Object[] array;
+
+    ExpressionArray(Object[] array) {
+      this.array = array;
+    }
+
+    @NonNull
+    @Override
+    public Object[] toArray() {
+      return new Object[] {
+        "literal", array
+      };
+    }
+
+    @Override
+    public String toString() {
+      StringBuilder builder = new StringBuilder("[\"literal\"], [");
+      Object argument;
+      for (int i = 0; i < array.length; i++) {
+        argument = array[i];
+        if (argument instanceof String) {
+          builder.append("\"").append(argument).append("\"");
+        } else {
+          builder.append(argument);
+        }
+
+        if (i != array.length - 1) {
+          builder.append(", ");
+        }
+      }
+      builder.append("]]");
+      return builder.toString();
     }
   }
 }

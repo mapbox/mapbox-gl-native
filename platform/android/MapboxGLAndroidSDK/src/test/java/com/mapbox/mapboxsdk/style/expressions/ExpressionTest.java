@@ -365,14 +365,14 @@ public class ExpressionTest {
 
   @Test
   public void testAt() throws Exception {
-    Object[] expected = new Object[] {"at", 3, new Object[] {"one", "two"}};
+    Object[] expected = new Object[] {"at", 3, new Object[] {"literal", new Object[] {"one", "two"}}};
     Object[] actual = at(literal(3), literal(new Object[] {"one", "two"})).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
   @Test
   public void testAtLiteral() throws Exception {
-    Object[] expected = new Object[] {"at", 3, new Object[] {"one", "two"}};
+    Object[] expected = new Object[] {"at", 3, new Object[] {"literal", new Object[] {"one", "two"}}};
     Object[] actual = at(3, literal(new Object[] {"one", "two"})).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -955,12 +955,13 @@ public class ExpressionTest {
 
   @Test
   public void testLinear() throws Exception {
-    Object[] stopZero = new Object[] {0, 1};
-    Object[] stopOne = new Object[] {1, 2};
-    Object[] stopTwo = new Object[] {2, 3};
-    Object[] expected = new Object[] {"interpolate", new Object[] {"linear"}, 12, stopZero, stopOne, stopTwo};
-    Object[] actual = interpolate(linear(), literal(12),
-      literal(stopZero), literal(stopOne), literal(stopTwo)).toArray();
+    Object[] expected = new Object[] {"interpolate", new Object[] {"linear"}, 12, 0, 1, 1, 2, 2, 3};
+    Object[] actual = interpolate(
+      linear(), literal(12),
+      literal(0), literal(1),
+      literal(1), literal(2),
+      literal(2), literal(3))
+      .toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -1063,5 +1064,21 @@ public class ExpressionTest {
     String actual = interpolate(cubicBezier(literal(1), literal(1), literal(1), literal(1)),
       get(literal("x")), literal(0), literal(100), literal(100), literal(200)).toString();
     assertEquals("toString should match", expected, actual);
+  }
+
+  @Test
+  public void testLiteralArray() throws Exception {
+    Object[] array = new Object[] {1, "text"};
+    Object[] expected = new Object[] {"literal", array};
+    Object[] actual = literal(array).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testLiteralArrayString() throws Exception {
+    Object[] array = new Object[] {1, "text"};
+    String expected = "[\"literal\"], [1, \"text\"]]";
+    String actual = literal(array).toString();
+    assertEquals("literal array should match", expected, actual);
   }
 }
