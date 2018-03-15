@@ -20,7 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  Although you do not create instances of this class directly, you can use its
  `+[MGLShape shapeWithData:encoding:error:]` factory method to create one of the
- concrete subclasses of `MGLShape` noted above from GeoJSON data.
+ concrete subclasses of `MGLShape` noted above from GeoJSON data. To access a
+ shape’s attributes, use the corresponding `MGLFeature` class instead.
 
  You can add shapes to the map by adding them to an `MGLShapeSource` object.
  Configure the appearance of an `MGLShapeSource`’s or `MGLVectorSource`’s shapes
