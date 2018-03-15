@@ -305,7 +305,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-debug-arm-v7:
     docker:
-      - image: mbgl/7d2403f42e:android-ndk-r16b
+      - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:
@@ -358,7 +358,7 @@ jobs:
             gcloud firebase test android run --type instrumentation \
               --app platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug/MapboxGLAndroidSDKTestApp-debug.apk \
               --test platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/androidTest/debug/MapboxGLAndroidSDKTestApp-debug-androidTest.apk \
-              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m 
+              --device-ids sailfish --os-version-ids 26 --locales en --orientations portrait --timeout 20m
       - store_artifacts:
           path: platform/android/MapboxGLAndroidSDKTestApp/build/outputs/apk/debug
           destination: .
@@ -378,7 +378,7 @@ jobs:
 # ------------------------------------------------------------------------------
   android-release-all:
     docker:
-      - image: mbgl/7d2403f42e:android-ndk-r16b
+      - image: mbgl/feb0443038:android-ndk-r17
     resource_class: large
     working_directory: /src
     environment:

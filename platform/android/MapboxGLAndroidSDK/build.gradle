@@ -1,9 +1,13 @@
 apply plugin: 'com.android.library'
 
 dependencies {
-    api dependenciesList.mapboxAndroidTelemetry
+    api (dependenciesList.mapboxAndroidTelemetry) {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
     api dependenciesList.mapboxJavaGeoJSON
-    api dependenciesList.mapboxAndroidGestures
+    api (dependenciesList.mapboxAndroidGestures) {
+        exclude group: 'com.android.support', module: 'appcompat-v7'
+    }
     implementation dependenciesList.supportAnnotations
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.timber
@@ -87,7 +91,7 @@ android {
                     if (abi != 'all') {
                         abiFilters abi.split(' ')
                     } else {
-                        abiFilters "armeabi", "armeabi-v7a", "mips", "x86", "arm64-v8a", "x86_64"
+                        abiFilters "armeabi-v7a", "x86", "arm64-v8a", "x86_64"
                     }
                 }
             }
@@ -111,7 +115,7 @@ android {
     }
 
     lintOptions {
-        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission'
+        disable 'MissingTranslation', 'TypographyQuotes', 'ObsoleteLintCustomCheck', 'MissingPermission', 'WrongThreadInterprocedural'
         checkAllWarnings true
         warningsAsErrors false
     }
