@@ -207,6 +207,12 @@
     return nil;
 }
 
+- (id)mgl_matchWithOptions:(NSDictionary<NSNumber *, id> *)stops default:(id)minimum {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Match expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
 @implementation NSNumber (MGLExpressionAdditions)
@@ -222,6 +228,12 @@
 - (id)mgl_stepWithMinimum:(id)minimum stops:(NSDictionary<NSNumber *, id> *)stops {
     [NSException raise:NSInvalidArgumentException
                 format:@"Interpolation expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+- (id)mgl_matchWithOptions:(NSDictionary<NSNumber *, id> *)stops default:(id)minimum {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Match expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -476,10 +488,28 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 } else {
                     [arguments addObject:[NSExpression mgl_expressionWithJSONObject:caseExpressions[index]]];
                 }
-                
-            }
             
             return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
+        } else if ([op isEqualToString:@"match"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSArray *matchOptions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+            NSExpression *defaultOption;
+            if (matchOptions.count % 2) {
+                defaultOption = [NSExpression mgl_expressionWithJSONObject:matchOptions.lastObject];
+                matchOptions = [matchOptions subarrayWithRange:NSMakeRange(0, matchOptions.count - 1)];
+            }
+            NSMutableArray *optionsArray = [NSMutableArray array];
+            NSEnumerator *optionsEnumerator = matchOptions.objectEnumerator;
+            while (NSNumber *key = optionsEnumerator.nextObject) {
+                NSMutableDictionary *option = [NSMutableDictionary dictionaryWithCapacity:1];
+                NSExpression *valueExpression = optionsEnumerator.nextObject;
+                option[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                [optionsArray addObject:option];
+            }
+            NSExpression *optionsExpression = [NSExpression expressionForConstantValue:optionsArray];
+            return [NSExpression expressionForFunction:operand
+                                          selectorName:@"mgl_matchWithOptions:default:"
+                                             arguments:@[optionsExpression, defaultOption]];
         } else {
             [NSException raise:NSInvalidArgumentException
                         format:@"Expression operator %@ not yet implemented.", op];
@@ -674,16 +704,28 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"mgl_case:"]) {
                 NSPredicate *firstConditional = (NSPredicate *)self.operand.constantValue;
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", firstConditional.mgl_jsonExpressionObject, nil];
-                
+
                 for (NSExpression *option in self.arguments) {
                     if ([option respondsToSelector:@selector(constantValue)] && [option.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
                         NSPredicate *predicate = (NSPredicate *)option.constantValue;
                         [expressionObject addObject:predicate.mgl_jsonExpressionObject];
                     } else {
                         [expressionObject addObject:option.mgl_jsonExpressionObject];
+
+                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_matchWithOptions:default:"]) {
+
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", self.operand.mgl_jsonExpressionObject, nil];
+                NSArray *optionsArray = self.arguments[0].constantValue;
+                for (NSDictionary<id, NSExpression*> *options in optionsArray) {
+                    for (NSNumber *key in options.allKeys) {
+                        [expressionObject addObject:key];
+                    } else {
+                        [expressionObject addObject:[options[key] mgl_jsonExpressionObject]];
                     }
                 }
                 
+                [expressionObject addObject:[self.arguments[1] mgl_jsonExpressionObject]];
                 return expressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||

@@ -572,6 +572,23 @@ using namespace std::string_literals;
     }
 }
 
+- (void)testMatchExpressionObject {
+    {
+        NSArray *options = @[@{@1 : MGLConstantExpression(@"one")}, @{@0 : MGLConstantExpression(@"zero")}];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 - 1, 'mgl_matchWithOptions:default:', %@, 'default')", options];
+        NSArray *jsonExpression =  @[@"match", @[@"-", @2, @1], @1, @"one", @0, @"zero", @"default"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects( [NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSArray *options = @[@{@1 : MGLConstantExpression(@"one")}];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 * 1, 'mgl_matchWithOptions:default:', %@, 'default')", options];
+        NSArray *jsonExpression =  @[@"match", @[@"*", @2, @1], @1, @"one", @"default"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects( [NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+}
+
 - (void)testConditionalExpressionObject {
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_case:', %@, %@)",
