@@ -591,16 +591,30 @@ using namespace std::string_literals;
         NSDictionary *stops = @{@0: MGLConstantExpression(@0), @100: MGLConstantExpression(@100)};
         NSArray *parameters = @[ @0.42, @0, @0.58, @1 ];
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
-        NSExpression *aggregate = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@0.42], [NSExpression expressionForConstantValue:@0], [NSExpression expressionForConstantValue:@0.85], [NSExpression expressionForConstantValue:@1]]];
+        NSExpression *aggregate = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@0.42], [NSExpression expressionForConstantValue:@0], [NSExpression expressionForConstantValue:@0.58], [NSExpression expressionForConstantValue:@1]]];
         NSExpression *interpolateExpression = [NSExpression mgl_expressionForInterpolateFunction:[NSExpression expressionForKeyPath:@"x"]
                                                                                        curveType:MGLExpressionInterpolationModeCubicBezier
                                                                                       parameters:aggregate
                                                                                            steps:[NSExpression expressionWithFormat:@"%@", stops]];
         NSArray *jsonExpression = @[@"interpolate", @[@"cubic-bezier", @0.42, @0, @0.58, @1], @[@"get", @"x"], @0, @0, @100, @100];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-//        XCTAssertEqualObjects(interpolateExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(interpolateExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
-//        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], interpolateExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], interpolateExpression);
+    }
+    {
+        NSDictionary *stops = @{@0: MGLConstantExpression(@0), @100: MGLConstantExpression(@100)};
+        NSArray *parameters = @[ @0.42, @0, @0.58, @1 ];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
+        NSExpression *interpolateExpression = [NSExpression mgl_expressionForInterpolateFunction:[NSExpression expressionForKeyPath:@"x"]
+                                                                                       curveType:MGLExpressionInterpolationModeCubicBezier
+                                                                                      parameters:[NSExpression expressionWithFormat:@"%@", parameters]
+                                                                                           steps:[NSExpression expressionWithFormat:@"%@", stops]];
+        NSArray *jsonExpression = @[@"interpolate", @[@"cubic-bezier", @0.42, @0, @0.58, @1], @[@"get", @"x"], @0, @0, @100, @100];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(interpolateExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertNotEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], interpolateExpression);
     }
     {
         NSDictionary *stops = @{@0: MGLConstantExpression(@111), @1: MGLConstantExpression(@1111)};
