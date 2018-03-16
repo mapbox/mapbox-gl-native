@@ -11,7 +11,46 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "NSValue+MGLStyleAttributeAdditions.h"
 
+#import <objc/runtime.h>
+
 #import <mbgl/style/expression/expression.hpp>
+
+/**
+ Joins the given components into a single string by concatenating each component
+ in order.
+ */
+NSString *MGLJoinComponents(Class self, SEL _cmd, NSArray<NSString *> *components) {
+    return [components componentsJoinedByString:@""];
+}
+
+/**
+ Adds to NSExpression’s built-in repertoire of functions.
+ */
+void MGLEndowExpressionsWithCustomFunctions() {
+    // NSExpression’s built-in functions are backed by class methods on a
+    // private class, so use a function expression to get at the class.
+    // http://funwithobjc.tumblr.com/post/2922267976/using-custom-functions-with-nsexpression
+    NSExpression *functionExpression = [NSExpression expressionWithFormat:@"sum({})"];
+    NSString *className = NSStringFromClass([functionExpression.operand.constantValue class]);
+    
+    // Effectively categorize the class with some extra class methods.
+    Class NSPredicateUtilities = objc_getMetaClass(className.UTF8String);
+#pragma clang push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+    class_addMethod(NSPredicateUtilities, @selector(mgl_join:), (IMP)MGLJoinComponents, "@@:@");
+#pragma clang pop
+}
+
+@interface MGLExpressionEndowmentLoader: NSObject
+@end
+
+@implementation MGLExpressionEndowmentLoader
+
++ (void)load {
+    MGLEndowExpressionsWithCustomFunctions();
+}
+
+@end
 
 @implementation NSExpression (MGLPrivateAdditions)
 
@@ -415,9 +454,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForConstantValue:@(M_PI)];
         } else if ([op isEqualToString:@"concat"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            NSExpression *operand = subexpressions.firstObject;
-            subexpressions = [subexpressions subarrayWithRange:NSMakeRange(1, subexpressions.count - 1)];
-            return [NSExpression expressionForFunction:operand selectorName:@"stringByAppendingString:" arguments:subexpressions];
+            return [NSExpression expressionForFunction:@"mgl_join" arguments:subexpressions];
         }  else if ([op isEqualToString:@"at"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *index = subexpressions.firstObject;
