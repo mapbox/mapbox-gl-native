@@ -12,6 +12,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Toast;
 
+import com.mapbox.android.telemetry.TelemetryEnabler;
 import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.attribution.Attribution;
 import com.mapbox.mapboxsdk.attribution.AttributionParser;
@@ -98,6 +99,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
       @Override
       public void onClick(DialogInterface dialog, int which) {
+        TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
         Events.obtainTelemetry().enable();
         dialog.cancel();
       }
@@ -113,6 +115,7 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
       @Override
       public void onClick(DialogInterface dialog, int which) {
         Events.obtainTelemetry().disable();
+        TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
         dialog.cancel();
       }
     });
