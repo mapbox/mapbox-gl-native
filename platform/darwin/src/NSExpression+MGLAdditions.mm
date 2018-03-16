@@ -26,7 +26,7 @@ NSString *MGLJoinComponents(Class self, SEL _cmd, NSArray<NSString *> *component
 /**
  Adds to NSExpression’s built-in repertoire of functions.
  */
-void MGLEndowExpressionsWithCustomFunctions() {
+void MGLInstallAftermarketExpressionFunctions() {
     // NSExpression’s built-in functions are backed by class methods on a
     // private class, so use a function expression to get at the class.
     // http://funwithobjc.tumblr.com/post/2922267976/using-custom-functions-with-nsexpression
@@ -41,13 +41,13 @@ void MGLEndowExpressionsWithCustomFunctions() {
 #pragma clang pop
 }
 
-@interface MGLExpressionEndowmentLoader: NSObject
+@interface MGLAftermarketExpressionInstaller: NSObject
 @end
 
-@implementation MGLExpressionEndowmentLoader
+@implementation MGLAftermarketExpressionInstaller
 
 + (void)load {
-    MGLEndowExpressionsWithCustomFunctions();
+    MGLInstallAftermarketExpressionFunctions();
 }
 
 @end
@@ -454,7 +454,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForConstantValue:@(M_PI)];
         } else if ([op isEqualToString:@"concat"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            return [NSExpression expressionForFunction:@"mgl_join" arguments:subexpressions];
+            NSExpression *subexpression = [NSExpression expressionForAggregate:subexpressions];
+            return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];
         }  else if ([op isEqualToString:@"at"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *index = subexpressions.firstObject;
@@ -710,6 +711,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"floor:"]) {
                 return [NSExpression expressionWithFormat:@"trunc:(%@) - TERNARY(modulus:by:(%@, 1) < 0, 1, 0)",
                         self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
+            } else if ([function isEqualToString:@"mgl_join:"]) {
+                NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                return [@[@"concat"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];

@@ -510,13 +510,13 @@ using namespace std::string_literals;
     NSArray *arguments = @[MGLConstantExpression(@"MacDonald")];
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION('Old', 'stringByAppendingString:', 'MacDonald')"];
-        NSExpression *customExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'McDonald'})"];
+        NSExpression *aftermarketExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'MacDonald'})"];
         NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        XCTAssertEqualObjects(customExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
-        XCTAssertEqualObjects([customExpression expressionValueWithObject:nil context:nil], @"OldMacDonald");
-        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], customExpression);
+        XCTAssertEqualObjects([aftermarketExpression expressionValueWithObject:nil context:nil], @"OldMacDonald");
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], aftermarketExpression);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];
