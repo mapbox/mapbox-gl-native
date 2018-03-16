@@ -796,6 +796,8 @@ final class MapGestureDetector {
       transform.cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(REASON_API_GESTURE);
 
+      sendTelemetryEvent(Events.TWO_FINGER_TAP, detector.getFocalPoint());
+
       PointF zoomFocalPoint;
       // Single finger double tap
       if (focalPoint != null) {
