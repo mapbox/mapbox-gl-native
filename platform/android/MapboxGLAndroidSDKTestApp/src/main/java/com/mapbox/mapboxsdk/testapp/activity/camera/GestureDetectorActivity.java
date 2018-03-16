@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.annotation.IntDef;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -39,6 +40,9 @@ import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
+/**
+ * Test activity showcasing APIs around gestures implementation.
+ */
 public class GestureDetectorActivity extends AppCompatActivity {
 
   private static final int MAX_NUMBER_OF_ALERTS = 30;
@@ -50,8 +54,10 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
   private AndroidGesturesManager gesturesManager;
 
-  private Marker marker = null;
-  private LatLng focalPointLatLng = null;
+  @Nullable
+  private Marker marker;
+  @Nullable
+  private LatLng focalPointLatLng;
   private boolean animationsEnabled = true;
 
   @Override
