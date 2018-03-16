@@ -716,7 +716,16 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     id base = [self.arguments[1] mgl_jsonExpressionObject];
                     [interpolationArray addObject:base];
                 } else if ([curveType isEqualToString:@"cubic-bezier"]) {
-                    NSArray *controlPoints = [self.arguments[1].collection mgl_jsonExpressionObject];
+                    NSMutableArray *controlPoints = [NSMutableArray array];
+                    
+                    if (self.arguments[1].expressionType == NSAggregateExpressionType) {
+                        controlPoints = [self.arguments[1].collection mgl_jsonExpressionObject];
+                    } else {
+                        for (id expression in self.arguments[1].constantValue) {
+                            [controlPoints addObject:[expression mgl_jsonExpressionObject]];
+                        }
+                    }
+                    
                     [interpolationArray addObjectsFromArray:controlPoints];
                 }
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, self.operand.mgl_jsonExpressionObject, nil];
