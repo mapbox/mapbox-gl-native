@@ -20,8 +20,7 @@ public class Events {
     telemetry = new MapboxTelemetry(Mapbox.getApplicationContext(), Mapbox.getAccessToken(),
       BuildConfig.MAPBOX_EVENTS_USER_AGENT);
     TelemetryEnabler.State telemetryState = TelemetryEnabler.retrieveTelemetryStateFromPreferences();
-    if (TelemetryEnabler.State.NOT_INITIALIZED.equals(telemetryState)
-      || TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
+    if (TelemetryEnabler.State.ENABLED.equals(telemetryState)) {
       telemetry.enable();
     }
   }
