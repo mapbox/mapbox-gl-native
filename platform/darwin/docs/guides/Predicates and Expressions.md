@@ -123,9 +123,7 @@ style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
 
 ## Using expressions to configure layout and paint attributes
 
-### Functions
-
-#### Key paths
+### Key paths
 
 A key path expression refers to an attribute of the `MGLFeature` object being
 evaluated for display. For example, if a polygon’s `MGLFeature.attributes`
@@ -133,7 +131,7 @@ dictionary contains the `floorCount` key, then the key path `floorCount` refers
 to the value of the `floorCount` attribute when evaluating that particular
 polygon.
 
-#### Predefined functions
+### Predefined functions
 
 Of the
 [functions predefined by the `+[NSExpression expressionForFunction:arguments:]` method](https://developer.apple.com/documentation/foundation/nsexpression/1413747-init#discussion),
@@ -182,7 +180,7 @@ Initializer parameter | Format string syntax
 `onesComplement:`     | `onesComplement(255)`
 `distanceToLocation:fromLocation:` | `distanceToLocation:fromLocation:(there, here)`
 
-#### Mapbox-specific functions
+### Mapbox-specific functions
 
 For compatibility with the Mapbox Style Specification, the following functions
 are defined by this SDK for use with style layers. Because these functions are
