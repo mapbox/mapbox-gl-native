@@ -237,7 +237,61 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssert(self.mapView.selectedAnnotations.count == 0, @"There should be 0 selected annotations");
 }
 
+- (void)testAddAnnotationWithBoundaryCoordinates
+{
+    typedef struct {
+        CLLocationDegrees lat;
+        CLLocationDegrees lon;
+        BOOL expectation;
+    } TestParam;
+
+    TestParam params[] = {
+        //          Lat     Lon     Valid
+        {   -91.0,  0.0,    NO},
+        {   -90.0,  0.0,    YES}, // THIS ONE CURRENTLY FAILS
+        {   90.0,   0.0,    YES},
+        {   91.0,   0.0,    NO},
+
+        {   0.0,    -181.0, NO},
+        {   0.0,    -180.0, YES},
+        {   0.0,    180.0,  YES},
+        {   0.0,    181.0,  NO},
+    };
+
+    for (int i = 0; i < sizeof(params)/sizeof(params[0]); i++) {
+        TestParam param = params[i];
+
+        // Essentially a deconstructed -[MGLMapView convertCoordinate:toPointToView]
+        CLLocationCoordinate2D coordinate = CLLocationCoordinate2DMake(param.lat, param.lon);
+        NSString *coordDesc = [NSString stringWithFormat:@"(%0.1f,%0.1f)", param.lat, param.lon];
+
+        XCTAssert(CLLocationCoordinate2DIsValid(coordinate) == param.expectation, @"Unexpected valid result for coordinate %@", coordDesc);
+
+        CGPoint point = [_mapView convertCoordinate:coordinate toPointToView:_mapView];
+        (void)point;
+        XCTAssert(isnan(point.x) != param.expectation, @"Unexpected point.x for coordinate %@", coordDesc);
+        XCTAssert(isnan(point.y) != param.expectation, @"Unexpected point.y for coordinate %@", coordDesc);
+
+        if (param.expectation) {
+            // If we expect a valid coordinate, let's finally try to add an annotation
+
+            // The above method is called by the following, which will trigger CALayer to raise an
+            // exception
+            MGLTestAnnotation *annotation = [[MGLTestAnnotation alloc] init];
+            annotation.coordinate = coordinate;
+
+            @try {
+                [_mapView addAnnotation:annotation];
+            }
+            @catch (NSException *e) {
+                XCTFail("addAnnotation triggered exception: %@ for coordinate %@", e, coordDesc);
+            }
+        }
+    }
+}
+
 #pragma mark - MGLMapViewDelegate -
+
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
