@@ -183,10 +183,18 @@ Initializer parameter | Format string syntax
 ### Mapbox-specific functions
 
 For compatibility with the Mapbox Style Specification, the following functions
-are defined by this SDK for use with style layers. Because these functions are
-not predefined by `NSExpression`, you must use the
+are defined by this SDK. When setting a style layer property, you can call these
+functions just like the predefined functions above, using either the
+`+[NSExpression expressionForFunction:arguments:]` method or a convenient format
+string syntax:
+
+Initializer parameter | Format string syntax | Arguments | Returns
+----------------------|----------------------|-----------|--------
+`mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | An aggregate expression or `NSArray` constant value expression containing one or more `NSExpression`s, each evaluating to a string. | An `NSString` object (the result of concatenating together all the elements of an array in order).
+
+The following custom functions are also available with the
 `+[NSExpression expressionForFunction:selectorName:arguments:]` method or the
-`FUNCTION()` format string syntax instead. 
+`FUNCTION()` format string syntax:
 
 <table>
 <thead>
@@ -307,18 +315,6 @@ not predefined by `NSExpression`, you must use the
       The output value of the stop whose key is just less than the evaluated
       target, or the minimum value if the target is less than the least of the
       stops’ keys.
-   </td>
-</tr>
-<tr>
-   <td><code>stringByAppendingString:</code></td>
-   <td>
-      An `NSExpression` that evaluates to a string.
-   </td>
-   <td>
-      One or more `NSExpression`s, each evaluating to a string.
-   </td>
-   <td>
-      The target string with each of the argument strings appended in order.
    </td>
 </tr>
 <tr>
