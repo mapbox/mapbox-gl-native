@@ -248,8 +248,24 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     TestParam params[] = {
         //          Lat     Lon     Valid
         {   -91.0,  0.0,    NO},
-        {   -90.0,  0.0,    YES}, // THIS ONE CURRENTLY FAILS
-        {   90.0,   0.0,    YES},
+
+        // The follow coordinate fails, essentially because the following in projection.hpp
+        //
+        //      util::LONGITUDE_MAX - util::RAD2DEG * std::log(std::tan(M_PI / 4 + latLng.latitude() * M_PI / util::DEGREES_MAX))
+        //
+        // boils down to ln(0)
+        //
+        // It makes sense that -90° latitude (south pole) should be invalid from a projection point
+        // of view, but in that case shouldn't +90° (north pole) also be invalid?
+        //
+        // In Obj-C code, perhaps we need to replace usage of CLLocationCoordinate2DIsValid for an
+        // MGL one...
+
+        {   -90.0,  0.0,    YES}, // South pole. Should this really be considered an invalid coordinate?
+
+        // The rest for completeness
+        {   -89.0,  0.0,    YES},
+        {   90.0,   0.0,    YES}, // North pole. Similarly, should this one be considered invalid?
         {   91.0,   0.0,    NO},
 
         {   0.0,    -181.0, NO},
