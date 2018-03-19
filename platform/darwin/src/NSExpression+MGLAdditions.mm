@@ -510,7 +510,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:operand
                                           selectorName:@"mgl_matchWithOptions:default:"
                                              arguments:@[optionsExpression, defaultOption]];
-        } else {
+        } else if ([op isEqualToString:@"coalesce"]) {
+            NSMutableArray *expressions = [NSMutableArray array];
+            for (id operand in argumentObjects) {
+                [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
+            }
+            
+            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'coalesce:')", expressions];
+        }else {
             [NSException raise:NSInvalidArgumentException
                         format:@"Expression operator %@ not yet implemented.", op];
         }
@@ -536,7 +543,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"ln:": @"ln",
             @"raise:toPower:": @"^",
             @"uppercase:": @"upcase",
-            @"lowercase:": @"downcase",
+            @"lowercase:": @"downcase"
         };
     });
     
@@ -726,6 +733,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 
                 [expressionObject addObject:[self.arguments[1] mgl_jsonExpressionObject]];
+                return expressionObject;
+            } else if ([function isEqualToString:@"coalesce:"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
+                
+                for (NSExpression *expression in self.operand.constantValue) {
+                    [expressionObject addObject:[expression mgl_jsonExpressionObject]];
+                }
+                
                 return expressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
