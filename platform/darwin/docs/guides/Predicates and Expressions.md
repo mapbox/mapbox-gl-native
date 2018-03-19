@@ -162,6 +162,7 @@ Initializer parameter | Format string syntax
 `lowercase:`          | `lowercase('DOWNTOWN')`
 `noindex:`            | `noindex(0 + 2 + c)`
 `length:`             | `length('Wapakoneta')`
+`castObject:toType:`  | `CAST(ele, 'NSString')`<br>`CAST(ele, 'NSNumber')`
 
 The following predefined functions are not supported:
 

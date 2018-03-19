@@ -421,12 +421,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
         } else if ([op isEqualToString:@"to-number"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            if (argumentObjects.count == 1) {
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'NSNumber')", operand];
+            }
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             return [NSExpression expressionForFunction:operand selectorName:@"mgl_numberWithFallbackValues:" arguments:subexpressions];
         } else if ([op isEqualToString:@"to-string"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
-            return [NSExpression expressionForFunction:operand selectorName:@"stringValue" arguments:@[]];
+            return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
@@ -820,6 +823,16 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 
                 return expressionObject;
+            } else if ([function isEqualToString:@"castObject:toType:"]) {
+                id object = self.arguments.firstObject.mgl_jsonExpressionObject;
+                NSString *type = self.arguments[1].mgl_jsonExpressionObject;
+                if ([type isEqualToString:@"NSString"]) {
+                    return @[@"to-string", object];
+                } else if ([type isEqualToString:@"NSNumber"]) {
+                    return @[@"to-number", object];
+                }
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Casting expression to %@ not yet implemented.", type];
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||
