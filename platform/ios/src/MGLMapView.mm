@@ -1476,10 +1476,12 @@ public:
         double zoom = log2(newScale);
         MGLMapCamera *toCamera = [self cameraByZoomingToZoomLevel:zoom aroundAnchorPoint:centerPoint];
 
-        if ([self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
+        if ( ! [self _shouldChangeFromCamera:oldCamera toCamera:toCamera])
         {
             drift = NO;
-        } else {
+        }
+        else
+        {
             if (drift)
             {
                 _mbglMap->setZoom(zoom, mbgl::ScreenCoordinate { centerPoint.x, centerPoint.y }, MGLDurationFromTimeInterval(duration));
@@ -1730,7 +1732,9 @@ public:
              {
                  [weakSelf unrotateIfNeededForGesture];
              }];
-        } else {
+        }
+        else
+        {
             [self unrotateIfNeededForGesture];
         }
     }
@@ -4148,51 +4152,48 @@ public:
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
     if (nearbyAnnotations.size())
     {
-        // The annotation tags need to be stable in order to compare them with
-        // the remembered tags.
-        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
-
+        // The first selection in the cycle should be the one nearest to the
+        // tap. Also the annotation tags need to be stable in order to compare them with
+        // the remembered tags _annotationsNearbyLastTap.
+        CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+            CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+            CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+            CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                             coordinateA.longitude - currentCoordinate.longitude);
+            CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                             coordinateB.longitude - currentCoordinate.longitude);
+            return deltaA < deltaB;
+        });
+        
         if (nearbyAnnotations == _annotationsNearbyLastTap)
         {
-            // The first selection in the cycle should be the one nearest to the
-            // tap.
-            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
-            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
-                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
-                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
-                CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
-                                                 coordinateA.longitude - currentCoordinate.longitude);
-                CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
-                                                 coordinateB.longitude - currentCoordinate.longitude);
-                return deltaA < deltaB;
-            });
-
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
             if (_selectedAnnotationTag == MGLAnnotationTagNotFound
-                || _selectedAnnotationTag == _annotationsNearbyLastTap.back())
+                || _selectedAnnotationTag == nearbyAnnotations.back())
             {
                 // Either no annotation is selected or the last annotation in
                 // the set was selected. Wrap around to the first annotation in
                 // the set.
-                hitAnnotationTag = _annotationsNearbyLastTap.front();
+                hitAnnotationTag = nearbyAnnotations.front();
             }
             else
             {
-                auto result = std::find(_annotationsNearbyLastTap.begin(),
-                                        _annotationsNearbyLastTap.end(),
+                auto result = std::find(nearbyAnnotations.begin(),
+                                        nearbyAnnotations.end(),
                                         _selectedAnnotationTag);
-                if (result == _annotationsNearbyLastTap.end())
+                if (result == nearbyAnnotations.end())
                 {
                     // An annotation from this set hasn’t been selected before.
                     // Select the first (nearest) one.
-                    hitAnnotationTag = _annotationsNearbyLastTap.front();
+                    hitAnnotationTag = nearbyAnnotations.front();
                 }
                 else
                 {
                     // Step to the next annotation in the set.
-                    auto distance = std::distance(_annotationsNearbyLastTap.begin(), result);
-                    hitAnnotationTag = _annotationsNearbyLastTap[distance + 1];
+                    auto distance = std::distance(nearbyAnnotations.begin(), result);
+                    hitAnnotationTag = nearbyAnnotations[distance + 1];
                 }
             }
         }
@@ -4204,7 +4205,7 @@ public:
             {
                 _annotationsNearbyLastTap = nearbyAnnotations;
             }
-
+            
             // Choose the first nearby annotation.
             if (nearbyAnnotations.size())
             {

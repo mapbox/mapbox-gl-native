@@ -187,7 +187,7 @@ public class GeoJsonSource extends Source {
    *
    * @param geometry the GeoJSON {@link Geometry} to set
    */
-  public void setGeoJson(Geometry<?> geometry) {
+  public void setGeoJson(Geometry geometry) {
     nativeSetGeometry(geometry);
   }
 
@@ -259,7 +259,7 @@ public class GeoJsonSource extends Source {
 
   private native void nativeSetFeature(Feature feature);
 
-  private native void nativeSetGeometry(Geometry<?> geometry);
+  private native void nativeSetGeometry(Geometry geometry);
 
   private native Feature[] querySourceFeatures(Object[] filter);
 

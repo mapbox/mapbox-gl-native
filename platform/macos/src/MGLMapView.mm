@@ -2099,44 +2099,41 @@ public:
 
     MGLAnnotationTag hitAnnotationTag = MGLAnnotationTagNotFound;
     if (nearbyAnnotations.size()) {
-        // The annotation tags need to be stable in order to compare them with
-        // the remembered tags.
-        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end());
-
+        // The first selection in the cycle should be the one nearest to the
+        // tap. Also the annotation tags need to be stable in order to compare them with
+        // the remembered tags _annotationsNearbyLastClick.
+        CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
+        std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
+            CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
+            CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
+            CLLocationDegrees deltaA = hypot(coordinateA.latitude - currentCoordinate.latitude,
+                                             coordinateA.longitude - currentCoordinate.longitude);
+            CLLocationDegrees deltaB = hypot(coordinateB.latitude - currentCoordinate.latitude,
+                                             coordinateB.longitude - currentCoordinate.longitude);
+            return deltaA < deltaB;
+        });
+        
         if (nearbyAnnotations == _annotationsNearbyLastClick) {
-            // The first selection in the cycle should be the one nearest to the
-            // click.
-            CLLocationCoordinate2D currentCoordinate = [self convertPoint:point toCoordinateFromView:self];
-            std::sort(nearbyAnnotations.begin(), nearbyAnnotations.end(), [&](const MGLAnnotationTag tagA, const MGLAnnotationTag tagB) {
-                CLLocationCoordinate2D coordinateA = [[self annotationWithTag:tagA] coordinate];
-                CLLocationCoordinate2D coordinateB = [[self annotationWithTag:tagB] coordinate];
-                CLLocationDegrees distanceA = hypot(coordinateA.latitude - currentCoordinate.latitude,
-                                                    coordinateA.longitude - currentCoordinate.longitude);
-                CLLocationDegrees distanceB = hypot(coordinateB.latitude - currentCoordinate.latitude,
-                                                    coordinateB.longitude - currentCoordinate.longitude);
-                return distanceA < distanceB;
-            });
-
             // The last time we persisted a set of annotations, we had the same
             // set of annotations as we do now. Cycle through them.
             if (_lastSelectedAnnotationTag == MGLAnnotationTagNotFound
-                || _lastSelectedAnnotationTag == _annotationsNearbyLastClick.back()) {
+                || _lastSelectedAnnotationTag == nearbyAnnotations.back()) {
                 // Either no annotation is selected or the last annotation in
                 // the set was selected. Wrap around to the first annotation in
                 // the set.
-                hitAnnotationTag = _annotationsNearbyLastClick.front();
+                hitAnnotationTag = nearbyAnnotations.front();
             } else {
-                auto result = std::find(_annotationsNearbyLastClick.begin(),
-                                        _annotationsNearbyLastClick.end(),
+                auto result = std::find(nearbyAnnotations.begin(),
+                                        nearbyAnnotations.end(),
                                         _lastSelectedAnnotationTag);
-                if (result == _annotationsNearbyLastClick.end()) {
+                if (result == nearbyAnnotations.end()) {
                     // An annotation from this set hasn’t been selected before.
                     // Select the first (nearest) one.
-                    hitAnnotationTag = _annotationsNearbyLastClick.front();
+                    hitAnnotationTag = nearbyAnnotations.front();
                 } else {
                     // Step to the next annotation in the set.
-                    auto distance = std::distance(_annotationsNearbyLastClick.begin(), result);
-                    hitAnnotationTag = _annotationsNearbyLastClick[distance + 1];
+                    auto distance = std::distance(nearbyAnnotations.begin(), result);
+                    hitAnnotationTag = nearbyAnnotations[distance + 1];
                 }
             }
         } else {
