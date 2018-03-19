@@ -578,15 +578,28 @@ using namespace std::string_literals;
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 - 1, 'mgl_matchWithOptions:default:', %@, 'default')", options];
         NSArray *jsonExpression =  @[@"match", @[@"-", @2, @1], @1, @"one", @0, @"zero", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        XCTAssertEqualObjects( [NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSArray *options = @[@{@1 : MGLConstantExpression(@"one")}];
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 * 1, 'mgl_matchWithOptions:default:', %@, 'default')", options];
         NSArray *jsonExpression =  @[@"match", @[@"*", @2, @1], @1, @"one", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
-        XCTAssertEqualObjects( [NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
+}
+
+- (void)testCoalesceExpressionObject {
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'coalesce:')", @[[NSExpression expressionForKeyPath:@"x"],
+                                                                                                     [NSExpression expressionForKeyPath:@"y"],
+                                                                                                     [NSExpression expressionForKeyPath:@"z"],
+                                                                                                     [NSExpression expressionForConstantValue:@0]]];
+        NSArray *jsonExpression = @[@"coalesce", @[@"get", @"x"], @[@"get", @"y"], @[@"get", @"z"], @0];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    
 }
 
 - (void)testConditionalExpressionObject {
