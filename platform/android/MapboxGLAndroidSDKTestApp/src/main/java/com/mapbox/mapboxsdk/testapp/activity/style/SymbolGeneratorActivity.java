@@ -21,7 +21,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -38,6 +37,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.downcase;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
@@ -121,8 +121,8 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       return true;
     } else if (item.getItemId() == R.id.menu_action_filter) {
       SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
-      layer.setFilter(Filter.eq(FEATURE_RANK, 1));
-      //layer.setFilter(eq(get(FEATURE_RANK), 1));
+      layer.setFilter(eq(get(FEATURE_RANK), literal(1)));
+      Timber.e("Filter that was set: %s", layer.getFilter());
       return true;
     }
     return super.onOptionsItemSelected(item);

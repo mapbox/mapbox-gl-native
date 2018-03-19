@@ -40,7 +40,7 @@ import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.style.layers.Filter;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -2079,13 +2079,13 @@ public final class MapboxMap {
    * Queries the map for rendered features
    *
    * @param coordinates the point to query
-   * @param filter      filters the returned features
+   * @param filter      filters the returned features with an expression
    * @param layerIds    optionally - only query these layers
    * @return the list of feature
    */
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
-                                             @Nullable Filter.Statement filter,
+                                             @Nullable Expression filter,
                                              @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
   }
@@ -2107,13 +2107,13 @@ public final class MapboxMap {
    * Queries the map for rendered features
    *
    * @param coordinates the box to query
-   * @param filter      filters the returned features
+   * @param filter      filters the returned features with an expression
    * @param layerIds    optionally - only query these layers
    * @return the list of feature
    */
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
-                                             @Nullable Filter.Statement filter,
+                                             @Nullable Expression filter,
                                              @Nullable String... layerIds) {
     return nativeMapView.queryRenderedFeatures(coordinates, layerIds, filter);
   }

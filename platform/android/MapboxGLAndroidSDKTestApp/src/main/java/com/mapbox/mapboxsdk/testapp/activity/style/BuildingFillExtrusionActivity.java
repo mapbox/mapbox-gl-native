@@ -16,7 +16,9 @@ import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.light.Position;
 import com.mapbox.mapboxsdk.testapp.R;
 
-import static com.mapbox.mapboxsdk.style.layers.Filter.eq;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionBase;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillExtrusionHeight;
@@ -52,7 +54,7 @@ public class BuildingFillExtrusionActivity extends AppCompatActivity {
   private void setupBuildings() {
     FillExtrusionLayer fillExtrusionLayer = new FillExtrusionLayer("3d-buildings", "composite");
     fillExtrusionLayer.setSourceLayer("building");
-    fillExtrusionLayer.setFilter(eq("extrude", "true"));
+    fillExtrusionLayer.setFilter(eq(get("extrude"), literal("true")));
     fillExtrusionLayer.setMinZoom(15);
     fillExtrusionLayer.setProperties(
       fillExtrusionColor(Color.LTGRAY),

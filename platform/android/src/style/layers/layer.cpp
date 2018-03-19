@@ -25,6 +25,8 @@
 
 // C++ -> Java conversion
 #include "../conversion/property_value.hpp"
+#include <mbgl/style/filter.hpp>
+#include "../conversion/gson.hpp"
 
 #include <string>
 
@@ -134,6 +136,39 @@ namespace android {
         layer.accept(SetFilterEvaluator {std::move(*converted)});
     }
 
+    struct GetFilterEvaluator {
+        mbgl::style::Filter noop(std::string layerType) {
+            Log::Warning(mbgl::Event::JNI, "%s doesn't support filter", layerType.c_str());
+            return {};
+        }
+
+        mbgl::style::Filter operator()(style::BackgroundLayer&) { return noop("BackgroundLayer"); }
+        mbgl::style::Filter operator()(style::CustomLayer&) { return noop("CustomLayer"); }
+        mbgl::style::Filter operator()(style::RasterLayer&) { return noop("RasterLayer"); }
+        mbgl::style::Filter operator()(style::HillshadeLayer&) { return noop("HillshadeLayer"); }
+
+        template <class LayerType>
+            mbgl::style::Filter operator()(LayerType& layer) {
+            return layer.getFilter();
+        }
+    };
+
+    jni::Object<gson::JsonArray> Layer::getFilter(jni::JNIEnv& env) {
+        using namespace mbgl::style;
+        using namespace mbgl::style::conversion;
+
+        Filter filter = layer.accept(GetFilterEvaluator());
+
+        jni::jobject* converted = nullptr;
+        if (filter.is<ExpressionFilter>()) {
+            ExpressionFilter filterExpression = filter.get<ExpressionFilter>();
+            mbgl::Value expressionValue = filterExpression.expression.get()->serialize();
+            conversion::JsonEvaluator jsonEvaluator{env};
+            converted = apply_visitor(jsonEvaluator, expressionValue);
+        }
+        return jni::Object<gson::JsonArray>(converted);
+    }
+
     struct SetSourceLayerEvaluator {
         std::string sourceLayer;
 
@@ -208,6 +243,7 @@ namespace android {
             METHOD(&Layer::setLayoutProperty, "nativeSetLayoutProperty"),
             METHOD(&Layer::setPaintProperty, "nativeSetPaintProperty"),
             METHOD(&Layer::setFilter, "nativeSetFilter"),
+            METHOD(&Layer::getFilter, "nativeGetFilter"),
             METHOD(&Layer::setSourceLayer, "nativeSetSourceLayer"),
             METHOD(&Layer::getSourceLayer, "nativeGetSourceLayer"),
             METHOD(&Layer::getMinZoom, "nativeGetMinZoom"),

@@ -86,6 +86,26 @@ public class CircleLayerTest extends BaseActivityTest {
   }
 
   @Test
+  public void testFilter() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("Filter");
+    invoke(mapboxMap, (uiController, mapboxMap1) -> {
+      assertNotNull(layer);
+
+      // Get initial
+      assertEquals(layer.getFilter(), null);
+
+      // Set
+      Expression filter = eq(get("undefined"), literal(1.0));
+      layer.setFilter(filter);
+      assertEquals(layer.getFilter().toString(), filter.toString());
+    });
+  }
+
+
+
+  @Test
   public void testCircleRadiusTransition() {
     validateTestSetup();
     setupLayer();

@@ -24,8 +24,8 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
-import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
@@ -799,7 +799,7 @@ final class NativeMapView {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
-                                             @Nullable Filter.Statement filter) {
+                                             @Nullable Expression filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
@@ -811,7 +811,7 @@ final class NativeMapView {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
                                              @Nullable String[] layerIds,
-                                             @Nullable Filter.Statement filter) {
+                                             @Nullable Expression filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
