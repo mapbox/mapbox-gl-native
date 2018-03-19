@@ -153,7 +153,7 @@ namespace android {
         }
     };
 
-    jni::Object<jni::ObjectTag> Layer::getFilter(jni::JNIEnv& env) {
+    jni::Object<gson::JsonArray> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
@@ -166,7 +166,7 @@ namespace android {
             conversion::JsonEvaluator jsonEvaluator{env};
             converted = apply_visitor(jsonEvaluator, expressionValue);
         }
-        return jni::Object<jni::ObjectTag>(converted);
+        return jni::Object<gson::JsonArray>(converted);
     }
 
     struct SetSourceLayerEvaluator {

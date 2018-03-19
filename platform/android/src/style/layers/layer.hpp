@@ -3,7 +3,7 @@
 #include <mbgl/util/noncopyable.hpp>
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/layer.hpp>
-
+#include "../../gson/json_array.hpp"
 #include "../value.hpp"
 
 #include <jni/jni.hpp>
@@ -68,7 +68,7 @@ public:
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 
-    jni::Object<jni::ObjectTag> getFilter(jni::JNIEnv&);
+    jni::Object<gson::JsonArray> getFilter(jni::JNIEnv&);
 
     void setSourceLayer(jni::JNIEnv&, jni::String);
 

@@ -99,9 +99,9 @@ public class FillExtrusionLayer extends Layer {
   @Nullable
   public Expression getFilter() {
     Expression expression = null;
-    Object object = nativeGetFilter();
-    if (object != null && object instanceof JsonArray) {
-      expression = Expression.Converter.convert((JsonArray) object);
+    JsonArray array = nativeGetFilter();
+    if (array != null) {
+      expression = Expression.Converter.convert(array);
     }
     return expression;
   }
