@@ -161,6 +161,7 @@ Initializer parameter | Format string syntax
 `uppercase:`          | `uppercase('Elysian Fields')`
 `lowercase:`          | `lowercase('DOWNTOWN')`
 `noindex:`            | `noindex(0 + 2 + c)`
+`length:`             | `length('Wapakoneta')`
 
 The following predefined functions are not supported:
 

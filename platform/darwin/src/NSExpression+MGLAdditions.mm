@@ -439,7 +439,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForKeyPath:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"length"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            return [NSExpression expressionForFunction:@"count:" arguments:@[subexpressions.firstObject]];
+            NSString *function = @"count:";
+            if ([subexpressions.firstObject expressionType] == NSConstantValueExpressionType
+                && [[subexpressions.firstObject constantValue] isKindOfClass:[NSString class]]) {
+                function = @"length:";
+            }
+            return [NSExpression expressionForFunction:function arguments:@[subexpressions.firstObject]];
         } else if ([op isEqualToString:@"min"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *subexpression = [NSExpression expressionForAggregate:subexpressions];
@@ -599,6 +604,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"raise:toPower:": @"^",
             @"uppercase:": @"upcase",
             @"lowercase:": @"downcase",
+            @"length:": @"length",
         };
     });
     

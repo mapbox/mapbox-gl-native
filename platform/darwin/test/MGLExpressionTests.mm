@@ -530,6 +530,12 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"length:" arguments:arguments];
+        NSArray *jsonExpression = @[@"length", @"MacDonald"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testTypeConversionExpressionObject {
