@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
 
 import com.mapbox.android.gestures.AndroidGesturesManager;
+import com.mapbox.android.gestures.Constants;
 import com.mapbox.android.gestures.MoveGestureDetector;
 import com.mapbox.android.gestures.MultiFingerTapGestureDetector;
 import com.mapbox.android.gestures.RotateGestureDetector;
@@ -77,13 +78,6 @@ final class MapGestureDetector {
   private final CopyOnWriteArrayList<MapboxMap.OnShoveListener> onShoveListenerList
     = new CopyOnWriteArrayList<>();
 
-  private StandardGestureListener standardGestureListener;
-  private MoveGestureListener moveGestureListener;
-  private ScaleGestureListener scaleGestureListener;
-  private RotateGestureListener rotateGestureListener;
-  private ShoveGestureListener shoveGestureListener;
-  private TapGestureListener tapGestureListener;
-
   /**
    * User-set focal point.
    */
@@ -112,29 +106,39 @@ final class MapGestureDetector {
 
     // Checking for context != null for testing purposes
     if (context != null) {
-      // Initialize gesture listeners
-      initializeGestureListeners(context);
-
       // Initialize gestures manager
       AndroidGesturesManager androidGesturesManager = new AndroidGesturesManager(context);
-      initializeGesturesManager(androidGesturesManager, true, true);
+      initializeGesturesManager(androidGesturesManager, true);
+
+      // Initialize gesture listeners
+      initializeGestureListeners(context, true);
     }
   }
 
-  private void initializeGestureListeners(Context context) {
-    standardGestureListener = new StandardGestureListener();
-    moveGestureListener = new MoveGestureListener();
-    scaleGestureListener = new ScaleGestureListener(
-      context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity));
-    rotateGestureListener = new RotateGestureListener(
-      context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
-      context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity));
-    shoveGestureListener = new ShoveGestureListener();
-    tapGestureListener = new TapGestureListener();
+  private void initializeGestureListeners(Context context, boolean attachDefaultListeners) {
+    if (attachDefaultListeners) {
+      StandardGestureListener standardGestureListener = new StandardGestureListener();
+      MoveGestureListener moveGestureListener = new MoveGestureListener();
+      ScaleGestureListener scaleGestureListener = new ScaleGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_velocity));
+      RotateGestureListener rotateGestureListener = new RotateGestureListener(
+        context.getResources().getDimension(R.dimen.mapbox_minimum_scale_span_when_rotating),
+        context.getResources().getDimension(R.dimen.mapbox_minimum_angular_velocity),
+        context.getResources().getDimension(R.dimen.mapbox_defaultScaleSpanSinceStartThreshold));
+      ShoveGestureListener shoveGestureListener = new ShoveGestureListener();
+      TapGestureListener tapGestureListener = new TapGestureListener();
+
+      gesturesManager.setStandardGestureListener(standardGestureListener);
+      gesturesManager.setMoveGestureListener(moveGestureListener);
+      gesturesManager.setStandardScaleGestureListener(scaleGestureListener);
+      gesturesManager.setRotateGestureListener(rotateGestureListener);
+      gesturesManager.setShoveGestureListener(shoveGestureListener);
+      gesturesManager.setMultiFingerTapGestureListener(tapGestureListener);
+    }
   }
 
   private void initializeGesturesManager(AndroidGesturesManager androidGesturesManager,
-                                         boolean attachDefaultListeners, boolean setDefaultMutuallyExclusives) {
+                                         boolean setDefaultMutuallyExclusives) {
     if (setDefaultMutuallyExclusives) {
       Set<Integer> shoveScaleSet = new HashSet<>();
       shoveScaleSet.add(AndroidGesturesManager.GESTURE_TYPE_SHOVE);
@@ -149,15 +153,6 @@ final class MapGestureDetector {
       ScaleLongPressSet.add(AndroidGesturesManager.GESTURE_TYPE_LONG_PRESS);
 
       androidGesturesManager.setMutuallyExclusiveGestures(shoveScaleSet, shoveRotateSet, ScaleLongPressSet);
-    }
-
-    if (attachDefaultListeners) {
-      androidGesturesManager.setStandardGestureListener(standardGestureListener);
-      androidGesturesManager.setMoveGestureListener(moveGestureListener);
-      androidGesturesManager.setStandardScaleGestureListener(scaleGestureListener);
-      androidGesturesManager.setRotateGestureListener(rotateGestureListener);
-      androidGesturesManager.setShoveGestureListener(shoveGestureListener);
-      androidGesturesManager.setMultiFingerTapGestureListener(tapGestureListener);
     }
 
     gesturesManager = androidGesturesManager;
@@ -501,7 +496,7 @@ final class MapGestureDetector {
       if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
         // increase rotate angle threshold when scale is detected first
         gesturesManager.getRotateGestureDetector().setAngleThreshold(
-          gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+          Constants.DEFAULT_ROTATE_ANGLE_THRESHOLD
             + MapboxConstants.ROTATION_THRESHOLD_INCREASE_WHEN_SCALING
         );
       }
@@ -544,7 +539,7 @@ final class MapGestureDetector {
       if (uiSettings.isIncreaseRotateThresholdWhenScaling()) {
         // resetting default angle threshold
         gesturesManager.getRotateGestureDetector().setAngleThreshold(
-          gesturesManager.getRotateGestureDetector().getDefaultAngleThreshold()
+          Constants.DEFAULT_ROTATE_ANGLE_THRESHOLD
         );
       }
 
@@ -603,10 +598,13 @@ final class MapGestureDetector {
     private PointF rotateFocalPoint;
     private final float minimumScaleSpanWhenRotating;
     private final float minimumAngularVelocity;
+    private final float defaultSpanSinceStartThreshold;
 
-    RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity) {
+    public RotateGestureListener(float minimumScaleSpanWhenRotating, float minimumAngularVelocity,
+                                 float defaultSpanSinceStartThreshold) {
       this.minimumScaleSpanWhenRotating = minimumScaleSpanWhenRotating;
       this.minimumAngularVelocity = minimumAngularVelocity;
+      this.defaultSpanSinceStartThreshold = defaultSpanSinceStartThreshold;
     }
 
     @Override
@@ -660,8 +658,7 @@ final class MapGestureDetector {
 
       if (uiSettings.isIncreaseScaleThresholdWhenRotating()) {
         // resetting default scale threshold values
-        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(
-          gesturesManager.getStandardScaleGestureDetector().getDefaultSpanSinceStartThreshold());
+        gesturesManager.getStandardScaleGestureDetector().setSpanSinceStartThreshold(defaultSpanSinceStartThreshold);
       }
 
       notifyOnRotateEndListeners(detector);
@@ -1109,8 +1106,9 @@ final class MapGestureDetector {
     return gesturesManager;
   }
 
-  void setGesturesManager(AndroidGesturesManager gesturesManager, boolean attachDefaultListeners,
+  void setGesturesManager(Context context, AndroidGesturesManager gesturesManager, boolean attachDefaultListeners,
                           boolean setDefaultMutuallyExclusives) {
-    initializeGesturesManager(gesturesManager, attachDefaultListeners, setDefaultMutuallyExclusives);
+    initializeGesturesManager(gesturesManager, setDefaultMutuallyExclusives);
+    initializeGestureListeners(context, attachDefaultListeners);
   }
 }
