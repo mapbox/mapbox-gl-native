@@ -7,7 +7,6 @@
 #include "../../conversion/constant.hpp"
 #include "types.hpp"
 #include "function.hpp"
-#include "gson.hpp"
 
 namespace mbgl {
 namespace android {

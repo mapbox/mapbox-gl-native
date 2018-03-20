@@ -131,7 +131,6 @@ add_library(mbgl-android STATIC
     platform/android/src/conversion/constant.hpp
     platform/android/src/conversion/conversion.hpp
     platform/android/src/style/conversion/function.hpp
-    platform/android/src/style/conversion/gson.hpp
     platform/android/src/style/conversion/property_value.hpp
     platform/android/src/style/conversion/types.hpp
     platform/android/src/style/conversion/types_string_values.hpp
@@ -213,6 +212,8 @@ add_library(mbgl-android STATIC
     platform/android/src/map_renderer_runnable.hpp
 
     # Java core classes
+    platform/android/src/java/lang.cpp
+    platform/android/src/java/lang.hpp
     platform/android/src/java/util.cpp
     platform/android/src/java/util.hpp
 

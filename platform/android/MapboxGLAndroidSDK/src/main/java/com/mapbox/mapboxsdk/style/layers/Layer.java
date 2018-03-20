@@ -3,6 +3,7 @@ package com.mapbox.mapboxsdk.style.layers;
 import android.support.annotation.NonNull;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 /**
@@ -72,7 +73,7 @@ public abstract class Layer {
 
   protected native void nativeSetFilter(Object[] filter);
 
-  protected native JsonArray nativeGetFilter();
+  protected native JsonElement nativeGetFilter();
 
   protected native void nativeSetSourceLayer(String sourceLayer);
 

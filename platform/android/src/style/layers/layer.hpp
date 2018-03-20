@@ -5,6 +5,7 @@
 #include <mbgl/style/layer.hpp>
 #include "../../gson/json_array.hpp"
 #include "../value.hpp"
+#include "../../gson/json_element.hpp"
 
 #include <jni/jni.hpp>
 
@@ -68,7 +69,7 @@ public:
 
     void setFilter(jni::JNIEnv&, jni::Array<jni::Object<>>);
 
-    jni::Object<gson::JsonArray> getFilter(jni::JNIEnv&);
+    jni::Object<gson::JsonElement> getFilter(jni::JNIEnv&);
 
     void setSourceLayer(jni::JNIEnv&, jni::String);
 

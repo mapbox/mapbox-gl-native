@@ -6,6 +6,20 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
+jni::Object<JsonArray> JsonArray::New(jni::JNIEnv& env, std::vector<mapbox::geometry::value> values){
+    static auto constructor = JsonArray::javaClass.GetConstructor(env);
+    static auto addMethod = JsonArray::javaClass.GetMethod<void (jni::Object<JsonElement>)>(env, "add");
+
+    auto jsonArray = JsonArray::javaClass.New(env, constructor);
+
+    for (const auto &v : values) {
+        auto jsonElement = JsonElement::New(env, v);
+        jsonArray.Call(env, addMethod, jsonElement);
+    }
+
+    return jsonArray;
+}
+
 std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv &env, jni::Object<JsonArray> jsonArray) {
     std::vector<mapbox::geometry::value> values;
 
