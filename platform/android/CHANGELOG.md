@@ -2,6 +2,28 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0-beta.4 - March 20, 2018
+ - Gesture library 0.1.0 stable [#11483](https://github.com/mapbox/mapbox-gl-native/pull/11483)
+ - Filters with expressions [#11429](https://github.com/mapbox/mapbox-gl-native/pull/11429)
+ - Telemetry 3.0.0-beta.2 [#11474](https://github.com/mapbox/mapbox-gl-native/pull/11474)
+ - High level JNI conversion for geojson [#11471](https://github.com/mapbox/mapbox-gl-native/pull/11471)
+ - Update to MAS 3.0.0-beta.4 [#11468](https://github.com/mapbox/mapbox-gl-native/pull/11468)
+ - Support for expression literal on arrays [#11457](https://github.com/mapbox/mapbox-gl-native/pull/11457)
+ - Fix telemetry integration for two finger tap gesture [#11460](https://github.com/mapbox/mapbox-gl-native/pull/11460)
+ - Revisit proguard configuration [#11434](https://github.com/mapbox/mapbox-gl-native/pull/11434)
+ - Expressions accessor support [#11352](https://github.com/mapbox/mapbox-gl-native/pull/11352)
+ - Calculate camera's LatLng for bounds without map padding [#11410](https://github.com/mapbox/mapbox-gl-native/pull/11410)
+ - Check for null on http body request [#11413](https://github.com/mapbox/mapbox-gl-native/pull/11413)
+ - Expose more gesture settings [#11407](https://github.com/mapbox/mapbox-gl-native/pull/11407)
+ - Revert java 8 language support [#11398](https://github.com/mapbox/mapbox-gl-native/pull/11398)
+ - Update to MAS 3.0.0-beta.3 [#11373](https://github.com/mapbox/mapbox-gl-native/pull/11373)
+ - Rework match expression to style specification syntax [#11388](https://github.com/mapbox/mapbox-gl-native/pull/11388)
+ - Update javadoc configuration for Gradle 4.4 [#11384](https://github.com/mapbox/mapbox-gl-native/pull/11384)
+ - Rework zoomIn and zoomOut to use ValueAnimators [#11382](https://github.com/mapbox/mapbox-gl-native/pull/11382)
+ - Delete LocalRef when converting Image.java [#11350](https://github.com/mapbox/mapbox-gl-native/pull/11350)
+ - Use float for pixelratio when creating a snapshotter [#11367](https://github.com/mapbox/mapbox-gl-native/pull/11367) 
+ - Validate width/height when creating a snapshot [#11364](https://github.com/mapbox/mapbox-gl-native/pull/11364)
+  
 ## 6.0.0-beta.3 - March 2, 2018
  - Added missing local reference deletes [#11243](https://github.com/mapbox/mapbox-gl-native/pull/11243), [#11272](https://github.com/mapbox/mapbox-gl-native/pull/11272)
  - Remove obsolete camera api [#11201](https://github.com/mapbox/mapbox-gl-native/pull/11201)
