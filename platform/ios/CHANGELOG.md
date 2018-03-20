@@ -37,7 +37,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Improved performance of `MGLAnnotationView`-backed annotations that have `scalesWithViewingDistance` enabled. ([#10951](https://github.com/mapbox/mapbox-gl-native/pull/10951))
 * Fix an issue where a wrong annotation may selected if annotations were set close together. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
 * The `MGLMapView.selectedAnnotations` property (backed by `-[MGLMapView setSelectedAnnotations:]`) now selects annotations that are off-screen. ([#9790](https://github.com/mapbox/mapbox-gl-native/issues/9790))
-* The `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` now controls whether the annotation and its callout are brought on-screen. If `animated` is `NO` then the annotation is selected if offscreen, but the map is not panned. Currently only point annotations are supported. Setting the `MGLMapView.selectedAnnotations` property now animates (matching macOS). ([#3249](https://github.com/mapbox/mapbox-gl-native/issues/3249))
+* The `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` now controls whether the annotation and its callout are brought on-screen. If `animated` is `NO` then the annotation is selected if offscreen, but the map is not panned. Currently only point annotations are supported. Setting the `MGLMapView.selectedAnnotations` property now animates. ([#3249](https://github.com/mapbox/mapbox-gl-native/issues/3249))
 
 ### Map snapshots
 
