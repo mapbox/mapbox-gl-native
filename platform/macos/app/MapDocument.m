@@ -642,17 +642,23 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 
-- (id<MGLAnnotation>)randomOffscreenAnnotation {
-    NSArray *annotations = self.mapView.annotations;
+- (id<MGLAnnotation>)randomOffscreenPointAnnotation {
+
+    NSPredicate *pointAnnotationPredicate = [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[MGLPointAnnotation class]];
+    }];
+
+    NSArray *annotations = [self.mapView.annotations filteredArrayUsingPredicate:pointAnnotationPredicate];
+
 
     if (annotations.count == 0)
         return nil;
 
-    // NOTE: This occasionally returns nil - see
+    // NOTE: self.mapView.visibleAnnotations occasionally returns nil - see
     // https://github.com/mapbox/mapbox-gl-native/issues/11296
-    NSArray *visibleAnnotations = self.mapView.visibleAnnotations;
+    NSArray *visibleAnnotations = [self.mapView.visibleAnnotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
-    NSLog(@"Number of visible annotations = %ld", visibleAnnotations.count);
+    NSLog(@"Number of visible point annotations = %ld", visibleAnnotations.count);
 
     if (visibleAnnotations.count == annotations.count)
         return nil;
@@ -668,8 +674,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     return invisibleAnnotations[index];
 }
 
-- (IBAction)selectOffscreenAnnotation:(id)sender {
-    id<MGLAnnotation> annotation = [self randomOffscreenAnnotation];
+- (IBAction)selectOffscreenPointAnnotation:(id)sender {
+    id<MGLAnnotation> annotation = [self randomOffscreenPointAnnotation];
     if (annotation) {
         [self.mapView selectAnnotation:annotation];
 
@@ -1149,7 +1155,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     if (menuItem.action == @selector(insertGraticuleLayer:)) {
         return ![self.mapView.style sourceWithIdentifier:@"graticule"];
     }
-    if (menuItem.action == @selector(selectOffscreenAnnotation:)) {
+    if (menuItem.action == @selector(selectOffscreenPointAnnotation:)) {
         return YES;
     }
     if (menuItem.action == @selector(showAllAnnotations:) || menuItem.action == @selector(removeAllAnnotations:)) {

@@ -2223,10 +2223,10 @@ public:
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint
 {
-    [self selectAnnotation:annotation atPoint:gesturePoint animated:YES];
+    [self selectAnnotation:annotation atPoint:gesturePoint moveOnscreen:YES animateSelection:YES];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint animated:(BOOL)animated
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation atPoint:(NSPoint)gesturePoint moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection
 {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     if (annotation == selectedAnnotation) {
@@ -2242,12 +2242,14 @@ public:
         [self addAnnotation:annotation];
     }
 
-    BOOL checkOffscreenAnnotation = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animated];
+    if (moveOnscreen) {
+        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
+    }
 
     // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
 
-    if (!checkOffscreenAnnotation && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
+    if (!moveOnscreen && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
         positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
     }
 
@@ -2278,8 +2280,10 @@ public:
         [callout showRelativeToRect:positioningRect ofView:self preferredEdge:edge];
     }
 
-    if (checkOffscreenAnnotation)
+    if (moveOnscreen)
     {
+        moveOnscreen = NO;
+
         NSRect (^edgeInsetsInsetRect)(NSRect, NSEdgeInsets) = ^(NSRect rect, NSEdgeInsets insets) {
             return NSMakeRect(rect.origin.x + insets.left,
                               rect.origin.y + insets.top,
@@ -2294,36 +2298,34 @@ public:
         CGRect constrainedRect = edgeInsetsInsetRect(self.bounds, self.contentInsets);
         CGRect bounds          = constrainedRect;
 
-        BOOL moveOffscreenAnnotation = NO;
-
         // Any one of these cases should trigger a move onscreen
         if (CGRectGetMinX(positioningRect) < CGRectGetMinX(bounds))
         {
             constrainedRect.origin.x = expandedPositioningRect.origin.x;
-            moveOffscreenAnnotation = YES;
+            moveOnscreen = YES;
         }
         else if (CGRectGetMaxX(positioningRect) > CGRectGetMaxX(bounds))
         {
             constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
-            moveOffscreenAnnotation = YES;
+            moveOnscreen = YES;
         }
 
         if (CGRectGetMinY(positioningRect) < CGRectGetMinY(bounds))
         {
             constrainedRect.origin.y = expandedPositioningRect.origin.y;
-            moveOffscreenAnnotation = YES;
+            moveOnscreen = YES;
         }
         else if (CGRectGetMaxY(positioningRect) > CGRectGetMaxY(bounds))
         {
             constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
-            moveOffscreenAnnotation = YES;
+            moveOnscreen = YES;
         }
 
-        if (moveOffscreenAnnotation)
+        if (moveOnscreen)
         {
             CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
             CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
-            [self setCenterCoordinate:centerCoord animated:animated];
+            [self setCenterCoordinate:centerCoord animated:animateSelection];
         }
     }
 }

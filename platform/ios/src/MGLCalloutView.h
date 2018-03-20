@@ -59,14 +59,19 @@ NS_ASSUME_NONNULL_BEGIN
  If implemented, should provide margins to expand the rect the callout is presented from.
 
  These are used to determine positioning. Currently only the top and bottom properties of the return
- value are used. For example, `{ .top = -50.0, .left = 0.0, .bottom = 0.0, .right = 0.0 }` indicates
- a 50 point margin above the presentation origin rect, in which the callout is assumed to be displayed.
+ value are used. For example, `{ .top = -50.0, .left = -10.0, .bottom = 0.0, .right = -10.0 }` indicates
+ a 50 point margin above the presentation origin rect (and 10 point margins to the left and the right)
+ in which the callout is assumed to be displayed.
 
- @param rect rect that the callout is presented from. This should be the same as the one passed in
- `-presentCalloutFromRect:inView:constrainedToRect:animated:`
- @return margins. Since this is a UIEdgeInsets, values should be negative.
+ There are no assumed defaults for these margins, as they should be calculated from the callout that
+ is to be presented. For example, `SMCalloutView` generates the top margin from the callout height, but
+ the left and right margins from a minimum width that the callout should have.
+
+ @param rect Rect that the callout is presented from. This should be the same as the one passed in
+ `-[MGLCalloutView presentCalloutFromRect:inView:constrainedToRect:animated:]`
+ @return `UIEdgeInsets` representing the margins. Values should be negative.
  */
-- (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect;
+- (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect NS_SWIFT_NAME(marginInsetsHintForPresentation(from:));
 
 /**
  A Boolean value indicating whether the callout view should be anchored to

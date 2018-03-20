@@ -54,7 +54,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsAnnotationsRows) {
     MBXSettingsAnnotationsQueryAnnotations,
     MBXSettingsAnnotationsCustomUserDot,
     MBXSettingsAnnotationsRemoveAnnotations,
-    MBXSettingsAnnotationSelectRandomOffscreenAnnotation,
+    MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation,
     MBXSettingsAnnotationCenterSelectedAnnotation,
     MBXSettingsAnnotationAddVisibleAreaPolyline
 };
@@ -343,7 +343,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Query Annotations",
                 [NSString stringWithFormat:@"%@ Custom User Dot", (_customUserLocationAnnnotationEnabled ? @"Disable" : @"Enable")],
                 @"Remove Annotations",
-                @"Select an offscreen annotation",
+                @"Select an offscreen point annotation",
                 @"Center selected annotation",
                 @"Add visible area polyline"
             ]];
@@ -474,8 +474,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsAnnotationsRemoveAnnotations:
                     [self.mapView removeAnnotations:self.mapView.annotations];
                     break;
-                case MBXSettingsAnnotationSelectRandomOffscreenAnnotation:
-                    [self selectAnOffscreenAnnotation];
+                case MBXSettingsAnnotationSelectRandomOffscreenPointAnnotation:
+                    [self selectAnOffscreenPointAnnotation];
                     break;
 
                 case MBXSettingsAnnotationCenterSelectedAnnotation:
@@ -1569,13 +1569,18 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self presentViewController:alertController animated:YES completion:nil];
 }
 
-- (id<MGLAnnotation>)randomOffscreenAnnotation {
-    NSArray *annotations = self.mapView.annotations;
+- (id<MGLAnnotation>)randomOffscreenPointAnnotation {
+
+    NSPredicate *pointAnnotationPredicate = [NSPredicate predicateWithBlock:^BOOL(id  _Nullable evaluatedObject, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [evaluatedObject isKindOfClass:[MGLPointAnnotation class]];
+    }];
+
+    NSArray *annotations = [self.mapView.annotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
     if (annotations.count == 0)
         return nil;
 
-    NSArray *visibleAnnotations = self.mapView.visibleAnnotations;
+    NSArray *visibleAnnotations = [self.mapView.visibleAnnotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
     if (visibleAnnotations.count == annotations.count)
         return nil;
@@ -1591,8 +1596,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return invisibleAnnotations[index];
 }
 
-- (void)selectAnOffscreenAnnotation {
-    id<MGLAnnotation> annotation = [self randomOffscreenAnnotation];
+- (void)selectAnOffscreenPointAnnotation {
+    id<MGLAnnotation> annotation = [self randomOffscreenPointAnnotation];
     if (annotation) {
         [self.mapView selectAnnotation:annotation animated:YES];
 
