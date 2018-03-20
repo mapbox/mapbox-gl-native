@@ -58,7 +58,6 @@ public class GestureDetectorActivity extends AppCompatActivity {
   private Marker marker;
   @Nullable
   private LatLng focalPointLatLng;
-  private boolean animationsEnabled = true;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -198,9 +197,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
         if (focalPointLatLng != null) {
           gestureAlertsAdapter.addAlert(new GestureAlert(GestureAlert.TYPE_OTHER, "REVERTING MOVE THRESHOLD"));
-          gesturesManager.getMoveGestureDetector().setMoveThreshold(
-            gesturesManager.getMoveGestureDetector().getDefaultMoveThreshold()
-          );
+          gesturesManager.getMoveGestureDetector().setMoveThreshold(0f);
         }
       }
     });
@@ -242,8 +239,7 @@ public class GestureDetectorActivity extends AppCompatActivity {
         mapboxMap.getUiSettings().setFocalPoint(mapboxMap.getProjection().toScreenLocation(focalPointLatLng));
         return true;
       case R.id.menu_gesture_animation:
-        animationsEnabled = !animationsEnabled;
-        mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(animationsEnabled);
+        mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(false);
     }
     return super.onOptionsItemSelected(item);
   }
@@ -251,10 +247,8 @@ public class GestureDetectorActivity extends AppCompatActivity {
   private void resetModes() {
     focalPointLatLng = null;
     mapboxMap.getUiSettings().setFocalPoint(null);
-
-    gesturesManager.getMoveGestureDetector().setMoveThreshold(
-      gesturesManager.getMoveGestureDetector().getDefaultMoveThreshold()
-    );
+    gesturesManager.getMoveGestureDetector().setMoveThreshold(0f);
+    mapboxMap.getUiSettings().setAllVelocityAnimationsEnabled(true);
 
     if (marker != null) {
       mapboxMap.removeMarker(marker);
