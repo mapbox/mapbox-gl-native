@@ -51,12 +51,15 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated { }
 
+- (void)presentCalloutFromRect:(CGRect)rect inView:(nonnull UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated {}
+
 @end
 
 @interface MGLAnnotationViewTests : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) XCTestExpectation *expectation;
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic, weak) MGLAnnotationView *annotationView;
+@property (nonatomic) NSInteger annotationSelectedCount;
 @end
 
 @implementation MGLAnnotationViewTests
@@ -98,6 +101,61 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssertNotNil(customAnnotationView);
 }
 
+- (void)testSelectingOffscreenAnnotation
+{
+    // Partial test for https://github.com/mapbox/mapbox-gl-native/issues/9790
+
+    // This isn't quite the same as in updateAnnotationViews, but should be sufficient for this test.
+    MGLCoordinateBounds coordinateBounds = [_mapView convertRect:_mapView.bounds toCoordinateBoundsFromView:_mapView];
+
+    // -90 latitude is invalid. TBD.
+    BOOL anyOffscreen = NO;
+    NSInteger selectionCount = 0;
+
+    for (NSInteger latitude = -89; latitude <= 90; latitude += 10)
+    {
+        for (NSInteger longitude = -180; longitude <= 180; longitude += 10)
+        {
+            MGLTestAnnotation *annotation = [[MGLTestAnnotation alloc] init];
+
+            annotation.coordinate = CLLocationCoordinate2DMake(latitude, longitude);
+            [_mapView addAnnotation:annotation];
+
+            if (!(MGLCoordinateInCoordinateBounds(annotation.coordinate, coordinateBounds)))
+                anyOffscreen = YES;
+
+            XCTAssertNil(_mapView.selectedAnnotations.firstObject, @"There should be no selected annotation");
+
+            // First selection
+            [_mapView selectAnnotation:annotation animated:NO];
+            selectionCount++;
+
+            XCTAssert(_mapView.selectedAnnotations.count == 1, @"There should only be 1 selected annotation");
+            XCTAssertEqualObjects(_mapView.selectedAnnotations.firstObject, annotation, @"The annotation should be selected");
+
+            // Deselect
+            [_mapView deselectAnnotation:annotation animated:NO];
+            XCTAssert(_mapView.selectedAnnotations.count == 0, @"There should be no selected annotations");
+
+            // Second selection
+            _mapView.selectedAnnotations = @[annotation];
+            selectionCount++;
+
+            XCTAssert(_mapView.selectedAnnotations.count == 1, @"There should be 1 selected annotation");
+            XCTAssertEqualObjects(_mapView.selectedAnnotations.firstObject, annotation, @"The annotation should be selected");
+
+            // Deselect
+            [_mapView deselectAnnotation:annotation animated:NO];
+            XCTAssert(_mapView.selectedAnnotations.count == 0, @"There should be no selected annotations");
+        }
+    }
+
+    XCTAssert(anyOffscreen, @"At least one of these annotations should be offscreen");
+    XCTAssertEqual(selectionCount, self.annotationSelectedCount, @"-mapView:didSelectAnnotation: should be called for each selection");
+}
+
+#pragma mark - MGLMapViewDelegate -
+
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
 {
     MGLAnnotationView *annotationView = [mapView dequeueReusableAnnotationViewWithIdentifier:MGLTestAnnotationReuseIdentifer];
@@ -115,6 +173,11 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 - (void)mapView:(MGLMapView *)mapView didAddAnnotationViews:(NSArray<MGLAnnotationView *> *)annotationViews
 {
     [_expectation fulfill];
+}
+
+- (void)mapView:(MGLMapView *)mapView didSelectAnnotation:(id<MGLAnnotation>)annotation
+{
+    self.annotationSelectedCount++;
 }
 
 @end

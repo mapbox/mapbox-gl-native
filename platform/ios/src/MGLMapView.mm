@@ -144,6 +144,9 @@ const CGFloat MGLAnnotationImagePaddingForCallout = 1;
 
 const CGSize MGLAnnotationAccessibilityElementMinimumSize = CGSizeMake(10, 10);
 
+/// Padding to edge of view that an offscreen annotation must have when being brought onscreen (by being selected)
+const UIEdgeInsets MGLMapViewOffscreenAnnotationPadding = UIEdgeInsetsMake(-20.0f, -20.0f, -20.0f, -20.0f);
+
 /// An indication that the requested annotation was not found or is nonexistent.
 enum { MGLAnnotationTagNotFound = UINT32_MAX };
 
@@ -272,7 +275,7 @@ public:
     CADisplayLink *_displayLink;
     BOOL _needsDisplayRefresh;
 
-    NSUInteger _changeDelimiterSuppressionDepth;
+    NSInteger _changeDelimiterSuppressionDepth;
 
     /// Center coordinate of the pinch gesture on the previous iteration of the gesture.
     CLLocationCoordinate2D _previousPinchCenterCoordinate;
@@ -1625,7 +1628,7 @@ public:
     {
         CGPoint calloutPoint = [singleTap locationInView:self];
         CGRect positionRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:calloutPoint];
-        [self selectAnnotation:annotation animated:YES calloutPositioningRect:positionRect];
+        [self selectAnnotation:annotation moveOnscreen:YES animateSelection:YES calloutPositioningRect:positionRect];
     }
     else if (self.selectedAnnotation)
     {
@@ -4234,6 +4237,12 @@ public:
     });
 }
 
+
+- (BOOL)isBringingAnnotationOnscreenSupportedForAnnotation:(id<MGLAnnotation>)annotation animated:(BOOL)animated {
+    // Consider delegating
+    return animated && [annotation isKindOfClass:[MGLPointAnnotation class]];
+}
+
 - (id <MGLAnnotation>)selectedAnnotation
 {
     if (_userLocationAnnotationIsSelected)
@@ -4274,20 +4283,16 @@ public:
 
     if ([firstAnnotation isKindOfClass:[MGLMultiPoint class]]) return;
 
-    // Select the annotation if it’s visible.
-    if (MGLCoordinateInCoordinateBounds(firstAnnotation.coordinate, self.visibleCoordinateBounds))
-    {
-        [self selectAnnotation:firstAnnotation animated:NO];
-    }
+    [self selectAnnotation:firstAnnotation animated:YES];
 }
 
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated
 {
     CGRect positioningRect = [self positioningRectForAnnotation:annotation defaultCalloutPoint:CGPointZero];
-    [self selectAnnotation:annotation animated:animated calloutPositioningRect:positioningRect];
+    [self selectAnnotation:annotation moveOnscreen:animated animateSelection:YES calloutPositioningRect:positioningRect];
 }
 
-- (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated calloutPositioningRect:(CGRect)calloutPositioningRect
+- (void)selectAnnotation:(id <MGLAnnotation>)annotation moveOnscreen:(BOOL)moveOnscreen animateSelection:(BOOL)animateSelection calloutPositioningRect:(CGRect)calloutPositioningRect
 {
     if ( ! annotation) return;
 
@@ -4311,14 +4316,27 @@ public:
             MGLAnnotationContext &annotationContext = _annotationContextsByAnnotationTag.at(annotationTag);
             annotationView = annotationContext.annotationView;
             if (annotationView && annotationView.enabled) {
-                    // Annotations represented by views use the view frame as the positioning rect.
-                    calloutPositioningRect = annotationView.frame;
-                    [annotationView.superview bringSubviewToFront:annotationView];
-                    [annotationView setSelected:YES animated:animated];
+                // Annotations represented by views use the view frame as the positioning rect.
+                calloutPositioningRect = annotationView.frame;
+                [annotationView.superview bringSubviewToFront:annotationView];
+
+                [annotationView setSelected:YES animated:animateSelection];
             }
         }
 
     self.selectedAnnotation = annotation;
+
+    // Determine if we're allowed to move this offscreen annotation on screen, even though we've asked it to
+    if (moveOnscreen) {
+        moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
+    }
+
+    CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
+
+    // Used for callout positioning, and moving offscreen annotations onscreen.
+    CGRect constrainedRect = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+
+    UIView <MGLCalloutView> *calloutView = nil;
 
     if ([annotation respondsToSelector:@selector(title)] &&
         annotation.title &&
@@ -4326,7 +4344,6 @@ public:
         [self.delegate mapView:self annotationCanShowCallout:annotation])
     {
         // build the callout
-        UIView <MGLCalloutView> *calloutView;
         if ([self.delegate respondsToSelector:@selector(mapView:calloutViewForAnnotation:)])
         {
             id providedCalloutView = [self.delegate mapView:self calloutViewForAnnotation:annotation];
@@ -4384,12 +4401,50 @@ public:
         // set annotation delegate to handle taps on the callout view
         calloutView.delegate = self;
 
-        // present popup
-        [calloutView presentCalloutFromRect:calloutPositioningRect
-                                     inView:self.glView
-                          constrainedToView:self.glView
-                                   animated:animated];
+        // If the callout view provides inset (outset) information, we can use it to expand our positioning
+        // rect, which we then use to help move the annotation on-screen if want need to.
+        if (moveOnscreen && [calloutView respondsToSelector:@selector(marginInsetsHintForPresentationFromRect:)]) {
+            UIEdgeInsets margins = [calloutView marginInsetsHintForPresentationFromRect:calloutPositioningRect];
+            expandedPositioningRect = UIEdgeInsetsInsetRect(expandedPositioningRect, margins);
+        }
     }
+
+    if (moveOnscreen)
+    {
+        moveOnscreen = NO;
+
+        // Need to consider the content insets.
+        CGRect bounds = UIEdgeInsetsInsetRect(self.bounds, self.contentInset);
+
+        // Any one of these cases should trigger a move onscreen
+        if (CGRectGetMinX(calloutPositioningRect) < CGRectGetMinX(bounds))
+        {
+            constrainedRect.origin.x = expandedPositioningRect.origin.x;
+            moveOnscreen = YES;
+        }
+        else if (CGRectGetMaxX(calloutPositioningRect) > CGRectGetMaxX(bounds))
+        {
+            constrainedRect.origin.x = CGRectGetMaxX(expandedPositioningRect) - constrainedRect.size.width;
+            moveOnscreen = YES;
+        }
+
+        if (CGRectGetMinY(calloutPositioningRect) < CGRectGetMinY(bounds))
+        {
+            constrainedRect.origin.y = expandedPositioningRect.origin.y;
+            moveOnscreen = YES;
+        }
+        else if (CGRectGetMaxY(calloutPositioningRect) > CGRectGetMaxY(bounds))
+        {
+            constrainedRect.origin.y = CGRectGetMaxY(expandedPositioningRect) - constrainedRect.size.height;
+            moveOnscreen = YES;
+        }
+    }
+
+    // Remember, calloutView can be nil here.
+    [calloutView presentCalloutFromRect:calloutPositioningRect
+                                 inView:self.glView
+                      constrainedToRect:constrainedRect
+                               animated:animateSelection];
 
     // notify delegate
     if ([self.delegate respondsToSelector:@selector(mapView:didSelectAnnotation:)])
@@ -4400,6 +4455,13 @@ public:
     if (annotationView && [self.delegate respondsToSelector:@selector(mapView:didSelectAnnotationView:)])
     {
         [self.delegate mapView:self didSelectAnnotationView:annotationView];
+    }
+
+    if (moveOnscreen)
+    {
+        CGPoint center = CGPointMake(CGRectGetMidX(constrainedRect), CGRectGetMidY(constrainedRect));
+        CLLocationCoordinate2D centerCoord = [self convertPoint:center toCoordinateFromView:self];
+        [self setCenterCoordinate:centerCoord animated:animateSelection];
     }
 }
 
@@ -4590,6 +4652,7 @@ public:
                          edgePadding:insets
                             animated:animated];
 }
+
 
 #pragma mark Annotation Image Delegate
 

@@ -1200,17 +1200,32 @@ MGL_EXPORT IB_DESIGNABLE
 
  Assigning a new array to this property selects only the first annotation in
  the array.
+
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the camera
+ will animate to bring the annotation and its callout just on screen. If you
+ need finer control, consider using `-selectAnnotation:animated:`.
+
+ @note In versions prior to `4.0.0` if the annotation was offscreen it was not
+ selected.
  */
 @property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
 
 /**
- Selects an annotation and displays a callout view for it.
+ Selects an annotation and displays its callout view.
 
- If the given annotation is not visible within the current viewport, this
- method has no effect.
+ The `animated` parameter determines whether the map is panned to bring the
+ annotation on-screen, specifically:
+
+ | `animated` parameter | Effect |
+ |------------------|--------|
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen. The presentation of the callout is animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
 
  @param annotation The annotation object to select.
- @param animated If `YES`, the callout view is animated into position.
+ @param animated If `YES`, the annotation and callout view are animated on-screen.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 

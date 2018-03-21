@@ -247,6 +247,35 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     return CGSizeMake(nudgeLeft ? nudgeLeft : nudgeRight, nudgeTop ? nudgeTop : nudgeBottom);
 }
 
+- (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect {
+
+    // form our subviews based on our content set so far
+    [self rebuildSubviews];
+
+    // size the callout to fit the width constraint as best as possible
+    CGFloat height = self.calloutHeight;
+    CGSize size = [self sizeThatFits:CGSizeMake(0.0f, height)];
+
+    // Without re-jigging presentCalloutFromRect, let's just make a best-guess with what we have
+    // right now.
+    CGFloat horizontalMargin = fmaxf(0, ceilf((CALLOUT_MIN_WIDTH-rect.size.width)/2));
+
+    UIEdgeInsets insets = {
+        .top = 0.0f,
+        .right = -horizontalMargin,
+        .bottom = 0.0f,
+        .left = -horizontalMargin
+    };
+
+    if (self.permittedArrowDirection == MGLSMCalloutArrowDirectionUp)
+        insets.bottom -= size.height;
+    else
+        insets.top -= size.height;
+
+    return insets;
+}
+
+
 - (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated {
     [self presentCalloutFromRect:rect inLayer:view.layer ofView:view constrainedToLayer:constrainedView.layer animated:animated];
 }
@@ -255,8 +284,18 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     [self presentCalloutFromRect:rect inLayer:layer ofView:nil constrainedToLayer:constrainedLayer animated:animated];
 }
 
-// this private method handles both CALayer and UIView parents depending on what's passed.
 - (void)presentCalloutFromRect:(CGRect)rect inLayer:(CALayer *)layer ofView:(UIView *)view constrainedToLayer:(CALayer *)constrainedLayer animated:(BOOL)animated {
+    // figure out the constrained view's rect in our popup view's coordinate system
+    CGRect constrainedRect = [constrainedLayer convertRect:constrainedLayer.bounds toLayer:layer];
+    [self presentCalloutFromRect:rect inLayer:layer ofView:view constrainedToRect:constrainedRect animated:animated];
+}
+
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated {
+    [self presentCalloutFromRect:rect inLayer:view.layer ofView:view constrainedToRect:constrainedRect animated:animated];
+}
+
+// this private method handles both CALayer and UIView parents depending on what's passed.
+- (void)presentCalloutFromRect:(CGRect)rect inLayer:(CALayer *)layer ofView:(UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated {
 
     // Sanity check: dismiss this callout immediately if it's displayed somewhere
     if (self.layer.superlayer) [self dismissCalloutAnimated:NO];
@@ -265,8 +304,6 @@ NSTimeInterval const kMGLSMCalloutViewRepositionDelayForUIScrollView = 1.0/3.0;
     [self.layer removeAnimationForKey:@"present"];
     [self.layer removeAnimationForKey:@"dismiss"];
 
-    // figure out the constrained view's rect in our popup view's coordinate system
-    CGRect constrainedRect = [constrainedLayer convertRect:constrainedLayer.bounds toLayer:layer];
 
     // apply our edge constraints
     constrainedRect = UIEdgeInsetsInsetRect(constrainedRect, self.constrainedInsets);
