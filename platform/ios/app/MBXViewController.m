@@ -1577,13 +1577,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     NSArray *annotations = [self.mapView.annotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
-    if (annotations.count == 0)
+    if (annotations.count == 0) {
         return nil;
+    }
 
     NSArray *visibleAnnotations = [self.mapView.visibleAnnotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
-    if (visibleAnnotations.count == annotations.count)
+    if (visibleAnnotations.count == annotations.count) {
         return nil;
+    }
 
     NSMutableArray *invisibleAnnotations = [annotations mutableCopy];
 

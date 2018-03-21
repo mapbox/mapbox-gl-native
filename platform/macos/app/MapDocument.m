@@ -650,9 +650,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
     NSArray *annotations = [self.mapView.annotations filteredArrayUsingPredicate:pointAnnotationPredicate];
 
-
-    if (annotations.count == 0)
+    if (annotations.count == 0) {
         return nil;
+    }
 
     // NOTE: self.mapView.visibleAnnotations occasionally returns nil - see
     // https://github.com/mapbox/mapbox-gl-native/issues/11296
@@ -660,8 +660,9 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 
     NSLog(@"Number of visible point annotations = %ld", visibleAnnotations.count);
 
-    if (visibleAnnotations.count == annotations.count)
+    if (visibleAnnotations.count == annotations.count) {
         return nil;
+    }
 
     NSMutableArray *invisibleAnnotations = [annotations mutableCopy];
 
