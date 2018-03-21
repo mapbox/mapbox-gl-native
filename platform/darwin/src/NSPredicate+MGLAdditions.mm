@@ -324,4 +324,29 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     return nil;
 }
 
+- (id)mgl_case:(id)firstValue, ... {
+
+    if ([self evaluateWithObject:nil]) {
+        return firstValue;
+    }
+    
+    id eachExpression;
+    va_list argumentList;
+    va_start(argumentList, firstValue);
+    
+    while ((eachExpression = va_arg(argumentList, id))) {
+        if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
+            id valueExpression = va_arg(argumentList, id);
+            if ([eachExpression evaluateWithObject:nil]) {
+                return valueExpression;
+            }
+        } else {
+            return eachExpression;
+        }
+    }
+    va_end(argumentList);
+    
+    return nil;
+}
+
 @end
