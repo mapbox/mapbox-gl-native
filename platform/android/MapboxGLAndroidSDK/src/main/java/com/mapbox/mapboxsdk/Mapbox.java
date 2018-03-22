@@ -10,7 +10,7 @@ import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.exceptions.MapboxConfigurationException;
-import com.mapbox.mapboxsdk.maps.Events;
+import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 
 /**
@@ -46,7 +46,7 @@ public final class Mapbox {
       Context appContext = context.getApplicationContext();
       INSTANCE = new Mapbox(appContext, accessToken);
 
-      Events.initialize();
+      Telemetry.initialize();
       ConnectivityReceiver.instance(appContext);
     }
 
