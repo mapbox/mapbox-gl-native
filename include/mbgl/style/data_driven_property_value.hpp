@@ -50,6 +50,13 @@ public:
         return !value.template is<CameraFunction<T>>() && !value.template is<CompositeFunction<T>>();
     }
 
+    bool isExpression() const {
+        return value.match(
+            [] (const Undefined&) { return false; },
+            [] (const T&)         { return false; },
+            [] (const auto& fn)   { return fn.isExpression; });
+    }
+
     template <class... Ts>
     auto match(Ts&&... ts) const {
         return value.match(std::forward<Ts>(ts)...);
