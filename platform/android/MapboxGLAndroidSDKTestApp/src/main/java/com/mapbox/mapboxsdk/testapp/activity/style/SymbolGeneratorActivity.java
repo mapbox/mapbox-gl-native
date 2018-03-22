@@ -45,8 +45,11 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.number;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.pi;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.product;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.string;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
 import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_TOP;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -265,7 +268,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         iconAllowOverlap(false),
         iconSize(iconSizeExpression),
         iconAnchor(ICON_ANCHOR_BOTTOM),
-        iconOffset(new Float[] {0.0f, -5.0f}),
+        iconOffset(step(zoom(), literal(new float[] {0f, 0f}),
+          literal(1), literal(new Float[] {0f, 0f}),
+          literal(10), literal(new Float[] {0f, -35f})
+        )),
 
         // text field configuration
         textField(textFieldExpression),

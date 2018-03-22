@@ -112,6 +112,9 @@ public class Expression {
    * @return the expression
    */
   public static Expression literal(@NonNull Object object) {
+    if (object.getClass().isArray()) {
+      return literal(ExpressionArray.toObjectArray(object));
+    }
     return new ExpressionLiteral(object);
   }
 
@@ -2033,6 +2036,11 @@ public class Expression {
       };
     }
 
+    /**
+     * Convert the expression array to a string representation.
+     *
+     * @return the string representation of the expression array
+     */
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder("[\"literal\"], [");
@@ -2052,5 +2060,21 @@ public class Expression {
       builder.append("]]");
       return builder.toString();
     }
+  }
+
+  /**
+   * Converts an object that is a primitive array to an Object[]
+   *
+   * @param object the object to convert to an object array
+   * @return the converted object array
+   */
+  static Object[] toObjectArray(Object object) {
+    // object is a primitive array
+    int len = java.lang.reflect.Array.getLength(object);
+    Object[] objects = new Object[len];
+    for (int i = 0; i < len; i++) {
+      objects[i] = java.lang.reflect.Array.get(object, i);
+    }
+    return objects;
   }
 }
