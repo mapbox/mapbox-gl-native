@@ -1,5 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.activity.style;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -33,6 +34,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
@@ -173,9 +175,9 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
       fillColor(
         interpolate(
           exponential(0.5f), zoom(),
-          stop(1, rgb(255, 0, 0)),
-          stop(5, rgb(0, 0, 255)),
-          stop(10, rgb(0, 255, 0))
+          stop(1, color(Color.RED)),
+          stop(5, color(Color.BLUE)),
+          stop(10, color(Color.GREEN))
         )
       )
     );
@@ -460,7 +462,7 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     // Add a fill layer
     mapboxMap.addLayer(new FillLayer(AMSTERDAM_PARKS_LAYER, source.getId())
       .withProperties(
-        fillColor(rgba(0.0f, 0.0f, 0.0f, 0.5f)),
+        fillColor(color(Color.GREEN)),
         fillOutlineColor(rgb(0, 0, 255)),
         fillAntialias(true)
       )
