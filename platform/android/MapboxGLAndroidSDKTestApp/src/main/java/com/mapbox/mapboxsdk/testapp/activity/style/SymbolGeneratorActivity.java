@@ -269,8 +269,8 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         iconSize(iconSizeExpression),
         iconAnchor(ICON_ANCHOR_BOTTOM),
         iconOffset(step(zoom(), literal(new float[] {0f, 0f}),
-          literal(1), literal(new Float[] {0f, 0f}),
-          literal(10), literal(new Float[] {0f, -35f})
+          stop(1, new Float[] {0f, 0f}),
+          stop(10, new Float[] {0f, -35f})
         )),
 
         // text field configuration
