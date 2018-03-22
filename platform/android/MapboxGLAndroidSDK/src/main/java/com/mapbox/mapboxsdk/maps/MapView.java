@@ -268,7 +268,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
     if (savedInstanceState == null) {
-      MapboxTelemetry telemetry = Events.obtainTelemetry();
+      MapboxTelemetry telemetry = Telemetry.obtainTelemetry();
       AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
         BuildConfig.MAPBOX_SDK_VERSION);
       telemetry.push(turnstileEvent);

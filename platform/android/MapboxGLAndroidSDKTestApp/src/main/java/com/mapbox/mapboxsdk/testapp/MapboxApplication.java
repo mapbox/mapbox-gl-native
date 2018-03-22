@@ -5,6 +5,7 @@ import android.os.StrictMode;
 import android.text.TextUtils;
 
 import com.mapbox.mapboxsdk.Mapbox;
+import com.mapbox.mapboxsdk.maps.Telemetry;
 import com.mapbox.mapboxsdk.testapp.utils.TokenUtils;
 import com.squareup.leakcanary.LeakCanary;
 
@@ -57,6 +58,8 @@ public class MapboxApplication extends Application {
     }
 
     Mapbox.getInstance(getApplicationContext(), mapboxAccessToken);
+
+    Telemetry.updateDebugLoggingEnabled(true);
   }
 
   private void initializeLogger() {
