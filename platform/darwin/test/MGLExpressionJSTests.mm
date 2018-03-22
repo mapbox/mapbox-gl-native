@@ -9,9 +9,9 @@
 
 @implementation MGLExpressionJSTests
 
-- (void)testAllJavascriptTests {
-    NSString *testRootPath = @"expression-tests";
+NSString *testRootPath = @"expression-tests";
 
+- (void)testAllJavascriptTests {
     NSBundle *bundle = [NSBundle bundleForClass:[self class]];
     NSURL *rootURL = [[bundle bundleURL] URLByAppendingPathComponent:testRootPath];
 
@@ -25,16 +25,17 @@
             NSData *data = [NSData dataWithContentsOfURL:fileURL];
             NSError *error = nil;
             NSDictionary *jsonDict = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
+            NSString *testName = [self testNameFromURL:fileURL];
 
             if (!jsonDict && error) {
-                XCTFail(@"================> JSON parse failed with error: %@", error.localizedDescription);
+                XCTFail(@"JSON parse failed with error: %@", error.localizedDescription);
                 continue;
             }
 
             try {
-                [self runTestsWithDictionary:jsonDict];
+                [self runTestsNamed:testName withDictionary:jsonDict];
             } catch (NSException *e) {
-                XCTFail(@"================> File at URL: %@ failed with reason: %@", fileURL, e.reason);
+                XCTFail(@"%@: %@", testName, e.reason);
                 continue;
             }
         }
@@ -58,13 +59,13 @@ NSSet *testsToSkip = [NSSet setWithObjects:
     BOOL shouldSkip = [testsToSkip filteredSetUsingPredicate:blacklistPredicate].count > 0;
 
     if (shouldSkip) {
-        XCTFail(@"================> Skipping test due to blacklisted file URL: %@", fileURL);
+        NSLog(@"Skipping test due to blacklisted file URL: %@", [self testNameFromURL:fileURL]);
     }
 
     return shouldSkip;
 }
 
-- (void)runTestsWithDictionary:(NSDictionary *)testcase {
+- (void)runTestsNamed:(NSString *)testName withDictionary:(NSDictionary *)testcase {
     NSArray *inputs = testcase[@"inputs"];
 
     NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:testcase[@"expression"]];
@@ -75,8 +76,12 @@ NSSet *testsToSkip = [NSSet setWithObjects:
 
         id expressionValue = [exp expressionValueWithObject:actualInput context:[NSMutableDictionary dictionary]];
         id expectedValue = testcase[@"expected"][@"outputs"][i];
-        XCTAssertEqualObjects(expressionValue, expectedValue);
+        XCTAssertEqualObjects(expressionValue, expectedValue, @"in %@", testName);
     }
+}
+
+- (NSString *)testNameFromURL:(NSURL *)testURL {
+    return [testURL.absoluteString componentsSeparatedByString:testRootPath].lastObject;
 }
 
 @end
