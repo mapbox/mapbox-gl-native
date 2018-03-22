@@ -43,12 +43,12 @@ NSString *testRootPath = @"expression-tests";
 }
 
 NSSet *testsToSkip = [NSSet setWithObjects:
-                      @"to-boolean",
-                      @"concat/arity-1",
-                      @"plus/arity-1",
-                      @"minus/arity-0",
-                      @"minus/arity-1",
-                      @"times/arity-1",
+                      @"to-boolean", // EXC_BAD_ACCESS (code=1, address=0x1)
+                      @"concat/arity-1", // EXC_BAD_ACCESS (code=1, address=0x1)
+                      @"plus/arity-1", // EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
+                      @"minus/arity-0", // EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
+                      @"minus/arity-1", // EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
+                      @"times/arity-1", // EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
                       nil];
 
 - (BOOL)shouldSkipTest:(NSURL *)fileURL {
