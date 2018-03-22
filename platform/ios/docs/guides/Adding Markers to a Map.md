@@ -1,4 +1,6 @@
-# Adding Points to a Map
+# Adding Markers to a Map
+
+Mapbox offers a few different ways to add markers to a map, each with different tradeoffs. Below is an overview of the variety of approaches that can be used.
 
 ## **Annotations API**
 
@@ -9,19 +11,21 @@ Our annotations API includes the `MGLAnnotationImage`, and `MGLAnnotationView` c
 | `MGLAnnotationImage` | `MGLAnnotationView` |
 
 **MGLAnnotationImage** is an annotation class that is easily customizable with any `UIImage`.
-It is highly performant, as the images are rendered directly in OpenGL. However, if you need to animate your annotations or control z-layer ordering, consider working with **MGLAnnotationView** which supports basic CALayer animations and can be stacked by using `zPosition` property on `CALayer`.
+It is highly performant, as the images are rendered directly using OpenGL. However, if you need to animate your annotations or control z-layer ordering, consider working with **MGLAnnotationView** which supports any animation that can be applied to a `UIView`. View hierarchy can also be manipulated by using `zPosition` property on `CALayer` to order an individual view, or by using other instance methods available on `UIView` such as `-[UIView bringSubviewToFront:]`.
 
-**MGLAnnotationView** is an annotation class that is easily customizable with a `UIView`. Use this class if you need your markers to be dynamic or animatable. MGLAnnotationView has a significant advantage over MGLAnnotationImage when you need every annotation to be unique. For example, annotation views are ideal for showing user locations on a map using high-resolution profile pictures. However, the map can get slow down when many annotation views are visible at the same time, so if you need to add a very large amount of markers, consider using our runtime styling APIs instead.
+**MGLAnnotationView** is an annotation class that is an easily customizable `UIView`. Use this class if you need your markers to be dynamic or animatable. `MGLAnnotationView` has a significant advantage over `MGLAnnotationImage` when you need every annotation to be unique. For example, annotation views are ideal for showing user locations on a map using high-resolution profile pictures. However, the map can slow down when many annotation views are visible at the same time, so if you need to add a very large amount of markers, consider using our runtime styling APIs instead.
 
-Both MGLAnnotationImage and MGLAnnotationView can become interactive with the addition of a single line of code. When the user taps an annotation, the annotation’s name appears in a basic callout. An annotation view can additionally respond to drag-and-drop gestures.
+Both `MGLAnnotationImage` and `MGLAnnotationView` can become interactive by adding a [few lines of code](https://www.mapbox.com/ios-sdk/examples/marker/). When the user taps an annotation, the annotation’s name appears in a basic callout. An annotation view can additionally respond to [drag-and-drop gestures](https://www.mapbox.com/ios-sdk/examples/draggable-views/).
 
 ## **Runtime Styling API**
 
-For absolute full control of how points are displayed on a map, consider using our [runtime styling](#) APIs. It is the most performant approach for adding hundreds of markers because markers are rendered in GL directly. The runtime styling API provides support for labels rendered together with icons, finer control of z-ordering, and clustering.
+For absolute full control of how markers are displayed on a map, consider using our [runtime styling](#) APIs. Like `MGLAnnotationImage`, it is a performant approach to adding markers because they rendered directly using OpenGL. However, the runtime styling APIs also provide support for rendering labels together with icons, finer control of z-ordering, and clustering, so consider using this set of APIs if you need to display a large amount of highly customizable markers.
 
-If you need to implement callouts with the runtime styling API, you will need to implement your own tap gesture recognizer that calls `-[MGLMapView visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:]` to get the tapped point feature, then show a UIView you provide. Additionally, if you need to animate markers when using the runtime styling APIs, consider using an NSTimer and updating the source data coordinates accordingly.
+Our runtime styling API is the most powerful option if you need to create rich data visualizations within in your map, but it is the most complex and has a steeper learning curve than our annotations API.
 
-Our runtime styling API is the most powerful option if you need to create rich data visualizations within in your map. This API includes our `MGLSymbolStyleLayer` and `MGLCircleStyleLayer` classes that can be used to dynamically display on markers on map when used in conjunction with either an MGLVectorSource or an MGLShapeSource.
+The runtime styling API includes our `MGLSymbolStyleLayer` and `MGLCircleStyleLayer` classes that can be used to dynamically display on markers on map when used in conjunction with either an `MGLVectorSource` or an `MGLShapeSource`.
+
+If you need to implement callouts with the `MGLSymbolStyleLayer` or `MGLCircleStyleLayer`, you will need to implement your own tap gesture recognizer that calls `-[MGLMapView visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:]` to get the tapped point feature, then show a UIView you provide. Additionally, if you need to animate markers when using the runtime styling APIs, consider using an timer to update the source data coordinates accordingly.
 
 | ![`MGLCircleStyleLayer`](img/adding-points-to-a-map/circle-layer.png "MGLCircleStyleLayer")               | ![`MGLSymbolStyleLayer`](img/adding-points-to-a-map/symbol-layer.png "MGLSymbolStyleLayer")              |
 |----------------------|---------------------|
@@ -31,9 +35,9 @@ The **MGLCircleStyleLayer** class is the style layer class responsible for displ
 
 The **MGLSymbolStyleLayer** class is the style layer class responsible for displaying the source’s point features as icons and labels. You can use custom images as icons and also combine text labels, placing them exactly where you specify. You can also dynamically change the symbol’s styling properties based on any attributes your source data contains.
 
-Still undecided on which approach will work best for your use case? Reach out to our support team.
+Still undecided on which approach will work best for your use case? [Reach out to our support team](https://www.mapbox.com/contact/).
 
-Mapbox offers a few different ways to add points to a map, each with different tradeoffs. See the table below for a summary of the different approaches:
+See the table below for a summary of APIs that can be used to add markers to a map:
 
 ✅ Recommended
 

@@ -17,7 +17,7 @@ framework_root: ../darwin/src
 custom_categories:
   - name: Guides
     children:
-      - Adding Points to a Map
+      - Adding Markers to a Map
       - Runtime Styling
       - Using Style Functions at Runtime
       - Working with Mapbox Studio
