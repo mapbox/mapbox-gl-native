@@ -1081,4 +1081,12 @@ public class ExpressionTest {
     String actual = literal(array).toString();
     assertEquals("literal array should match", expected, actual);
   }
+
+  @Test
+  public void testLiteralPrimitiveArrayConversion() throws Exception {
+    float[] array = new float[] {0.2f, 0.5f};
+    Object[] expected = new Object[] {"literal", new Object[] {0.2f, 0.5f}};
+    Object[] actual = literal(array).toArray();
+    assertEquals("primitive array should be convered", expected, actual);
+  }
 }
