@@ -18,4 +18,6 @@
 
 - (id)mgl_case:(id)firstValue, ...;
 
+- (id)mgl_matchWithOptions:(NSArray *)options default:(id)minimum;
+
 @end

@@ -207,12 +207,6 @@
     return nil;
 }
 
-- (id)mgl_matchWithOptions:(NSDictionary<NSNumber *, id> *)stops default:(id)minimum {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Match expressions lack underlying Objective-C implementations."];
-    return nil;
-}
-
 @end
 
 @implementation NSNumber (MGLExpressionAdditions)
@@ -228,12 +222,6 @@
 - (id)mgl_stepWithMinimum:(id)minimum stops:(NSDictionary<NSNumber *, id> *)stops {
     [NSException raise:NSInvalidArgumentException
                 format:@"Interpolation expressions lack underlying Objective-C implementations."];
-    return nil;
-}
-
-- (id)mgl_matchWithOptions:(NSDictionary<NSNumber *, id> *)stops default:(id)minimum {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Match expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -516,7 +504,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
             }
             
-            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'coalesce:')", expressions];
+            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", expressions];
         }else {
             [NSException raise:NSInvalidArgumentException
                         format:@"Expression operator %@ not yet implemented.", op];
@@ -543,7 +531,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"ln:": @"ln",
             @"raise:toPower:": @"^",
             @"uppercase:": @"upcase",
-            @"lowercase:": @"downcase"
+            @"lowercase:": @"downcase",
         };
     });
     
@@ -734,7 +722,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 
                 [expressionObject addObject:[self.arguments[1] mgl_jsonExpressionObject]];
                 return expressionObject;
-            } else if ([function isEqualToString:@"coalesce:"]) {
+            } else if ([function isEqualToString:@"mgl_coalesce"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
                 
                 for (NSExpression *expression in self.operand.constantValue) {

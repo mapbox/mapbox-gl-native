@@ -349,4 +349,10 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     return nil;
 }
 
+- (id)mgl_matchWithOptions:(NSArray *)options default:(id)minimum {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Match expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
