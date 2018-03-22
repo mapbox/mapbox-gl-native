@@ -3,12 +3,13 @@
 @implementation MGLPinAnnotationView
 
 - (instancetype)initWithReuseIdentifier:(nullable NSString *)reuseIdentifier {
-    self = [super initWithReuseIdentifier:reuseIdentifier];
-    _shadowColor = [UIColor blackColor];
-    _pinColor = [UIColor blueColor];
-    _strokeColor = [UIColor whiteColor];
-    _innerColor = [UIColor whiteColor];
-    self.backgroundColor = [UIColor clearColor];
+    if (self = [super initWithReuseIdentifier:reuseIdentifier]) {
+        _shadowColor = [UIColor blackColor];
+        _pinColor = [UIColor blueColor];
+        _strokeColor = [UIColor yellowColor];
+        _innerColor = [UIColor whiteColor];
+        self.backgroundColor = [UIColor clearColor];
+    }
 
     return self;
 }
