@@ -9,6 +9,7 @@ CustomLayer::~CustomLayer()
 {
     printf("~CustomLayer destructor %p\n", this);
 
+    // Need to set rawLayer to nil in the obj-c layer.
 }
 
 CustomLayer::CustomLayer(const std::string& layerID,

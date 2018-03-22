@@ -19,7 +19,7 @@ MGL_EXPORT
 @property (nonatomic, unsafe_unretained, nullable) void *owner;
 - (instancetype)initWithLayer:(MGLStyleLayer*)styleLayer;
 - (void)retainLayer;
-- (void)weakenLayer;
+- (void)releaseLayer;
 @end
 
 

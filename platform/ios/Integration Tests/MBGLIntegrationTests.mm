@@ -68,7 +68,7 @@
 - (void)waitForMapViewToBeRendered {
     [self.mapView setNeedsGLDisplay];
     _renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
-    [self waitForExpectations:@[_renderFinishedExpectation] timeout:1];
+    [self waitForExpectations:@[_renderFinishedExpectation] timeout:10000];
 }
 
 - (void)waitForManagedLayersToExpire {
@@ -515,29 +515,44 @@
             [self.style insertLayer:layer atIndex:0];
             layer = nil;
         }
-        // Unlike other MGLStyleLayers, MGLOpenGLStyleLayers are managed for retain/release purposes
-        XCTAssertNotNil(weakLayer);
-
-        [self waitForMapViewToBeRendered];
-
-        NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self.mapView setStyleURL:styleURL];
-        [self waitForExpectations:@[_styleLoadingExpectation] timeout:10];
     }
+
+    // Unlike other MGLStyleLayers, MGLOpenGLStyleLayers are managed for retain/release purposes
+    XCTAssertNotNil(weakLayer);
+
+    [self waitForMapViewToBeRendered];
+
+    // should be identical to the original
+    MGLStyleLayer *layer2 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
+
+
+    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
+    _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+    [self.mapView setStyleURL:styleURL];
+    [self waitForExpectations:@[_styleLoadingExpectation] timeout:10];
+
+    // At this point the C++ CustomLayer will have been destroyed, BUT we're holding on
+    // to the obj-c layer. We don't currently clear the rawLayer, so it could now be
+    // pointing at garbage. And the following line will crash (due to description
+    // using .rawLayer)
+
+//    (void)layer2;
+    XCTFail();
+//    [self.style insertLayer:layer2 atIndex:0];
+
 
     [self waitForManagedLayersToExpire];
 
     // Asking the style for the layer should return nil
-    MGLStyleLayer *layer2 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
-    XCTAssertNil(layer2);
-    XCTAssertNil(weakLayer);
+    MGLStyleLayer *layer3 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
+    XCTAssertNil(layer3);
+//    XCTAssertNil(weakLayer);
 }
 
 
 - (void)testOpenGLLayerDoesNotLeakWhenMapViewDeallocs {
     __weak id weakLayer;
-
+ 
     @autoreleasepool {
 
         NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];

@@ -18,7 +18,7 @@
     NSLog(@"LayerRetainer dealloc start %p", self);
 
     while (self.layerRetainCount) {
-        [self weakenLayer];
+        [self releaseLayer];
     }
 
     NSLog(@"LayerRetainer dealloc end %p", self);
@@ -60,11 +60,11 @@
     }
     self.layerRetainCount++;
 
-    NSLog(@"LayerRetainer %p strengthen %ld", self,  self.layerRetainCount);
+    NSLog(@"LayerRetainer %p retained %ld", self,  self.layerRetainCount);
 }
 
 
-- (void)weakenLayer {
+- (void)releaseLayer {
     if (!self.layer)
         return;
 
@@ -76,7 +76,7 @@
         CFBridgingRelease((__bridge CFTypeRef)self.layer);
     }
 
-    NSLog(@"LayerRetainer %p weaken %ld", self, self.layerRetainCount);
+    NSLog(@"LayerRetainer %p released %ld", self, self.layerRetainCount);
 }
 @end
 
@@ -92,7 +92,7 @@ void MGLCustomLayerContextAttachFunction(void *context) {
 
 void MGLCustomLayerContextDetachFunction(void *context) {
     MGLOpenGLStyleLayerRetainer *contextRetainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    [contextRetainer weakenLayer];
+    [contextRetainer releaseLayer];
 }
 
 
