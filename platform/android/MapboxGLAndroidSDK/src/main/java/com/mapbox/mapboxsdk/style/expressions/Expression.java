@@ -1523,13 +1523,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Number input, @NonNull Expression expression, Expression... stops) {
-    return step(literal(input), expression, stops);
+  public static Expression step(@NonNull Number input, @NonNull Expression defaultOutput, Expression... stops) {
+    return step(literal(input), defaultOutput, stops);
   }
 
   /**
@@ -1539,13 +1540,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param expression the input expression
-   * @param stops      pair of input and output values
+   * @param input         the input expression
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Expression input, @NonNull Expression expression, Expression... stops) {
-    return new Expression("step", join(new Expression[] {input, expression}, stops));
+  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, Expression... stops) {
+    return new Expression("step", join(new Expression[] {input, defaultOutput}, stops));
   }
 
   /**
@@ -1555,13 +1557,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Number input, @NonNull Expression expression, Stop... stops) {
-    return step(literal(input), expression, Stop.toExpressionArray(stops));
+  public static Expression step(@NonNull Number input, @NonNull Expression defaultOutput, Stop... stops) {
+    return step(literal(input), defaultOutput, Stop.toExpressionArray(stops));
   }
 
   /**
@@ -1571,13 +1574,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Expression input, @NonNull Expression expression, Stop... stops) {
-    return step(input, expression, Stop.toExpressionArray(stops));
+  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, Stop... stops) {
+    return step(input, defaultOutput, Stop.toExpressionArray(stops));
   }
 
   /**
