@@ -114,6 +114,7 @@ test('Map', function(t) {
             'removeLayer',
             'addImage',
             'removeImage',
+            'setLayerZoomRange',
             'setLayoutProperty',
             'setPaintProperty',
             'setFilter',
