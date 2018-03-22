@@ -61,8 +61,8 @@ struct SymbolLayoutAttributes : gl::Attributes<
             {{
                 static_cast<int16_t>(labelAnchor.x),
                 static_cast<int16_t>(labelAnchor.y),
-                static_cast<int16_t>(::round(o.x * 64)),  // use 1/64 pixels for placement
-                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 64))
+                static_cast<int16_t>(::round(o.x * 32)),  // use 1/32 pixels for placement
+                static_cast<int16_t>(::round((o.y + glyphOffsetY) * 32))
             }},
             {{
                 tx,
