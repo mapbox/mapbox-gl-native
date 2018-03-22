@@ -84,7 +84,6 @@
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 @property (readonly, copy, nullable) NSURL *URL;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
-@property (nonatomic, readwrite) NSMutableSet *managedLayers;
 
 @end
 
@@ -173,7 +172,6 @@ static NSURL *MGLStyleURL_trafficNight;
 
 - (instancetype)initWithRawStyle:(mbgl::style::Style *)rawStyle mapView:(MGLMapView *)mapView {
     if (self = [super init]) {
-        _managedLayers = [NSMutableSet set];
         _mapView = mapView;
         _rawStyle = rawStyle;
         _localizedLayersByIdentifier = [NSMutableDictionary dictionary];
@@ -534,16 +532,6 @@ static NSURL *MGLStyleURL_trafficNight;
         }
     }
     [self didChangeValueForKey:@"layers"];
-}
-
-#pragma mark - Layer retain/release management
-
-- (void)addToManagedLayers:(MGLStyleLayer*)layer {
-    [self.managedLayers addObject:layer];
-}
-
-- (void)removeFromManagedLayers:(MGLStyleLayer*)layer {
-    [self.managedLayers removeObject:layer];
 }
 
 #pragma mark Style classes

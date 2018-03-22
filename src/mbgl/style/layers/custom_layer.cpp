@@ -5,35 +5,48 @@
 namespace mbgl {
 namespace style {
 
+CustomLayer::~CustomLayer()
+{
+    printf("~CustomLayer destructor %p\n", this);
+
+}
+
 CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerInitializeFunction init,
                          CustomLayerRenderFunction render,
                          CustomLayerContextLostFunction contextLost,
                          CustomLayerDeinitializeFunction deinit,
-                         CustomLayerDeallocationFunction deallocation,
+
+                         CustomLayerContextOwnerChangedFunction ownerChanged,
+                         CustomLayerContextAttachFunction attach,
+                         CustomLayerContextDetachFunction detach,
                          void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)),
-    deallocationFn(deallocation) {
+    : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, ownerChanged, attach, detach, context))
+{
+    printf("CustomLayer::CustomLayer %p\n", this);
+
 }
 
 CustomLayer::CustomLayer(const std::string& layerID,
                          CustomLayerInitializeFunction init,
                          CustomLayerRenderFunction render,
                          CustomLayerDeinitializeFunction deinit,
-                         CustomLayerDeallocationFunction deallocation,
-                         void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)),
-    deallocationFn(deallocation) {
-}
 
-CustomLayer::~CustomLayer() {
-    if (deallocationFn) {
-        deallocationFn(&peer);
-    }
-};
+                         CustomLayerContextOwnerChangedFunction ownerChanged,
+                         CustomLayerContextAttachFunction attach,
+                         CustomLayerContextDetachFunction detach,
+                         void* context)
+    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, ownerChanged, attach, detach, context))
+{
+    printf("CustomLayer::CustomLayer %p\n", this);
+}
 
 const CustomLayer::Impl& CustomLayer::impl() const {
     return static_cast<const Impl&>(*baseImpl);
+}
+
+const void* CustomLayer::getContext() const {
+    return impl().context;
 }
 
 Mutable<CustomLayer::Impl> CustomLayer::mutableImpl() const {
@@ -43,6 +56,13 @@ Mutable<CustomLayer::Impl> CustomLayer::mutableImpl() const {
 std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
     assert(false);
     return nullptr;
+}
+
+void CustomLayer::setObserver(LayerObserver* observer) {
+
+    Layer::setObserver(observer);
+
+    impl().didSetObserver(observer != NULL);
 }
 
 // Visibility

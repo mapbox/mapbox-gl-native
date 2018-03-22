@@ -127,7 +127,7 @@ public:
     virtual std::unique_ptr<Layer> cloneRef(const std::string& id) const = 0;
 
     LayerObserver* observer = nullptr;
-    void setObserver(LayerObserver*);
+    virtual void setObserver(LayerObserver*);
 
     // For use in SDK bindings, which store a reference to a platform-native peer
     // object here, so that separately-obtained references to this object share

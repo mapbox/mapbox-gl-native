@@ -2,9 +2,11 @@
 #import <objc/message.h>
 #import <Mapbox/Mapbox.h>
 
-#import "src/MGLStyleLayerRetentionManager_Private.h"
 #import "src/MGLStyleLayer_Private.h"
 #import "../ios/src/MGLMapView_Private.h"
+
+#define TRACE(message) NSLog(@"%@: %@", NSStringFromSelector(_cmd), message)
+
 
 @interface MBGLIntegrationTests : XCTestCase <MGLMapViewDelegate>
 
@@ -70,14 +72,17 @@
 }
 
 - (void)waitForManagedLayersToExpire {
-    NSInteger count = MGLStyleLayerRetentionManagerDefaultLifetime;
-    while (count--) {
-        [self waitForMapViewToBeRendered];
-    }
+    //    NSInteger count = MGLStyleLayerRetentionManagerDefaultLifetime;
+    //    while (count--) {
+    [self waitForMapViewToBeRendered];
+    //    }
 }
 
 - (BOOL)isLayerBeingManaged:(MGLStyleLayer*)layer {
-    return [self.mapView debugIsStyleLayerBeingManaged:layer];
+
+    MGLOpenGLStyleLayer *glLayer = [layer isKindOfClass:[MGLOpenGLStyleLayer class]] ? (MGLOpenGLStyleLayer*)layer : nil;
+
+    return [glLayer isBeingManaged];
 }
 
 - (MGLStyle *)style {
@@ -85,6 +90,108 @@
 }
 
 #pragma mark - Tests
+
+
+- (void)testLayerRetainer {
+
+    __weak MGLOpenGLStyleLayer *weaklayer1 = nil;
+    __weak MGLOpenGLStyleLayerRetainer *weakLayerRetainer = nil;
+    __unsafe_unretained MGLOpenGLStyleLayer *unsafelayer1 = nil;
+
+
+    // For test purposes, we look at the retain count, but for this to make any
+    // sense we also need to use unsafe unretained (to stop the call from retaining
+    // the very value we're intereested in. We also use autorelease pools. Do
+    // NOT use this in production code!!!
+    SEL retainCountSelector = NSSelectorFromString(@"retainCount");
+    NSInteger (*retainCount)(id, SEL) = (NSInteger (*)(id, SEL))objc_msgSend;
+
+    #define ASSERT_RETAIN_COUNT(object, expectedCount) { \
+            NSInteger count = retainCount(object, retainCountSelector); \
+            XCTAssert(count == (expectedCount), @"Expected retain count mismatch for %s. Expected %d, got %ld", #object, expectedCount, count); \
+        }
+
+
+
+    @autoreleasepool {
+
+        // Setup
+        TRACE(@"MGLOpenGLStyleLayer allocation:");
+        MGLOpenGLStyleLayer *layer1 = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"test"];
+        weaklayer1 = layer1;
+        unsafelayer1 = layer1;
+
+        ASSERT_RETAIN_COUNT(unsafelayer1, 1);
+
+        // First check to ensure a retainer gets released
+        {
+            TRACE(@"testing retainer dealloc");
+
+            @autoreleasepool {
+                MGLOpenGLStyleLayerRetainer *layerRetainer = [[MGLOpenGLStyleLayerRetainer alloc] initWithLayer:layer1];
+                weakLayerRetainer = layerRetainer;
+            }
+
+            XCTAssertNil(weakLayerRetainer);
+        }
+
+        // Second check to check setting/unsetting owner
+        {
+            TRACE(@"testing retainer dealloc, after setting/clearing owner");
+
+            @autoreleasepool {
+                MGLOpenGLStyleLayerRetainer *layerRetainer = [[MGLOpenGLStyleLayerRetainer alloc] initWithLayer:layer1];
+                weakLayerRetainer = layerRetainer;
+                layerRetainer.owner = (__bridge void*)self;
+            }
+            XCTAssertNotNil(weakLayerRetainer);
+            weakLayerRetainer.owner = NULL;
+            XCTAssertNil(weakLayerRetainer);
+        }
+
+        // Now test "retaining" (used by layer during render & adding to style)
+        @autoreleasepool {
+            TRACE(@"testing retaining");
+
+            // Create a retainer
+            MGLOpenGLStyleLayerRetainer *layerRetainer = [[MGLOpenGLStyleLayerRetainer alloc] initWithLayer:layer1];
+            weakLayerRetainer = layerRetainer;
+
+            ASSERT_RETAIN_COUNT(unsafelayer1, 1);
+
+            layerRetainer.owner = (__bridge void*)self;
+
+            ASSERT_RETAIN_COUNT(unsafelayer1, 1);
+
+            [layerRetainer retainLayer];
+
+            ASSERT_RETAIN_COUNT(unsafelayer1, 2);
+        }
+
+        ASSERT_RETAIN_COUNT(unsafelayer1, 2);
+
+        // Get rid of the layer, but we should still hold on to it via our
+        // retainer.
+        layer1 = nil;
+    }
+
+    XCTAssertNotNil(weaklayer1);
+    XCTAssertNotNil(weakLayerRetainer);
+
+    @autoreleasepool {
+        XCTAssertNotNil(weakLayerRetainer.layer);
+    }
+
+    ASSERT_RETAIN_COUNT(unsafelayer1, 1);
+
+    weakLayerRetainer.owner = NULL;
+
+    XCTAssertNil(weakLayerRetainer);
+    XCTAssertNil(weaklayer1);
+
+    #undef ASSERT_RETAIN_COUNT
+}
+
 
 - (void)testStoringOpenGLLayerInCollections {
     // If we change the meaning of equality for MGLStyleLayer we want to know about it - since we
@@ -307,7 +414,7 @@
 
 - (void)testOpenGLLayerDoesNotLeakWhenRemovedFromStyle {
 
-//    MGLOpenGLStyleLayer *layer;
+    //    MGLOpenGLStyleLayer *layer;
     __weak id weakLayer;
     @autoreleasepool {
         MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
@@ -328,9 +435,10 @@
     XCTAssert([self isLayerBeingManaged:weakLayer]);
     [self waitForMapViewToBeRendered];
 
-    XCTAssertNotNil(weakLayer);
-    XCTAssert([self isLayerBeingManaged:weakLayer]);
-    [self waitForMapViewToBeRendered];
+
+    //    XCTAssertNotNil(weakLayer);
+    //    XCTAssert([self isLayerBeingManaged:weakLayer]);
+    //    [self waitForMapViewToBeRendered];
 
     XCTAssertNotNil(weakLayer);
     XCTAssert(![self isLayerBeingManaged:weakLayer]);

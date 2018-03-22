@@ -22,6 +22,8 @@ RenderCustomLayer::~RenderCustomLayer() {
         } else if (!contextDestroyed && impl().deinitializeFn) {
             impl().deinitializeFn(impl().context);
         }
+
+        impl().detachFn(impl().context);
     }
 }
 
@@ -47,10 +49,20 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
         //If the context changed, deinitialize the previous one before initializing the new one.
         if (context && !contextDestroyed && impl().deinitializeFn) {
             impl().deinitializeFn(context);
+
+            if (impl().detachFn) {
+                impl().detachFn(context);
+            }
         }
         context = impl().context;
+
+        if (impl().attachFn) {
+            impl().attachFn(context);
+        }
+
         assert(impl().initializeFn);
         impl().initializeFn(impl().context);
+
         initialized = true;
     }
 

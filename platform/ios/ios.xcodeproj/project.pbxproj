@@ -311,10 +311,6 @@
 		CA67C7FB204CFC9000C1CBB4 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		CA67C7FD204CFCAA00C1CBB4 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA67C7FC204CFCAA00C1CBB4 /* UIKit.framework */; };
 		CA7F25182048841E00896957 /* polyline.geojson in Resources */ = {isa = PBXBuildFile; fileRef = DA1DC96D1CB6C6CE006E619F /* polyline.geojson */; };
-		CA8F66E62049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CA8F66E42049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h */; };
-		CA8F66E72049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = CA8F66E42049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h */; };
-		CA8F66E82049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8F66E52049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm */; };
-		CA8F66E92049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CA8F66E52049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm */; };
 		CAAD2BD62041EF05003881EC /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
 		CAAD2BD72041EF05003881EC /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -875,8 +871,6 @@
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		CA67C7FC204CFCAA00C1CBB4 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		CA8F66E42049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLStyleLayerRetentionManager_Private.h; sourceTree = "<group>"; };
-		CA8F66E52049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLStyleLayerRetentionManager.mm; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
 		DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFeatureTests.mm; path = ../../darwin/test/MGLFeatureTests.mm; sourceTree = "<group>"; };
@@ -1625,8 +1619,6 @@
 				DA8847EE1CBAFA5100AB86E3 /* MGLTypes.h */,
 				DA8848111CBAFA6200AB86E3 /* MGLTypes.m */,
 				35E1A4D71D74336F007AA97F /* MGLValueEvaluator.h */,
-				CA8F66E42049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h */,
-				CA8F66E52049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm */,
 			);
 			name = Foundation;
 			path = ../darwin/src;
@@ -1939,7 +1931,6 @@
 				9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */,
 				40F887701D7A1E58008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
-				CA8F66E62049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h in Headers */,
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
@@ -2138,7 +2129,6 @@
 				DABFB8651CBE99E500D62B32 /* MGLOverlay.h in Headers */,
 				35E79F211D41266300957B9E /* MGLStyleLayer_Private.h in Headers */,
 				350098DD1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
-				CA8F66E72049DD2900B5B9DC /* MGLStyleLayerRetentionManager_Private.h in Headers */,
 				DABFB8681CBE99E500D62B32 /* MGLPolyline.h in Headers */,
 				96E516DF200054FB00A02306 /* MGLShape_Private.h in Headers */,
 				DABFB86F1CBE9A0F00D62B32 /* MGLMapView.h in Headers */,
@@ -2710,7 +2700,6 @@
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
 				07D947541F67489200E37934 /* MGLAbstractShapeSource.mm in Sources */,
 				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
-				CA8F66E82049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DACA86282019218600E9693A /* MGLRasterDEMSource.mm in Sources */,
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
@@ -2804,7 +2793,6 @@
 				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
 				07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */,
-				CA8F66E92049DD2900B5B9DC /* MGLStyleLayerRetentionManager.mm in Sources */,
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DACA86292019218600E9693A /* MGLRasterDEMSource.mm in Sources */,
 				35B82BFB1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
