@@ -231,6 +231,43 @@ TEST(TileCover, GeomSanFranciscoPoly) {
 
 }
 
+TEST(TileCover, GeomPoint) {
+    auto geom = Point<double>(-122.5744, 37.6609);
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ {2 ,0 ,1 } }),
+            util::tileCover(geom, 2));
+}
+
+TEST(TileCover, GeomMultiPoint) {
+    auto geom = MultiPoint<double>{ { -122.5, 37.76 }, { -122.4, 37.76} };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+                {19, 83740, 202675}, {19, 83886, 202675} }),
+            util::tileCover(geom, 19));
+}
+
+TEST(TileCover, GeomLineString) {
+    auto geom = LineString<double>{{ -122.5, 37.76 }, { -122.4, 37.76} };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+                {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
+                {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333} }),
+              util::tileCover(geom, 14));
+}
+
+TEST(TileCover, GeomMultiLineString) {
+    auto geom = MultiLineString<double>{
+            { { -122.5, 37.76 }, { -122.4, 37.76} },
+            { { -122.5, 37.72 }, { -122.4, 37.72} } };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+                {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
+                {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333},
+                {14, 2616, 6335}, {14, 2617, 6335}, {14, 2618, 6335},
+                {14, 2619, 6335}, {14, 2620, 6335}, {14, 2621, 6335} }),
+            util::tileCover(geom, 14));
+}
+
 TEST(TileCount, World) {
     EXPECT_EQ(1u, util::tileCount(LatLngBounds::world(), 0));
     EXPECT_EQ(4u, util::tileCount(LatLngBounds::world(), 1));

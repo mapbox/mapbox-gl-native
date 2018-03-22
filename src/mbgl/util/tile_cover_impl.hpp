@@ -85,7 +85,8 @@ private:
     bool closed_geom;
     uint32_t current_y; // current scanLine
     bound_list aet;
-    edge_table et;
+    std::vector<edge_table> et;
+    std::vector<edge_table>::iterator current_edge_table;
     uint32_t max_y;
 };
 

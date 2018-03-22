@@ -182,44 +182,51 @@ struct ToEdges {
         return edges;
     }
 
-    edge_list operator()(const Point<double>& p) const {
+    std::vector<edge_list> operator()(const Point<double>& p) const {
         const auto pt = Projection::project({p.y, p.x}, zoom);
-        return { {pt, pt} };
+        return { { {pt, pt} } };
     }
 
-    edge_list operator()(const MultiPoint<double>&points) const {
-        edge_list edges;
-        edges.reserve(points.size());
+    std::vector<edge_list> operator()(const MultiPoint<double>&points) const {
+        std::vector<edge_list> edgeLists;
+        edgeLists.reserve(points.size());
         for (const auto& p: points) {
             const auto pt = Projection::project({p.y, p.x}, zoom);
-            edges.emplace_back(pt, pt);
+            edgeLists.push_back({ edge{pt, pt} });
         }
-        return edges;
+        return edgeLists;
     }
 
-    edge_list operator()(const LineString<double>& lines) const {
+    std::vector<edge_list> operator()(const LineString<double>& lines) const {
         edge_list edges;
         makeEdges(lines, edges);
-        return edges;
+        return { edges };
     }
 
-    edge_list operator()(const MultiLineString<double>& g) const {
-        edge_list edges;
+    std::vector<edge_list> operator()(const MultiLineString<double>& g) const {
+        std::vector<edge_list> edgeLists;
         for(const auto& lines: g) {
+            edge_list edges;
             makeEdges(lines, edges);
+            edgeLists.push_back(edges);
+            edges.clear();
         }
-        return edges;
+        return edgeLists;
     }
 
-    edge_list operator()(const Polygon<double>& g) const {
-        return polyEdges(g);
+    std::vector<edge_list> operator()(const Polygon<double>& g) const {
+        return { polyEdges(g) };
     }
 
-    edge_list operator()(const MultiPolygon<double>&) const {
-        return {};
+    std::vector<edge_list> operator()(const MultiPolygon<double>& g) const {
+        std::vector<edge_list> edgeLists;
+        for(const auto& polygon: g) {
+            edgeLists.push_back(polyEdges(polygon));
+        }
+        return edgeLists;
     }
 
-    std::vector<edge> operator()(const mapbox::geometry::geometry_collection<double>&) const {
+    std::vector<edge_list> operator()(const mapbox::geometry::geometry_collection<double>&) const {
         return {};
     }
 };
@@ -232,18 +239,25 @@ TileCoverImpl::TileCoverImpl(int32_t z, const Geometry<double>& geom, bool proje
 
     // Build edge table
     ToEdges te(z, project);
-    edge_list edges = apply_visitor(te, geom);
-    build_edge_table(edges, max_y, et, closed_geom);
+    std::vector<edge_list> edgeLists = apply_visitor(te, geom);
+    for(auto& edges: edgeLists) {
+        edge_table table;
+        build_edge_table(edges, max_y, table, closed_geom);
+        et.push_back(table);
+    }
     reset();
 }
 
 void TileCoverImpl::reset() {
-    aet = et.begin()->second;
-    current_y = et.begin()->first;
+    current_edge_table = et.begin();
+    if (current_edge_table != et.end()) {
+        aet = current_edge_table->begin()->second;
+        current_y = current_edge_table->begin()->first;
+    }
 }
 
 bool TileCoverImpl::next() {
-    return aet.size() != 0 && current_y < max_y;
+    return current_edge_table != et.end() && aet.size() != 0 && current_y < max_y;
 }
 
 bool TileCoverImpl::scanRow(ScanLine& scanCover) {
@@ -264,9 +278,14 @@ bool TileCoverImpl::scanRow(ScanLine& scanCover) {
     current_y++;
 
     // Update AET for next row
-    auto nextRow = et.find(current_y);
-    if (nextRow != et.end()) {
+    auto nextRow = current_edge_table->find(current_y);
+    if (nextRow != current_edge_table->end()) {
         aet.insert(aet.end(), nextRow->second.begin(), nextRow->second.end());
+    } else if (aet.size() == 0){
+        current_edge_table++;
+        if (current_edge_table == et.end()) return false;
+        aet = current_edge_table->begin()->second;
+        current_y = current_edge_table->begin()->first;
     }
 
     return next();
