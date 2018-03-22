@@ -54,7 +54,9 @@ public:
         return value.match(
             [] (const Undefined&) { return false; },
             [] (const T&)         { return false; },
-            [] (const auto& fn)   { return fn.isExpression; });
+            [] (const    CameraFunction<T>& fn)   { return fn.isExpression; },
+            [] (const    SourceFunction<T>& fn)   { return fn.isExpression; },
+            [] (const CompositeFunction<T>& fn)   { return fn.isExpression; });
     }
 
     template <class... Ts>
