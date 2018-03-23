@@ -1357,7 +1357,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-string">Style specification</a>
    */
-  public static Expression string(@NonNull Expression input) {
+  public static Expression string(@NonNull Expression... input) {
     return new Expression("string", input);
   }
 
@@ -1370,7 +1370,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-number">Style specification</a>
    */
-  public static Expression number(@NonNull Expression input) {
+  public static Expression number(@NonNull Expression... input) {
     return new Expression("number", input);
   }
 
@@ -1383,7 +1383,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-boolean">Style specification</a>
    */
-  public static Expression bool(@NonNull Expression input) {
+  public static Expression bool(@NonNull Expression... input) {
     return new Expression("boolean", input);
   }
 
