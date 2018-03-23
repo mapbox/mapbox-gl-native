@@ -2,8 +2,6 @@ package com.mapbox.mapboxsdk.style.expressions;
 
 import android.graphics.Color;
 
-import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
-
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -113,7 +111,7 @@ public class ExpressionTest {
 
   @Test
   public void testToRgba() throws Exception {
-    Object[] expected = new Object[] {"to-rgba", PropertyFactory.colorToRgbaString(Color.RED)};
+    Object[] expected = new Object[] {"to-rgba", new Object[] {"to-color", "rgba(255, 0, 0, 255)"}};
     Object[] actual = toRgba(color(Color.RED)).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
@@ -1087,6 +1085,14 @@ public class ExpressionTest {
     float[] array = new float[] {0.2f, 0.5f};
     Object[] expected = new Object[] {"literal", new Object[] {0.2f, 0.5f}};
     Object[] actual = literal(array).toArray();
-    assertEquals("primitive array should be convered", expected, actual);
+    assertEquals("primitive array should be converted", expected, actual);
   }
+
+  @Test
+  public void testColorConversion() {
+    Expression greenColor = color(0xFF00FF00);
+    Object[] expected = new Object[] {"to-color", "rgba(0, 255, 0, 255)"};
+    assertTrue("expression should match", Arrays.deepEquals(expected, greenColor.toArray()));
+  }
+
 }

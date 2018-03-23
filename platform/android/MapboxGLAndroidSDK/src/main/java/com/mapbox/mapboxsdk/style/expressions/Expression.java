@@ -135,7 +135,7 @@ public class Expression {
    * @return the color expression
    */
   public static Expression color(@ColorInt int color) {
-    return new ExpressionLiteral(new Color(color));
+    return toColor(literal(PropertyFactory.colorToRgbaString(color)));
   }
 
   /**
@@ -1735,9 +1735,7 @@ public class Expression {
    */
   private Object toValue(ExpressionLiteral expressionValue) {
     Object value = expressionValue.toValue();
-    if (value instanceof Expression.Color) {
-      return ((Expression.Color) value).convertColor();
-    } else if (value instanceof Expression.ExpressionLiteral) {
+    if (value instanceof Expression.ExpressionLiteral) {
       return toValue((ExpressionLiteral) value);
     } else if (value instanceof Expression) {
       return ((Expression) value).toArray();
@@ -1890,32 +1888,6 @@ public class Expression {
 
     Interpolator(@NonNull String operator, @Nullable Expression... arguments) {
       super(operator, arguments);
-    }
-  }
-
-  /**
-   * Expression color type.
-   */
-  public static class Color {
-
-    private int color;
-
-    /**
-     * Creates a color color type from a color int.
-     *
-     * @param color the int color
-     */
-    public Color(@ColorInt int color) {
-      this.color = color;
-    }
-
-    /**
-     * Converts the int color to rgba(d, d, d, d) string representation
-     *
-     * @return the string representation of a color
-     */
-    String convertColor() {
-      return PropertyFactory.colorToRgbaString(color);
     }
   }
 
