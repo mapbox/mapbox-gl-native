@@ -14,29 +14,12 @@ public:
     virtual ~Impl();
 
     Impl(const std::string& id,
-         CustomLayerInitializeFunction,
-         CustomLayerRenderFunction,
-         CustomLayerContextLostFunction,
-         CustomLayerDeinitializeFunction,
-
-         CustomLayerContextOwnerChangedFunction,
-         CustomLayerContextAttachFunction,
-         CustomLayerContextDetachFunction,
-         void* context);
+         std::unique_ptr<CustomLayerContext> context);
 
     bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;
 
-    CustomLayerInitializeFunction initializeFn = nullptr;
-    CustomLayerRenderFunction renderFn = nullptr;
-    CustomLayerContextLostFunction contextLostFn = nullptr;
-    CustomLayerDeinitializeFunction deinitializeFn = nullptr;
-
-    CustomLayerContextOwnerChangedFunction changeOwnerFn = nullptr;
-    CustomLayerContextAttachFunction attachFn = nullptr;
-    CustomLayerContextDetachFunction detachFn = nullptr;
-
-    void* context = nullptr;
+    std::shared_ptr<CustomLayerContext> context;
 
     void didSetObserver(bool didSet) const;
 };

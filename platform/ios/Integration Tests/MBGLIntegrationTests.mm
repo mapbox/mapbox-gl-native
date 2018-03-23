@@ -78,12 +78,12 @@
     //    }
 }
 
-- (BOOL)isLayerBeingManaged:(MGLStyleLayer*)layer {
-
-    MGLOpenGLStyleLayer *glLayer = [layer isKindOfClass:[MGLOpenGLStyleLayer class]] ? (MGLOpenGLStyleLayer*)layer : nil;
-
-    return [glLayer isBeingManaged];
-}
+//- (BOOL)isLayerBeingManaged:(MGLStyleLayer*)layer {
+//
+//    MGLOpenGLStyleLayer *glLayer = [layer isKindOfClass:[MGLOpenGLStyleLayer class]] ? (MGLOpenGLStyleLayer*)layer : nil;
+//
+//    return [glLayer isBeingManaged];
+//}
 
 - (MGLStyle *)style {
     return self.mapView.style;
@@ -91,7 +91,7 @@
 
 #pragma mark - Tests
 
-
+/*
 - (void)testLayerRetainer {
 
     __weak MGLOpenGLStyleLayer *weaklayer1 = nil;
@@ -191,6 +191,7 @@
 
     #undef ASSERT_RETAIN_COUNT
 }
+ */
 
 
 - (void)testStoringOpenGLLayerInCollections {
@@ -432,7 +433,7 @@
     MGLStyleLayer *layer2 = weakLayer;
 
     XCTAssertNotNil(weakLayer);
-    XCTAssert([self isLayerBeingManaged:weakLayer]);
+//    XCTAssert([self isLayerBeingManaged:weakLayer]);
     [self waitForMapViewToBeRendered];
 
 
@@ -441,7 +442,7 @@
     //    [self waitForMapViewToBeRendered];
 
     XCTAssertNotNil(weakLayer);
-    XCTAssert(![self isLayerBeingManaged:weakLayer]);
+//    XCTAssert(![self isLayerBeingManaged:weakLayer]);
 
     layer2 = nil;
     XCTAssertNil(weakLayer);

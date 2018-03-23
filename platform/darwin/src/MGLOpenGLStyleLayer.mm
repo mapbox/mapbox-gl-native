@@ -7,187 +7,96 @@
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/math/wrap.hpp>
 
-@interface MGLOpenGLStyleLayerRetainer ()
-@property (nonatomic, weak, readwrite) MGLOpenGLStyleLayer *layer;
-@property (nonatomic, assign, readwrite) NSInteger layerRetainCount;
-@end
+class MGLOpenGLStyleLayerContext: public mbgl::style::CustomLayerContext
+{
+public:
+    __weak MGLOpenGLStyleLayer* layer;
+    int layerRetainCount;
 
-@implementation MGLOpenGLStyleLayerRetainer
-
-- (void)dealloc {
-    NSLog(@"LayerRetainer dealloc start %p", self);
-
-    while (self.layerRetainCount) {
-        [self releaseLayer];
-    }
-
-    NSLog(@"LayerRetainer dealloc end %p", self);
-}
-
-- (instancetype)initWithLayer:(MGLOpenGLStyleLayer*)styleLayer {
-    if ((self = [super init])) {
-        _layer = styleLayer;
-    }
-    NSLog(@"LayerRetainer %p init with layer %p", self, styleLayer);
-    return self;
-}
-
-- (void)setOwner:(nullable void *)owner {
-    void* oldOwner = _owner;
-
-    _owner = owner;
-
-    if (oldOwner) {
-        NSLog(@"LayerRetainer %p released", self);
-        CFBridgingRelease((__bridge CFTypeRef)(self));
-    }
-
-    if (_owner) {
-        NSLog(@"LayerRetainer %p retained", self);
-        CFBridgingRetain(self);
-    }
-}
-
-- (void)retainLayer {
-
-    if (!self.layer)
-        return;
-
-    NSAssert(self.layerRetainCount >= 0, @"");
-
-    @autoreleasepool {
-        CFBridgingRetain(self.layer);
-    }
-    self.layerRetainCount++;
-
-    NSLog(@"LayerRetainer %p retained %ld", self,  self.layerRetainCount);
-}
-
-
-- (void)releaseLayer {
-    if (!self.layer)
-        return;
-
-    NSAssert(self.layerRetainCount > 0, @"");
-
-    self.layerRetainCount--;
-
-    @autoreleasepool {
-        CFBridgingRelease((__bridge CFTypeRef)self.layer);
-    }
-
-    NSLog(@"LayerRetainer %p released %ld", self, self.layerRetainCount);
-}
-@end
-
-void MGLCustomLayerContextOwnerChangedFunction(void *context, void* owner) {
-    MGLOpenGLStyleLayerRetainer *contextRetainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    contextRetainer.owner = owner;
-}
-
-void MGLCustomLayerContextAttachFunction(void *context) {
-    MGLOpenGLStyleLayerRetainer *contextRetainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    [contextRetainer retainLayer];
-}
-
-void MGLCustomLayerContextDetachFunction(void *context) {
-    MGLOpenGLStyleLayerRetainer *contextRetainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    [contextRetainer releaseLayer];
-}
-
-
-
-/**
- Runs the preparation handler block contained in the given context, which is
- implicitly an instance of `MGLOpenGLStyleLayer`.
-
- @param context An `MGLOpenGLStyleLayer` instance that was provided as context
-    when creating an OpenGL style layer.
- */
-void MGLPrepareCustomStyleLayer(void *context) {
-    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
-    // is alive during rendering
-//    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
-
-    MGLOpenGLStyleLayerRetainer *retainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    MGLOpenGLStyleLayer *layer = retainer.layer;
-
-    [layer didMoveToMapView:layer.style.mapView];
-}
-
-/**
- Runs the drawing handler block contained in the given context, which is
- implicitly an instance of `MGLOpenGLStyleLayer`.
-
- @param context An `MGLOpenGLStyleLayer` instance that was provided as context
-    when creating an OpenGL style layer.
- */
-void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRenderParameters &params) {
-//    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
-    MGLOpenGLStyleLayer *layer = ((__bridge MGLOpenGLStyleLayerRetainer*)context).layer;
-
-    if (!layer)
+    MGLOpenGLStyleLayerContext(MGLOpenGLStyleLayer *layer_) :
+        mbgl::style::CustomLayerContext(),
+        layer(layer_),
+        layerRetainCount(0)
     {
-        NSLog(@"no layer");
-        return;
+
     }
 
-    MGLStyleLayerDrawingContext drawingContext = {
-        .size = CGSizeMake(params.width, params.height),
-        .centerCoordinate = CLLocationCoordinate2DMake(params.latitude, params.longitude),
-        .zoomLevel = params.zoom,
-        .direction = mbgl::util::wrap(params.bearing, 0., 360.),
-        .pitch = static_cast<CGFloat>(params.pitch),
-        .fieldOfView = static_cast<CGFloat>(params.fieldOfView),
+    ~MGLOpenGLStyleLayerContext()
+    {
+        while (layerRetainCount) {
+            detach();
+        }
+    }
+
+    void attach()
+    {
+        if (!layer) return;
+
+        assert(layerRetainCount >= 0);
+
+        @autoreleasepool {
+            CFBridgingRetain(layer);
+        }
+        layerRetainCount++;
+
+        printf("LayerRetainer %p retained %d", this, layerRetainCount);
+    }
+
+
+    void detach()
+    {
+        if (!layer) return;
+
+        assert(layerRetainCount > 0);
+
+        layerRetainCount--;
+
+        @autoreleasepool {
+            CFBridgingRelease((__bridge CFTypeRef)layer);
+        }
+
+        printf("LayerRetainer %p released %d", this, layerRetainCount);
+    }
+
+    // Custom stuff
+
+    /**
+     Runs the preparation handler block contained in the given context, which is
+     implicitly an instance of `MGLOpenGLStyleLayer`.
+
+     */
+    void initialize() {
+        [layer didMoveToMapView:layer.style.mapView];
     };
-    [layer drawInMapView:layer.style.mapView withContext:drawingContext];
-}
 
-/**
- Runs the completion handler block contained in the given context, which is
- implicitly an instance of `MGLOpenGLStyleLayer`.
+    /**
+     Runs the drawing handler block contained in the given context, which is
+     implicitly an instance of `MGLOpenGLStyleLayer`.
 
- @param context An `MGLOpenGLStyleLayer` instance that was provided as context
-    when creating an OpenGL style layer.
- */
-void MGLFinishCustomStyleLayer(void *context) {
-    // Note, that the layer is retained/released by MGLStyle, ensuring that the layer
-    // is alive during rendering
-//    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)context;
-    MGLOpenGLStyleLayerRetainer *retainer = (__bridge MGLOpenGLStyleLayerRetainer*)context;
-    MGLOpenGLStyleLayer *layer = retainer.layer;
+     */
+    void render(const mbgl::style::CustomLayerRenderParameters& params) {
 
-    [layer willMoveFromMapView:layer.style.mapView];
-}
+        MGLStyleLayerDrawingContext drawingContext = {
+            .size = CGSizeMake(params.width, params.height),
+            .centerCoordinate = CLLocationCoordinate2DMake(params.latitude, params.longitude),
+            .zoomLevel = params.zoom,
+            .direction = mbgl::util::wrap(params.bearing, 0., 360.),
+            .pitch = static_cast<CGFloat>(params.pitch),
+            .fieldOfView = static_cast<CGFloat>(params.fieldOfView),
+        };
+        [layer drawInMapView:layer.style.mapView withContext:drawingContext];
+    };
 
+    /**
+     Runs the completion handler block contained in the given context, which is
+     implicitly an instance of `MGLOpenGLStyleLayer`.
 
-/**
- Function to be called when the core `CustomLayer` (not the Impl) gets deallocated.
- It's possible taht at this stage the Obj-C style layer is being deallocated (but that case is detected).
- */
-//void MGLDeallocateCustomStyleLayer(mbgl::util::unique_any *peer) {
-//
-//    // We know that the peer object contains a LayerWrapper with a weak pointer to
-//    // our custom layer. We can use this to safely access the layer, and clear out the
-//    // raw pointer.
-//    //
-//    // If we don't do this rawLayer can become a dangling pointer (which was previously being
-//    // accessed via the description method)
-//
-//    if (!(peer && peer->has_value()))
-//        return;
-//
-//    LayerWrapper *wrapper = mbgl::util::any_cast<LayerWrapper>(peer);
-//
-//    if (!wrapper)
-//        return;
-//
-//    // If the MGLStyleLayer is currently being dealloc'd (and trigger the CustomLayer destructor, and
-//    // this function) then layer here will be nil (even though wrapper->layer may appear to be non-nil)
-//    MGLStyleLayer *layer = wrapper->layer;
-//
-//    layer.rawLayer = NULL;
-//}
+     */
+    void deinitialize() {
+        [layer willMoveFromMapView:layer.style.mapView];
+    };
+};
+
 
 
 /**
@@ -224,6 +133,11 @@ void MGLFinishCustomStyleLayer(void *context) {
 
 @implementation MGLOpenGLStyleLayer
 
+- (void)dealloc
+{
+    NSLog(@"MGLOpenGLStyleLayer dealloc %p\n", self);
+}
+
 /**
  Returns an OpenGL style layer object initialized with the given identifier.
 
@@ -236,44 +150,15 @@ void MGLFinishCustomStyleLayer(void *context) {
  @return An initialized OpenGL style layer.
  */
 
-- (BOOL)isBeingManaged {
-    if (self.rawLayer == NULL) {
-        return NO;
-    }
-
-    auto customLayer = self.rawLayer->template as<mbgl::style::CustomLayer>();
-
-    if (!customLayer) {
-        return NO;
-    }
-
-    MGLOpenGLStyleLayerRetainer *retainer = (__bridge MGLOpenGLStyleLayerRetainer*)(customLayer->getContext());
-
-    return retainer.layerRetainCount > 0;
-}
-
-- (void)dealloc
-{
-    NSLog(@"MGLOpenGLStyleLayer dealloc %p\n", self);
-}
-
 - (instancetype)initWithIdentifier:(NSString *)identifier {
 
     NSLog(@"MGLOpenGLStyleLayer init %p\n", self);
 
-    MGLOpenGLStyleLayerRetainer *retainer = [[MGLOpenGLStyleLayerRetainer alloc] initWithLayer:self];
+    auto context = std::make_unique<MGLOpenGLStyleLayerContext>(self);
 
     // Note, do not retain self here, otherwise MGLOpenGLStyleLayer will never be dealloc'd
     auto layer = std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String,
-                                                            MGLPrepareCustomStyleLayer,
-                                                            MGLDrawCustomStyleLayer,
-                                                            MGLFinishCustomStyleLayer,
-
-                                                            MGLCustomLayerContextOwnerChangedFunction,
-                                                            MGLCustomLayerContextAttachFunction,
-                                                            MGLCustomLayerContextDetachFunction,
-
-                                                            (__bridge void*)retainer);
+                                                            std::move(context));
 
     return self = [super initWithPendingLayer:std::move(layer)];
 }

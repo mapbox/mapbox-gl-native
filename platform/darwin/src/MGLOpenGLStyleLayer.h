@@ -12,19 +12,6 @@ NS_ASSUME_NONNULL_BEGIN
 
 @class MGLOpenGLStyleLayer;
 
-MGL_EXPORT
-@interface MGLOpenGLStyleLayerRetainer: NSObject
-@property (nonatomic, weak, readonly) MGLOpenGLStyleLayer *layer;
-@property (nonatomic, assign, readonly) NSInteger layerRetainCount;
-@property (nonatomic, unsafe_unretained, nullable) void *owner;
-- (instancetype)initWithLayer:(MGLStyleLayer*)styleLayer;
-- (void)retainLayer;
-- (void)releaseLayer;
-@end
-
-
-
-
 typedef struct MGLStyleLayerDrawingContext {
     CGSize size;
     CLLocationCoordinate2D centerCoordinate;
@@ -37,8 +24,6 @@ typedef struct MGLStyleLayerDrawingContext {
 MGL_EXPORT
 @interface MGLOpenGLStyleLayer : MGLStyleLayer
 @property (nonatomic, weak, readonly) MGLStyle *style;
-
-- (BOOL)isBeingManaged;
 
 - (instancetype)initWithIdentifier:(NSString *)identifier;
 

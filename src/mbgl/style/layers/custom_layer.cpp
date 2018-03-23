@@ -13,41 +13,15 @@ CustomLayer::~CustomLayer()
 }
 
 CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerContextLostFunction contextLost,
-                         CustomLayerDeinitializeFunction deinit,
-
-                         CustomLayerContextOwnerChangedFunction ownerChanged,
-                         CustomLayerContextAttachFunction attach,
-                         CustomLayerContextDetachFunction detach,
-                         void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, ownerChanged, attach, detach, context))
+                         std::unique_ptr<CustomLayerContext> context):
+    Layer(makeMutable<Impl>(layerID, std::move(context)))
 {
     printf("CustomLayer::CustomLayer %p\n", this);
 
-}
-
-CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerDeinitializeFunction deinit,
-
-                         CustomLayerContextOwnerChangedFunction ownerChanged,
-                         CustomLayerContextAttachFunction attach,
-                         CustomLayerContextDetachFunction detach,
-                         void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, ownerChanged, attach, detach, context))
-{
-    printf("CustomLayer::CustomLayer %p\n", this);
 }
 
 const CustomLayer::Impl& CustomLayer::impl() const {
     return static_cast<const Impl&>(*baseImpl);
-}
-
-const void* CustomLayer::getContext() const {
-    return impl().context;
 }
 
 Mutable<CustomLayer::Impl> CustomLayer::mutableImpl() const {

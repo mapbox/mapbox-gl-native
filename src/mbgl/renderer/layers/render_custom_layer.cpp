@@ -16,14 +16,24 @@ RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
 
 RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
-    if (initialized) {
-        if (contextDestroyed && impl().contextLostFn ) {
-            impl().contextLostFn(impl().context);
-        } else if (!contextDestroyed && impl().deinitializeFn) {
-            impl().deinitializeFn(impl().context);
+    if (initialized && impl().context.get()) {
+
+        if (contextDestroyed) {
+            impl().context->lost();
+        }
+        else {
+            impl().context->deinitialize();
         }
 
-        impl().detachFn(impl().context);
+        impl().context->detach();
+
+//        if (contextDestroyed && impl().contextLostFn ) {
+//            impl().contextLostFn(impl().context);
+//        } else if (!contextDestroyed && impl().deinitializeFn) {
+//            impl().deinitializeFn(impl().context);
+//        }
+//
+//        impl().detachFn(impl().context);
     }
 }
 
@@ -46,22 +56,18 @@ std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&,
 
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
     if (context != impl().context || !initialized) {
-        //If the context changed, deinitialize the previous one before initializing the new one.
-        if (context && !contextDestroyed && impl().deinitializeFn) {
-            impl().deinitializeFn(context);
 
-            if (impl().detachFn) {
-                impl().detachFn(context);
-            }
+        if (!contextDestroyed && context.get()) {
+            context->deinitialize();
+            context->detach();
         }
+
         context = impl().context;
 
-        if (impl().attachFn) {
-            impl().attachFn(context);
+        if (context.get()) {
+            context->attach();
+            context->initialize();
         }
-
-        assert(impl().initializeFn);
-        impl().initializeFn(impl().context);
 
         initialized = true;
     }
@@ -86,8 +92,9 @@ void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) 
     parameters.pitch = state.getPitch();
     parameters.fieldOfView = state.getFieldOfView();
 
-    assert(impl().renderFn);
-    impl().renderFn(context, parameters);
+//    assert(impl().renderFn);
+    context->render(parameters);
+//    impl().renderFn(context, parameters);
 
     // Reset the view back to our original one, just in case the CustomLayer changed
     // the viewport or Framebuffer.

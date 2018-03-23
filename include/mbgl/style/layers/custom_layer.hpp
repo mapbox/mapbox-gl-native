@@ -61,30 +61,27 @@ using CustomLayerContextAttachFunction = void (*)(void* context);
 using CustomLayerContextDetachFunction = void (*)(void* context);
 
 
+class CustomLayerContext {
+    public:
+    CustomLayerContext() = default;
+    virtual ~CustomLayerContext() = default;
+
+    virtual void initialize() = 0;
+    virtual void render(const CustomLayerRenderParameters&) = 0;
+    virtual void deinitialize() = 0;
+
+    virtual void lost() {};
+
+    // could lose these if we go back to having the set/style manage life times for
+    // MGLOpenGLStyleLayers
+    virtual void attach() {}
+    virtual void detach() {}
+};
+
 class CustomLayer : public Layer {
 public:
     CustomLayer(const std::string& id,
-                CustomLayerInitializeFunction,
-                CustomLayerRenderFunction,
-                CustomLayerContextLostFunction,
-                CustomLayerDeinitializeFunction,
-
-                // Wrap these 4?
-                CustomLayerContextOwnerChangedFunction,
-                CustomLayerContextAttachFunction,
-                CustomLayerContextDetachFunction,
-                void* context);
-
-    CustomLayer(const std::string& id,
-                CustomLayerInitializeFunction,
-                CustomLayerRenderFunction,
-                CustomLayerDeinitializeFunction,
-
-                // Wrap these 4?
-                CustomLayerContextOwnerChangedFunction,
-                CustomLayerContextAttachFunction,
-                CustomLayerContextDetachFunction,
-                void* context);
+                std::unique_ptr<CustomLayerContext> context);
 
     ~CustomLayer() final;
 

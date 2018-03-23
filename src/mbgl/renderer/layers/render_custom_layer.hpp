@@ -2,6 +2,7 @@
 
 #include <mbgl/renderer/render_layer.hpp>
 #include <mbgl/style/layers/custom_layer_impl.hpp>
+#include <mbgl/style/layers/custom_layer.hpp>
 
 namespace mbgl {
 
@@ -26,7 +27,7 @@ public:
 private:
     bool initialized = false;
     bool contextDestroyed = false;
-    void * context = nullptr;
+    std::shared_ptr<style::CustomLayerContext> context;
 };
 
 template <>

@@ -4,41 +4,21 @@ namespace mbgl {
 namespace style {
 
 CustomLayer::Impl::~Impl() {
-    if (changeOwnerFn)
-        changeOwnerFn(context, NULL);
 }
 
 CustomLayer::Impl::Impl(const std::string& id_,
-                        CustomLayerInitializeFunction initializeFn_,
-                        CustomLayerRenderFunction renderFn_,
-                        CustomLayerContextLostFunction contextLostFn_,
-                        CustomLayerDeinitializeFunction deinitializeFn_,
-
-                        CustomLayerContextOwnerChangedFunction changeOwnerFn_,
-                        CustomLayerContextAttachFunction attachFn_,
-                        CustomLayerContextDetachFunction detachFn_,
-
-                        void* context_):
+                        std::unique_ptr<CustomLayerContext> context_):
     Layer::Impl(LayerType::Custom, id_, std::string()),
-    initializeFn(initializeFn_),
-    renderFn(renderFn_),
-    contextLostFn(contextLostFn_),
-    deinitializeFn(deinitializeFn_),
-    changeOwnerFn(changeOwnerFn_),
-    attachFn(attachFn_),
-    detachFn(detachFn_),
-    context(context_) {
+    context(std::move(context_)) {
 
-        if (changeOwnerFn)
-            changeOwnerFn(context, this);
 }
 
 void CustomLayer::Impl::didSetObserver(bool didSet) const {
     if (didSet) {
-        if (attachFn) attachFn(context);
+        context->attach();
     }
     else {
-        if (detachFn) detachFn(context);
+        context->detach();
     }
 }
 
