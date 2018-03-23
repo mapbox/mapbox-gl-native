@@ -66,7 +66,7 @@ public:
     std::size_t size = 0;
 
     auto createRegion() {
-        OfflineRegionDefinition definition { "", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 1.0 };
+        OfflineTilePyramidRegionDefinition definition { "", LatLngBounds::hull({1, 2}, {3, 4}), 5, 6, 1.0 };
         OfflineRegionMetadata metadata;
         return db.createRegion(definition, metadata);
     }
