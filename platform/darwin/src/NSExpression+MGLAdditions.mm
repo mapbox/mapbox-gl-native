@@ -258,6 +258,12 @@
     return [self valueForKeyPath:@"mgl_jsonExpressionObject"];
 }
 
+- (id)mgl_coalesce {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Coalesce expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
 @implementation NSDictionary (MGLExpressionAdditions)
@@ -481,23 +487,17 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"match"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
             NSArray *matchOptions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-            NSExpression *defaultOption;
-            if (matchOptions.count % 2) {
-                defaultOption = [NSExpression mgl_expressionWithJSONObject:matchOptions.lastObject];
-                matchOptions = [matchOptions subarrayWithRange:NSMakeRange(0, matchOptions.count - 1)];
-            }
+
             NSMutableArray *optionsArray = [NSMutableArray array];
             NSEnumerator *optionsEnumerator = matchOptions.objectEnumerator;
-            while (NSNumber *key = optionsEnumerator.nextObject) {
-                NSMutableDictionary *option = [NSMutableDictionary dictionaryWithCapacity:1];
-                NSExpression *valueExpression = optionsEnumerator.nextObject;
-                option[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+            while (id object = optionsEnumerator.nextObject) {
+                NSExpression *option = [NSExpression mgl_expressionWithJSONObject:object];
                 [optionsArray addObject:option];
             }
-            NSExpression *optionsExpression = [NSExpression expressionForConstantValue:optionsArray];
+        
             return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_matchWithOptions:default:"
-                                             arguments:@[optionsExpression, defaultOption]];
+                                          selectorName:@"mgl_match:"
+                                             arguments:optionsArray];
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
             for (id operand in argumentObjects) {
@@ -708,19 +708,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                         [expressionObject addObject:option.mgl_jsonExpressionObject];
 
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_matchWithOptions:default:"]) {
-
+            } else if ([function isEqualToString:@"mgl_match:"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", self.operand.mgl_jsonExpressionObject, nil];
-                NSArray *optionsArray = self.arguments[0].constantValue;
-                for (NSDictionary<id, NSExpression*> *options in optionsArray) {
-                    for (NSNumber *key in options.allKeys) {
-                        [expressionObject addObject:key];
-                    } else {
-                        [expressionObject addObject:[options[key] mgl_jsonExpressionObject]];
-                    }
+                
+
+                for (NSExpression *option in self.arguments) {
+                    [expressionObject addObject:option.mgl_jsonExpressionObject];
                 }
                 
-                [expressionObject addObject:[self.arguments[1] mgl_jsonExpressionObject]];
                 return expressionObject;
             } else if ([function isEqualToString:@"mgl_coalesce"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
