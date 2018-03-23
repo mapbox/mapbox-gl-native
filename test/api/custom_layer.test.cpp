@@ -34,7 +34,7 @@ void main() {
 // layer implementation because it is intended to reflect how someone using custom layers
 // might actually write their own implementation.
 
-class TestLayer {
+class TestLayer: public CustomLayerContext {
 public:
     ~TestLayer() {
         if (program) {
@@ -67,6 +67,11 @@ public:
         MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
     }
 
+    void render(const CustomLayerRenderParameters& params) {
+        (void)params;
+        render();
+    }
+
     void render() {
         MBGL_CHECK_ERROR(glUseProgram(program));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
@@ -93,19 +98,12 @@ TEST(CustomLayer, Basic) {
             threadPool, MapMode::Static);
     map.getStyle().loadJSON(util::read_file("test/fixtures/api/water.json"));
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
-    map.getStyle().addLayer(std::make_unique<CustomLayer>(
-        "custom",
-        [] (void* context) {
-          reinterpret_cast<TestLayer*>(context)->initialize();
-        },
-        [] (void* context, const CustomLayerRenderParameters&) {
-          reinterpret_cast<TestLayer*>(context)->render();
-        },
-        [] (void* context) {
-          delete reinterpret_cast<TestLayer*>(context);
-        },
-        nullptr,
-        new TestLayer()));
+
+
+    auto testLayer = std::make_unique<TestLayer>();
+    auto customLayer = std::make_unique<CustomLayer>("custom", std::move(testLayer));
+    map.getStyle().addLayer(std::move(customLayer));
+
 
     auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
     layer->setSourceLayer("landcover");

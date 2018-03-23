@@ -193,7 +193,9 @@ public:
 
     // We need to ensure that this layer is retained, so that any references from layer impl's
     // e.g. contexts) are still valid
-//    [style addToManagedLayers:self];
+
+//    [style addToManagedLayers:self]; // This is currently handled by the Custom layer, when the style
+//  sets itself to be the layer's observer
 
     [super addToStyle:style belowLayer:otherLayer];
 }
@@ -201,8 +203,9 @@ public:
 - (void)removeFromStyle:(MGLStyle *)style {
     [super removeFromStyle:style];
 
-    // We need to ensure that this layer is now released (however, if this layer is about to be
-    // used by the renderer then it will released once rendering is complete)
+    // We need to ensure that this layer is now released (not necessarily freed)
+    // This is currently handled by the Custom layer, when the style
+    //  unsets itself as the layer's observer
 //    [style removeFromManagedLayers:self];
 
     self.style = nil;

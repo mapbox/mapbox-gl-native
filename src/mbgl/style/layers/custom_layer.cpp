@@ -10,7 +10,8 @@ CustomLayer::~CustomLayer()
     printf("~CustomLayer destructor %p\n", this);
 
     // Need to set rawLayer to nil in the obj-c layer.
-    onDestruction();
+    if (onDestruction)
+        onDestruction();
 }
 
 CustomLayer::CustomLayer(const std::string& layerID,
@@ -18,7 +19,6 @@ CustomLayer::CustomLayer(const std::string& layerID,
     Layer(makeMutable<Impl>(layerID, std::move(context)))
 {
     printf("CustomLayer::CustomLayer %p\n", this);
-
 }
 
 const CustomLayer::Impl& CustomLayer::impl() const {

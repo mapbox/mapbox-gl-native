@@ -69,7 +69,7 @@ class CustomLayerContext {
 
     virtual void initialize() = 0;
     virtual void render(const CustomLayerRenderParameters&) = 0;
-    virtual void deinitialize() = 0;
+    virtual void deinitialize() {};
 
     virtual void lost() {};
 
