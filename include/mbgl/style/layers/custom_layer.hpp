@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <mbgl/style/layer.hpp>
 
 namespace mbgl {
@@ -105,6 +106,8 @@ public:
     std::unique_ptr<Layer> cloneRef(const std::string& id) const final;
 
     CustomLayer(const CustomLayer&) = delete;
+
+    std::function<void()> onDestruction;
 };
 
 template <>

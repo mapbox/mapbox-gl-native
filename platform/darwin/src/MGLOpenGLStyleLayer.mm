@@ -160,7 +160,18 @@ public:
     auto layer = std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String,
                                                             std::move(context));
 
-    return self = [super initWithPendingLayer:std::move(layer)];
+    self = [super initWithPendingLayer:std::move(layer)];
+
+    if (self) {
+        __weak MGLOpenGLStyleLayer *weakself = self;
+
+        self.rawLayer->onDestruction =^{
+            weakself.rawLayer = NULL;
+        };
+    }
+
+    return self;
+
 }
 
 - (mbgl::style::CustomLayer *)rawLayer {

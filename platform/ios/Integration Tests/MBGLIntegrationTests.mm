@@ -507,7 +507,8 @@
 }
 
 - (void)testOpenGLLayerDoesNotLeakWhenStyleChanged {
-    __weak id weakLayer;
+
+    __weak MGLOpenGLStyleLayer *weakLayer;
 
     @autoreleasepool {
         {
@@ -532,22 +533,24 @@
     [self.mapView setStyleURL:styleURL];
     [self waitForExpectations:@[_styleLoadingExpectation] timeout:10];
 
-    // At this point the C++ CustomLayer will have been destroyed, BUT we're holding on
-    // to the obj-c layer. We don't currently clear the rawLayer, so it could now be
-    // pointing at garbage. And the following line will crash (due to description
-    // using .rawLayer)
+    // At this point the C++ CustomLayer will have been destroyed, and the rawLayer pointer has been NULLed
+    XCTAssert(weakLayer == layer2);
+    XCTAssertNotNil(weakLayer);
+    XCTAssert(weakLayer.rawLayer == NULL);
 
-//    (void)layer2;
-    XCTFail();
-//    [self.style insertLayer:layer2 atIndex:0];
-
+    @try {
+        [self.style insertLayer:layer2 atIndex:0];
+        XCTFail();
+    }
+    @catch (NSException *exception) {
+        // Success, we're expecting an exception
+    }
 
     [self waitForManagedLayersToExpire];
 
     // Asking the style for the layer should return nil
     MGLStyleLayer *layer3 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
     XCTAssertNil(layer3);
-//    XCTAssertNil(weakLayer);
 }
 
 
