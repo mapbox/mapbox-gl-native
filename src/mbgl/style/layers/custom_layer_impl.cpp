@@ -14,6 +14,9 @@ CustomLayer::Impl::Impl(const std::string& id_,
 }
 
 void CustomLayer::Impl::didSetObserver(bool didSet) const {
+    if (!context)
+        return;
+
     if (didSet) {
         context->attach();
     }

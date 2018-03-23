@@ -16,7 +16,7 @@ RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
 
 RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
-    if (initialized && impl().context.get()) {
+    if (initialized && impl().context) {
 
         if (contextDestroyed) {
             impl().context->lost();
@@ -57,14 +57,14 @@ std::unique_ptr<Bucket> RenderCustomLayer::createBucket(const BucketParameters&,
 void RenderCustomLayer::render(PaintParameters& paintParameters, RenderSource*) {
     if (context != impl().context || !initialized) {
 
-        if (!contextDestroyed && context.get()) {
+        if (!contextDestroyed && context) {
             context->deinitialize();
             context->detach();
         }
 
         context = impl().context;
 
-        if (context.get()) {
+        if (context) {
             context->attach();
             context->initialize();
         }
