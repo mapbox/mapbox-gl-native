@@ -38,6 +38,10 @@
                     "to the style more than once is invalid.", self, style];
     }
 
+    // Since we're adding self to a C++ collection, we need to retain ourselves, so that we don't
+    // end up with a dangling pointer
+    CFBridgingRetain(self);
+
     if (otherLayer) {
         const mbgl::optional<std::string> belowLayerId{otherLayer.identifier.UTF8String};
         style.rawStyle->addLayer(std::move(_pendingLayer), belowLayerId);
@@ -50,6 +54,10 @@
 {
     if (self.rawLayer == style.rawStyle->getLayer(self.identifier.UTF8String)) {
         _pendingLayer = style.rawStyle->removeLayer(self.identifier.UTF8String);
+
+        // Pair the retain above, and release self, since we're now removed from the collection
+        CFTypeRef toRelease = (__bridge CFTypeRef)self;
+        CFBridgingRelease(toRelease);
     }
 }
 

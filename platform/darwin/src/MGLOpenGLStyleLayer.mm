@@ -15,7 +15,11 @@
     when creating an OpenGL style layer.
  */
 void MGLPrepareCustomStyleLayer(void *context) {
-    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
+
+    // Pair retain/release during rendering (see MGLFinishCustomStyleLayer)
+    id retaineee = (__bridge id)context;
+    MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer*)CFBridgingRetain(retaineee);
+
     [layer didMoveToMapView:layer.style.mapView];
 }
 
@@ -47,7 +51,8 @@ void MGLDrawCustomStyleLayer(void *context, const mbgl::style::CustomLayerRender
     when creating an OpenGL style layer.
  */
 void MGLFinishCustomStyleLayer(void *context) {
-    MGLOpenGLStyleLayer *layer = (__bridge_transfer MGLOpenGLStyleLayer *)context;
+    // Release the layer (since we retained it in the initialization)
+    MGLOpenGLStyleLayer *layer = CFBridgingRelease(context);
     [layer willMoveFromMapView:layer.style.mapView];
 }
 
@@ -97,11 +102,12 @@ void MGLFinishCustomStyleLayer(void *context) {
  @return An initialized OpenGL style layer.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier {
+    // Note, do not retain self here, otherwise MGLOpenGLStyleLayer will never be dealloc'd
     auto layer = std::make_unique<mbgl::style::CustomLayer>(identifier.UTF8String,
                                                             MGLPrepareCustomStyleLayer,
                                                             MGLDrawCustomStyleLayer,
                                                             MGLFinishCustomStyleLayer,
-                                                            (__bridge_retained void *)self);
+                                                            (__bridge void*)self);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
 

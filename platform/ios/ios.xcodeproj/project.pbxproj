@@ -27,7 +27,6 @@
 		16376B411FFDB4B40000563E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B401FFDB4B40000563E /* main.m */; };
 		16376B471FFDB92B0000563E /* one-liner.json in Resources */ = {isa = PBXBuildFile; fileRef = DA35D0871E1A6309007DED41 /* one-liner.json */; };
 		16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */; };
-		165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		170C437C2029D96F00863DF0 /* MGLHeatmapColorTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43782028D49800863DF0 /* MGLHeatmapColorTests.mm */; };
 		170C437D2029D97900863DF0 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43792028D49800863DF0 /* MGLHeatmapStyleLayerTests.mm */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
@@ -309,6 +308,8 @@
 		AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CAAD2BD62041EF05003881EC /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
+		CAAD2BD72041EF05003881EC /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -577,6 +578,13 @@
 			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
 			remoteInfo = dynamic;
 		};
+		CAA55225204486D7004D1B8E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16376B2E1FFDB4B40000563E;
+			remoteInfo = "Integration Test Harness";
+		};
 		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
@@ -622,6 +630,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		CAAD2BD82041EF05003881EC /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CAAD2BD72041EF05003881EC /* Mapbox.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DA4A269A1CB6F5D3000B7809 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -1121,7 +1140,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1129,6 +1147,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAAD2BD62041EF05003881EC /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1908,7 +1927,6 @@
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
-				1FB7DAAF1F2A4DBD00410606 /* MGLVectorSource+MGLAdditions.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
@@ -2175,6 +2193,7 @@
 			buildRules = (
 			);
 			dependencies = (
+				CAA55226204486D7004D1B8E /* PBXTargetDependency */,
 				165D0CE620005351009A3C66 /* PBXTargetDependency */,
 			);
 			name = integration;
@@ -2189,6 +2208,7 @@
 				16376B2B1FFDB4B40000563E /* Sources */,
 				16376B2C1FFDB4B40000563E /* Frameworks */,
 				16376B2D1FFDB4B40000563E /* Resources */,
+				CAAD2BD82041EF05003881EC /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2810,6 +2830,11 @@
 			isa = PBXTargetDependency;
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
 			targetProxy = 165D0CE520005351009A3C66 /* PBXContainerItemProxy */;
+		};
+		CAA55226204486D7004D1B8E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16376B2E1FFDB4B40000563E /* Integration Test Harness */;
+			targetProxy = CAA55225204486D7004D1B8E /* PBXContainerItemProxy */;
 		};
 		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
