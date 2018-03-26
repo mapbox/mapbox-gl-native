@@ -193,6 +193,7 @@ string syntax:
 Initializer parameter | Format string syntax | Arguments | Returns
 ----------------------|----------------------|-----------|--------
 `mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | An aggregate expression or `NSArray` constant value expression containing one or more `NSExpression`s, each evaluating to a string. | An `NSString` object (the result of concatenating together all the elements of an array in order).
+`MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables.
 
 The following custom functions are also available with the
 `+[NSExpression expressionForFunction:selectorName:arguments:]` method or the
@@ -212,22 +213,6 @@ The following custom functions are also available with the
    <td>
       A Boolean representation of the target: `FALSE` when then input is an
       empty string, 0, `FALSE`, `NIL`, or NaN, otherwise `TRUE`.
-   </td>
-</tr>
-<tr>
-   <td><code>mgl_expressionWithContext:</code></td>
-   <td>
-      An `NSExpression` that may contain references to the variables defined in
-      the context dictionary.
-   </td>
-   <td>
-      An `NSDictionary` with `NSString`s as keys and `NSExpression`s as values.
-      Each key is a variable name and each value is the variable’s value within
-      the target expression.
-   </td>
-   <td>
-      The target expression with variable subexpressions replaced with the
-      values defined in the context dictionary.
    </td>
 </tr>
 <tr>

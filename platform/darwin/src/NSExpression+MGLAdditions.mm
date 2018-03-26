@@ -24,6 +24,16 @@ NSString *MGLJoinComponents(Class self, SEL _cmd, NSArray<NSString *> *component
 }
 
 /**
+ A placeholder for a method that evaluates an expression based on an arbitrary
+ number of variable names and assigned expressions.
+ */
+id MGLEvaluateWithContext(Class self, SEL _cmd, NSString *firstVariableName, ...) {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
+};
+
+/**
  Adds to NSExpression’s built-in repertoire of functions.
  */
 void MGLInstallAftermarketExpressionFunctions() {
@@ -38,6 +48,10 @@ void MGLInstallAftermarketExpressionFunctions() {
 #pragma clang push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
     class_addMethod(NSPredicateUtilities, @selector(mgl_join:), (IMP)MGLJoinComponents, "@@:@");
+    
+    // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
+    class_addMethod(NSPredicateUtilities, @selector(MGL_LET), (IMP)MGLEvaluateWithContext, "@@:@");
+    class_addMethod(NSPredicateUtilities, @selector(MGL_LET:), (IMP)MGLEvaluateWithContext, "@@:@");
 #pragma clang pop
 }
 
@@ -369,6 +383,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"^": @"raise:toPower:",
             @"upcase": @"uppercase:",
             @"downcase": @"lowercase:",
+            @"let": @"MGL_LET",
         };
     });
     
@@ -530,17 +545,6 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
         }  else if ([op isEqualToString:@"properties"]) {
             return [NSExpression expressionForVariable:@"mgl_featureProperties"];
-        } else if ([op isEqualToString:@"let"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
-            NSArray *bindingObjects = [argumentObjects subarrayWithRange:NSMakeRange(0, argumentObjects.count - 1)];
-            NSMutableDictionary *context = [NSMutableDictionary dictionaryWithCapacity:bindingObjects.count / 2];
-            NSEnumerator *bindingEnumerator = bindingObjects.objectEnumerator;
-            while (NSString *key = bindingEnumerator.nextObject) {
-                context[key] = [NSExpression mgl_expressionWithJSONObject:bindingEnumerator.nextObject];
-            }
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_expressionWithContext:"
-                                             arguments:@[[NSExpression expressionForConstantValue:context]]];
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
@@ -608,6 +612,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"uppercase:": @"upcase",
             @"lowercase:": @"downcase",
             @"length:": @"length",
+            // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
+            @"MGL_LET": @"let",
+            @"MGL_LET:": @"let",
         };
     });
     
