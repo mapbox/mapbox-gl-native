@@ -171,6 +171,24 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
     }
     {
+        NSExpression *expression = [NSExpression expressionForVariable:@"geometryType"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"geometry-type"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"geometry-type"]], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureId"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"id"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureId"].mgl_jsonExpressionObject, @[@"id"]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"id"]], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureProperties"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"properties"]], expression);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForVariable:@"loremIpsum"];
         NSArray *jsonExpression = @[@"var", @"loremIpsum"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);

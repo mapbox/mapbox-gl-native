@@ -465,6 +465,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForVariable:@"zoomLevel"];
         } else if ([op isEqualToString:@"heatmap-density"]) {
             return [NSExpression expressionForVariable:@"heatmapDensity"];
+        } else if ([op isEqualToString:@"geometry-type"]) {
+            return [NSExpression expressionForVariable:@"geometryType"];
+        } else if ([op isEqualToString:@"id"]) {
+            return [NSExpression expressionForVariable:@"featureId"];
+        }  else if ([op isEqualToString:@"properties"]) {
+            return [NSExpression expressionForVariable:@"featureProperties"];
         } else if ([op isEqualToString:@"let"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
             NSArray *bindingObjects = [argumentObjects subarrayWithRange:NSMakeRange(0, argumentObjects.count - 1)];
@@ -552,6 +558,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             if ([self.variable isEqualToString:@"zoomLevel"]) {
                 return @[@"zoom"];
+            }
+            if ([self.variable isEqualToString:@"geometryType"]) {
+                return @[@"geometry-type"];
+            }
+            if ([self.variable isEqualToString:@"featureId"]) {
+                return @[@"id"];
+            }
+            if ([self.variable isEqualToString:@"featureProperties"]) {
+                return @[@"properties"];
             }
             return @[@"var", self.variable];
         }
