@@ -54,6 +54,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
+@property (nonatomic, readonly) id mgl_coalesce;
+
 @end
 
 @interface NSDictionary (MGLExpressionAdditions)
