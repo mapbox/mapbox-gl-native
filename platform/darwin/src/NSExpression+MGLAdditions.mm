@@ -406,6 +406,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSExpression *operand = subexpressions.firstObject;
             subexpressions = [subexpressions subarrayWithRange:NSMakeRange(1, subexpressions.count - 1)];
             return [NSExpression expressionForFunction:operand selectorName:@"stringByAppendingString:" arguments:subexpressions];
+        }  else if ([op isEqualToString:@"at"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            NSExpression *index = subexpressions.firstObject;
+            NSExpression *operand = subexpressions[1];
+            return [NSExpression expressionForFunction:operand selectorName:@"objectAtIndex:" arguments:@[index]];
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
@@ -639,6 +644,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
+            } else if ([function isEqualToString:@"objectAtIndex:"]) {
+                NSExpression *index = self.arguments[0];
+                return @[@"at", index.mgl_jsonExpressionObject, self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"boolValue"]) {
                 return @[@"to-boolean", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"mgl_numberWithFallbackValues:"] ||

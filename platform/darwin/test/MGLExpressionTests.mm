@@ -629,4 +629,25 @@ using namespace std::string_literals;
     
 }
 
+- (void)testLookupExpressionObject {
+    {
+        NSExpression *operand = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
+                                                                         MGLConstantExpression(@8),
+                                                                         MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'objectAtIndex:', %@)", operand, MGLConstantExpression(@1)];
+        NSArray *jsonExpression = @[@"at", @1, @[ @"literal", @[@9, @8, @7]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *operand = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
+                                                                       MGLConstantExpression(@8),
+                                                                       MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'objectAtIndex:', x)", operand];
+        NSArray *jsonExpression = @[@"at", @[@"get", @"x"], @[ @"literal", @[@9, @8, @7]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+}
+
 @end
