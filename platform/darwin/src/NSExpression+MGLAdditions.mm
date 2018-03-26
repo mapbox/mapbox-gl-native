@@ -411,6 +411,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSExpression *index = subexpressions.firstObject;
             NSExpression *operand = subexpressions[1];
             return [NSExpression expressionForFunction:operand selectorName:@"objectAtIndex:" arguments:@[index]];
+        } else if ([op isEqualToString:@"has"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            NSExpression *property = subexpressions.firstObject;
+            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'has')", property];
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
@@ -659,6 +663,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
+            } else if ([function isEqualToString:@"has"]) {
+                return @[@"has", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
                 if (self.arguments.count < 3) {
                     [NSException raise:NSInvalidArgumentException format:

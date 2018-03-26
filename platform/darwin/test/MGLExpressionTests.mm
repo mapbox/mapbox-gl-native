@@ -648,6 +648,12 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION('x', 'has')"];
+        NSArray *jsonExpression = @[@"has", @"x"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
 }
 
 @end
