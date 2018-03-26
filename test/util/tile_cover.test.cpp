@@ -2,6 +2,8 @@
 #include <mbgl/util/geo.hpp>
 #include <mbgl/map/transform.hpp>
 
+#include <algorithm>
+
 #include <gtest/gtest.h>
 
 using namespace mbgl;
@@ -22,8 +24,8 @@ TEST(TileCover, Antarctic) {
 
 TEST(TileCover, WorldZ0) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                  { 0, 0, 0 },
-              }),
+        { 0, 0, 0 },
+    }),
               util::tileCover(LatLngBounds::world(), 0));
 }
 
@@ -37,15 +39,15 @@ TEST(TileCover, Pitch) {
     transform.setPitch(40.0 * M_PI / 180.0);
 
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                  { 2, 1, 2 }, { 2, 1, 1 }, { 2, 2, 2 }, { 2, 2, 1 }, { 2, 3, 2 }
-              }),
+        { 2, 1, 2 }, { 2, 1, 1 }, { 2, 2, 2 }, { 2, 2, 1 }, { 2, 3, 2 }
+    }),
               util::tileCover(transform.getState(), 2));
 }
 
 TEST(TileCover, WorldZ1) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                  { 1, 0, 0 }, { 1, 0, 1 }, { 1, 1, 0 }, { 1, 1, 1 },
-              }),
+        { 1, 0, 0 }, { 1, 0, 1 }, { 1, 1, 0 }, { 1, 1, 1 },
+    }),
               util::tileCover(LatLngBounds::world(), 1));
 }
 
@@ -83,24 +85,24 @@ TEST(TileCoverStream, WorldZ1) {
         }
     })){};
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 1 }, { 1, 1, 1 },
-            }), t);
+        { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 1 }, { 1, 1, 1 },
+    }), t);
 }
 
 static const LatLngBounds sanFrancisco =
-    LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
+LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
 
 TEST(TileCover, SanFranciscoZ0) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                  { 0, 0, 0 },
-              }),
+        { 0, 0, 0 },
+    }),
               util::tileCover(sanFrancisco, 0));
 }
 
 TEST(TileCover, SanFranciscoZ10) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-                  { 10, 163, 395 }, { 10, 163, 396 }, { 10, 164, 395 }, { 10, 164, 396 },
-              }),
+        { 10, 163, 395 }, { 10, 163, 396 }, { 10, 164, 395 }, { 10, 164, 396 },
+    }),
               util::tileCover(sanFrancisco, 10));
 }
 
@@ -112,81 +114,100 @@ TEST(TileCover, SanFranciscoZ0Wrapped) {
               util::tileCover(sanFranciscoWrapped, 0));
 }
 
-TEST(TileCover, GeomPointZ13) {
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 13, 2343, 3133 } }),
-            util::tileCover(Point<double> {-77.03355114851098,38.89224995264726 }, 13));
-}
-
-TEST(TileCover, GeomPointZ10) {
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 10, 292, 391 } }),
-            util::tileCover(Point<double> {-77.03355114851098,38.89224995264726 }, 10));
-}
-
 TEST(TileCover, GeomLineZ10) {
-
     auto lineCover = util::tileCover(LineString<double>{
-            {-121.49368286132812,38.57903714667459},
-            {-122.4422836303711,37.773157169570695}
-        }, 10);
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 10, 166, 392}, {10, 165, 393}, {10, 166, 393}, {10, 164, 394}, {10, 165, 394}, {10,163,395}, {10, 164, 395} }),
-        lineCover);
-
-}
-
-TEST(TileCover, GeomLineZ13) {
-    auto lineCover = util::tileCover(LineString<double>{
-            {-77.03342914581299,38.892101707724315},
-            {-77.02394485473633,38.89203490311832},
-            {-77.02390193939209,38.8824811975508},
-            {-77.0119285583496,38.8824811975508},
-            {-77.01218605041504,38.887391829071106},
-            {-77.01390266418456,38.88735842456116},
-            {-77.01622009277342,38.896510672795266},
-            {-77.01725006103516,38.914143795902376},
-            {-77.01879501342773,38.914143795902376},
-            {-77.0196533203125,38.91307524644972}
-        }, 13);
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 13, 2343, 3133 }, { 13, 2343, 3134 } }),
-        lineCover);
+        {-121.49368286132812,38.57903714667459},
+        {-122.4422836303711,37.773157169570695}
+    }, 10);
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+        { 10, 166, 392}, {10, 165, 393}, {10, 166, 393},
+        {10, 164, 394}, {10, 165, 394}, {10,163,395}, {10, 164, 395}
+    }),lineCover);
+    
 }
 
 TEST(TileCover, WrappedGeomLineZ10) {
     auto lineCover = util::tileCover(LineString<double>{
-            {-179.93342914581299,38.892101707724315},
-            {-180.02394485473633,38.89203490311832}
-        }, 10);
+        {-179.93342914581299,38.892101707724315},
+        {-180.02394485473633,38.89203490311832}
+    }, 10);
     EXPECT_EQ((std::vector<UnwrappedTileID>{ { 10, -1, 391 }, { 10, 0, 391 } }),
-        lineCover);
-
+              lineCover);
+    
     lineCover = util::tileCover(LineString<double>{
-            {179.93342914581299,38.892101707724315},
-            {180.02394485473633,38.89203490311832}
-        }, 10);
+        {179.93342914581299,38.892101707724315},
+        {180.02394485473633,38.89203490311832}
+    }, 10);
     EXPECT_EQ((std::vector<UnwrappedTileID>{ { 10, 1023, 391 }, { 10, 1024, 391 } }),
-        lineCover);
+              lineCover);
 }
 
-TEST(TileCover, GeomLineZ15) {
-    auto lineCover = util::tileCover(LineString<double>{
-            {-77.03342914581299,38.892101707724315},
-            {-77.02394485473633,38.89203490311832},
-            {-77.02390193939209,38.8824811975508},
-            {-77.0119285583496,38.8824811975508},
-            {-77.01218605041504,38.887391829071106},
-            {-77.01390266418456,38.88735842456116},
-            {-77.01622009277342,38.896510672795266},
-            {-77.01725006103516,38.914143795902376},
-            {-77.01879501342773,38.914143795902376},
-            {-77.0196533203125,38.91307524644972}
-        }, 15);
-    EXPECT_EQ(lineCover, (std::vector<UnwrappedTileID>{
-        { 15,9373,12533 },
-        { 15,9373,12534 },
-        { 15,9372,12535 },
-        { 15,9373,12535 },
-        { 15,9373,12536 },
-        { 15,9374,12536 }
-        }));
+TEST(TileCover, GeomMultiLineString) {
+    auto geom = MultiLineString<double>{
+        { { -122.5, 37.76 }, { -122.4, 37.76} },
+        { { -122.5, 37.72 }, { -122.4, 37.72} } };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+        {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
+        {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333} }),
+              util::tileCover(geom, 14));
+}
+
+TEST(TileCover, GeomPolygon) {
+    auto polygon = Polygon<double>{
+        {
+            {5.09765625,53.067626642387374},
+            {2.373046875,43.389081939117496},
+            {-4.74609375,48.45835188280866},
+            {-1.494140625,37.09023980307208},
+            {22.587890625,36.24427318493909},
+            {31.640625,46.13417004624326},
+            {17.841796875,54.7246201949245},
+            {5.09765625,53.067626642387374},
+        },{
+            {19.6875,49.66762782262194},
+            {8.701171874999998,50.233151832472245},
+            {5.185546875,41.244772343082076},
+            {16.34765625,39.095962936305476},
+            {13.623046875,45.089035564831036},
+            {22.8515625,43.51668853502906},
+            {19.6875,49.66762782262194}
+        }
+    };
+
+    auto results = util::tileCover(polygon, 8);
+
+    EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 134, 87}), results.end());
+    EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 139, 87}), results.end());
+    // Should have a hole
+    EXPECT_EQ(std::find(results.begin(), results.end(), UnwrappedTileID{8, 136, 87}), results.end());
+}
+
+TEST(TileCover, GeomMultiPolygon) {
+    auto multiPolygon = MultiPolygon<double>{
+        {{
+            {5.09765625,53.067626642387374},
+            {2.373046875,43.389081939117496},
+            {-4.74609375,48.45835188280866},
+            {-1.494140625,37.09023980307208},
+            {22.587890625,36.24427318493909},
+            {31.640625,46.13417004624326},
+            {17.841796875,54.7246201949245},
+            {5.09765625,53.067626642387374},
+        }},{{
+            {59.150390625,45.460130637921004},
+            {65.126953125,41.11246878918088},
+            {69.169921875,47.45780853075031},
+            {63.896484375,50.064191736659104},
+            {59.150390625,45.460130637921004}
+        }}
+    };
+    auto results = util::tileCover(multiPolygon, 8);
+
+    EXPECT_EQ(423u, results.size());
+    EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 139, 87}), results.end());
+    EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 136, 87}), results.end());
+    EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 174, 94}), results.end());
 }
 
 TEST(TileCover, GeomSanFranciscoPoly) {
@@ -218,55 +239,14 @@ TEST(TileCover, GeomSanFranciscoPoly) {
         }
     };
 
-    auto results = util::tileCover(sanFranciscoGeom, 10);
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ { 10, 163, 395 }, { 10, 163, 396 } }),
-        results);
-
-    results = util::tileCover(sanFranciscoGeom, 12);
     EXPECT_EQ((std::vector<UnwrappedTileID>{
-            { 12, 654, 1582 }, { 12, 655, 1582 },
-            { 12, 654, 1583 },  { 12, 655, 1583 },
-            { 12, 654, 1584 }, { 12, 655, 1584 }
-        }), results);
-
+        { 12, 654, 1582 }, { 12, 655, 1582 },
+        { 12, 654, 1583 },  { 12, 655, 1583 },
+        { 12, 654, 1584 }, { 12, 655, 1584 }
+    }), util::tileCover(sanFranciscoGeom, 12));
 }
 
-TEST(TileCover, GeomPoint) {
-    auto geom = Point<double>(-122.5744, 37.6609);
 
-    EXPECT_EQ((std::vector<UnwrappedTileID>{ {2 ,0 ,1 } }),
-            util::tileCover(geom, 2));
-}
-
-TEST(TileCover, GeomMultiPoint) {
-    auto geom = MultiPoint<double>{ { -122.5, 37.76 }, { -122.4, 37.76} };
-
-    EXPECT_EQ((std::vector<UnwrappedTileID>{
-                {19, 83740, 202675}, {19, 83886, 202675} }),
-            util::tileCover(geom, 19));
-}
-
-TEST(TileCover, GeomLineString) {
-    auto geom = LineString<double>{{ -122.5, 37.76 }, { -122.4, 37.76} };
-
-    EXPECT_EQ((std::vector<UnwrappedTileID>{
-                {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
-                {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333} }),
-              util::tileCover(geom, 14));
-}
-
-TEST(TileCover, GeomMultiLineString) {
-    auto geom = MultiLineString<double>{
-            { { -122.5, 37.76 }, { -122.4, 37.76} },
-            { { -122.5, 37.72 }, { -122.4, 37.72} } };
-
-    EXPECT_EQ((std::vector<UnwrappedTileID>{
-                {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
-                {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333},
-                {14, 2616, 6335}, {14, 2617, 6335}, {14, 2618, 6335},
-                {14, 2619, 6335}, {14, 2620, 6335}, {14, 2621, 6335} }),
-            util::tileCover(geom, 14));
-}
 
 TEST(TileCount, World) {
     EXPECT_EQ(1u, util::tileCount(LatLngBounds::world(), 0));
