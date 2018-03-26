@@ -2,25 +2,25 @@
 
 #import "MGLFoundation.h"
 #import "MGLOfflineRegion.h"
-#import "MGLGeometry.h"
+#import "MGLShape.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- An offline region defined by a style URL, geographic coordinate bounds, and
+ An offline region defined by a style URL, geographic shape, and
  range of zoom levels.
  
- To minimize the resources required by an irregularly shaped offline region,
- use the MGLShapeOfflineRegion class instead.
+ This class requires fewer resources than MGLTilePyramidOfflineRegion
+ for irregularly shaped regions.
  */
 MGL_EXPORT
-@interface MGLTilePyramidOfflineRegion : NSObject <MGLOfflineRegion, NSSecureCoding, NSCopying>
+@interface MGLShapeOfflineRegion : NSObject <MGLOfflineRegion, NSSecureCoding, NSCopying>
 
 /**
- The coordinate bounds for the geographic region covered by the downloaded
+ The shape for the geographic region covered by the downloaded
  tiles.
  */
-@property (nonatomic, readonly) MGLCoordinateBounds bounds;
+@property (nonatomic, readonly) MGLShape *shape;
 
 /**
  The minimum zoom level for which to download tiles and other resources.
@@ -39,10 +39,10 @@ MGL_EXPORT
 - (instancetype)init NS_UNAVAILABLE;
 
 /**
- Initializes a newly created offline region with the given style URL, geographic
- coordinate bounds, and range of zoom levels.
+ Initializes a newly created offline region with the given style URL, geometry,
+ and range of zoom levels.
 
- This is the designated initializer for `MGLTilePyramidOfflineRegion`.
+ This is the designated initializer for `MGLShapeOfflineRegion`.
 
  @param styleURL URL of the map style for which to download resources. The URL
     may be a full HTTP or HTTPS URL or a Mapbox URL indicating the style’s map
@@ -50,7 +50,7 @@ MGL_EXPORT
     Relative file URLs cannot be used as offline style URLs. To download the
     online resources required by a local style, specify a URL to an online copy
     of the style.
- @param bounds The coordinate bounds for the geographic region to be covered by
+ @param shape The shape of the geographic region to be covered by
     the downloaded tiles.
  @param minimumZoomLevel The minimum zoom level to be covered by the downloaded
     tiles. This parameter should be set to at least 0 but no greater than the
@@ -65,7 +65,7 @@ MGL_EXPORT
     level, the download covers zoom levels up to the tile source’s maximum zoom
     level.
  */
-- (instancetype)initWithStyleURL:(nullable NSURL *)styleURL bounds:(MGLCoordinateBounds)bounds fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithStyleURL:(nullable NSURL *)styleURL shape:(MGLShape *)shape fromZoomLevel:(double)minimumZoomLevel toZoomLevel:(double)maximumZoomLevel NS_DESIGNATED_INITIALIZER;
 
 @end
 

@@ -285,7 +285,7 @@ const MGLExceptionName MGLUnsupportedRegionTypeException = @"MGLUnsupportedRegio
         return;
     }
 
-    const mbgl::OfflineTilePyramidRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
+    const mbgl::OfflineRegionDefinition regionDefinition = [(id <MGLOfflineRegion_Private>)region offlineRegionDefinition];
     mbgl::OfflineRegionMetadata metadata(context.length);
     [context getBytes:&metadata[0] length:metadata.size()];
     self.mbglFileSource->createOfflineRegion(regionDefinition, metadata, [&, completion](mbgl::expected<mbgl::OfflineRegion, std::exception_ptr> mbglOfflineRegion) {
