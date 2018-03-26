@@ -756,7 +756,6 @@ jobs:
     steps:
       - checkout
       - *install-macos-dependencies
-      - *install-xcpretty-workaround
       - *generate-cache-key
       - *restore-cache
       - *reset-ccache-stats
