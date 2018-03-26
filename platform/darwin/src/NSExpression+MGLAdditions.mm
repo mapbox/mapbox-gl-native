@@ -15,28 +15,24 @@
 
 #import <mbgl/style/expression/expression.hpp>
 
-/**
- Joins the given components into a single string by concatenating each component
- in order.
- */
-NSString *MGLJoinComponents(Class self, SEL _cmd, NSArray<NSString *> *components) {
-    return [components componentsJoinedByString:@""];
-}
+@interface MGLAftermarketExpressionInstaller: NSObject
+@end
 
-/**
- A placeholder for a method that evaluates an expression based on an arbitrary
- number of variable names and assigned expressions.
- */
-id MGLEvaluateWithContext(Class self, SEL _cmd, NSString *firstVariableName, ...) {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Assignment expressions lack underlying Objective-C implementations."];
-    return nil;
-};
+@implementation MGLAftermarketExpressionInstaller
+
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self installFunctions];
+    });
+}
 
 /**
  Adds to NSExpression’s built-in repertoire of functions.
  */
-void MGLInstallAftermarketExpressionFunctions() {
++ (void)installFunctions {
+    Class MGLAftermarketExpressionInstaller = [self class];
+    
     // NSExpression’s built-in functions are backed by class methods on a
     // private class, so use a function expression to get at the class.
     // http://funwithobjc.tumblr.com/post/2922267976/using-custom-functions-with-nsexpression
@@ -47,21 +43,67 @@ void MGLInstallAftermarketExpressionFunctions() {
     Class NSPredicateUtilities = objc_getMetaClass(className.UTF8String);
 #pragma clang push
 #pragma clang diagnostic ignored "-Wundeclared-selector"
-    class_addMethod(NSPredicateUtilities, @selector(mgl_join:), (IMP)MGLJoinComponents, "@@:@");
+    #define INSTALL_METHOD(sel) \
+        { \
+            Method method = class_getInstanceMethod(MGLAftermarketExpressionInstaller, @selector(sel)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel), method_getImplementation(method), method_getTypeEncoding(method)); \
+        }
+    #define INSTALL_CONTROL_STRUCTURE(sel) \
+        { \
+            Method method = class_getInstanceMethod(MGLAftermarketExpressionInstaller, @selector(sel:)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel), method_getImplementation(method), method_getTypeEncoding(method)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel:), method_getImplementation(method), method_getTypeEncoding(method)); \
+        }
     
-    // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
-    class_addMethod(NSPredicateUtilities, @selector(MGL_LET), (IMP)MGLEvaluateWithContext, "@@:@");
-    class_addMethod(NSPredicateUtilities, @selector(MGL_LET:), (IMP)MGLEvaluateWithContext, "@@:@");
+    // Install method-like functions, taking the number of arguments implied by
+    // the selector name.
+    INSTALL_METHOD(mgl_join:);
+    INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
+    INSTALL_METHOD(mgl_step:from:stops:);
+    
+    // Install functions that resemble control structures, taking arbitrary
+    // numbers of arguments. Vararg aftermarket functions need to be declared
+    // with an explicit and implicit first argument.
+    INSTALL_CONTROL_STRUCTURE(MGL_LET);
+    
+    #undef INSTALL_AFTERMARKET_FN
 #pragma clang pop
 }
 
-@interface MGLAftermarketExpressionInstaller: NSObject
-@end
+/**
+ Joins the given components into a single string by concatenating each component
+ in order.
+ */
+- (NSString *)mgl_join:(NSArray<NSString *> *)components {
+    return [components componentsJoinedByString:@""];
+}
 
-@implementation MGLAftermarketExpressionInstaller
+/**
+ A placeholder for a method that evaluates an interpolation expression.
+ */
+- (id)mgl_interpolate:(id)inputExpression withCurveType:(NSString *)curveType parameters:(NSDictionary *)params stops:(NSDictionary *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Interpolation expressions lack underlying Objective-C implementations."];
+    return nil;
+}
 
-+ (void)load {
-    MGLInstallAftermarketExpressionFunctions();
+/**
+ A placeholder for a method that evaluates a step expression.
+ */
+- (id)mgl_step:(id)inputExpression from:(id)minimumExpression stops:(NSDictionary *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Step expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates an expression based on an arbitrary
+ number of variable names and assigned expressions.
+ */
+- (id)MGL_LET:(NSString *)firstVariableName, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
 }
 
 @end
@@ -501,7 +543,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             NSExpression *curveParameterExpression = [NSExpression mgl_expressionWithJSONObject:curveParameters];
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
             NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
@@ -510,11 +552,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_interpolateWithCurveType:parameters:stops:"
-                                             arguments:@[curveTypeExpression, curveParameterExpression, stopExpression]];
+            return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
+                                             arguments:@[inputExpression, curveTypeExpression, curveParameterExpression, stopExpression]];
         } else if ([op isEqualToString:@"step"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSExpression *minimum;
             if (stopExpressions.count % 2) {
@@ -532,9 +573,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_stepWithMinimum:stops:"
-                                             arguments:@[minimum, stopExpression]];
+            return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
+                                             arguments:@[inputExpression, minimum, stopExpression]];
         } else if ([op isEqualToString:@"zoom"]) {
             return [NSExpression expressionForVariable:@"zoomLevel"];
         } else if ([op isEqualToString:@"heatmap-density"]) {
@@ -753,40 +793,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 }
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
-                if (self.arguments.count < 3) {
-                    [NSException raise:NSInvalidArgumentException format:
-                     @"Too few arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments."];
-                } else if (self.arguments.count > 3) {
-                    [NSException raise:NSInvalidArgumentException format:
-                     @"%lu unexpected arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments.",
-                     self.arguments.count - 3];
-                }
-                NSString *curveType = self.arguments.firstObject.constantValue;
-                NSMutableArray *interpolationArray = [NSMutableArray arrayWithObject:curveType];
-                if ([curveType isEqualToString:@"exponential"]) {
-                    id base = [self.arguments[1] mgl_jsonExpressionObject];
-                    [interpolationArray addObject:base];
-                } else if ([curveType isEqualToString:@"cubic-bezier"]) {
-                    NSArray *controlPoints = [self.arguments[1].collection mgl_jsonExpressionObject];
-                    [interpolationArray addObjectsFromArray:controlPoints];
-                }
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, self.operand.mgl_jsonExpressionObject, nil];
-                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[2].constantValue;
-                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
-                    [expressionObject addObject:key];
-                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
-                }
-                return expressionObject;
-            } else if ([function isEqualToString:@"mgl_stepWithMinimum:stops:"]) {
-                id minimum = self.arguments.firstObject.mgl_jsonExpressionObject;
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", self.operand.mgl_jsonExpressionObject, minimum, nil];
-                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[1].constantValue;
-                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
-                    [expressionObject addObject:key];
-                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
-                }
-                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"]
+                       || [function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
+                return self.mgl_jsonInterpolationExpressionObject;
+            } else if ([function isEqualToString:@"mgl_step:from:stops:"]
+                       || [function isEqualToString:@"mgl_stepWithMinimum:stops:"]) {
+                return self.mgl_jsonStepExpressionObject;
             } else if ([function isEqualToString:@"mgl_expressionWithContext:"]) {
                 id context = self.arguments.firstObject;
                 if ([context isKindOfClass:[NSExpression class]]) {
@@ -916,6 +928,52 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     }
     
     return nil;
+}
+
+- (id)mgl_jsonInterpolationExpressionObject {
+    NSUInteger expectedArgumentCount = [self.function componentsSeparatedByString:@":"].count - 1;
+    if (self.arguments.count < expectedArgumentCount) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"Too few arguments to ‘%@’ function; expected %lu arguments.",
+         self.function, expectedArgumentCount];
+    } else if (self.arguments.count > expectedArgumentCount) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"%lu unexpected arguments to ‘%@’ function; expected %lu arguments.",
+         self.arguments.count - expectedArgumentCount, self.function, expectedArgumentCount];
+    }
+    
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"];
+    NSUInteger curveTypeIndex = isAftermarketFunction ? 1 : 0;
+    NSString *curveType = self.arguments[curveTypeIndex].constantValue;
+    NSMutableArray *interpolationArray = [NSMutableArray arrayWithObject:curveType];
+    if ([curveType isEqualToString:@"exponential"]) {
+        id base = [self.arguments[curveTypeIndex + 1] mgl_jsonExpressionObject];
+        [interpolationArray addObject:base];
+    } else if ([curveType isEqualToString:@"cubic-bezier"]) {
+        NSArray *controlPoints = [self.arguments[curveTypeIndex + 1].collection mgl_jsonExpressionObject];
+        [interpolationArray addObjectsFromArray:controlPoints];
+    }
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, nil];
+    [expressionObject addObject:(isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject];
+    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[curveTypeIndex + 2].constantValue;
+    for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+        [expressionObject addObject:key];
+        [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+    }
+    return expressionObject;
+}
+
+- (id)mgl_jsonStepExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_step:from:stops:"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+    id minimum = self.arguments[minimumIndex].mgl_jsonExpressionObject;
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, minimum, nil];
+    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[minimumIndex + 1].constantValue;
+    for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+        [expressionObject addObject:key];
+        [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+    }
+    return expressionObject;
 }
 
 @end

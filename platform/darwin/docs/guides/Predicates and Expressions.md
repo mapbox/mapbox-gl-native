@@ -190,10 +190,12 @@ functions just like the predefined functions above, using either the
 `+[NSExpression expressionForFunction:arguments:]` method or a convenient format
 string syntax:
 
-Initializer parameter | Format string syntax | Arguments | Returns
-----------------------|----------------------|-----------|--------
-`mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | An aggregate expression or `NSArray` constant value expression containing one or more `NSExpression`s, each evaluating to a string. | An `NSString` object (the result of concatenating together all the elements of an array in order).
-`MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables.
+Initializer parameter | Format string syntax | Description
+----------------------|----------------------|------------
+`mgl_interpolate:withCurveType:parameters:stops:` | `mgl_interpolate:withCurveType:parameters:stops:($zoom, 'linear', x, nil, %@)` | Produces continuous, smooth results by interpolating between pairs of input and output values (“stops”). Compared to the `mgl_interpolateWithCurveType:parameters:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
+`mgl_step:from:stops:` | `mgl_step:from:stops:(x, 11, %@)` |Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of input and output values ("stops"). Compared to the `mgl_stepWithMinimum:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
+`mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | Returns the result of concatenating together all the elements of an array in order. Compared to the `stringByAppendingString:` custom function, this function takes only one argument, which is an aggregate expression containing the strings to concatenate.
+`MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables. Compared to the `mgl_expressionWithContext:` custom function, this function takes the variable names and values inline before the expression that contains references to those variables.
 
 The following custom functions are also available with the
 `+[NSExpression expressionForFunction:selectorName:arguments:]` method or the
@@ -213,6 +215,22 @@ The following custom functions are also available with the
    <td>
       A Boolean representation of the target: `FALSE` when then input is an
       empty string, 0, `FALSE`, `NIL`, or NaN, otherwise `TRUE`.
+   </td>
+</tr>
+<tr>
+   <td><code>mgl_expressionWithContext:</code></td>
+   <td>
+      An `NSExpression` that may contain references to the variables defined in
+      the context dictionary.
+   </td>
+   <td>
+      An `NSDictionary` with `NSString`s as keys and `NSExpression`s as values.
+      Each key is a variable name and each value is the variable’s value within
+      the target expression.
+   </td>
+   <td>
+      The target expression with variable subexpressions replaced with the
+      values defined in the context dictionary.
    </td>
 </tr>
 <tr>
@@ -302,6 +320,18 @@ The following custom functions are also available with the
       The output value of the stop whose key is just less than the evaluated
       target, or the minimum value if the target is less than the least of the
       stops’ keys.
+   </td>
+</tr>
+<tr>
+   <td><code>stringByAppendingString:</code></td>
+   <td>
+      An `NSExpression` that evaluates to a string.
+   </td>
+   <td>
+      One or more `NSExpression`s, each evaluating to a string.
+   </td>
+   <td>
+      The target string with each of the argument strings appended in order.
    </td>
 </tr>
 <tr>
