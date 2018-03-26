@@ -48,9 +48,7 @@ void OfflineManager::createOfflineRegion(jni::JNIEnv& env_,
                                          jni::Array<jni::jbyte> metadata_,
                                          jni::Object<CreateOfflineRegionCallback> callback_) {
     // Convert
-
-    // XXX hardcoded cast for now as we only support OfflineTilePyramidRegionDefinition
-    auto definition = OfflineTilePyramidRegionDefinition::getDefinition(env_, jni::Object<OfflineTilePyramidRegionDefinition>(*definition_));
+    auto definition = OfflineRegionDefinition::getDefinition(env_, definition_);
 
     mbgl::OfflineRegionMetadata metadata;
     if (metadata_) {
@@ -152,7 +150,7 @@ void OfflineManager::CreateOfflineRegionCallback::onCreate(jni::JNIEnv& env,
                                                         jni::Object<FileSource> jFileSource,
                                                         jni::Object<OfflineManager::CreateOfflineRegionCallback> callback,
                                                         mbgl::optional<mbgl::OfflineRegion> region) {
-    //Convert the region to java peer object
+    // Convert the region to java peer object
     auto jregion = OfflineRegion::New(env, jFileSource, std::move(*region));
 
     // Trigger callback
