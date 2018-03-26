@@ -482,6 +482,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 } else {
                     [arguments addObject:[NSExpression mgl_expressionWithJSONObject:caseExpressions[index]]];
                 }
+            }
             
             return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
@@ -706,6 +707,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                         [expressionObject addObject:predicate.mgl_jsonExpressionObject];
                     } else {
                         [expressionObject addObject:option.mgl_jsonExpressionObject];
+                    }
+                }
 
                 return expressionObject;
             } else if ([function isEqualToString:@"mgl_match:"]) {
