@@ -660,7 +660,7 @@ using namespace std::string_literals;
 
 - (void)testConditionalExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_case:', %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_SWITCH(%@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
                                     MGLConstantExpression(@YES),
                                     MGLConstantExpression(@NO)];
@@ -670,7 +670,7 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_case:', %@, %@, %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_SWITCH(%@, %@, %@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
                                     MGLConstantExpression(@YES),
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 1"]],

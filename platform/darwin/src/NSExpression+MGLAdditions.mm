@@ -66,6 +66,7 @@
     // with an explicit and implicit first argument.
     INSTALL_CONTROL_STRUCTURE(MGL_LET);
     INSTALL_CONTROL_STRUCTURE(MGL_MATCH);
+    INSTALL_CONTROL_STRUCTURE(MGL_SWITCH);
     INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
     
     #undef INSTALL_AFTERMARKET_FN
@@ -116,6 +117,29 @@
                 format:@"Assignment expressions lack underlying Objective-C implementations."];
     return nil;
 }
+
+/**
+ A placeholder for a method that evaluates an expression and returns the matching element.
+ */
+- (id)MGL_SWITCH:(id)firstCondition, ... {
+    va_list argumentList;
+    va_start(argumentList, firstCondition);
+    
+    for (id eachExpression = firstCondition; eachExpression; eachExpression = va_arg(argumentList, id)) {
+        if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
+            id valueExpression = va_arg(argumentList, id);
+            if ([eachExpression evaluateWithObject:nil]) {
+                return valueExpression;
+            }
+        } else {
+            return eachExpression;
+        }
+    }
+    va_end(argumentList);
+    
+    return nil;
+}
+
 
 /**
  A placeholder for a catch-all method that evaluates an arbitrary number of
@@ -610,21 +634,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
-            NSArray *caseExpressions = argumentObjects;
-            NSExpression *firstConditional = [NSExpression expressionWithFormat:@"%@", [NSPredicate mgl_predicateWithJSONObject:caseExpressions[0]]];
             NSMutableArray *arguments = [NSMutableArray array];
             
-            for (NSUInteger index = 1; index < caseExpressions.count; index++) {
-                if ([caseExpressions[index] isKindOfClass:[NSArray class]]) {
-                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:caseExpressions[index]];
+            for (NSUInteger index = 0; index < argumentObjects.count; index++) {
+                if ([argumentObjects[index] isKindOfClass:[NSArray class]]) {
+                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
                     NSExpression *argument = [NSExpression expressionWithFormat:@"%@", conditional];
                     [arguments addObject:argument];
                 } else {
-                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:caseExpressions[index]]];
+                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:argumentObjects[index]]];
                 }
             }
             
-            return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
+            return [NSExpression expressionForFunction:@"MGL_SWITCH" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];
             NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
@@ -829,9 +851,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }];
                 [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_case:"]) {
-                NSPredicate *firstConditional = (NSPredicate *)self.operand.constantValue;
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", firstConditional.mgl_jsonExpressionObject, nil];
+            } else if ([function isEqualToString:@"MGL_SWITCH"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", nil];
 
                 for (NSExpression *option in self.arguments) {
                     if ([option respondsToSelector:@selector(constantValue)] && [option.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
