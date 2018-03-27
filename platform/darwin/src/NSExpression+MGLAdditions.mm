@@ -65,6 +65,7 @@
     // numbers of arguments. Vararg aftermarket functions need to be declared
     // with an explicit and implicit first argument.
     INSTALL_CONTROL_STRUCTURE(MGL_LET);
+    INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
     
     #undef INSTALL_AFTERMARKET_FN
 #pragma clang pop
@@ -103,6 +104,17 @@
 - (id)MGL_LET:(NSString *)firstVariableName, ... {
     [NSException raise:NSInvalidArgumentException
                 format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a catch-all method that evaluates an arbitrary number of
+ arguments as an expression according to the Mapbox Style Specification’s
+ expression language.
+ */
+- (id)MGL_FUNCTION:(id)firstArgument, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Mapbox GL function expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -624,9 +636,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             
             return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", expressions];
-        }else {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"Expression operator %@ not yet implemented.", op];
+        } else {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
         }
     }
     
@@ -852,6 +864,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
+            } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
+                return self.arguments.mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||

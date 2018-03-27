@@ -311,6 +311,11 @@ defined by the style specification.
 
 ### Expression operators
 
+Many expression operators defined in the style specification have corresponding
+symbols to be used with the `+[NSExpression expressionWithFormat:]`,
+`+[NSExpression expressionForFunction:arguments:]`, or
+`+[NSExpression expressionForFunction:selectorName:arguments:]` method:
+
 In style specification | Method, function, or predicate type | Format string syntax
 -----------------------|-------------------------------------|---------------------
 `array`                | |
@@ -375,6 +380,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `tan`                  | |
 `zoom`                 | | `$zoom`
 `heatmap-density`      | | `$heatmapDensity`
+
+For operators that have no corresponding `NSExpression` symbol, use the
+`MGL_FUNCTION()` format string syntax.
 
 ## Filtering sources
 

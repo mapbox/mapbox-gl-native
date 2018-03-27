@@ -377,6 +377,10 @@ classes, but you should not call them directly outside the context of an
 expression, because the result may differ from the evaluated expression’s result
 or may result in undefined behavior.
 
+The Mapbox Style Specification defines some operators for which no custom
+function is available. To use these operators in an `NSExpression`, call the
+`MGL_FUNCTION()` function with the same arguments that the operator expects.
+
 ### Variables
 
 The following variables are defined by this SDK for use with style layers:
