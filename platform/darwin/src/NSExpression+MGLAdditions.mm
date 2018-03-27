@@ -65,6 +65,7 @@
     // numbers of arguments. Vararg aftermarket functions need to be declared
     // with an explicit and implicit first argument.
     INSTALL_CONTROL_STRUCTURE(MGL_LET);
+    INSTALL_CONTROL_STRUCTURE(MGL_MATCH);
     INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
     
     #undef INSTALL_AFTERMARKET_FN
@@ -102,6 +103,15 @@
  number of variable names and assigned expressions.
  */
 - (id)MGL_LET:(NSString *)firstVariableName, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates an expression and returns the matching element.
+ */
+- (id)MGL_MATCH:(id)firstCondition, ... {
     [NSException raise:NSInvalidArgumentException
                 format:@"Assignment expressions lack underlying Objective-C implementations."];
     return nil;
@@ -616,18 +626,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
-            NSArray *matchOptions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-
             NSMutableArray *optionsArray = [NSMutableArray array];
-            NSEnumerator *optionsEnumerator = matchOptions.objectEnumerator;
+            NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
             while (id object = optionsEnumerator.nextObject) {
                 NSExpression *option = [NSExpression mgl_expressionWithJSONObject:object];
                 [optionsArray addObject:option];
             }
         
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_match:"
+            return [NSExpression expressionForFunction:@"MGL_MATCH"
                                              arguments:optionsArray];
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
@@ -837,8 +843,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
 
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_match:"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", self.operand.mgl_jsonExpressionObject, nil];
+            } else if ([function isEqualToString:@"MGL_MATCH"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", nil];
                 
 
                 for (NSExpression *option in self.arguments) {

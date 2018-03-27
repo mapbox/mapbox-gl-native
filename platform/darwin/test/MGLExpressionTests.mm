@@ -628,7 +628,7 @@ using namespace std::string_literals;
 
 - (void)testMatchExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 - 1, 'mgl_match:', %@, %@, %@, %@, 'default')", MGLConstantExpression(@1),
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 - 1,  %@, %@, %@, %@, 'default')", MGLConstantExpression(@1),
                                     MGLConstantExpression(@"one"),
                                     MGLConstantExpression(@0),
                                     MGLConstantExpression(@"zero")];
@@ -637,7 +637,7 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 * 1, 'mgl_match:', %@, %@, 'default')", MGLConstantExpression(@1), MGLConstantExpression(@"one")];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 * 1, %@, %@, 'default')", MGLConstantExpression(@1), MGLConstantExpression(@"one")];
         NSArray *jsonExpression =  @[@"match", @[@"*", @2, @1], @1, @"one", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
