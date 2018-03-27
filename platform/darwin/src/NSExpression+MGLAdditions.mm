@@ -60,6 +60,7 @@
     INSTALL_METHOD(mgl_join:);
     INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
     INSTALL_METHOD(mgl_step:from:stops:);
+    INSTALL_METHOD(mgl_coalesce:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -96,6 +97,12 @@
 - (id)mgl_step:(id)inputExpression from:(id)minimumExpression stops:(NSDictionary *)stops {
     [NSException raise:NSInvalidArgumentException
                 format:@"Step expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+- (id)mgl_coalesce:(NSArray<NSExpression *> *)elements {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Coalesce expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -399,12 +406,6 @@
     return [self valueForKeyPath:@"mgl_jsonExpressionObject"];
 }
 
-- (id)mgl_coalesce {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Coalesce expressions lack underlying Objective-C implementations."];
-    return nil;
-}
-
 @end
 
 @implementation NSDictionary (MGLExpressionAdditions)
@@ -663,7 +664,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
             }
             
-            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", expressions];
+            return [NSExpression expressionWithFormat:@"mgl_coalesce(%@)", expressions];
         } else {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
             return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
@@ -873,10 +874,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
                 
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_coalesce"]) {
+            } else if ([function isEqualToString:@"mgl_coalesce:"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
                 
-                for (NSExpression *expression in self.operand.constantValue) {
+                for (NSExpression *expression in self.arguments.firstObject.constantValue) {
                     [expressionObject addObject:[expression mgl_jsonExpressionObject]];
                 }
                 

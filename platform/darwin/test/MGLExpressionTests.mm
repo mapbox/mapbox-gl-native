@@ -646,7 +646,7 @@ using namespace std::string_literals;
 
 - (void)testCoalesceExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
                                     @[[NSExpression expressionForKeyPath:@"x"],
                                       [NSExpression expressionForKeyPath:@"y"],
                                       [NSExpression expressionForKeyPath:@"z"],
