@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		3EAB52CD206ACE7E008BFE2D /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAB52CE206ACE7E008BFE2D /* libmbgl-loop-darwin.a */; };
+		3EAB52D0206ACE7F008BFE2D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAB52CF206ACE7E008BFE2D /* OpenGLES.framework */; };
 		96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96567A221B0E84CD00D78776 /* LaunchScreen.xib */; };
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
 		DA180EF21DD1A4DF000A211D /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */; };
@@ -47,6 +49,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		3EAB52CE206ACE7E008BFE2D /* libmbgl-loop-darwin.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; path = "libmbgl-loop-darwin.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EAB52CF206ACE7E008BFE2D /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
 		96567A221B0E84CD00D78776 /* LaunchScreen.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = LaunchScreen.xib; sourceTree = SOURCE_ROOT; };
 		96567A301B0E8BB900D78776 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = SOURCE_ROOT; };
 		DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OHHTTPStubs.framework; path = "OHHTTPStubs/OHHTTPStubs/build/Debug-iphoneos/OHHTTPStubs.framework"; sourceTree = "<group>"; };
@@ -82,6 +86,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				3EAB52D0206ACE7F008BFE2D /* OpenGLES.framework in Frameworks */,
+				3EAB52CD206ACE7E008BFE2D /* libmbgl-loop-darwin.a in Frameworks */,
 				DA482C801C12582600772FE3 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -122,6 +128,8 @@
 		DD043325196DB9BC00E6F39D /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				3EAB52CF206ACE7E008BFE2D /* OpenGLES.framework */,
+				3EAB52CE206ACE7E008BFE2D /* libmbgl-loop-darwin.a */,
 				DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */,
 				DA9C551B1CD9DFA7000A15C6 /* libKIF.a */,
 				DA482C7F1C12582600772FE3 /* Mapbox.framework */,
