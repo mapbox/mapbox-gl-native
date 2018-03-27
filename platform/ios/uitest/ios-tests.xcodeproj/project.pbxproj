@@ -7,8 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		3EAB52CD206ACE7E008BFE2D /* libmbgl-loop-darwin.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAB52CE206ACE7E008BFE2D /* libmbgl-loop-darwin.a */; };
-		3EAB52D0206ACE7F008BFE2D /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EAB52CF206ACE7E008BFE2D /* OpenGLES.framework */; };
 		96567A231B0E84CD00D78776 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = 96567A221B0E84CD00D78776 /* LaunchScreen.xib */; };
 		96567A311B0E8BB900D78776 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 96567A301B0E8BB900D78776 /* Images.xcassets */; };
 		DA180EF21DD1A4DF000A211D /* OHHTTPStubs.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA180EF11DD1A4DF000A211D /* OHHTTPStubs.framework */; };
@@ -86,8 +84,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3EAB52D0206ACE7F008BFE2D /* OpenGLES.framework in Frameworks */,
-				3EAB52CD206ACE7E008BFE2D /* libmbgl-loop-darwin.a in Frameworks */,
 				DA482C801C12582600772FE3 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
