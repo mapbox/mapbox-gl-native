@@ -131,6 +131,9 @@ mbgl::util::UnitBezier MGLUnitBezierForMediaTimingFunction(CAMediaTimingFunction
     return { p1[0], p1[1], p2[0], p2[1] };
 }
 
+/// Forward declaration of render callback function called via CVDisplayLink
+static CVReturn MGLMapViewRenderCallback(CVDisplayLinkRef displayLink, const CVTimeStamp *inNow, const CVTimeStamp *inOutputTime, CVOptionFlags flagsIn, CVOptionFlags *flagsOut, void *displayLinkContext);
+
 /// Lightweight container for metadata about an annotation, including the annotation itself.
 class MGLAnnotationContext {
 public:
@@ -207,6 +210,10 @@ public:
 
     /// reachability instance
     MGLReachability *_reachability;
+
+    // Display update
+    CVDisplayLinkRef _displayLink;
+    BOOL _needsDisplayRefresh;
 }
 
 #pragma mark Lifecycle
@@ -513,9 +520,9 @@ public:
 }
 
 - (void)dealloc {
+    [self validateDisplayLink];
 
     [_reachability stopNotifier];
-
 
     [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
     [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
@@ -663,9 +670,44 @@ public:
         self.dormant = YES;
     }
 
+    [self validateDisplayLink];
+
     [self.window removeObserver:self forKeyPath:@"contentLayoutRect"];
     [self.window removeObserver:self forKeyPath:@"titlebarAppearsTransparent"];
 }
+
+- (void)validateDisplayLink
+{
+    BOOL isVisible = self.superview && self.window;
+    if (isVisible && !_displayLink)
+    {
+        if (_mbglMap->getConstrainMode() == mbgl::ConstrainMode::None)
+        {
+            _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+        }
+
+        CVReturn error = CVDisplayLinkCreateWithCGDisplay(CGMainDisplayID(), &_displayLink);
+
+        if (error)
+        {
+            throw std::runtime_error("Failed to create display callback.");
+            _displayLink = NULL;
+        }
+        else
+        {
+            CVDisplayLinkSetOutputCallback(_displayLink, MGLMapViewRenderCallback, (__bridge void *)self);
+            _needsDisplayRefresh = YES;
+            CVDisplayLinkStart(_displayLink);
+        }
+    }
+    else if ( ! isVisible && _displayLink)
+    {
+        CVDisplayLinkStop(_displayLink);
+        CVDisplayLinkRelease(_displayLink);
+        _displayLink = nil;
+    }
+}
+
 
 - (void)viewDidMoveToWindow {
     NSWindow *window = self.window;
@@ -673,9 +715,11 @@ public:
         self.dormant = NO;
     }
 
-    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
-        _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
-    }
+    [self validateDisplayLink];
+
+//    if (window && _mbglMap->getConstrainMode() == mbgl::ConstrainMode::None) {
+//        _mbglMap->setConstrainMode(mbgl::ConstrainMode::HeightOnly);
+//    }
 
     [window addObserver:self
              forKeyPath:@"contentLayoutRect"
@@ -795,10 +839,21 @@ public:
     }
 }
 
+- (void)updateFromDisplayLink
+{
+    MGLAssertIsMainThread();
+
+    if (_needsDisplayRefresh)
+    {
+        _needsDisplayRefresh = NO;
+        [self.layer setNeedsDisplay];
+    }
+}
+
 - (void)setNeedsGLDisplay {
     MGLAssertIsMainThread();
 
-    [self.layer setNeedsDisplay];
+    _needsDisplayRefresh = YES;
 }
 
 - (void)cameraWillChangeAnimated:(BOOL)animated {
@@ -3024,3 +3079,17 @@ private:
 };
 
 @end
+
+CVReturn MGLMapViewRenderCallback(CVDisplayLinkRef displayLink,
+                                  const CVTimeStamp *inNow,
+                                  const CVTimeStamp *inOutputTime,
+                                  CVOptionFlags flagsIn,
+                                  CVOptionFlags *flagsOut,
+                                  void *displayLinkContext) {
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [(__bridge MGLMapView *)displayLinkContext updateFromDisplayLink];
+    });
+
+    return kCVReturnSuccess;
+}
+
