@@ -313,8 +313,8 @@ In style specification | Method, function, or predicate type | Format string syn
 `string`               | |
 `to-boolean`           | `boolValue` |
 `to-color`             | |
-`to-number`            | `mgl_numberWithFallbackValues:` |
-`to-string`            | `stringValue` |
+`to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
+`to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
 `geometry-type`        | |
 `id`                   | |
@@ -335,11 +335,11 @@ In style specification | Method, function, or predicate type | Format string syn
 `case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
 `coalesce`             | |
 `match`                | |
-`interpolate`          | `mgl_interpolateWithCurveType:parameters:stops:` |
-`step`                 | `mgl_stepWithMinimum:stops:` |
-`let`                  | `mgl_expressionWithContext:` |
+`interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` |
+`step`                 | `mgl_step:withMinimum:stops:` |
+`let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
 `var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
-`concat`               | `stringByAppendingString:` |
+`concat`               | `mgl_join:` | `mgl_join({'Old', ' ', 'MacDonald'})`
 `downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
 `rgb`                  | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |

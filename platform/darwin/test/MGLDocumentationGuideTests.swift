@@ -71,7 +71,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         #endif
         //#-end-example-code
         
-        let _ = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+        let _ = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
                              stops[0]!, stops)
     }
     
@@ -104,10 +104,10 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         #if os(macOS)
-            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+            layer.circleColor = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:(mag, 'linear', nil, %@)",
                                              stops)
         #else
-            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+            layer.circleColor = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:(mag, 'linear', nil, %@)",
                                              stops)
         #endif
         layer.circleRadius = NSExpression(forConstantValue: 10)
@@ -126,7 +126,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
             18: 18,
         ]
         
-        layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+        layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
                                           stops)
         //#-end-example-code
     }
@@ -145,7 +145,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
                 10: .white,
             ]
             
-            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+            layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
                                              NSColor.green, stops)
         #else
             let stops: [Float: UIColor] = [
@@ -156,7 +156,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
                 10: .white,
             ]
             
-            layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+            layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
                                              UIColor.green, stops)
         #endif
         //#-end-example-code
