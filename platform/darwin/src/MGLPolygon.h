@@ -18,7 +18,8 @@ NS_ASSUME_NONNULL_BEGIN
  You can add polygon shapes to the map by adding them to an `MGLShapeSource`
  object. Configure the appearance of an `MGLShapeSource`’s or
  `MGLVectorSource`’s polygons collectively using an `MGLFillStyleLayer` or
- `MGLSymbolStyleLayer` object.
+ `MGLSymbolStyleLayer` object. To access a polygon’s attributes, use an
+ `MGLPolygonFeature` object.
 
  Alternatively, you can add a polygon overlay directly to a map view using the
  `-[MGLMapView addAnnotation:]` or `-[MGLMapView addOverlay:]` method. Configure

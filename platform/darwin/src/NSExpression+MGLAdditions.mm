@@ -258,6 +258,12 @@
     return [self valueForKeyPath:@"mgl_jsonExpressionObject"];
 }
 
+- (id)mgl_coalesce {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Coalesce expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
 @implementation NSDictionary (MGLExpressionAdditions)
@@ -464,18 +470,43 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
-            NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
-            NSExpression *trueExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[1]];
-            NSExpression *falseExpression;
-            if (argumentObjects.count > 3) {
-                NSArray *falseObjects = [@[@"case"] arrayByAddingObjectsFromArray:
-                                         [argumentObjects subarrayWithRange:NSMakeRange(2, argumentObjects.count - 2)]];
-                falseExpression = [NSExpression mgl_expressionWithJSONObject:falseObjects];
-            } else {
-                falseExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[2]];
+            NSArray *caseExpressions = argumentObjects;
+            NSExpression *firstConditional = [NSExpression expressionWithFormat:@"%@", [NSPredicate mgl_predicateWithJSONObject:caseExpressions[0]]];
+            NSMutableArray *arguments = [NSMutableArray array];
+            
+            for (NSUInteger index = 1; index < caseExpressions.count; index++) {
+                if ([caseExpressions[index] isKindOfClass:[NSArray class]]) {
+                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:caseExpressions[index]];
+                    NSExpression *argument = [NSExpression expressionWithFormat:@"%@", conditional];
+                    [arguments addObject:argument];
+                } else {
+                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:caseExpressions[index]]];
+                }
             }
-            return [NSExpression expressionForConditional:conditional trueExpression:trueExpression falseExpression:falseExpression];
-        } else {
+            
+            return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
+        } else if ([op isEqualToString:@"match"]) {
+            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSArray *matchOptions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
+
+            NSMutableArray *optionsArray = [NSMutableArray array];
+            NSEnumerator *optionsEnumerator = matchOptions.objectEnumerator;
+            while (id object = optionsEnumerator.nextObject) {
+                NSExpression *option = [NSExpression mgl_expressionWithJSONObject:object];
+                [optionsArray addObject:option];
+            }
+        
+            return [NSExpression expressionForFunction:operand
+                                          selectorName:@"mgl_match:"
+                                             arguments:optionsArray];
+        } else if ([op isEqualToString:@"coalesce"]) {
+            NSMutableArray *expressions = [NSMutableArray array];
+            for (id operand in argumentObjects) {
+                [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
+            }
+            
+            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", expressions];
+        }else {
             [NSException raise:NSInvalidArgumentException
                         format:@"Expression operator %@ not yet implemented.", op];
         }
@@ -666,6 +697,37 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }];
                 [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 return expressionObject;
+            } else if ([function isEqualToString:@"mgl_case:"]) {
+                NSPredicate *firstConditional = (NSPredicate *)self.operand.constantValue;
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", firstConditional.mgl_jsonExpressionObject, nil];
+
+                for (NSExpression *option in self.arguments) {
+                    if ([option respondsToSelector:@selector(constantValue)] && [option.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
+                        NSPredicate *predicate = (NSPredicate *)option.constantValue;
+                        [expressionObject addObject:predicate.mgl_jsonExpressionObject];
+                    } else {
+                        [expressionObject addObject:option.mgl_jsonExpressionObject];
+                    }
+                }
+
+                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_match:"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", self.operand.mgl_jsonExpressionObject, nil];
+                
+
+                for (NSExpression *option in self.arguments) {
+                    [expressionObject addObject:option.mgl_jsonExpressionObject];
+                }
+                
+                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_coalesce"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
+                
+                for (NSExpression *expression in self.operand.constantValue) {
+                    [expressionObject addObject:[expression mgl_jsonExpressionObject]];
+                }
+                
+                return expressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||
@@ -690,7 +752,17 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         }
             
         case NSConditionalExpressionType: {
-            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:self.predicate.mgl_jsonExpressionObject, self.trueExpression.mgl_jsonExpressionObject, nil];
+            NSMutableArray *arguments = [NSMutableArray arrayWithObjects:self.predicate.mgl_jsonExpressionObject, nil];
+            
+            if (self.trueExpression.expressionType == NSConditionalExpressionType) {
+                // Fold nested conditionals into a single case expression.
+                NSArray *trueArguments = self.trueExpression.mgl_jsonExpressionObject;
+                trueArguments = [trueArguments subarrayWithRange:NSMakeRange(1, trueArguments.count - 1)];
+                [arguments addObjectsFromArray:trueArguments];
+            } else {
+                [arguments addObject:self.trueExpression.mgl_jsonExpressionObject];
+            }
+            
             if (self.falseExpression.expressionType == NSConditionalExpressionType) {
                 // Fold nested conditionals into a single case expression.
                 NSArray *falseArguments = self.falseExpression.mgl_jsonExpressionObject;

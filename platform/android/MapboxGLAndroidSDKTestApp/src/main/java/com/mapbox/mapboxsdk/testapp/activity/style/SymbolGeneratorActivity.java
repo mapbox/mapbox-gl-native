@@ -21,7 +21,6 @@ import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.style.sources.Source;
@@ -38,6 +37,7 @@ import timber.log.Timber;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.division;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.downcase;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
@@ -45,8 +45,11 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.number;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.pi;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.product;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.string;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
 import static com.mapbox.mapboxsdk.style.layers.Property.ICON_ANCHOR_BOTTOM;
 import static com.mapbox.mapboxsdk.style.layers.Property.TEXT_ANCHOR_TOP;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
@@ -121,8 +124,8 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
       return true;
     } else if (item.getItemId() == R.id.menu_action_filter) {
       SymbolLayer layer = mapboxMap.getLayerAs(LAYER_ID);
-      layer.setFilter(Filter.eq(FEATURE_RANK, 1));
-      //layer.setFilter(eq(get(FEATURE_RANK), 1));
+      layer.setFilter(eq(get(FEATURE_RANK), literal(1)));
+      Timber.e("Filter that was set: %s", layer.getFilter());
       return true;
     }
     return super.onOptionsItemSelected(item);
@@ -265,7 +268,10 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
         iconAllowOverlap(false),
         iconSize(iconSizeExpression),
         iconAnchor(ICON_ANCHOR_BOTTOM),
-        iconOffset(new Float[] {0.0f, -5.0f}),
+        iconOffset(step(zoom(), literal(new float[] {0f, 0f}),
+          stop(1, new Float[] {0f, 0f}),
+          stop(10, new Float[] {0f, -35f})
+        )),
 
         // text field configuration
         textField(textFieldExpression),

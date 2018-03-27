@@ -17,6 +17,8 @@
 -dontwarn com.mapbox.android.core.location.MockLocationEngine$LocationUpdateRunnable
 -dontwarn java.awt.Color
 -dontwarn com.mapzen.android.lost.api**
+-dontwarn org.conscrypt.OpenSSLProvider
+-dontwarn org.conscrypt.Conscrypt
 
 # config for mapbox-sdk-geojson:3.0.0-beta.3
 -keep class com.mapbox.geojson.** { *; }

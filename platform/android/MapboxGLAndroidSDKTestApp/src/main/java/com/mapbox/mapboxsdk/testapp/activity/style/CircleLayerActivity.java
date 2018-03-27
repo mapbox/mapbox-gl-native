@@ -13,6 +13,7 @@ import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
 import com.mapbox.mapboxsdk.style.layers.LineLayer;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
@@ -23,7 +24,10 @@ import java.net.URL;
 
 import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.layers.Filter.in;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.array;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.has;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.circleRadius;
 
@@ -117,7 +121,7 @@ public class CircleLayerActivity extends AppCompatActivity implements View.OnCli
   }
 
   private void applyBusRouteFilterToBusStopSource() {
-    layer.setFilter(in("number", (Object[]) Data.STOPS_FOR_ROUTE));
+    layer.setFilter(has(Expression.toString(get("number")), array(literal(Data.STOPS_FOR_ROUTE))));
   }
 
   private void addBusRouteSource() {

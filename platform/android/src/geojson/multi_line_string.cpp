@@ -1,10 +1,21 @@
 #include "multi_line_string.hpp"
 
 #include "line_string.hpp"
+#include "util.hpp"
 
 namespace mbgl {
 namespace android {
 namespace geojson {
+
+jni::Object<MultiLineString> MultiLineString::New(jni::JNIEnv& env, const mbgl::MultiLineString<double>& multiLineString) {
+    auto jList = asPointsListsList(env, multiLineString);
+
+    static auto method = javaClass.GetStaticMethod<jni::Object<MultiLineString> (jni::Object<java::util::List>)>(env, "fromLngLats");
+    auto jMultiLineString = javaClass.Call(env, method, jList);
+
+    jni::DeleteLocalRef(env, jList);
+    return jMultiLineString;
+}
 
 mapbox::geojson::multi_line_string MultiLineString::convert(jni::JNIEnv &env, jni::Object<MultiLineString> jMultiLineString) {
     mapbox::geojson::multi_line_string multiLineString;

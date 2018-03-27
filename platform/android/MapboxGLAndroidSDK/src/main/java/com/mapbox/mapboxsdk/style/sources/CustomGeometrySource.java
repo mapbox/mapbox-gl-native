@@ -8,7 +8,7 @@ import android.support.annotation.WorkerThread;
 import com.mapbox.geojson.Feature;
 import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
-import com.mapbox.mapboxsdk.style.layers.Filter;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -94,11 +94,11 @@ public class CustomGeometrySource extends Source {
   /**
    * Queries the source for features.
    *
-   * @param filter an optional filter statement to filter the returned Features
+   * @param filter an optional filter expression to filter the returned Features
    * @return the features
    */
   @NonNull
-  public List<Feature> querySourceFeatures(@Nullable Filter.Statement filter) {
+  public List<Feature> querySourceFeatures(@Nullable Expression filter) {
     Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
     return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
   }

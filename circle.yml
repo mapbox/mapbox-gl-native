@@ -32,8 +32,9 @@ workflows:
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
       - ios-debug
+      - ios-sanitize
       #- ios-sanitize-address
-      - ios-sanitize-thread
+      - ios-static-analyzer
       - ios-release:
           filters:
             tags:
@@ -222,6 +223,18 @@ step-library:
       store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
+
+  - &collect-xcode-build-logs
+      run:
+        name: Collect Xcode build logs
+        when: always
+        command: |
+          export XCODE_LOG_DIR=build/logs
+          mkdir -p $XCODE_LOG_DIR
+          cp build/*.log $XCODE_LOG_DIR
+  - &upload-xcode-build-logs
+      store_artifacts:
+        path: build/logs
 
 jobs:
   nitpick:
@@ -730,6 +743,29 @@ jobs:
           command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  ios-sanitize:
+    macos:
+      xcode: "9.2.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread and undefined behavior sanitizers
+          command: make ios-sanitize
+      - *show-ccache-stats
+      - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
@@ -749,9 +785,11 @@ jobs:
           command: make ios-sanitize-address
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  ios-sanitize-thread:
+  ios-static-analyzer:
     macos:
       xcode: "9.2.0"
     environment:
@@ -764,10 +802,12 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - run:
-          name: Build and run SDK unit tests with thread sanitizer
-          command: make ios-sanitize-thread
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-release:
@@ -823,6 +863,8 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-debug-qt5:
@@ -869,6 +911,8 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-release-node6:
@@ -890,3 +934,5 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs

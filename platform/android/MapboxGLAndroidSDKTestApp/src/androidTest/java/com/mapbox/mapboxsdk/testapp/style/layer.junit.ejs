@@ -96,6 +96,26 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       assertEquals(layer.getSourceLayer(), sourceLayer);
     });
   }
+
+  @Test
+  public void testFilter() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("Filter");
+    invoke(mapboxMap, (uiController, mapboxMap1) -> {
+      assertNotNull(layer);
+
+      // Get initial
+      assertEquals(layer.getFilter(), null);
+
+      // Set
+      Expression filter = eq(get("undefined"), literal(1.0));
+      layer.setFilter(filter);
+      assertEquals(layer.getFilter().toString(), filter.toString());
+    });
+  }
+
+
 <% } -%>
 <% for (const property of properties) { -%>
 <% if (property.name != 'heatmap-color') { -%>

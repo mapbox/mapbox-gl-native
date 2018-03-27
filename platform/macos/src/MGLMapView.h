@@ -721,16 +721,27 @@ MGL_EXPORT IB_DESIGNABLE
 
  Assigning a new array to this property selects only the first annotation in the
  array.
+
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the map is
+ panned so that the annotation and its callout are brought just onscreen. The
+ annotation is *not* centered within the viewport.
+
+ @note In versions prior to `4.0.0` if the annotation was offscreen it was not
+ selected.
  */
 @property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
 
 /**
  Selects an annotation and displays a callout popover for it.
 
- If the given annotation is not visible within the current viewport, this method
- has no effect.
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the map is
+ panned so that the annotation and its callout are brought just onscreen. The
+ annotation is *not* centered within the viewport.
 
  @param annotation The annotation object to select.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation;
 

@@ -112,6 +112,9 @@ public class Expression {
    * @return the expression
    */
   public static Expression literal(@NonNull Object object) {
+    if (object.getClass().isArray()) {
+      return literal(ExpressionArray.toObjectArray(object));
+    }
     return new ExpressionLiteral(object);
   }
 
@@ -132,7 +135,7 @@ public class Expression {
    * @return the color expression
    */
   public static Expression color(@ColorInt int color) {
-    return new ExpressionLiteral(new Color(color));
+    return toColor(literal(PropertyFactory.colorToRgbaString(color)));
   }
 
   /**
@@ -1354,7 +1357,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-string">Style specification</a>
    */
-  public static Expression string(@NonNull Expression input) {
+  public static Expression string(@NonNull Expression... input) {
     return new Expression("string", input);
   }
 
@@ -1367,7 +1370,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-number">Style specification</a>
    */
-  public static Expression number(@NonNull Expression input) {
+  public static Expression number(@NonNull Expression... input) {
     return new Expression("number", input);
   }
 
@@ -1380,7 +1383,7 @@ public class Expression {
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-boolean">Style specification</a>
    */
-  public static Expression bool(@NonNull Expression input) {
+  public static Expression bool(@NonNull Expression... input) {
     return new Expression("boolean", input);
   }
 
@@ -1520,13 +1523,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Number input, @NonNull Expression expression, Expression... stops) {
-    return step(literal(input), expression, stops);
+  public static Expression step(@NonNull Number input, @NonNull Expression defaultOutput, Expression... stops) {
+    return step(literal(input), defaultOutput, stops);
   }
 
   /**
@@ -1536,13 +1540,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param expression the input expression
-   * @param stops      pair of input and output values
+   * @param input         the input expression
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Expression input, @NonNull Expression expression, Expression... stops) {
-    return new Expression("step", join(new Expression[] {input, expression}, stops));
+  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, Expression... stops) {
+    return new Expression("step", join(new Expression[] {input, defaultOutput}, stops));
   }
 
   /**
@@ -1552,13 +1557,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Number input, @NonNull Expression expression, Stop... stops) {
-    return step(literal(input), expression, Stop.toExpressionArray(stops));
+  public static Expression step(@NonNull Number input, @NonNull Expression defaultOutput, Stop... stops) {
+    return step(literal(input), defaultOutput, Stop.toExpressionArray(stops));
   }
 
   /**
@@ -1568,13 +1574,14 @@ public class Expression {
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
    *
-   * @param input the input value
-   * @param stops pair of input and output values
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
    */
-  public static Expression step(@NonNull Expression input, @NonNull Expression expression, Stop... stops) {
-    return step(input, expression, Stop.toExpressionArray(stops));
+  public static Expression step(@NonNull Expression input, @NonNull Expression defaultOutput, Stop... stops) {
+    return step(input, defaultOutput, Stop.toExpressionArray(stops));
   }
 
   /**
@@ -1728,9 +1735,7 @@ public class Expression {
    */
   private Object toValue(ExpressionLiteral expressionValue) {
     Object value = expressionValue.toValue();
-    if (value instanceof Expression.Color) {
-      return ((Expression.Color) value).convertColor();
-    } else if (value instanceof Expression.ExpressionLiteral) {
+    if (value instanceof Expression.ExpressionLiteral) {
       return toValue((ExpressionLiteral) value);
     } else if (value instanceof Expression) {
       return ((Expression) value).toArray();
@@ -1887,32 +1892,6 @@ public class Expression {
   }
 
   /**
-   * Expression color type.
-   */
-  public static class Color {
-
-    private int color;
-
-    /**
-     * Creates a color color type from a color int.
-     *
-     * @param color the int color
-     */
-    public Color(@ColorInt int color) {
-      this.color = color;
-    }
-
-    /**
-     * Converts the int color to rgba(d, d, d, d) string representation
-     *
-     * @return the string representation of a color
-     */
-    String convertColor() {
-      return PropertyFactory.colorToRgbaString(color);
-    }
-  }
-
-  /**
    * Expression array type.
    */
   public static class Array {
@@ -2033,6 +2012,11 @@ public class Expression {
       };
     }
 
+    /**
+     * Convert the expression array to a string representation.
+     *
+     * @return the string representation of the expression array
+     */
     @Override
     public String toString() {
       StringBuilder builder = new StringBuilder("[\"literal\"], [");
@@ -2052,5 +2036,21 @@ public class Expression {
       builder.append("]]");
       return builder.toString();
     }
+  }
+
+  /**
+   * Converts an object that is a primitive array to an Object[]
+   *
+   * @param object the object to convert to an object array
+   * @return the converted object array
+   */
+  static Object[] toObjectArray(Object object) {
+    // object is a primitive array
+    int len = java.lang.reflect.Array.getLength(object);
+    Object[] objects = new Object[len];
+    for (int i = 0; i < len; i++) {
+      objects[i] = java.lang.reflect.Array.get(object, i);
+    }
+    return objects;
   }
 }

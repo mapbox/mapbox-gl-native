@@ -24,6 +24,21 @@ public:
 
 };
 
+class Arrays : private mbgl::util::noncopyable {
+public:
+
+    static constexpr auto Name() { return "java/util/Arrays"; };
+
+    template <class T>
+    static jni::Object<List> asList(jni::JNIEnv& env, jni::Array<jni::Object<T>> array) {
+        static auto asList = Arrays::javaClass.GetStaticMethod<jni::Object<List>(jni::Array<jni::Object<>>)>(env, "asList");
+        return javaClass.Call(env, asList, (jni::Array<jni::Object<>>) array);
+    }
+
+    static jni::Class<Arrays> javaClass;
+
+};
+
 class Set : private mbgl::util::noncopyable {
 public:
 

@@ -27,7 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 
  To represent a collection of point, polyline, or polygon shapes, it may be more
  convenient to use an `MGLPointCollection`, `MGLMultiPolyline`, or
- `MGLMultiPolygon` object, respectively.
+ `MGLMultiPolygon` object, respectively. To access a shape collection’s attributes,
+ use the corresponding `MGLFeature` object.
 
  A shape collection is known as a
  <a href="https://tools.ietf.org/html/rfc7946#section-3.1.8">GeometryCollection</a>
