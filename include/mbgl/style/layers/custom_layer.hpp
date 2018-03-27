@@ -2,6 +2,8 @@
 
 #include <mbgl/style/layer.hpp>
 
+#include <functional>
+
 namespace mbgl {
 namespace style {
 
@@ -44,7 +46,7 @@ using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRende
  * `CustomLayerInitializeFunction` will be called instead to prepare for a new render.
  *
  */
-using CustomLayerContextLostFunction = void (*)(void* context);
+using CustomLayerContextLostFunction = std::function<void(void*)>;
 
 /**
  * Destroy any GL state needed by the custom layer, and deallocate context, if necessary. This

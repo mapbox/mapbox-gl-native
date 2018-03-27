@@ -38,7 +38,6 @@ std::unique_ptr<Layer> CustomLayer::cloneRef(const std::string&) const {
 }
 
 // Visibility
-
 void CustomLayer::setVisibility(VisibilityType value) {
     if (value == getVisibility())
         return;

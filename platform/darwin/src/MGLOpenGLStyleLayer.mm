@@ -16,6 +16,7 @@
  */
 void MGLPrepareCustomStyleLayer(void *context) {
     MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
+    (__bridge_retained void *)layer;
     [layer didMoveToMapView:layer.style.mapView];
 }
 
@@ -101,7 +102,7 @@ void MGLFinishCustomStyleLayer(void *context) {
                                                             MGLPrepareCustomStyleLayer,
                                                             MGLDrawCustomStyleLayer,
                                                             MGLFinishCustomStyleLayer,
-                                                            (__bridge_retained void *)self);
+                                                            (__bridge void *) self);
     return self = [super initWithPendingLayer:std::move(layer)];
 }
 
@@ -116,7 +117,9 @@ void MGLFinishCustomStyleLayer(void *context) {
         [NSException raise:@"MGLLayerReuseException"
                     format:@"%@ cannot be added to more than one MGLStyle at a time.", self];
     }
+    _style.openGLLayers[self.identifier] = nil;
     _style = style;
+    _style.openGLLayers[self.identifier] = self;
 }
 
 - (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer {
