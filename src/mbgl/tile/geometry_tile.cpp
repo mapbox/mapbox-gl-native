@@ -130,8 +130,8 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     //  replacing a tile at a different zoom that _did_ have symbols.
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
-    pendingFeatureIndex = std::move(result.featureIndex);
-    pendingData = std::move(result.tileData);
+    pendingFeatureIndex = { std::move(result.featureIndex) };
+    pendingData = { std::move(result.tileData) };
     observer->onTileChanged(*this);
 }
 
@@ -215,10 +215,12 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 
 void GeometryTile::commitFeatureIndex() {
     if (pendingFeatureIndex) {
-        featureIndex = std::move(pendingFeatureIndex);
+        featureIndex = std::move(*pendingFeatureIndex);
+        pendingFeatureIndex = nullopt;
     }
     if (pendingData) {
-        data = std::move(pendingData);
+        data = std::move(*pendingData);
+        pendingData = nullopt;
     }
 }
 
