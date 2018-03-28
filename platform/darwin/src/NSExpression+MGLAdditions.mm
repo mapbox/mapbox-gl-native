@@ -277,6 +277,12 @@
     return expressionObject;
 }
 
+- (id)mgl_has:(id)element {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Has expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
 @implementation NSExpression (MGLExpressionAdditions)
@@ -285,6 +291,12 @@
     [NSException raise:NSInternalInconsistencyException
                 format:@"Assignment expressions lack underlying Objective-C implementations."];
     return self;
+}
+
+- (id)mgl_has:(id)element {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Has expressions lack underlying Objective-C implementations."];
+    return nil;
 }
 
 @end
@@ -406,6 +418,16 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSExpression *operand = subexpressions.firstObject;
             subexpressions = [subexpressions subarrayWithRange:NSMakeRange(1, subexpressions.count - 1)];
             return [NSExpression expressionForFunction:operand selectorName:@"stringByAppendingString:" arguments:subexpressions];
+        }  else if ([op isEqualToString:@"at"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            NSExpression *index = subexpressions.firstObject;
+            NSExpression *operand = subexpressions[1];
+            return [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[operand, index]];
+        } else if ([op isEqualToString:@"has"]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
+            NSExpression *operand = argumentObjects.count > 1 ? subexpressions[1] : [NSExpression expressionWithFormat:@"self"];
+            NSExpression *property = subexpressions.firstObject;
+            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_has:', %@)", operand, property];
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
@@ -456,6 +478,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForVariable:@"zoomLevel"];
         } else if ([op isEqualToString:@"heatmap-density"]) {
             return [NSExpression expressionForVariable:@"heatmapDensity"];
+        } else if ([op isEqualToString:@"geometry-type"]) {
+            return [NSExpression expressionForVariable:@"mgl_geometryType"];
+        } else if ([op isEqualToString:@"id"]) {
+            return [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
+        }  else if ([op isEqualToString:@"properties"]) {
+            return [NSExpression expressionForVariable:@"mgl_featureProperties"];
         } else if ([op isEqualToString:@"let"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
             NSArray *bindingObjects = [argumentObjects subarrayWithRange:NSMakeRange(0, argumentObjects.count - 1)];
@@ -543,6 +571,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             if ([self.variable isEqualToString:@"zoomLevel"]) {
                 return @[@"zoom"];
+            }
+            if ([self.variable isEqualToString:@"mgl_geometryType"]) {
+                return @[@"geometry-type"];
+            }
+            if ([self.variable isEqualToString:@"mgl_featureIdentifier"]) {
+                return @[@"id"];
+            }
+            if ([self.variable isEqualToString:@"mgl_featureProperties"]) {
+                return @[@"properties"];
             }
             return @[@"var", self.variable];
         }
@@ -639,6 +676,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
+            } else if ([function isEqualToString:@"objectFrom:withIndex:"]) {
+                return @[@"at", self.arguments[1].mgl_jsonExpressionObject, self.arguments[0].mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"boolValue"]) {
                 return @[@"to-boolean", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"mgl_numberWithFallbackValues:"] ||
@@ -651,6 +690,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
+            } else if ([function isEqualToString:@"mgl_has:"]) {
+                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", self.arguments[0].mgl_jsonExpressionObject, nil];
+                if (self.operand.expressionType != NSEvaluatedObjectExpressionType) {
+                    [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
+                }
+                return expressionObject;
             } else if ([function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
                 if (self.arguments.count < 3) {
                     [NSException raise:NSInvalidArgumentException format:
