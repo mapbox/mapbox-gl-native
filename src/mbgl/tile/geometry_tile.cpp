@@ -130,8 +130,10 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     //  replacing a tile at a different zoom that _did_ have symbols.
     (void)resultCorrelationID;
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
-    pendingFeatureIndex = { std::move(result.featureIndex) };
-    pendingData = { std::move(result.tileData) };
+    // It is possible for multiple onLayouts to be called before an onPlacement is called, in which
+    // case we will discard previous pending data
+    pendingFeatureIndex = {{ false, std::move(result.featureIndex) }};
+    pendingData = {{ false, std::move(result.tileData) }};
     observer->onTileChanged(*this);
 }
 
@@ -142,6 +144,17 @@ void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorr
         pending = false;
     }
     symbolBuckets = std::move(result.symbolBuckets);
+    // When symbolBuckets arrive, mark pendingData/FeatureIndex as "ready for commit" at the
+    // time of the next global placement. We are counting on these symbolBuckets being
+    // in sync with the data/index in the last `onLayout` call, even though the correlation IDs
+    // may not be the same (e.g. "setShowCollisionBoxes" could bump the correlation ID while
+    // waiting for glyph dependencies)
+    if (pendingData) {
+        pendingData->first = true;
+    }
+    if (pendingFeatureIndex) {
+        pendingFeatureIndex->first = true;
+    }
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
     }
@@ -214,12 +227,16 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 }
 
 void GeometryTile::commitFeatureIndex() {
-    if (pendingFeatureIndex) {
-        featureIndex = std::move(*pendingFeatureIndex);
+    // We commit our pending FeatureIndex and GeometryTileData when:
+    // 1) An `onPlacement` result has delivered us updated symbolBuckets since we received the pending data
+    // 2) A global placement has run, synchronizing the global CollisionIndex with the latest
+    //    symbolBuckets (and thus with the latest FeatureIndex/GeometryTileData)
+    if (pendingFeatureIndex && pendingFeatureIndex->first) {
+        featureIndex = std::move(pendingFeatureIndex->second);
         pendingFeatureIndex = nullopt;
     }
-    if (pendingData) {
-        data = std::move(*pendingData);
+    if (pendingData && pendingData->first) {
+        data = std::move(pendingData->second);
         pendingData = nullopt;
     }
 }
