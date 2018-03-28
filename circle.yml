@@ -33,7 +33,7 @@ workflows:
       - linux-gcc5-release-qt5
       - ios-debug
       - ios-sanitize
-      #- ios-sanitize-address
+      - ios-sanitize-address
       - ios-static-analyzer
       - ios-release:
           filters:
