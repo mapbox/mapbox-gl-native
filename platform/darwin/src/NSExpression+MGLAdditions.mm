@@ -409,6 +409,12 @@
     return [self valueForKeyPath:@"mgl_jsonExpressionObject"];
 }
 
+- (id)mgl_coalesce {
+    [NSException raise:NSInvalidArgumentException
+                      format:@"Coalesce expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
 @implementation NSDictionary (MGLExpressionAdditions)
@@ -861,14 +867,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"MGL_MATCH"] ||
                        [function isEqualToString:@"mgl_match:"]) {
                 return self.mgl_jsonMatchExpressionObject;
-            } else if ([function isEqualToString:@"mgl_coalesce:"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
+            } else if ([function isEqualToString:@"mgl_coalesce:"] ||
+                       [function isEqualToString:@"mgl_coalesce"]) {
                 
-                for (NSExpression *expression in self.arguments.firstObject.constantValue) {
-                    [expressionObject addObject:[expression mgl_jsonExpressionObject]];
-                }
-                
-                return expressionObject;
+                return self.mgl_jsonCoalesceExpressionObject;
             } else if ([function isEqualToString:@"castObject:toType:"]) {
                 id object = self.arguments.firstObject.mgl_jsonExpressionObject;
                 NSString *type = self.arguments[1].mgl_jsonExpressionObject;
@@ -1048,6 +1050,17 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else {
             [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
         }
+    }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonCoalesceExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_coalesce:"];
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
+    
+    for (NSExpression *expression in  (isAftermarketFunction ? self.arguments.firstObject : self.operand).constantValue) {
+        [expressionObject addObject:[expression mgl_jsonExpressionObject]];
     }
     
     return expressionObject;

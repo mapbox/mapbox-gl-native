@@ -658,8 +658,13 @@ using namespace std::string_literals;
                                       [NSExpression expressionForKeyPath:@"y"],
                                       [NSExpression expressionForKeyPath:@"z"],
                                       [NSExpression expressionForConstantValue:@0]]];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", @[[NSExpression expressionForKeyPath:@"x"],
+                                                                                                                      [NSExpression expressionForKeyPath:@"y"],
+                                                                                                                      [NSExpression expressionForKeyPath:@"z"],
+                                                                                                                      [NSExpression expressionForConstantValue:@0]]];
         NSArray *jsonExpression = @[@"coalesce", @[@"get", @"x"], @[@"get", @"y"], @[@"get", @"z"], @0];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     
