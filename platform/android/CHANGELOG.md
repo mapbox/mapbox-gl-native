@@ -2,6 +2,17 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0-beta.5 - March 27, 2018
+ - Avoid flashing on pitched overzoomed tiles [#11488](https://github.com/mapbox/mapbox-gl-native/pull/11488)
+ - Literal array conversion of primitive arrays [#11500](https://github.com/mapbox/mapbox-gl-native/pull/11500)
+ - Make default output from step more descriptive [#11501](https://github.com/mapbox/mapbox-gl-native/pull/11501)
+ - Expose public Telemetry API [#11503](https://github.com/mapbox/mapbox-gl-native/pull/11503)
+ - Convert Android int colors with to-color expression [#11506](https://github.com/mapbox/mapbox-gl-native/pull/11506)
+ - Prevent default style reload when string style json was set [#11520](https://github.com/mapbox/mapbox-gl-native/pull/11520)
+ - String, number and bool Expressions with multiple values [#11512](https://github.com/mapbox/mapbox-gl-native/pull/11512)
+ - Telemetry library 3.0.0-beta.3 [#11534](https://github.com/mapbox/mapbox-gl-native/pull/11534)
+ - Gestures library v0.2.0 [#11535](https://github.com/mapbox/mapbox-gl-native/pull/11535)
+
 ## 5.5.1 - March 26, 2018
  - Verify optional access of FileSource deactivation [#11480](https://github.com/mapbox/mapbox-gl-native/pull/11480)
  - Prevent default style loading when style json was set [#11519](https://github.com/mapbox/mapbox-gl-native/pull/11519)
