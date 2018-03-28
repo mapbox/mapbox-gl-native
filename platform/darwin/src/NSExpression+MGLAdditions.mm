@@ -67,7 +67,7 @@
     // with an explicit and implicit first argument.
     INSTALL_CONTROL_STRUCTURE(MGL_LET);
     INSTALL_CONTROL_STRUCTURE(MGL_MATCH);
-    INSTALL_CONTROL_STRUCTURE(MGL_SWITCH);
+    INSTALL_CONTROL_STRUCTURE(MGL_IF);
     INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
     
     #undef INSTALL_AFTERMARKET_FN
@@ -100,6 +100,9 @@
     return nil;
 }
 
+/**
+ A placeholder for a method that evaluates a coalesce expression.
+ */
 - (id)mgl_coalesce:(NSArray<NSExpression *> *)elements {
     [NSException raise:NSInvalidArgumentException
                 format:@"Coalesce expressions lack underlying Objective-C implementations."];
@@ -128,7 +131,7 @@
 /**
  A placeholder for a method that evaluates an expression and returns the matching element.
  */
-- (id)MGL_SWITCH:(id)firstCondition, ... {
+- (id)MGL_IF:(id)firstCondition, ... {
     va_list argumentList;
     va_start(argumentList, firstCondition);
     
@@ -647,7 +650,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
             }
             
-            return [NSExpression expressionForFunction:@"MGL_SWITCH" arguments:arguments];
+            return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];
             NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
@@ -852,28 +855,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }];
                 [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 return expressionObject;
-            } else if ([function isEqualToString:@"MGL_SWITCH"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", nil];
-
-                for (NSExpression *option in self.arguments) {
-                    if ([option respondsToSelector:@selector(constantValue)] && [option.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
-                        NSPredicate *predicate = (NSPredicate *)option.constantValue;
-                        [expressionObject addObject:predicate.mgl_jsonExpressionObject];
-                    } else {
-                        [expressionObject addObject:option.mgl_jsonExpressionObject];
-                    }
-                }
-
-                return expressionObject;
-            } else if ([function isEqualToString:@"MGL_MATCH"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", nil];
-                
-
-                for (NSExpression *option in self.arguments) {
-                    [expressionObject addObject:option.mgl_jsonExpressionObject];
-                }
-                
-                return expressionObject;
+            } else if ([function isEqualToString:@"MGL_IF"] ||
+                       [function isEqualToString:@"mgl_if:"]) {
+                return self.mgl_jsonIfExpressionObject;
+            } else if ([function isEqualToString:@"MGL_MATCH"] ||
+                       [function isEqualToString:@"mgl_match:"]) {
+                return self.mgl_jsonMatchExpressionObject;
             } else if ([function isEqualToString:@"mgl_coalesce:"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
                 
@@ -1015,6 +1002,54 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         [expressionObject addObject:key];
         [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
     }
+    return expressionObject;
+}
+
+- (id)mgl_jsonMatchExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_MATCH"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, nil];
+    NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
+    
+    for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
+        [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+    }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonIfExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_IF"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+    NSExpression *firstCondition;
+    id condition;
+    
+    if (isAftermarketFunction) {
+        firstCondition = self.arguments.firstObject;
+    } else {
+        firstCondition = self.operand;
+    }
+    
+    if ([firstCondition respondsToSelector:@selector(constantValue)] && [firstCondition.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
+        NSPredicate *predicate = (NSPredicate *)firstCondition.constantValue;
+        condition = predicate.mgl_jsonExpressionObject;
+    } else {
+        condition = firstCondition.mgl_jsonExpressionObject;
+    }
+    
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", condition, nil];
+    NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
+    
+    for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
+        if ([arguments[index] respondsToSelector:@selector(constantValue)] && [arguments[index].constantValue isKindOfClass:[NSComparisonPredicate class]]) {
+            NSPredicate *predicate = (NSPredicate *)arguments[index].constantValue;
+            [expressionObject addObject:predicate.mgl_jsonExpressionObject];
+        } else {
+            [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+        }
+    }
+    
     return expressionObject;
 }
 

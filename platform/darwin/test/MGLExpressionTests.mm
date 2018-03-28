@@ -632,8 +632,15 @@ using namespace std::string_literals;
                                     MGLConstantExpression(@"one"),
                                     MGLConstantExpression(@0),
                                     MGLConstantExpression(@"zero")];
+        NSExpression *predicate = [NSExpression expressionWithFormat:@"2 - 1"];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_match:', %@)", predicate, @[MGLConstantExpression(@1),
+                                                 MGLConstantExpression(@"one"),
+                                                 MGLConstantExpression(@0),
+                                                 MGLConstantExpression(@"zero"),
+                                                 MGLConstantExpression(@"default")]];
         NSArray *jsonExpression =  @[@"match", @[@"-", @2, @1], @1, @"one", @0, @"zero", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
@@ -660,17 +667,19 @@ using namespace std::string_literals;
 
 - (void)testConditionalExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_SWITCH(%@, %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
                                     MGLConstantExpression(@YES),
                                     MGLConstantExpression(@NO)];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_if:', %@)", [NSPredicate predicateWithFormat:@"1 = 2"], @[MGLConstantExpression(@YES), MGLConstantExpression(@NO)]];
         NSArray *jsonExpression = @[@"case", @[@"==", @1, @2], @YES, @NO];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_SWITCH(%@, %@, %@, %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, %@, %@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
                                     MGLConstantExpression(@YES),
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 1"]],
