@@ -354,9 +354,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
 `all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
 `any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
-`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
-`coalesce`             | |
-`match`                | |
+`case`                 | `MGL_IF` | `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)` 
+`coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
+`match`                | `MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
 `interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` |
 `step`                 | `mgl_step:withMinimum:stops:` |
 `let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
