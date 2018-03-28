@@ -692,7 +692,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"mgl_has:"]) {
                 NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", self.arguments[0].mgl_jsonExpressionObject, nil];
-                if (self.operand.expressionType == NSConstantValueExpressionType) {
+                if (self.operand.expressionType != NSEvaluatedObjectExpressionType) {
                     [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 }
                 return expressionObject;
