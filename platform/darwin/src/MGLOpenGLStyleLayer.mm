@@ -16,7 +16,7 @@
  */
 void MGLPrepareCustomStyleLayer(void *context) {
     MGLOpenGLStyleLayer *layer = (__bridge MGLOpenGLStyleLayer *)context;
-    (__bridge_retained void *)layer;
+    (void)(__bridge_retained void *)layer;
     [layer didMoveToMapView:layer.style.mapView];
 }
 
@@ -117,9 +117,9 @@ void MGLFinishCustomStyleLayer(void *context) {
         [NSException raise:@"MGLLayerReuseException"
                     format:@"%@ cannot be added to more than one MGLStyle at a time.", self];
     }
-    _style.openGLLayers[self.identifier] = nil;
+    [_style.openGLLayers removeObject:self];
     _style = style;
-    _style.openGLLayers[self.identifier] = self;
+    [_style.openGLLayers addObject:self];
 }
 
 - (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer {

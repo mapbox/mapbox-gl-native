@@ -2,10 +2,6 @@
 #import <objc/message.h>
 #import <Mapbox/Mapbox.h>
 
-
-#define TRACE(message) NSLog(@"%@: %@", NSStringFromSelector(_cmd), message)
-
-
 @interface MBGLIntegrationTests : XCTestCase <MGLMapViewDelegate>
 
 @property (nonatomic) MGLMapView *mapView;
@@ -76,8 +72,8 @@
 #pragma mark - Tests
 
 - (void)testStoringOpenGLLayerInCollections {
-    // If we change the meaning of equality for MGLStyleLayer we want to know about it - since we
-    // store layers in both a NSMutableSet and in a NSMapTable
+    // If we change the meaning of equality for MGLOpenGLStyleLayer we want to know about it - since we
+    // store layers in a NSMutableSet
     MGLStyleLayer *layer1 = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
     MGLStyleLayer *layer2 = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
 
@@ -225,7 +221,6 @@
 
 - (void)testOpenGLLayerDoesNotLeakWhenRemovedFromStyle {
 
-    //    MGLOpenGLStyleLayer *layer;
     __weak id weakLayer;
     @autoreleasepool {
         MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
@@ -235,7 +230,6 @@
 
         // Run the render loop, so the layer gets used/managed.
         [self waitForMapViewToBeRendered];
-        //        [[NSRunLoop currentRunLoop] runUntilDate:[[NSDate date] dateByAddingTimeInterval:waitInterval]];
 
         [self.style removeLayer:[self.style layerWithIdentifier:@"gl-layer"]];
     }
@@ -334,9 +328,26 @@
     [self.mapView setStyleURL:styleURL];
     [self waitForExpectations:@[_styleLoadingExpectation] timeout:10];
 
-    // At this point the C++ CustomLayer will have been destroyed, and the rawLayer pointer has been NULLed
+    // At this point the C++ CustomLayer will have been destroyed. Ideally the
+    // Obj-C rawLayer pointer will have been NULL'd at this point, but that is still
+    // TBD.
     XCTAssert(weakLayer == layer2);
     XCTAssertNotNil(weakLayer);
+
+    /*
+    // Attempting to re-insert this layer2 will crash the app, since the rawLayer
+    // pointer is now (potentially) pointing at garbage (i.e. it's a dangling
+    // pointer). When this issue has been fixed, we can uncomment the follow checks...
+    XCTAssert(weakLayer.rawLayer == NULL);
+
+    @try {
+        [self.style insertLayer:layer2 atIndex:0];
+        XCTFail();
+    }
+    @catch (NSException *exception) {
+        // Success, we're expecting an exception
+    }
+    */
 
     // Asking the style for the layer should return nil
     MGLStyleLayer *layer3 = [self.mapView.style layerWithIdentifier:@"gl-layer"];

@@ -1908,6 +1908,7 @@
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
+				1FB7DAAF1F2A4DBD00410606 /* MGLVectorSource+MGLAdditions.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
@@ -2340,7 +2341,6 @@
 					};
 					16376B2E1FFDB4B40000563E = {
 						CreatedOnToolsVersion = 9.2;
-						DevelopmentTeam = GJZR2MEM28;
 						ProvisioningStyle = Automatic;
 					};
 					DA1DC9491CB6C1C2006E619F = {
@@ -3072,7 +3072,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GJZR2MEM28;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Integration Test Harness/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
@@ -3098,7 +3097,6 @@
 				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CODE_SIGN_STYLE = Automatic;
-				DEVELOPMENT_TEAM = GJZR2MEM28;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				INFOPLIST_FILE = "Integration Test Harness/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 11.2;
