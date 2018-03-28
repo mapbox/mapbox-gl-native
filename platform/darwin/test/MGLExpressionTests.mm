@@ -177,15 +177,15 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"geometry-type"]], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"featureIdentifier"];
+        NSExpression *expression = [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"id"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureIdentifier"].mgl_jsonExpressionObject, @[@"id"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$mgl_featureIdentifier"].mgl_jsonExpressionObject, @[@"id"]);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"id"]], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"featureProperties"];
+        NSExpression *expression = [NSExpression expressionForVariable:@"mgl_featureProperties"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$mgl_featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:@[@"properties"]], expression);
     }
     {

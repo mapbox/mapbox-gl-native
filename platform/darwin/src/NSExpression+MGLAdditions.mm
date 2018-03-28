@@ -481,9 +481,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"geometry-type"]) {
             return [NSExpression expressionForVariable:@"mgl_geometryType"];
         } else if ([op isEqualToString:@"id"]) {
-            return [NSExpression expressionForVariable:@"featureIdentifier"];
+            return [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
         }  else if ([op isEqualToString:@"properties"]) {
-            return [NSExpression expressionForVariable:@"featureProperties"];
+            return [NSExpression expressionForVariable:@"mgl_featureProperties"];
         } else if ([op isEqualToString:@"let"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
             NSArray *bindingObjects = [argumentObjects subarrayWithRange:NSMakeRange(0, argumentObjects.count - 1)];
@@ -575,10 +575,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([self.variable isEqualToString:@"mgl_geometryType"]) {
                 return @[@"geometry-type"];
             }
-            if ([self.variable isEqualToString:@"featureIdentifier"]) {
+            if ([self.variable isEqualToString:@"mgl_featureIdentifier"]) {
                 return @[@"id"];
             }
-            if ([self.variable isEqualToString:@"featureProperties"]) {
+            if ([self.variable isEqualToString:@"mgl_featureProperties"]) {
                 return @[@"properties"];
             }
             return @[@"var", self.variable];
