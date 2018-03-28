@@ -125,9 +125,9 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
+    optional<std::unique_ptr<FeatureIndex>> pendingFeatureIndex;
     std::unique_ptr<const GeometryTileData> data;
-    std::unique_ptr<const GeometryTileData> pendingData;
+    optional<std::unique_ptr<const GeometryTileData>> pendingData;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
