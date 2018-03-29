@@ -328,12 +328,12 @@ In style specification | Method, function, or predicate type | Format string syn
 `to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
 `to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
-`geometry-type`        | |
-`id`                   | |
-`properties`           | |
-`at`                   | |
+`geometry-type`        | |`$mgl_geometryType`
+`id`                   | |`$mgl_featureIdentifier`
+`properties`           | |`$mgl_featureProperties`
+`at`                   | `objectFrom:withIndex:` |
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
-`has`                  | |
+`has`                  | `mgl_hasProperty:properties:` |
 `length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
 `!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
 `!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`

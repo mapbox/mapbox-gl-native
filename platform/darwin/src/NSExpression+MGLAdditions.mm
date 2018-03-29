@@ -111,7 +111,7 @@
 }
 
 /**
- A placeholder for a method that evaluates a coalesce expression.
+ A placeholder for a method that evaluates has expression.
  */
 - (id)mgl_hasProperty:(id)element properties:(id)properties {
     [NSException raise:NSInvalidArgumentException
