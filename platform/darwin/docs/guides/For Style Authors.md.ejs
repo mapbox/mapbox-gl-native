@@ -343,7 +343,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `properties`           | |`$mgl_featureProperties`
 `at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
-`has`                  | `mgl_hasProperty:properties:` |
+`has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
 `length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
 `!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
 `!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`

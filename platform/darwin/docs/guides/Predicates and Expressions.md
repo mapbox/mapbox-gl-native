@@ -192,8 +192,9 @@ string syntax:
 
 Initializer parameter | Format string syntax | Description
 ----------------------|----------------------|------------
+`mgl_does:have:` | `mgl_does:have:(SELF, 'key')` or `mgl_does:have:(%@, 'key')` | Returns a Boolean value indicating whether the dictionary has a value for the key or whether the evaluated object (`SELF`) has a value for the feature attribute. Compared to the `mgl_has:` custom function, that function’s target is instead passed in as the first argument to this function. Both functions are equivalent to the syntax `key != NIL` or `%@[key] != NIL` but can be used outside of a predicate.
 `mgl_interpolate:withCurveType:parameters:stops:` | `mgl_interpolate:withCurveType:parameters:stops:(x, 'linear', nil, %@)` | Produces continuous, smooth results by interpolating between pairs of input and output values (“stops”). Compared to the `mgl_interpolateWithCurveType:parameters:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
-`mgl_step:from:stops:` | `mgl_step:from:stops:(x, 11, %@)` |Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of input and output values ("stops"). Compared to the `mgl_stepWithMinimum:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
+`mgl_step:from:stops:` | `mgl_step:from:stops:(x, 11, %@)` | Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of input and output values ("stops"). Compared to the `mgl_stepWithMinimum:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
 `mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | Returns the result of concatenating together all the elements of an array in order. Compared to the `stringByAppendingString:` custom function, this function takes only one argument, which is an aggregate expression containing the strings to concatenate.
 `mgl_coalesce:` | `mgl_coalesce({x, y, z})` | Returns the first non-`nil` value from an array of expressions.
 `MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables. Compared to the `mgl_expressionWithContext:` custom function, this function takes the variable names and values inline before the expression that contains references to those variables.
@@ -221,6 +222,17 @@ The following custom functions are also available with the
       empty string, 0, `FALSE`, `NIL`, or NaN, otherwise `TRUE`.
    </td>
 </tr>
+<tr>
+   <td><code>mgl_has:</code></td>
+   <td>
+      An `NSExpression` that evaluates to an <code>NSDictionary</code> or the evaluated object (<code>SELF</code>).
+   </td>
+   <td>
+      An `NSExpression` that evaluates to an <code>NSString</code> representing the key to look up in the dictionary or the feature attribute to look up in the evaluated object (see <code>MGLFeature.attributes</code>).
+   </td>
+   <td>
+      `true` if the dictionary has a value for the key or if the evaluated object has a value for the feature attribute.
+   </td>
 <tr>
    <td><code>mgl_expressionWithContext:</code></td>
    <td>
