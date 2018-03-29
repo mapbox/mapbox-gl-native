@@ -969,7 +969,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                       @12.0f: [UIColor greenColor],
                                       @14.0f: [UIColor blueColor]};
     waterLayer.fillColor = [NSExpression expressionWithFormat:
-                            @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                            @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                             waterColorStops];
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
@@ -978,7 +978,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                            @14: @NO,
                                            @15: @YES};
     waterLayer.fillAntialiased = [NSExpression expressionWithFormat:
-                                  @"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', false, %@)",
+                                  @"mgl_step:from:stops:($zoomLevel, false, %@)",
                                   fillAntialiasedStops];
 }
 
@@ -991,7 +991,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                      @10: @15,
                                      @15: @30};
     NSExpression *lineWidthExpression = [NSExpression expressionWithFormat:
-                                         @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                         @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                                          lineWidthStops];
     roadLayer.lineWidth = lineWidthExpression;
     roadLayer.lineGapWidth = lineWidthExpression;
@@ -1000,7 +1000,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                          @13: [UIColor yellowColor],
                                          @16: [UIColor cyanColor]};
     roadLayer.lineColor = [NSExpression expressionWithFormat:
-                           @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                           @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                            roadLineColorStops];
 
     roadLayer.visible = YES;
@@ -1018,7 +1018,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     NSDictionary *opacityStops = @{@20.0f: @1.0f,
                                    @5.0f: @0.0f};
     rasterLayer.rasterOpacity = [NSExpression expressionWithFormat:
-                                 @"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+                                 @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                                  opacityStops];
     [self.mapView.style addLayer:rasterLayer];
 }

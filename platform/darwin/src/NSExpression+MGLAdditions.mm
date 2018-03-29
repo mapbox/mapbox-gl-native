@@ -11,7 +11,167 @@
 #import "NSPredicate+MGLAdditions.h"
 #import "NSValue+MGLStyleAttributeAdditions.h"
 
+#import <objc/runtime.h>
+
 #import <mbgl/style/expression/expression.hpp>
+
+@interface MGLAftermarketExpressionInstaller: NSObject
+@end
+
+@implementation MGLAftermarketExpressionInstaller
+
++ (void)load {
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        [self installFunctions];
+    });
+}
+
+/**
+ Adds to NSExpression’s built-in repertoire of functions.
+ */
++ (void)installFunctions {
+    Class MGLAftermarketExpressionInstaller = [self class];
+    
+    // NSExpression’s built-in functions are backed by class methods on a
+    // private class, so use a function expression to get at the class.
+    // http://funwithobjc.tumblr.com/post/2922267976/using-custom-functions-with-nsexpression
+    NSExpression *functionExpression = [NSExpression expressionWithFormat:@"sum({})"];
+    NSString *className = NSStringFromClass([functionExpression.operand.constantValue class]);
+    
+    // Effectively categorize the class with some extra class methods.
+    Class NSPredicateUtilities = objc_getMetaClass(className.UTF8String);
+#pragma clang push
+#pragma clang diagnostic ignored "-Wundeclared-selector"
+    #define INSTALL_METHOD(sel) \
+        { \
+            Method method = class_getInstanceMethod(MGLAftermarketExpressionInstaller, @selector(sel)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel), method_getImplementation(method), method_getTypeEncoding(method)); \
+        }
+    #define INSTALL_CONTROL_STRUCTURE(sel) \
+        { \
+            Method method = class_getInstanceMethod(MGLAftermarketExpressionInstaller, @selector(sel:)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel), method_getImplementation(method), method_getTypeEncoding(method)); \
+            class_addMethod(NSPredicateUtilities, @selector(sel:), method_getImplementation(method), method_getTypeEncoding(method)); \
+        }
+    
+    // Install method-like functions, taking the number of arguments implied by
+    // the selector name.
+    INSTALL_METHOD(mgl_join:);
+    INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
+    INSTALL_METHOD(mgl_step:from:stops:);
+    INSTALL_METHOD(mgl_coalesce:);
+    INSTALL_METHOD(mgl_does:have:);
+    
+    // Install functions that resemble control structures, taking arbitrary
+    // numbers of arguments. Vararg aftermarket functions need to be declared
+    // with an explicit and implicit first argument.
+    INSTALL_CONTROL_STRUCTURE(MGL_LET);
+    INSTALL_CONTROL_STRUCTURE(MGL_MATCH);
+    INSTALL_CONTROL_STRUCTURE(MGL_IF);
+    INSTALL_CONTROL_STRUCTURE(MGL_FUNCTION);
+    
+    #undef INSTALL_AFTERMARKET_FN
+#pragma clang pop
+}
+
+/**
+ Joins the given components into a single string by concatenating each component
+ in order.
+ */
+- (NSString *)mgl_join:(NSArray<NSString *> *)components {
+    return [components componentsJoinedByString:@""];
+}
+
+/**
+ A placeholder for a method that evaluates an interpolation expression.
+ */
+- (id)mgl_interpolate:(id)inputExpression withCurveType:(NSString *)curveType parameters:(NSDictionary *)params stops:(NSDictionary *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Interpolation expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates a step expression.
+ */
+- (id)mgl_step:(id)inputExpression from:(id)minimumExpression stops:(NSDictionary *)stops {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Step expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates a coalesce expression.
+ */
+- (id)mgl_coalesce:(NSArray<NSExpression *> *)elements {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Coalesce expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ Returns a Boolean value indicating whether the object has a value for the given
+ key.
+ */
+- (BOOL)mgl_does:(id)object have:(NSString *)key {
+    return [object valueForKey:key] != nil;
+}
+
+/**
+ A placeholder for a method that evaluates an expression based on an arbitrary
+ number of variable names and assigned expressions.
+ */
+- (id)MGL_LET:(NSString *)firstVariableName, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates an expression and returns the matching element.
+ */
+- (id)MGL_MATCH:(id)firstCondition, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates an expression and returns the matching element.
+ */
+- (id)MGL_IF:(id)firstCondition, ... {
+    va_list argumentList;
+    va_start(argumentList, firstCondition);
+    
+    for (id eachExpression = firstCondition; eachExpression; eachExpression = va_arg(argumentList, id)) {
+        if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
+            id valueExpression = va_arg(argumentList, id);
+            if ([eachExpression evaluateWithObject:nil]) {
+                return valueExpression;
+            }
+        } else {
+            return eachExpression;
+        }
+    }
+    va_end(argumentList);
+    
+    return nil;
+}
+
+
+/**
+ A placeholder for a catch-all method that evaluates an arbitrary number of
+ arguments as an expression according to the Mapbox Style Specification’s
+ expression language.
+ */
+- (id)MGL_FUNCTION:(id)firstArgument, ... {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Mapbox GL function expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+@end
 
 @implementation NSExpression (MGLPrivateAdditions)
 
@@ -260,7 +420,7 @@
 
 - (id)mgl_coalesce {
     [NSException raise:NSInvalidArgumentException
-                format:@"Coalesce expressions lack underlying Objective-C implementations."];
+                      format:@"Coalesce expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -330,6 +490,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"^": @"raise:toPower:",
             @"upcase": @"uppercase:",
             @"downcase": @"lowercase:",
+            @"let": @"MGL_LET",
         };
     });
     
@@ -382,12 +543,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
         } else if ([op isEqualToString:@"to-number"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            if (argumentObjects.count == 1) {
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'NSNumber')", operand];
+            }
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             return [NSExpression expressionForFunction:operand selectorName:@"mgl_numberWithFallbackValues:" arguments:subexpressions];
         } else if ([op isEqualToString:@"to-string"]) {
             NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
-            return [NSExpression expressionForFunction:operand selectorName:@"stringValue" arguments:@[]];
+            return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
@@ -400,7 +564,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForKeyPath:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"length"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            return [NSExpression expressionForFunction:@"count:" arguments:@[subexpressions.firstObject]];
+            NSString *function = @"count:";
+            if ([subexpressions.firstObject expressionType] == NSConstantValueExpressionType
+                && [[subexpressions.firstObject constantValue] isKindOfClass:[NSString class]]) {
+                function = @"length:";
+            }
+            return [NSExpression expressionForFunction:function arguments:@[subexpressions.firstObject]];
         } else if ([op isEqualToString:@"min"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *subexpression = [NSExpression expressionForAggregate:subexpressions];
@@ -415,9 +584,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForConstantValue:@(M_PI)];
         } else if ([op isEqualToString:@"concat"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            NSExpression *operand = subexpressions.firstObject;
-            subexpressions = [subexpressions subarrayWithRange:NSMakeRange(1, subexpressions.count - 1)];
-            return [NSExpression expressionForFunction:operand selectorName:@"stringByAppendingString:" arguments:subexpressions];
+            NSExpression *subexpression = [NSExpression expressionForAggregate:subexpressions];
+            return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];
         }  else if ([op isEqualToString:@"at"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *index = subexpressions.firstObject;
@@ -425,9 +593,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[operand, index]];
         } else if ([op isEqualToString:@"has"]) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
-            NSExpression *operand = argumentObjects.count > 1 ? subexpressions[1] : [NSExpression expressionWithFormat:@"self"];
-            NSExpression *property = subexpressions.firstObject;
-            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_has:', %@)", operand, property];
+            NSExpression *operand = argumentObjects.count > 1 ? subexpressions[1] : [NSExpression expressionForEvaluatedObject];
+            NSExpression *key = subexpressions.firstObject;
+            return [NSExpression expressionForFunction:@"mgl_does:have:" arguments:@[operand, key]];
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
@@ -440,7 +608,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             }
             NSExpression *curveParameterExpression = [NSExpression mgl_expressionWithJSONObject:curveParameters];
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
             NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
@@ -449,11 +617,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_interpolateWithCurveType:parameters:stops:"
-                                             arguments:@[curveTypeExpression, curveParameterExpression, stopExpression]];
+            return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
+                                             arguments:@[inputExpression, curveTypeExpression, curveParameterExpression, stopExpression]];
         } else if ([op isEqualToString:@"step"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSExpression *minimum;
             if (stopExpressions.count % 2) {
@@ -471,9 +638,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_stepWithMinimum:stops:"
-                                             arguments:@[minimum, stopExpression]];
+            return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
+                                             arguments:@[inputExpression, minimum, stopExpression]];
         } else if ([op isEqualToString:@"zoom"]) {
             return [NSExpression expressionForVariable:@"zoomLevel"];
         } else if ([op isEqualToString:@"heatmap-density"]) {
@@ -484,48 +650,37 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
         }  else if ([op isEqualToString:@"properties"]) {
             return [NSExpression expressionForVariable:@"mgl_featureProperties"];
-        } else if ([op isEqualToString:@"let"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
-            NSArray *bindingObjects = [argumentObjects subarrayWithRange:NSMakeRange(0, argumentObjects.count - 1)];
-            NSMutableDictionary *context = [NSMutableDictionary dictionaryWithCapacity:bindingObjects.count / 2];
-            NSEnumerator *bindingEnumerator = bindingObjects.objectEnumerator;
-            while (NSString *key = bindingEnumerator.nextObject) {
-                context[key] = [NSExpression mgl_expressionWithJSONObject:bindingEnumerator.nextObject];
-            }
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_expressionWithContext:"
-                                             arguments:@[[NSExpression expressionForConstantValue:context]]];
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
-            NSArray *caseExpressions = argumentObjects;
-            NSExpression *firstConditional = [NSExpression expressionWithFormat:@"%@", [NSPredicate mgl_predicateWithJSONObject:caseExpressions[0]]];
             NSMutableArray *arguments = [NSMutableArray array];
             
-            for (NSUInteger index = 1; index < caseExpressions.count; index++) {
-                if ([caseExpressions[index] isKindOfClass:[NSArray class]]) {
-                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:caseExpressions[index]];
+            for (NSUInteger index = 0; index < argumentObjects.count; index++) {
+                if ([argumentObjects[index] isKindOfClass:[NSArray class]]) {
+                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
                     NSExpression *argument = [NSExpression expressionWithFormat:@"%@", conditional];
                     [arguments addObject:argument];
                 } else {
-                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:caseExpressions[index]]];
+                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:argumentObjects[index]]];
                 }
             }
             
-            return [NSExpression expressionForFunction:firstConditional selectorName:@"mgl_case:" arguments:arguments];
+            if (@available(iOS 9.0, *)) {
+                if (arguments.count == 3) {
+                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
+                    return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
+                }
+            }
+            return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
-            NSArray *matchOptions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-
             NSMutableArray *optionsArray = [NSMutableArray array];
-            NSEnumerator *optionsEnumerator = matchOptions.objectEnumerator;
+            NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
             while (id object = optionsEnumerator.nextObject) {
                 NSExpression *option = [NSExpression mgl_expressionWithJSONObject:object];
                 [optionsArray addObject:option];
             }
         
-            return [NSExpression expressionForFunction:operand
-                                          selectorName:@"mgl_match:"
+            return [NSExpression expressionForFunction:@"MGL_MATCH"
                                              arguments:optionsArray];
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
@@ -533,10 +688,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
             }
             
-            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", expressions];
-        }else {
-            [NSException raise:NSInvalidArgumentException
-                        format:@"Expression operator %@ not yet implemented.", op];
+            return [NSExpression expressionWithFormat:@"mgl_coalesce(%@)", expressions];
+        } else {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
         }
     }
     
@@ -561,6 +716,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"raise:toPower:": @"^",
             @"uppercase:": @"upcase",
             @"lowercase:": @"downcase",
+            @"length:": @"length",
+            // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
+            @"MGL_LET": @"let",
+            @"MGL_LET:": @"let",
         };
     });
     
@@ -673,6 +832,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             } else if ([function isEqualToString:@"floor:"]) {
                 return [NSExpression expressionWithFormat:@"trunc:(%@) - TERNARY(modulus:by:(%@, 1) < 0, 1, 0)",
                         self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
+            } else if ([function isEqualToString:@"mgl_join:"]) {
+                NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];
+                return [@[@"concat"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"stringByAppendingString:"]) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
@@ -690,46 +852,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
-            } else if ([function isEqualToString:@"mgl_has:"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", self.arguments[0].mgl_jsonExpressionObject, nil];
-                if (self.operand.expressionType != NSEvaluatedObjectExpressionType) {
-                    [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
-                }
-                return expressionObject;
-            } else if ([function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
-                if (self.arguments.count < 3) {
-                    [NSException raise:NSInvalidArgumentException format:
-                     @"Too few arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments."];
-                } else if (self.arguments.count > 3) {
-                    [NSException raise:NSInvalidArgumentException format:
-                     @"%lu unexpected arguments to ‘mgl_interpolateWithCurveType:parameters:stops:’ function; expected 3 arguments.",
-                     self.arguments.count - 3];
-                }
-                NSString *curveType = self.arguments.firstObject.constantValue;
-                NSMutableArray *interpolationArray = [NSMutableArray arrayWithObject:curveType];
-                if ([curveType isEqualToString:@"exponential"]) {
-                    id base = [self.arguments[1] mgl_jsonExpressionObject];
-                    [interpolationArray addObject:base];
-                } else if ([curveType isEqualToString:@"cubic-bezier"]) {
-                    NSArray *controlPoints = [self.arguments[1].collection mgl_jsonExpressionObject];
-                    [interpolationArray addObjectsFromArray:controlPoints];
-                }
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, self.operand.mgl_jsonExpressionObject, nil];
-                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[2].constantValue;
-                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
-                    [expressionObject addObject:key];
-                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
-                }
-                return expressionObject;
-            } else if ([function isEqualToString:@"mgl_stepWithMinimum:stops:"]) {
-                id minimum = self.arguments.firstObject.mgl_jsonExpressionObject;
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", self.operand.mgl_jsonExpressionObject, minimum, nil];
-                NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[1].constantValue;
-                for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
-                    [expressionObject addObject:key];
-                    [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
-                }
-                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_does:have:"] ||
+                       [function isEqualToString:@"mgl_has:"]) {
+                return self.mgl_jsonHasExpressionObject;
+            } else if ([function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"]
+                       || [function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
+                return self.mgl_jsonInterpolationExpressionObject;
+            } else if ([function isEqualToString:@"mgl_step:from:stops:"]
+                       || [function isEqualToString:@"mgl_stepWithMinimum:stops:"]) {
+                return self.mgl_jsonStepExpressionObject;
             } else if ([function isEqualToString:@"mgl_expressionWithContext:"]) {
                 id context = self.arguments.firstObject;
                 if ([context isKindOfClass:[NSExpression class]]) {
@@ -742,37 +873,28 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }];
                 [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
                 return expressionObject;
-            } else if ([function isEqualToString:@"mgl_case:"]) {
-                NSPredicate *firstConditional = (NSPredicate *)self.operand.constantValue;
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", firstConditional.mgl_jsonExpressionObject, nil];
-
-                for (NSExpression *option in self.arguments) {
-                    if ([option respondsToSelector:@selector(constantValue)] && [option.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
-                        NSPredicate *predicate = (NSPredicate *)option.constantValue;
-                        [expressionObject addObject:predicate.mgl_jsonExpressionObject];
-                    } else {
-                        [expressionObject addObject:option.mgl_jsonExpressionObject];
-                    }
+            } else if ([function isEqualToString:@"MGL_IF"] ||
+                       [function isEqualToString:@"mgl_if:"]) {
+                return self.mgl_jsonIfExpressionObject;
+            } else if ([function isEqualToString:@"MGL_MATCH"] ||
+                       [function isEqualToString:@"mgl_match:"]) {
+                return self.mgl_jsonMatchExpressionObject;
+            } else if ([function isEqualToString:@"mgl_coalesce:"] ||
+                       [function isEqualToString:@"mgl_coalesce"]) {
+                
+                return self.mgl_jsonCoalesceExpressionObject;
+            } else if ([function isEqualToString:@"castObject:toType:"]) {
+                id object = self.arguments.firstObject.mgl_jsonExpressionObject;
+                NSString *type = self.arguments[1].mgl_jsonExpressionObject;
+                if ([type isEqualToString:@"NSString"]) {
+                    return @[@"to-string", object];
+                } else if ([type isEqualToString:@"NSNumber"]) {
+                    return @[@"to-number", object];
                 }
-
-                return expressionObject;
-            } else if ([function isEqualToString:@"mgl_match:"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", self.operand.mgl_jsonExpressionObject, nil];
-                
-
-                for (NSExpression *option in self.arguments) {
-                    [expressionObject addObject:option.mgl_jsonExpressionObject];
-                }
-                
-                return expressionObject;
-            } else if ([function isEqualToString:@"mgl_coalesce"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
-                
-                for (NSExpression *expression in self.operand.constantValue) {
-                    [expressionObject addObject:[expression mgl_jsonExpressionObject]];
-                }
-                
-                return expressionObject;
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Casting expression to %@ not yet implemented.", type];
+            } else if ([function isEqualToString:@"MGL_FUNCTION"]) {
+                return self.arguments.mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"median:"] ||
                        [function isEqualToString:@"mode:"] ||
                        [function isEqualToString:@"stddev:"] ||
@@ -849,6 +971,123 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     }
     
     return nil;
+}
+
+- (id)mgl_jsonInterpolationExpressionObject {
+    NSUInteger expectedArgumentCount = [self.function componentsSeparatedByString:@":"].count - 1;
+    if (self.arguments.count < expectedArgumentCount) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"Too few arguments to ‘%@’ function; expected %lu arguments.",
+         self.function, expectedArgumentCount];
+    } else if (self.arguments.count > expectedArgumentCount) {
+        [NSException raise:NSInvalidArgumentException format:
+         @"%lu unexpected arguments to ‘%@’ function; expected %lu arguments.",
+         self.arguments.count - expectedArgumentCount, self.function, expectedArgumentCount];
+    }
+    
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"];
+    NSUInteger curveTypeIndex = isAftermarketFunction ? 1 : 0;
+    NSString *curveType = self.arguments[curveTypeIndex].constantValue;
+    NSMutableArray *interpolationArray = [NSMutableArray arrayWithObject:curveType];
+    if ([curveType isEqualToString:@"exponential"]) {
+        id base = [self.arguments[curveTypeIndex + 1] mgl_jsonExpressionObject];
+        [interpolationArray addObject:base];
+    } else if ([curveType isEqualToString:@"cubic-bezier"]) {
+        NSArray *controlPoints = [self.arguments[curveTypeIndex + 1].collection mgl_jsonExpressionObject];
+        [interpolationArray addObjectsFromArray:controlPoints];
+    }
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, nil];
+    [expressionObject addObject:(isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject];
+    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[curveTypeIndex + 2].constantValue;
+    for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+        [expressionObject addObject:key];
+        [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+    }
+    return expressionObject;
+}
+
+- (id)mgl_jsonStepExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_step:from:stops:"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+    id minimum = self.arguments[minimumIndex].mgl_jsonExpressionObject;
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, minimum, nil];
+    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[minimumIndex + 1].constantValue;
+    for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
+        [expressionObject addObject:key];
+        [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
+    }
+    return expressionObject;
+}
+
+- (id)mgl_jsonMatchExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_MATCH"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"match", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, nil];
+    NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
+    
+    for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
+        [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+    }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonIfExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"MGL_IF"];
+    NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
+    NSExpression *firstCondition;
+    id condition;
+    
+    if (isAftermarketFunction) {
+        firstCondition = self.arguments.firstObject;
+    } else {
+        firstCondition = self.operand;
+    }
+    
+    if ([firstCondition respondsToSelector:@selector(constantValue)] && [firstCondition.constantValue isKindOfClass:[NSComparisonPredicate class]]) {
+        NSPredicate *predicate = (NSPredicate *)firstCondition.constantValue;
+        condition = predicate.mgl_jsonExpressionObject;
+    } else {
+        condition = firstCondition.mgl_jsonExpressionObject;
+    }
+    
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"case", condition, nil];
+    NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
+    
+    for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
+        if ([arguments[index] respondsToSelector:@selector(constantValue)] && [arguments[index].constantValue isKindOfClass:[NSComparisonPredicate class]]) {
+            NSPredicate *predicate = (NSPredicate *)arguments[index].constantValue;
+            [expressionObject addObject:predicate.mgl_jsonExpressionObject];
+        } else {
+            [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+        }
+    }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonCoalesceExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_coalesce:"];
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"coalesce", nil];
+    
+    for (NSExpression *expression in  (isAftermarketFunction ? self.arguments.firstObject : self.operand).constantValue) {
+        [expressionObject addObject:[expression mgl_jsonExpressionObject]];
+    }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonHasExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_does:have:"];
+    NSExpression *operand = isAftermarketFunction ? self.arguments[0] : self.operand;
+    NSExpression *key = self.arguments[isAftermarketFunction ? 1 : 0];
+
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", key.mgl_jsonExpressionObject, nil];
+    if (operand.expressionType != NSEvaluatedObjectExpressionType) {
+        [expressionObject addObject:operand.mgl_jsonExpressionObject];
+    }
+    return expressionObject;
 }
 
 @end

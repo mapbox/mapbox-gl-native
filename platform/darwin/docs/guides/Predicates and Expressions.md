@@ -123,9 +123,7 @@ style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
 
 ## Using expressions to configure layout and paint attributes
 
-### Functions
-
-#### Key paths
+### Key paths
 
 A key path expression refers to an attribute of the `MGLFeature` object being
 evaluated for display. For example, if a polygon’s `MGLFeature.attributes`
@@ -133,7 +131,7 @@ dictionary contains the `floorCount` key, then the key path `floorCount` refers
 to the value of the `floorCount` attribute when evaluating that particular
 polygon.
 
-#### Predefined functions
+### Predefined functions
 
 Of the
 [functions predefined by the `+[NSExpression expressionForFunction:arguments:]` method](https://developer.apple.com/documentation/foundation/nsexpression/1413747-init#discussion),
@@ -163,6 +161,8 @@ Initializer parameter | Format string syntax
 `uppercase:`          | `uppercase('Elysian Fields')`
 `lowercase:`          | `lowercase('DOWNTOWN')`
 `noindex:`            | `noindex(0 + 2 + c)`
+`length:`             | `length('Wapakoneta')`
+`castObject:toType:`  | `CAST(ele, 'NSString')`<br>`CAST(ele, 'NSNumber')`
 
 The following predefined functions are not supported:
 
@@ -182,13 +182,28 @@ Initializer parameter | Format string syntax
 `onesComplement:`     | `onesComplement(255)`
 `distanceToLocation:fromLocation:` | `distanceToLocation:fromLocation:(there, here)`
 
-#### Mapbox-specific functions
+### Mapbox-specific functions
 
 For compatibility with the Mapbox Style Specification, the following functions
-are defined by this SDK for use with style layers. Because these functions are
-not predefined by `NSExpression`, you must use the
+are defined by this SDK. When setting a style layer property, you can call these
+functions just like the predefined functions above, using either the
+`+[NSExpression expressionForFunction:arguments:]` method or a convenient format
+string syntax:
+
+Initializer parameter | Format string syntax | Description
+----------------------|----------------------|------------
+`mgl_does:have:` | `mgl_does:have:(SELF, 'key')` or `mgl_does:have:(%@, 'key')` | Returns a Boolean value indicating whether the dictionary has a value for the key or whether the evaluated object (`SELF`) has a value for the feature attribute. Compared to the `mgl_has:` custom function, that function’s target is instead passed in as the first argument to this function. Both functions are equivalent to the syntax `key != NIL` or `%@[key] != NIL` but can be used outside of a predicate.
+`mgl_interpolate:withCurveType:parameters:stops:` | `mgl_interpolate:withCurveType:parameters:stops:(x, 'linear', nil, %@)` | Produces continuous, smooth results by interpolating between pairs of input and output values (“stops”). Compared to the `mgl_interpolateWithCurveType:parameters:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
+`mgl_step:from:stops:` | `mgl_step:from:stops:(x, 11, %@)` | Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of input and output values ("stops"). Compared to the `mgl_stepWithMinimum:stops:` custom function, the input expression (that function’s target) is instead passed in as the first argument to this function.
+`mgl_join:` | `mgl_join({'Old', 'MacDonald'})` | Returns the result of concatenating together all the elements of an array in order. Compared to the `stringByAppendingString:` custom function, this function takes only one argument, which is an aggregate expression containing the strings to concatenate.
+`mgl_coalesce:` | `mgl_coalesce({x, y, z})` | Returns the first non-`nil` value from an array of expressions.
+`MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables. Compared to the `mgl_expressionWithContext:` custom function, this function takes the variable names and values inline before the expression that contains references to those variables.
+`MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')` | Evaluates the first expression and returns the value that matches the initial condition. After the first expression condition a pair of matching/return value should be added and a default value.
+`MGL_IF` | `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)` | Returns the first value that meets the condition otherwise a default value. The expression conditions should be added in pairs of conditional/return value. Unlike `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or the `TERNARY()` syntax, this function can accept multiple “if else” conditions and is supported on iOS 8._x_ and macOS 10.10._x_; however, each conditional passed into this function must be wrapped in a constant expression.
+
+The following custom functions are also available with the
 `+[NSExpression expressionForFunction:selectorName:arguments:]` method or the
-`FUNCTION()` format string syntax instead. 
+`FUNCTION()` format string syntax:
 
 <table>
 <thead>
@@ -206,6 +221,17 @@ not predefined by `NSExpression`, you must use the
       empty string, 0, `FALSE`, `NIL`, or NaN, otherwise `TRUE`.
    </td>
 </tr>
+<tr>
+   <td><code>mgl_has:</code></td>
+   <td>
+      An `NSExpression` that evaluates to an <code>NSDictionary</code> or the evaluated object (<code>SELF</code>).
+   </td>
+   <td>
+      An `NSExpression` that evaluates to an <code>NSString</code> representing the key to look up in the dictionary or the feature attribute to look up in the evaluated object (see <code>MGLFeature.attributes</code>).
+   </td>
+   <td>
+      `true` if the dictionary has a value for the key or if the evaluated object has a value for the feature attribute.
+   </td>
 <tr>
    <td><code>mgl_expressionWithContext:</code></td>
    <td>
@@ -366,6 +392,10 @@ classes, but you should not call them directly outside the context of an
 expression, because the result may differ from the evaluated expression’s result
 or may result in undefined behavior.
 
+The Mapbox Style Specification defines some operators for which no custom
+function is available. To use these operators in an `NSExpression`, call the
+`MGL_FUNCTION()` function with the same arguments that the operator expects.
+
 ### Variables
 
 The following variables are defined by this SDK for use with style layers:
@@ -404,11 +434,9 @@ of a [Mapbox-specific function](#mapbox-specific-functions) that takes an
 `NSDictionary` as an argument:
 
 ```objc
-[NSExpression expressionWithFormat:@"FUNCTION($floorCount + 1, 'mgl_expressionWithContext:', %@)",
- {@"floorCount": @2}];
+[NSExpression expressionWithFormat:@"MGL_LET('floorCount', 2, $floorCount + 1)"];
 ```
 
 ```swift
-NSExpression(format: "FUNCTION($floorCount + 1, 'mgl_expressionWithContext:', %@)",
-             ["floorCount": 2])
+NSExpression(format: "MGL_LET(floorCount, 2, $floorCount + 1)")
 ```

@@ -162,7 +162,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         #else
             layer.circleColor = NSExpression(forConstantValue: UIColor.green)
         #endif
-        layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.75, %@)",
+        layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.75, %@)",
                                           [12: 2,
                                            22: 180])
         layer.circleOpacity = NSExpression(forConstantValue: 0.7)
@@ -180,7 +180,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
         layer.sourceLayerIdentifier = "trails"
-        layer.lineWidth = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+        layer.lineWidth = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
                                        [14: 2,
                                         18: 20])
         #if os(macOS)
@@ -237,10 +237,10 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         
         //#-example-code
         let layer = MGLHeatmapStyleLayer(identifier: "earthquake-heat", source: earthquakes)
-        layer.heatmapWeight = NSExpression(format: "FUNCTION(magnitude, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+        layer.heatmapWeight = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:(magnitude, 'linear', nil, %@)",
                                            [0: 0,
                                             6: 1])
-        layer.heatmapIntensity = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+        layer.heatmapIntensity = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                                               [0: 1,
                                                9: 3])
         mapView.style?.addLayer(layer)

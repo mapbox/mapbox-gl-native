@@ -63,7 +63,7 @@
                               @"circleBlur should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleBlur = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -77,7 +77,7 @@
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
                               @"circleBlur should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleBlur = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
@@ -88,7 +88,7 @@
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
                               @"circleBlur should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleBlur = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
@@ -133,7 +133,7 @@
                               @"circleColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleColor = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
@@ -147,7 +147,7 @@
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
                               @"circleColor should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleColor = functionExpression;
 
         mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
@@ -158,7 +158,7 @@
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
                               @"circleColor should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleColor = functionExpression;
 
         std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
@@ -203,7 +203,7 @@
                               @"circleOpacity should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleOpacity = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -217,7 +217,7 @@
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
                               @"circleOpacity should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleOpacity = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
@@ -228,7 +228,7 @@
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
                               @"circleOpacity should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleOpacity = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
@@ -273,7 +273,7 @@
                               @"circlePitchAlignment should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circlePitchAlignment = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::style::AlignmentType> intervalStops = {{
@@ -297,8 +297,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.circlePitchAlignment = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.circlePitchAlignment = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -317,7 +317,7 @@
                               @"circleRadius should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleRadius = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -331,7 +331,7 @@
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
                               @"circleRadius should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleRadius = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
@@ -342,7 +342,7 @@
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
                               @"circleRadius should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleRadius = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
@@ -387,7 +387,7 @@
                               @"circleScaleAlignment should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleScaleAlignment = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::style::CirclePitchScaleType> intervalStops = {{
@@ -411,8 +411,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.circleScaleAlignment = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.circleScaleAlignment = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -431,7 +431,7 @@
                               @"circleStrokeColor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleStrokeColor = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::Color> intervalStops = {{
@@ -445,7 +445,7 @@
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
                               @"circleStrokeColor should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleStrokeColor = functionExpression;
 
         mbgl::style::ExponentialStops<mbgl::Color> exponentialStops = { {{18, { 1, 0, 0, 1 }}}, 1.0 };
@@ -456,7 +456,7 @@
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
                               @"circleStrokeColor should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleStrokeColor = functionExpression;
 
         std::map<float, mbgl::Color> innerStops { {18, { 1, 0, 0, 1 }} };
@@ -501,7 +501,7 @@
                               @"circleStrokeOpacity should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleStrokeOpacity = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -515,7 +515,7 @@
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
                               @"circleStrokeOpacity should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleStrokeOpacity = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
@@ -526,7 +526,7 @@
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
                               @"circleStrokeOpacity should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleStrokeOpacity = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
@@ -571,7 +571,7 @@
                               @"circleStrokeWidth should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"0xff"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleStrokeWidth = functionExpression;
 
         mbgl::style::IntervalStops<float> intervalStops = {{
@@ -585,7 +585,7 @@
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
                               @"circleStrokeWidth should round-trip camera expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(keyName, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(keyName, 'linear', nil, %@)", @{@18: constantExpression}];
         layer.circleStrokeWidth = functionExpression;
 
         mbgl::style::ExponentialStops<float> exponentialStops = { {{18, 0xff}}, 1.0 };
@@ -596,7 +596,7 @@
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
                               @"circleStrokeWidth should round-trip data expressions.");
 
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         layer.circleStrokeWidth = functionExpression;
 
         std::map<float, float> innerStops { {18, 0xff} };
@@ -647,7 +647,7 @@
                               @"circleTranslation should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"{1, 1}"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleTranslation = functionExpression;
 
         mbgl::style::IntervalStops<std::array<float, 2>> intervalStops = {{
@@ -671,8 +671,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.circleTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.circleTranslation = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 
@@ -691,7 +691,7 @@
                               @"circleTranslationAnchor should round-trip constant value expressions.");
 
         constantExpression = [NSExpression expressionWithFormat:@"'viewport'"];
-        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+        NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
         layer.circleTranslationAnchor = functionExpression;
 
         mbgl::style::IntervalStops<mbgl::style::TranslateAnchorType> intervalStops = {{
@@ -715,8 +715,8 @@
 
         functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
         XCTAssertThrowsSpecificNamed(layer.circleTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-        functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertThrowsSpecificNamed(layer.circleTranslationAnchor = functionExpression, NSException, NSInvalidArgumentException, @"MGLCircleLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
     }
 }

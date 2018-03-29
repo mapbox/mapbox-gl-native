@@ -321,6 +321,11 @@ iOS.
 <% } -%>
 ### Expression operators
 
+Many expression operators defined in the style specification have corresponding
+symbols to be used with the `+[NSExpression expressionWithFormat:]`,
+`+[NSExpression expressionForFunction:arguments:]`, or
+`+[NSExpression expressionForFunction:selectorName:arguments:]` method:
+
 In style specification | Method, function, or predicate type | Format string syntax
 -----------------------|-------------------------------------|---------------------
 `array`                | |
@@ -330,15 +335,15 @@ In style specification | Method, function, or predicate type | Format string syn
 `string`               | |
 `to-boolean`           | `boolValue` |
 `to-color`             | |
-`to-number`            | `mgl_numberWithFallbackValues:` |
-`to-string`            | `stringValue` |
+`to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
+`to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
-`geometry-type`        | |
-`id`                   | |
-`properties`           | |
-`at`                   | |
+`geometry-type`        | |`$mgl_geometryType`
+`id`                   | |`$mgl_featureIdentifier`
+`properties`           | |`$mgl_featureProperties`
+`at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
-`has`                  | |
+`has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
 `length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
 `!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
 `!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`
@@ -349,14 +354,14 @@ In style specification | Method, function, or predicate type | Format string syn
 `>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
 `all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
 `any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
-`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
-`coalesce`             | |
-`match`                | |
-`interpolate`          | `mgl_interpolateWithCurveType:parameters:stops:` |
-`step`                 | `mgl_stepWithMinimum:stops:` |
-`let`                  | `mgl_expressionWithContext:` |
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or `MGL_IF` | `TERNARY(1 = 2, YES, NO)` or `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`
+`coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
+`match`                | `MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
+`interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` |
+`step`                 | `mgl_step:withMinimum:stops:` |
+`let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
 `var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
-`concat`               | `stringByAppendingString:` |
+`concat`               | `mgl_join:` | `mgl_join({'Old', ' ', 'MacDonald'})`
 `downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
 <% if (macOS) { -%>
@@ -390,6 +395,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `tan`                  | |
 `zoom`                 | | `$zoom`
 `heatmap-density`      | | `$heatmapDensity`
+
+For operators that have no corresponding `NSExpression` symbol, use the
+`MGL_FUNCTION()` format string syntax.
 
 ## Filtering sources
 

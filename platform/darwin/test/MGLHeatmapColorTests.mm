@@ -33,7 +33,7 @@
 
     constantExpression = [NSExpression expressionWithFormat:@"%@", [MGLColor redColor]];
     NSExpression *constantExpression2 = [NSExpression expressionWithFormat:@"%@", [MGLColor blueColor]];
-    NSExpression *functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($heatmapDensity, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@12: constantExpression2}];
+    NSExpression *functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($heatmapDensity, %@, %@)", constantExpression, @{@12: constantExpression2}];
     layer.heatmapColor = functionExpression;
     
     XCTAssertEqual(rawLayer->getHeatmapColor().evaluate(11.0), mbgl::Color::red(),
@@ -49,12 +49,12 @@
     XCTAssertEqualObjects(layer.heatmapColor, defaultExpression,
                           @"heatmapColor should return the default value after being unset.");
 
-    functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
+    functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
     XCTAssertThrowsSpecificNamed(layer.heatmapColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHeatmapLayer should raise an exception if a camera expression is applied to heatmapColor.");
     functionExpression = [NSExpression expressionForKeyPath:@"bogus"];
     XCTAssertThrowsSpecificNamed(layer.heatmapColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHeatmapLayer should raise an exception if a data expression is applied to heatmapColor.");
-    functionExpression = [NSExpression expressionWithFormat:@"FUNCTION(bogus, 'mgl_stepWithMinimum:stops:', %@, %@)", constantExpression, @{@18: constantExpression}];
-    functionExpression = [NSExpression expressionWithFormat:@"FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", @{@10: functionExpression}];
+    functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(bogus, %@, %@)", constantExpression, @{@18: constantExpression}];
+    functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
     XCTAssertThrowsSpecificNamed(layer.heatmapColor = functionExpression, NSException, NSInvalidArgumentException, @"MGLHeatmapLayer should raise an exception if a camera-data expression is applied to a property that does not support key paths to feature attributes.");
 }
 

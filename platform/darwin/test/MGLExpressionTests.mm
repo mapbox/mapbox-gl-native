@@ -199,9 +199,11 @@ using namespace std::string_literals;
     }
     {
         NSDictionary *context = @{@"loremIpsum": MGLConstantExpression(@"Lorem ipsum dolor sit amet")};
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(uppercase($loremIpsum), 'mgl_expressionWithContext:', %@)", context];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_LET('loremIpsum', 'Lorem ipsum dolor sit amet', uppercase($loremIpsum))", context];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(uppercase($loremIpsum), 'mgl_expressionWithContext:', %@)", context];
         NSArray *jsonExpression = @[@"let", @"loremIpsum", @"Lorem ipsum dolor sit amet", @[@"upcase", @[@"var", @"loremIpsum"]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
 }
@@ -351,6 +353,15 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithFormat:@"1 + 1"].mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSArray *arguments = @[MGLConstantExpression(@1), MGLConstantExpression(@1), MGLConstantExpression(@1)];
+        NSExpression *expression = [NSExpression expressionForFunction:@"add:to:" arguments:arguments];
+        NSArray *jsonExpression = @[@"+", @1, @1, @1];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        jsonExpression = @[@"+", @[@"+", @1, @1], @1];
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"1 + 1 + 1"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], [NSExpression expressionWithFormat:@"1 + 1 + 1"]);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"from:subtract:" arguments:arguments];
@@ -510,10 +521,13 @@ using namespace std::string_literals;
     NSArray *arguments = @[MGLConstantExpression(@"MacDonald")];
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION('Old', 'stringByAppendingString:', 'MacDonald')"];
+        NSExpression *aftermarketExpression = [NSExpression expressionWithFormat:@"mgl_join({'Old', 'MacDonald'})"];
         NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(aftermarketExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
-        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects([aftermarketExpression expressionValueWithObject:nil context:nil], @"OldMacDonald");
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], aftermarketExpression);
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"uppercase:" arguments:arguments];
@@ -524,6 +538,12 @@ using namespace std::string_literals;
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"lowercase:" arguments:arguments];
         NSArray *jsonExpression = @[@"downcase", @"MacDonald"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"length:" arguments:arguments];
+        NSArray *jsonExpression = @[@"length", @"MacDonald"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
@@ -551,10 +571,22 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(number, 'stringValue')"];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(postalCode, 'NSNumber')"];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'mgl_numberWithFallbackValues:')"];
+        NSArray *jsonExpression = @[@"to-number", @[@"get", @"postalCode"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:@{@"postalCode": @"02134"} context:nil], @02134);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(number, 'NSString')"];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(number, 'stringValue')"];
         NSArray *jsonExpression = @[@"to-string", @[@"get", @"number"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:@{@"number": @1.5} context:nil], @"1.5");
+        XCTAssertEqualObjects([compatibilityExpression expressionValueWithObject:@{@"number": @1.5} context:nil], @"1.5");
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
 }
@@ -562,46 +594,57 @@ using namespace std::string_literals;
 - (void)testInterpolationExpressionObject {
     {
         NSDictionary *stops = @{@0: MGLConstantExpression(@100), @10: MGLConstantExpression(@200)};
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", stops];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(x, 'linear', nil, %@)", stops];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)", stops];
         NSArray *jsonExpression = @[@"interpolate", @[@"linear"], @[@"get", @"x"], @0, @100, @10, @200];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSDictionary *stops = @{@1: MGLConstantExpression(@2), @3: MGLConstantExpression(@6)};
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 2, %@)", stops];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(x, 'exponential', 2, %@)", stops];
         NSArray *jsonExpression = @[@"interpolate", @[@"exponential", @2], @[@"get", @"x"], @1, @2, @3, @6];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSDictionary *stops = @{@0: MGLConstantExpression(@0), @100: MGLConstantExpression(@100)};
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_interpolateWithCurveType:parameters:stops:', 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(x, 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
         NSArray *jsonExpression = @[@"interpolate", @[@"cubic-bezier", @0.42, @0, @0.58, @1], @[@"get", @"x"], @0, @0, @100, @100];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSDictionary *stops = @{@0: MGLConstantExpression(@111), @1: MGLConstantExpression(@1111)};
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_stepWithMinimum:stops:', 11, %@)", stops];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:(x, 11, %@)", stops];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(x, 'mgl_stepWithMinimum:stops:', 11, %@)", stops];
         NSArray *jsonExpression = @[@"step", @[@"get", @"x"], @11, @0, @111, @1, @1111];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
 }
 
 - (void)testMatchExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 - 1, 'mgl_match:', %@, %@, %@, %@, 'default')", MGLConstantExpression(@1),
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 - 1,  %@, %@, %@, %@, 'default')", MGLConstantExpression(@1),
                                     MGLConstantExpression(@"one"),
                                     MGLConstantExpression(@0),
                                     MGLConstantExpression(@"zero")];
+        NSExpression *predicate = [NSExpression expressionWithFormat:@"2 - 1"];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_match:', %@)", predicate, @[MGLConstantExpression(@1),
+                                                 MGLConstantExpression(@"one"),
+                                                 MGLConstantExpression(@0),
+                                                 MGLConstantExpression(@"zero"),
+                                                 MGLConstantExpression(@"default")]];
         NSArray *jsonExpression =  @[@"match", @[@"-", @2, @1], @1, @"one", @0, @"zero", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(2 * 1, 'mgl_match:', %@, %@, 'default')", MGLConstantExpression(@1), MGLConstantExpression(@"one")];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 * 1, %@, %@, 'default')", MGLConstantExpression(@1), MGLConstantExpression(@"one")];
         NSArray *jsonExpression =  @[@"match", @[@"*", @2, @1], @1, @"one", @"default"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
@@ -610,35 +653,71 @@ using namespace std::string_literals;
 
 - (void)testCoalesceExpressionObject {
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", @[[NSExpression expressionForKeyPath:@"x"],
-                                                                                                     [NSExpression expressionForKeyPath:@"y"],
-                                                                                                     [NSExpression expressionForKeyPath:@"z"],
-                                                                                                     [NSExpression expressionForConstantValue:@0]]];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_coalesce(%@)",
+                                    @[[NSExpression expressionForKeyPath:@"x"],
+                                      [NSExpression expressionForKeyPath:@"y"],
+                                      [NSExpression expressionForKeyPath:@"z"],
+                                      [NSExpression expressionForConstantValue:@0]]];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_coalesce')", @[[NSExpression expressionForKeyPath:@"x"],
+                                                                                                                      [NSExpression expressionForKeyPath:@"y"],
+                                                                                                                      [NSExpression expressionForKeyPath:@"z"],
+                                                                                                                      [NSExpression expressionForConstantValue:@0]]];
         NSArray *jsonExpression = @[@"coalesce", @[@"get", @"x"], @[@"get", @"y"], @[@"get", @"z"], @0];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     
 }
 
 - (void)testConditionalExpressionObject {
+    // This test crashes on iOS 8, which doesn't have `+[NSExpression expressionForConditional:trueExpression:falseExpression:]`.
+    // https://github.com/mapbox/mapbox-gl-native/issues/11007
+    if (@available(iOS 9.0, *)) {
+        {
+            NSPredicate *conditional = [NSPredicate predicateWithFormat:@"1 = 2"];
+            NSExpression *trueExpression = [NSExpression expressionForConstantValue:@YES];
+            NSExpression *falseExpression = [NSExpression expressionForConstantValue:@NO];
+            NSExpression *expression = [NSExpression expressionForConditional:conditional trueExpression:trueExpression falseExpression:falseExpression];
+            NSArray *jsonExpression = @[@"case", @[@"==", @1, @2], @YES, @NO];
+            XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+            XCTAssertEqualObjects([NSExpression expressionWithFormat:@"TERNARY(1 = 2, TRUE, FALSE)"].mgl_jsonExpressionObject, jsonExpression);
+            XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
+            XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        }
+        {
+            NSExpression *expression = [NSExpression expressionWithFormat:@"TERNARY(0 = 1, TRUE, TERNARY(1 = 2, TRUE, FALSE))"];
+            NSArray *jsonExpression = @[@"case", @[@"==", @0, @1], @YES, @[@"==", @1, @2], @YES, @NO];
+            XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+            XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
+            expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, TRUE, %@, TRUE, FALSE)",
+                          MGLConstantExpression([NSPredicate predicateWithFormat:@"0 = 1"]),
+                          MGLConstantExpression([NSPredicate predicateWithFormat:@"1 = 2"])];
+            XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        }
+    }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_case:', %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
-                                                                                                 MGLConstantExpression(@YES),
-                                                                                                 MGLConstantExpression(@NO)];
+                                    MGLConstantExpression(@YES),
+                                    MGLConstantExpression(@NO)];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_if:', %@)", [NSPredicate predicateWithFormat:@"1 = 2"], @[MGLConstantExpression(@YES), MGLConstantExpression(@NO)]];
         NSArray *jsonExpression = @[@"case", @[@"==", @1, @2], @YES, @NO];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
+        if (@available(iOS 9.0, *)) {
+            expression = [NSExpression expressionWithFormat:@"TERNARY(1 = 2, YES, NO)"];
+        }
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_case:', %@, %@, %@, %@)",
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, %@, %@, %@, %@)",
                                     [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 2"]],
-                                                                                                 MGLConstantExpression(@YES),
-                                                                                                 [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 1"]],
-                                                                                                 MGLConstantExpression(@YES),
-                                                                                                 MGLConstantExpression(@NO)];
+                                    MGLConstantExpression(@YES),
+                                    [NSExpression expressionWithFormat:@"%@", [NSPredicate predicateWithFormat:@"1 = 1"]],
+                                    MGLConstantExpression(@YES),
+                                    MGLConstantExpression(@NO)];
         NSArray *jsonExpression = @[@"case", @[@"==", @1, @2], @YES, @[@"==", @1, @1], @YES, @NO];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
@@ -650,39 +729,90 @@ using namespace std::string_literals;
 - (void)testLookupExpressionObject {
     {
         NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
-                                                                         MGLConstantExpression(@8),
-                                                                         MGLConstantExpression(@7)]];
-        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[array, MGLConstantExpression(@1)]];
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, MGLConstantExpression(@1)]];
         NSArray *jsonExpression = @[@"at", @1, @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
-                                                                       MGLConstantExpression(@8),
-                                                                       MGLConstantExpression(@7)]];
-        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[array, [NSExpression expressionForKeyPath:@"x"]]];
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, [NSExpression expressionForKeyPath:@"x"]]];
         NSArray *jsonExpression = @[@"at", @[@"get", @"x"], @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(self, 'mgl_has:', 'x')"];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_does:have:"
+                                                             arguments:@[[NSExpression expressionForEvaluatedObject],
+                                                                         [NSExpression expressionForConstantValue:@"x"]]];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(self, 'mgl_has:', 'x')"];
         NSArray *jsonExpression = @[@"has", @"x"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_has:', 'x')", [NSExpression expressionForConstantValue:@{@"x": MGLConstantExpression(@0)}]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_does:have:"
+                                                             arguments:@[MGLConstantExpression(@{@"x": MGLConstantExpression(@0)}),
+                                                                         MGLConstantExpression(@"x")]];
         NSArray *jsonExpression = @[@"has", @"x",  @[@"literal", @{@"x": @0}]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION($mgl_featureProperties, 'mgl_has:', 'x')"];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_does:have:"
+                                                             arguments:@[[NSExpression expressionForVariable:@"mgl_featureProperties"],
+                                                                         [NSExpression expressionForConstantValue:@"x"]]];
         NSArray *jsonExpression = @[@"has", @"x", @[@"properties"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression;
+        if (@available(iOS 9.0, *)) {
+            expression = [NSExpression expressionWithFormat:@"TERNARY(key != nil, 1, 0)"];
+        } else {
+            expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, 1, 0)",
+                          MGLConstantExpression([NSPredicate predicateWithFormat:@"key != nil"])];
+        }
+        NSArray *jsonExpression = @[@"case", @[@"!=", @[@"get", @"key"], [NSNull null]], @1, @0];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:@{} context:nil], @NO);
+        XCTAssertEqualObjects([expression expressionValueWithObject:@{@"key": @"🗝"} context:nil], @YES);
+    }
+    {
+        NSDictionary *dictionary = @{@"key": @"🔑"};
+        NSExpression *expression;
+        if (@available(iOS 9.0, *)) {
+            expression = [NSExpression expressionWithFormat:@"TERNARY(%@.key != nil, 1, 0)", dictionary];
+        } else {
+            NSPredicate *conditional = [NSPredicate predicateWithFormat:@"%@.key != nil", dictionary];
+            expression = [NSExpression expressionWithFormat:@"MGL_IF(%@, 1, 0)",
+                          MGLConstantExpression(conditional)];
+        }
+        NSArray *jsonExpression = @[@"case", @[@"!=", @[@"get", @"key", @[@"literal", dictionary]], [NSNull null]], @1, @0];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        // The dictionary isn’t equal enough.
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression].description, expression.description);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @YES);
+    }
+}
+
+- (void)testGenericExpressionObject {
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4, 5)"];
+        NSArray *jsonExpression = @[@"random", @1, @2, @3, @4, @5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('random', 1, 2, 3, 4)"];
+        XCTAssertThrowsSpecificNamed([expression expressionValueWithObject:nil context:nil], NSException, NSInvalidArgumentException);
     }
 }
 

@@ -16,7 +16,7 @@
 
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
-- (id)mgl_case:(id)firstValue, ...;
+- (id)mgl_if:(id)firstValue, ...;
 
 - (id)mgl_match:(NSExpression *)firstCase, ...;
 

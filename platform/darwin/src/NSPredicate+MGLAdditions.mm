@@ -324,34 +324,34 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     return nil;
 }
 
-- (id)mgl_case:(id)firstValue, ... {
+- (id)mgl_if:(id)firstValue, ... {
 
     if ([self evaluateWithObject:nil]) {
-        return firstValue;
-    }
-    
+            return firstValue;
+        }
+
     id eachExpression;
     va_list argumentList;
     va_start(argumentList, firstValue);
-    
+
     while ((eachExpression = va_arg(argumentList, id))) {
-        if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
-            id valueExpression = va_arg(argumentList, id);
-            if ([eachExpression evaluateWithObject:nil]) {
-                return valueExpression;
-            }
-        } else {
-            return eachExpression;
+            if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
+                    id valueExpression = va_arg(argumentList, id);
+                    if ([eachExpression evaluateWithObject:nil]) {
+                            return valueExpression;
+                        }
+                } else {
+                        return eachExpression;
+                    }
         }
-    }
     va_end(argumentList);
-    
+
     return nil;
 }
 
 - (id)mgl_match:(NSExpression *)firstCase, ... {
     [NSException raise:NSInvalidArgumentException
-                format:@"Match expressions lack underlying Objective-C implementations."];
+                      format:@"Match expressions lack underlying Objective-C implementations."];
     return nil;
 }
 

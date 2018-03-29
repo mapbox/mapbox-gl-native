@@ -66,7 +66,7 @@ let stops: [Float: UIColor] = [
 ]
 
 let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
-layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', nil, %@)",
+layer.circleColor = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:(mag, 'linear', nil, %@)",
                                  stops)
 layer.circleRadius = NSExpression(forConstantValue: 10)
 mapView.style?.insertLayer(layer, below: symbolLayer)
@@ -92,7 +92,7 @@ let stops = [
     18: 18,
 ]
 
-layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
                                   stops)
 ```
 
@@ -111,7 +111,7 @@ let stops: [Float: UIColor] = [
     10: .white,
 ]
 
-layer.circleColor = NSExpression(format: "FUNCTION(mag, 'mgl_stepWithMinimum:stops:', %@, %@)",
+layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
                                  UIColor.green, stops)
 ```
 
