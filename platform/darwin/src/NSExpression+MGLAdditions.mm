@@ -61,6 +61,7 @@
     INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
     INSTALL_METHOD(mgl_step:from:stops:);
     INSTALL_METHOD(mgl_coalesce:);
+    INSTALL_METHOD(mgl_hasProperty:properties:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -106,6 +107,15 @@
 - (id)mgl_coalesce:(NSArray<NSExpression *> *)elements {
     [NSException raise:NSInvalidArgumentException
                 format:@"Coalesce expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+/**
+ A placeholder for a method that evaluates a coalesce expression.
+ */
+- (id)mgl_hasProperty:(id)element properties:(id)properties {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Has expressions lack underlying Objective-C implementations."];
     return nil;
 }
 
@@ -586,7 +596,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             NSExpression *operand = argumentObjects.count > 1 ? subexpressions[1] : [NSExpression expressionWithFormat:@"self"];
             NSExpression *property = subexpressions.firstObject;
-            return [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_has:', %@)", operand, property];
+            
+            return [NSExpression expressionForFunction:@"mgl_hasProperty:properties:" arguments:@[property, operand]];
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
@@ -837,12 +848,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return @[@"to-string", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"noindex:"]) {
                 return self.arguments.firstObject.mgl_jsonExpressionObject;
-            } else if ([function isEqualToString:@"mgl_has:"]) {
-                NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", self.arguments[0].mgl_jsonExpressionObject, nil];
-                if (self.operand.expressionType != NSEvaluatedObjectExpressionType) {
-                    [expressionObject addObject:self.operand.mgl_jsonExpressionObject];
-                }
-                return expressionObject;
+            } else if ([function isEqualToString:@"mgl_hasProperty:properties:"] ||
+                       [function isEqualToString:@"mgl_has:"]) {
+                return self.mgl_jsonHasExpressionObject;
             } else if ([function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"]
                        || [function isEqualToString:@"mgl_interpolateWithCurveType:parameters:stops:"]) {
                 return self.mgl_jsonInterpolationExpressionObject;
@@ -1062,6 +1070,19 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     for (NSExpression *expression in  (isAftermarketFunction ? self.arguments.firstObject : self.operand).constantValue) {
         [expressionObject addObject:[expression mgl_jsonExpressionObject]];
     }
+    
+    return expressionObject;
+}
+
+- (id)mgl_jsonHasExpressionObject {
+    BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_hasProperty:properties:"];
+    NSExpression *operand = isAftermarketFunction ? self.arguments[1] : self.operand;
+
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"has", self.arguments[0].mgl_jsonExpressionObject, nil];
+    if (operand.expressionType != NSEvaluatedObjectExpressionType) {
+        [expressionObject addObject:operand.mgl_jsonExpressionObject];
+    }
+    return expressionObject;
     
     return expressionObject;
 }

@@ -718,19 +718,24 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(self, 'mgl_has:', 'x')"];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_hasProperty:properties:" arguments:@[[NSExpression expressionForConstantValue:@"x"],
+                                                                                                                 [NSExpression expressionForEvaluatedObject]]];
+        NSExpression *compatibilityExpression = [NSExpression expressionWithFormat:@"FUNCTION(self, 'mgl_has:', 'x')"];
         NSArray *jsonExpression = @[@"has", @"x"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(%@, 'mgl_has:', 'x')", [NSExpression expressionForConstantValue:@{@"x": MGLConstantExpression(@0)}]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_hasProperty:properties:" arguments:@[[NSExpression expressionForConstantValue:@"x"],
+                                                                                                                  [NSExpression expressionForConstantValue:@{@"x": MGLConstantExpression(@0)}]]];
         NSArray *jsonExpression = @[@"has", @"x",  @[@"literal", @{@"x": @0}]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION($mgl_featureProperties, 'mgl_has:', 'x')"];
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_hasProperty:properties:" arguments:@[[NSExpression expressionForConstantValue:@"x"],
+                                                                                                                  [NSExpression expressionForVariable:@"mgl_featureProperties"]]];
         NSArray *jsonExpression = @[@"has", @"x", @[@"properties"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
