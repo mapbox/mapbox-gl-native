@@ -80,6 +80,8 @@ TEST(Stringify, Filter) {
 }
 
 TEST(Stringify, CameraFunction) {
+    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
+        "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0]");
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
         "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0]");
     ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
@@ -109,7 +111,7 @@ TEST(Stringify, CompositeFunction) {
             2
         }, 0.0f)),
         "[\"interpolate\","
-            "[\"exponential\",1.0],"
+            "[\"linear\"],"
             "[\"zoom\"],"
             "0.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0],"
             "1.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0]]");
