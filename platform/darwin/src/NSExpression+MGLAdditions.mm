@@ -665,6 +665,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
             }
             
+            if (@available(iOS 9.0, *)) {
+                if (arguments.count == 3) {
+                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
+                    return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
+                }
+            }
             return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];

@@ -199,8 +199,7 @@ Initializer parameter | Format string syntax | Description
 `mgl_coalesce:` | `mgl_coalesce({x, y, z})` | Returns the first non-`nil` value from an array of expressions.
 `MGL_LET` | `MGL_LET('age', uppercase('old'), 'name', uppercase('MacDonald'), mgl_join({$age, $name}))` | Any number of variable names interspersed with their assigned `NSExpression` values, followed by an `NSExpression` that may contain references to those variables. Compared to the `mgl_expressionWithContext:` custom function, this function takes the variable names and values inline before the expression that contains references to those variables.
 `MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')` | Evaluates the first expression and returns the value that matches the initial condition. After the first expression condition a pair of matching/return value should be added and a default value.
-`MGL_IF` | `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)` | Returns the first value that meets the condition otherwise a default value. The expression conditions should be added in pairs of conditional/return value.
-`mgl_hasProperty:properties:` | `mgl_hasProperty:properties:('x', {'x': 'value'})` | Evaluates the expression and returns true if the properties contains the passed property.
+`MGL_IF` | `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)` | Returns the first value that meets the condition otherwise a default value. The expression conditions should be added in pairs of conditional/return value. Unlike `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or the `TERNARY()` syntax, this function can accept multiple “if else” conditions and is supported on iOS 8._x_ and macOS 10.10._x_; however, each conditional passed into this function must be wrapped in a constant expression.
 
 The following custom functions are also available with the
 `+[NSExpression expressionForFunction:selectorName:arguments:]` method or the
