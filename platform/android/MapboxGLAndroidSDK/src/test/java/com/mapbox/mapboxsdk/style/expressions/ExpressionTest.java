@@ -126,7 +126,7 @@ public class ExpressionTest {
   @Test
   public void testEqLiteral() throws Exception {
     Object[] expected = new Object[] {"==", 1, 1};
-    Object[] actual = eq(1, 1).toArray();
+    Object[] actual = eq(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -140,7 +140,7 @@ public class ExpressionTest {
   @Test
   public void testNeqLiteral() throws Exception {
     Object[] expected = new Object[] {"!=", 0, 1};
-    Object[] actual = neq(0, 1).toArray();
+    Object[] actual = neq(literal(0), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -154,7 +154,7 @@ public class ExpressionTest {
   @Test
   public void testGtLiteral() throws Exception {
     Object[] expected = new Object[] {">", 0, 1};
-    Object[] actual = gt(0, 1).toArray();
+    Object[] actual = gt(literal(0), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -168,7 +168,7 @@ public class ExpressionTest {
   @Test
   public void testLtLiteral() throws Exception {
     Object[] expected = new Object[] {"<", 1, 0};
-    Object[] actual = lt(1, 0).toArray();
+    Object[] actual = lt(literal(1), 0).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -182,7 +182,7 @@ public class ExpressionTest {
   @Test
   public void testGteLiteral() throws Exception {
     Object[] expected = new Object[] {">=", 1, 1};
-    Object[] actual = gte(1, 1).toArray();
+    Object[] actual = gte(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -196,7 +196,7 @@ public class ExpressionTest {
   @Test
   public void testLteLiteral() throws Exception {
     Object[] expected = new Object[] {"<=", 1, 1};
-    Object[] actual = lte(1, 1).toArray();
+    Object[] actual = lte(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
