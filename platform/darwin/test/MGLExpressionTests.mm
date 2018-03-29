@@ -701,18 +701,20 @@ using namespace std::string_literals;
 - (void)testLookupExpressionObject {
     {
         NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
-                                                                         MGLConstantExpression(@8),
-                                                                         MGLConstantExpression(@7)]];
-        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[array, MGLConstantExpression(@1)]];
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, MGLConstantExpression(@1)]];
         NSArray *jsonExpression = @[@"at", @1, @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
         NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
-                                                                       MGLConstantExpression(@8),
-                                                                       MGLConstantExpression(@7)]];
-        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:" arguments:@[array, [NSExpression expressionForKeyPath:@"x"]]];
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, [NSExpression expressionForKeyPath:@"x"]]];
         NSArray *jsonExpression = @[@"at", @[@"get", @"x"], @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
