@@ -129,6 +129,7 @@
 
         XCTAssertEqual(rawLayer->getFillColor(), propertyValue,
                        @"Setting fillColor to a data expression should update fill-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.fillColor, functionExpression,
                               @"fillColor should round-trip data expressions.");
 
@@ -142,6 +143,7 @@
 
         XCTAssertEqual(rawLayer->getFillColor(), propertyValue,
                        @"Setting fillColor to a camera-data expression should update fill-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.fillColor, functionExpression,
                               @"fillColor should round-trip camera-data expressions.");
                               
@@ -199,6 +201,7 @@
 
         XCTAssertEqual(rawLayer->getFillOpacity(), propertyValue,
                        @"Setting fillOpacity to a data expression should update fill-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.fillOpacity, functionExpression,
                               @"fillOpacity should round-trip data expressions.");
 
@@ -212,6 +215,7 @@
 
         XCTAssertEqual(rawLayer->getFillOpacity(), propertyValue,
                        @"Setting fillOpacity to a camera-data expression should update fill-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.fillOpacity, functionExpression,
                               @"fillOpacity should round-trip camera-data expressions.");
                               
@@ -269,6 +273,7 @@
 
         XCTAssertEqual(rawLayer->getFillOutlineColor(), propertyValue,
                        @"Setting fillOutlineColor to a data expression should update fill-outline-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.fillOutlineColor, functionExpression,
                               @"fillOutlineColor should round-trip data expressions.");
 
@@ -282,6 +287,7 @@
 
         XCTAssertEqual(rawLayer->getFillOutlineColor(), propertyValue,
                        @"Setting fillOutlineColor to a camera-data expression should update fill-outline-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.fillOutlineColor, functionExpression,
                               @"fillOutlineColor should round-trip camera-data expressions.");
                               

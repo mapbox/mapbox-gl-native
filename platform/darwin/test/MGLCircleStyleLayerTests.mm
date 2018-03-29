@@ -85,6 +85,7 @@
 
         XCTAssertEqual(rawLayer->getCircleBlur(), propertyValue,
                        @"Setting circleBlur to a data expression should update circle-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
                               @"circleBlur should round-trip data expressions.");
 
@@ -98,6 +99,7 @@
 
         XCTAssertEqual(rawLayer->getCircleBlur(), propertyValue,
                        @"Setting circleBlur to a camera-data expression should update circle-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleBlur, functionExpression,
                               @"circleBlur should round-trip camera-data expressions.");
                               
@@ -155,6 +157,7 @@
 
         XCTAssertEqual(rawLayer->getCircleColor(), propertyValue,
                        @"Setting circleColor to a data expression should update circle-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
                               @"circleColor should round-trip data expressions.");
 
@@ -168,6 +171,7 @@
 
         XCTAssertEqual(rawLayer->getCircleColor(), propertyValue,
                        @"Setting circleColor to a camera-data expression should update circle-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleColor, functionExpression,
                               @"circleColor should round-trip camera-data expressions.");
                               
@@ -225,6 +229,7 @@
 
         XCTAssertEqual(rawLayer->getCircleOpacity(), propertyValue,
                        @"Setting circleOpacity to a data expression should update circle-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
                               @"circleOpacity should round-trip data expressions.");
 
@@ -238,6 +243,7 @@
 
         XCTAssertEqual(rawLayer->getCircleOpacity(), propertyValue,
                        @"Setting circleOpacity to a camera-data expression should update circle-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleOpacity, functionExpression,
                               @"circleOpacity should round-trip camera-data expressions.");
                               
@@ -339,6 +345,7 @@
 
         XCTAssertEqual(rawLayer->getCircleRadius(), propertyValue,
                        @"Setting circleRadius to a data expression should update circle-radius.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
                               @"circleRadius should round-trip data expressions.");
 
@@ -352,6 +359,7 @@
 
         XCTAssertEqual(rawLayer->getCircleRadius(), propertyValue,
                        @"Setting circleRadius to a camera-data expression should update circle-radius.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleRadius, functionExpression,
                               @"circleRadius should round-trip camera-data expressions.");
                               
@@ -453,6 +461,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeColor(), propertyValue,
                        @"Setting circleStrokeColor to a data expression should update circle-stroke-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
                               @"circleStrokeColor should round-trip data expressions.");
 
@@ -466,6 +475,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeColor(), propertyValue,
                        @"Setting circleStrokeColor to a camera-data expression should update circle-stroke-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleStrokeColor, functionExpression,
                               @"circleStrokeColor should round-trip camera-data expressions.");
                               
@@ -523,6 +533,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeOpacity(), propertyValue,
                        @"Setting circleStrokeOpacity to a data expression should update circle-stroke-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
                               @"circleStrokeOpacity should round-trip data expressions.");
 
@@ -536,6 +547,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeOpacity(), propertyValue,
                        @"Setting circleStrokeOpacity to a camera-data expression should update circle-stroke-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleStrokeOpacity, functionExpression,
                               @"circleStrokeOpacity should round-trip camera-data expressions.");
                               
@@ -593,6 +605,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeWidth(), propertyValue,
                        @"Setting circleStrokeWidth to a data expression should update circle-stroke-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
                               @"circleStrokeWidth should round-trip data expressions.");
 
@@ -606,6 +619,7 @@
 
         XCTAssertEqual(rawLayer->getCircleStrokeWidth(), propertyValue,
                        @"Setting circleStrokeWidth to a camera-data expression should update circle-stroke-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.circleStrokeWidth, functionExpression,
                               @"circleStrokeWidth should round-trip camera-data expressions.");
                               

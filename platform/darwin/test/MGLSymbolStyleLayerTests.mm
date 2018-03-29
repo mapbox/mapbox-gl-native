@@ -255,6 +255,7 @@
 
         XCTAssertEqual(rawLayer->getIconOffset(), propertyValue,
                        @"Setting iconOffset to a data expression should update icon-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconOffset, functionExpression,
                               @"iconOffset should round-trip data expressions.");
 
@@ -268,6 +269,7 @@
 
         XCTAssertEqual(rawLayer->getIconOffset(), propertyValue,
                        @"Setting iconOffset to a camera-data expression should update icon-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconOffset, functionExpression,
                               @"iconOffset should round-trip camera-data expressions.");
                               
@@ -448,6 +450,7 @@
 
         XCTAssertEqual(rawLayer->getIconRotate(), propertyValue,
                        @"Setting iconRotation to a data expression should update icon-rotate.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconRotation, functionExpression,
                               @"iconRotation should round-trip data expressions.");
 
@@ -461,6 +464,7 @@
 
         XCTAssertEqual(rawLayer->getIconRotate(), propertyValue,
                        @"Setting iconRotation to a camera-data expression should update icon-rotate.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconRotation, functionExpression,
                               @"iconRotation should round-trip camera-data expressions.");
                               
@@ -553,6 +557,7 @@
 
         XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
                        @"Setting iconScale to a data expression should update icon-size.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconScale, functionExpression,
                               @"iconScale should round-trip data expressions.");
 
@@ -566,6 +571,7 @@
 
         XCTAssertEqual(rawLayer->getIconSize(), propertyValue,
                        @"Setting iconScale to a camera-data expression should update icon-size.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconScale, functionExpression,
                               @"iconScale should round-trip camera-data expressions.");
                               
@@ -840,6 +846,7 @@
 
         XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
                        @"Setting maximumTextWidth to a data expression should update text-max-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.maximumTextWidth, functionExpression,
                               @"maximumTextWidth should round-trip data expressions.");
 
@@ -853,6 +860,7 @@
 
         XCTAssertEqual(rawLayer->getTextMaxWidth(), propertyValue,
                        @"Setting maximumTextWidth to a camera-data expression should update text-max-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.maximumTextWidth, functionExpression,
                               @"maximumTextWidth should round-trip camera-data expressions.");
                               
@@ -1191,6 +1199,7 @@
 
         XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
                        @"Setting textFontSize to a data expression should update text-size.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textFontSize, functionExpression,
                               @"textFontSize should round-trip data expressions.");
 
@@ -1204,6 +1213,7 @@
 
         XCTAssertEqual(rawLayer->getTextSize(), propertyValue,
                        @"Setting textFontSize to a camera-data expression should update text-size.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textFontSize, functionExpression,
                               @"textFontSize should round-trip camera-data expressions.");
                               
@@ -1334,6 +1344,7 @@
 
         XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
                        @"Setting textLetterSpacing to a data expression should update text-letter-spacing.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textLetterSpacing, functionExpression,
                               @"textLetterSpacing should round-trip data expressions.");
 
@@ -1347,6 +1358,7 @@
 
         XCTAssertEqual(rawLayer->getTextLetterSpacing(), propertyValue,
                        @"Setting textLetterSpacing to a camera-data expression should update text-letter-spacing.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textLetterSpacing, functionExpression,
                               @"textLetterSpacing should round-trip camera-data expressions.");
                               
@@ -1445,6 +1457,7 @@
 
         XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
                        @"Setting textOffset to a data expression should update text-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textOffset, functionExpression,
                               @"textOffset should round-trip data expressions.");
 
@@ -1458,6 +1471,7 @@
 
         XCTAssertEqual(rawLayer->getTextOffset(), propertyValue,
                        @"Setting textOffset to a camera-data expression should update text-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textOffset, functionExpression,
                               @"textOffset should round-trip camera-data expressions.");
                               
@@ -1638,6 +1652,7 @@
 
         XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
                        @"Setting textRotation to a data expression should update text-rotate.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textRotation, functionExpression,
                               @"textRotation should round-trip data expressions.");
 
@@ -1651,6 +1666,7 @@
 
         XCTAssertEqual(rawLayer->getTextRotate(), propertyValue,
                        @"Setting textRotation to a camera-data expression should update text-rotate.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textRotation, functionExpression,
                               @"textRotation should round-trip camera-data expressions.");
                               
@@ -1781,6 +1797,7 @@
 
         XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
                        @"Setting iconColor to a data expression should update icon-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconColor, functionExpression,
                               @"iconColor should round-trip data expressions.");
 
@@ -1794,6 +1811,7 @@
 
         XCTAssertEqual(rawLayer->getIconColor(), propertyValue,
                        @"Setting iconColor to a camera-data expression should update icon-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconColor, functionExpression,
                               @"iconColor should round-trip camera-data expressions.");
                               
@@ -1851,6 +1869,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
                        @"Setting iconHaloBlur to a data expression should update icon-halo-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconHaloBlur, functionExpression,
                               @"iconHaloBlur should round-trip data expressions.");
 
@@ -1864,6 +1883,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloBlur(), propertyValue,
                        @"Setting iconHaloBlur to a camera-data expression should update icon-halo-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconHaloBlur, functionExpression,
                               @"iconHaloBlur should round-trip camera-data expressions.");
                               
@@ -1921,6 +1941,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
                        @"Setting iconHaloColor to a data expression should update icon-halo-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconHaloColor, functionExpression,
                               @"iconHaloColor should round-trip data expressions.");
 
@@ -1934,6 +1955,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloColor(), propertyValue,
                        @"Setting iconHaloColor to a camera-data expression should update icon-halo-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconHaloColor, functionExpression,
                               @"iconHaloColor should round-trip camera-data expressions.");
                               
@@ -1991,6 +2013,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
                        @"Setting iconHaloWidth to a data expression should update icon-halo-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconHaloWidth, functionExpression,
                               @"iconHaloWidth should round-trip data expressions.");
 
@@ -2004,6 +2027,7 @@
 
         XCTAssertEqual(rawLayer->getIconHaloWidth(), propertyValue,
                        @"Setting iconHaloWidth to a camera-data expression should update icon-halo-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconHaloWidth, functionExpression,
                               @"iconHaloWidth should round-trip camera-data expressions.");
                               
@@ -2061,6 +2085,7 @@
 
         XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
                        @"Setting iconOpacity to a data expression should update icon-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.iconOpacity, functionExpression,
                               @"iconOpacity should round-trip data expressions.");
 
@@ -2074,6 +2099,7 @@
 
         XCTAssertEqual(rawLayer->getIconOpacity(), propertyValue,
                        @"Setting iconOpacity to a camera-data expression should update icon-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.iconOpacity, functionExpression,
                               @"iconOpacity should round-trip camera-data expressions.");
                               
@@ -2225,6 +2251,7 @@
 
         XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
                        @"Setting textColor to a data expression should update text-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textColor, functionExpression,
                               @"textColor should round-trip data expressions.");
 
@@ -2238,6 +2265,7 @@
 
         XCTAssertEqual(rawLayer->getTextColor(), propertyValue,
                        @"Setting textColor to a camera-data expression should update text-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textColor, functionExpression,
                               @"textColor should round-trip camera-data expressions.");
                               
@@ -2295,6 +2323,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
                        @"Setting textHaloBlur to a data expression should update text-halo-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textHaloBlur, functionExpression,
                               @"textHaloBlur should round-trip data expressions.");
 
@@ -2308,6 +2337,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloBlur(), propertyValue,
                        @"Setting textHaloBlur to a camera-data expression should update text-halo-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textHaloBlur, functionExpression,
                               @"textHaloBlur should round-trip camera-data expressions.");
                               
@@ -2365,6 +2395,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
                        @"Setting textHaloColor to a data expression should update text-halo-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textHaloColor, functionExpression,
                               @"textHaloColor should round-trip data expressions.");
 
@@ -2378,6 +2409,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloColor(), propertyValue,
                        @"Setting textHaloColor to a camera-data expression should update text-halo-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textHaloColor, functionExpression,
                               @"textHaloColor should round-trip camera-data expressions.");
                               
@@ -2435,6 +2467,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
                        @"Setting textHaloWidth to a data expression should update text-halo-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textHaloWidth, functionExpression,
                               @"textHaloWidth should round-trip data expressions.");
 
@@ -2448,6 +2481,7 @@
 
         XCTAssertEqual(rawLayer->getTextHaloWidth(), propertyValue,
                        @"Setting textHaloWidth to a camera-data expression should update text-halo-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textHaloWidth, functionExpression,
                               @"textHaloWidth should round-trip camera-data expressions.");
                               
@@ -2505,6 +2539,7 @@
 
         XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
                        @"Setting textOpacity to a data expression should update text-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.textOpacity, functionExpression,
                               @"textOpacity should round-trip data expressions.");
 
@@ -2518,6 +2553,7 @@
 
         XCTAssertEqual(rawLayer->getTextOpacity(), propertyValue,
                        @"Setting textOpacity to a camera-data expression should update text-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.textOpacity, functionExpression,
                               @"textOpacity should round-trip camera-data expressions.");
                               

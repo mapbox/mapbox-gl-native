@@ -255,6 +255,7 @@
 
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
                        @"Setting lineBlur to a data expression should update line-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineBlur, functionExpression,
                               @"lineBlur should round-trip data expressions.");
 
@@ -268,6 +269,7 @@
 
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
                        @"Setting lineBlur to a camera-data expression should update line-blur.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineBlur, functionExpression,
                               @"lineBlur should round-trip camera-data expressions.");
                               
@@ -325,6 +327,7 @@
 
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
                        @"Setting lineColor to a data expression should update line-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineColor, functionExpression,
                               @"lineColor should round-trip data expressions.");
 
@@ -338,6 +341,7 @@
 
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
                        @"Setting lineColor to a camera-data expression should update line-color.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineColor, functionExpression,
                               @"lineColor should round-trip camera-data expressions.");
                               
@@ -439,6 +443,7 @@
 
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
                        @"Setting lineGapWidth to a data expression should update line-gap-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
                               @"lineGapWidth should round-trip data expressions.");
 
@@ -452,6 +457,7 @@
 
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
                        @"Setting lineGapWidth to a camera-data expression should update line-gap-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
                               @"lineGapWidth should round-trip camera-data expressions.");
                               
@@ -509,6 +515,7 @@
 
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
                        @"Setting lineOffset to a data expression should update line-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineOffset, functionExpression,
                               @"lineOffset should round-trip data expressions.");
 
@@ -522,6 +529,7 @@
 
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
                        @"Setting lineOffset to a camera-data expression should update line-offset.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineOffset, functionExpression,
                               @"lineOffset should round-trip camera-data expressions.");
                               
@@ -579,6 +587,7 @@
 
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
                        @"Setting lineOpacity to a data expression should update line-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
                               @"lineOpacity should round-trip data expressions.");
 
@@ -592,6 +601,7 @@
 
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
                        @"Setting lineOpacity to a camera-data expression should update line-opacity.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
                               @"lineOpacity should round-trip camera-data expressions.");
                               
@@ -796,6 +806,7 @@
 
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
                        @"Setting lineWidth to a data expression should update line-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.lineWidth, functionExpression,
                               @"lineWidth should round-trip data expressions.");
 
@@ -809,6 +820,7 @@
 
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
                        @"Setting lineWidth to a camera-data expression should update line-width.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.lineWidth, functionExpression,
                               @"lineWidth should round-trip camera-data expressions.");
                               

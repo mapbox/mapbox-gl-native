@@ -103,6 +103,7 @@
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a data expression should update <%- originalPropertyName(property) %>.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
                               @"<%- objCName(property) %> should round-trip data expressions.");
 
@@ -116,6 +117,7 @@
 
         XCTAssertEqual(rawLayer->get<%- camelize(originalPropertyName(property)) %>(), propertyValue,
                        @"Setting <%- objCName(property) %> to a camera-data expression should update <%- originalPropertyName(property) %>.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.<%- objCName(property) %>, functionExpression,
                               @"<%- objCName(property) %> should round-trip camera-data expressions.");
 <% } -%>                              

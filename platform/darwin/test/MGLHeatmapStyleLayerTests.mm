@@ -191,6 +191,7 @@
 
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a data expression should update heatmap-radius.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
                               @"heatmapRadius should round-trip data expressions.");
 
@@ -204,6 +205,7 @@
 
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a camera-data expression should update heatmap-radius.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
                               @"heatmapRadius should round-trip camera-data expressions.");
                               
@@ -261,6 +263,7 @@
 
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a data expression should update heatmap-weight.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
         XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
                               @"heatmapWeight should round-trip data expressions.");
 
@@ -274,6 +277,7 @@
 
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a camera-data expression should update heatmap-weight.");
+        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
         XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
                               @"heatmapWeight should round-trip camera-data expressions.");
                               
