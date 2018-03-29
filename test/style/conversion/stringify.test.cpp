@@ -80,6 +80,8 @@ TEST(Stringify, Filter) {
 }
 
 TEST(Stringify, CameraFunction) {
+    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
+        "{\"type\":\"linear\",\"stops\":[[0.0,1.0]]}");
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
         "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
     ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
