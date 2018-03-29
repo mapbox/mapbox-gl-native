@@ -1343,20 +1343,43 @@ void QMapboxGL::removeSource(const QString& id)
     this API and is not officially supported. Use at your own risk.
 */
 void QMapboxGL::addCustomLayer(const QString &id,
-        QMapbox::CustomLayerInitializeFunction initFn,
-        QMapbox::CustomLayerRenderFunction renderFn,
-        QMapbox::CustomLayerDeinitializeFunction deinitFn,
-        void *context,
+        QScopedPointer<QMapbox::CustomLayerHostInterface>& host,
         const QString& before)
 {
+    class HostWrapper : public mbgl::style::CustomLayerHost {
+        public:
+        QScopedPointer<QMapbox::CustomLayerHostInterface> ptr;
+        HostWrapper(QScopedPointer<QMapbox::CustomLayerHostInterface>& p)
+         : ptr(p.take()) {
+         }
+
+        void initialize() {
+            ptr->initialize(); 
+        }
+
+        void render(const mbgl::style::CustomLayerRenderParameters& params) {
+            QMapbox::CustomLayerRenderParameters renderParams;
+            renderParams.width = params.width;
+            renderParams.height = params.height;
+            renderParams.latitude = params.latitude;
+            renderParams.longitude = params.longitude;
+            renderParams.zoom = params.zoom;
+            renderParams.bearing = params.bearing;
+            renderParams.pitch = params.pitch;
+            renderParams.fieldOfView = params.fieldOfView;
+            ptr->render(renderParams);
+        }
+
+        void contextLost() { }
+
+        void deinitialize() {
+            ptr->deinitialize();
+        }
+    };
+
     d_ptr->mapObj->getStyle().addLayer(std::make_unique<mbgl::style::CustomLayer>(
             id.toStdString(),
-            reinterpret_cast<mbgl::style::CustomLayerInitializeFunction>(initFn),
-            // This cast is safe as long as both mbgl:: and QMapbox::
-            // CustomLayerRenderParameters members remains the same.
-            (mbgl::style::CustomLayerRenderFunction)renderFn,
-            reinterpret_cast<mbgl::style::CustomLayerDeinitializeFunction>(deinitFn),
-            context),
+            std::make_unique<HostWrapper>(host)),
             before.isEmpty() ? mbgl::optional<std::string>() : mbgl::optional<std::string>(before.toStdString()));
 }
 
