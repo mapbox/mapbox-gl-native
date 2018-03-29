@@ -331,9 +331,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `geometry-type`        | |`$mgl_geometryType`
 `id`                   | |`$mgl_featureIdentifier`
 `properties`           | |`$mgl_featureProperties`
-`at`                   | `objectFrom:withIndex:` |
+`at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
-`has`                  | `mgl_hasProperty:properties:` |
+`has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
 `length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
 `!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
 `!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`
@@ -344,7 +344,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
 `all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
 `any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
-`case`                 | `MGL_IF` | `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)` 
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or `MGL_IF` | `TERNARY(1 = 2, YES, NO)` or `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`
 `coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
 `match`                | `MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
 `interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` |
