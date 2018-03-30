@@ -73,6 +73,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.typeOf;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.var;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -1095,4 +1096,13 @@ public class ExpressionTest {
     assertTrue("expression should match", Arrays.deepEquals(expected, greenColor.toArray()));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testThrowIllegalArgumentExceptionForPropertyValueLiteral() {
+    Expression expression = interpolate(exponential(1f), zoom(),
+      stop(17f, lineOpacity(1f)),
+      stop(16.5f, lineOpacity(0.5f)),
+      stop(16f, lineOpacity(0f))
+    );
+    expression.toArray();
+  }
 }
