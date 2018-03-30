@@ -14,8 +14,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  Setting this option to `YES` affects rendering performance.
  
- This option is ignored when creating an instance of a class besides
- `MGLComputedShapeSource`.
+ This option is used with the `MGLComputedShapeSource` class; it is ignored when
+ creating an `MGLShapeSource` object.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates;
 
@@ -27,8 +27,8 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinate
  Setting this option to `YES` affects rendering performance. Use this option to
  clip `MGLPolyline`s and `MGLPolygon`s at tile boundaries without artifacts.
  
- This option is ignored when creating an instance of a class besides
- `MGLComputedShapeSource`.
+ This option is used with the `MGLComputedShapeSource` class; it is ignored when
+ creating an `MGLShapeSource` object.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates;
 
@@ -93,8 +93,10 @@ MGL_EXPORT
  
  This class supports the following options:
  `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
- `MGLShapeSourceOptionBuffer`, and
- `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a computed
+ `MGLShapeSourceOptionBuffer`,
+ `MGLShapeSourceOptionSimplificationTolerance`,
+ `MGLShapeSourceOptionWrapsCoordinates`, and
+ `MGLShapeSourceOptionClipsCoordinates`. Shapes provided by a computed
  shape source cannot be clustered.
 
  @param identifier A string that uniquely identifies the source.
@@ -110,9 +112,11 @@ MGL_EXPORT
  
  This class supports the following options:
  `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
- `MGLShapeSourceOptionBuffer`, and
- `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a computed
- shape source cannot be clustered.
+ `MGLShapeSourceOptionBuffer`,
+ `MGLShapeSourceOptionSimplificationTolerance`,
+ `MGLShapeSourceOptionWrapsCoordinates`, and
+ `MGLShapeSourceOptionClipsCoordinates`. Shapes provided by a computed shape
+ source cannot be clustered.
 
  @param identifier A string that uniquely identifies the source.
  @param options An `NSDictionary` of options for this source.

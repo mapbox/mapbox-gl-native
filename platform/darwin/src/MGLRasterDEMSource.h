@@ -3,6 +3,19 @@
 #import "MGLRasterTileSource.h"
 
 /**
+ An `NSNumber` object containing an unsigned integer that specifies the encoding
+ formula for raster-dem tilesets. The integer corresponds to one of
+ the constants described in `MGLDEMEncoding`.
+ 
+ The default value for this option is `MGLDEMEncodingMapbox`.
+ 
+ This option cannot be represented in a TileJSON or style JSON file. It is used
+ with the `MGLRasterDEMSource` class and is ignored when creating an
+ `MGLRasterTileSource` or `MGLVectorTileSource` object.
+ */
+extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
+
+/**
  `MGLRasterDEMSource` is a map content source that supplies rasterized
  <a href="https://en.wikipedia.org/wiki/Digital_elevation_model">digital elevation model</a>
  (DEM) tiles to be shown on the map. The location of and metadata about the
