@@ -6,15 +6,6 @@ namespace mbgl {
 namespace style {
 
 /**
- * Initialize any GL state needed by the custom layer. This method is called once, from the
- * main thread, at a point when the GL context is active but before rendering for the first
- * time.
- *
- * Resources that are acquired in this method must be released in the UninitializeFunction.
- */
-using CustomLayerInitializeFunction = void (*)(void* context);
-
-/**
  * Parameters that define the current camera position for a CustomLayerRenderFunction.
  */
 struct CustomLayerRenderParameters {
@@ -28,6 +19,18 @@ struct CustomLayerRenderParameters {
     double fieldOfView;
 };
 
+class CustomLayerHost {
+public:
+virtual ~CustomLayerHost() = default;
+/**
+ * Initialize any GL state needed by the custom layer. This method is called once, from the
+ * main thread, at a point when the GL context is active but before rendering for the first
+ * time.
+ *
+ * Resources that are acquired in this method must be released in the UninitializeFunction.
+ */
+virtual void initialize() = 0;
+
 /**
  * Render the layer. This method is called once per frame. The implementation should not make
  * any assumptions about the GL state (other than that the correct context is active). It may
@@ -36,7 +39,7 @@ struct CustomLayerRenderParameters {
  * Make sure that you are drawing your fragments with a z value of 1 to take advantage of the
  * opaque fragment culling in case there are opaque layers above your custom layer.
  */
-using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRenderParameters&);
+virtual void render(const CustomLayerRenderParameters&) = 0;
 
 /**
  * Called when the system has destroyed the underlying GL context. The
@@ -44,7 +47,7 @@ using CustomLayerRenderFunction = void (*)(void* context, const CustomLayerRende
  * `CustomLayerInitializeFunction` will be called instead to prepare for a new render.
  *
  */
-using CustomLayerContextLostFunction = void (*)(void* context);
+virtual void contextLost() = 0;
 
 /**
  * Destroy any GL state needed by the custom layer, and deallocate context, if necessary. This
@@ -52,22 +55,13 @@ using CustomLayerContextLostFunction = void (*)(void* context);
  *
  * Note that it may be called even when the InitializeFunction has not been called.
  */
-using CustomLayerDeinitializeFunction = void (*)(void* context);
+virtual void deinitialize() = 0;
+};
 
 class CustomLayer : public Layer {
 public:
     CustomLayer(const std::string& id,
-                CustomLayerInitializeFunction,
-                CustomLayerRenderFunction,
-                CustomLayerContextLostFunction,
-                CustomLayerDeinitializeFunction,
-                void* context);
-
-    CustomLayer(const std::string& id,
-                CustomLayerInitializeFunction,
-                CustomLayerRenderFunction,
-                CustomLayerDeinitializeFunction,
-                void* context);
+                std::unique_ptr<CustomLayerHost> host);
 
     ~CustomLayer() final;
 
