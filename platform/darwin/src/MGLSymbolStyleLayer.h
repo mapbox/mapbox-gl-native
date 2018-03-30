@@ -320,8 +320,8 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  points or along lines on the map.
  
  Use a symbol style layer to configure the visual appearance of labels for
- features in vector tiles loaded by an `MGLVectorSource` object or `MGLShape` or
- `MGLFeature` instances in an `MGLShapeSource` object.
+ features in vector tiles loaded by an `MGLVectorTileSource` object or
+ `MGLShape` or `MGLFeature` instances in an `MGLShapeSource` object.
 
  You can access an existing symbol style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;

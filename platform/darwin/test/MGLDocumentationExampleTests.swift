@@ -109,9 +109,9 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "hills"))
     }
 
-    func testMGLVectorSource() {
+    func testMGLVectorTileSource() {
         //#-example-code
-        let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
+        let source = MGLVectorTileSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .attributionInfos: [
@@ -151,7 +151,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLCircleStyleLayer() {
-        let population = MGLVectorSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
+        let population = MGLVectorTileSource(identifier: "population", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(population)
         
         //#-example-code
@@ -174,7 +174,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLLineStyleLayer() {
-        let trails = MGLVectorSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
+        let trails = MGLVectorTileSource(identifier: "trails", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(trails)
 
         //#-example-code
@@ -197,7 +197,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLFillStyleLayer() {
-        let parks = MGLVectorSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
+        let parks = MGLVectorTileSource(identifier: "parks", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(parks)
 
         //#-example-code
@@ -216,7 +216,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
     
     func testMGLFillExtrusionStyleLayer() {
-        let buildings = MGLVectorSource(identifier: "buildings", configurationURL: URL(string: "https://example.com/style.json")!)
+        let buildings = MGLVectorTileSource(identifier: "buildings", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(buildings)
         
         //#-example-code
@@ -250,7 +250,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLSymbolStyleLayer() {
-        let pois = MGLVectorSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
+        let pois = MGLVectorTileSource(identifier: "pois", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(pois)
 
         //#-example-code
@@ -305,7 +305,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         ])
         mapView.style?.addSource(source)
         
-        let canals = MGLVectorSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
+        let canals = MGLVectorTileSource(identifier: "canals", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(canals)
         let canalShadowLayer = MGLLineStyleLayer(identifier: "waterway-river-canal-shadow", source: canals)
         mapView.style?.addLayer(canalShadowLayer)
@@ -322,7 +322,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLVectorStyleLayer$predicate() {
-        let terrain = MGLVectorSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
+        let terrain = MGLVectorTileSource(identifier: "terrain", configurationURL: URL(string: "https://example.com/style.json")!)
         mapView.style?.addSource(terrain)
 
         //#-example-code

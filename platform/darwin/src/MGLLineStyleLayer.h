@@ -78,8 +78,8 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  polylines on the map.
  
  Use a line style layer to configure the visual appearance of polyline or
- multipolyline features in vector tiles loaded by an `MGLVectorSource` object or
- `MGLPolyline`, `MGLPolylineFeature`, `MGLMultiPolyline`, or
+ multipolyline features in vector tiles loaded by an `MGLVectorTileSource`
+ object or `MGLPolyline`, `MGLPolylineFeature`, `MGLMultiPolyline`, or
  `MGLMultiPolylineFeature` instances in an `MGLShapeSource` object.
 
  You can access an existing line style layer using the

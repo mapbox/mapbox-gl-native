@@ -1,8 +1,8 @@
-#import "MGLVectorSource.h"
+#import "MGLVectorTileSource.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLVectorSource (Private)
+@interface MGLVectorTileSource (Private)
 
 @property (nonatomic, readonly, getter=isMapboxStreets) BOOL mapboxStreets;
 

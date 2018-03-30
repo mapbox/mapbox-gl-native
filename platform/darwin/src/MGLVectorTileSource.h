@@ -5,29 +5,30 @@
 NS_ASSUME_NONNULL_BEGIN
 
 /**
- `MGLVectorSource` is a map content source that supplies tiled vector data in
- <a href="https://www.mapbox.com/vector-tiles/">Mapbox Vector Tile</a> format to
- be shown on the map. The location of and metadata about the tiles are defined
- either by an option dictionary or by an external file that conforms to the
+ `MGLVectorTileSource` is a map content source that supplies tiled vector data
+ in <a href="https://www.mapbox.com/vector-tiles/">Mapbox Vector Tile</a> format
+ to be shown on the map. The location of and metadata about the tiles are
+ defined either by an option dictionary or by an external file that conforms to
+ the
  <a href="https://github.com/mapbox/tilejson-spec/">TileJSON specification</a>.
- A vector source is added to an `MGLStyle` object along with one or more
+ A vector tile source is added to an `MGLStyle` object along with one or more
  `MGLVectorStyleLayer` objects. A vector style layer defines the appearance of
- any content supplied by the vector source.
+ any content supplied by the vector tile source.
 
  Each
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector"><code>vector</code></a>
  source defined by the style JSON file is represented at runtime by an
- `MGLVectorSource` object that you can use to initialize new style layers. You
- can also add and remove sources dynamically using methods such as
+ `MGLVectorTileSource` object that you can use to initialize new style layers.
+ You can also add and remove sources dynamically using methods such as
  `-[MGLStyle addSource:]` and `-[MGLStyle sourceWithIdentifier:]`.
 
  Within each vector tile, each geometric coordinate must lie between
  −1&nbsp;×&nbsp;<var>extent</var> and
  (<var>extent</var>&nbsp;×&nbsp;2)&nbsp;−&nbsp;1, inclusive. Any vector style
- layer initialized with a vector source must have a non-`nil` value in its
+ layer initialized with a vector tile source must have a non-`nil` value in its
  `sourceLayerIdentifier` property.
  
- Commonly used vector sources include
+ Commonly used vector tile sources include
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets/">Mapbox Streets</a>,
  <a href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>,
  and
@@ -36,7 +37,7 @@ NS_ASSUME_NONNULL_BEGIN
  ### Example
 
  ```swift
- let source = MGLVectorSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
+ let source = MGLVectorTileSource(identifier: "pois", tileURLTemplates: ["https://example.com/vector-tiles/{z}/{x}/{y}.mvt"], options: [
      .minimumZoomLevel: 9,
      .maximumZoomLevel: 16,
      .attributionInfos: [
@@ -47,12 +48,13 @@ NS_ASSUME_NONNULL_BEGIN
  ```
  */
 MGL_EXPORT
-@interface MGLVectorSource : MGLTileSource
+@interface MGLVectorTileSource : MGLTileSource
 
 #pragma mark Initializing a Source
 
 /**
- Returns a vector source initialized with an identifier and configuration URL.
+ Returns a vector tile source initialized with an identifier and configuration
+ URL.
 
  After initializing and configuring the source, add it to a map view’s style
  using the `-[MGLStyle addSource:]` method.
@@ -66,12 +68,12 @@ MGL_EXPORT
     which it is added.
  @param configurationURL A URL to a TileJSON configuration file describing the
     source’s contents and other metadata.
- @return An initialized vector source.
+ @return An initialized vector tile source.
  */
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL NS_DESIGNATED_INITIALIZER;
 
 /**
- Returns a vector source initialized an identifier, tile URL templates, and
+ Returns a vector tile source initialized an identifier, tile URL templates, and
  options.
 
  Tile URL templates are strings that specify the URLs of the vector tiles to

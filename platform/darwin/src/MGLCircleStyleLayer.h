@@ -62,8 +62,8 @@ typedef NS_ENUM(NSUInteger, MGLCircleTranslationAnchor) {
  circles on the map.
  
  Use a circle style layer to configure the visual appearance of point or point
- collection features in vector tiles loaded by an `MGLVectorSource` object or
- `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or
+ collection features in vector tiles loaded by an `MGLVectorTileSource` object
+ or `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`, or
  `MGLPointCollectionFeature` instances in an `MGLShapeSource` object.
  
  A circle style layer renders circles whose radii are measured in screen units.

@@ -69,7 +69,7 @@ custom_categories:
       - MGLTileSource
       - MGLRasterTileSource
       - MGLRasterDEMSource
-      - MGLVectorSource
+      - MGLVectorTileSource
       - MGLImageSource
   - name: Style Layers
     children:

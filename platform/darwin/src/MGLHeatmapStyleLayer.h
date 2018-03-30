@@ -14,7 +14,7 @@ NS_ASSUME_NONNULL_BEGIN
  data, using color to avoid cluttering the map with individual points at low
  zoom levels. The points are weighted by an attribute you specify. Use a heatmap
  style layer in conjunction with point or point collection features in vector
- tiles loaded by an `MGLVectorSource` object or `MGLPointAnnotation`,
+ tiles loaded by an `MGLVectorTileSource` object or `MGLPointAnnotation`,
  `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature`
  instances in an `MGLShapeSource` object.
  

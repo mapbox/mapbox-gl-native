@@ -161,14 +161,14 @@
     [self.style addSource:rasterTileSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:rasterTileSource], NSException, @"MGLRedundantSourceException");
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
-    [self.style addSource:vectorSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"vectorTileSource" configurationURL:[NSURL URLWithString:@".json"]];
+    [self.style addSource:vectorTileSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:vectorTileSource], NSException, @"MGLRedundantSourceException");
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
-    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source1 = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source2 = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
     XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
@@ -185,10 +185,10 @@
     [self.style addSource:shapeSource];
     XCTAssertNotNil([self.style sourceWithIdentifier:shapeSource.identifier]);
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vector-source" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:vectorSource];
-    [self.style addSource:vectorSource];
-    XCTAssertNotNil([self.style sourceWithIdentifier:vectorSource.identifier]);
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"vector-tile-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:vectorTileSource];
+    [self.style addSource:vectorTileSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:vectorTileSource.identifier]);
 }
 
 - (void)testAddingSourceOfTypeABeforeSourceOfTypeBWithSameIdentifier {
@@ -208,22 +208,22 @@
     // Add the shape source
     [self.style addSource:imageSource];
 
-    // Attempt to remove a vector source with the same identifer as the shape source
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:vectorSource];
+    // Attempt to remove a vector tile source with the same identifer as the shape source
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:vectorTileSource];
     // The image source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLImageSource class]]);
 
     // Remove the image source
     [self.style removeSource:imageSource];
 
-    // Add the vector source
-    [self.style addSource:vectorSource];
+    // Add the vector tile source
+    [self.style addSource:vectorTileSource];
 
     // Attempt to remove the previously created raster tile source that has the same identifer as the shape source
     [self.style removeSource:rasterTileSource];
-    // The vector source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
+    // The vector tile source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorTileSource class]]);
 }
 
 - (void)testRemovingSourceInUse {
@@ -289,7 +289,7 @@
 
 - (void)testAddingLayersWithDuplicateIdentifiers {
     // Just some source
-    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
     [self.style addSource: source];
 
     // Add initial layer

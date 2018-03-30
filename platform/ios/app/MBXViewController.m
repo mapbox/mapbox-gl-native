@@ -78,7 +78,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateShapeSourceData,
     MBXSettingsRuntimeStylingUpdateShapeSourceURL,
     MBXSettingsRuntimeStylingUpdateShapeSourceFeatures,
-    MBXSettingsRuntimeStylingVectorSource,
+    MBXSettingsRuntimeStylingVectorTileSource,
     MBXSettingsRuntimeStylingRasterTileSource,
     MBXSettingsRuntimeStylingImageSource,
     MBXSettingsRuntimeStylingRouteLine,
@@ -368,7 +368,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update Shape Source: Data",
                 @"Update Shape Source: URL",
                 @"Update Shape Source: Features",
-                @"Style Vector Source",
+                @"Style Vector Tile Source",
                 @"Style Raster Tile Source",
                 @"Style Image Source",
                 @"Add Route Line",
@@ -548,8 +548,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsRuntimeStylingUpdateShapeSourceFeatures:
                     [self updateShapeSourceFeatures];
                     break;
-                case MBXSettingsRuntimeStylingVectorSource:
-                    [self styleVectorSource];
+                case MBXSettingsRuntimeStylingVectorTileSource:
+                    [self styleVectorTileSource];
                     break;
                 case MBXSettingsRuntimeStylingRasterTileSource:
                     [self styleRasterTileSource];
@@ -1334,17 +1334,17 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:layer];
 }
 
-- (void)styleVectorSource
+- (void)styleVectorTileSource
 {
     NSURL *url = [[NSURL alloc] initWithString:@"mapbox://mapbox.mapbox-terrain-v2"];
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"style-vector-source-id" configurationURL:url];
-    [self.mapView.style addSource:vectorSource];
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"style-vector-tile-source-id" configurationURL:url];
+    [self.mapView.style addSource:vectorTileSource];
 
     MGLBackgroundStyleLayer *backgroundLayer = [[MGLBackgroundStyleLayer alloc] initWithIdentifier:@"style-vector-background-layer-id"];
     backgroundLayer.backgroundColor = [NSExpression expressionForConstantValue:[UIColor blackColor]];
     [self.mapView.style addLayer:backgroundLayer];
 
-    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorSource];
+    MGLLineStyleLayer *lineLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"style-vector-line-layer-id" source:vectorTileSource];
     lineLayer.sourceLayerIdentifier = @"contour";
     lineLayer.lineJoin = [NSExpression expressionForConstantValue:@"round"];
     lineLayer.lineCap = [NSExpression expressionForConstantValue:@"round"];

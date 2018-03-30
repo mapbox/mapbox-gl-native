@@ -14,7 +14,7 @@ namespace mbgl {
 @class MGLAttributionInfo;
 @class MGLMapView;
 @class MGLOpenGLStyleLayer;
-@class MGLVectorSource;
+@class MGLVectorTileSource;
 @class MGLVectorStyleLayer;
 
 @interface MGLStyle (Private)

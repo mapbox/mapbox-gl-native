@@ -36,7 +36,7 @@ typedef NS_ENUM(NSUInteger, MGLHillshadeIlluminationAnchor) {
  
  To display posterized hillshading based on vector shapes, as with the <a
  href="https://www.mapbox.com/vector-tiles/mapbox-terrain/">Mapbox Terrain</a>
- source, use an `MGLVectorSource` object in conjunction with several
+ source, use an `MGLVectorTileSource` object in conjunction with several
  `MGLFillStyleLayer` objects.
 
  You can access an existing hillshade style layer using the
