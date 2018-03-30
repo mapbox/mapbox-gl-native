@@ -83,6 +83,7 @@
 @property (nonatomic, readonly, weak) MGLMapView *mapView;
 @property (nonatomic, readonly) mbgl::style::Style *rawStyle;
 @property (readonly, copy, nullable) NSURL *URL;
+@property (nonatomic, readwrite, strong) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLOpenGLStyleLayer *) *openGLLayers;
 @property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, NS_DICTIONARY_OF(NSObject *, MGLTextLanguage *) *) *localizedLayersByIdentifier;
 
 @end
@@ -125,6 +126,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     if (self = [super init]) {
         _mapView = mapView;
         _rawStyle = rawStyle;
+        _openGLLayers = [NSMutableDictionary dictionary];
         _localizedLayersByIdentifier = [NSMutableDictionary dictionary];
     }
     return self;

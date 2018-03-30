@@ -2,6 +2,8 @@
 
 #include <mbgl/style/layer.hpp>
 
+#include <functional>
+
 namespace mbgl {
 namespace style {
 
