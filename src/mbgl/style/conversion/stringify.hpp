@@ -303,9 +303,13 @@ public:
     template <class T>
     void operator()(const ExponentialStops<T>& f) {
         writer.Key("type");
-        writer.String("exponential");
-        writer.Key("base");
-        writer.Double(f.base);
+        if (f.base == 1) {
+            writer.String("linear");
+        } else {
+            writer.String("exponential");
+            writer.Key("base");
+            writer.Double(f.base);
+        }
         writer.Key("stops");
         stringifyStops(f.stops);
     }
@@ -335,9 +339,13 @@ public:
     template <class T>
     void operator()(const CompositeExponentialStops<T>& f) {
         writer.Key("type");
-        writer.String("exponential");
-        writer.Key("base");
-        writer.Double(f.base);
+        if (f.base == 1) {
+            writer.String("linear");
+        } else {
+            writer.String("exponential");
+            writer.Key("base");
+            writer.Double(f.base);
+        }
         writer.Key("stops");
         stringifyCompositeStops(f.stops);
     }
