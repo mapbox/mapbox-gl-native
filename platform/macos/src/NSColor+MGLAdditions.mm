@@ -82,15 +82,18 @@
     // Alpha
     components.back() *= 255.0;
     
+    // macOS 10.12 Sierra and below uses calibrated RGB by default.
+    if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
+        return [NSColor colorWithCalibratedRed:components[0]
+                                         green:components[1]
+                                          blue:components[2]
+                                         alpha:components[3]];
+    }
     // The Mapbox Style Specification does not specify a color space, but it is
     // assumed to be sRGB for consistency with CSS.
-    NSColor *color = [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace]
-                                       components:&components[0]
-                                            count:components.size()];
-    if ([NSColor redColor].colorSpaceName == NSCalibratedRGBColorSpace) {
-        color = [color colorUsingColorSpaceName:NSCalibratedRGBColorSpace];
-    }
-    return color;
+    return [NSColor colorWithColorSpace:[NSColorSpace sRGBColorSpace]
+                             components:&components[0]
+                                  count:components.size()];
 }
 
 @end
