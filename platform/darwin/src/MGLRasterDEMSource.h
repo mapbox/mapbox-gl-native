@@ -1,6 +1,6 @@
 #import "MGLFoundation.h"
 
-#import "MGLRasterSource.h"
+#import "MGLRasterTileSource.h"
 
 /**
  `MGLRasterDEMSource` is a map content source that supplies rasterized
@@ -32,6 +32,6 @@
  ```
  */
 MGL_EXPORT
-@interface MGLRasterDEMSource : MGLRasterSource
+@interface MGLRasterDEMSource : MGLRasterTileSource
 
 @end

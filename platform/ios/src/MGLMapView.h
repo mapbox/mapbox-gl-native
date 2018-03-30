@@ -1330,8 +1330,8 @@ MGL_EXPORT IB_DESIGNABLE
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
  `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ from `MGLRasterTileSource` objects, or from video or canvas sources, which are
+ unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1432,8 +1432,8 @@ MGL_EXPORT IB_DESIGNABLE
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
  `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ from `MGLRasterTileSource` objects, or from video or canvas sources, which are
+ unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the

@@ -20,7 +20,7 @@
 #import "MGLTileSource_Private.h"
 #import "MGLVectorSource.h"
 #import "MGLVectorSource_Private.h"
-#import "MGLRasterSource.h"
+#import "MGLRasterTileSource.h"
 #import "MGLRasterDEMSource.h"
 #import "MGLShapeSource.h"
 #import "MGLImageSource.h"
@@ -187,7 +187,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     } else if (auto geoJSONSource = rawSource->as<mbgl::style::GeoJSONSource>()) {
         return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource mapView:self.mapView];
     } else if (auto rasterSource = rawSource->as<mbgl::style::RasterSource>()) {
-        return [[MGLRasterSource alloc] initWithRawSource:rasterSource mapView:self.mapView];
+        return [[MGLRasterTileSource alloc] initWithRawSource:rasterSource mapView:self.mapView];
     } else if (auto rasterDEMSource = rawSource->as<mbgl::style::RasterDEMSource>()) {
         return [[MGLRasterDEMSource alloc] initWithRawSource:rasterDEMSource mapView:self.mapView];
     } else if (auto imageSource = rawSource->as<mbgl::style::ImageSource>()) {

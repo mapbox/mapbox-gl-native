@@ -63,13 +63,14 @@ custom_categories:
   - name: Content Sources
     children:
       - MGLSource
-      - MGLTileSource
       - MGLAbstractShapeSource
       - MGLShapeSource
       - MGLComputedShapeSource
-      - MGLRasterSource
+      - MGLTileSource
+      - MGLRasterTileSource
       - MGLRasterDEMSource
       - MGLVectorSource
+      - MGLImageSource
   - name: Style Layers
     children:
       - MGLStyleLayer
