@@ -404,6 +404,11 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         // commitFeatureIndexes depends on the assumption that no new FeatureIndex has been loaded since placement
         // started. If we violate this assumption, then we need to either make CollisionIndex completely independendent of
         // FeatureIndex, or find a way for its entries to point to multiple FeatureIndexes.
+        // We also depend on the assumption that anything that can change the results of CollisionIndex::queryRenderedSymbols
+        // will cause 'placementChanged' to be true (note that adding a non-placed item to the index will _not_ make
+        // placementChanged true).
+        // We should consider switching to the "always commit new placements" strategy used in
+        //   https://github.com/mapbox/mapbox-gl-js/pull/6104
         commitFeatureIndexes();
         crossTileSymbolIndex.pruneUnusedLayers(usedSymbolLayers);
         if (placementChanged || symbolBucketsChanged) {
