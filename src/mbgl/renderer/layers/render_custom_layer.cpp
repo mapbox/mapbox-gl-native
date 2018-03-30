@@ -13,6 +13,7 @@ using namespace style;
 
 RenderCustomLayer::RenderCustomLayer(Immutable<style::CustomLayer::Impl> _impl)
     : RenderLayer(LayerType::Custom, _impl), host(_impl->host) {
+    assert(BackendScope::exists());
     host->initialize();
 }
 
@@ -20,7 +21,7 @@ RenderCustomLayer::~RenderCustomLayer() {
     assert(BackendScope::exists());
     if (contextDestroyed) {
         host->contextLost();
-    } else if (!contextDestroyed) {
+    } else {
         host->deinitialize();
     }
 }

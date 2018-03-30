@@ -36,17 +36,6 @@ void main() {
 
 class TestLayer : public mbgl::style::CustomLayerHost {
 public:
-    ~TestLayer() {
-        if (program) {
-            MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
-            MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
-            MBGL_CHECK_ERROR(glDetachShader(program, fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteShader(vertexShader));
-            MBGL_CHECK_ERROR(glDeleteShader(fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteProgram(program));
-        }
-    }
-
     void initialize() {
         program = MBGL_CHECK_ERROR(glCreateProgram());
         vertexShader = MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
@@ -77,7 +66,16 @@ public:
 
     void contextLost() {}
 
-    void deinitialize() {}
+    void deinitialize() {
+         if (program) {
+                MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
+                MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
+                MBGL_CHECK_ERROR(glDetachShader(program, fragmentShader));
+                MBGL_CHECK_ERROR(glDeleteShader(vertexShader));
+                MBGL_CHECK_ERROR(glDeleteShader(fragmentShader));
+                MBGL_CHECK_ERROR(glDeleteProgram(program));
+            }
+    }
 
     GLuint program = 0;
     GLuint vertexShader = 0;

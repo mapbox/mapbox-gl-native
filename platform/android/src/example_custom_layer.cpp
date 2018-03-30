@@ -115,15 +115,6 @@ static const GLchar * fragmentShaderSource = "uniform highp vec4 fill_color; voi
 class ExampleCustomLayer: mbgl::style::CustomLayerHost {
 public:
     ~ExampleCustomLayer() {
-        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "~ExampleCustomLayer");
-        if (program) {
-            glDeleteBuffers(1, &buffer);
-            glDetachShader(program, vertexShader);
-            glDetachShader(program, fragmentShader);
-            glDeleteShader(vertexShader);
-            glDeleteShader(fragmentShader);
-            glDeleteProgram(program);
-        }
     }
 
     void initialize() {
@@ -159,7 +150,7 @@ public:
     }
 
     void render(const mbgl::style::CustomLayerRenderParameters&) {
-        mbgl::Log::Info(mbgl::Event::General, "Render");
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "Render");
         glUseProgram(program);
         glBindBuffer(GL_ARRAY_BUFFER, buffer);
         glEnableVertexAttribArray(a_pos);
@@ -180,10 +171,20 @@ public:
     }
 
     void contextLost() {
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "ContextLost");
+        program = 0;
     }
 
     void deinitialize() {
-
+        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "DeInitialize");
+        if (program) {
+            glDeleteBuffers(1, &buffer);
+            glDetachShader(program, vertexShader);
+            glDetachShader(program, fragmentShader);
+            glDeleteShader(vertexShader);
+            glDeleteShader(fragmentShader);
+            glDeleteProgram(program);
+        }
     }
 
     GLuint program = 0;

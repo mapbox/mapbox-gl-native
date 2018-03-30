@@ -1,4 +1,4 @@
- #import "MGLOpenGLStyleLayer.h"
+#import "MGLOpenGLStyleLayer.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLStyle_Private.h"
@@ -13,9 +13,6 @@ public:
         layerRef = styleLayer;
         layer = nil;
     }
-    ~MGLOpenGLLayerHost () {
-        layer = nil;
-    }
 
     void initialize() {
         if (layerRef == nil) return;
@@ -25,7 +22,7 @@ public:
     }
 
     void render(const mbgl::style::CustomLayerRenderParameters &params) {
-        assert(layerRef);
+        if(!layer) return;
 
         MGLStyleLayerDrawingContext drawingContext = {
             .size = CGSizeMake(params.width, params.height),
@@ -108,24 +105,15 @@ private:
 }
 
 #pragma mark - Adding to and removing from a map view
-
-- (void)setStyle:(MGLStyle *)style {
-    if (_style && style) {
-        [NSException raise:@"MGLLayerReuseException"
-                    format:@"%@ cannot be added to more than one MGLStyle at a time.", self];
-    }
-    _style.openGLLayers[self.identifier] = nil;
-    _style = style;
-    _style.openGLLayers[self.identifier] = self;
-}
-
 - (void)addToStyle:(MGLStyle *)style belowLayer:(MGLStyleLayer *)otherLayer {
     self.style = style;
+    self.style.openGLLayers[self.identifier] = self;
     [super addToStyle:style belowLayer:otherLayer];
 }
 
 - (void)removeFromStyle:(MGLStyle *)style {
     [super removeFromStyle:style];
+    self.style.openGLLayers[self.identifier] = nil;
     self.style = nil;
 }
 
