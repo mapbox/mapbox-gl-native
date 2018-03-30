@@ -27,7 +27,6 @@
 		16376B411FFDB4B40000563E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B401FFDB4B40000563E /* main.m */; };
 		16376B471FFDB92B0000563E /* one-liner.json in Resources */ = {isa = PBXBuildFile; fileRef = DA35D0871E1A6309007DED41 /* one-liner.json */; };
 		16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */; };
-		165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		170C437C2029D96F00863DF0 /* MGLHeatmapColorTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43782028D49800863DF0 /* MGLHeatmapColorTests.mm */; };
 		170C437D2029D97900863DF0 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43792028D49800863DF0 /* MGLHeatmapStyleLayerTests.mm */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
@@ -1266,7 +1265,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
