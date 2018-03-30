@@ -13,10 +13,11 @@ NS_ASSUME_NONNULL_BEGIN
  A heatmap visualizes the spatial distribution of a large, dense set of point
  data, using color to avoid cluttering the map with individual points at low
  zoom levels. The points are weighted by an attribute you specify. Use a heatmap
- style layer in conjunction with point or point collection features in vector
- tiles loaded by an `MGLVectorTileSource` object or `MGLPointAnnotation`,
- `MGLPointFeature`, `MGLPointCollection`, or `MGLPointCollectionFeature`
- instances in an `MGLShapeSource` object.
+ style layer in conjunction with point or point collection features. These
+ features can come from vector tiles loaded by an `MGLVectorTileSource` object,
+ or they can be `MGLPointAnnotation`, `MGLPointFeature`, `MGLPointCollection`,
+ or `MGLPointCollectionFeature` instances in an `MGLShapeSource` or
+ `MGLComputedShapeSource` object.
  
  Consider accompanying a heatmap style layer with an `MGLCircleStyleLayer` or
  `MGLSymbolStyleLayer` at high zoom levels. If you are unsure whether the point
@@ -65,8 +66,9 @@ MGL_EXPORT
 #pragma mark - Accessing the Paint Attributes
 
 /**
- Defines the color of each point based on its density value in a heatmap. Should
- be an expression that uses `$heatmapDensity` as input.
+ The color of each screen point based on its density value in a heatmap. This
+ property is normally set to an interpolation or step expression with the
+ `$heatmapDensity` value as its input.
  
  The default value of this property is an expression that evaluates to a rainbow
  color scale from blue to red. Set this property to `nil` to reset it to the

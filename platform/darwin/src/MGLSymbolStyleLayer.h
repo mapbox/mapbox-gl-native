@@ -319,9 +319,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  An `MGLSymbolStyleLayer` is a style layer that renders icon and text labels at
  points or along lines on the map.
  
- Use a symbol style layer to configure the visual appearance of labels for
- features in vector tiles loaded by an `MGLVectorTileSource` object or
- `MGLShape` or `MGLFeature` instances in an `MGLShapeSource` object.
+ Use a symbol style layer to configure the visual appearance of feature labels.
+ These features can come from vector tiles loaded by an `MGLVectorTileSource`
+ object, or they can be `MGLShape` or `MGLFeature` instances in an
+ `MGLShapeSource` or `MGLComputedShapeSource` object.
 
  You can access an existing symbol style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -460,11 +461,15 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
- Name of image in sprite to use for drawing an image background. Within literal
- values, attribute names enclosed in curly brackets (e.g. `{token}`) are
- replaced with the value of the named attribute. Expressions do not support this
- syntax; for equivalent functionality in expressions, use
- `stringByAppendingString:` and key path expressions.
+ Name of a style image to use for drawing an image background.
+ 
+ Use the `+[MGLStyle setImage:forName:]` method to associate an image with a
+ name that you can set this property to.
+ 
+ Within a constant string value, a feature attribute name enclosed in curly
+ braces (e.g., `{token}`) is replaced with the value of the named attribute.
+ Tokens inside non-constant expressions are ignored; instead, use `mgl_join:`
+ and key path expressions.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
@@ -987,10 +992,12 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *symbolSpacing;
 
 /**
- Value to use for a text label. Within literal values, attribute names enclosed
- in curly brackets (e.g. `{token}`) are replaced with the value of the named
- attribute. Expressions do not support this syntax; for equivalent functionality
- in expressions, use `stringByAppendingString:` and key path expressions.
+ Value to use for a text label.
+ 
+ Within a constant string value, a feature attribute name enclosed in curly
+ braces (e.g., `{token}`) is replaced with the value of the named attribute.
+ Tokens inside non-constant expressions are ignored; instead, use `mgl_join:`
+ and key path expressions.
  
  The default value of this property is an expression that evaluates to the empty
  string. Set this property to `nil` to reset it to the default value.

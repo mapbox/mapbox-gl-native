@@ -28,9 +28,10 @@ typedef NS_ENUM(NSUInteger, MGLFillTranslationAnchor) {
  optionally stroked) polygons on the map.
  
  Use a fill style layer to configure the visual appearance of polygon or
- multipolygon features in vector tiles loaded by an `MGLVectorTileSource` object
- or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
- `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
+ multipolygon features. These features can come from vector tiles loaded by an
+ `MGLVectorTileSource` object, or they can be `MGLPolygon`, `MGLPolygonFeature`,
+ `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances in an `MGLShapeSource`
+ or `MGLComputedShapeSource` object.
 
  You can access an existing fill style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
