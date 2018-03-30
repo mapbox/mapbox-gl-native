@@ -117,6 +117,8 @@ To add an example code listing to the documentation for a class or class member:
    to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
    Wrap the code you’d like to appear in the documentation within
    `//#-example-code` and `//#-end-example-code` comments.
+1. If the header doesn’t already have an example code listing, add the path to
+   the header to platform/darwin/scripts/update-examples.list.
 1. Insert the code listings into the headers:
 
 ```bash
