@@ -28,8 +28,13 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
                           const std::string& bucketName) {
     for (const auto& ring : geometries) {
         auto envelope = mapbox::geometry::envelope(ring);
-        grid.insert(IndexedSubfeature(index, sourceLayerName, bucketName, sortIndex++),
-                    {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
+        if (envelope.min.x < util::EXTENT &&
+            envelope.min.y < util::EXTENT &&
+            envelope.max.x >= 0 &&
+            envelope.max.y >= 0) {
+            grid.insert(IndexedSubfeature(index, sourceLayerName, bucketName, sortIndex++),
+                        {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
+        }
     }
 }
 
