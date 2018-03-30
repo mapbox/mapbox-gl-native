@@ -14,6 +14,13 @@ NS_ASSUME_NONNULL_BEGIN
  A vector tile source is added to an `MGLStyle` object along with one or more
  `MGLVectorStyleLayer` objects. A vector style layer defines the appearance of
  any content supplied by the vector tile source.
+ 
+ `MGLVectorTileSource` is optimized for data sets that are too large to fit
+ completely in memory, such as vector tile sets or data sets managed in
+ <a href="https://www.mapbox.com/studio/">Mapbox Studio</a>. For
+ <a href="http://geojson.org/">GeoJSON</a> data, use the `MGLShapeSource`
+ class. For tiled data that changes dynamically, the `MGLComputedShapeSource`
+ class may be a suitable alternative.
 
  Each
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-vector"><code>vector</code></a>

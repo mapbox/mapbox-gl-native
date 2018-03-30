@@ -1,15 +1,71 @@
-#import "MGLComputedShapeSource.h"
+#import "MGLComputedShapeSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
 #import "MGLShape_Private.h"
-#import "MGLAbstractShapeSource_Private.h"
 #import "MGLGeometry_Private.h"
 
 #include <mbgl/map/map.hpp>
 #include <mbgl/style/sources/custom_geometry_source.hpp>
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/geojson.hpp>
+
+const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
+const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
+
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
+    mbgl::style::CustomGeometrySource::Options sourceOptions;
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevelForClustering must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.min = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionMaximumZoomLevel]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionMaximumZoomLevel must be an NSNumber."];
+        }
+        sourceOptions.zoomRange.max = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionBuffer]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionBuffer must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.buffer = value.integerValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionSimplificationTolerance]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionSimplificationTolerance must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.tolerance = value.doubleValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionWrapsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionWrapsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.wrap = value.boolValue;
+    }
+
+    if (NSNumber *value = options[MGLShapeSourceOptionClipsCoordinates]) {
+        if (![value isKindOfClass:[NSNumber class]]) {
+            [NSException raise:NSInvalidArgumentException
+                        format:@"MGLShapeSourceOptionClipsCoordinates must be an NSNumber."];
+        }
+        sourceOptions.tileOptions.clip = value.boolValue;
+    }
+
+    return sourceOptions;
+}
 
 @interface MGLComputedShapeSource () {
     std::unique_ptr<mbgl::style::CustomGeometrySource> _pendingSource;
