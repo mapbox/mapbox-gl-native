@@ -209,12 +209,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         );
     });
     define("to-rgba", [](const Color& color) -> Result<std::array<double, 4>> {
-        return std::array<double, 4> {{ 
-            255 * color.r / color.a, 
-            255 * color.g / color.a,
-            255 * color.b / color.a, 
-            color.a 
-        }};
+        return color.toArray();
     });
     
     define("rgba", rgba);
