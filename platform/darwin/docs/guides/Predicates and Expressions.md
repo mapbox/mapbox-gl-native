@@ -36,7 +36,7 @@ The following compound operators are supported:
 `NSCompoundPredicateType` | Format string syntax
 --------------------------|---------------------
 `NSAndPredicateType`      | `predicate1 AND predicate2`<br />`predicate1 && predicate2`
-`NSOrPredicateType`       | `predicate1 OR predicate2`<br />`predicate1 || predicate2`
+`NSOrPredicateType`       | `predicate1 OR predicate2`<br /><code>predicate1 &vert;&vert; predicate2</code>
 `NSNotPredicateType`      | `NOT predicate`<br />`!predicate`
 
 The following aggregate operators are supported:
@@ -213,33 +213,33 @@ The following custom functions are also available with the
 <tr>
    <td><code>boolValue</code></td>
    <td>
-      An `NSExpression` that evaluates to a number or string.
+      An <code>NSExpression</code> that evaluates to a number or string.
    </td>
    <td></td>
    <td>
-      A Boolean representation of the target: `FALSE` when then input is an
-      empty string, 0, `FALSE`, `NIL`, or NaN, otherwise `TRUE`.
+      A Boolean representation of the target: <code>FALSE</code> when then input is an
+      empty string, 0, <code>FALSE</code>, <code>NIL</code>, or <code>NaN</code>, otherwise <code>TRUE</code>.
    </td>
 </tr>
 <tr>
    <td><code>mgl_has:</code></td>
    <td>
-      An `NSExpression` that evaluates to an <code>NSDictionary</code> or the evaluated object (<code>SELF</code>).
+      An <code>NSExpression</code> that evaluates to an <code>NSDictionary</code> or the evaluated object (<code>SELF</code>).
    </td>
    <td>
-      An `NSExpression` that evaluates to an <code>NSString</code> representing the key to look up in the dictionary or the feature attribute to look up in the evaluated object (see <code>MGLFeature.attributes</code>).
+      An <code>NSExpression</code> that evaluates to an <code>NSString</code> representing the key to look up in the dictionary or the feature attribute to look up in the evaluated object (see <code>MGLFeature.attributes</code>).
    </td>
    <td>
-      `true` if the dictionary has a value for the key or if the evaluated object has a value for the feature attribute.
+      <code>true</code> if the dictionary has a value for the key or if the evaluated object has a value for the feature attribute.
    </td>
 <tr>
    <td><code>mgl_expressionWithContext:</code></td>
    <td>
-      An `NSExpression` that may contain references to the variables defined in
+      An <code>NSExpression</code> that may contain references to the variables defined in
       the context dictionary.
    </td>
    <td>
-      An `NSDictionary` with `NSString`s as keys and `NSExpression`s as values.
+      An <code>NSDictionary</code> with <code>NSString</code>s as keys and <code>NSExpression</code>s as values.
       Each key is a variable name and each value is the variable’s value within
       the target expression.
    </td>
@@ -251,31 +251,31 @@ The following custom functions are also available with the
 <tr>
    <td><code>mgl_interpolateWithCurveType:parameters:stops:</code></td>
    <td>
-      An `NSExpression` that evaluates to a number and contains a variable or
+      An <code>NSExpression</code> that evaluates to a number and contains a variable or
       key path expression.
    </td>
    <td>
       The first argument is one of the following strings denoting curve types:
-      `linear`, `exponential`, or `cubic-bezier`.
+      <code>linear</code>, <code>exponential</code>, or <code>cubic-bezier</code>.
       
       The second argument is an expression providing parameters for the curve:
       
       <ul>
-         <li>If the curve type is `linear`, the argument is `NIL`.</li>
+         <li>If the curve type is <code>linear</code>, the argument is <code>NIL</code>.</li>
          <li>
-            If the curve type is `exponential`, the argument is an expression
+            If the curve type is <code>exponential</code>, the argument is an expression
             that evaluates to a number, specifying the base of the exponential
             interpolation.
          </li>
          <li>
-            If the curve type is `cubic-bezier`, the argument is an array or
+            If the curve type is <code>cubic-bezier</code>, the argument is an array or
             aggregate expression containing four expressions, each evaluating to
             a number. The four numbers are control points for the cubic Bézier
             curve.
          </li>
       </ul>
       
-      The third argument is an `NSDictionary` object representing the
+      The third argument is an <code>NSDictionary</code> object representing the
       interpolation’s stops, with numeric zoom levels as keys and expressions as
       values.
    </td>
@@ -292,16 +292,16 @@ The following custom functions are also available with the
       <code>decimalValue</code>
    </td>
    <td>
-      An `NSExpression` that evaluates to a Boolean value, number, or string.
+      An <code>NSExpression</code> that evaluates to a Boolean value, number, or string.
    </td>
    <td>
-      Zero or more `NSExpression`s, each evaluating to a Boolean value or
+      Zero or more <code>NSExpression</code>s, each evaluating to a Boolean value or
       string.
    </td>
    <td>
       A numeric representation of the target:
       <ul>
-         <li>If the target is `NIL` or `FALSE`, the result is 0.</li>
+         <li>If the target is <code>NIL</code> or <code>FALSE</code>, the result is 0.</li>
          <li>If the target is true, the result is 1.</li>
          <li>
             If the target is a string, it is converted to a number as specified
@@ -319,7 +319,7 @@ The following custom functions are also available with the
 <tr>
    <td><code>mgl_stepWithMinimum:stops:</code></td>
    <td>
-      An `NSExpression` that evaluates to a number and contains a variable or
+      An <code>NSExpression</code> that evaluates to a number and contains a variable or
       key path expression.
    </td>
    <td>
@@ -327,7 +327,7 @@ The following custom functions are also available with the
       the minimum value in case the target is less than any of the stops in the
       second argument.
       
-      The second argument is an `NSDictionary` object representing the
+      The second argument is an <code>NSDictionary</code> object representing the
       interpolation’s stops, with numeric zoom levels as keys and expressions as
       values.
    </td>
@@ -340,10 +340,10 @@ The following custom functions are also available with the
 <tr>
    <td><code>stringByAppendingString:</code></td>
    <td>
-      An `NSExpression` that evaluates to a string.
+      An <code>NSExpression</code> that evaluates to a string.
    </td>
    <td>
-      One or more `NSExpression`s, each evaluating to a string.
+      One or more <code>NSExpression</code>s, each evaluating to a string.
    </td>
    <td>
       The target string with each of the argument strings appended in order.
@@ -352,16 +352,16 @@ The following custom functions are also available with the
 <tr>
    <td><code>stringValue</code></td>
    <td>
-      An `NSExpression` that evaluates to a Boolean value, number, or string.
+      An <code>NSExpression</code> that evaluates to a Boolean value, number, or string.
    </td>
    <td></td>
    <td>
       A string representation of the target:
       <ul>
-         <li>If the target is `NIL`, the result is the string `null`.</li>
+         <li>If the target is <code>NIL</code>, the result is the string <code>null</code>.</li>
          <li>
-            If the target is a Boolean value, the result is the string `true` or
-            `false`.
+            If the target is a Boolean value, the result is the string <code>true</code> or
+            <code>false</code>.
          </li>
          <li>
             If the target is a number, it is converted to a string as specified
@@ -371,14 +371,14 @@ The following custom functions are also available with the
          </li>
          <li>
             If the target is a color, it is converted to a string of the form
-            `rgba(r,g,b,a)`, where <var>r</var>, <var>g</var>, and <var>b</var>
+            <code>rgba(r,g,b,a)</code>, where <var>r</var>, <var>g</var>, and <var>b</var>
             are numerals ranging from 0 to 255 and <var>a</var> ranges from 0 to
             1.
          </li>
          <li>
             Otherwise, the target is converted to a string in the format
             specified by the
-            [`JSON.stringify()`](https://tc39.github.io/ecma262/#sec-json.stringify)
+            <a href="https://tc39.github.io/ecma262/#sec-json.stringify"><code>JSON.stringify()</code></a>
             function of the ECMAScript Language Specification.
          </li>
       </ul>
@@ -413,7 +413,7 @@ The following variables are defined by this SDK for use with style layers:
       <a href="https://en.wikipedia.org/wiki/Kernel_density_estimation">kernel density estimation</a>
       of a screen point in a heatmap layer; in other words, a relative measure
       of how many data points are crowded around a particular pixel. This
-      variable can only be used with the `heatmapColor` property.
+      variable can only be used with the <code>heatmapColor</code> property.
    </td>
 </tr>
 <tr>
