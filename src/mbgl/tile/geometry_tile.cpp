@@ -204,7 +204,7 @@ float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layer
     float queryPadding = 0;
     for (const RenderLayer* layer : layers) {
         auto bucket = getBucket(*layer->baseImpl);
-        if (bucket) {
+        if (bucket && bucket->hasData()) {
             queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
         }
     }

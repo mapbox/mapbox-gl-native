@@ -146,7 +146,7 @@ bool RenderCircleLayer::queryIntersectsFeature(
     auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature);
     auto size = radius + stroke;
 
-	// For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile
+    // For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile
     // Otherwise, compare geometry in the plane of the viewport
     // A circle with fixed scaling relative to the viewport gets larger in tile space as it moves into the distance
     // A circle with fixed scaling relative to the map gets smaller in viewport space as it moves into the distance
