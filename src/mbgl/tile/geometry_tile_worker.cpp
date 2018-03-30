@@ -41,48 +41,73 @@ GeometryTileWorker::GeometryTileWorker(ActorRef<GeometryTileWorker> self_,
 GeometryTileWorker::~GeometryTileWorker() = default;
 
 /*
-   NOTE: The comments below are technically correct, but currently
-   conceptually misleading. The change to foreground label placement
-   means that:
-   (1) "placement" here is a misnomer: the remaining role of
-    "attemptPlacement" is symbol buffer generation
-   (2) Once a tile has completed layout, we will only run
-    "attemptPlacement" once
-   (3) Tiles won't be rendered until "attemptPlacement" has run once
- 
-   TODO: Simplify GeometryTileWorker to fit its new role
-    https://github.com/mapbox/mapbox-gl-native/issues/10457
-
    GeometryTileWorker is a state machine. This is its transition diagram.
    States are indicated by [state], lines are transitions triggered by
    messages, (parentheses) are actions taken on transition.
 
-                              [idle] <----------------------------.
-                                 |                                |
-      set{Data,Layers,Placement}, symbolDependenciesChanged       |
-                                 |                                |
-           (do layout/placement; self-send "coalesced")           |
-                                 v                                |
-                           [coalescing] --- coalesced ------------.
-                               |   |
-             .-----------------.   .---------------.
+                         [Idle] <-------------------------.
+                            |                             |
+        set{Data,Layers}, symbolDependenciesChanged,      |
+                    setShowCollisionBoxes                 |
+                            |                             |
+   (do parse and/or symbol layout; self-send "coalesced") |
+                            v                             |
+                      [Coalescing] --- coalesced ---------.
+                         |   |
+             .-----------.   .---------------------.
              |                                     |
-   .--- set{Data,Layers}                      setPlacement -----.
-   |         |                                     |            |
-   |         v                                     v            |
-   .-- [need layout] <-- set{Data,Layers} -- [need placement] --.
+   .--- set{Data,Layers}                setShowCollisionBoxes,
+   |         |                         symbolDependenciesChanged --.
+   |         |                                     |               |
+   |         v                                     v               |
+   .-- [NeedsParse] <-- set{Data,Layers} -- [NeedsSymbolLayout] ---.
              |                                     |
          coalesced                             coalesced
              |                                     |
              v                                     v
-    (do layout or placement; self-send "coalesced"; goto [coalescing])
+   (do parse or symbol layout; self-send "coalesced"; goto [coalescing])
 
-   The idea is that in the [idle] state, layout or placement happens immediately
-   in response to a "set" message. During this processing, multiple "set" messages
-   might get queued in the mailbox. At the end of processing, we self-send "coalesced",
-   read all the queued messages until we get to "coalesced", and then redo either
-   layout or placement if there were one or more "set"s (with layout taking priority,
-   since it will trigger placement when complete), or return to the [idle] state if not.
+   The idea is that in the [idle] state, parsing happens immediately in response to
+   a "set" message, and symbol layout happens once all symbol dependencies are met.
+   During this processing, multiple "set" messages might get queued in the mailbox.
+   At the end of processing, we self-send "coalesced", read all the queued messages
+   until we get to "coalesced", and then re-parse if there were one or more "set"s or
+   return to the [idle] state if not.
+ 
+   One important goal of the design is to prevent starvation. Under heavy load new
+   requests for tiles should not prevent in progress request from completing.
+   It is nevertheless possible to restart an in-progress request:
+ 
+    - [Idle] setData -> parse()
+        sends getGlyphs, hasPendingSymbolDependencies() is true
+        enters [Coalescing], sends coalesced
+    - [Coalescing] coalesced -> [Idle]
+    - [Idle] setData -> new parse(), interrupts old parse()
+        sends getGlyphs, hasPendingSymbolDependencies() is true
+        enters [Coalescing], sends coalesced
+    - [Coalescing] onGlyphsAvailable -> [NeedsSymbolLayout]
+           hasPendingSymbolDependencies() may or may not be true
+    - [NeedsSymbolLayout] coalesced -> performSymbolLayout()
+           Generates result depending on whether dependencies are met
+           -> [Idle]
+ 
+   In this situation, we are counting on the idea that even with rapid changes to
+   the tile's data, the set of glyphs/images it requires will not keep growing without
+   limit.
+ 
+   Although parsing (which populates all non-symbol buckets and requests dependencies
+   for symbol buckets) is internally separate from symbol layout, we only return
+   results to the foreground when we have completed both steps. Because we _move_
+   the result buckets to the foreground, it is necessary to re-generate all buckets from
+   scratch for `setShowCollisionBoxes`, even though it only affects symbol layers.
+ 
+   The GL JS equivalent (in worker_tile.js and vector_tile_worker_source.js)
+   is somewhat simpler because it relies on getGlyphs/getImages calls that transfer
+   an entire set of glyphs/images on every tile load, while the native logic
+   maintains a local state that can be incrementally updated. Because each tile load
+   call becomes self-contained, the equivalent of the coalescing logic is handled by
+   'reloadTile' queueing a single extra 'reloadTile' callback to run after the next
+   completed parse.
 */
 
 void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, uint64_t correlationID_) {
@@ -92,14 +117,14 @@ void GeometryTileWorker::setData(std::unique_ptr<const GeometryTileData> data_, 
 
         switch (state) {
         case Idle:
-            redoLayout();
+            parse();
             coalesce();
             break;
 
         case Coalescing:
-        case NeedLayout:
-        case NeedPlacement:
-            state = NeedLayout;
+        case NeedsParse:
+        case NeedsSymbolLayout:
+            state = NeedsParse;
             break;
         }
     } catch (...) {
@@ -114,16 +139,16 @@ void GeometryTileWorker::setLayers(std::vector<Immutable<Layer::Impl>> layers_, 
 
         switch (state) {
         case Idle:
-            redoLayout();
+            parse();
             coalesce();
             break;
 
         case Coalescing:
-        case NeedPlacement:
-            state = NeedLayout;
+        case NeedsSymbolLayout:
+            state = NeedsParse;
             break;
 
-        case NeedLayout:
+        case NeedsParse:
             break;
         }
     } catch (...) {
@@ -138,16 +163,20 @@ void GeometryTileWorker::setShowCollisionBoxes(bool showCollisionBoxes_, uint64_
 
         switch (state) {
         case Idle:
-            attemptPlacement();
-            coalesce();
+            if (!hasPendingParseResult()) {
+                // Trigger parse if nothing is in flight, otherwise symbol layout will automatically
+                // pick up the change
+                parse();
+                coalesce();
+            }
             break;
 
         case Coalescing:
-            state = NeedPlacement;
+            state = NeedsSymbolLayout;
             break;
 
-        case NeedPlacement:
-        case NeedLayout:
+        case NeedsSymbolLayout:
+        case NeedsParse:
             break;
         }
     } catch (...) {
@@ -160,19 +189,23 @@ void GeometryTileWorker::symbolDependenciesChanged() {
         switch (state) {
         case Idle:
             if (symbolLayoutsNeedPreparation) {
-                attemptPlacement();
+                // symbolLayoutsNeedPreparation can only be set true by parsing
+                // and the parse result can only be cleared by performSymbolLayout
+                // which also clears symbolLayoutsNeedPreparation
+                assert(hasPendingParseResult());
+                performSymbolLayout();
                 coalesce();
             }
             break;
 
         case Coalescing:
             if (symbolLayoutsNeedPreparation) {
-                state = NeedPlacement;
+                state = NeedsSymbolLayout;
             }
             break;
 
-        case NeedPlacement:
-        case NeedLayout:
+        case NeedsSymbolLayout:
+        case NeedsParse:
             break;
         }
     } catch (...) {
@@ -191,13 +224,16 @@ void GeometryTileWorker::coalesced() {
             state = Idle;
             break;
 
-        case NeedLayout:
-            redoLayout();
+        case NeedsParse:
+            parse();
             coalesce();
             break;
 
-        case NeedPlacement:
-            attemptPlacement();
+        case NeedsSymbolLayout:
+            // We may have entered NeedsSymbolLayout while coalescing
+            // after a performSymbolLayout. In that case, we need to
+            // start over with parsing in order to do another layout.
+            hasPendingParseResult() ? performSymbolLayout() : parse();
             coalesce();
             break;
         }
@@ -279,7 +315,7 @@ static std::vector<std::unique_ptr<RenderLayer>> toRenderLayers(const std::vecto
     return renderLayers;
 }
 
-void GeometryTileWorker::redoLayout() {
+void GeometryTileWorker::parse() {
     if (!data || !layers) {
         return;
     }
@@ -292,8 +328,8 @@ void GeometryTileWorker::redoLayout() {
     }
 
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
-    auto featureIndex = std::make_unique<FeatureIndex>();
+    nonSymbolBuckets.clear();
+    featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode, pixelRatio };
 
     GlyphDependencies glyphDependencies;
@@ -352,7 +388,7 @@ void GeometryTileWorker::redoLayout() {
             }
 
             for (const auto& layer : group) {
-                buckets.emplace(layer->getID(), bucket);
+                nonSymbolBuckets.emplace(layer->getID(), bucket);
             }
         }
     }
@@ -368,13 +404,7 @@ void GeometryTileWorker::redoLayout() {
     requestNewGlyphs(glyphDependencies);
     requestNewImages(imageDependencies);
 
-    parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
-        std::move(buckets),
-        std::move(featureIndex),
-        *data ? (*data)->clone() : nullptr,
-    }, correlationID);
-
-    attemptPlacement();
+    performSymbolLayout();
 }
 
 bool GeometryTileWorker::hasPendingSymbolDependencies() const {
@@ -385,9 +415,13 @@ bool GeometryTileWorker::hasPendingSymbolDependencies() const {
     }
     return !pendingImageDependencies.empty();
 }
+    
+bool GeometryTileWorker::hasPendingParseResult() const {
+    return bool(featureIndex);
+}
 
-void GeometryTileWorker::attemptPlacement() {
-    if (!data || !layers || hasPendingSymbolDependencies()) {
+void GeometryTileWorker::performSymbolLayout() {
+    if (!data || !layers || !hasPendingParseResult() || hasPendingSymbolDependencies()) {
         return;
     }
     
@@ -435,11 +469,14 @@ void GeometryTileWorker::attemptPlacement() {
     }
 
     firstLoad = false;
-
-    parent.invoke(&GeometryTile::onPlacement, GeometryTile::PlacementResult {
+    
+    parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
+        std::move(nonSymbolBuckets),
+        std::move(featureIndex),
+        *data ? (*data)->clone() : nullptr,
         std::move(buckets),
         std::move(glyphAtlasImage),
-        std::move(iconAtlasImage),
+        std::move(iconAtlasImage)
     }, correlationID);
 }
 
