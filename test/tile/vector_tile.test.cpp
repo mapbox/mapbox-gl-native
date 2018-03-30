@@ -65,39 +65,6 @@ TEST(VectorTile, onError) {
     EXPECT_TRUE(tile.isComplete());
 }
 
-TEST(VectorTile, Issue7615) {
-    VectorTileTest test;
-    VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
-
-    style::SymbolLayer symbolLayer("symbol", "source");
-    std::vector<SymbolInstance> symbolInstances;
-    auto symbolBucket = std::make_shared<SymbolBucket>(
-        style::SymbolLayoutProperties::PossiblyEvaluated(),
-        std::map<
-            std::string,
-            std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>>(),
-        16.0f, 1.0f, 0.0f, false, false, false, std::move(symbolInstances));
-    
-    // Simulate placement of a symbol layer.
-    tile.onPlacement(GeometryTile::PlacementResult {
-        {{
-            symbolLayer.getID(),
-            symbolBucket
-        }},
-        {},
-        {},
-    }, 0);
-
-    // Subsequent onLayout should not cause the existing symbol bucket to be discarded.
-    tile.onLayout(GeometryTile::LayoutResult {
-        std::unordered_map<std::string, std::shared_ptr<Bucket>>(),
-        nullptr,
-        nullptr,
-    }, 0);
-
-    EXPECT_EQ(symbolBucket.get(), tile.getBucket(*symbolLayer.baseImpl));
-}
-
 TEST(VectorTile, Issue8542) {
     VectorTileTest test;
     VectorTile tile(OverscaledTileID(0, 0, 0), "source", test.tileParameters, test.tileset);
