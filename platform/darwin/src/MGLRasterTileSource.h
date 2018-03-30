@@ -17,8 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  requires a value of 256, as do many third-party tile servers, so consult your
  provider’s documentation for the correct value.
 
- This option is only applicable to `MGLRasterTileSource` objects; it is ignored when
- initializing `MGLVectorSource` objects.
+ This option is only applicable to `MGLRasterTileSource` objects; it is ignored
+ when initializing `MGLVectorTileSource` objects.
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
 

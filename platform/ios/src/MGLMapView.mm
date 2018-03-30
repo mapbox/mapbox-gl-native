@@ -41,7 +41,7 @@
 #import "MGLGeometry_Private.h"
 #import "MGLMultiPoint_Private.h"
 #import "MGLOfflineStorage_Private.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 #import "MGLFoundation_Private.h"
 #import "MGLRendererFrontend.h"
 #import "MGLRendererConfiguration.h"

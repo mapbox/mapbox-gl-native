@@ -178,7 +178,7 @@ source object is a member of one of the following subclasses of `MGLSource`:
 
 In style JSON | In the SDK
 --------------|-----------
-`vector`      | `MGLVectorSource`
+`vector`      | `MGLVectorTileSource`
 `raster`      | `MGLRasterTileSource`
 `raster-dem`  | `MGLRasterDEMSource`
 `geojson`     | `MGLShapeSource`
@@ -193,7 +193,7 @@ This SDK supports the properties defined in the style specification, which are a
 subset of the keys defined in version 2.1.0 of the
 [TileJSON](https://github.com/mapbox/tilejson-spec/tree/master/2.1.0)
 specification. As an alternative to authoring a custom TileJSON file, you may
-supply various tile source options when creating a raster or vector source.
+supply various tile source options when creating a raster or vector tile source.
 These options are detailed in the `MGLTileSourceOption` documentation:
 
 In style JSON | In TileJSON   | In the SDK
@@ -402,7 +402,7 @@ For operators that have no corresponding `NSExpression` symbol, use the
 
 ## Filtering sources
 
-You can filter a shape or vector source by setting the
+You can filter a shape or vector tile source by setting the
 `MGLVectorStyleLayer.predicate` property to an `NSPredicate` object. Below is a
 table of style JSON operators and the corresponding operators used in the
 predicate format string:

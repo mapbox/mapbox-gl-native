@@ -6,7 +6,7 @@
 #import "MGLMapsnapshotter.h"
 
 #import "MGLStyle+MBXAdditions.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -50,13 +50,13 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     return flattenedShapes;
 }
 
-@interface MGLVectorSource (MBXAdditions)
+@interface MGLVectorTileSource (MBXAdditions)
 
 @property (nonatomic, readonly, getter=isMapboxTerrain) BOOL mapboxTerrain;
 
 @end
 
-@implementation MGLVectorSource (MBXAdditions)
+@implementation MGLVectorTileSource (MBXAdditions)
 
 - (BOOL)isMapboxTerrain {
     NSURL *url = self.configurationURL;
@@ -806,8 +806,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 - (IBAction)enhanceTerrain:(id)sender {
     // Find all the identifiers of Mapbox Terrain sources used in the style.
     NSMutableSet *terrainSourceIdentifiers = [NSMutableSet set];
-    for (MGLVectorSource *source in self.mapView.style.sources) {
-        if (![source isKindOfClass:[MGLVectorSource class]]) {
+    for (MGLVectorTileSource *source in self.mapView.style.sources) {
+        if (![source isKindOfClass:[MGLVectorTileSource class]]) {
             continue;
         }
         
@@ -1067,7 +1067,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
         if (menuItem.tag) {
             NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
-            NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
+            NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguage];
             menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:preferredLanguage];
         }
         return YES;

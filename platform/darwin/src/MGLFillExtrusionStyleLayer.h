@@ -29,8 +29,8 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslationAnchor) {
  extruded polygons on the map.
  
  Use a fill-extrusion style layer to configure the visual appearance of polygon
- or multipolygon features in vector tiles loaded by an `MGLVectorSource` object
- or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
+ or multipolygon features in vector tiles loaded by an `MGLVectorTileSource`
+ object or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
  `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
 
  You can access an existing fill-extrusion style layer using the

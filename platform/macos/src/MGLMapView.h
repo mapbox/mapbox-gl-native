@@ -875,9 +875,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterTileSource` objects, or from video or canvas sources, which are
- unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -909,7 +909,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
@@ -972,9 +972,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterTileSource` objects, or from video or canvas sources, which are
- unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1007,7 +1007,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different

@@ -18,8 +18,7 @@
 #import "MGLSource_Private.h"
 #import "MGLLight_Private.h"
 #import "MGLTileSource_Private.h"
-#import "MGLVectorSource.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 #import "MGLRasterTileSource.h"
 #import "MGLRasterDEMSource.h"
 #import "MGLShapeSource.h"
@@ -183,7 +182,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     // TODO: Fill in options specific to the respective source classes
     // https://github.com/mapbox/mapbox-gl-native/issues/6584
     if (auto vectorSource = rawSource->as<mbgl::style::VectorSource>()) {
-        return [[MGLVectorSource alloc] initWithRawSource:vectorSource mapView:self.mapView];
+        return [[MGLVectorTileSource alloc] initWithRawSource:vectorSource mapView:self.mapView];
     } else if (auto geoJSONSource = rawSource->as<mbgl::style::GeoJSONSource>()) {
         return [[MGLShapeSource alloc] initWithRawSource:geoJSONSource mapView:self.mapView];
     } else if (auto rasterSource = rawSource->as<mbgl::style::RasterSource>()) {
@@ -578,15 +577,15 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     }
     
     if (_localizesLabels) {
-        NSString *preferredLanguage = [MGLVectorSource preferredMapboxStreetsLanguage];
+        NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguage];
         NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
         for (MGLSymbolStyleLayer *layer in self.layers) {
             if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
                 continue;
             }
             
-            MGLVectorSource *source = (MGLVectorSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
-            if (![source isKindOfClass:[MGLVectorSource class]] || !source.mapboxStreets) {
+            MGLVectorTileSource *source = (MGLVectorTileSource *)[self sourceWithIdentifier:layer.sourceIdentifier];
+            if (![source isKindOfClass:[MGLVectorTileSource class]] || !source.mapboxStreets) {
                 continue;
             }
             
@@ -639,9 +638,9 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
     }
 }
 
-- (NS_SET_OF(MGLVectorSource *) *)mapboxStreetsSources {
-    return [self.sources objectsPassingTest:^BOOL (__kindof MGLVectorSource * _Nonnull source, BOOL * _Nonnull stop) {
-        return [source isKindOfClass:[MGLVectorSource class]] && source.mapboxStreets;
+- (NS_SET_OF(MGLVectorTileSource *) *)mapboxStreetsSources {
+    return [self.sources objectsPassingTest:^BOOL (__kindof MGLVectorTileSource * _Nonnull source, BOOL * _Nonnull stop) {
+        return [source isKindOfClass:[MGLVectorTileSource class]] && source.mapboxStreets;
     }];
 }
 

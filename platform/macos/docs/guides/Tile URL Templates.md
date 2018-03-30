@@ -5,8 +5,8 @@
 # Tile URL Templates
 
 `MGLTileSource` objects, specifically `MGLRasterTileSource` and
-`MGLVectorSource` objects, can be created using an initializer that accepts an
-array of tile URL templates. Tile URL templates are strings that specify the
+`MGLVectorTileSource` objects, can be created using an initializer that accepts
+an array of tile URL templates. Tile URL templates are strings that specify the
 URLs of the vector tiles or raster tile images to load. A template resembles an
 absolute URL, but with any number of placeholder strings that the source
 evaluates based on the tile it needs to load. For example:

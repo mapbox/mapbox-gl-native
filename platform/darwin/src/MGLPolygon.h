@@ -17,7 +17,7 @@ NS_ASSUME_NONNULL_BEGIN
 
  You can add polygon shapes to the map by adding them to an `MGLShapeSource`
  object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s polygons collectively using an `MGLFillStyleLayer` or
+ `MGLVectorTileSource`’s polygons collectively using an `MGLFillStyleLayer` or
  `MGLSymbolStyleLayer` object. To access a polygon’s attributes, use an
  `MGLPolygonFeature` object.
 
@@ -96,8 +96,8 @@ MGL_EXPORT
 
  You can add multipolygon shapes to the map by adding them to an
  `MGLShapeSource` object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s multipolygons collectively using an `MGLFillStyleLayer` or
- `MGLSymbolStyleLayer` object.
+ `MGLVectorTileSource`’s multipolygons collectively using an `MGLFillStyleLayer`
+ or `MGLSymbolStyleLayer` object.
 
  You cannot add an `MGLMultiPolygon` object directly to a map view using
  `-[MGLMapView addAnnotation:]` or `-[MGLMapView addOverlay:]`. However, you can

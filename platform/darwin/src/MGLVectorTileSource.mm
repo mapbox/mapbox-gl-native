@@ -1,4 +1,4 @@
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import "MGLFeature_Private.h"
 #import "MGLSource_Private.h"
@@ -13,13 +13,13 @@
 #include <mbgl/style/sources/vector_source.hpp>
 #include <mbgl/renderer/renderer.hpp>
 
-@interface MGLVectorSource ()
+@interface MGLVectorTileSource ()
 
 @property (nonatomic, readonly) mbgl::style::VectorSource *rawSource;
 
 @end
 
-@implementation MGLVectorSource
+@implementation MGLVectorTileSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
     auto source = std::make_unique<mbgl::style::VectorSource>(identifier.UTF8String,
@@ -73,7 +73,7 @@
 
 @end
 
-@implementation MGLVectorSource (Private)
+@implementation MGLVectorTileSource (Private)
 
 + (NS_SET_OF(NSString *) *)mapboxStreetsLanguages {
     // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
@@ -87,7 +87,7 @@
 }
 
 + (NSString *)preferredMapboxStreetsLanguage {
-    NSArray<NSString *> *supportedLanguages = [MGLVectorSource mapboxStreetsLanguages].allObjects;
+    NSArray<NSString *> *supportedLanguages = [MGLVectorTileSource mapboxStreetsLanguages].allObjects;
     NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages
                                                                          forPreferences:[NSLocale preferredLanguages]];
     NSString *mostSpecificLanguage;
@@ -116,7 +116,7 @@
     // Replace {name} and {name_*} with the matching localized name tag.
     NSString *localizedKey = preferredLanguage ? [NSString stringWithFormat:@"name_%@", preferredLanguage] : @"name";
     NSMutableDictionary *localizedKeysByKey = [NSMutableDictionary dictionaryWithObject:localizedKey forKey:@"name"];
-    for (NSString *languageCode in [MGLVectorSource mapboxStreetsLanguages]) {
+    for (NSString *languageCode in [MGLVectorTileSource mapboxStreetsLanguages]) {
         NSString *key = [NSString stringWithFormat:@"name_%@", languageCode];
         localizedKeysByKey[key] = localizedKey;
     }

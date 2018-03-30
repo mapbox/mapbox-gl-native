@@ -184,9 +184,9 @@ typedef NS_ENUM(NSUInteger, MGLDEMEncoding) {
  Mapbox-hosted tile set, view it in
  <a href="https://www.mapbox.com/studio/tilesets/">Mapbox Studio’s Tilesets editor</a>.
 
- Create instances of `MGLRasterTileSource` and `MGLVectorSource` in order to use
- `MGLTileSource`'s properties and methods. Do not create instances of `MGLTileSource`
- directly, and do not create your own subclasses of this class.
+ Create instances of `MGLRasterTileSource` and `MGLVectorTileSource` in order
+ to use `MGLTileSource`'s properties and methods. Do not create instances of
+ `MGLTileSource` directly, and do not create your own subclasses of this class.
  */
 MGL_EXPORT
 @interface MGLTileSource : MGLSource

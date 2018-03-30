@@ -7,7 +7,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 /**
  `MGLVectorStyleLayer` is an abstract superclass for style layers whose content
- is defined by an `MGLShapeSource` or `MGLVectorSource` object.
+ is defined by an `MGLShapeSource` or `MGLVectorTileSource` object.
 
  Create instances of `MGLCircleStyleLayer`, `MGLFillStyleLayer`,
  `MGLFillExtrusionStyleLayer`, `MGLHeatmapStyleLayer`, `MGLLineStyleLayer`, and
