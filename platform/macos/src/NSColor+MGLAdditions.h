@@ -18,3 +18,10 @@
 - (mbgl::style::PropertyValue<mbgl::Color>)mgl_colorPropertyValue;
 
 @end
+
+@interface NSExpression (MGLColorAdditions)
+
++ (NSExpression *)mgl_expressionForRGBComponents:(NSArray<NSExpression *> *)components;
++ (NSExpression *)mgl_expressionForRGBAComponents:(NSArray<NSExpression *> *)components;
+
+@end

@@ -559,6 +559,19 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'mgl_number')"];
+        NSArray *jsonExpression = @[@"to-number", @[@"get", @"postalCode"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'doubleValue')"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'floatValue')"].mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'decimalValue')"].mgl_jsonExpressionObject, jsonExpression);
+        // NSExpression is unable to evaluate NSNumber’s -floatValue,
+        // -doubleValue, or -decimalValue by themselves because they each return
+        // a primitive instead of an object.
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression],
+                              [NSExpression expressionWithFormat:@"CAST(postalCode, 'NSNumber')"]);
+    }
+    {
         NSExpression *expression = [NSExpression expressionWithFormat:@"FUNCTION(postalCode, 'mgl_numberWithFallbackValues:', zipCode)"];
         NSArray *jsonExpression = @[@"to-number", @[@"get", @"postalCode"], @[@"get", @"zipCode"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
@@ -622,6 +635,13 @@ using namespace std::string_literals;
         NSArray *jsonExpression = @[@"step", @[@"get", @"x"], @11, @0, @111, @1, @1111];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects(compatibilityExpression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+    }
+    {
+        NSDictionary *stops = @{@0: MGLConstantExpression(@111), @1: MGLConstantExpression(@1111)};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, 11, %@)", stops];
+        NSArray *jsonExpression = @[@"step", @[@"zoom"], @11, @0, @111, @1, @1111];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
     }
 }
