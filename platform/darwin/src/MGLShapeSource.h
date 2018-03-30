@@ -17,11 +17,12 @@ typedef NSString *MGLShapeSourceOption NS_STRING_ENUM;
  If the `shape` property contains point shapes, setting this option to
  `YES` clusters the points by radius into groups. The default value is `NO`.
  
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-cluster"><code>cluster</code></a>
  source property in the Mapbox Style Specification.
  
- This option only affects point features within a shape source.
+ This option only affects point features within an `MGLShapeSource` object; it
+ is ignored when creating an `MGLComputedShapeSource` object.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
 
@@ -29,6 +30,9 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClustered;
  An `NSNumber` object containing an integer; specifies the radius of each
  cluster if clustering is enabled. A value of 512 produces a radius equal to
  the width of a tile. The default value is 50.
+ 
+ This option only affects point features within an `MGLShapeSource` object; it
+ is ignored when creating an `MGLComputedShapeSource` object.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
 
@@ -38,9 +42,12 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionClusterRadius;
  less than the value of `MGLShapeSourceOptionMaximumZoomLevel` so that, at the
  maximum zoom level, the shapes are not clustered.
  
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-clusterMaxZoom"><code>clusterMaxZoom</code></a>
  source property in the Mapbox Style Specification.
+ 
+ This option only affects point features within an `MGLShapeSource` object; it
+ is ignored when creating an `MGLComputedShapeSource` object.
  */
 extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering;
 
@@ -48,7 +55,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLeve
  An `NSNumber` object containing an integer; specifies the minimum zoom level at
  which to create vector tiles. The default value is 0.
 
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-minzoom"><code>minzoom</code></a>
  source property in the Mapbox Style Specification.
  */
@@ -59,7 +66,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLeve
  which to create vector tiles. A greater value produces greater detail at high
  zoom levels. The default value is 18.
  
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-maxzoom"><code>maxzoom</code></a>
  source property in the Mapbox Style Specification.
  */
@@ -71,7 +78,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLeve
  buffer as wide as the tile itself. Larger values produce fewer rendering
  artifacts near tile edges and slower performance. The default value is 128.
  
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-buffer"><code>buffer</code></a>
  source property in the Mapbox Style Specification.
  */
@@ -82,7 +89,7 @@ extern MGL_EXPORT const MGLShapeSourceOption MGLShapeSourceOptionBuffer;
  simplification tolerance. A greater value produces simpler geometries and
  improves performance. The default value is 0.375.
  
- This attribute corresponds to the
+ This option corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-style-spec/#sources-geojson-tolerance"><code>tolerance</code></a>
  source property in the Mapbox Style Specification.
  */
@@ -132,6 +139,14 @@ MGL_EXPORT
 /**
  Returns a shape source with an identifier, URL, and dictionary of options for
  the source.
+ 
+ This class supports the following options: `MGLShapeSourceOptionClustered`,
+ `MGLShapeSourceOptionClusterRadius`,
+ `MGLShapeSourceOptionMaximumZoomLevelForClustering`,
+ `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
+ `MGLShapeSourceOptionBuffer`, and
+ `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a shape
+ source are not clipped or wrapped automatically.
 
  @param identifier A string that uniquely identifies the source.
  @param url An HTTP(S) URL, absolute file URL, or local file URL relative to the
@@ -144,6 +159,14 @@ MGL_EXPORT
 /**
  Returns a shape source with an identifier, a shape, and dictionary of options
  for the source.
+ 
+ This class supports the following options: `MGLShapeSourceOptionClustered`,
+ `MGLShapeSourceOptionClusterRadius`,
+ `MGLShapeSourceOptionMaximumZoomLevelForClustering`,
+ `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
+ `MGLShapeSourceOptionBuffer`, and
+ `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a shape
+ source are not clipped or wrapped automatically.
 
  To specify attributes about the shape, use an instance of an `MGLShape`
  subclass that conforms to the `MGLFeature` protocol, such as `MGLPointFeature`.
@@ -165,6 +188,14 @@ MGL_EXPORT
 /**
  Returns a shape source with an identifier, an array of features, and a dictionary
  of options for the source.
+ 
+ This class supports the following options: `MGLShapeSourceOptionClustered`,
+ `MGLShapeSourceOptionClusterRadius`,
+ `MGLShapeSourceOptionMaximumZoomLevelForClustering`,
+ `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
+ `MGLShapeSourceOptionBuffer`, and
+ `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a shape
+ source are not clipped or wrapped automatically.
 
  Unlike `-initWithIdentifier:shapes:options:`, this method accepts `MGLFeature`
  instances, such as `MGLPointFeature` objects, whose attributes you can use when
@@ -184,6 +215,14 @@ MGL_EXPORT
 /**
  Returns a shape source with an identifier, an array of shapes, and a dictionary of
  options for the source.
+ 
+ This class supports the following options: `MGLShapeSourceOptionClustered`,
+ `MGLShapeSourceOptionClusterRadius`,
+ `MGLShapeSourceOptionMaximumZoomLevelForClustering`,
+ `MGLShapeSourceOptionMinimumZoomLevel`, `MGLShapeSourceOptionMaximumZoomLevel`,
+ `MGLShapeSourceOptionBuffer`, and
+ `MGLShapeSourceOptionSimplificationTolerance`. Shapes provided by a shape
+ source are not clipped or wrapped automatically.
 
  Any `MGLFeature` instance passed into this initializer is treated as an ordinary
  shape, causing any attributes to be inaccessible to an `MGLVectorStyleLayer` when

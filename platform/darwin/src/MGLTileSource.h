@@ -117,7 +117,6 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionAttributionInfos;
  */
 extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileCoordinateSystem;
 
-
 /**
  Tile coordinate systems that determine how tile coordinates in tile URLs are
  interpreted.
@@ -141,18 +140,6 @@ typedef NS_ENUM(NSUInteger, MGLTileCoordinateSystem) {
      */
     MGLTileCoordinateSystemTMS
 };
-
-
-/**
- An `NSNumber` object containing an unsigned integer that specifies the encoding
- formula for raster-dem tilesets. The integer corresponds to one of
- the constants described in `MGLDEMEncoding`.
-
- The default value for this option is `MGLDEMEncodingMapbox`.
-
- This option is not supported by the TileJSON spec.
- */
-extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionDEMEncoding;
 
 /**
  The encoding formula used to generate the raster-dem tileset
