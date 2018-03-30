@@ -112,7 +112,7 @@ void checkCompileStatus(GLuint shader) {
 static const GLchar * vertexShaderSource = "attribute vec2 a_pos; void main() { gl_Position = vec4(a_pos, 0, 1); }";
 static const GLchar * fragmentShaderSource = "uniform highp vec4 fill_color; void main() { gl_FragColor = fill_color; }";
 
-class ExampleCustomLayer {
+class ExampleCustomLayer: mbgl::style::CustomLayerHost {
 public:
     ~ExampleCustomLayer() {
         __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "~ExampleCustomLayer");
@@ -158,8 +158,15 @@ public:
         GL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 8 * sizeof(GLfloat), background, GL_STATIC_DRAW));
     }
 
-    void render() {
-        __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "Render");
+    void render(const mbgl::style::CustomLayerRenderParameters&) {
+        mbgl::Log::Info(mbgl::Event::General, "Render");
+        glUseProgram(program);
+        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        glEnableVertexAttribArray(a_pos);
+        glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+        glDisable(GL_STENCIL_TEST);
+        glDisable(GL_DEPTH_TEST);
+        glUniform4fv(fill_color, 1, color);
 
         GL_CHECK_ERROR(glUseProgram(program));
         GL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
@@ -169,6 +176,13 @@ public:
         GL_CHECK_ERROR(glDisable(GL_DEPTH_TEST));
         GL_CHECK_ERROR(glUniform4fv(fill_color, 1, color));
         GL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 4));
+
+    }
+
+    void contextLost() {
+    }
+
+    void deinitialize() {
 
     }
 
@@ -186,7 +200,8 @@ GLfloat ExampleCustomLayer::color[] = { 0.0f, 1.0f, 0.0f, 1.0f };
 
 jlong JNICALL nativeCreateContext(JNIEnv*, jobject) {
     __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeCreateContext");
-     return reinterpret_cast<jlong>(new ExampleCustomLayer());
+    auto exampleCustomLayer = std::make_unique<ExampleCustomLayer>();
+    return reinterpret_cast<jlong>(exampleCustomLayer.release());
 }
 
 void JNICALL nativeSetColor(JNIEnv*, jobject, jfloat red, jfloat green, jfloat blue, jfloat alpha) {
@@ -195,25 +210,6 @@ void JNICALL nativeSetColor(JNIEnv*, jobject, jfloat red, jfloat green, jfloat b
     ExampleCustomLayer::color[1] = green;
     ExampleCustomLayer::color[2] = blue;
     ExampleCustomLayer::color[3] = alpha;
-}
-
-void nativeInitialize(void *context) {
-    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeInitialize");
-    reinterpret_cast<ExampleCustomLayer*>(context)->initialize();
-}
-
-void nativeRender(void *context, const mbgl::style::CustomLayerRenderParameters& /*parameters*/) {
-    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeRender");
-    reinterpret_cast<ExampleCustomLayer*>(context)->render();
-}
-
-void nativeContextLost(void */*context*/) {
-    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeContextLost");
-}
-
-void nativeDeinitialize(void *context) {
-    __android_log_write(ANDROID_LOG_INFO, LOG_TAG, "nativeDeinitialize");
-    delete reinterpret_cast<ExampleCustomLayer*>(context);
 }
 
 extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
@@ -233,22 +229,6 @@ extern "C" JNIEXPORT jint JNICALL JNI_OnLoad(JavaVM *vm, void *) {
         env->ExceptionDescribe();
         return JNI_ERR;
     }
-
-    env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "InitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeInitialize));
-
-    env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "RenderFunction", "J"),
-        reinterpret_cast<jlong>(nativeRender));
-
-    env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "ContextLostFunction", "J"),
-        reinterpret_cast<jlong>(nativeContextLost));
-
-    env->SetStaticLongField(customLayerClass,
-        env->GetStaticFieldID(customLayerClass, "DeinitializeFunction", "J"),
-        reinterpret_cast<jlong>(nativeDeinitialize));
 
     return JNI_VERSION_1_6;
 }
