@@ -1,6 +1,10 @@
 #include <mbgl/tile/geometry_tile_data.hpp>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wshadow"
 #include <vtzero/vector_tile.hpp>
+#pragma GCC diagnostic pop
+
 #include <protozero/pbf_reader.hpp>
 
 #include <map>
