@@ -124,11 +124,11 @@ private:
     uint64_t correlationID = 0;
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+    optional<std::pair<std::unique_ptr<FeatureIndex>, std::unique_ptr<const GeometryTileData>>> dataPendingSymbolBuckets;
+    optional<std::pair<std::unique_ptr<FeatureIndex>, std::unique_ptr<const GeometryTileData>>> dataPendingCommit;
     std::unique_ptr<FeatureIndex> featureIndex;
-    optional<std::pair<bool,std::unique_ptr<FeatureIndex>>> pendingFeatureIndex;
     std::unique_ptr<const GeometryTileData> data;
-    optional<std::pair<bool, std::unique_ptr<const GeometryTileData>>> pendingData;
-
+    
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
 

@@ -20,8 +20,6 @@
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 
-#include <iostream>
-
 namespace mbgl {
 
 using namespace style;
@@ -132,8 +130,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     nonSymbolBuckets = std::move(result.nonSymbolBuckets);
     // It is possible for multiple onLayouts to be called before an onPlacement is called, in which
     // case we will discard previous pending data
-    pendingFeatureIndex = {{ false, std::move(result.featureIndex) }};
-    pendingData = {{ false, std::move(result.tileData) }};
+    dataPendingSymbolBuckets = {{ std::move(result.featureIndex), std::move(result.tileData) }};
     observer->onTileChanged(*this);
 }
 
@@ -149,11 +146,9 @@ void GeometryTile::onPlacement(PlacementResult result, const uint64_t resultCorr
     // in sync with the data/index in the last `onLayout` call, even though the correlation IDs
     // may not be the same (e.g. "setShowCollisionBoxes" could bump the correlation ID while
     // waiting for glyph dependencies)
-    if (pendingData) {
-        pendingData->first = true;
-    }
-    if (pendingFeatureIndex) {
-        pendingFeatureIndex->first = true;
+    if (dataPendingSymbolBuckets) {
+        std::swap(dataPendingSymbolBuckets, dataPendingCommit);
+        dataPendingSymbolBuckets = nullopt;
     }
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
@@ -231,13 +226,10 @@ void GeometryTile::commitFeatureIndex() {
     // 1) An `onPlacement` result has delivered us updated symbolBuckets since we received the pending data
     // 2) A global placement has run, synchronizing the global CollisionIndex with the latest
     //    symbolBuckets (and thus with the latest FeatureIndex/GeometryTileData)
-    if (pendingFeatureIndex && pendingFeatureIndex->first) {
-        featureIndex = std::move(pendingFeatureIndex->second);
-        pendingFeatureIndex = nullopt;
-    }
-    if (pendingData && pendingData->first) {
-        data = std::move(pendingData->second);
-        pendingData = nullopt;
+    if (dataPendingCommit) {
+        featureIndex = std::move(dataPendingCommit->first);
+        data = std::move(dataPendingCommit->second);
+        dataPendingCommit = nullopt;
     }
 }
 
