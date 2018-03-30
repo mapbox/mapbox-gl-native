@@ -77,7 +77,6 @@ custom_categories:
   - name: Style Content
     children:
       - MGLSource
-      - MGLAbstractShapeSource
       - MGLShapeSource
       - MGLComputedShapeSource
       - MGLTileSource
