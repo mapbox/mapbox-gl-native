@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
  imagery on the map, especially raster tiles.
  
  Use a raster style layer to configure the color parameters of raster tiles
- loaded by an `MGLRasterSource` object or raster images loaded by an
+ loaded by an `MGLRasterTileSource` object or raster images loaded by an
  `MGLImageSource` object. For example, you could use a raster style layer to
  render <a href="https://www.mapbox.com/satellite/">Mapbox Satellite</a>
  imagery, a <a

@@ -127,17 +127,18 @@ source object is a member of one of the following subclasses of `MGLSource`:
 
 In style JSON | In the SDK
 --------------|-----------
-`geojson`     | `MGLShapeSource`
-`raster`      | `MGLRasterSource`
 `vector`      | `MGLVectorSource`
+`raster`      | `MGLRasterTileSource`
+`raster-dem`  | `MGLRasterDEMSource`
+`geojson`     | `MGLShapeSource`
 `image`       | `MGLImageSource`
 
 `canvas` and `video` sources are not supported.
 
 ### Tile sources
 
-Raster and vector sources may be defined in TileJSON configuration files. This
-SDK supports the properties defined in the style specification, which are a
+Raster and vector tile sources may be defined in TileJSON configuration files.
+This SDK supports the properties defined in the style specification, which are a
 subset of the keys defined in version 2.1.0 of the
 [TileJSON](https://github.com/mapbox/tilejson-spec/tree/master/2.1.0)
 specification. As an alternative to authoring a custom TileJSON file, you may

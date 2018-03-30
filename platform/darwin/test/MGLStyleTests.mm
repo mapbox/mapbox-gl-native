@@ -157,9 +157,9 @@
     [self.style addSource:shapeSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
-    [self.style addSource:rasterSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"rasterTileSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
+    [self.style addSource:rasterTileSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:rasterTileSource], NSException, @"MGLRedundantSourceException");
 
     MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
     [self.style addSource:vectorSource];
@@ -175,10 +175,10 @@
 }
 
 - (void)testRemovingSourcesBeforeAddingThem {
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"raster-source" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:rasterSource];
-    [self.style addSource:rasterSource];
-    XCTAssertNotNil([self.style sourceWithIdentifier:rasterSource.identifier]);
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"raster-tile-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:rasterTileSource];
+    [self.style addSource:rasterTileSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:rasterTileSource.identifier]);
 
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source" shape:nil options:nil];
     [self.style removeSource:shapeSource];
@@ -192,18 +192,18 @@
 }
 
 - (void)testAddingSourceOfTypeABeforeSourceOfTypeBWithSameIdentifier {
-    // Add a raster source
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style addSource:rasterSource];
+    // Add a raster tile source
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterTileSource];
 
-    // Attempt to remove an image source with the same identifier as the raster source
+    // Attempt to remove an image source with the same identifier as the raster tile source
     MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinateQuad: { } URL:[NSURL URLWithString:@"http://host/image.png"]];
     [self.style removeSource:imageSource];
-    // The raster source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
+    // The raster tile source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
 
-    // Remove the raster source
-    [self.style removeSource:rasterSource];
+    // Remove the raster tile source
+    [self.style removeSource:rasterTileSource];
 
     // Add the shape source
     [self.style addSource:imageSource];
@@ -220,26 +220,26 @@
     // Add the vector source
     [self.style addSource:vectorSource];
 
-    // Attempt to remove the previously created raster source that has the same identifer as the shape source
-    [self.style removeSource:rasterSource];
+    // Attempt to remove the previously created raster tile source that has the same identifer as the shape source
+    [self.style removeSource:rasterTileSource];
     // The vector source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
 }
 
 - (void)testRemovingSourceInUse {
-    // Add a raster source
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style addSource:rasterSource];
+    // Add a raster tile source
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterTileSource];
     
     // Add a layer using it
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterSource];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterTileSource];
     [self.style addLayer:fillLayer];
 
-    // Attempt to remove the raster source
-    [self.style removeSource:rasterSource];
+    // Attempt to remove the raster tile source
+    [self.style removeSource:rasterTileSource];
     
     // Ensure it is still there
-    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
 }
 
 - (void)testLayers {

@@ -73,9 +73,9 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         XCTAssertNotNil(mapView.style?.source(withIdentifier: "lines"))
     }
 
-    func testMGLRasterSource() {
+    func testMGLRasterTileSource() {
         //#-example-code
-        let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+        let source = MGLRasterTileSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,
@@ -275,7 +275,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
     }
 
     func testMGLRasterStyleLayer() {
-        let source = MGLRasterSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
+        let source = MGLRasterTileSource(identifier: "clouds", tileURLTemplates: ["https://example.com/raster-tiles/{z}/{x}/{y}.png"], options: [
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .tileSize: 512,

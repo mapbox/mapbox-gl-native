@@ -1,4 +1,4 @@
-#import "MGLRasterSource.h"
+#import "MGLRasterTileSource.h"
 
 #include <memory>
 
@@ -10,7 +10,7 @@ namespace mbgl {
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface MGLRasterSource (Private)
+@interface MGLRasterTileSource (Private)
 
 @property (nonatomic, readonly) mbgl::style::RasterSource *rawSource;
 

@@ -79,7 +79,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingUpdateShapeSourceURL,
     MBXSettingsRuntimeStylingUpdateShapeSourceFeatures,
     MBXSettingsRuntimeStylingVectorSource,
-    MBXSettingsRuntimeStylingRasterSource,
+    MBXSettingsRuntimeStylingRasterTileSource,
     MBXSettingsRuntimeStylingImageSource,
     MBXSettingsRuntimeStylingRouteLine,
     MBXSettingsRuntimeStylingDDSPolygon,
@@ -369,7 +369,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Update Shape Source: URL",
                 @"Update Shape Source: Features",
                 @"Style Vector Source",
-                @"Style Raster Source",
+                @"Style Raster Tile Source",
                 @"Style Image Source",
                 @"Add Route Line",
                 @"Dynamically Style Polygon",
@@ -551,8 +551,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsRuntimeStylingVectorSource:
                     [self styleVectorSource];
                     break;
-                case MBXSettingsRuntimeStylingRasterSource:
-                    [self styleRasterSource];
+                case MBXSettingsRuntimeStylingRasterTileSource:
+                    [self styleRasterTileSource];
                     break;
                 case MBXSettingsRuntimeStylingImageSource:
                     [self styleImageSource];
@@ -1011,10 +1011,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 - (void)styleRasterLayer
 {
     NSURL *rasterURL = [NSURL URLWithString:@"mapbox://mapbox.satellite"];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"my-raster-source" configurationURL:rasterURL tileSize:512];
-    [self.mapView.style addSource:rasterSource];
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"my-raster-tile-source" configurationURL:rasterURL tileSize:512];
+    [self.mapView.style addSource:rasterTileSource];
 
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterSource];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"my-raster-layer" source:rasterTileSource];
     NSDictionary *opacityStops = @{@20.0f: @1.0f,
                                    @5.0f: @0.0f};
     rasterLayer.rasterOpacity = [NSExpression expressionWithFormat:
@@ -1353,15 +1353,15 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self.mapView.style addLayer:lineLayer];
 }
 
-- (void)styleRasterSource
+- (void)styleRasterTileSource
 {
     NSString *tileURL = [NSString stringWithFormat:@"https://stamen-tiles.a.ssl.fastly.net/terrain-background/{z}/{x}/{y}%@.jpg", UIScreen.mainScreen.nativeScale > 1 ? @"@2x" : @""];
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"style-raster-source-id" tileURLTemplates:@[tileURL] options:@{
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"style-raster-tile-source-id" tileURLTemplates:@[tileURL] options:@{
         MGLTileSourceOptionTileSize: @256,
     }];
-    [self.mapView.style addSource:rasterSource];
+    [self.mapView.style addSource:rasterTileSource];
 
-    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterSource];
+    MGLRasterStyleLayer *rasterLayer = [[MGLRasterStyleLayer alloc] initWithIdentifier:@"style-raster-layer-id" source:rasterTileSource];
     [self.mapView.style addLayer:rasterLayer];
 }
 

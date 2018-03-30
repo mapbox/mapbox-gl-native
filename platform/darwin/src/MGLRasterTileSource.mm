@@ -1,4 +1,4 @@
-#import "MGLRasterSource_Private.h"
+#import "MGLRasterTileSource_Private.h"
 
 #import "MGLMapView_Private.h"
 #import "MGLSource_Private.h"
@@ -10,16 +10,16 @@
 
 const MGLTileSourceOption MGLTileSourceOptionTileSize = @"MGLTileSourceOptionTileSize";
 
-static const CGFloat MGLRasterSourceClassicTileSize = 256;
-static const CGFloat MGLRasterSourceRetinaTileSize = 512;
+static const CGFloat MGLRasterTileSourceClassicTileSize = 256;
+static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
 
-@interface MGLRasterSource ()
+@interface MGLRasterTileSource ()
 
 @property (nonatomic, readonly) mbgl::style::RasterSource *rawSource;
 
 @end
 
-@implementation MGLRasterSource
+@implementation MGLRasterTileSource
 
 - (instancetype)initWithIdentifier:(NSString *)identifier configurationURL:(NSURL *)configurationURL {
     // The style specification default is 512, but 256 is the expected value for
@@ -28,7 +28,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
     BOOL isMapboxURL = ([configurationURL.scheme isEqualToString:@"mapbox"]
                         && [configurationURL.host containsString:@"."]
                         && (!configurationURL.path.length || [configurationURL.path isEqualToString:@"/"]));
-    CGFloat tileSize = isMapboxURL ? MGLRasterSourceClassicTileSize : MGLRasterSourceRetinaTileSize;
+    CGFloat tileSize = isMapboxURL ? MGLRasterTileSourceClassicTileSize : MGLRasterTileSourceRetinaTileSize;
     return [self initWithIdentifier:identifier configurationURL:configurationURL tileSize:tileSize];
 }
 
@@ -47,7 +47,7 @@ static const CGFloat MGLRasterSourceRetinaTileSize = 512;
 - (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
 
-    uint16_t tileSize = MGLRasterSourceRetinaTileSize;
+    uint16_t tileSize = MGLRasterTileSourceRetinaTileSize;
     if (NSNumber *tileSizeNumber = options[MGLTileSourceOptionTileSize]) {
         if (![tileSizeNumber isKindOfClass:[NSNumber class]]) {
             [NSException raise:NSInvalidArgumentException
