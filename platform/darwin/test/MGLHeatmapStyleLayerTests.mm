@@ -191,8 +191,8 @@
 
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a data expression should update heatmap-radius.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
-        XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.heatmapRadius, pedanticFunctionExpression,
                               @"heatmapRadius should round-trip data expressions.");
 
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
@@ -205,8 +205,8 @@
 
         XCTAssertEqual(rawLayer->getHeatmapRadius(), propertyValue,
                        @"Setting heatmapRadius to a camera-data expression should update heatmap-radius.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertEqualObjects(layer.heatmapRadius, functionExpression,
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.heatmapRadius, pedanticFunctionExpression,
                               @"heatmapRadius should round-trip camera-data expressions.");
                               
 
@@ -263,8 +263,8 @@
 
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a data expression should update heatmap-weight.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
-        XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.heatmapWeight, pedanticFunctionExpression,
                               @"heatmapWeight should round-trip data expressions.");
 
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
@@ -277,8 +277,8 @@
 
         XCTAssertEqual(rawLayer->getHeatmapWeight(), propertyValue,
                        @"Setting heatmapWeight to a camera-data expression should update heatmap-weight.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertEqualObjects(layer.heatmapWeight, functionExpression,
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.heatmapWeight, pedanticFunctionExpression,
                               @"heatmapWeight should round-trip camera-data expressions.");
                               
 

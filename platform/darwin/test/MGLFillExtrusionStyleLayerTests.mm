@@ -85,8 +85,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a data expression should update fill-extrusion-base.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionBase, pedanticFunctionExpression,
                               @"fillExtrusionBase should round-trip data expressions.");
 
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
@@ -99,8 +99,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionBase(), propertyValue,
                        @"Setting fillExtrusionBase to a camera-data expression should update fill-extrusion-base.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionBase, functionExpression,
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionBase, pedanticFunctionExpression,
                               @"fillExtrusionBase should round-trip camera-data expressions.");
                               
 
@@ -157,8 +157,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a data expression should update fill-extrusion-color.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionColor, pedanticFunctionExpression,
                               @"fillExtrusionColor should round-trip data expressions.");
 
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
@@ -171,8 +171,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionColor(), propertyValue,
                        @"Setting fillExtrusionColor to a camera-data expression should update fill-extrusion-color.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionColor, functionExpression,
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionColor, pedanticFunctionExpression,
                               @"fillExtrusionColor should round-trip camera-data expressions.");
                               
 
@@ -229,8 +229,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a data expression should update fill-extrusion-height.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
+        NSExpression *pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST(keyName, 'NSNumber'), 'linear', nil, %@)", @{@18: constantExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, pedanticFunctionExpression,
                               @"fillExtrusionHeight should round-trip data expressions.");
 
         functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: functionExpression}];
@@ -243,8 +243,8 @@
 
         XCTAssertEqual(rawLayer->getFillExtrusionHeight(), propertyValue,
                        @"Setting fillExtrusionHeight to a camera-data expression should update fill-extrusion-height.");
-        functionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(CAST($zoomLevel 'NSNumber'), 'linear', nil, %@)", @{@10: functionExpression}];
-        XCTAssertEqualObjects(layer.fillExtrusionHeight, functionExpression,
+        pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
+        XCTAssertEqualObjects(layer.fillExtrusionHeight, pedanticFunctionExpression,
                               @"fillExtrusionHeight should round-trip camera-data expressions.");
                               
 

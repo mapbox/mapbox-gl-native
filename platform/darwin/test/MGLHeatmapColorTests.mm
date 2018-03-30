@@ -46,7 +46,8 @@
     layer.heatmapColor = nil;
     XCTAssertTrue(rawLayer->getHeatmapColor().isUndefined(),
                   @"Unsetting heatmapColor should return heatmap-color to the default value.");
-    XCTAssertEqualObjects(layer.heatmapColor, defaultExpression,
+    // The contained colors aren’t object equal, even though their descriptions are.
+    XCTAssertEqualObjects(layer.heatmapColor.description, defaultExpression.description,
                           @"heatmapColor should return the default value after being unset.");
 
     functionExpression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, %@, %@)", constantExpression, @{@18: constantExpression}];
