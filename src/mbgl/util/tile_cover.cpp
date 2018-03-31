@@ -186,12 +186,10 @@ std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t
         tc.getTiles(scanCover);
     };
 
-    // Sort by y/x.
     t.sort([](const ID& a, const ID& b) {
         return std::tie(a.y, a.x) < std::tie(b.y, b.x);
     });
 
-    // Erase duplicate tile IDs.
     t.erase(std::unique(t.begin(), t.end(), [](const ID& a, const ID& b) {
         return a.x == b.x && a.y == b.y;
     }), t.end());

@@ -4,6 +4,7 @@
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/geometry.hpp>
+
 #include <vector>
 
 namespace mbgl {
@@ -20,13 +21,14 @@ using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 class TileCover {
 public:
     TileCover(const LatLngBounds&, int32_t z);
-    // When project == true, use projection the geometry points to tile coordinates
+    // When project == true, projects the geometry points to tile coordinates
     TileCover(const Geometry<double>&, int32_t z, bool project = true);
     ~TileCover();
 
     //Returns false when there are no more rows to cover
     bool next();
     //Invokes the ScanLine callback to indicate tiles coverd for the row from [x0,x1)
+    // ScanLine may be invoked with duplcaite or overlapping ranges.
     bool getTiles(ScanLine&);
 
 private:

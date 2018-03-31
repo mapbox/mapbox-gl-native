@@ -147,7 +147,7 @@ std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
         }
         tile_range.push_back(xp);
     }
-    // Erase bounds in the aet whose current edge ends inside this row, or there are no more edges
+    // Erase bounds in aet whose current edge ends inside this row, or there are no more edges
     auto bound = aet.begin();
     while (bound != aet.end()) {
         if ( bound->currentPointIndex == bound->points.size() - 1 &&
@@ -157,7 +157,7 @@ std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
             bound++;
         }
     }
-    // Sort the X-extents of each lml by x_min, x_max
+    // Sort the X-extents of each crossing bound by x_min, x_max
     std::sort(tile_range.begin(), tile_range.end(), [] (x_range& a, x_range& b) {
         return std::tie(a.first, a.second) < std::tie(b.first, b.second);
     });
@@ -264,7 +264,6 @@ bool TileCoverImpl::scanRow(ScanLine& scanCover) {
         auto x_max = p++->second;
         scanCover(x_min, x_max, currentY);
     }
-    // Move to the next row
     currentY++;
 
     // Update AET for next row

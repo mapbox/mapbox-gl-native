@@ -90,7 +90,7 @@ TEST(TileCoverStream, WorldZ1) {
 }
 
 static const LatLngBounds sanFrancisco =
-LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
+    LatLngBounds::hull({ 37.6609, -122.5744 }, { 37.8271, -122.3204 });
 
 TEST(TileCover, SanFranciscoZ0) {
     EXPECT_EQ((std::vector<UnwrappedTileID>{
