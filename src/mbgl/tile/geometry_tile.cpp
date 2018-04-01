@@ -131,8 +131,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
         pending = false;
     }
     
-    nonSymbolBuckets = std::move(result.nonSymbolBuckets);
-    symbolBuckets = std::move(result.symbolBuckets);
+    buckets = std::move(result.buckets);
     
     dataPendingCommit = {{ std::move(result.tileData), std::move(result.featureIndex) }};
 
@@ -177,11 +176,7 @@ void GeometryTile::upload(gl::Context& context) {
         }
     };
 
-    for (auto& entry : nonSymbolBuckets) {
-        uploadFn(*entry.second);
-    }
-
-    for (auto& entry : symbolBuckets) {
+    for (auto& entry : buckets) {
         uploadFn(*entry.second);
     }
 
@@ -197,7 +192,6 @@ void GeometryTile::upload(gl::Context& context) {
 }
 
 Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
-    const auto& buckets = layer.type == LayerType::Symbol ? symbolBuckets : nonSymbolBuckets;
     const auto it = buckets.find(layer.id);
     if (it == buckets.end()) {
         return nullptr;
@@ -209,7 +203,7 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 
 void GeometryTile::commitFeatureIndex() {
     // We commit our pending FeatureIndex and GeometryTileData when a global placement has run,
-    // synchronizing the global CollisionIndex with the latest symbolBuckets/FeatureIndex/GeometryTileData
+    // synchronizing the global CollisionIndex with the latest buckets/FeatureIndex/GeometryTileData
     if (dataPendingCommit) {
         data = std::move(dataPendingCommit->first);
         featureIndex = std::move(dataPendingCommit->second);
