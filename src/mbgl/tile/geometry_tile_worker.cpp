@@ -329,7 +329,7 @@ void GeometryTileWorker::parse() {
 
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
     buckets.clear();
-    featureIndex = std::make_unique<FeatureIndex>();
+    featureIndex = std::make_unique<FeatureIndex>(*data ? (*data)->clone() : nullptr);
     BucketParameters parameters { id, mode, pixelRatio };
 
     GlyphDependencies glyphDependencies;
@@ -471,7 +471,6 @@ void GeometryTileWorker::performSymbolLayout() {
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
         std::move(buckets),
         std::move(featureIndex),
-        *data ? (*data)->clone() : nullptr,
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage)
     }, correlationID);

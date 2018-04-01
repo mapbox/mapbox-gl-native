@@ -133,7 +133,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     
     buckets = std::move(result.buckets);
     
-    dataPendingCommit = {{ std::move(result.tileData), std::move(result.featureIndex) }};
+    featureIndexPendingCommit = { std::move(result.featureIndex) };
 
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
@@ -202,12 +202,11 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
 }
 
 void GeometryTile::commitFeatureIndex() {
-    // We commit our pending FeatureIndex and GeometryTileData when a global placement has run,
-    // synchronizing the global CollisionIndex with the latest buckets/FeatureIndex/GeometryTileData
-    if (dataPendingCommit) {
-        data = std::move(dataPendingCommit->first);
-        featureIndex = std::move(dataPendingCommit->second);
-        dataPendingCommit = nullopt;
+    // We commit our pending FeatureIndex when a global placement has run,
+    // synchronizing the global CollisionIndex with the latest buckets/FeatureIndex
+    if (featureIndexPendingCommit) {
+        featureIndex = std::move(*featureIndexPendingCommit);
+        featureIndexPendingCommit = nullopt;
     }
 }
 
@@ -219,7 +218,7 @@ void GeometryTile::queryRenderedFeatures(
     const RenderedQueryOptions& options,
     const CollisionIndex& collisionIndex) {
 
-    if (!featureIndex || !data) return;
+    if (!getData()) return;
 
     // Determine the additional radius needed factoring in property functions
     float additionalRadius = 0;
@@ -236,7 +235,6 @@ void GeometryTile::queryRenderedFeatures(
                         util::tileSize * id.overscaleFactor(),
                         std::pow(2, transformState.getZoom() - id.overscaledZ),
                         options,
-                        *data,
                         id.toUnwrapped(),
                         sourceID,
                         layers,
@@ -248,8 +246,8 @@ void GeometryTile::querySourceFeatures(
     std::vector<Feature>& result,
     const SourceQueryOptions& options) {
 
-    // Data not yet available
-    if (!data) {
+    // Data not yet available, or tile is empty
+    if (!getData()) {
         return;
     }
     
@@ -262,7 +260,7 @@ void GeometryTile::querySourceFeatures(
     for (auto sourceLayer : *options.sourceLayers) {
         // Go throught all sourceLayers, if any
         // to gather all the features
-        auto layer = data->getLayer(sourceLayer);
+        auto layer = getData()->getLayer(sourceLayer);
         
         if (layer) {
             auto featureCount = layer->featureCount();
