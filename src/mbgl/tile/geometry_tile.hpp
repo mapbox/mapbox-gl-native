@@ -67,18 +67,15 @@ public:
     public:
         std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
         std::unique_ptr<FeatureIndex> featureIndex;
-        std::unique_ptr<GeometryTileData> tileData;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
         LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
-                     std::unique_ptr<GeometryTileData> tileData_,
                      optional<AlphaImage> glyphAtlasImage_,
                      optional<PremultipliedImage> iconAtlasImage_)
             : buckets(std::move(buckets_)),
               featureIndex(std::move(featureIndex_)),
-              tileData(std::move(tileData_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
@@ -95,7 +92,7 @@ public:
     
 protected:
     const GeometryTileData* getData() {
-        return data.get();
+        return featureIndex ? featureIndex->getData() : nullptr;
     }
 
 private:
@@ -116,9 +113,8 @@ private:
 
     std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     
-    optional<std::pair<std::unique_ptr<const GeometryTileData>, std::unique_ptr<FeatureIndex>>> dataPendingCommit;
+    optional<std::unique_ptr<FeatureIndex>> featureIndexPendingCommit;
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<const GeometryTileData> data;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;

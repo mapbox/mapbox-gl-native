@@ -17,8 +17,9 @@
 
 namespace mbgl {
 
-FeatureIndex::FeatureIndex()
-    : grid(util::EXTENT, util::EXTENT, util::EXTENT / 16) { // 16x16 grid -> 32px cell
+FeatureIndex::FeatureIndex(std::unique_ptr<const GeometryTileData> tileData_)
+    : grid(util::EXTENT, util::EXTENT, util::EXTENT / 16) // 16x16 grid -> 32px cell
+    , tileData(std::move(tileData_)) {
 }
 
 void FeatureIndex::insert(const GeometryCollection& geometries,
@@ -47,12 +48,15 @@ void FeatureIndex::query(
         const double tileSize,
         const double scale,
         const RenderedQueryOptions& queryOptions,
-        const GeometryTileData& geometryTileData,
         const UnwrappedTileID& tileID,
         const std::string& sourceID,
         const std::vector<const RenderLayer*>& layers,
         const CollisionIndex& collisionIndex,
         const float additionalQueryRadius) const {
+    
+    if (!tileData) {
+        return;
+    }
 
     // Determine query radius
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
@@ -72,13 +76,13 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 
     std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, geometryTileData, tileID.canonical, layers, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
     }
 }
 
@@ -87,7 +91,6 @@ void FeatureIndex::addFeature(
     const IndexedSubfeature& indexedFeature,
     const GeometryCoordinates& queryGeometry,
     const RenderedQueryOptions& options,
-    const GeometryTileData& geometryTileData,
     const CanonicalTileID& tileID,
     const std::vector<const RenderLayer*>& layers,
     const float bearing,
@@ -113,7 +116,7 @@ void FeatureIndex::addFeature(
         }
 
         if (!geometryTileFeature) {
-            sourceLayer = geometryTileData.getLayer(indexedFeature.sourceLayerName);
+            sourceLayer = tileData->getLayer(indexedFeature.sourceLayerName);
             assert(sourceLayer);
 
             geometryTileFeature = sourceLayer->getFeature(indexedFeature.index);
