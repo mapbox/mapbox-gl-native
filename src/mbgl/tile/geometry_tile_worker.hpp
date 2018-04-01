@@ -67,7 +67,7 @@ private:
     const float pixelRatio;
     
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     enum State {
         Idle,

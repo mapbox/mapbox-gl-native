@@ -65,23 +65,20 @@ public:
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
         std::unique_ptr<FeatureIndex> featureIndex;
         std::unique_ptr<GeometryTileData> tileData;
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
-        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
+        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
                      std::unique_ptr<FeatureIndex> featureIndex_,
                      std::unique_ptr<GeometryTileData> tileData_,
-                     std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
                      optional<AlphaImage> glyphAtlasImage_,
                      optional<PremultipliedImage> iconAtlasImage_)
-            : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
+            : buckets(std::move(buckets_)),
               featureIndex(std::move(featureIndex_)),
               tileData(std::move(tileData_)),
-              symbolBuckets(std::move(symbolBuckets_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
@@ -117,8 +114,7 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
     
     optional<std::pair<std::unique_ptr<const GeometryTileData>, std::unique_ptr<FeatureIndex>>> dataPendingCommit;
     std::unique_ptr<FeatureIndex> featureIndex;

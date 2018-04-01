@@ -328,7 +328,7 @@ void GeometryTileWorker::parse() {
     }
 
     std::unordered_map<std::string, std::unique_ptr<SymbolLayout>> symbolLayoutMap;
-    nonSymbolBuckets.clear();
+    buckets.clear();
     featureIndex = std::make_unique<FeatureIndex>();
     BucketParameters parameters { id, mode, pixelRatio };
 
@@ -388,7 +388,7 @@ void GeometryTileWorker::parse() {
             }
 
             for (const auto& layer : group) {
-                nonSymbolBuckets.emplace(layer->getID(), bucket);
+                buckets.emplace(layer->getID(), bucket);
             }
         }
     }
@@ -448,8 +448,6 @@ void GeometryTileWorker::performSymbolLayout() {
         symbolLayoutsNeedPreparation = false;
     }
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
-
     for (auto& symbolLayout : symbolLayouts) {
         if (obsolete) {
             return;
@@ -471,10 +469,9 @@ void GeometryTileWorker::performSymbolLayout() {
     firstLoad = false;
     
     parent.invoke(&GeometryTile::onLayout, GeometryTile::LayoutResult {
-        std::move(nonSymbolBuckets),
+        std::move(buckets),
         std::move(featureIndex),
         *data ? (*data)->clone() : nullptr,
-        std::move(buckets),
         std::move(glyphAtlasImage),
         std::move(iconAtlasImage)
     }, correlationID);
