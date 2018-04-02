@@ -23,11 +23,15 @@
 * Fixed an issue preventing `MGLImageSource`s from drawing on the map when the map is zoomed in and tilted. ([#10677](https://github.com/mapbox/mapbox-gl-native/pull/10677))
 * Improved the sharpness of raster tiles on Retina displays. ([#10984](https://github.com/mapbox/mapbox-gl-native/pull/10984))
 * Fixed a crash parsing a malformed style. ([#11001](https://github.com/mapbox/mapbox-gl-native/pull/11001))
+* Fixed an issue where symbols with empty labels would always be hidden. ([#11206](https://github.com/mapbox/mapbox-gl-native/pull/11206))
+* Fixed an issue where a tilted map could flicker while displaying rotating symbols. ([#11488](https://github.com/mapbox/mapbox-gl-native/pull/11488))
+* Increased the maximum width of labels by a factor of two. ([#11508](https://github.com/mapbox/mapbox-gl-native/pull/11508))
 
 ### Annotations
-* Fix an issue where a wrong annotation may selected if annotations were set close together. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
+* Fixed an issue where tapping a group of annotations may not have selected the nearest annotation. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
 * The `MGLMapView.selectedAnnotations` property (backed by `-[MGLMapView setSelectedAnnotations:]`) now selects annotations that are off-screen. ([#9790](https://github.com/mapbox/mapbox-gl-native/issues/9790))
 * The `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` now controls whether the annotation and its callout are brought on-screen. If `animated` is `NO` then the annotation is selected if offscreen, but the map is not panned. Currently only point annotations are supported.([#3249](https://github.com/mapbox/mapbox-gl-native/issues/3249))
+* Fixed a crash when rapidly adding and removing annotations. ([#11551](https://github.com/mapbox/mapbox-gl-native/issues/11551), [#11575](https://github.com/mapbox/mapbox-gl-native/issues/11575))
 
 ### Map snapshots
 
