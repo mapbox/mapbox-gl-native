@@ -9,20 +9,8 @@ package com.mapbox.mapboxsdk.style.layers;
 public class CustomLayer extends Layer {
 
   public CustomLayer(String id,
-                     long context,
-                     long initializeFunction,
-                     long renderFunction,
-                     long deinitializeFunction) {
-    this(id, context, initializeFunction, renderFunction, 0L, deinitializeFunction);
-  }
-
-  public CustomLayer(String id,
-                     long context,
-                     long initializeFunction,
-                     long renderFunction,
-                     long contextLostFunction,
-                     long deinitializeFunction) {
-    initialize(id, initializeFunction, renderFunction, contextLostFunction, deinitializeFunction, context);
+                     long host) {
+    initialize(id, host);
   }
 
   public CustomLayer(long nativePtr) {
@@ -33,9 +21,7 @@ public class CustomLayer extends Layer {
     nativeUpdate();
   }
 
-  protected native void initialize(String id, long initializeFunction, long renderFunction,
-                                   long contextLostFunction, long deinitializeFunction,
-                                   long context);
+  protected native void initialize(String id, long host);
 
   protected native void nativeUpdate();
 
