@@ -217,21 +217,27 @@ void GeometryTile::queryRenderedFeatures(
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
-    const RenderedQueryOptions& options) {
+    const RenderedQueryOptions& options,
+    const mat4& projMatrix) {
 
     if (!getData()) return;
 
     const float queryPadding = getQueryPadding(layers);
 
+    mat4 posMatrix;
+    transformState.matrixFor(posMatrix, id.toUnwrapped());
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
+
     latestFeatureIndex->query(result,
                               queryGeometry,
-                              transformState.getAngle(),
+                              transformState,
+                              posMatrix,
                               util::tileSize * id.overscaleFactor(),
                               std::pow(2, transformState.getZoom() - id.overscaledZ),
                               options,
                               id.toUnwrapped(),
                               layers,
-                              queryPadding);
+                              queryPadding * transformState.maxPitchScaleFactor());
 }
 
 void GeometryTile::querySourceFeatures(

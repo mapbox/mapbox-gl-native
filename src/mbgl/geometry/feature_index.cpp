@@ -36,7 +36,8 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
-        const float bearing,
+        const TransformState& transformState,
+        const mat4& posMatrix,
         const double tileSize,
         const double scale,
         const RenderedQueryOptions& queryOptions,
@@ -68,7 +69,7 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, transformState, pixelsToTileUnits, posMatrix);
     }
 }
     
@@ -105,7 +106,7 @@ std::unordered_map<std::string, std::vector<Feature>> FeatureIndex::lookupSymbol
     });
 
     for (const auto& symbolFeature : sortedFeatures) {
-        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), 0, 0);
+        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), {}, 0, {});
     }
     return result;
 }
@@ -117,8 +118,9 @@ void FeatureIndex::addFeature(
     const CanonicalTileID& tileID,
     const std::vector<const RenderLayer*>& layers,
     const GeometryCoordinates& queryGeometry,
-    const float bearing,
-    const float pixelsToTileUnits) const {
+    const TransformState& transformState,
+    const float pixelsToTileUnits,
+    const mat4& posMatrix) const {
 
     auto getRenderLayer = [&] (const std::string& layerID) -> const RenderLayer* {
         for (const auto& layer : layers) {
@@ -148,7 +150,7 @@ void FeatureIndex::addFeature(
         }
 
         if (!renderLayer->is<RenderSymbolLayer>() &&
-             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits)) {
+             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, transformState, pixelsToTileUnits, posMatrix)) {
             continue;
         }
 

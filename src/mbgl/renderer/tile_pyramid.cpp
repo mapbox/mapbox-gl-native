@@ -241,7 +241,8 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
                                            const std::vector<const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options) const {
+                                           const RenderedQueryOptions& options,
+                                           const mat4& projMatrix) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
         return result;
@@ -263,8 +264,11 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
             std::tie(b.id.canonical.z, b.id.canonical.y, b.id.wrap, b.id.canonical.x);
     });
 
+    auto maxPitchScaleFactor = transformState.maxPitchScaleFactor();
+
     for (const RenderTile& renderTile : sortedTiles) {
-        auto queryPadding = renderTile.tile.getQueryPadding(layers);
+        const float scale = std::pow(2, transformState.getZoom() - renderTile.id.canonical.z);
+        auto queryPadding = maxPitchScaleFactor * renderTile.tile.getQueryPadding(layers) * util::EXTENT / util::tileSize / scale;
 
         GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
         if (tileSpaceBoundsMin.x - queryPadding >= util::EXTENT || tileSpaceBoundsMin.y - queryPadding >= util::EXTENT) {
@@ -286,7 +290,8 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
                                               tileSpaceQueryGeometry,
                                               transformState,
                                               layers,
-                                              options);
+                                              options,
+                                              projMatrix);
     }
 
     return result;
