@@ -22,8 +22,9 @@ public:
         const GeometryCoordinates&,
         const GeometryTileFeature&,
         const float,
+        const TransformState&,
         const float,
-        const float) const override;
+        const mat4&) const override;
 
     std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const override;
 

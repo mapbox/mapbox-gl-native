@@ -54,7 +54,8 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>& layers,
-            const RenderedQueryOptions& options) override;
+            const RenderedQueryOptions& options,
+            const mat4& projMatrix) override;
 
     void querySourceFeatures(
         std::vector<Feature>& result,

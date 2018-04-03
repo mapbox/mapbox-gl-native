@@ -162,15 +162,16 @@ bool RenderLineLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
         const float zoom,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+        const TransformState& transformState,
+        const float pixelsToTileUnits,
+        const mat4&) const {
 
     // Translate query geometry
     auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::LineTranslate>(),
             evaluated.get<style::LineTranslateAnchor>(),
-            bearing,
+            transformState.getAngle(),
             pixelsToTileUnits);
 
     // Evaluate function

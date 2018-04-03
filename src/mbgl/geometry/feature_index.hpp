@@ -5,6 +5,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/util/grid_index.hpp>
 #include <mbgl/util/feature.hpp>
+#include <mbgl/util/mat4.hpp>
 
 #include <vector>
 #include <string>
@@ -14,6 +15,7 @@ namespace mbgl {
 
 class RenderedQueryOptions;
 class RenderLayer;
+class TransformState;
 
 class CollisionIndex;
 
@@ -56,7 +58,8 @@ public:
     void query(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const GeometryCoordinates& queryGeometry,
-            const float bearing,
+            const TransformState&,
+            const mat4& posMatrix,
             const double tileSize,
             const double scale,
             const RenderedQueryOptions& options,
@@ -88,8 +91,9 @@ private:
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
             const GeometryCoordinates& queryGeometry,
-            const float bearing,
-            const float pixelsToTileUnits) const;
+            const TransformState& transformState,
+            const float pixelsToTileUnits,
+            const mat4& posMatrix) const;
 
     GridIndex<IndexedSubfeature> grid;
     unsigned int sortIndex = 0;
