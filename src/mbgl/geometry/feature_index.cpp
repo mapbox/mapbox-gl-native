@@ -41,7 +41,7 @@ void FeatureIndex::query(
         const RenderedQueryOptions& queryOptions,
         const UnwrappedTileID& tileID,
         const std::vector<const RenderLayer*>& layers,
-        const float additionalQueryRadius) const {
+        const float additionalQueryPadding) const {
     
     if (!tileData) {
         return;
@@ -49,12 +49,12 @@ void FeatureIndex::query(
 
     // Determine query radius
     const float pixelsToTileUnits = util::EXTENT / tileSize / scale;
-    const int16_t additionalRadius = std::min<int16_t>(util::EXTENT, additionalQueryRadius * pixelsToTileUnits);
+    const int16_t additionalPadding = std::min<int16_t>(util::EXTENT, additionalQueryPadding * pixelsToTileUnits);
 
     // Query the grid index
     mapbox::geometry::box<int16_t> box = mapbox::geometry::envelope(queryGeometry);
-    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalRadius),
-                                                           convertPoint<float>(box.max + additionalRadius) });
+    std::vector<IndexedSubfeature> features = grid.query({ convertPoint<float>(box.min - additionalPadding),
+                                                           convertPoint<float>(box.max + additionalPadding) });
 
 
     std::sort(features.begin(), features.end(), [](const IndexedSubfeature& a, const IndexedSubfeature& b) {
