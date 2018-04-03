@@ -93,27 +93,75 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
     }
 }
 
+GeometryCoordinate projectPoint(const GeometryCoordinate& p, const mat4& posMatrix, const Size& size) {
+    vec4 pos = {{ static_cast<double>(p.x), static_cast<double>(p.y), 0, 1 }};
+    matrix::transformMat4(pos, pos, posMatrix);
+    return {
+        static_cast<int16_t>((static_cast<float>(pos[0] / pos[3]) + 1) * size.width * 0.5),
+        static_cast<int16_t>((static_cast<float>(pos[1] / pos[3]) + 1) * size.height * 0.5)
+    };
+}
+
+GeometryCoordinates projectQueryGeometry(const GeometryCoordinates& queryGeometry, const mat4& posMatrix, const Size& size) {
+    GeometryCoordinates projectedGeometry;
+    for (auto& p : queryGeometry) {
+        projectedGeometry.push_back(projectPoint(p, posMatrix, size));
+    }
+    return projectedGeometry;
+}
+
 bool RenderCircleLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
         const float zoom,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+        const TransformState& transformState,
+        const float pixelsToTileUnits,
+        const mat4& posMatrix) const {
 
     // Translate query geometry
-    auto translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
+    const GeometryCoordinates& translatedQueryGeometry = FeatureIndex::translateQueryGeometry(
             queryGeometry,
             evaluated.get<style::CircleTranslate>(),
             evaluated.get<style::CircleTranslateAnchor>(),
-            bearing,
-            pixelsToTileUnits);
+            transformState.getAngle(),
+            pixelsToTileUnits).value_or(queryGeometry);
 
     // Evaluate functions
-    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature) * pixelsToTileUnits;
-    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature) * pixelsToTileUnits;
+    auto radius = evaluated.evaluate<style::CircleRadius>(zoom, feature);
+    auto stroke = evaluated.evaluate<style::CircleStrokeWidth>(zoom, feature);
+    auto size = radius + stroke;
 
-    // Test intersection
-    return util::polygonIntersectsBufferedMultiPoint(translatedQueryGeometry.value_or(queryGeometry), feature.getGeometries(), radius + stroke);
+	// For pitch-alignment: map, compare feature geometry to query geometry in the plane of the tile
+    // Otherwise, compare geometry in the plane of the viewport
+    // A circle with fixed scaling relative to the viewport gets larger in tile space as it moves into the distance
+    // A circle with fixed scaling relative to the map gets smaller in viewport space as it moves into the distance
+    bool alignWithMap = evaluated.evaluate<style::CirclePitchAlignment>(zoom, feature) == AlignmentType::Map;
+    const GeometryCoordinates& transformedQueryGeometry = alignWithMap ?
+        translatedQueryGeometry :
+        projectQueryGeometry(translatedQueryGeometry, posMatrix, transformState.getSize());
+    auto transformedSize = alignWithMap ? size * pixelsToTileUnits : size;
+
+    auto geometry = feature.getGeometries();
+    for (auto& ring : geometry) {
+        for (auto& point : ring) {
+            const GeometryCoordinate& transformedPoint = alignWithMap ? point : projectPoint(point, posMatrix, transformState.getSize());
+
+            float adjustedSize = transformedSize;
+            vec4 center = {{ static_cast<double>(point.x), static_cast<double>(point.y), 0, 1 }};
+            matrix::transformMat4(center, center, posMatrix);
+            auto pitchScale = evaluated.evaluate<style::CirclePitchScale>(zoom, feature);
+            auto pitchAlignment = evaluated.evaluate<style::CirclePitchAlignment>(zoom, feature);
+            if (pitchScale == CirclePitchScaleType::Viewport && pitchAlignment == AlignmentType::Map) {
+                adjustedSize *= center[3] / transformState.getCameraToCenterDistance();
+            } else if (pitchScale == CirclePitchScaleType::Map && pitchAlignment == AlignmentType::Viewport) {
+                adjustedSize *= transformState.getCameraToCenterDistance() / center[3];
+            }
+
+            if (util::polygonIntersectsBufferedPoint(transformedQueryGeometry, transformedPoint, adjustedSize)) return true;
+        }
+    }
+
+    return false;
 }
 
 } // namespace mbgl

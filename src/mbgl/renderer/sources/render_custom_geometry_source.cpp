@@ -68,8 +68,9 @@ RenderCustomGeometrySource::queryRenderedFeatures(const ScreenLineString& geomet
                                            const TransformState& transformState,
                                            const std::vector<const RenderLayer*>& layers,
                                            const RenderedQueryOptions& options,
-                                           const CollisionIndex& collisionIndex) const {
-   return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, collisionIndex);
+                                           const CollisionIndex& collisionIndex,
+                                           const mat4& projMatrix) const {
+   return tilePyramid.queryRenderedFeatures(geometry, transformState, layers, options, collisionIndex, projMatrix);
 }
 
 std::vector<Feature> RenderCustomGeometrySource::querySourceFeatures(const SourceQueryOptions& options) const {

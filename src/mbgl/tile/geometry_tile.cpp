@@ -227,15 +227,21 @@ void GeometryTile::queryRenderedFeatures(
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
     const RenderedQueryOptions& options,
-    const CollisionIndex& collisionIndex) {
+    const CollisionIndex& collisionIndex,
+    const mat4& projMatrix) {
 
     if (!getData()) return;
 
     const float queryPadding = getQueryPadding(layers);
 
+    mat4 posMatrix;
+    transformState.matrixFor(posMatrix, id.toUnwrapped());
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
+
     featureIndex->query(result,
                         queryGeometry,
-                        transformState.getAngle(),
+                        transformState,
+                        posMatrix,
                         util::tileSize * id.overscaleFactor(),
                         std::pow(2, transformState.getZoom() - id.overscaledZ),
                         options,
@@ -243,7 +249,7 @@ void GeometryTile::queryRenderedFeatures(
                         sourceID,
                         layers,
                         collisionIndex,
-                        queryPadding);
+                        queryPadding * transformState.maxPitchScaleFactor());
 }
 
 void GeometryTile::querySourceFeatures(

@@ -44,7 +44,8 @@ static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& 
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
-        const float bearing,
+        const TransformState& transformState,
+        const mat4& posMatrix,
         const double tileSize,
         const double scale,
         const RenderedQueryOptions& queryOptions,
@@ -76,13 +77,13 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryGeometry, queryOptions, tileID.canonical, layers, transformState, pixelsToTileUnits, posMatrix);
     }
 
     std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
     std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
     for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
+        addFeature(result, symbolFeature, queryGeometry, queryOptions, tileID.canonical, layers, transformState, pixelsToTileUnits, posMatrix);
     }
 }
 
@@ -93,8 +94,9 @@ void FeatureIndex::addFeature(
     const RenderedQueryOptions& options,
     const CanonicalTileID& tileID,
     const std::vector<const RenderLayer*>& layers,
-    const float bearing,
-    const float pixelsToTileUnits) const {
+    const TransformState& transformState,
+    const float pixelsToTileUnits,
+    const mat4& posMatrix) const {
 
     auto getRenderLayer = [&] (const std::string& layerID) -> const RenderLayer* {
         for (const auto& layer : layers) {
@@ -124,7 +126,7 @@ void FeatureIndex::addFeature(
         }
 
         if (!renderLayer->is<RenderSymbolLayer>() &&
-             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, bearing, pixelsToTileUnits)) {
+             !renderLayer->queryIntersectsFeature(queryGeometry, *geometryTileFeature, tileID.z, transformState, pixelsToTileUnits, posMatrix)) {
             continue;
         }
 
