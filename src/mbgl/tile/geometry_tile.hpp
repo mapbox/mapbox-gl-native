@@ -60,6 +60,8 @@ public:
         std::vector<Feature>& result,
         const SourceQueryOptions&) override;
 
+    float getQueryPadding(const std::vector<const RenderLayer*>&) override;
+
     void cancel() override;
 
     class LayoutResult {

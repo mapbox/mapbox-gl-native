@@ -264,13 +264,15 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
     });
 
     for (const RenderTile& renderTile : sortedTiles) {
+        auto queryPadding = renderTile.tile.getQueryPadding(layers);
+
         GeometryCoordinate tileSpaceBoundsMin = TileCoordinate::toGeometryCoordinate(renderTile.id, box.min);
-        if (tileSpaceBoundsMin.x >= util::EXTENT || tileSpaceBoundsMin.y >= util::EXTENT) {
+        if (tileSpaceBoundsMin.x - queryPadding >= util::EXTENT || tileSpaceBoundsMin.y - queryPadding >= util::EXTENT) {
             continue;
         }
 
         GeometryCoordinate tileSpaceBoundsMax = TileCoordinate::toGeometryCoordinate(renderTile.id, box.max);
-        if (tileSpaceBoundsMax.x < 0 || tileSpaceBoundsMax.y < 0) {
+        if (tileSpaceBoundsMax.x + queryPadding < 0 || tileSpaceBoundsMax.y + queryPadding < 0) {
             continue;
         }
 

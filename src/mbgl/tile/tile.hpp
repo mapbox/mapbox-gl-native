@@ -63,6 +63,8 @@ public:
             std::vector<Feature>& result,
             const SourceQueryOptions&);
 
+    virtual float getQueryPadding(const std::vector<const RenderLayer*>&);
+
     void setTriedCache();
 
     // Returns true when the tile source has received a first response, regardless of whether a load
