@@ -87,6 +87,7 @@ public:
     }
 
     float getCameraToTileDistance(const UnwrappedTileID&) const;
+    float maxPitchScaleFactor() const;
 
 private:
     bool rotatedNorth() const;

@@ -201,12 +201,12 @@ bool RenderHeatmapLayer::queryIntersectsFeature(
         const GeometryCoordinates& queryGeometry,
         const GeometryTileFeature& feature,
         const float zoom,
-        const float bearing,
-        const float pixelsToTileUnits) const {
+        const TransformState&,
+        const float pixelsToTileUnits,
+        const mat4&) const {
     (void) queryGeometry;
     (void) feature;
     (void) zoom;
-    (void) bearing;
     (void) pixelsToTileUnits;
     return false;
 }

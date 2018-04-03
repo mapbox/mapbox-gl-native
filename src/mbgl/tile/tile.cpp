@@ -37,7 +37,8 @@ void Tile::queryRenderedFeatures(
         const GeometryCoordinates&,
         const TransformState&,
         const std::vector<const RenderLayer*>&,
-        const RenderedQueryOptions&) {}
+        const RenderedQueryOptions&,
+        const mat4&) {}
 
 float Tile::getQueryPadding(const std::vector<const RenderLayer*>&) {
     return 0;

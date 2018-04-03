@@ -4,6 +4,7 @@
 #include <mbgl/style/layer_impl.hpp>
 #include <mbgl/style/layer_type.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
+#include <mbgl/util/mat4.hpp>
 
 #include <memory>
 #include <string>
@@ -17,6 +18,7 @@ class PropertyEvaluationParameters;
 class PaintParameters;
 class RenderSource;
 class RenderTile;
+class TransformState;
 
 class RenderLayer {
 protected:
@@ -69,8 +71,9 @@ public:
             const GeometryCoordinates&,
             const GeometryTileFeature&,
             const float,
+            const TransformState&,
             const float,
-            const float) const { return false; };
+            const mat4&) const { return false; };
 
     virtual std::unique_ptr<Bucket> createBucket(const BucketParameters&, const std::vector<const RenderLayer*>&) const = 0;
 
