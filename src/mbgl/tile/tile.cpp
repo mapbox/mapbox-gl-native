@@ -40,6 +40,10 @@ void Tile::queryRenderedFeatures(
         const RenderedQueryOptions&,
         const CollisionIndex&) {}
 
+float Tile::getQueryPadding(const std::vector<const RenderLayer*>&) {
+    return 0;
+}
+
 void Tile::querySourceFeatures(
         std::vector<Feature>&,
         const SourceQueryOptions&) {}

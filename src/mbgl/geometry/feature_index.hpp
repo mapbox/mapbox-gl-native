@@ -67,7 +67,7 @@ public:
             const std::string&,
             const std::vector<const RenderLayer*>&,
             const CollisionIndex&,
-            const float additionalQueryRadius) const;
+            const float additionalQueryPadding) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
             const GeometryCoordinates& queryGeometry,

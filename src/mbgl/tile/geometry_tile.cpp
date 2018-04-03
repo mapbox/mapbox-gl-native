@@ -210,6 +210,17 @@ void GeometryTile::commitFeatureIndex() {
     }
 }
 
+float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
+    float queryPadding = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket) {
+            queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
+        }
+    }
+    return queryPadding;
+}
+
 void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
@@ -220,14 +231,7 @@ void GeometryTile::queryRenderedFeatures(
 
     if (!getData()) return;
 
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-    for (const RenderLayer* layer : layers) {
-        auto bucket = getBucket(*layer->baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
-        }
-    }
+    const float queryPadding = getQueryPadding(layers);
 
     featureIndex->query(result,
                         queryGeometry,
@@ -239,7 +243,7 @@ void GeometryTile::queryRenderedFeatures(
                         sourceID,
                         layers,
                         collisionIndex,
-                        additionalRadius);
+                        queryPadding);
 }
 
 void GeometryTile::querySourceFeatures(
