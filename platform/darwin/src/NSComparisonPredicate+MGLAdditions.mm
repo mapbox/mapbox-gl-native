@@ -361,7 +361,32 @@
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
     if (op) {
-        return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
+        id leftExpression = self.leftExpression.mgl_jsonExpressionObject;
+        id rightExpression = self.rightExpression.mgl_jsonExpressionObject;
+        
+        switch (self.predicateOperatorType) {
+            case NSLessThanPredicateOperatorType:
+            case NSLessThanOrEqualToPredicateOperatorType:
+            case NSGreaterThanPredicateOperatorType:
+            case NSGreaterThanOrEqualToPredicateOperatorType: {
+                if ([self.rightExpression.constantValue isKindOfClass:NSNumber.class]) {
+                    NSString *type;
+                    NSNumber *number = (NSNumber *)self.rightExpression.constantValue;
+                    if ((strcmp([number objCType], @encode(char)) == 0) ||
+                        (strcmp([number objCType], @encode(BOOL)) == 0)) {
+                        type = @"boolean";
+                    } else {
+                        type = @"number";
+                    }
+                    leftExpression = @[type, leftExpression];
+                }
+            }
+ 
+            default:
+                break;
+        }
+        
+        return @[op, leftExpression, rightExpression];
     }
     return nil;
 }

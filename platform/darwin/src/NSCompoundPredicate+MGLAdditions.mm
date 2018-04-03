@@ -1,7 +1,11 @@
 #import "NSCompoundPredicate+MGLAdditions.h"
 
+#import "MGLStyleValue_Private.h"
+
 #import "NSPredicate+MGLAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
+
+#include <mbgl/style/conversion/property_value.hpp>
 
 @implementation NSCompoundPredicate (MGLAdditions)
 
@@ -54,8 +58,17 @@
             return noneFilter;
         }
         case NSAndPredicateType: {
-            mbgl::style::AllFilter filter;
-            filter.filters = self.mgl_subfilters;
+            mbgl::style::conversion::Error valueError;
+            NSArray *jsonObject = self.mgl_jsonExpressionObject;
+            auto value = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::expression::Expression>>(mbgl::style::conversion::makeConvertible(jsonObject), valueError, mbgl::style::expression::type::Boolean);
+            mbgl::style::ExpressionFilter filter;
+            if (!value) {
+                [NSException raise:NSInvalidArgumentException
+                            format:@"Invalid property value: %@", @(valueError.message.c_str())];
+                return {};
+            }
+            filter.expression = std::move(*value);
+            
             return filter;
         }
         case NSOrPredicateType: {
@@ -69,6 +82,8 @@
                 format:@""];
     return {};
 }
+
+//- (mbgl::style::expression::Expression)
 
 @end
 
