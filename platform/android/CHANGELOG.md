@@ -2,6 +2,13 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0-beta.6 - April 4, 2018
+ - Fix race condition crash for heavily modified annotations [#11551](https://github.com/mapbox/mapbox-gl-native/pull/11551)
+ - Throw exception when converting PropertyValue with an expression [#11572](https://github.com/mapbox/mapbox-gl-native/pull/11572)
+ - Invalidate camera position before delivering onMapReady [#11585](https://github.com/mapbox/mapbox-gl-native/pull/11585)
+ - Rework logical condition convenience expressions [#11555](https://github.com/mapbox/mapbox-gl-native/pull/11555)
+ - Telemetry library version update to 3.0.0-beta.4 [#11590](https://github.com/mapbox/mapbox-gl-native/pull/11590)
+
 ## 6.0.0-beta.5 - March 27, 2018
  - Avoid flashing on pitched overzoomed tiles [#11488](https://github.com/mapbox/mapbox-gl-native/pull/11488)
  - Literal array conversion of primitive arrays [#11500](https://github.com/mapbox/mapbox-gl-native/pull/11500)
