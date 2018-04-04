@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -236,36 +237,36 @@ public class Expression {
   /**
    * Returns true if the input values are equal, false otherwise.
    *
-   * @param compareOne the first boolean
+   * @param compareOne the first expression
    * @param compareTwo the second boolean
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
-  public static Expression eq(boolean compareOne, boolean compareTwo) {
+  public static Expression eq(Expression compareOne, boolean compareTwo) {
+    return eq(compareOne, literal(compareTwo));
+  }
+
+  /**
+   * Returns true if the input values are equal, false otherwise.
+   *
+   * @param compareOne the first expression
+   * @param compareTwo the second number
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
+   */
+  public static Expression eq(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return eq(literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns true if the input values are equal, false otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
    */
-  public static Expression eq(@NonNull String compareOne, @NonNull String compareTwo) {
-    return eq(literal(compareOne), literal(compareTwo));
-  }
-
-  /**
-   * Returns true if the input values are equal, false otherwise.
-   *
-   * @param compareOne the first number
-   * @param compareTwo the second number
-   * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-==">Style specification</a>
-   */
-  public static Expression eq(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression eq(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return eq(literal(compareOne), literal(compareTwo));
   }
 
@@ -285,36 +286,36 @@ public class Expression {
   /**
    * Returns true if the input values are equal, false otherwise.
    *
-   * @param compareOne the first boolean
+   * @param compareOne the first expression
    * @param compareTwo the second boolean
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
-  public static Expression neq(boolean compareOne, boolean compareTwo) {
+  public static Expression neq(Expression compareOne, boolean compareTwo) {
     return new Expression("!=", literal(compareOne), literal(compareTwo));
   }
-
+//fixme
   /**
    * Returns `true` if the input values are not equal, `false` otherwise.
    *
-   * @param compareOne the first string
+   * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
-  public static Expression neq(@NonNull String compareOne, @NonNull String compareTwo) {
+  public static Expression neq(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression("!=", literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns `true` if the input values are not equal, `false` otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-!=">Style specification</a>
    */
-  public static Expression neq(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression neq(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression("!=", literal(compareOne), literal(compareTwo));
   }
 
@@ -334,24 +335,24 @@ public class Expression {
   /**
    * Returns true if the first input is strictly greater than the second, false otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
    */
-  public static Expression gt(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression gt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns true if the first input is strictly greater than the second, false otherwise.
    *
-   * @param compareOne the first string
+   * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
    */
-  public static Expression gt(@NonNull String compareOne, @NonNull String compareTwo) {
+  public static Expression gt(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
   }
 
@@ -359,7 +360,7 @@ public class Expression {
    * Returns true if the first input is strictly less than the second, false otherwise.
    * The inputs must be numbers or strings, and both of the same type.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
@@ -371,24 +372,24 @@ public class Expression {
   /**
    * Returns true if the first input is strictly less than the second, false otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
    */
-  public static Expression lt(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression lt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns true if the first input is strictly less than the second, false otherwise.
    *
-   * @param compareOne the first string
+   * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
    */
-  public static Expression lt(@NonNull String compareOne, @NonNull String compareTwo) {
+  public static Expression lt(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
   }
 
@@ -408,24 +409,24 @@ public class Expression {
   /**
    * Returns true if the first input is greater than or equal to the second, false otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
    */
-  public static Expression gte(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression gte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns true if the first input is greater than or equal to the second, false otherwise.
    *
-   * @param compareOne the first string
+   * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
    */
-  public static Expression gte(@NonNull String compareOne, @NonNull String compareTwo) {
+  public static Expression gte(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
   }
 
@@ -445,24 +446,24 @@ public class Expression {
   /**
    * Returns true if the first input is less than or equal to the second, false otherwise.
    *
-   * @param compareOne the first number
+   * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
    */
-  public static Expression lte(@NonNull Number compareOne, @NonNull Number compareTwo) {
+  public static Expression lte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
   }
 
   /**
    * Returns true if the first input is less than or equal to the second, false otherwise.
    *
-   * @param compareOne the first string
+   * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
    */
-  public static Expression lte(@NonNull String compareOne, @NonNull String compareTwo) {
+  public static Expression lte(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
   }
 
@@ -1735,7 +1736,9 @@ public class Expression {
    */
   private Object toValue(ExpressionLiteral expressionValue) {
     Object value = expressionValue.toValue();
-    if (value instanceof Expression.ExpressionLiteral) {
+    if (value instanceof PropertyValue) {
+      throw new IllegalArgumentException("PropertyValue are not allowed as an expression literal, use value instead.");
+    } else if (value instanceof Expression.ExpressionLiteral) {
       return toValue((ExpressionLiteral) value);
     } else if (value instanceof Expression) {
       return ((Expression) value).toArray();

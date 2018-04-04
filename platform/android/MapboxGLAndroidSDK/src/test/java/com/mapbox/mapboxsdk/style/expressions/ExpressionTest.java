@@ -73,6 +73,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.typeOf;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.upcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.var;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.lineOpacity;
 import static junit.framework.Assert.assertTrue;
 import static org.junit.Assert.assertEquals;
 
@@ -126,7 +127,7 @@ public class ExpressionTest {
   @Test
   public void testEqLiteral() throws Exception {
     Object[] expected = new Object[] {"==", 1, 1};
-    Object[] actual = eq(1, 1).toArray();
+    Object[] actual = eq(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -140,7 +141,7 @@ public class ExpressionTest {
   @Test
   public void testNeqLiteral() throws Exception {
     Object[] expected = new Object[] {"!=", 0, 1};
-    Object[] actual = neq(0, 1).toArray();
+    Object[] actual = neq(literal(0), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -154,7 +155,7 @@ public class ExpressionTest {
   @Test
   public void testGtLiteral() throws Exception {
     Object[] expected = new Object[] {">", 0, 1};
-    Object[] actual = gt(0, 1).toArray();
+    Object[] actual = gt(literal(0), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -168,7 +169,7 @@ public class ExpressionTest {
   @Test
   public void testLtLiteral() throws Exception {
     Object[] expected = new Object[] {"<", 1, 0};
-    Object[] actual = lt(1, 0).toArray();
+    Object[] actual = lt(literal(1), 0).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -182,7 +183,7 @@ public class ExpressionTest {
   @Test
   public void testGteLiteral() throws Exception {
     Object[] expected = new Object[] {">=", 1, 1};
-    Object[] actual = gte(1, 1).toArray();
+    Object[] actual = gte(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -196,7 +197,7 @@ public class ExpressionTest {
   @Test
   public void testLteLiteral() throws Exception {
     Object[] expected = new Object[] {"<=", 1, 1};
-    Object[] actual = lte(1, 1).toArray();
+    Object[] actual = lte(literal(1), 1).toArray();
     assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 
@@ -1095,4 +1096,13 @@ public class ExpressionTest {
     assertTrue("expression should match", Arrays.deepEquals(expected, greenColor.toArray()));
   }
 
+  @Test(expected = IllegalArgumentException.class)
+  public void testThrowIllegalArgumentExceptionForPropertyValueLiteral() {
+    Expression expression = interpolate(exponential(1f), zoom(),
+      stop(17f, lineOpacity(1f)),
+      stop(16.5f, lineOpacity(0.5f)),
+      stop(16f, lineOpacity(0f))
+    );
+    expression.toArray();
+  }
 }

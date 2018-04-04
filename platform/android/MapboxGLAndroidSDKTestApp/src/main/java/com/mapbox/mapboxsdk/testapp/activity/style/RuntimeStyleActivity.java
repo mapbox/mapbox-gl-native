@@ -529,7 +529,7 @@ public class RuntimeStyleActivity extends AppCompatActivity {
       LineLayer counties = (LineLayer) mapboxMap.getLayer("counties");
 
       if (counties != null) {
-        counties.setFilter(eq("NAME10", "Washington"));
+        counties.setFilter(eq(get("NAME10"), "Washington"));
 
         counties.setProperties(
           lineColor(Color.RED),
