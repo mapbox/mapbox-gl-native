@@ -69,6 +69,7 @@
                 android:value=".activity.FeatureOverviewActivity" />
         </activity>
         <activity
+            android:exported="true"
             android:name=".activity.annotation.AnimatedMarkerActivity"
             android:description="@string/description_animated_marker"
             android:label="@string/activity_animated_marker">

@@ -2,53 +2,68 @@ package com.mapbox.mapboxsdk.testapp.activity.annotation;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
-import android.animation.ObjectAnimator;
 import android.animation.TypeEvaluator;
 import android.animation.ValueAnimator;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.DrawableRes;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.LinearInterpolator;
 
+import com.google.gson.JsonObject;
+import com.mapbox.geojson.Feature;
+import com.mapbox.geojson.FeatureCollection;
 import com.mapbox.geojson.Point;
-import com.mapbox.mapboxsdk.annotations.Icon;
-import com.mapbox.mapboxsdk.annotations.IconFactory;
-import com.mapbox.mapboxsdk.annotations.Marker;
-import com.mapbox.mapboxsdk.annotations.MarkerView;
-import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
-import com.mapbox.mapboxsdk.annotations.MarkerViewOptions;
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
+import com.mapbox.mapboxsdk.style.layers.SymbolLayer;
+import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
-import com.mapbox.mapboxsdk.testapp.utils.IconUtils;
 import com.mapbox.turf.TurfMeasurement;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconAllowOverlap;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconIgnorePlacement;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconImage;
+import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.iconRotate;
+
 /**
  * Test activity showcasing animating MarkerViews.
  */
 public class AnimatedMarkerActivity extends AppCompatActivity {
 
+  private static final String PASSENGER = "passenger";
+  private static final String PASSENGER_LAYER = "passenger-layer";
+  private static final String PASSENGER_SOURCE = "passenger-source";
+  private static final String TAXI = "taxi";
+  private static final String TAXI_LAYER = "taxi-layer";
+  private static final String TAXI_SOURCE = "taxi-source";
+  private static final String RANDOM_CAR_LAYER = "random-car-layer";
+  private static final String RANDOM_CAR_SOURCE = "random-car-source";
+  private static final String RANDOM_CAR_IMAGE_ID = "random-car";
+  private static final String PROPERTY_BEARING = "bearing";
+  private static final String WATERWAY_LAYER_ID = "waterway-label";
+  private static final int DURATION_RANDOM_MAX = 1500;
+  private static final int DURATION_BASE = 3000;
+
+  private final Random random = new Random();
+
   private MapView mapView;
   private MapboxMap mapboxMap;
 
-  private LatLng dupontCircle = new LatLng(38.90962, -77.04341);
+  private List<Car> randomCars = new ArrayList<>();
+  private GeoJsonSource randomCarSource;
+  private Car taxi;
+  private GeoJsonSource taxiSource;
+  private LatLng passenger;
 
-  private Marker passengerMarker = null;
-  private MarkerView carMarker = null;
-
-  private Runnable animationRunnable;
-
-  private List<MarkerView> markerViews = new ArrayList<>();
-  private boolean stopped;
+  private List<Animator> animators = new ArrayList<>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -59,130 +74,254 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     mapView.onCreate(savedInstanceState);
     mapView.getMapAsync(mapboxMap -> {
       AnimatedMarkerActivity.this.mapboxMap = mapboxMap;
-      setupMap();
-
-      animationRunnable = () -> {
-        for (int i = 0; i < 10; i++) {
-          addRandomCar();
-        }
-        addPassenger();
-        addMainCar();
-      };
-      mapView.post(animationRunnable);
+      setupCars();
+      animateRandomRoutes();
+      animateTaxi();
     });
   }
 
-  private void setupMap() {
-    CameraPosition cameraPosition = new CameraPosition.Builder()
-      .target(dupontCircle)
-      .zoom(15)
-      .build();
-    mapboxMap.setCameraPosition(cameraPosition);
+  private void setupCars() {
+    addRandomCars();
+    addPassenger();
+    addMainCar();
+  }
+
+  private void animateRandomRoutes() {
+    final Car longestDrive = getLongestDrive();
+    final Random random = new Random();
+    for (final Car car : randomCars) {
+      final boolean isLongestDrive = longestDrive.equals(car);
+      ValueAnimator valueAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), car.current, car.next);
+      valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+        private LatLng latLng;
+
+        @Override
+        public void onAnimationUpdate(ValueAnimator animation) {
+          latLng = (LatLng) animation.getAnimatedValue();
+          car.current = latLng;
+          if (isLongestDrive) {
+            updateRandomCarSource();
+          }
+        }
+      });
+
+      if (isLongestDrive) {
+        valueAnimator.addListener(new AnimatorListenerAdapter() {
+          @Override
+          public void onAnimationEnd(Animator animation) {
+            super.onAnimationEnd(animation);
+            updateRandomDestinations();
+            animateRandomRoutes();
+          }
+        });
+      }
+
+      valueAnimator.addListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationStart(Animator animation) {
+          super.onAnimationStart(animation);
+          car.feature.properties().addProperty("bearing", Car.getBearing(car.current, car.next));
+        }
+      });
+
+      int offset = random.nextInt(2) == 0 ? 0 : random.nextInt(1000) + 250;
+      valueAnimator.setStartDelay(offset);
+      valueAnimator.setDuration(car.duration - offset);
+      valueAnimator.setInterpolator(new LinearInterpolator());
+      valueAnimator.start();
+
+      animators.add(valueAnimator);
+    }
+  }
+
+  private void animateTaxi() {
+    ValueAnimator valueAnimator = ValueAnimator.ofObject(new LatLngEvaluator(), taxi.current, taxi.next);
+    valueAnimator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+
+      private LatLng latLng;
+
+      @Override
+      public void onAnimationUpdate(ValueAnimator animation) {
+        latLng = (LatLng) animation.getAnimatedValue();
+        taxi.current = latLng;
+        updateTaxiSource();
+      }
+    });
+
+    valueAnimator.addListener(new AnimatorListenerAdapter() {
+      @Override
+      public void onAnimationEnd(Animator animation) {
+        super.onAnimationEnd(animation);
+        updatePassenger();
+        animateTaxi();
+      }
+    });
+
+    valueAnimator.addListener(new AnimatorListenerAdapter() {
+      @Override
+      public void onAnimationStart(Animator animation) {
+        super.onAnimationStart(animation);
+        taxi.feature.properties().addProperty("bearing", Car.getBearing(taxi.current, taxi.next));
+      }
+    });
+
+    valueAnimator.setDuration((long) (7 * taxi.current.distanceTo(taxi.next)));
+    valueAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
+    valueAnimator.start();
+
+    animators.add(valueAnimator);
+  }
+
+  private void updatePassenger() {
+    passenger = getLatLngInBounds();
+    updatePassengerSource();
+    taxi.setNext(passenger);
+  }
+
+  private void updatePassengerSource() {
+    GeoJsonSource source = mapboxMap.getSourceAs(PASSENGER_SOURCE);
+    FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {
+      Feature.fromGeometry(
+        Point.fromLngLat(
+          passenger.getLongitude(),
+          passenger.getLatitude()
+        )
+      )
+    });
+    source.setGeoJson(featureCollection);
+  }
+
+  private void updateTaxiSource() {
+    taxi.updateFeature();
+    taxiSource.setGeoJson(taxi.feature);
+  }
+
+  private void updateRandomDestinations() {
+    for (Car randomCar : randomCars) {
+      randomCar.setNext(getLatLngInBounds());
+    }
+  }
+
+  private Car getLongestDrive() {
+    Car longestDrive = null;
+    for (Car randomCar : randomCars) {
+      if (longestDrive == null) {
+        longestDrive = randomCar;
+      } else if (longestDrive.duration < randomCar.duration) {
+        longestDrive = randomCar;
+      }
+    }
+    return longestDrive;
+  }
+
+  private void updateRandomCarSource() {
+    for (Car randomCarsRoute : randomCars) {
+      randomCarsRoute.updateFeature();
+    }
+    randomCarSource.setGeoJson(featuresFromRoutes());
+  }
+
+  private FeatureCollection featuresFromRoutes() {
+    List<Feature> features = new ArrayList<>();
+    for (Car randomCarsRoute : randomCars) {
+      features.add(randomCarsRoute.feature);
+    }
+    return FeatureCollection.fromFeatures(features);
+  }
+
+  private long getDuration() {
+    return random.nextInt(DURATION_RANDOM_MAX) + DURATION_BASE;
+  }
+
+  private void addRandomCars() {
+    LatLng latLng;
+    LatLng next;
+    for (int i = 0; i < 3000; i++) {
+      latLng = getLatLngInBounds();
+      next = getLatLngInBounds();
+
+      JsonObject properties = new JsonObject();
+      properties.addProperty(PROPERTY_BEARING, Car.getBearing(latLng, next));
+
+      Feature feature = Feature.fromGeometry(
+        Point.fromLngLat(
+          latLng.getLongitude(),
+          latLng.getLatitude()
+        ), properties);
+
+      randomCars.add(
+        new Car(feature, next, getDuration())
+      );
+    }
+
+    randomCarSource = new GeoJsonSource(RANDOM_CAR_SOURCE, featuresFromRoutes());
+    mapboxMap.addSource(randomCarSource);
+    mapboxMap.addImage(RANDOM_CAR_IMAGE_ID,
+      ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_car_top)).getBitmap());
+
+    SymbolLayer symbolLayer = new SymbolLayer(RANDOM_CAR_LAYER, RANDOM_CAR_SOURCE);
+    symbolLayer.withProperties(
+      iconImage(RANDOM_CAR_IMAGE_ID),
+      iconAllowOverlap(true),
+      iconRotate(get("bearing")),
+      iconIgnorePlacement(true)
+    );
+
+    mapboxMap.addLayerBelow(symbolLayer, WATERWAY_LAYER_ID);
   }
 
   private void addPassenger() {
-    if (isActivityStopped()) {
-      return;
-    }
+    passenger = getLatLngInBounds();
+    FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {
+      Feature.fromGeometry(
+        Point.fromLngLat(
+          passenger.getLongitude(),
+          passenger.getLatitude()
+        )
+      )
+    });
 
-    LatLng randomLatLng = getLatLngInBounds();
+    mapboxMap.addImage(PASSENGER,
+      ((BitmapDrawable) getResources().getDrawable(R.drawable.icon_burned)).getBitmap());
 
-    if (passengerMarker == null) {
-      Icon icon = IconUtils.drawableToIcon(this, R.drawable.ic_directions_run_black,
-        ResourcesCompat.getColor(getResources(), R.color.blueAccent, getTheme()));
-      passengerMarker = mapboxMap.addMarker(new MarkerViewOptions()
-        .position(randomLatLng)
-        .icon(icon));
-    } else {
-      passengerMarker.setPosition(randomLatLng);
-    }
+    GeoJsonSource geoJsonSource = new GeoJsonSource(PASSENGER_SOURCE, featureCollection);
+    mapboxMap.addSource(geoJsonSource);
+
+    SymbolLayer symbolLayer = new SymbolLayer(PASSENGER_LAYER, PASSENGER_SOURCE);
+    symbolLayer.withProperties(
+      iconImage(PASSENGER),
+      iconIgnorePlacement(true),
+      iconAllowOverlap(true)
+    );
+    mapboxMap.addLayerBelow(symbolLayer, RANDOM_CAR_LAYER);
   }
 
   private void addMainCar() {
-    if (isActivityStopped()) {
-      return;
-    }
+    LatLng latLng = getLatLngInBounds();
+    JsonObject properties = new JsonObject();
+    properties.addProperty(PROPERTY_BEARING, Car.getBearing(latLng, passenger));
+    Feature feature = Feature.fromGeometry(
+      Point.fromLngLat(
+        latLng.getLongitude(),
+        latLng.getLatitude()), properties);
+    FeatureCollection featureCollection = FeatureCollection.fromFeatures(new Feature[] {feature});
 
-    LatLng randomLatLng = getLatLngInBounds();
+    taxi = new Car(feature, passenger, getDuration());
+    mapboxMap.addImage(TAXI,
+      ((BitmapDrawable) getResources().getDrawable(R.drawable.ic_taxi_top)).getBitmap());
+    taxiSource = new GeoJsonSource(TAXI_SOURCE, featureCollection);
+    mapboxMap.addSource(taxiSource);
 
-    if (carMarker == null) {
-      carMarker = createCarMarker(randomLatLng, R.drawable.ic_taxi_top,
-        markerView -> {
-          // Make sure the car marker is selected so that it's always brought to the front (#5285)
-          mapboxMap.selectMarker(carMarker);
-          animateMoveToPassenger(carMarker);
-        });
-      markerViews.add(carMarker);
-    } else {
-      carMarker.setPosition(randomLatLng);
-    }
-  }
+    SymbolLayer symbolLayer = new SymbolLayer(TAXI_LAYER, TAXI_SOURCE);
+    symbolLayer.withProperties(
+      iconImage(TAXI),
+      iconRotate(get(PROPERTY_BEARING)),
+      iconAllowOverlap(true),
+      iconIgnorePlacement(true)
 
-  private void animateMoveToPassenger(final MarkerView car) {
-    if (isActivityStopped()) {
-      return;
-    }
-
-    ValueAnimator animator = animateMoveMarker(car, passengerMarker.getPosition());
-    animator.addListener(new AnimatorListenerAdapter() {
-      @Override
-      public void onAnimationEnd(Animator animation) {
-        addPassenger();
-        animateMoveToPassenger(car);
-      }
-    });
-  }
-
-  protected void addRandomCar() {
-    markerViews.add(createCarMarker(getLatLngInBounds(), R.drawable.ic_car_top,
-      markerView -> randomlyMoveMarker(markerView)));
-  }
-
-  private void randomlyMoveMarker(final MarkerView marker) {
-    if (isActivityStopped()) {
-      return;
-    }
-
-    ValueAnimator animator = animateMoveMarker(marker, getLatLngInBounds());
-
-    // Add listener to restart animation on end
-    animator.addListener(new AnimatorListenerAdapter() {
-      @Override
-      public void onAnimationEnd(Animator animation) {
-        randomlyMoveMarker(marker);
-      }
-    });
-  }
-
-  private ValueAnimator animateMoveMarker(final MarkerView marker, LatLng to) {
-    marker.setRotation((float) getBearing(marker.getPosition(), to));
-
-    final ValueAnimator markerAnimator = ObjectAnimator.ofObject(
-      marker, "position", new LatLngEvaluator(), marker.getPosition(), to);
-    markerAnimator.setDuration((long) (10 * marker.getPosition().distanceTo(to)));
-    markerAnimator.setInterpolator(new AccelerateDecelerateInterpolator());
-
-    // Start
-    markerAnimator.start();
-
-    return markerAnimator;
-  }
-
-  private MarkerView createCarMarker(LatLng start, @DrawableRes int carResource,
-                                     MarkerViewManager.OnMarkerViewAddedListener listener) {
-    Icon icon = IconFactory.getInstance(AnimatedMarkerActivity.this)
-      .fromResource(carResource);
-
-    // View Markers
-    return mapboxMap.addMarker(new MarkerViewOptions()
-      .position(start)
-      .icon(icon), listener);
-
-    // GL Markers
-//        return mapboxMap.addMarker(new MarkerOptions()
-//                .position(start)
-//                .icon(icon));
-
+    );
+    mapboxMap.addLayer(symbolLayer);
   }
 
   private LatLng getLatLngInBounds() {
@@ -216,23 +355,7 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   @Override
   protected void onStop() {
     super.onStop();
-
-    stopped = true;
-
-    // Stop ongoing animations, prevent memory leaks
-    if (mapboxMap != null) {
-      MarkerViewManager markerViewManager = mapboxMap.getMarkerViewManager();
-      for (MarkerView markerView : markerViews) {
-        View view = markerViewManager.getView(markerView);
-        if (view != null) {
-          view.animate().cancel();
-        }
-      }
-    }
-
-    // onStop
     mapView.onStop();
-    mapView.removeCallbacks(animationRunnable);
   }
 
   @Override
@@ -244,6 +367,14 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
   @Override
   protected void onDestroy() {
     super.onDestroy();
+
+    for (Animator animator : animators) {
+      if (animator != null) {
+        animator.removeAllListeners();
+        animator.cancel();
+      }
+    }
+
     mapView.onDestroy();
   }
 
@@ -270,14 +401,38 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
     }
   }
 
-  private double getBearing(LatLng from, LatLng to) {
-    return TurfMeasurement.bearing(
-      Point.fromLngLat(from.getLongitude(), from.getLatitude()),
-      Point.fromLngLat(to.getLongitude(), to.getLatitude())
-    );
-  }
 
-  private boolean isActivityStopped() {
-    return stopped;
+  private static class Car {
+    private Feature feature;
+    private LatLng next;
+    private LatLng current;
+    private long duration;
+
+    Car(Feature feature, LatLng next, long duration) {
+      this.feature = feature;
+      Point point = ((Point) feature.geometry());
+      this.current = new LatLng(point.latitude(), point.longitude());
+      this.duration = duration;
+      this.next = next;
+    }
+
+    void setNext(LatLng next) {
+      this.next = next;
+    }
+
+    void updateFeature() {
+      feature = Feature.fromGeometry(Point.fromLngLat(
+        current.getLongitude(),
+        current.getLatitude())
+      );
+      feature.properties().addProperty("bearing", getBearing(current, next));
+    }
+
+    private static float getBearing(LatLng from, LatLng to) {
+      return (float) TurfMeasurement.bearing(
+        Point.fromLngLat(from.getLongitude(), from.getLatitude()),
+        Point.fromLngLat(to.getLongitude(), to.getLatitude())
+      );
+    }
   }
 }
