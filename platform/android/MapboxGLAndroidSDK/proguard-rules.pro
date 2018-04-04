@@ -20,7 +20,7 @@
 -dontwarn org.conscrypt.OpenSSLProvider
 -dontwarn org.conscrypt.Conscrypt
 
-# config for mapbox-sdk-geojson:3.0.0-beta.3
+# config for mapbox-sdk-geojson:3.0.1
 -keep class com.mapbox.geojson.** { *; }
 -keep class com.google.gson.** { *; }
 -dontnote com.google.gson.internal.UnsafeAllocator
