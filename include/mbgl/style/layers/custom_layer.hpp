@@ -2,6 +2,8 @@
 
 #include <mbgl/style/layer.hpp>
 
+#include <array>
+
 namespace mbgl {
 namespace style {
 
@@ -17,6 +19,7 @@ struct CustomLayerRenderParameters {
     double bearing;
     double pitch;
     double fieldOfView;
+    std::array<double, 16> projectionMatrix;
 };
 
 class CustomLayerHost {
