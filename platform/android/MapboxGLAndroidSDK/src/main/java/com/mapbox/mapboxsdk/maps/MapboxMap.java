@@ -168,6 +168,7 @@ public final class MapboxMap {
    * Called before the OnMapReadyCallback is invoked.
    */
   void onPreMapReady() {
+    invalidateCameraPosition();
     annotationManager.reloadMarkers();
     annotationManager.adjustTopOffsetPixels(this);
   }
@@ -912,7 +913,7 @@ public final class MapboxMap {
   /**
    * Invalidates the current camera position by reconstructing it from mbgl
    */
-  void invalidateCameraPosition() {
+  private void invalidateCameraPosition() {
     CameraPosition cameraPosition = transform.invalidateCameraPosition();
     if (cameraPosition != null) {
       transform.updateCameraPosition(cameraPosition);
