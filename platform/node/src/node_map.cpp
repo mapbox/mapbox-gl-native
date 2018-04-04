@@ -744,8 +744,7 @@ void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     
 void NodeMap::SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     using namespace mbgl::style;
-    using namespace mbgl::style::conversion;
-        
+
     auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
     if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
     
@@ -762,6 +761,10 @@ void NodeMap::SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>& info
     }
     
     mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
+    if (!layer) {
+        return Nan::ThrowTypeError("layer not found");
+    }
+
     layer->setMinZoom(info[1]->NumberValue());
     layer->setMaxZoom(info[2]->NumberValue());
 }
