@@ -9,6 +9,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import com.mapbox.mapboxsdk.style.layers.PropertyFactory;
+import com.mapbox.mapboxsdk.style.layers.PropertyValue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -1735,7 +1736,9 @@ public class Expression {
    */
   private Object toValue(ExpressionLiteral expressionValue) {
     Object value = expressionValue.toValue();
-    if (value instanceof Expression.ExpressionLiteral) {
+    if (value instanceof PropertyValue) {
+      throw new IllegalArgumentException("PropertyValue are not allowed as an expression literal, use value instead.");
+    } else if (value instanceof Expression.ExpressionLiteral) {
       return toValue((ExpressionLiteral) value);
     } else if (value instanceof Expression) {
       return ((Expression) value).toArray();
