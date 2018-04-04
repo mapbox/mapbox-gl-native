@@ -37,8 +37,10 @@
     <string name="description_print">Shows how to print a map</string>
     <string name="description_query_rendered_feature_properties_point">Query rendered feature properties on click</string>
     <string name="description_query_rendered_features_box_count">Count all rendered features in box</string>
+    <string name="description_query_rendered_features_limits">Test limits on geojson conversions</string>
     <string name="description_query_rendered_features_box_symbol_count">Count all rendered symbols in box</string>
     <string name="description_query_rendered_features_box_highlight">Highlight buildings in box</string>
+    <string name="activity_query_rendered_features_limits">Test geojson conversion limits</string>
     <string name="description_query_source_features">Query source for features</string>
     <string name="description_simple_map">Shows a simple map</string>
     <string name="description_map_change">Logs map change events to Logcat</string>
