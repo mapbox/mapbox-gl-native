@@ -1,6 +1,8 @@
 {
   "query-tests/circle-pitch-scale/viewport-inside-align-map": "https://github.com/mapbox/mapbox-gl-native/issues/10615",
   "query-tests/circle-pitch-scale/viewport-inside-align-viewport": "https://github.com/mapbox/mapbox-gl-native/issues/10615",
+  "query-tests/edge-cases/box-cutting-antimeridian-z0": "https://github.com/mapbox/mapbox-gl-native/issues/11607",
+  "query-tests/edge-cases/null-island": "https://github.com/mapbox/mapbox-gl-native/issues/11607",
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
   "query-tests/geometry/polygon": "needs investigation",
