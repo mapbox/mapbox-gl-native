@@ -239,7 +239,9 @@ void OfflineRegion::OfflineRegionStatusCallback::onError(jni::JNIEnv& env,
                                                           std::exception_ptr error) {
     static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
     std::string message = mbgl::util::toString(error);
-    callback.Call(env, method, jni::Make<jni::String>(env, message));
+    auto jmessage = jni::Make<jni::String>(env, message);
+    callback.Call(env, method, jmessage);
+    jni::DeleteLocalRef(env, jmessage);
 }
 
 void OfflineRegion::OfflineRegionStatusCallback::onStatus(jni::JNIEnv& env,
@@ -267,7 +269,9 @@ void OfflineRegion::OfflineRegionDeleteCallback::onError(jni::JNIEnv& env,
                                                           std::exception_ptr error) {
     static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
     std::string message = mbgl::util::toString(error);
-    callback.Call(env, method, jni::Make<jni::String>(env, message));
+    auto jmessage = jni::Make<jni::String>(env, message);
+    callback.Call(env, method, jmessage);
+    jni::DeleteLocalRef(env, jmessage);
 }
 
 void OfflineRegion::OfflineRegionDeleteCallback::onDelete(jni::JNIEnv& env, jni::Object<OfflineRegion::OfflineRegionDeleteCallback> callback) {
@@ -289,7 +293,9 @@ void OfflineRegion::OfflineRegionUpdateMetadataCallback::onError(jni::JNIEnv& en
                                                           std::exception_ptr error) {
     static auto method = javaClass.GetMethod<void (jni::String)>(env, "onError");
     std::string message = mbgl::util::toString(error);
-    callback.Call(env, method, jni::Make<jni::String>(env, message));
+    auto jmessage = jni::Make<jni::String>(env, message);
+    callback.Call(env, method, jmessage);
+    jni::DeleteLocalRef(env, jmessage);
 }
 
 void OfflineRegion::OfflineRegionUpdateMetadataCallback::onUpdate(jni::JNIEnv& env,
