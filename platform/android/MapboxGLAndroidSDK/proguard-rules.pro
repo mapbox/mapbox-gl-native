@@ -13,6 +13,7 @@
 -dontnote okhttp3.**
 
 # config for mapbox-android-telemetry:3.0.0-beta.1
+-keep class com.mapbox.android.telemetry.** { *; }
 -dontwarn com.mapbox.android.core.location.MockLocationEngine
 -dontwarn com.mapbox.android.core.location.MockLocationEngine$LocationUpdateRunnable
 -dontwarn java.awt.Color
@@ -20,7 +21,7 @@
 -dontwarn org.conscrypt.OpenSSLProvider
 -dontwarn org.conscrypt.Conscrypt
 
-# config for mapbox-sdk-geojson:3.0.0-beta.3
+# config for mapbox-sdk-geojson:3.0.1
 -keep class com.mapbox.geojson.** { *; }
 -keep class com.google.gson.** { *; }
 -dontnote com.google.gson.internal.UnsafeAllocator
@@ -39,3 +40,4 @@
 -dontnote com.google.protobuf.Extension
 -dontnote android.net.**
 -dontnote org.apache.http.**
+-dontwarn com.sun.xml.internal.ws.spi.db.**
