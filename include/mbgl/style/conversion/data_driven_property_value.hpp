@@ -46,9 +46,17 @@ struct Converter<DataDrivenPropertyValue<T>> {
             } else {
                 // If an expression is neither zoom- nor feature-dependent, it
                 // should have been reduced to a Literal when it was parsed.
-                auto literal = dynamic_cast<Literal*>(expression->get());
-                assert(literal);
-                optional<T> constant = fromExpressionValue<T>(literal->getValue());
+                optional<T> constant;
+                if (auto literal = dynamic_cast<Literal*>(expression->get())) {
+                    // cool, it's pre-folded to a literal
+                    constant = fromExpressionValue<T>(literal->getValue());
+                } else {
+                    // we didn't manage to fold to a literal during parsing, so evaluate it now
+                    EvaluationContext params(nullptr);
+                    EvaluationResult evaluated((*expression)->evaluate(params));
+                    assert(evaluated);
+                    constant = fromExpressionValue<T>(*evaluated);
+                }
                 if (!constant) {
                     return {};
                 }
