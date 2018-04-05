@@ -25,7 +25,10 @@ public:
      */
     jni::Object<JsonPrimitive> operator()(const std::string value) const {
         static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::String>(env);
-        return JsonPrimitive::javaClass.New(env, constructor, jni::Make<jni::String>(env, value));
+        auto jvalue = jni::Make<jni::String>(env, value);
+        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, jvalue);
+        jni::DeleteLocalRef(env, jvalue);
+        return jsonPrimitive;
     }
 
     /**
@@ -35,7 +38,9 @@ public:
         static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
         auto boxedValue = java::lang::Double::valueOf(env, value);
         auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        return JsonPrimitive::javaClass.New(env, constructor, number);
+        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, number);
+        jni::DeleteLocalRef(env, boxedValue);
+        return jsonPrimitive;
     }
 
     /**
@@ -45,18 +50,21 @@ public:
         static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
         auto boxedValue = java::lang::Long::valueOf(env, value);
         auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        return JsonPrimitive::javaClass.New(env, constructor, number);
+        auto jsonPrimitive =  JsonPrimitive::javaClass.New(env, constructor, number);
+        jni::DeleteLocalRef(env, boxedValue);
+        return jsonPrimitive;
     }
 
     /**
      * Create a primitive containing a number value with type long
      */
     jni::Object<JsonPrimitive> operator()(const uint64_t value) const {
-        // long conversion
         static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Number>>(env);
         auto boxedValue = java::lang::Long::valueOf(env, value);
         auto number = jni::Cast(env, boxedValue, java::lang::Number::javaClass);
-        return JsonPrimitive::javaClass.New(env, constructor, number);
+        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, number);
+        jni::DeleteLocalRef(env, boxedValue);
+        return jsonPrimitive;
     }
 
     /**
@@ -65,7 +73,9 @@ public:
     jni::Object<JsonPrimitive> operator()(const bool value) const {
         static auto constructor = JsonPrimitive::javaClass.GetConstructor<jni::Object<java::lang::Boolean>>(env);
         auto boxedValue = java::lang::Boolean::valueOf(env, value);
-        return JsonPrimitive::javaClass.New(env, constructor, boxedValue);
+        auto jsonPrimitive = JsonPrimitive::javaClass.New(env, constructor, boxedValue);
+        jni::DeleteLocalRef(env, boxedValue);
+        return jsonPrimitive;
     }
 };
 
