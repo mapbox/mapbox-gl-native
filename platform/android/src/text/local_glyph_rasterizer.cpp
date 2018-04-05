@@ -46,6 +46,7 @@ PremultipliedImage LocalGlyphRasterizer::drawGlyphBitmap(const std::string& font
                                      jniFontFamily,
                                      static_cast<jni::jboolean>(bold),
                                      static_cast<jni::jchar>(glyphID));
+    jni::DeleteLocalRef(*env, jniFontFamily);
 
     PremultipliedImage result = Bitmap::GetImage(*env, javaBitmap);
     jni::DeleteLocalRef(*env, javaBitmap);
