@@ -743,7 +743,21 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @YES);
     }
-    
+    {
+        NSArray *jsonExpression = @[
+            @"case",
+            @[
+                @"<",
+                @[@"get", @"area"],
+                @80000
+            ],
+            @[@"get", @"abbr"],
+            @[@"get", @"name_en"]
+        ];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"TERNARY(area < 80000, abbr, name_en)"];
+        XCTAssertEqualObjects([NSExpression mgl_expressionWithJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+    }
 }
 
 - (void)testLookupExpressionObject {
