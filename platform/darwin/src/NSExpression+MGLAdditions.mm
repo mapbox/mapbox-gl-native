@@ -806,7 +806,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if (op) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[op] arrayByAddingObjectsFromArray:arguments];
-            } else if ([function isEqualToString:@"valueForKeyPath:"]) {
+            } else if ([function isEqualToString:@"valueForKey:"] || [function isEqualToString:@"valueForKeyPath:"]) {
                 return @[@"get", self.arguments.firstObject.mgl_jsonExpressionObject, self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"average:"]) {
                 NSExpression *sum = [NSExpression expressionForFunction:@"sum:" arguments:self.arguments];
