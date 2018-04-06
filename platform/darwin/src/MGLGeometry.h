@@ -36,6 +36,17 @@ NS_INLINE MGLCoordinateSpan MGLCoordinateSpanMake(CLLocationDegrees latitudeDelt
 }
 
 /**
+ Creates a new `MGLMapPoint` from the given X and Y coordinates, and zoom level.
+ */
+NS_INLINE MGLMapPoint MGLMapPointMake(CGFloat x, CGFloat y, CGFloat zoomLevel) {
+    MGLMapPoint point;
+    point.x = x;
+    point.y = y;
+    point.zoomLevel = zoomLevel;
+    return point;
+}
+
+/**
  Returns `YES` if the two coordinate spans represent the same latitudinal change
  and the same longitudinal change.
  */
@@ -192,6 +203,6 @@ NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
 }
 
 /** Returns Mercator projection of a WGS84 coordinate at the specified zoom level. */
-extern MGL_EXPORT MGLMapPoint MGLMapPointMake(CLLocationCoordinate2D coordinate, double zoomLevel);
+extern MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
 
 NS_ASSUME_NONNULL_END
