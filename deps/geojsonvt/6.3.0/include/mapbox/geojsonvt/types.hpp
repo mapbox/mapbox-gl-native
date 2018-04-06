@@ -3,6 +3,8 @@
 #include <mapbox/geometry.hpp>
 #include <mapbox/variant.hpp>
 
+#include <mbgl/util/optional.hpp>
+
 #include <algorithm>
 #include <string>
 #include <unordered_map>
@@ -90,7 +92,7 @@ using property_map = mapbox::geometry::property_map;
 using identifier = mapbox::geometry::identifier;
 
 template <class T>
-using optional = std::experimental::optional<T>;
+using optional = mbgl::optional<T>;
 
 template <class T>
 struct vt_geometry_type;

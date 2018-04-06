@@ -106,15 +106,15 @@ public:
 
     static optional<Value> toValue(const QVariant& value) {
         if (value.type() == QVariant::Bool) {
-            return { value.toBool() };
+            return Value{ value.toBool() };
         } else if (value.type() == QVariant::String) {
-            return { value.toString().toStdString() };
+            return Value{ value.toString().toStdString() };
         } else if (value.type() == QVariant::Color) {
-            return { value.value<QColor>().name().toStdString() };
+            return Value{ value.value<QColor>().name().toStdString() };
         } else if (value.type() == QVariant::Int) {
-            return { int64_t(value.toInt()) };
+            return Value{ int64_t(value.toInt()) };
         } else if (value.canConvert(QVariant::Double)) {
-            return { value.toDouble() };
+            return Value{ value.toDouble() };
         } else {
             return {};
         }

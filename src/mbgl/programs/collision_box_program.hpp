@@ -36,7 +36,17 @@ class CollisionBoxProgram : public Program<
     style::Properties<>>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    CollisionBoxProgram(Args&&... args) : Program<
+                                          shaders::collision_box,
+                                          gl::Line,
+                                          gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
+                                          gl::Uniforms<
+                                              uniforms::u_matrix,
+                                              uniforms::u_extrude_scale,
+                                              uniforms::u_camera_to_center_distance>,
+                                          style::Properties<>>(std::forward<Args>(args)...)
+    {}
 
     static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
         return CollisionBoxLayoutAttributes::Vertex {
@@ -115,7 +125,18 @@ class CollisionCircleProgram : public Program<
     style::Properties<>>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    CollisionCircleProgram(Args&&... args) : Program<
+                                             shaders::collision_circle,
+                                             gl::Triangle,
+                                             gl::ConcatenateAttributes<CollisionBoxLayoutAttributes, CollisionBoxDynamicAttributes>,
+                                             gl::Uniforms<
+                                                 uniforms::u_matrix,
+                                                 uniforms::u_extrude_scale,
+                                                 uniforms::u_overscale_factor,
+                                                 uniforms::u_camera_to_center_distance>,
+                                             style::Properties<>>(std::forward<Args>(args)...)
+    {}
 
     static CollisionBoxLayoutAttributes::Vertex vertex(Point<float> a, Point<float> anchor, Point<float> o) {
         return CollisionBoxLayoutAttributes::Vertex {

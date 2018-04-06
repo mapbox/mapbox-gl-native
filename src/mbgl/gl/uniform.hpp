@@ -90,6 +90,11 @@ public:
     using Values = IndexedTuple<TypeList<Us...>, TypeList<typename Us::Value...>>;
     using NamedLocations = std::vector<std::pair<const std::string, UniformLocation>>;
 
+    template<class Us_>
+    static auto createUniformLocation(const ProgramID& id) {
+        return std::move(uniformLocation(id, Us_::name()));
+    }
+
     static State bindLocations(const ProgramID& id) {
 #ifndef NDEBUG
         // Verify active uniform types match the enum
@@ -103,7 +108,7 @@ public:
                    : false)... });
 #endif
 
-        return State { { uniformLocation(id, Us::name()) }... };
+        return State { createUniformLocation<Us>(id)... };
     }
 
     template <class Program>

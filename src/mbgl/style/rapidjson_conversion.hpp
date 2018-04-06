@@ -86,18 +86,18 @@ public:
         switch (value->GetType()) {
             case rapidjson::kNullType:
             case rapidjson::kFalseType:
-                return { false };
+                return Value{ false };
 
             case rapidjson::kTrueType:
-                return { true };
+                return Value{ true };
 
             case rapidjson::kStringType:
-                return { std::string { value->GetString(), value->GetStringLength() } };
+                return Value{ std::string { value->GetString(), value->GetStringLength() } };
 
             case rapidjson::kNumberType:
-                if (value->IsUint64()) return { value->GetUint64() };
-                if (value->IsInt64()) return { value->GetInt64() };
-                return { value->GetDouble() };
+                if (value->IsUint64()) return Value{ value->GetUint64() };
+                if (value->IsInt64()) return Value{ value->GetInt64() };
+                return Value{ value->GetDouble() };
 
             default:
                 return {};

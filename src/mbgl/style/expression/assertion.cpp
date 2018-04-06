@@ -27,7 +27,7 @@ ParseResult Assertion::parse(const Convertible& value, ParsingContext& ctx) {
     std::vector<std::unique_ptr<Expression>> parsed;
     parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        ParseResult input = ctx.parse(arrayMember(value, i), i, {type::Value});
+        ParseResult input = ctx.parse(arrayMember(value, i), i, optional<type::Type>{type::Value});
         if (!input) return ParseResult();
         parsed.push_back(std::move(*input));
     }

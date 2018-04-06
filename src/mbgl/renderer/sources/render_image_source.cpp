@@ -56,7 +56,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     }
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
     for (auto matrix : matrices) {
         parameters.programs.debug.draw(
@@ -189,15 +189,16 @@ void RenderImageSource::update(Immutable<style::Source::Impl> baseImpl_,
         }
     }
 
+    uint16_t u16EXTENT = static_cast<uint16_t>(util::EXTENT);
     // Set Bucket Vertices, Indices, and segments
     bucket->vertices.emplace_back(
         RasterProgram::layoutVertex({ geomCoords[0].x, geomCoords[0].y }, { 0, 0 }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { util::EXTENT, 0 }));
+        RasterProgram::layoutVertex({ geomCoords[1].x, geomCoords[1].y }, { u16EXTENT, 0 }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, util::EXTENT }));
+        RasterProgram::layoutVertex({ geomCoords[3].x, geomCoords[3].y }, { 0, u16EXTENT }));
     bucket->vertices.emplace_back(
-        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { util::EXTENT, util::EXTENT }));
+        RasterProgram::layoutVertex({ geomCoords[2].x, geomCoords[2].y }, { u16EXTENT, u16EXTENT }));
 
     bucket->indices.emplace_back(0, 1, 2);
     bucket->indices.emplace_back(1, 2, 3);

@@ -8,15 +8,15 @@ namespace expression {
 template <typename T>
 optional<Value> checkNumber(T n) {
     if (n > std::numeric_limits<double>::max()) {
-        return {std::numeric_limits<double>::infinity()};
+        return optional<Value>{std::numeric_limits<double>::infinity()};
     } else {
-        return {static_cast<double>(n)};
+        return optional<Value>{static_cast<double>(n)};
     }
 }
 
 using namespace mbgl::style::conversion;
 optional<Value> parseValue(const Convertible& value, ParsingContext& ctx) {
-    if (isUndefined(value)) return {Null};
+    if (isUndefined(value)) return optional<Value>{Null};
     if (isObject(value)) {
         std::unordered_map<std::string, Value> result;
         bool error = false;

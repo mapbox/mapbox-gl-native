@@ -63,7 +63,14 @@ class BackgroundProgram : public Program<
     style::Properties<>>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    BackgroundProgram(Args&&... args) : Program<
+                                        shaders::background,
+                                        gl::Triangle,
+                                        BackgroundLayoutAttributes,
+                                        BackgroundUniforms,
+                                        style::Properties<>>(std::forward<Args>(args)...)
+    {}
 };
 
 class BackgroundPatternProgram : public Program<
@@ -74,7 +81,14 @@ class BackgroundPatternProgram : public Program<
     style::Properties<>>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    BackgroundPatternProgram(Args&&... args) : Program<
+                                               shaders::background_pattern,
+                                               gl::Triangle,
+                                               BackgroundLayoutAttributes,
+                                               BackgroundPatternUniforms,
+                                               style::Properties<>>(std::forward<Args>(args)...)
+    {}
 };
 
 using BackgroundLayoutVertex = BackgroundProgram::LayoutVertex;

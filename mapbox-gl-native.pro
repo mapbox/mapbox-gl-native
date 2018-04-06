@@ -15,10 +15,14 @@ QMAKE_CXXFLAGS += \
     -DRAPIDJSON_HAS_STDSTRING=1 \
     -DMBGL_USE_GLES2 \
     -D__QT__ \
-    -O3 \
-    -ftemplate-depth=1024 \
-    -fvisibility-inlines-hidden \
-    -fvisibility=hidden
+    #-std:c++14 \
+    -std:c++latest \
+    /bigobj \
+    /permissive-
+    #-O3 \
+    #-ftemplate-depth=1024 \
+    #-fvisibility-inlines-hidden \
+    #-fvisibility=hidden
 
 android|win32|darwin {
     SOURCES += \
@@ -384,8 +388,7 @@ HEADERS += \
     platform/qt/src/timer_impl.hpp \
 
 INCLUDEPATH += \
-    deps/boost/1.65.1 \
-    deps/boost/1.65.1/include \
+    deps/boost/1.66.0/include \
     deps/cheap-ruler/2.5.3 \
     deps/cheap-ruler/2.5.3/include \
     deps/earcut/0.12.4 \
@@ -412,8 +415,10 @@ INCLUDEPATH += \
     deps/shelf-pack/2.1.1/include \
     deps/supercluster/0.2.2 \
     deps/supercluster/0.2.2/include \
-    deps/tao_tuple/28626e99 \
-    deps/tao_tuple/28626e99/include \
+    #deps/tao_tuple/28626e99 \
+    #deps/tao_tuple/28626e99/include \
+    #deps/sequences-master/ \
+    #deps/sequences-master/include \
     deps/unique_resource/cba309e \
     deps/unique_resource/cba309e/include \
     deps/variant/1.1.4 \

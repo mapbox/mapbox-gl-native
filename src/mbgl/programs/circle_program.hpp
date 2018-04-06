@@ -27,7 +27,20 @@ class CircleProgram : public Program<
     style::CirclePaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    CircleProgram(Args&&... args) : Program<
+                                    shaders::circle,
+                                    gl::Triangle,
+                                    gl::Attributes<
+                                        attributes::a_pos>,
+                                    gl::Uniforms<
+                                        uniforms::u_matrix,
+                                        uniforms::u_scale_with_map,
+                                        uniforms::u_extrude_scale,
+                                        uniforms::u_camera_to_center_distance,
+                                        uniforms::u_pitch_with_map>,
+                                    style::CirclePaintProperties>(std::forward<Args>(args)...)
+    {}
 
     /*
      * @param {number} x vertex position

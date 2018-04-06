@@ -125,7 +125,14 @@ public:
     using Binders = PaintPropertyBinders<DataDrivenProperties>;
 
     template <class TypeList>
-    using Tuple = IndexedTuple<PropertyTypes, TypeList>;
+    class Tuple : public IndexedTuple<PropertyTypes, TypeList>
+    {
+    public:
+        template <class... Us>
+        Tuple(Us&&... us)
+        : IndexedTuple<PropertyTypes, TypeList>(std::forward<Us>(us)...)
+        {}
+    };
 
     class Evaluated : public Tuple<EvaluatedTypes> {
     public:

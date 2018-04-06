@@ -42,10 +42,25 @@ public:
 template <typename T>
 class Result : private variant<EvaluationError, T> {
 public:
-    using variant<EvaluationError, T>::variant;
+    typedef variant<EvaluationError, T> base_t;
+    using base_t::base_t;
+    //using variant<EvaluationError, T>::variant;
     using Value = T;
     
     Result() = default;
+
+    Result(EvaluationError&& arg)
+    : base_t(std::forward<EvaluationError>(arg))
+    { }
+    Result(T&& arg)
+    : base_t(std::forward<T>(arg))
+    { }
+    Result(const T& arg)
+    : base_t(arg)
+    { }
+    Result(const EvaluationError& arg)
+    : base_t(arg)
+    { }
 
     explicit operator bool () const {
         return this->template is<T>();
@@ -79,11 +94,66 @@ public:
     }
 };
 
-class EvaluationResult : public Result<Value> {
+class EvaluationResult : public Result<mbgl::style::expression::Value> {
 public:
-    using Result::Result; // NOLINT
-    
+    //using Result::Result; // NOLINT
+    typedef Result<Value> base_t;
+    using base_t::base_t;
+
+
+    EvaluationResult(const Value& arg)
+    : Result<Value>(arg)
+    { }
+    EvaluationResult(const EvaluationError& arg)
+    : Result<Value>(arg)
+    { }
+
+
+    template <typename T>
+    EvaluationResult(T&& arg)
+    : base_t(Value(std::forward<T>(arg)))
+    { }
+    template <typename T>
+    EvaluationResult(T& arg)
+    : base_t(Value(arg))
+    { }
+    template <typename T>
+    EvaluationResult(const T& arg)
+    : base_t(Value(arg))
+    { }
+
+    template <>
+    EvaluationResult(Value&& arg)
+    : Result<Value>(std::forward<Value>(arg))
+    { }
+    template <>
+    EvaluationResult(EvaluationError&& arg)
+    : Result<Value>(std::forward<EvaluationError>(arg))
+    { }
+
+    EvaluationResult(const EvaluationResult& er) = default;
+    EvaluationResult& operator=(const EvaluationResult& er) = default;
+    EvaluationResult(EvaluationResult&& er) = default;
+
+
     EvaluationResult() = default;
+
+    const Value* operator->() const {
+       return base_t::operator ->();
+    }
+
+    Value* operator->() {
+       return base_t::operator ->();
+    }
+
+    Value& operator*() {
+       return base_t::operator*();
+    }
+
+    const Value& operator*() const {
+       return base_t::operator*();
+    }
+
 
     EvaluationResult(const std::array<double, 4>& arr) :
         Result(toExpressionValue(arr))

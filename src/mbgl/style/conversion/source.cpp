@@ -22,7 +22,7 @@ static optional<variant<std::string, Tileset>> convertURLOrTileset(const Convert
         if (!tileset) {
             return {};
         }
-        return { *tileset };
+        return optional<variant<std::string, Tileset>>{*tileset};
     }
 
     optional<std::string> url = toString(*urlVal);
@@ -31,7 +31,7 @@ static optional<variant<std::string, Tileset>> convertURLOrTileset(const Convert
         return {};
     }
 
-    return { *url };
+    return optional<variant<std::string, Tileset>>{*url};
 }
 
 static optional<std::unique_ptr<Source>> convertRasterSource(const std::string& id,
@@ -53,7 +53,7 @@ static optional<std::unique_ptr<Source>> convertRasterSource(const std::string& 
         tileSize = *size;
     }
 
-    return { std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize) };
+    return optional<std::unique_ptr<Source>>{std::make_unique<RasterSource>(id, std::move(*urlOrTileset), tileSize)};
 }
 
 static optional<std::unique_ptr<Source>> convertRasterDEMSource(const std::string& id,
@@ -75,7 +75,7 @@ static optional<std::unique_ptr<Source>> convertRasterDEMSource(const std::strin
         tileSize = *size;
     }
 
-    return { std::make_unique<RasterDEMSource>(id, std::move(*urlOrTileset), tileSize) };
+    return optional<std::unique_ptr<Source>>{std::make_unique<RasterDEMSource>(id, std::move(*urlOrTileset), tileSize)};
 }
 
 static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& id,
@@ -86,7 +86,7 @@ static optional<std::unique_ptr<Source>> convertVectorSource(const std::string& 
         return {};
     }
 
-    return { std::make_unique<VectorSource>(id, std::move(*urlOrTileset)) };
+    return optional<std::unique_ptr<Source>>{std::make_unique<VectorSource>(id, std::move(*urlOrTileset))};
 }
 
 static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string& id,
@@ -118,7 +118,7 @@ static optional<std::unique_ptr<Source>> convertGeoJSONSource(const std::string&
         return {};
     }
 
-    return { std::move(result) };
+    return optional<std::unique_ptr<Source>>{std::move(result)};
 }
 
 static optional<std::unique_ptr<Source>> convertImageSource(const std::string& id,
@@ -158,7 +158,7 @@ static optional<std::unique_ptr<Source>> convertImageSource(const std::string& i
     auto result = std::make_unique<ImageSource>(id, coordinates);
     result->setURL(*urlString);
 
-    return { std::move(result) };
+    return optional<std::unique_ptr<Source>>{std::move(result)};
 }
 
 optional<std::unique_ptr<Source>> Converter<std::unique_ptr<Source>>::operator()(const Convertible& value, Error& error, const std::string& id) const {

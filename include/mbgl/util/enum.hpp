@@ -16,9 +16,9 @@ public:
     static optional<T> toEnum(const std::string&);
 };
 
-#define MBGL_DEFINE_ENUM(T, values...)                                          \
+#define MBGL_DEFINE_ENUM(T, ...)                                          \
                                                                                 \
-static const constexpr std::pair<const T, const char *> T##_names[] = values;   \
+static const constexpr std::pair<const T, const char *> T##_names[] = __VA_ARGS__;   \
                                                                                 \
 template <>                                                                     \
 const char * Enum<T>::toString(T t) {                                           \

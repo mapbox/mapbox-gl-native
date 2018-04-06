@@ -17,16 +17,103 @@ namespace expression {
 
 struct Value;
 
-using ValueBase = variant<
+typedef variant<
     NullValue,
     bool,
     double,
     std::string,
     Color,
     mapbox::util::recursive_wrapper<std::vector<Value>>,
-    mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>>;
-struct Value : ValueBase {
+    mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>>> ValueBase;
+
+class Value : public ValueBase {
+public:
     using ValueBase::ValueBase;
+
+    template <typename T>
+    bool is(T*) const {
+        return ValueBase::is<T>();
+    }
+
+    template <>
+    bool is(float*) const {
+        return ValueBase::is<double>();
+    }
+
+    template <typename T>
+    bool is() const {
+        return ValueBase::is<T>();
+    }
+    template <typename T>
+    T& get(T*) {
+        return ValueBase::get<T>();
+    }
+    template <typename T>
+    T const& get(T*) const {
+        return ValueBase::get<T>();
+    }
+    template <>
+    float const& get(float*) const {
+        return ValueBase::get<double>();
+    }
+
+
+    template <typename T>
+    T& get() {
+        return ValueBase::get<T>();
+    }
+    template <typename T>
+    T const& get() const {
+        return ValueBase::get<T>();
+    }
+
+    Value(NullValue&& args)
+    : ValueBase(std::move(args))
+    { }
+    Value(bool&& args)
+    : ValueBase(std::forward<bool>(args))
+    { }
+    Value(double&& args)
+    : ValueBase(std::forward<double>(args))
+    { }
+    Value(std::string&& args)
+    : ValueBase(std::move(args))
+    { }
+    Value(Color&& args)
+    : ValueBase(std::forward<Color>(args))
+    { }
+    Value(std::vector<Value>&& args)
+    : ValueBase(mapbox::util::recursive_wrapper<std::vector<Value>>(args))
+    { }
+    typedef mapbox::util::recursive_wrapper<std::unordered_map<std::string, Value>> rec_map;
+    Value(std::unordered_map<std::string, Value>&& args)
+    : ValueBase(rec_map(args))
+    { }
+
+    Value(const NullValue& args)
+    : ValueBase(args)
+    { }
+    Value(const bool& args)
+    : ValueBase(args)
+    { }
+    Value(const double& args)
+    : ValueBase(args)
+    { }
+    Value(const std::string& args)
+    : ValueBase(args)
+    { }
+    Value(const Color& args)
+    : ValueBase(args)
+    { }
+    Value(const std::vector<Value>& args)
+    : ValueBase(mapbox::util::recursive_wrapper<std::vector<Value>>(args))
+    { }
+    Value(const std::unordered_map<std::string, Value>& args)
+    : ValueBase(rec_map(args))
+    { }
+
+
+    Value(const Value&) = default;
     
     // Javascript's Number.MAX_SAFE_INTEGER
     static uint64_t maxSafeInteger() { return 9007199254740991ULL; }
@@ -74,7 +161,9 @@ template <typename T>
 std::enable_if_t< std::is_convertible<T, Value>::value && !std::is_same<T, Value>::value,
 optional<T>> fromExpressionValue(const Value& v)
 {
-    return v.template is<T>() ? v.template get<T>() : optional<T>();
+    // This helps MSVC type deduction
+    T* t;
+    return v.template is<T>(t) ? v.template get<T>(t) : optional<T>();
 }
 
 // real conversions
@@ -106,6 +195,22 @@ struct ValueConverter<float> {
     static Value toExpressionValue(const float value);
     static optional<float> fromExpressionValue(const Value& value);
 };
+
+template <>
+struct ValueConverter<uint64_t> {
+    using ExpressionType = double;
+    static type::Type expressionType() { return type::Number; }
+    static Value toExpressionValue(const uint64_t& value);
+    static optional<uint64_t> fromExpressionValue(const Value& value);
+};
+template <>
+struct ValueConverter<int64_t> {
+    using ExpressionType = double;
+    static type::Type expressionType() { return type::Number; }
+    static Value toExpressionValue(const int64_t& value);
+    static optional<int64_t> fromExpressionValue(const Value& value);
+};
+
 
 template<>
 struct ValueConverter<mbgl::Value> {
@@ -140,6 +245,7 @@ struct ValueConverter<Position> {
     static Value toExpressionValue(const mbgl::style::Position& value);
     static optional<Position> fromExpressionValue(const Value& v);
 };
+
 
 template <typename T>
 struct ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >> {

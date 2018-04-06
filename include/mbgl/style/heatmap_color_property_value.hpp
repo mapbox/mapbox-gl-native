@@ -34,8 +34,9 @@ public:
     Color evaluate(const Evaluator&, TimePoint = {}) const { return {}; }
 
     Color evaluate(double heatmapDensity) const {
-        const auto result = value->evaluate(expression::EvaluationContext({}, nullptr, {heatmapDensity}));
-        return *expression::fromExpressionValue<Color>(*result);
+        expression::EvaluationResult result = value->evaluate(expression::EvaluationContext({}, nullptr, {heatmapDensity}));
+        expression::Value v = *result;
+        return *expression::fromExpressionValue<Color>(v);
     }
 
     bool isDataDriven()     const { return false; }

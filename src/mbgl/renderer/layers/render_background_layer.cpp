@@ -47,7 +47,7 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     // glClear rather than this method.
 
     const Properties<>::PossiblyEvaluated properties;
-    const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
     if (!evaluated.get<BackgroundPattern>().to.empty()) {
         optional<ImagePosition> imagePosA = parameters.imageManager.getPattern(evaluated.get<BackgroundPattern>().from);

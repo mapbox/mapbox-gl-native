@@ -1,6 +1,7 @@
 #pragma once
 
-#include <experimental/optional>
+
+#ifdef ORIGINAL
 
 namespace mbgl {
 
@@ -11,3 +12,19 @@ using nullopt_t = std::experimental::nullopt_t;
 constexpr nullopt_t nullopt = std::experimental::nullopt;
 
 } // namespace mbgl
+
+#else // use boost
+
+#include <boost/optional.hpp>
+
+namespace mbgl {
+
+template <typename T>
+using optional = boost::optional<T>;
+
+const boost::none_t nullopt{boost::none_t::init_tag{}};
+
+
+} // namespace mbgl
+
+#endif

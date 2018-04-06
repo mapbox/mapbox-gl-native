@@ -84,7 +84,14 @@ class FillExtrusionProgram : public Program<
     style::FillExtrusionPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillExtrusionProgram(Args&&... args) : Program<
+                                           shaders::fill_extrusion,
+                                           gl::Triangle,
+                                           FillExtrusionLayoutAttributes,
+                                           FillExtrusionUniforms,
+                                           style::FillExtrusionPaintProperties>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p, double nx, double ny, double nz, unsigned short t, uint16_t e) {
         const auto factor = pow(2, 13);
@@ -115,7 +122,14 @@ class FillExtrusionPatternProgram : public Program<
     style::FillExtrusionPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillExtrusionPatternProgram(Args&&... args) : Program<
+                                                  shaders::fill_extrusion_pattern,
+                                                  gl::Triangle,
+                                                  FillExtrusionLayoutAttributes,
+                                                  FillExtrusionPatternUniforms,
+                                                  style::FillExtrusionPaintProperties>(std::forward<Args>(args)...)
+    {}
 };
 
 using FillExtrusionLayoutVertex = FillExtrusionProgram::LayoutVertex;

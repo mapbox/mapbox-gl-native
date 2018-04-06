@@ -31,7 +31,12 @@ template <typename T>
 struct geometry : geometry_base<T>
 {
     using coordinate_type = T;
-    using geometry_base<T>::geometry_base;
+    //using geometry_base<T>::geometry_base;
+
+    template <typename... Args>
+    geometry(Args&&... args)
+    : geometry_base<T>(std::forward<Args>(args)...)
+    { }
 
     /*
      * The default constructor would create a point geometry with default-constructed coordinates;

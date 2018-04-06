@@ -107,7 +107,7 @@ void RenderRasterDEMSource::onTileChanged(Tile& tile){
         };
 
         for (uint8_t i = 0; i < 8; i++) {
-            DEMTileNeighbors mask = DEMTileNeighbors(std::pow(2,i));
+            DEMTileNeighbors mask = (DEMTileNeighbors)uint8_t(std::pow(2,i));
             // only backfill if this neighbor has not been previously backfilled
             if ((demtile.neighboringTiles & mask) != mask) {
                 OverscaledTileID neighborid = getNeighbor(mask);

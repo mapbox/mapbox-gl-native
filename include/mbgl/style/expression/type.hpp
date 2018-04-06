@@ -72,7 +72,7 @@ constexpr ErrorType Error;
 
 struct Array;
 
-using Type = variant<
+typedef variant<
     NullType,
     NumberType,
     BooleanType,
@@ -81,7 +81,7 @@ using Type = variant<
     ObjectType,
     ValueType,
     mapbox::util::recursive_wrapper<Array>,
-    ErrorType>;
+    ErrorType> Type;
 
 struct Array {
     explicit Array(Type itemType_) : itemType(std::move(itemType_)) {}

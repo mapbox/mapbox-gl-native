@@ -125,7 +125,7 @@ public:
 };
 
 template <typename T>
-using optional = std::experimental::optional<T>;
+using optional = mbgl::optional<T>;
 
 
 Database::Database(const std::string& file, int flags)

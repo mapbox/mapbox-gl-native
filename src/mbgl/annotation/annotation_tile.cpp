@@ -56,7 +56,7 @@ optional<Value> AnnotationTileFeature::getValue(const std::string& key) const {
 }
 
 optional<FeatureIdentifier> AnnotationTileFeature::getID() const {
-    return { static_cast<uint64_t>(data->id) };
+    return optional<FeatureIdentifier>{ static_cast<uint64_t>(data->id) };
 }
 
 GeometryCollection AnnotationTileFeature::getGeometries() const {

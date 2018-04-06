@@ -22,7 +22,10 @@ class GeometryCoordinates : public std::vector<GeometryCoordinate> {
 public:
     using coordinate_type = int16_t;
 
-    GeometryCoordinates() = default;
+      GeometryCoordinates() = default;
+      GeometryCoordinates(const GeometryCoordinates&) = default;
+      GeometryCoordinates(GeometryCoordinates&&) = default;
+      GeometryCoordinates& operator=(const GeometryCoordinates&) = default;
     GeometryCoordinates(const std::vector<GeometryCoordinate>& v)
         : std::vector<GeometryCoordinate>(v) {}
     GeometryCoordinates(std::vector<GeometryCoordinate>&& v)
@@ -84,7 +87,7 @@ GeometryCollection fixupPolygons(const GeometryCollection&);
 
 struct ToGeometryCollection {
     GeometryCollection operator()(const mapbox::geometry::point<int16_t>& geom) const {
-        return { { geom } };
+        return GeometryCollection{ GeometryCoordinates{ geom } };
     }
     GeometryCollection operator()(const mapbox::geometry::multi_point<int16_t>& geom) const {
         GeometryCoordinates coordinates;

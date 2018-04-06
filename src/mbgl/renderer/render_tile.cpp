@@ -72,7 +72,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
         return;
 
     static const style::Properties<>::PossiblyEvaluated properties {};
-    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+    static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
     if (parameters.debugOptions & (MapDebugOptions::Timestamps | MapDebugOptions::ParseStatus)) {
         if (!tile.debugBucket || tile.debugBucket->renderable != tile.isRenderable() ||

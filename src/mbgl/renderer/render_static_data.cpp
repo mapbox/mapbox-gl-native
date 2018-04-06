@@ -31,10 +31,14 @@ static gl::IndexVector<gl::LineStrip> tileLineStripIndices() {
 
 static gl::VertexVector<RasterLayoutVertex> rasterVertices() {
     gl::VertexVector<RasterLayoutVertex> result;
+
+    constexpr uint16_t u16EXTENT = static_cast<uint16_t>(util::EXTENT);
+    constexpr  int16_t i16EXTENT = static_cast<int16_t>(util::EXTENT);
+
     result.emplace_back(RasterProgram::layoutVertex({ 0, 0 }, { 0, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, 0 }, { util::EXTENT, 0 }));
-    result.emplace_back(RasterProgram::layoutVertex({ 0, util::EXTENT }, { 0, util::EXTENT }));
-    result.emplace_back(RasterProgram::layoutVertex({ util::EXTENT, util::EXTENT }, { util::EXTENT, util::EXTENT }));
+    result.emplace_back(RasterProgram::layoutVertex({ i16EXTENT, 0 }, { u16EXTENT, 0 }));
+    result.emplace_back(RasterProgram::layoutVertex({ 0, i16EXTENT }, { 0, u16EXTENT }));
+    result.emplace_back(RasterProgram::layoutVertex({ i16EXTENT, i16EXTENT }, { u16EXTENT, u16EXTENT }));
     return result;
 }
 

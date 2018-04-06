@@ -13,6 +13,11 @@ namespace style {
 class CategoricalValue : public variant<bool, int64_t, std::string> {
 public:
     using variant<bool, int64_t, std::string>::variant;
+
+    template <typename... Args>
+    CategoricalValue(Args&&... args)
+    : variant<bool, int64_t, std::string>(std::forward<Args>(args)...)
+    { }
 };
 
 template <class T>

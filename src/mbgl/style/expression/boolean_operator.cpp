@@ -6,7 +6,7 @@ namespace expression {
 
 EvaluationResult Any::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
-        const EvaluationResult result = (*it)->evaluate(params);
+        EvaluationResult result = (*it)->evaluate(params);
         if (!result) return result;
         if (result->get<bool>()) return EvaluationResult(true);
     }
@@ -27,13 +27,13 @@ bool Any::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> Any::possibleOutputs() const {
-    return {{ true }, { false }};
+    return {optional<Value>{ true }, optional<Value>{ false }};
 }
 
 
 EvaluationResult All::evaluate(const EvaluationContext& params) const {
     for (auto it = inputs.begin(); it != inputs.end(); it++) {
-        const EvaluationResult result = (*it)->evaluate(params);
+        EvaluationResult result = (*it)->evaluate(params);
         if (!result) return result;
         if (!result->get<bool>()) return EvaluationResult(false);
     }
@@ -54,7 +54,7 @@ bool All::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> All::possibleOutputs() const {
-    return {{ true }, { false }};
+    return {optional<Value>{ true }, optional<Value>{ false }};
 }
 
 using namespace mbgl::style::conversion;
@@ -69,7 +69,7 @@ ParseResult parseBooleanOp(const Convertible& value, ParsingContext& ctx) {
     
     parsedInputs.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        auto parsed = ctx.parse(arrayMember(value, i), i, {type::Boolean});
+        auto parsed = ctx.parse(arrayMember(value, i), i, type::Type{type::Boolean});
         if (!parsed) {
             return parsed;
         }

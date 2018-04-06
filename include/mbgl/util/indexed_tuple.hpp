@@ -28,16 +28,23 @@ class IndexedTuple<TypeList<Is...>, TypeList<Ts...>> : public tuple_polyfill<Ts.
 public:
     static_assert(sizeof...(Is) == sizeof...(Ts), "IndexedTuple size mismatch");
 
-    using tuple_polyfill<Ts...>::tuple;
+    typedef tuple_polyfill<Ts...> base_t;
+    using base_t::base_t;
+
+    IndexedTuple(Ts&&... args) : tuple_polyfill<Ts...>(std::forward<Ts>(args)...)
+    {}
+    IndexedTuple(tuple_polyfill<Ts...>&& b) : tuple_polyfill<Ts...>(std::move<tuple_polyfill<Ts...>>(b))
+    {}
+
 
     template <class I>
     auto& get() {
-        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
+       return get_polyfill<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class I>
     const auto& get() const {
-        return get_polyfill<TypeIndex<I, Is...>::value>(*this);
+       return get_polyfill<TypeIndex<I, Is...>::value>(*this);
     }
 
     template <class... Js, class... Us>

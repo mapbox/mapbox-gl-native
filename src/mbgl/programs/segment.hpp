@@ -21,6 +21,8 @@ public:
           vertexLength(vertexLength_),
           indexLength(indexLength_) {}
 
+    Segment(Segment&&) = default;
+
     const std::size_t vertexOffset;
     const std::size_t indexOffset;
 

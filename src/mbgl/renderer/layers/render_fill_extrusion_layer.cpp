@@ -142,7 +142,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             parameters.staticData.extrusionTextureVertexBuffer,
             parameters.staticData.quadTriangleIndexBuffer,
             parameters.staticData.extrusionTextureSegments,
-            ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
+            ExtrusionTextureProgram::PaintPropertyBinders{ properties, 0.0f }, properties,
             parameters.state.getZoom(), getID());
     }
 }

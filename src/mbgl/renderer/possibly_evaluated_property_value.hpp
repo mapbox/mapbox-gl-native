@@ -10,10 +10,10 @@ namespace mbgl {
 template <class T>
 class PossiblyEvaluatedPropertyValue {
 private:
-    using Value = variant<
+    typedef variant<
         T,
         style::SourceFunction<T>,
-        style::CompositeFunction<T>>;
+        style::CompositeFunction<T>> Value;
 
     Value value;
 

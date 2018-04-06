@@ -83,7 +83,7 @@ ParseResult parseInterpolate(const Convertible& value, ParsingContext& ctx) {
         return ParseResult();
     }
     
-    ParseResult input = ctx.parse(arrayMember(value, 2), 2, {type::Number});
+    ParseResult input = ctx.parse(arrayMember(value, 2), 2, type::Type{type::Number});
     if (!input) {
         return input;
     }

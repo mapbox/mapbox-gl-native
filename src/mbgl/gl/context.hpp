@@ -226,7 +226,7 @@ public:
     State<value::BindVertexBuffer> vertexBuffer;
 
     State<value::BindVertexArray, const Context&> bindVertexArray { *this };
-    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { this }), *this };
+    VertexArrayState globalVertexArrayState { UniqueVertexArray(0, { const_cast<Context*>(this) }), *this };
 
     State<value::PixelStorePack> pixelStorePack;
     State<value::PixelStoreUnpack> pixelStoreUnpack;

@@ -70,7 +70,7 @@ ParseResult ArrayAssertion::parse(const Convertible& value, ParsingContext& ctx)
         N = optional<std::size_t>(*n);
     }
 
-    auto input = ctx.parse(arrayMember(value, length - 1), length - 1, {type::Value});
+    auto input = ctx.parse(arrayMember(value, length - 1), length - 1, optional<type::Type>{type::Value});
     if (!input) {
         return input;
     }

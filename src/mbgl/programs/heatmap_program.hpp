@@ -25,7 +25,18 @@ class HeatmapProgram : public Program<
     style::HeatmapPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    HeatmapProgram (Args&&... args) : Program<
+                                      shaders::heatmap,
+                                      gl::Triangle,
+                                      gl::Attributes<
+                                          attributes::a_pos>,
+                                      gl::Uniforms<
+                                          uniforms::u_intensity,
+                                          uniforms::u_matrix,
+                                          uniforms::heatmap::u_extrude_scale>,
+                                      style::HeatmapPaintProperties>(std::forward<Args>(args)...)
+    {}
 
     /*
      * @param {number} x vertex position

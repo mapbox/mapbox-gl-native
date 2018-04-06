@@ -135,7 +135,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             parameters.staticData.extrusionTextureVertexBuffer,
             parameters.staticData.quadTriangleIndexBuffer,
             parameters.staticData.extrusionTextureSegments,
-            HeatmapTextureProgram::PaintPropertyBinders{ properties, 0 }, properties,
+            HeatmapTextureProgram::PaintPropertyBinders{ properties, 0.0f }, properties,
             parameters.state.getZoom(), getID());
     }
 }

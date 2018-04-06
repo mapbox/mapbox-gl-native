@@ -13,17 +13,17 @@ DEMData::DEMData(const PremultipliedImage& _image, Tileset::DEMEncoding encoding
         throw std::runtime_error("raster-dem tiles must be square.");
     }
 
-    auto decodeMapbox = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+    std::function<uint32_t(const uint8_t,const uint8_t,const uint8_t)> decodeMapbox = [] (const uint8_t r, const uint8_t g, const uint8_t b){
         // https://www.mapbox.com/help/access-elevation-data/#mapbox-terrain-rgb
         return (r * 256 * 256 + g * 256 + b)/10 - 10000;
     };
 
-    auto decodeTerrarium = [] (const uint8_t r, const uint8_t g, const uint8_t b){
+    std::function<uint32_t(const uint8_t,const uint8_t,const uint8_t)> decodeTerrarium = [] (const uint8_t r, const uint8_t g, const uint8_t b){
         // https://aws.amazon.com/public-datasets/terrain/
         return ((r * 256 + g + b / 256) - 32768);
     };
 
-    auto decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
+    std::function<uint32_t(const uint8_t,const uint8_t,const uint8_t)> decodeRGB = encoding == Tileset::DEMEncoding::Terrarium ? decodeTerrarium : decodeMapbox;
 
     std::memset(image.data.get(), 0, image.bytes());
 

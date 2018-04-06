@@ -64,7 +64,14 @@ class FillProgram : public Program<
     style::FillPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillProgram(Args&&... args) : Program<
+                                  shaders::fill,
+                                  gl::Triangle,
+                                  FillLayoutAttributes,
+                                  FillUniforms,
+                                  style::FillPaintProperties>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p) {
         return LayoutVertex {
@@ -84,7 +91,14 @@ class FillPatternProgram : public Program<
     style::FillPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillPatternProgram(Args&&... args) : Program<
+                                         shaders::fill_pattern,
+                                         gl::Triangle,
+                                         FillLayoutAttributes,
+                                         FillPatternUniforms,
+                                         style::FillPaintProperties>(std::forward<Args>(args)...)
+    {}
 };
 
 class FillOutlineProgram : public Program<
@@ -95,7 +109,14 @@ class FillOutlineProgram : public Program<
     style::FillPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillOutlineProgram(Args&&... args) : Program<
+                                         shaders::fill_outline,
+                                         gl::Line,
+                                         FillLayoutAttributes,
+                                         FillUniforms,
+                                         style::FillPaintProperties>(std::forward<Args>(args)...)
+    {}
 };
 
 class FillOutlinePatternProgram : public Program<
@@ -106,7 +127,14 @@ class FillOutlinePatternProgram : public Program<
     style::FillPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    FillOutlinePatternProgram(Args&&... args) : Program<
+                                               shaders::fill_outline_pattern,
+                                               gl::Line,
+                                               FillLayoutAttributes,
+                                               FillPatternUniforms,
+                                               style::FillPaintProperties>(std::forward<Args>(args)...)
+    {}
 };
 
 using FillLayoutVertex = FillProgram::LayoutVertex;

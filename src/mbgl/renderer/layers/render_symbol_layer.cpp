@@ -218,7 +218,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
 
         if (bucket.hasCollisionBoxData()) {
             static const style::Properties<>::PossiblyEvaluated properties {};
-            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
             auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));
@@ -251,7 +251,7 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         }
         if (bucket.hasCollisionCircleData()) {
             static const style::Properties<>::PossiblyEvaluated properties {};
-            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+            static const CollisionBoxProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
             auto pixelRatio = tile.id.pixelsToTileUnits(1, parameters.state.getZoom());
             auto scale = std::pow(2.0f, float(parameters.state.getZoom() - tile.tile.id.overscaledZ));

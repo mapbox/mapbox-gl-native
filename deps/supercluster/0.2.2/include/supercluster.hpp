@@ -134,8 +134,8 @@ public:
             if (c.num_points == 1) {
                 feature.properties = this->features[c.id].properties;
             } else {
-                feature.properties["cluster"] = true;
-                feature.properties["point_count"] = static_cast<std::uint64_t>(c.num_points);
+                feature.properties.insert_or_assign("cluster", mapbox::geometry::value(true));
+                feature.properties.insert_or_assign("point_count", static_cast<std::uint64_t>(c.num_points));
             }
 
             result.push_back(feature);

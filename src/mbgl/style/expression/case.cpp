@@ -70,7 +70,7 @@ ParseResult Case::parse(const Convertible& value, ParsingContext& ctx) {
     std::vector<Case::Branch> branches;
     branches.reserve((length - 2) / 2);
     for (size_t i = 1; i + 1 < length; i += 2) {
-        auto test = ctx.parse(arrayMember(value, i), i, {type::Boolean});
+        auto test = ctx.parse(arrayMember(value, i), i, type::Type{type::Boolean});
         if (!test) {
             return test;
         }

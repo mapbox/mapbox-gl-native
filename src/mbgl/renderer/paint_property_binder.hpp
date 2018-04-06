@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include <mbgl/programs/attributes.hpp>
 #include <mbgl/gl/attribute.hpp>
 #include <mbgl/gl/uniform.hpp>
@@ -278,18 +280,47 @@ class PaintPropertyBinders;
 template <class... Ps>
 class PaintPropertyBinders<TypeList<Ps...>> {
 public:
-    template <class P>
-    using Binder = PaintPropertyBinder<typename P::Type, typename P::Attribute::Type>;
 
-    using Binders = IndexedTuple<
-        TypeList<Ps...>,
-        TypeList<std::unique_ptr<Binder<Ps>>...>>;
+      template <class T>
+      using UniquePtrBinder = std::unique_ptr<PaintPropertyBinder<typename T::Type, typename T::Attribute::Type>>;
 
-    template <class EvaluatedProperties>
-    PaintPropertyBinders(const EvaluatedProperties& properties, float z)
-        : binders(Binder<Ps>::create(properties.template get<Ps>(), z, Ps::defaultValue())...) {
-        (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
-    }
+      typedef TypeList<Ps...> key_type_list_t;
+      typedef TypeList<std::unique_ptr<PaintPropertyBinder<typename Ps::Type, typename Ps::Attribute::Type>>...> value_type_list_t;
+
+      class Binders : public IndexedTuple<
+            key_type_list_t,
+            value_type_list_t>
+      {
+         public:
+
+            typedef IndexedTuple<
+            key_type_list_t,
+            value_type_list_t> base_t;
+               using base_t::base_t;
+
+            template <typename... Args>
+            Binders(Args&&... args) : base_t(std::forward<Args>(args)...)
+            {}
+
+      };
+
+
+      template <class EvaluatedProperties>
+      PaintPropertyBinders(const EvaluatedProperties& properties, float z)
+          : binders(createBinder<Ps>(properties, z)...) {
+          (void)z; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
+      }
+      template <class A, typename B>
+      PaintPropertyBinders(const std::tuple<A,B>& ab)
+          : binders((PaintPropertyBinder<typename Ps::Type, typename Ps::Attribute::Type>::create(std::get<0>(ab) /*properties*/ .template get<Ps>(), (float)std::get<1>(ab), Ps::defaultValue()))...) {
+          (void)ab; // Workaround for https://gcc.gnu.org/bugzilla/show_bug.cgi?id=56958
+      }
+
+      template<class Ps_, class Prop>
+      UniquePtrBinder<Ps_> createBinder(const Prop& prop, float z) {
+         return std::move(PaintPropertyBinder<typename Ps_::Type, typename Ps_::Attribute::Type>::create(prop.template get<Ps_>(), z, Ps_::defaultValue()));
+      }
+
 
     PaintPropertyBinders(PaintPropertyBinders&&) = default;
     PaintPropertyBinders(const PaintPropertyBinders&) = delete;
@@ -307,7 +338,12 @@ public:
     }
 
     template <class P>
-    using Attribute = ZoomInterpolatedAttribute<typename P::Attribute>;
+    class Attribute : public ZoomInterpolatedAttribute<typename P::Attribute>
+    {
+       public:
+          typedef ZoomInterpolatedAttribute<typename P::Attribute> base_t;
+          using base_t::base_t;
+    };
 
     using Attributes = gl::Attributes<Attribute<Ps>...>;
     using AttributeBindings = typename Attributes::Bindings;

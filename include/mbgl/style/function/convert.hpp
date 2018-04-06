@@ -42,7 +42,7 @@ public:
     }
 
     EvaluationResult evaluate(const EvaluationContext&) const override {
-        return EvaluationError{message};
+        return EvaluationResult(std::move(EvaluationError{message}));
     }
 
     std::vector<optional<Value>> possibleOutputs() const override {
@@ -62,7 +62,8 @@ private:
 struct Convert {
     template <typename T>
     static std::unique_ptr<Literal> makeLiteral(const T& value) {
-        return std::make_unique<Literal>(Value(toExpressionValue(value)));
+       Value v(toExpressionValue(value));
+       return std::make_unique<Literal>(std::move(v));
     }
     
     static std::unique_ptr<Expression> makeGet(type::Type type, const std::string& property) {

@@ -6,7 +6,7 @@
 namespace QMapbox {
 
 mbgl::Point<double> asMapboxGLPoint(const QMapbox::Coordinate &coordinate) {
-    return mbgl::Point<double> { coordinate.second, coordinate.first };
+    return mbgl::Point<double> ( coordinate.second, coordinate.first );
 }
 
 mbgl::MultiPoint<double> asMapboxGLMultiPoint(const QMapbox::Coordinates &multiPoint) {
@@ -86,7 +86,7 @@ mbgl::Value asMapboxGLPropertyValue(const QVariant &value) {
 #else
     case QVariant::Invalid:
 #endif
-        return mbgl::NullValue {};
+        return mbgl::Value(mbgl::NullValue {});
     case QMetaType::Bool:
         return { value.toBool() };
     case QMetaType::ULongLong:
@@ -103,7 +103,7 @@ mbgl::Value asMapboxGLPropertyValue(const QVariant &value) {
         return valueMap(value.toMap());
     default:
         qWarning() << "Unsupported feature property value:" << value;
-        return {};
+        return mapbox::geometry::null_value;
     }
 }
 

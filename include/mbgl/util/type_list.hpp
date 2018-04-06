@@ -5,7 +5,7 @@
 
 namespace mbgl {
 
-template <class...>
+template <class... IgnoredClassLabel>
 class TypeList {};
 
 namespace detail {

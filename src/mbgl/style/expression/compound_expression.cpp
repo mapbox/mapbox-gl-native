@@ -1,6 +1,9 @@
 #include <mbgl/style/expression/compound_expression.hpp>
 #include <mbgl/style/expression/check_subtype.hpp>
 #include <mbgl/style/expression/util.hpp>
+
+#include <mbgl/style/expression/expression.hpp>
+
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/math/log2.hpp>
 #include <mbgl/util/ignore.hpp>
@@ -62,9 +65,15 @@ struct Signature<R (Params...)> : SignatureBase {
 
     R (*evaluate)(Params...);
 private:
+
+    template <std::size_t N>
+    static EvaluationResult getAndEvaluate(const EvaluationContext& evaluationParameters, const Args& args) {
+       return std::get<N>(args)->evaluate(evaluationParameters);
+    }
+
     template <std::size_t ...I>
     EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
-        const std::array<EvaluationResult, sizeof...(I)> evaluated = {{std::get<I>(args)->evaluate(evaluationParameters)...}};
+        const std::array<EvaluationResult, sizeof...(I)> evaluated {getAndEvaluate<I>(evaluationParameters, args)...};
         for (const auto& arg : evaluated) {
             if(!arg) return arg.error();
         }
@@ -102,7 +111,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
         }
         const R value = evaluate(evaluated);
         if (!value) return value.error();
-        return *value;
+        return std::move(*value);
     }
     
     R (*evaluate)(const Varargs<T>&);
@@ -195,7 +204,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return value.match(
             [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
             [](const std::string& s) -> Result<std::string> { return s; }, // avoid quoting
-            [](const auto& v) -> Result<std::string> { return stringify(v); }
+            [](const auto& v) -> Result<std::string> { return stringify(toExpressionValue(v)); }
         );
     });
     
@@ -260,13 +269,13 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
         auto propertyValue = params.feature->getValue(key);
         if (!propertyValue) {
-            return Null;
+            return Value{Null};
         }
         return Value(toExpressionValue(*propertyValue));
     });
     define("get", [](const std::string& key, const std::unordered_map<std::string, Value>& object) -> Result<Value> {
         if (object.find(key) == object.end()) {
-            return Null;
+           return Value{Null};
         }
         return object.at(key);
     });
@@ -287,7 +296,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         std::unordered_map<std::string, Value> result;
         const PropertyMap properties = params.feature->getProperties();
         for (const auto& entry : properties) {
-            result[entry.first] = toExpressionValue(entry.second);
+           result.insert({entry.first, toExpressionValue(entry.second)});
         }
         return result;
     });
@@ -301,13 +310,13 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     
         auto type = params.feature->getType();
         if (type == FeatureType::Point) {
-            return "Point";
+           return std::string{"Point"};
         } else if (type == FeatureType::LineString) {
-            return "LineString";
+           return std::string{"LineString"};
         } else if (type == FeatureType::Polygon) {
-            return "Polygon";
+           return std::string{"Polygon"};
         } else {
-            return "Unknown";
+           return std::string{"Unknown"};
         }
     });
     
@@ -320,11 +329,11 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     
         auto id = params.feature->getID();
         if (!id) {
-            return Null;
+            return Value{Null};
         }
         return id->match(
             [](const auto& idValue) {
-                return toExpressionValue(mbgl::Value(idValue));
+              return toExpressionValue(idValue);
             }
         );
     });

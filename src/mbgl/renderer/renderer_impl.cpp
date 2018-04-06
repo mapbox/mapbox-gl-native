@@ -492,7 +492,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         MBGL_DEBUG_GROUP(parameters.context, "clipping masks");
 
         static const Properties<>::PossiblyEvaluated properties {};
-        static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
+        static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0.0f);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
             parameters.staticData.programs.clippingMask.draw(

@@ -84,7 +84,7 @@ ParseResult Step::parse(const mbgl::style::conversion::Convertible& value, Parsi
         return ParseResult();
     }
     
-    ParseResult input = ctx.parse(arrayMember(value, 1), 1, {type::Number});
+    ParseResult input = ctx.parse(arrayMember(value, 1), 1, type::Type{type::Number});
     if (!input) {
         return input;
     }

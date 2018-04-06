@@ -53,7 +53,7 @@ StyleParseResult Parser::parse(const std::string& json) {
     if (document.HasMember("name")) {
         const JSValue& value = document["name"];
         if (value.IsString()) {
-            name = { value.GetString(), value.GetStringLength() };
+            name = std::string{ value.GetString(), value.GetStringLength() };
         }
     }
 
@@ -108,14 +108,14 @@ StyleParseResult Parser::parse(const std::string& json) {
     if (document.HasMember("sprite")) {
         const JSValue& sprite = document["sprite"];
         if (sprite.IsString()) {
-            spriteURL = { sprite.GetString(), sprite.GetStringLength() };
+            spriteURL = std::string{ sprite.GetString(), sprite.GetStringLength() };
         }
     }
 
     if (document.HasMember("glyphs")) {
         const JSValue& glyphs = document["glyphs"];
         if (glyphs.IsString()) {
-            glyphURL = { glyphs.GetString(), glyphs.GetStringLength() };
+            glyphURL = std::string{ glyphs.GetString(), glyphs.GetStringLength() };
         }
     }
 

@@ -87,7 +87,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             vertexBuffer,
             indexBuffer,
             segments,
-            HillshadeProgram::PaintPropertyBinders { evaluated, 0 },
+            HillshadeProgram::PaintPropertyBinders { evaluated, 0.0f },
             evaluated,
             parameters.state.getZoom(),
             getID()
@@ -129,7 +129,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 parameters.staticData.rasterVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.rasterSegments,
-                HillshadePrepareProgram::PaintPropertyBinders { properties, 0 },
+                HillshadePrepareProgram::PaintPropertyBinders { properties, 0.0f },
                 properties,
                 parameters.state.getZoom(),
                 getID()

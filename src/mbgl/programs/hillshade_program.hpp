@@ -33,7 +33,23 @@ class HillshadeProgram : public Program<
         uniforms::u_latrange>,
     style::HillshadePaintProperties>{
 public:
-    using Program::Program;
+    template <typename... Args>
+    HillshadeProgram(Args&&... args) : Program<
+                                       shaders::hillshade,
+                                       gl::Triangle,
+                                       gl::Attributes<
+                                           attributes::a_pos,
+                                           attributes::a_texture_pos>,
+                                       gl::Uniforms<
+                                           uniforms::u_matrix,
+                                           uniforms::u_image,
+                                           uniforms::u_highlight,
+                                           uniforms::u_shadow,
+                                           uniforms::u_accent,
+                                           uniforms::u_light,
+                                           uniforms::u_latrange>,
+                                       style::HillshadePaintProperties>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p, Point<uint16_t> t) {
         return LayoutVertex {

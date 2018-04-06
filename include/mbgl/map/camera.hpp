@@ -36,19 +36,6 @@ struct CameraOptions {
     optional<double> pitch;
 };
 
-constexpr bool operator==(const CameraOptions& a, const CameraOptions& b) {
-    return a.center == b.center
-        && a.padding == b.padding
-        && a.anchor == b.anchor
-        && a.zoom == b.zoom
-        && a.angle == b.angle
-        && a.pitch == b.pitch;
-}
-
-constexpr bool operator!=(const CameraOptions& a, const CameraOptions& b) {
-    return !(a == b);
-}
-
 /** Various options for describing a transition between viewpoints with
     animation. All fields are optional; the default values depend on how this
     struct is used. */
@@ -88,3 +75,17 @@ struct AnimationOptions {
 };
 
 } // namespace mbgl
+
+inline const bool operator==(const mbgl::CameraOptions& a, const mbgl::CameraOptions& b) {
+    return a.center == b.center
+        && a.padding == b.padding
+        && a.anchor == b.anchor
+        && a.zoom == b.zoom
+        && a.angle == b.angle
+        && a.pitch == b.pitch;
+}
+
+inline const bool operator!=(const mbgl::CameraOptions& a, const mbgl::CameraOptions& b) {
+    return !(a == b);
+}
+

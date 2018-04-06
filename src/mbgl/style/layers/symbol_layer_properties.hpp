@@ -59,7 +59,7 @@ struct IconTextFit : LayoutProperty<IconTextFitType> {
 
 struct IconTextFitPadding : LayoutProperty<std::array<float, 4>> {
     static constexpr const char * key = "icon-text-fit-padding";
-    static std::array<float, 4> defaultValue() { return {{ 0, 0, 0, 0 }}; }
+    static std::array<float, 4> defaultValue() { return std::array<float, 4>{{ 0, 0, 0, 0 }}; }
 };
 
 struct IconImage : DataDrivenLayoutProperty<std::string> {
@@ -84,7 +84,7 @@ struct IconKeepUpright : LayoutProperty<bool> {
 
 struct IconOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static constexpr const char * key = "icon-offset";
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return std::array<float, 2>{{ 0, 0 }}; }
 };
 
 struct IconAnchor : DataDrivenLayoutProperty<SymbolAnchorType> {
@@ -174,7 +174,7 @@ struct TextTransform : DataDrivenLayoutProperty<TextTransformType> {
 
 struct TextOffset : DataDrivenLayoutProperty<std::array<float, 2>> {
     static constexpr const char * key = "text-offset";
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return std::array<float, 2>{{ 0, 0 }}; }
 };
 
 struct TextAllowOverlap : LayoutProperty<bool> {
@@ -213,7 +213,7 @@ struct IconHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur, un
 };
 
 struct IconTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return std::array<float, 2>{{ 0, 0 }}; }
 };
 
 struct IconTranslateAnchor : PaintProperty<TranslateAnchorType> {
@@ -241,7 +241,7 @@ struct TextHaloBlur : DataDrivenPaintProperty<float, attributes::a_halo_blur, un
 };
 
 struct TextTranslate : PaintProperty<std::array<float, 2>> {
-    static std::array<float, 2> defaultValue() { return {{ 0, 0 }}; }
+    static std::array<float, 2> defaultValue() { return std::array<float, 2>{{ 0, 0 }}; }
 };
 
 struct TextTranslateAnchor : PaintProperty<TranslateAnchorType> {

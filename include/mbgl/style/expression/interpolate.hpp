@@ -119,7 +119,7 @@ public:
     EvaluationResult evaluate(const EvaluationContext& params) const override {
         const EvaluationResult evaluatedInput = input->evaluate(params);
         if (!evaluatedInput) {
-            return evaluatedInput.error();
+            return EvaluationError {evaluatedInput.error()};
         }
 
         float x = *fromExpressionValue<float>(*evaluatedInput);
@@ -148,11 +148,11 @@ public:
             
             EvaluationResult lower = std::prev(it)->second->evaluate(params);
             if (!lower) {
-                return lower.error();
+                return EvaluationError {lower.error()};
             }
             EvaluationResult upper = it->second->evaluate(params);
             if (!upper) {
-                return upper.error();
+                return EvaluationError {upper.error()};
             }
 
             if (!lower->is<T>()) {

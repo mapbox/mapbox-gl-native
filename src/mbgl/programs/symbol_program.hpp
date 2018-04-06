@@ -352,7 +352,28 @@ class SymbolIconProgram : public SymbolProgram<
     style::IconPaintProperties>
 {
 public:
-    using SymbolProgram::SymbolProgram;
+    template <typename... Args>
+    SymbolIconProgram(Args&&... args) : SymbolProgram<
+                                         shaders::symbol_icon,
+                                         gl::Triangle,
+                                         SymbolLayoutAttributes,
+                                         gl::Uniforms<
+                                             uniforms::u_matrix,
+                                             uniforms::u_label_plane_matrix,
+                                             uniforms::u_gl_coord_matrix,
+                                             uniforms::u_extrude_scale,
+                                             uniforms::u_texsize,
+                                             uniforms::u_texture,
+                                             uniforms::u_fade_change,
+                                             uniforms::u_is_text,
+                                             uniforms::u_camera_to_center_distance,
+                                             uniforms::u_pitch,
+                                             uniforms::u_pitch_with_map,
+                                             uniforms::u_max_camera_distance,
+                                             uniforms::u_rotate_symbol,
+                                             uniforms::u_aspect_ratio>,
+                                         style::IconPaintProperties>(std::forward<Args>(args)...)
+    {}
 
     static UniformValues uniformValues(const bool isText,
                                        const style::SymbolPropertyValues&,

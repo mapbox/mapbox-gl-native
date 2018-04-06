@@ -27,7 +27,21 @@ class HillshadePrepareProgram : public Program<
         uniforms::u_image>,
     style::Properties<>> {
 public:
-    using Program::Program;
+    template <typename... Args>
+    HillshadePrepareProgram(Args&&... args) : Program<
+                                              shaders::hillshade_prepare,
+                                              gl::Triangle,
+                                              gl::Attributes<
+                                                  attributes::a_pos,
+                                                  attributes::a_texture_pos>,
+                                              gl::Uniforms<
+                                                  uniforms::u_matrix,
+                                                  uniforms::u_dimension,
+                                                  uniforms::u_zoom,
+                                                  uniforms::u_maxzoom,
+                                                  uniforms::u_image>,
+                                              style::Properties<>>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p, Point<uint16_t> t) {
         return LayoutVertex {

@@ -48,7 +48,7 @@ ParseResult At::parse(const Convertible& value, ParsingContext& ctx) {
         return ParseResult();
     }
 
-    ParseResult index = ctx.parse(arrayMember(value, 1), 1, {type::Number});
+    ParseResult index = ctx.parse(arrayMember(value, 1), 1, type::Type{type::Number});
     
     type::Type inputType = type::Array(ctx.getExpected() ? *ctx.getExpected() : type::Value);
     ParseResult input = ctx.parse(arrayMember(value, 2), 2, {inputType});

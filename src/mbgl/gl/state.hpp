@@ -32,7 +32,7 @@ public:
     }
 
     bool operator!=(const typename T::Type& value) const {
-        return dirty || currentValue != value;
+        return dirty || !operator==(value);
     }
 
     void setCurrentValue(const typename T::Type& value) {

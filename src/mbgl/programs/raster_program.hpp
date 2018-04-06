@@ -46,7 +46,29 @@ class RasterProgram : public Program<
     style::RasterPaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    RasterProgram(Args&&... args) : Program<
+                                        shaders::raster,
+                                        gl::Triangle,
+                                        gl::Attributes<
+                                            attributes::a_pos,
+                                            attributes::a_texture_pos>,
+                                        gl::Uniforms<
+                                            uniforms::u_matrix,
+                                            uniforms::u_image0,
+                                            uniforms::u_image1,
+                                            uniforms::u_opacity,
+                                            uniforms::u_fade_t,
+                                            uniforms::u_brightness_low,
+                                            uniforms::u_brightness_high,
+                                            uniforms::u_saturation_factor,
+                                            uniforms::u_contrast_factor,
+                                            uniforms::u_spin_weights,
+                                            uniforms::u_buffer_scale,
+                                            uniforms::u_scale_parent,
+                                            uniforms::u_tl_parent>,
+                                        style::RasterPaintProperties>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p, Point<uint16_t> t) {
         return LayoutVertex {

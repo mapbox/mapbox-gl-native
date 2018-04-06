@@ -25,7 +25,19 @@ class HeatmapTextureProgram : public Program<
         uniforms::u_opacity>,
     style::Properties<>> {
 public:
-    using Program::Program;
+    template <typename... Args>
+    HeatmapTextureProgram(Args&&... args) : Program<
+                                            shaders::heatmap_texture,
+                                            gl::Triangle,
+                                            gl::Attributes<attributes::a_pos>,
+                                            gl::Uniforms<
+                                                uniforms::u_matrix,
+                                                uniforms::u_world,
+                                                uniforms::u_image,
+                                                uniforms::u_color_ramp,
+                                                uniforms::u_opacity>,
+                                            style::Properties<>>(std::forward<Args>(args)...)
+    {}
 
     static LayoutVertex layoutVertex(Point<int16_t> p) {
         return LayoutVertex{

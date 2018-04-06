@@ -14,16 +14,16 @@ class Literal : public Expression {
 public:
     Literal(Value value_)
         : Expression(typeOf(value_))
-        , value(value_)
+        , value(std::move(value_))
     {}
     
     Literal(type::Array type_, std::vector<Value> value_)
         : Expression(type_)
-        , value(value_)
+        , value(std::move(value_))
     {}
 
     EvaluationResult evaluate(const EvaluationContext&) const override {
-        return value;
+        return EvaluationResult(value);
     }
     
     static ParseResult parse(const mbgl::style::conversion::Convertible&, ParsingContext&);

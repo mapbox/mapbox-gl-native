@@ -101,7 +101,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             vertexBuffer,
             indexBuffer,
             segments,
-            RasterProgram::PaintPropertyBinders { evaluated, 0 },
+            RasterProgram::PaintPropertyBinders { evaluated, 0.0f },
             evaluated,
             parameters.state.getZoom(),
             getID()

@@ -3,6 +3,8 @@
 #include <mbgl/style/expression/util.hpp>
 #include <mbgl/util/string.hpp>
 
+#include <utility> // std::move
+
 namespace mbgl {
 namespace style {
 namespace expression {
@@ -12,7 +14,7 @@ EvaluationResult toNumber(const Value& v) {
         [](const double f) -> optional<double> { return f; },
         [](const std::string& s) -> optional<double> {
             try {
-                return util::stof(s);
+                return optional<double>(util::stof(s));
             } catch(std::exception) {
                 return optional<double>();
             }
@@ -39,19 +41,18 @@ EvaluationResult toColor(const Value& colorValue) {
                 };
             }
         },
-        [&](const std::vector<Value>& components) -> EvaluationResult {
+        [&colorValue](const std::vector<Value>& components) -> EvaluationResult {
             std::size_t len = components.size();
             bool isNumeric = std::all_of(components.begin(), components.end(), [](const Value& item) {
                 return item.template is<double>();
             });
             if ((len == 3 || len == 4) && isNumeric) {
-                Result<Color> c = {rgba(
-                    components[0].template get<double>(),
-                    components[1].template get<double>(),
-                    components[2].template get<double>(),
-                    len == 4 ? components[3].template get<double>() : 1.0
-                )};
-                if (!c) return c.error();
+               double r = components[0].template get<double>();
+               double g = components[1].template get<double>();
+               double b = components[2].template get<double>();
+               double a = len == 4 ? components[3].template get<double>() : 1.0;
+               Result<Color> c(rgba(r,g,b,a));
+                if (!c) return EvaluationResult{c.error()};
                 return *c;
             } else {
                 return EvaluationError{
@@ -59,7 +60,7 @@ EvaluationResult toColor(const Value& colorValue) {
                 };
             }
         },
-        [&](const auto&) -> EvaluationResult {
+        [&colorValue](const auto&) -> EvaluationResult {
             return EvaluationError{
                 "Could not parse color from value '" + stringify(colorValue) + "'"
             };
@@ -90,7 +91,7 @@ std::string Coercion::getOperator() const {
 
 using namespace mbgl::style::conversion;
 ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
-    static std::unordered_map<std::string, type::Type> types {
+   static std::unordered_map<std::string, type::Type> types {
         {"to-number", type::Number},
         {"to-color", type::Color}
     };
@@ -108,7 +109,7 @@ ParseResult Coercion::parse(const Convertible& value, ParsingContext& ctx) {
     std::vector<std::unique_ptr<Expression>> parsed;
     parsed.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
-        ParseResult input = ctx.parse(arrayMember(value, i), i, {type::Value});
+        ParseResult input{ctx.parse(arrayMember(value, i), i, type::Type{type::Value})};
         if (!input) return ParseResult();
         parsed.push_back(std::move(*input));
     }

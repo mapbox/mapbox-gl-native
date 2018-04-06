@@ -144,6 +144,26 @@ optional<float> ValueConverter<float>::fromExpressionValue(const Value& value) {
         : optional<float>();
 }
 
+Value ValueConverter<uint64_t>::toExpressionValue(const uint64_t& value) {
+    return static_cast<double>(value);
+}
+
+optional<uint64_t> ValueConverter<uint64_t>::fromExpressionValue(const Value& value) {
+    return value.template is<double>()
+        ? static_cast<uint64_t>(value.template get<double>())
+        : optional<uint64_t>();
+}
+
+Value ValueConverter<int64_t>::toExpressionValue(const int64_t& value) {
+    return static_cast<double>(value);
+}
+
+optional<int64_t> ValueConverter<int64_t>::fromExpressionValue(const Value& value) {
+    return value.template is<double>()
+        ? static_cast<int64_t>(value.template get<double>())
+        : optional<int64_t>();
+}
+
 
 template <typename T, typename Container>
 std::vector<Value> toArrayValue(const Container& value) {
@@ -228,15 +248,16 @@ optional<T> ValueConverter<T, std::enable_if_t< std::is_enum<T>::value >>::fromE
     );
 }
 
-
-Value toExpressionValue(const Value& v) {
-    return v;
+Value toExpressionValue(const Value& value) {
+    return value;
 }
+
 
 template <typename T, typename Enable>
 Value toExpressionValue(const T& value) {
     return ValueConverter<T>::toExpressionValue(value);
 }
+
 
 optional<Value> fromExpressionValue(const Value& v) {
     return optional<Value>(v);
@@ -274,6 +295,16 @@ template optional<mbgl::Value> fromExpressionValue<mbgl::Value>(const Value&);
 template type::Type valueTypeToExpressionType<std::array<double, 4>>();
 template optional<std::array<double, 4>> fromExpressionValue<std::array<double, 4>>(const Value&);
 template Value toExpressionValue(const std::array<double, 4>&);
+
+// missing conversions?
+template type::Type valueTypeToExpressionType<int64_t>();
+template optional<int64_t> fromExpressionValue<int64_t>(const Value&);
+template Value toExpressionValue(const int64_t&);
+
+template type::Type valueTypeToExpressionType<uint64_t>();
+template optional<uint64_t> fromExpressionValue<uint64_t>(const Value&);
+template Value toExpressionValue(const uint64_t&);
+
 
 // layout/paint property types
 template type::Type valueTypeToExpressionType<float>();

@@ -234,7 +234,7 @@ public:
 };
 
 
-using FilterBase = variant<
+typedef variant<
     class NullFilter,
     class EqualsFilter,
     class NotEqualsFilter,
@@ -258,11 +258,15 @@ using FilterBase = variant<
     class IdentifierInFilter,
     class IdentifierNotInFilter,
     class HasIdentifierFilter,
-    class NotHasIdentifierFilter>;
+    class NotHasIdentifierFilter> FilterBase;
 
 class Filter : public FilterBase {
 public:
     using FilterBase::FilterBase;
+
+    template <typename... Args>
+    Filter(Args&&... args) : FilterBase(std::forward<Args>(args)...)
+    {}
 
     bool operator()(const Feature&) const;
 

@@ -45,7 +45,17 @@ class LineProgram : public Program<
     RenderLinePaintProperties>
 {
 public:
-    using Program::Program;
+    template <typename... Args>
+    LineProgram(Args&&... args) : Program<
+                                  shaders::line,
+                                  gl::Triangle,
+                                  LineLayoutAttributes,
+                                  gl::Uniforms<
+                                      uniforms::u_matrix,
+                                      uniforms::u_ratio,
+                                      uniforms::u_gl_units_to_pixels>,
+                                  RenderLinePaintProperties>(std::forward<Args>(args)...)
+    {}
 
     /*
      * @param p vertex position

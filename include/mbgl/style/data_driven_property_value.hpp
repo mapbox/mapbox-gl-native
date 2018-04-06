@@ -12,12 +12,12 @@ namespace style {
 template <class T>
 class DataDrivenPropertyValue {
 private:
-    using Value = variant<
+    typedef variant<
         Undefined,
         T,
         CameraFunction<T>,
         SourceFunction<T>,
-        CompositeFunction<T>>;
+        CompositeFunction<T>> Value;
 
     Value value;
 
@@ -33,6 +33,9 @@ private:
 
 public:
     DataDrivenPropertyValue() = default;
+    DataDrivenPropertyValue(const DataDrivenPropertyValue&) = default;
+    DataDrivenPropertyValue& operator=(const DataDrivenPropertyValue&) = default;
+    DataDrivenPropertyValue(DataDrivenPropertyValue&&) = default;
     DataDrivenPropertyValue(                  T  v) : value(std::move(v)) {}
     DataDrivenPropertyValue(   CameraFunction<T> v) : value(std::move(v)) {}
     DataDrivenPropertyValue(   SourceFunction<T> v) : value(std::move(v)) {}

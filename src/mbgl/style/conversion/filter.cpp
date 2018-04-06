@@ -38,10 +38,10 @@ static optional<FeatureIdentifier> toFeatureIdentifier(const Convertible& value,
         return {};
     } else {
         return (*identifier).match(
-            [] (uint64_t t) -> optional<FeatureIdentifier> { return { t }; },
-            [] ( int64_t t) -> optional<FeatureIdentifier> { return { t }; },
-            [] (  double t) -> optional<FeatureIdentifier> { return { t }; },
-            [] (const std::string& t) -> optional<FeatureIdentifier> { return { t }; },
+            [] (uint64_t t) -> optional<FeatureIdentifier> { return { FeatureIdentifier(t) }; },
+            [] ( int64_t t) -> optional<FeatureIdentifier> { return { FeatureIdentifier(t) }; },
+            [] (  double t) -> optional<FeatureIdentifier> { return { FeatureIdentifier(t) }; },
+            [] (const std::string& t) -> optional<FeatureIdentifier> { return { FeatureIdentifier(t) }; },
             [&] (const auto&) -> optional<FeatureIdentifier> {
                 error = { "filter expression value must be a boolean, number, or string" };
                 return {};
@@ -63,9 +63,9 @@ optional<Filter> convertUnaryFilter(const Convertible& value, Error& error) {
     }
 
     if (*key == "$id") {
-        return { IdentifierFilterType {} };
+        return Filter{ IdentifierFilterType {} };
     } else {
-        return { FilterType { *key } };
+        return Filter{ FilterType { *key } };
     }
 }
 
@@ -88,7 +88,7 @@ optional<Filter> convertEqualityFilter(const Convertible& value, Error& error) {
             return {};
         }
 
-        return { TypeFilterType { *filterValue } };
+        return Filter{ TypeFilterType { *filterValue } };
 
     } else if (*key == "$id") {
         optional<FeatureIdentifier> filterValue = toFeatureIdentifier(arrayMember(value, 2), error);
@@ -96,7 +96,7 @@ optional<Filter> convertEqualityFilter(const Convertible& value, Error& error) {
             return {};
         }
 
-        return { IdentifierFilterType { *filterValue } };
+        return Filter{ IdentifierFilterType { *filterValue } };
 
     } else {
         optional<Value> filterValue = normalizeValue(toValue(arrayMember(value, 2)), error);
@@ -104,7 +104,7 @@ optional<Filter> convertEqualityFilter(const Convertible& value, Error& error) {
             return {};
         }
 
-        return { FilterType { *key, *filterValue } };
+        return Filter{ FilterType { *key, *filterValue } };
     }
 }
 
@@ -126,7 +126,7 @@ optional<Filter> convertBinaryFilter(const Convertible& value, Error& error) {
         return {};
     }
 
-    return { FilterType { *key, *filterValue } };
+    return Filter{ FilterType { *key, *filterValue } };
 }
 
 template <class FilterType, class TypeFilterType, class IdentifierFilterType>
@@ -152,7 +152,7 @@ optional<Filter> convertSetFilter(const Convertible& value, Error& error) {
             values.push_back(*filterValue);
         }
 
-        return { TypeFilterType { std::move(values) } };
+        return Filter{ TypeFilterType { std::move(values) } };
 
     } else if (*key == "$id") {
         std::vector<FeatureIdentifier> values;
@@ -164,7 +164,7 @@ optional<Filter> convertSetFilter(const Convertible& value, Error& error) {
             values.push_back(*filterValue);
         }
 
-        return { IdentifierFilterType { std::move(values) } };
+        return Filter{ IdentifierFilterType { std::move(values) } };
 
     } else {
         std::vector<Value> values;
@@ -176,7 +176,7 @@ optional<Filter> convertSetFilter(const Convertible& value, Error& error) {
             values.push_back(*filterValue);
         }
 
-        return { FilterType { *key, std::move(values) } };
+        return optional<Filter>{ FilterType { *key, std::move(values) } };
     }
 }
 
@@ -191,7 +191,7 @@ optional<Filter> convertCompoundFilter(const Convertible& value, Error& error) {
         filters.push_back(*element);
     }
 
-    return { FilterType { std::move(filters) } };
+    return optional<Filter>{ FilterType { std::move(filters) } };
 }
 
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {

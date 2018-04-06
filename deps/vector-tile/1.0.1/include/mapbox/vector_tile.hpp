@@ -11,10 +11,10 @@
 #include <string>
 #include <stdexcept>
 
-#include <experimental/optional>
+#include <mbgl/util/optional.hpp>
 
 template <typename T>
-using optional = std::experimental::optional<T>;
+using optional = mbgl::optional<T>;
 
 namespace mapbox { namespace vector_tile {
 

@@ -80,7 +80,7 @@ void FillBucket::addFeature(const GeometryTileFeature& feature,
             lineSegment.indexLength += nVertices * 2;
         }
 
-        std::vector<uint32_t> indices = mapbox::earcut(polygon);
+        std::vector<uint32_t> indices{ mapbox::earcut(polygon) };
 
         std::size_t nIndicies = indices.size();
         assert(nIndicies % 3 == 0);

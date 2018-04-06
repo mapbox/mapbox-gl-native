@@ -82,7 +82,7 @@ optional<std::unique_ptr<Layer>> convertVectorLayer(const std::string& id, const
         layer->setFilter(*filter);
     }
 
-    return { std::move(layer) };
+    return optional<std::unique_ptr<Layer>>{std::move(layer)};
 }
 
 static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id, const Convertible& value, Error& error) {
@@ -98,7 +98,7 @@ static optional<std::unique_ptr<Layer>> convertRasterLayer(const std::string& id
         return {};
     }
 
-    return { std::make_unique<RasterLayer>(id, *source) };
+    return optional<std::unique_ptr<Layer>>{std::make_unique<RasterLayer>(id, *source)};
 }
 
 static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string& id, const Convertible& value, Error& error) {
@@ -114,12 +114,12 @@ static optional<std::unique_ptr<Layer>> convertHillshadeLayer(const std::string&
         return {};
     }
 
-    return { std::make_unique<HillshadeLayer>(id, *source) };
+    return optional<std::unique_ptr<Layer>>{std::make_unique<HillshadeLayer>(id, *source)};
 }
 
 
 static optional<std::unique_ptr<Layer>> convertBackgroundLayer(const std::string& id, const Convertible&, Error&) {
-    return { std::make_unique<BackgroundLayer>(id) };
+    return optional<std::unique_ptr<Layer>>{std::make_unique<BackgroundLayer>(id)};
 }
 
 optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(const Convertible& value, Error& error) const {
@@ -224,7 +224,7 @@ optional<std::unique_ptr<Layer>> Converter<std::unique_ptr<Layer>>::operator()(c
         return {};
     }
 
-    return std::move(layer);
+    return optional<std::unique_ptr<Layer>>{std::move(layer)};
 }
 
 } // namespace conversion

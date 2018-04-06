@@ -7,7 +7,7 @@
 #define UNIQUE_RESOURCE_H_
 #include <utility>
 // workaround for GCC
-#if defined(__GNUC__)
+#if defined(__GNUC__) || defined(_MSC_VER)
 #ifdef UNIQUE_RESOURCE_ALLOW_DELETER_CALL_THROWING_EXCEPTION
 #define UNIQUE_RESOURCE_NOEXCEPT
 #else

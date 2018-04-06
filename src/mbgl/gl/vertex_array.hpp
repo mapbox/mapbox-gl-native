@@ -59,9 +59,10 @@ using UniqueVertexArrayState = std::unique_ptr<VertexArrayState, VertexArrayStat
 
 class VertexArray {
 public:
-    VertexArray(UniqueVertexArrayState state_)
-        : state(std::move(state_)) {
-    }
+      VertexArray(UniqueVertexArrayState state_)
+          : state(std::move(state_)) {
+      }
+      VertexArray(VertexArray&& other) = default;
 
     void bind(Context&, BufferID indexBuffer, const AttributeBindingArray&);
 

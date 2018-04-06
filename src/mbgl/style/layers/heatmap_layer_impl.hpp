@@ -9,7 +9,9 @@ namespace style {
 
 class HeatmapLayer::Impl : public Layer::Impl {
 public:
-    using Layer::Impl::Impl;
+    template <typename... Args>
+    Impl(Args&&... args) : Layer::Impl(std::forward<Args>(args)...)
+    {}
 
     bool hasLayoutDifference(const Layer::Impl&) const override;
     void stringifyLayout(rapidjson::Writer<rapidjson::StringBuffer>&) const override;

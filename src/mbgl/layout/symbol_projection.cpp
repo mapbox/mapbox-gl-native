@@ -95,7 +95,7 @@ namespace mbgl {
     PointAndCameraDistance project(const Point<float>& point, const mat4& matrix) {
         vec4 pos = {{ point.x, point.y, 0, 1 }};
         matrix::transformMat4(pos, pos, matrix);
-        return {{ static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) }, pos[3] };
+        return {{ static_cast<float>(pos[0] / pos[3]), static_cast<float>(pos[1] / pos[3]) }, static_cast<float>(pos[3]) };
     }
 
     float evaluateSizeForFeature(const ZoomEvaluatedSize& zoomEvaluatedSize, const PlacedSymbol& placedSymbol) {

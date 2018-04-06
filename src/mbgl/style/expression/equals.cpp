@@ -38,7 +38,7 @@ bool Equals::operator==(const Expression& e) const {
 }
 
 std::vector<optional<Value>> Equals::possibleOutputs() const {
-    return {{ true }, { false }};
+    return {optional<Value>{ true }, optional<Value>{ false }};
 }
 
 static bool isComparableType(const type::Type& type) {
@@ -59,10 +59,10 @@ ParseResult Equals::parse(const Convertible& value, ParsingContext& ctx) {
 
     bool negate = toString(arrayMember(value, 0)) == std::string("!=");
 
-    ParseResult lhs = ctx.parse(arrayMember(value, 1), 1, {type::Value});
+    ParseResult lhs = ctx.parse(arrayMember(value, 1), 1, type::Type{type::Value});
     if (!lhs) return ParseResult();
 
-    ParseResult rhs = ctx.parse(arrayMember(value, 2), 2, {type::Value});
+    ParseResult rhs = ctx.parse(arrayMember(value, 2), 2, type::Type{type::Value});
     if (!rhs) return ParseResult();
 
     type::Type lhsType = (*lhs)->getType();

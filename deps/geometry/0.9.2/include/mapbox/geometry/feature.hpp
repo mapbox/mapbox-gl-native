@@ -8,7 +8,7 @@
 #include <string>
 #include <vector>
 #include <unordered_map>
-#include <experimental/optional>
+#include <mbgl/util/optional.hpp>
 
 namespace mapbox {
 namespace geometry {
@@ -19,6 +19,8 @@ struct null_value_t
 {
     constexpr null_value_t() {}
     constexpr null_value_t(std::nullptr_t) {}
+    constexpr null_value_t(const null_value_t&) {}
+    constexpr null_value_t(null_value_t&&) {}
 };
 
 constexpr bool operator==(const null_value_t&, const null_value_t&) { return true; }
@@ -32,13 +34,73 @@ constexpr null_value_t null_value = null_value_t();
 // Implementations that produce `value`s should use that order for type preference,
 // using uint64_t for positive integers, int64_t for negative integers, and double
 // for non-integers and integers outside the range of 64 bits.
+/*
 using value_base = mapbox::util::variant<null_value_t, bool, uint64_t, int64_t, double, std::string,
                                          mapbox::util::recursive_wrapper<std::vector<value>>,
                                          mapbox::util::recursive_wrapper<std::unordered_map<std::string, value>>>;
-
+*/
+typedef mapbox::util::variant<null_value_t, bool, uint64_t, int64_t, double, std::string,
+                                         mapbox::util::recursive_wrapper<std::vector<value>>,
+                                         mapbox::util::recursive_wrapper<std::unordered_map<std::string, value>>> value_base;
 struct value : value_base
 {
     using value_base::value_base;
+    //typedef value_base base_t;
+    //using base_t::base_t;
+
+      value()
+      : value_base()
+      { }
+
+      //pjmj
+      value(null_value_t args)
+      : value_base(std::move(args))
+      { }
+      value(bool&& args)
+      : value_base(std::forward<bool>(args))
+      { }
+      value(uint64_t&& args)
+      : value_base(std::forward<uint64_t>(args))
+      { }
+      value(int64_t&& args)
+      : value_base(std::forward<int64_t>(args))
+      { }
+      value(double&& args)
+      : value_base(std::forward<double>(args))
+      { }
+      value(std::string&& args)
+      : value_base(std::move(args))
+      { }
+      value(std::vector<value>&& args)
+      : value_base(mapbox::util::recursive_wrapper<std::vector<value>>(args))
+      { }
+      typedef mapbox::util::recursive_wrapper<std::unordered_map<std::string, value>> rec_map;
+      value(std::unordered_map<std::string, value>&& args)
+      : value_base(rec_map(args))
+      { }
+
+      value(const bool& args)
+      : value_base(args)
+      { }
+      value(const uint64_t& args)
+         : value_base(args)
+      { }
+      value(const int64_t& args)
+         : value_base(args)
+      { }
+      value(const double& args)
+         : value_base(args)
+      { }
+      value(const std::string& args)
+         : value_base(args)
+      { }
+      value(const std::vector<value>& args)
+         : value_base(mapbox::util::recursive_wrapper<std::vector<value>>(args))
+      { }
+      value(const std::unordered_map<std::string, value>& args)
+         : value_base(rec_map(args))
+      { }
+
 };
 
 using property_map = std::unordered_map<std::string, value>;
@@ -54,13 +116,14 @@ struct feature
 
     geometry_type geometry;
     property_map properties {};
-    std::experimental::optional<identifier> id {};
+    mbgl::optional<identifier> id {};
 
     // GCC 4.9 does not support C++14 aggregates with non-static data member
     // initializers.
     feature(geometry_type geometry_,
             property_map properties_ = property_map {},
-            std::experimental::optional<identifier> id_ = std::experimental::optional<identifier> {})
+            mbgl::optional<identifier> id_ = {})
+//    mbgl::optional<identifier> id_ = mbgl::optional<identifier> {})
         : geometry(std::move(geometry_)),
           properties(std::move(properties_)),
           id(std::move(id_)) {}

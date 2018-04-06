@@ -25,7 +25,7 @@ struct Converter<PropertyValue<T>> {
                 return {};
             }
             if (isFeatureConstant(**expression)) {
-                return { CameraFunction<T>(std::move(*expression)) };
+                return optional<PropertyValue<T>>(CameraFunction<T>(std::move(*expression)));
             } else {
                 error = { "property expressions not supported" };
                 return {};
@@ -35,13 +35,13 @@ struct Converter<PropertyValue<T>> {
             if (!function) {
                 return {};
             }
-            return { *function };
+            return optional<PropertyValue<T>>(*function);
         } else {
             optional<T> constant = convert<T>(value, error);
             if (!constant) {
                 return {};
             }
-            return { *constant };
+            return PropertyValue<T>{ *constant };
         }
     }
 };
