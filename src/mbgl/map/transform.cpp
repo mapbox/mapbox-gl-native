@@ -595,12 +595,16 @@ void Transform::startTransition(const CameraOptions& camera,
             }
             observer.onCameraIsChanging();
         } else {
-            transitionFinishFn();
+            auto finish = transitionFinishFn;
+
             transitionFinishFn = nullptr;
 
             // This callback gets destroyed here,
             // we can only return after this point.
             transitionFrameFn = nullptr;
+
+            if (finish)
+                finish();
         }
     };
 
