@@ -149,6 +149,41 @@ private:
     
     R (*evaluate)(const EvaluationContext&, Params...);
 };
+    
+// Evaluate function needing EvaluationContext and Varargs
+// (const EvaluationContext&, const Varargs<T>&) -> Result<U>
+template <class R, typename T>
+struct Signature<R (const EvaluationContext&, const Varargs<T>&)> : SignatureBase {
+    using Args = std::vector<std::unique_ptr<Expression>>;
+    
+    Signature(R (*evaluate_)(const EvaluationContext&, const Varargs<T>&), std::string name_) :
+    SignatureBase(
+                  valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
+                  VarargsType { valueTypeToExpressionType<T>() },
+                  std::move(name_)
+                  ),
+    evaluate(evaluate_)
+    {}
+    
+    std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override  {
+        return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
+    };
+    
+    EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
+        Varargs<T> evaluated;
+        evaluated.reserve(args.size());
+        for (const auto& arg : args) {
+            const EvaluationResult evaluatedArg = arg->evaluate(evaluationParameters);
+            if(!evaluatedArg) return evaluatedArg.error();
+            evaluated.push_back(*fromExpressionValue<std::decay_t<T>>(*evaluatedArg));
+        }
+        const R value = evaluate(evaluationParameters, evaluated);
+        if (!value) return value.error();
+        return *value;
+    }
+    
+    R (*evaluate)(const EvaluationContext&, const Varargs<T>&);
+};
 
 // Machinery to pull out function types from class methods, lambdas, etc.
 template <class R, class... Params>
@@ -179,6 +214,59 @@ template <typename Fn>
 static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction, std::string name) {
     return std::make_unique<detail::Signature<Fn>>(evaluateFunction, std::move(name));
 }
+    
+Value featureIdAsExpressionValue(EvaluationContext params) {
+    assert(params.feature);
+    auto id = params.feature->getID();
+    if (!id) return Null;
+    return id->match([](const auto& idid) {
+        return toExpressionValue(mbgl::Value(idid));
+    });
+};
+    
+Value featurePropertyAsExpressionValue(EvaluationContext params, const std::string& key) {
+    assert(params.feature);
+    auto property = params.feature->getValue(key);
+    return property ? toExpressionValue(*property) : Null;
+};
+    
+optional<FeatureType> stringAsFeatureType(const std::string &type) {
+    if (type == "Point") return FeatureType::Point;
+    else if (type == "LineString") return FeatureType::LineString;
+    else if (type == "Polygon") return FeatureType::Polygon;
+    else if (type == "Unknown") return FeatureType::Unknown;
+    else return optional<FeatureType>();
+};
+    
+optional<std::string> featureTypeAsString(FeatureType type) {
+    if (type == FeatureType::Point) return optional<std::string>("Point");
+    else if (type == FeatureType::LineString) return optional<std::string>("LineString");
+    else if (type == FeatureType::Polygon) return optional<std::string>("Polygon");
+    else if (type == FeatureType::Unknown) return optional<std::string>("Unknown");
+    else return optional<std::string>();
+};
+    
+optional<double> featurePropertyAsDouble(EvaluationContext params, const std::string& key) {
+    assert(params.feature);
+    auto property = params.feature->getValue(key);
+    if (!property) return optional<double>();
+    return property->match(
+        [](double value) { return value; },
+        [](auto) { return optional<double>(); }
+    );
+};
+    
+optional<double> featureIdAsDouble(EvaluationContext params) {
+    assert(params.feature);
+    auto id = params.feature->getID();
+    if (!id) return optional<double>();
+    return id->match(
+       [](std::string) { return optional<double>(); },
+       [](uint64_t value) { return optional<double>(static_cast<double>(value)); },
+       [](int64_t value) { return optional<double>(static_cast<double>(value)); },
+       [](double value) { return optional<double>(value); }
+    );
+};
 
 std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initializeDefinitions() {
     std::unordered_map<std::string, CompoundExpressionRegistry::Definition> definitions;
@@ -394,6 +482,87 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     });
     define("error", [](const std::string& input) -> Result<type::ErrorType> {
         return EvaluationError { input };
+    });
+    
+    define("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
+        return lhs == featurePropertyAsExpressionValue(params, key);
+    });
+    
+    define("filter-id-==", [](const EvaluationContext& params, const Value &lhs) -> Result<bool> {
+        return lhs == featureIdAsExpressionValue(params);
+    });
+
+    define("filter-type-==", [](const EvaluationContext& params, const std::string &lhs) -> Result<bool> {
+        if (!params.feature) return false;
+        return params.feature->getType() == stringAsFeatureType(lhs);
+    });
+
+    define("filter-<", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsDouble(params, key);
+        return rhs ? rhs < lhs : false;
+    });
+    
+    define("filter-id-<", [](const EvaluationContext& params, double lhs) -> Result<bool> {
+        auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs < lhs : false;
+    });
+
+    define("filter->", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsDouble(params, key);
+        return rhs ? rhs > lhs : false;
+    });
+
+    define("filter-id->", [](const EvaluationContext& params, double lhs) -> Result<bool> {
+        auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs > lhs : false;
+    });
+    
+    define("filter-<=", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsDouble(params, key);
+        return rhs ? rhs <= lhs : false;
+    });
+    
+    define("filter-id-<=", [](const EvaluationContext& params, double lhs) -> Result<bool> {
+        auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs <= lhs : false;
+    });
+    
+    define("filter->=", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsDouble(params, key);
+        return rhs ? rhs >= lhs : false;
+    });
+    
+    define("filter-id->=", [](const EvaluationContext& params, double lhs) -> Result<bool> {
+        auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs >= lhs : false;
+    });
+
+    define("filter-has", [](const EvaluationContext& params, const std::string& key) -> Result<bool> {
+        assert(params.feature);
+        return bool(params.feature->getValue(key));
+    });
+
+    define("filter-has-id", [](const EvaluationContext& params) -> Result<bool> {
+        assert(params.feature);
+        return bool(params.feature->getID());
+    });
+
+    define("filter-type-in", [](const EvaluationContext& params, const Varargs<std::string>& types) -> Result<bool> {
+        assert(params.feature);
+        optional<std::string> type = featureTypeAsString(params.feature->getType());
+        return std::find(types.begin(), types.end(), type) != types.end();
+    });
+    
+    define("filter-id-in", [](const EvaluationContext& params, const Varargs<Value>& ids) -> Result<bool> {
+        auto id = featureIdAsExpressionValue(params);
+        return std::find(ids.begin(), ids.end(), id) != ids.end();
+    });
+
+    define("filter-in", [](const EvaluationContext& params, const Varargs<Value>& varargs) -> Result<bool> {
+        if (varargs.size() < 2) return false;
+        assert(varargs[0].is<std::string>());
+        auto value = featurePropertyAsExpressionValue(params, varargs[0].get<std::string>());
+        return std::find(varargs.begin() + 1, varargs.end(), value) != varargs.end();
     });
     
     return definitions;
