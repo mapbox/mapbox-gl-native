@@ -166,11 +166,11 @@ TEST(TileCover, GeomPolygon) {
             {5.09765625,53.067626642387374},
         },{
             {19.6875,49.66762782262194},
-            {8.701171874999998,50.233151832472245},
-            {5.185546875,41.244772343082076},
-            {16.34765625,39.095962936305476},
-            {13.623046875,45.089035564831036},
             {22.8515625,43.51668853502906},
+            {13.623046875,45.089035564831036},
+            {16.34765625,39.095962936305476},
+            {5.185546875,41.244772343082076},
+            {8.701171874999998,50.233151832472245},
             {19.6875,49.66762782262194}
         }
     };
@@ -204,7 +204,7 @@ TEST(TileCover, GeomMultiPolygon) {
     };
     auto results = util::tileCover(multiPolygon, 8);
 
-    EXPECT_EQ(423u, results.size());
+    EXPECT_EQ(424u, results.size());
     EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 139, 87}), results.end());
     EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 136, 87}), results.end());
     EXPECT_NE(std::find(results.begin(), results.end(), UnwrappedTileID{8, 174, 94}), results.end());

@@ -58,7 +58,7 @@ bound create_bound_towards_maximum(point_list& points, point_list::iterator& pt)
     if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::copy(begin, next_pt, std::back_inserter(bnd.points));
-
+    bnd.winding = true;
     return bnd;
 }
 
@@ -89,6 +89,7 @@ bound create_bound_towards_minimum(point_list& points, point_list::iterator& pt)
     if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::reverse_copy(begin, next_pt, std::back_inserter(bnd.points));
+    bnd.winding = false;
     return bnd;
 }
 
@@ -121,27 +122,27 @@ std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
     tile_range.reserve(aet.size());
 
     for(bound& b: aet) {
-        x_range xp = { INT_MAX, 0 };
+        x_range xp = { INT_MAX, 0 , b.winding };
         double x;
         const auto numEdges = b.points.size() - 1;
         while (b.currentPointIndex < numEdges) {
-            x = b.currentX;
-            xp.first = std::min(xp.first, static_cast<int32_t>(std::floor(x)));
-            xp.second = std::max(xp.second, static_cast<int32_t>(std::ceil(x)));
+            x = b.interpolate(y);
+            xp.x0 = std::min(xp.x0, static_cast<int32_t>(std::floor(x)));
+            xp.x1 = std::max(xp.x1, static_cast<int32_t>(std::ceil(x)));
 
             // If this edge ends beyond the current row, find the x-value at the exit,
             //  and be done with this bound
             auto& p1 = b.points[b.currentPointIndex + 1];
             if (p1.y > y+1) {
                 x = b.interpolate(y+1);
-                xp.first = std::min(xp.first, static_cast<int32_t>(std::floor(x)));
-                xp.second = std::max(xp.second, static_cast<int32_t>(std::ceil(x)));
+                xp.x0 = std::min(xp.x0, static_cast<int32_t>(std::floor(x)));
+                xp.x1 = std::max(xp.x1, static_cast<int32_t>(std::ceil(x)));
                 break;
             } else if(b.currentPointIndex == numEdges - 1) {
                 // For last edge, consider x at edge end;
                 x = p1.x;
-                xp.first = std::min(xp.first, static_cast<int32_t>(std::floor(x)));
-                xp.second = std::max(xp.second, static_cast<int32_t>(std::ceil(x)));
+                xp.x0 = std::min(xp.x0, static_cast<int32_t>(std::floor(x)));
+                xp.x1 = std::max(xp.x1, static_cast<int32_t>(std::ceil(x)));
             }
             b.currentPointIndex++;
         }
@@ -159,16 +160,16 @@ std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
     }
     // Sort the X-extents of each crossing bound by x_min, x_max
     std::sort(tile_range.begin(), tile_range.end(), [] (x_range& a, x_range& b) {
-        return std::tie(a.first, a.second) < std::tie(b.first, b.second);
+        return std::tie(a.x0, a.x1) < std::tie(b.x0, b.x1);
     });
 
     return tile_range;
 }
 
-struct ToEdgeTables {
+struct ToEdgeTable {
     int32_t zoom;
     bool project = false;
-    ToEdgeTables(int32_t z, bool p): zoom(z), project(p) {}
+    ToEdgeTable(int32_t z, bool p): zoom(z), project(p) {}
 
     void buildTable(const std::vector<Point<double>>& points, edge_table& et, bool closed = false) const {
         point_list projectedPoints;
@@ -184,48 +185,48 @@ struct ToEdgeTables {
         build_edge_table(projectedPoints, 1 << zoom, et, closed);
     }
     
-    edge_table buildPolygonTable(const Polygon<double>& polygon) const {
-        edge_table et;
+    void buildPolygonTable(const Polygon<double>& polygon, edge_table& et) const {
         for(const auto&ring : polygon) {
             buildTable(ring, et, true);
         }
-        return et;
     }
-    std::vector<edge_table> operator()(const Point<double>&) const {
+    edge_table operator()(const Point<double>&) const {
         return { };
     }
 
-    std::vector<edge_table> operator()(const MultiPoint<double>&) const {
+    edge_table operator()(const MultiPoint<double>&) const {
         return { };
     }
 
-    std::vector<edge_table> operator()(const LineString<double>& lines) const {
+    edge_table operator()(const LineString<double>& lines) const {
         edge_table et;
         buildTable(lines, et);
-        return { et };
+        return et;
     }
 
-    std::vector<edge_table> operator()(const MultiLineString<double>& lines) const {
+    edge_table operator()(const MultiLineString<double>& lines) const {
         edge_table et;
         for(const auto&line : lines) {
             buildTable(line, et);
         }
-        return { et };
+        return et;
     }
 
-    std::vector<edge_table> operator()(const Polygon<double>& polygon) const {
-        return { buildPolygonTable(polygon) };
+    edge_table operator()(const Polygon<double>& polygon) const {
+        edge_table et;
+        buildPolygonTable(polygon, et);
+        return et;
     }
 
-    std::vector<edge_table> operator()(const MultiPolygon<double>& polygons) const {
-        std::vector<edge_table> tables;
+    edge_table operator()(const MultiPolygon<double>& polygons) const {
+        edge_table et;
         for(const auto& polygon: polygons) {
-            tables.push_back(buildPolygonTable(polygon));
+            buildPolygonTable(polygon, et);
         }
-        return tables;
+        return et;
     }
 
-    std::vector<edge_table> operator()(const mapbox::geometry::geometry_collection<double>&) const {
+    edge_table operator()(const mapbox::geometry::geometry_collection<double>&) const {
         return {};
     }
 };
@@ -234,47 +235,48 @@ TileCoverImpl::TileCoverImpl(int32_t z, const Geometry<double>& geom, bool proje
     ToFeatureType toFeatureType;
     isClosed = apply_visitor(toFeatureType, geom) == FeatureType::Polygon;
 
-    ToEdgeTables toEdgeTables(z, project);
-    edgeTables = apply_visitor(toEdgeTables, geom);
+    ToEdgeTable toEdgeTable(z, project);
+    edgeTable = apply_visitor(toEdgeTable, geom);
     reset();
 }
 
 void TileCoverImpl::reset() {
-    currentEdgeTable = edgeTables.begin();
-    if (currentEdgeTable != edgeTables.end()) {
-        activeEdgeTable = currentEdgeTable->begin()->second;
-        currentY = currentEdgeTable->begin()->first;
-    }
+    activeEdgeTable = edgeTable.begin()->second;
+    currentRow = edgeTable.begin()->first;
 }
 
 bool TileCoverImpl::next() {
-    return currentEdgeTable != edgeTables.end() && activeEdgeTable.size() != 0 && currentY < maxY;
+    return activeEdgeTable.size() != 0 && currentRow < maxY;
 }
 
 bool TileCoverImpl::scanRow(ScanLine& scanCover) {
     if (!next()) { return false; }
 
-    auto xps = util::scan_row(currentY, activeEdgeTable);
-    auto p = xps.begin();
+    auto xps = util::scan_row(currentRow, activeEdgeTable);
     assert(isClosed ? xps.size() % 2 == 0 : true);
-    while (p != xps.end()) {
-        auto x_min = p->first;
-        // For closed geometries, consider odd even pairs of tile ranges
-        if (isClosed) { p++; }
-        auto x_max = p++->second;
-        scanCover(x_min, x_max, currentY);
+
+    auto x_min = xps[0].x0;
+    auto x_max = xps[0].x1;
+    int8_t nzRule = xps[0].winding ? 1 : -1;
+    for (size_t i = 1; i < xps.size(); i++) {
+        auto xp = xps[i];
+        if (!(isClosed && nzRule != 0)) {
+            if (xp.x0 >= x_max) {
+                scanCover(x_min, x_max, currentRow);
+                x_min = xp.x0;
+            }
+        }
+        nzRule += xp.winding ? 1 : -1;
+        x_max = std::max(x_min, xp.x1);
     }
-    currentY++;
+    scanCover(x_min, x_max, currentRow);
+    assert(isClosed ? nzRule == 0 : true);
 
     // Update AET for next row
-    auto nextRow = currentEdgeTable->find(currentY);
-    if (nextRow != currentEdgeTable->end()) {
+    currentRow++;
+    auto nextRow = edgeTable.find(currentRow);
+    if (nextRow != edgeTable.end()) {
         activeEdgeTable.insert(activeEdgeTable.end(), nextRow->second.begin(), nextRow->second.end());
-    } else if (activeEdgeTable.size() == 0){
-        currentEdgeTable++;
-        if (currentEdgeTable == edgeTables.end()) return false;
-        activeEdgeTable = currentEdgeTable->begin()->second;
-        currentY = currentEdgeTable->begin()->first;
     }
     return next();
 }

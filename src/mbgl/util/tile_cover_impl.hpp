@@ -19,12 +19,17 @@ struct bound;
 using point_list = std::vector<Point<double>>;
 using bound_list = std::vector<bound>;
 using edge_table = std::map<uint32_t, bound_list>;
-using x_range = std::pair<int32_t, int32_t>;
-
+struct x_range {
+    int32_t x0;
+    int32_t x1;
+    bool winding;
+};
+    
 struct bound {
     point_list points;
     size_t currentPointIndex = 0;
     double currentX;
+    bool winding;
 
     double interpolate(uint32_t y) {
         const auto& p0 = points[currentPointIndex];
@@ -56,10 +61,9 @@ public:
     void reset();
 private:
     bool isClosed;
-    uint32_t currentY;
+    uint32_t currentRow;
     bound_list activeEdgeTable;
-    std::vector<edge_table> edgeTables;
-    std::vector<edge_table>::iterator currentEdgeTable;
+    edge_table edgeTable;
     uint32_t maxY;
 };
 
