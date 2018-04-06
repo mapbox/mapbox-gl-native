@@ -628,8 +628,12 @@ bool Transform::inTransition() const {
 }
 
 void Transform::updateTransitions(const TimePoint& now) {
-    if (transitionFrameFn) {
-        transitionFrameFn(now);
+    auto transition = transitionFrameFn;
+    transitionFrameFn = nullptr;
+
+    if (transition) {
+        transition(now);
+        transitionFrameFn = transition;
     }
 }
 
