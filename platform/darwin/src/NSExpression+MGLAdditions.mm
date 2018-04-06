@@ -662,9 +662,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSMutableArray *arguments = [NSMutableArray array];
             
             for (NSUInteger index = 0; index < argumentObjects.count; index++) {
-                if ([argumentObjects[index] isKindOfClass:[NSArray class]]) {
-                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
-                    NSExpression *argument = [NSExpression expressionWithFormat:@"%@", conditional];
+                if (index % 2 == 0 && index != argumentObjects.count - 1) {
+                    NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
+                    NSExpression *argument = [NSExpression expressionForConstantValue:predicate];
                     [arguments addObject:argument];
                 } else {
                     [arguments addObject:[NSExpression mgl_expressionWithJSONObject:argumentObjects[index]]];
@@ -673,7 +673,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             if (@available(iOS 9.0, *)) {
                 if (arguments.count == 3) {
-                    NSPredicate *conditional = [NSPredicate mgl_predicateWithJSONObject:argumentObjects.firstObject];
+                    NSPredicate *conditional = [arguments.firstObject constantValue];
                     return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
                 }
             }
