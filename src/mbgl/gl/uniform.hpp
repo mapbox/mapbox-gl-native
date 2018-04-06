@@ -126,17 +126,25 @@ namespace detail {
 template <class...>
 struct ConcatenateUniforms;
 
+template <>
+struct ConcatenateUniforms<> {
+    using Type = Uniforms<>;
+};
+
 template <class... As, class... Bs>
 struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>> {
     using Type = Uniforms<As..., Bs...>;
 };
 
+template <class... As, class... Bs, class... RemainingTypeLists>
+struct ConcatenateUniforms<TypeList<As...>, TypeList<Bs...>, RemainingTypeLists...> {
+    using Type = typename ConcatenateUniforms<TypeList<As..., Bs...>, RemainingTypeLists...>::Type;
+};
+
 } // namespace detail
 
-template <class A, class B>
-using ConcatenateUniforms = typename detail::ConcatenateUniforms<
-    typename A::Types,
-    typename B::Types>::Type;
+template <class... Us>
+using ConcatenateUniforms = typename detail::ConcatenateUniforms<typename Us::Types...>::Type;
 
 } // namespace gl
 } // namespace mbgl

@@ -296,17 +296,25 @@ namespace detail {
 template <class...>
 struct ConcatenateAttributes;
 
+template <>
+struct ConcatenateAttributes<> {
+    using Type = Attributes<>;
+};
+
 template <class... As, class... Bs>
 struct ConcatenateAttributes<TypeList<As...>, TypeList<Bs...>> {
     using Type = Attributes<As..., Bs...>;
 };
 
+template <class... As, class... Bs, class... RemainingTypeLists>
+struct ConcatenateAttributes<TypeList<As...>, TypeList<Bs...>, RemainingTypeLists...> {
+    using Type = typename ConcatenateAttributes<TypeList<As..., Bs...>, RemainingTypeLists...>::Type;
+};
+
 } // namespace detail
 
-template <class A, class B>
-using ConcatenateAttributes = typename detail::ConcatenateAttributes<
-    typename A::Types,
-    typename B::Types>::Type;
+template <class... As> // gl:Attributes...
+using ConcatenateAttributes = typename detail::ConcatenateAttributes<typename As::Types...>::Type;
 
 } // namespace gl
 } // namespace mbgl
