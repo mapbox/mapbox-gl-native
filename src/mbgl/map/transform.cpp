@@ -595,16 +595,35 @@ void Transform::startTransition(const CameraOptions& camera,
             }
             observer.onCameraIsChanging();
         } else {
+
+            // Use a temporary function to ensure that the transitionFinishFn
+            // lambda is only called once at the end of a transition.
+            //
+            // This addresses the symptons of https://github.com/mapbox/mapbox-gl-native/issues/11180
+            // where setting a shape source to nil (or similar) in the
+            // `onCameraDidChange` observer function causes `Map::Impl::onUpdate()`
+            // to be called which in turn calls this lambda (before the current
+            // iteration has completed), leading to an infinite loop.
+            //
+            // By using a temporary, and clearing transitionFinishFn we stop this
+            // recursion. (However it does not address the underlying problem of
+            // `onSourceChanged()` called from observer methods triggering
+            // `Map::Impl::onUpdate()`)
+            //
+            // This is now addressed at an earlier stage by a similar change
+            // below in `Transform::updateTransitions()`.
+
             auto finish = transitionFinishFn;
 
             transitionFinishFn = nullptr;
+            transitionFrameFn = nullptr;
+
+            if (finish) {
+                finish();
+            }
 
             // This callback gets destroyed here,
             // we can only return after this point.
-            transitionFrameFn = nullptr;
-
-            if (finish)
-                finish();
         }
     };
 
@@ -628,6 +647,20 @@ bool Transform::inTransition() const {
 }
 
 void Transform::updateTransitions(const TimePoint& now) {
+    // Use a temporary function to ensure that the transitionFrameFn lambda is
+    // called only once per update.
+    //
+    // This addresses the symptons of https://github.com/mapbox/mapbox-gl-native/issues/11180
+    // where setting a shape source to nil (or similar) in the `onCameraIsChanging`
+    // observer function causes `Map::Impl::onUpdate()` to be called which
+    // in turn calls this function (before the current iteration has completed),
+    // leading to an infinite loop.
+    //
+    // By temporarily nulling the `transitionFrameFn` (and then restoring it
+    // after the temporary has been called) we stop this recursion. (However it
+    // does not address the underlying problem of `onSourceChanged()`
+    // called from observer methods triggering `Map::Impl::onUpdate()`)
+
     auto transition = transitionFrameFn;
     transitionFrameFn = nullptr;
 
