@@ -34,7 +34,7 @@ public:
 };
 
 
-jni::Object<JsonElement> JsonElement::New(jni::JNIEnv& env, mapbox::geometry::value value) {
+jni::Object<JsonElement> JsonElement::New(jni::JNIEnv& env, const mapbox::geometry::value& value) {
   JsonElementEvaluator evaluator { env } ;
   return mapbox::geometry::value::visit(value, evaluator);
 }

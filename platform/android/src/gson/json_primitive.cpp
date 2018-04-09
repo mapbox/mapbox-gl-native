@@ -79,7 +79,7 @@ public:
     }
 };
 
-jni::Object<JsonPrimitive> JsonPrimitive::New(jni::JNIEnv &env, value value) {
+jni::Object<JsonPrimitive> JsonPrimitive::New(jni::JNIEnv &env, const value& value) {
     JsonPrimitiveEvaluator evaluator { env };
     return value::visit(value, evaluator);
 }

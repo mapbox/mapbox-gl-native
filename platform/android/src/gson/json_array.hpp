@@ -13,7 +13,7 @@ class JsonArray : private mbgl::util::noncopyable {
 public:
     static constexpr auto Name() { return "com/google/gson/JsonArray"; };
 
-    static jni::Object<JsonArray> New(jni::JNIEnv&, std::vector<mapbox::geometry::value>);
+    static jni::Object<JsonArray> New(jni::JNIEnv&, const std::vector<mapbox::geometry::value>&);
 
     static std::vector<mapbox::geometry::value> convert(JNIEnv&, jni::Object<JsonArray>);
 

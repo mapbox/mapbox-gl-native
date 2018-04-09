@@ -15,7 +15,7 @@ public:
 
     static constexpr auto Name() { return "com/google/gson/JsonPrimitive"; };
 
-    static jni::Object<JsonPrimitive> New(jni::JNIEnv&, value);
+    static jni::Object<JsonPrimitive> New(jni::JNIEnv&, const value&);
 
     static value convert(JNIEnv&, jni::Object<JsonPrimitive>);
 
