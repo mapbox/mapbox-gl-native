@@ -576,6 +576,28 @@ namespace mbgl {
         NSArray *expected = @[@"==", @1, @2];
         XCTAssertEqualObjects([NSPredicate predicateWithFormat:@"1 = 2"].mgl_jsonExpressionObject, expected);
     }
+    {
+        NSArray *expected = @[@"all", @[@"<=", @10, @[@"get", @"x"]], @[@"<=", @[@"get", @"x"], @100]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"all", @[@">=",  @[@"get", @"x"], @10], @[@"<=", @[@"get", @"x"], @100]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"all", @[@">=",  @[@"get", @"x"], @10], @[@">=", @100, @[@"get", @"x"]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"all", @[@"==", @10, @[@"get", @"x"]], @[@"<=", @[@"get", @"x"], @100]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ == x && x <= %@", [NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
 }
 
 @end

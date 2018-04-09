@@ -280,7 +280,7 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     }
     if ([op isEqualToString:@">="]) {
         NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
-        return [NSPredicate predicateWithFormat:@"%K >= %@" argumentArray:subexpressions];
+        return [NSPredicate predicateWithFormat:@"%@ >= %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"!"]) {
         NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
@@ -294,7 +294,25 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSPredicate predicateWithValue:YES];
     }
     if ([op isEqualToString:@"all"]) {
-        NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *jsonObjects = [objects subarrayWithRange:NSMakeRange(1, objects.count - 1)];
+        NSArray *subpredicates = MGLSubpredicatesWithJSONObjects(jsonObjects);
+        if (jsonObjects.count == 2) {
+            // Determine if the expression is of BETWEEN type
+            if ([jsonObjects[0] isKindOfClass:[NSArray class]] &&
+                [jsonObjects[1] isKindOfClass:[NSArray class]]) {
+                NSArray *leftCondition = jsonObjects[0];
+                NSArray *rightCondition = jsonObjects[1];
+                NSString *leftOperator = leftCondition.firstObject;
+                NSString *rightOperator = rightCondition.firstObject;
+                if ([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@"<="]) {
+                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[2]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]]];
+                } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@"<="]) {
+                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[1]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]]];
+                } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@">="]) {
+                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[1]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]]];
+                }
+            }
+        }
         return [NSCompoundPredicate andPredicateWithSubpredicates:subpredicates];
     }
     if ([op isEqualToString:@"any"]) {

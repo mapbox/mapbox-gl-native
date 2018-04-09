@@ -318,6 +318,21 @@
         case NSNotEqualToPredicateOperatorType:
             op = @"!=";
             break;
+        case NSBetweenPredicateOperatorType: {
+            op = @"all";
+            NSArray *arguments = self.rightExpression.constantValue;
+            NSPredicate *leftHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:arguments[0]
+                                                                                rightExpression:self.leftExpression
+                                                                                       modifier:NSAllPredicateModifier
+                                                                                           type:NSLessThanOrEqualToPredicateOperatorType
+                                                                                        options:0];
+            NSPredicate *rightHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.leftExpression
+                                                                                 rightExpression:arguments[1]
+                                                                                        modifier:NSAllPredicateModifier
+                                                                                            type:NSLessThanOrEqualToPredicateOperatorType
+                                                                                         options:0];
+            return @[op, leftHandPredicate.mgl_jsonExpressionObject, rightHandPredicate.mgl_jsonExpressionObject];
+        }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
         case NSBeginsWithPredicateOperatorType:
@@ -325,7 +340,6 @@
         case NSInPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
         case NSContainsPredicateOperatorType:
-        case NSBetweenPredicateOperatorType:
             [NSException raise:NSInvalidArgumentException
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
