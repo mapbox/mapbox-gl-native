@@ -151,8 +151,7 @@ step-library:
       run:
         name: Install macOS dependencies
         command: |
-          brew install cmake
-          brew install ccache
+          brew install cmake ccache
 
   - &install-macos-node4-dependencies
       run:
@@ -172,14 +171,12 @@ step-library:
       run:
         name: Install macOS Qt dependencies
         command: |
-          sudo chown -R $USER /usr/local
           brew install qt
           brew link qt --force
-          brew linkapps qt
           export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
           export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
+          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
   - &run-node-macos-tests
       run:
