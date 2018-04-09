@@ -1,9 +1,9 @@
 #import "MBXBenchViewController.h"
 
-#import "MBXBenchAppDelegate.h"
-
 #import <Mapbox/Mapbox.h>
 #import "MGLMapView_Private.h"
+
+#import "MBXBenchAppDelegate.h"
 
 #include "locations.hpp"
 
@@ -19,25 +19,25 @@
 
 #pragma mark - Setup
 
-+ (void)initialize
-{
-    if (self == [MBXBenchViewController class])
-    {
-        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
-            @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
-            @"MBXShowsUserLocation": @NO,
-            @"MBXDebug": @NO,
-        }];
-    }
-}
+//+ (void)initialize
+//{
+//    if (self == [MBXBenchViewController class])
+//    {
+//        [[NSUserDefaults standardUserDefaults] registerDefaults:@{
+//            @"MBXUserTrackingMode": @(MGLUserTrackingModeNone),
+//            @"MBXShowsUserLocation": @NO,
+//            @"MBXDebug": @NO,
+//        }];
+//    }
+//}
 
 - (void)viewDidLoad
 {
     [super viewDidLoad];
 
     // Use a local style and local assets if they’ve been downloaded.
-    NSURL *tileSourceURL = [[NSBundle mainBundle] URLForResource:@"mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v6" withExtension:nil subdirectory:@"tiles"];
-    NSURL *url = [NSURL URLWithString:tileSourceURL ? @"asset://styles/streets-v8.json" : @"mapbox://styles/mapbox/streets-v8"];
+    NSURL *tileSourceURL = [[NSBundle mainBundle] URLForResource:@"mapbox.mapbox-terrain-v2,mapbox.mapbox-streets-v7" withExtension:nil subdirectory:@"tiles"];
+    NSURL *url = [NSURL URLWithString:tileSourceURL ? @"asset://styles/streets-v10.json" : @"mapbox://styles/mapbox/streets-v10"];
     self.mapView = [[MGLMapView alloc] initWithFrame:self.view.bounds styleURL:url];
     self.mapView.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
     self.mapView.delegate = self;

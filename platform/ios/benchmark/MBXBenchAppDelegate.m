@@ -1,5 +1,5 @@
 #import "MBXBenchAppDelegate.h"
-#import "MBXBenchViewController.h"
+#import "MBXAnnotationViewBenchViewController.h"
 #import <Mapbox/Mapbox.h>
 
 NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
@@ -23,7 +23,7 @@ NSString * const MBXMapboxAccessTokenDefaultsKey = @"MBXMapboxAccessToken";
     }
 
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    self.window.rootViewController = [MBXBenchViewController new];
+    self.window.rootViewController = [MBXAnnotationViewBenchViewController new];
     [self.window makeKeyAndVisible];
 
     return YES;

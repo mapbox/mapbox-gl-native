@@ -1562,7 +1562,7 @@ CLLocationCoordinate2D randomWorldCoordinate() {
     [annotations removeObjectAtIndex:0];
     MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:nextAnnotation.coordinate
                                                             fromDistance:10
-                                                                   pitch:arc4random_uniform(60)
+                                                                   pitch:0//arc4random_uniform(60)
                                                                  heading:arc4random_uniform(360)];
     __weak MBXViewController *weakSelf = self;
     [self.mapView flyToCamera:camera completionHandler:^{
