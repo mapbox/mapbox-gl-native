@@ -32,23 +32,36 @@ namespace style {
 namespace expression {
 
 bool isConstant(const Expression& expression) {
-    if (dynamic_cast<const Var*>(&expression)) {
-        return false;
+    if (auto varExpression = dynamic_cast<const Var*>(&expression)) {
+        return isConstant(*varExpression->getBoundExpression());
     }
-    
+
     if (auto compound = dynamic_cast<const CompoundExpressionBase*>(&expression)) {
         if (compound->getName() == "error") {
             return false;
         }
     }
+
+    bool isTypeAnnotation = dynamic_cast<const Coercion*>(&expression) ||
+        dynamic_cast<const Assertion*>(&expression) ||
+        dynamic_cast<const ArrayAssertion*>(&expression);
     
-    bool literalArgs = true;
+    bool childrenConstant = true;
     expression.eachChild([&](const Expression& child) {
-        if (!dynamic_cast<const Literal*>(&child)) {
-            literalArgs = false;
+        // We can _almost_ assume that if `expressions` children are constant,
+        // they would already have been evaluated to Literal values when they
+        // were parsed.  Type annotations are the exception, because they might
+        // have been inferred and added after a child was parsed.
+
+        // So we recurse into isConstant() for the children of type annotations,
+        // but otherwise simply check whether they are Literals.
+        if (isTypeAnnotation) {
+            childrenConstant = childrenConstant && isConstant(child);
+        } else {
+            childrenConstant = childrenConstant && dynamic_cast<const Literal*>(&child);
         }
     });
-    if (!literalArgs) {
+    if (!childrenConstant) {
         return false;
     }
     
@@ -141,13 +154,13 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
         return parsed;
     }
 
-    if (expected) {
-        auto array = [&](std::unique_ptr<Expression> expression) {
-            std::vector<std::unique_ptr<Expression>> args;
-            args.push_back(std::move(expression));
-            return args;
-        };
+    auto array = [&](std::unique_ptr<Expression> expression) {
+        std::vector<std::unique_ptr<Expression>> args;
+        args.push_back(std::move(expression));
+        return args;
+    };
 
+    if (expected) {
         const type::Type actual = (*parsed)->getType();
         if ((*expected == type::String || *expected == type::Number || *expected == type::Boolean || *expected == type::Object) && actual == type::Value) {
             if (typeAnnotationOption == includeTypeAnnotations) {
@@ -169,7 +182,7 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
         }
     }
 
-    // If an expression's arguments are all literals, we can evaluate
+    // If an expression's arguments are all constant, we can evaluate
     // it immediately and replace it with a literal value in the
     // parsed result.
     if (!dynamic_cast<Literal *>(parsed->get()) && isConstant(**parsed)) {

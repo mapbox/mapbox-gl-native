@@ -44,8 +44,6 @@ struct Converter<DataDrivenPropertyValue<T>> {
             } else if (!featureConstant && !zoomConstant) {
                 return DataDrivenPropertyValue<T>(CompositeFunction<T>(std::move(*expression)));
             } else {
-                // If an expression is neither zoom- nor feature-dependent, it
-                // should have been reduced to a Literal when it was parsed.
                 auto literal = dynamic_cast<Literal*>(expression->get());
                 assert(literal);
                 optional<T> constant = fromExpressionValue<T>(literal->getValue());
