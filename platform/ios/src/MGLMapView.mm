@@ -1168,6 +1168,9 @@ public:
     }
 }
 
+#import <sys/utsname.h>
+
+
 - (void)validateDisplayLink
 {
     BOOL isVisible = self.superview && self.window;
