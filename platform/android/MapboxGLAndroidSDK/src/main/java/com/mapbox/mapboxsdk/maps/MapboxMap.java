@@ -1640,7 +1640,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to notify
    */
-  public void addOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
+  public void addOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
     cameraChangeDispatcher.addOnCameraIdleListener(listener);
   }
 
@@ -1649,7 +1649,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to remove
    */
-  public void removeOnCameraIdleListener(@Nullable OnCameraIdleListener listener) {
+  public void removeOnCameraIdleListener(@NonNull OnCameraIdleListener listener) {
     cameraChangeDispatcher.removeOnCameraIdleListener(listener);
   }
 
@@ -1670,7 +1670,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to notify
    */
-  public void addOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
+  public void addOnCameraMoveCancelListener(@NonNull OnCameraMoveCanceledListener listener) {
     cameraChangeDispatcher.addOnCameraMoveCancelListener(listener);
   }
 
@@ -1679,7 +1679,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to remove
    */
-  public void removeOnCameraMoveCancelListener(@Nullable OnCameraMoveCanceledListener listener) {
+  public void removeOnCameraMoveCancelListener(@NonNull OnCameraMoveCanceledListener listener) {
     cameraChangeDispatcher.removeOnCameraMoveCancelListener(listener);
   }
 
@@ -1700,7 +1700,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to notify
    */
-  public void addOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
+  public void addOnCameraMoveStartedListener(@NonNull OnCameraMoveStartedListener listener) {
     cameraChangeDispatcher.addOnCameraMoveStartedListener(listener);
   }
 
@@ -1709,7 +1709,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to remove
    */
-  public void removeOnCameraMoveStartedListener(@Nullable OnCameraMoveStartedListener listener) {
+  public void removeOnCameraMoveStartedListener(@NonNull OnCameraMoveStartedListener listener) {
     cameraChangeDispatcher.removeOnCameraMoveStartedListener(listener);
   }
 
@@ -1730,7 +1730,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to notify
    */
-  public void addOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
+  public void addOnCameraMoveListener(@NonNull OnCameraMoveListener listener) {
     cameraChangeDispatcher.addOnCameraMoveListener(listener);
   }
 
@@ -1739,7 +1739,7 @@ public final class MapboxMap {
    *
    * @param listener the listener to remove
    */
-  public void removeOnCameraMoveListener(@Nullable OnCameraMoveListener listener) {
+  public void removeOnCameraMoveListener(@NonNull OnCameraMoveListener listener) {
     cameraChangeDispatcher.removeOnCameraMoveListener(listener);
   }
 
@@ -1775,9 +1775,8 @@ public final class MapboxMap {
    * Adds a callback that's invoked when the map is scrolled.
    *
    * @param listener The callback that's invoked when the map is scrolled.
-   *                 To unset the callback, use null.
    */
-  public void addOnScrollListener(@Nullable OnScrollListener listener) {
+  public void addOnScrollListener(@NonNull OnScrollListener listener) {
     onGesturesManagerInteractionListener.onAddScrollListener(listener);
   }
 
@@ -1785,9 +1784,8 @@ public final class MapboxMap {
    * Removes a callback that's invoked when the map is scrolled.
    *
    * @param listener The callback that's invoked when the map is scrolled.
-   *                 To unset the callback, use null.
    */
-  public void removeOnScrollListener(@Nullable OnScrollListener listener) {
+  public void removeOnScrollListener(@NonNull OnScrollListener listener) {
     onGesturesManagerInteractionListener.onRemoveScrollListener(listener);
   }
 
@@ -1807,9 +1805,8 @@ public final class MapboxMap {
    * Adds a callback that's invoked when the map is flinged.
    *
    * @param listener The callback that's invoked when the map is flinged.
-   *                 To unset the callback, use null.
    */
-  public void addOnFlingListener(@Nullable OnFlingListener listener) {
+  public void addOnFlingListener(@NonNull OnFlingListener listener) {
     onGesturesManagerInteractionListener.onAddFlingListener(listener);
   }
 
@@ -1817,9 +1814,8 @@ public final class MapboxMap {
    * Removes a callback that's invoked when the map is flinged.
    *
    * @param listener The callback that's invoked when the map is flinged.
-   *                 To unset the callback, use null.
    */
-  public void removeOnFlingListener(@Nullable OnFlingListener listener) {
+  public void removeOnFlingListener(@NonNull OnFlingListener listener) {
     onGesturesManagerInteractionListener.onRemoveFlingListener(listener);
   }
 
@@ -1828,7 +1824,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is moved.
    */
-  public void addOnMoveListener(OnMoveListener listener) {
+  public void addOnMoveListener(@NonNull OnMoveListener listener) {
     onGesturesManagerInteractionListener.onAddMoveListener(listener);
   }
 
@@ -1837,7 +1833,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is moved.
    */
-  public void removeOnMoveListener(OnMoveListener listener) {
+  public void removeOnMoveListener(@NonNull OnMoveListener listener) {
     onGesturesManagerInteractionListener.onRemoveMoveListener(listener);
   }
 
@@ -1846,7 +1842,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is rotated.
    */
-  public void addOnRotateListener(OnRotateListener listener) {
+  public void addOnRotateListener(@NonNull OnRotateListener listener) {
     onGesturesManagerInteractionListener.onAddRotateListener(listener);
   }
 
@@ -1855,7 +1851,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is rotated.
    */
-  public void removeOnRotateListener(OnRotateListener listener) {
+  public void removeOnRotateListener(@NonNull OnRotateListener listener) {
     onGesturesManagerInteractionListener.onRemoveRotateListener(listener);
   }
 
@@ -1864,7 +1860,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scaled.
    */
-  public void addOnScaleListener(OnScaleListener listener) {
+  public void addOnScaleListener(@NonNull OnScaleListener listener) {
     onGesturesManagerInteractionListener.onAddScaleListener(listener);
   }
 
@@ -1873,7 +1869,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is scaled.
    */
-  public void removeOnScaleListener(OnScaleListener listener) {
+  public void removeOnScaleListener(@NonNull OnScaleListener listener) {
     onGesturesManagerInteractionListener.onRemoveScaleListener(listener);
   }
 
@@ -1882,7 +1878,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is tilted.
    */
-  public void addOnShoveListener(OnShoveListener listener) {
+  public void addOnShoveListener(@NonNull OnShoveListener listener) {
     onGesturesManagerInteractionListener.onAddShoveListener(listener);
   }
 
@@ -1891,7 +1887,7 @@ public final class MapboxMap {
    *
    * @param listener The callback that's invoked when the map is tilted.
    */
-  public void removeOnShoveListener(OnShoveListener listener) {
+  public void removeOnShoveListener(@NonNull OnShoveListener listener) {
     onGesturesManagerInteractionListener.onRemoveShoveListener(listener);
   }
 
@@ -1945,9 +1941,8 @@ public final class MapboxMap {
    * Adds a callback that's invoked when the user clicks on the map view.
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
-   *                 To unset the callback, use null.
    */
-  public void addOnMapClickListener(@Nullable OnMapClickListener listener) {
+  public void addOnMapClickListener(@NonNull OnMapClickListener listener) {
     onGesturesManagerInteractionListener.onAddMapClickListener(listener);
   }
 
@@ -1955,9 +1950,8 @@ public final class MapboxMap {
    * Removes a callback that's invoked when the user clicks on the map view.
    *
    * @param listener The callback that's invoked when the user clicks on the map view.
-   *                 To unset the callback, use null.
    */
-  public void removeOnMapClickListener(@Nullable OnMapClickListener listener) {
+  public void removeOnMapClickListener(@NonNull OnMapClickListener listener) {
     onGesturesManagerInteractionListener.onRemoveMapClickListener(listener);
   }
 
@@ -1977,9 +1971,8 @@ public final class MapboxMap {
    * Adds a callback that's invoked when the user long clicks on the map view.
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
-   *                 To unset the callback, use null.
    */
-  public void addOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
+  public void addOnMapLongClickListener(@NonNull OnMapLongClickListener listener) {
     onGesturesManagerInteractionListener.onAddMapLongClickListener(listener);
   }
 
@@ -1987,9 +1980,8 @@ public final class MapboxMap {
    * Removes a callback that's invoked when the user long clicks on the map view.
    *
    * @param listener The callback that's invoked when the user long clicks on the map view.
-   *                 To unset the callback, use null.
    */
-  public void removeOnMapLongClickListener(@Nullable OnMapLongClickListener listener) {
+  public void removeOnMapLongClickListener(@NonNull OnMapLongClickListener listener) {
     onGesturesManagerInteractionListener.onRemoveMapLongClickListener(listener);
   }
 
