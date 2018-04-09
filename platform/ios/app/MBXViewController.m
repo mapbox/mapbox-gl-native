@@ -1810,12 +1810,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         // Comment out the pin dropping functionality in the handleLongPress:
         // method in this class to make draggable annotation views play nice.
         annotationView.draggable = YES;
-
-        // Uncomment to force annotation view to maintain a constant size when
-        // the map is tilted. By default, annotation views will shrink and grow
-        // as they move towards and away from the horizon. Relatedly, annotations
-        // backed by GL sprites currently ONLY scale with viewing distance.
-        // annotationView.scalesWithViewingDistance = NO;
     } else {
         // orange indicates that the annotation view was reused
         annotationView.backgroundColor = [UIColor orangeColor];

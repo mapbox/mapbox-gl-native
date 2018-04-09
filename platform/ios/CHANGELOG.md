@@ -39,6 +39,7 @@ The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iO
 
 ### Annotations
 
+* Changed the default value of `MGLAnnotationView.scalesWithViewingDistance` to `NO`, to improve performance. If your use case involves many annotation views, consider keeping this property disabled. ([#11636](https://github.com/mapbox/mapbox-gl-native/pull/11636))
 * Fixed an issue preventing `MGLAnnotationImage.image` from being updated. ([#10372](https://github.com/mapbox/mapbox-gl-native/pull/10372))
 * Improved performance of `MGLAnnotationView`-backed annotations that have `scalesWithViewingDistance` enabled. ([#10951](https://github.com/mapbox/mapbox-gl-native/pull/10951))
 * Fixed an issue where tapping a group of annotations may not have selected the nearest annotation. ([#11438](https://github.com/mapbox/mapbox-gl-native/pull/11438))
