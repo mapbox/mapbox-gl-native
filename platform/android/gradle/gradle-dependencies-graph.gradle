@@ -20,7 +20,7 @@ plugins.apply(DependencyGraphGeneratorPlugin)
 def mapboxGenerator = new Generator(
         "mapboxLibraries", // Suffix for our Gradle task.
         "", // Root suffix that we don't want in this case.
-        { dependency -> dependency.getModuleGroup().startsWith("com.mapbox") }, // Only want Mapbox libs.
+        { dependency -> dependency.getModuleGroup().startsWith("com.mapbox.mapboxsdk") }, // Only want Mapbox libs.
         { dependency -> true }, // Include transitive dependencies.
 )
 
