@@ -1,75 +1,15 @@
-#import <XCTest/XCTest.h>
-#import <objc/message.h>
-#import <Mapbox/Mapbox.h>
+#import "MGLMapViewIntegrationTest.h"
 
-@interface MBGLIntegrationTests : XCTestCase <MGLMapViewDelegate>
-
-@property (nonatomic) MGLMapView *mapView;
-@property (nonatomic) MGLStyle *style;
-
+@interface MBGLIntegrationTests : MGLMapViewIntegrationTest
 @end
 
-@implementation MBGLIntegrationTests {
-    XCTestExpectation *_styleLoadingExpectation;
-    XCTestExpectation *_renderFinishedExpectation;
-}
-
-#pragma mark - Setup/Teardown
-
-- (void)setUp {
-    [super setUp];
-
-    [MGLAccountManager setAccessToken:@"pk.feedcafedeadbeefbadebede"];
-    NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-    self.mapView = [[MGLMapView alloc] initWithFrame:UIScreen.mainScreen.bounds styleURL:styleURL];
-    self.mapView.delegate = self;
-    if (!self.mapView.style) {
-        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
-        [self waitForExpectationsWithTimeout:1 handler:nil];
-    }
-
-    UIView *superView = [[UIView alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    [superView addSubview:self.mapView];
-    UIWindow *window = [[UIWindow alloc] initWithFrame:UIScreen.mainScreen.bounds];
-    [window addSubview:superView];
-    [window makeKeyAndVisible];
-}
-
-- (void)tearDown {
-    _styleLoadingExpectation = nil;
-    self.mapView = nil;
-    self.style = nil;
-
-    [super tearDown];
-}
-
-#pragma mark - MGLMapViewDelegate
-
-- (void)mapView:(MGLMapView *)mapView didFinishLoadingStyle:(MGLStyle *)style {
-    XCTAssertNotNil(mapView.style);
-    XCTAssertEqual(mapView.style, style);
-
-    [_styleLoadingExpectation fulfill];
-}
-
-- (void)mapViewDidFinishRenderingFrame:(MGLMapView *)mapView fullyRendered:(__unused BOOL)fullyRendered {
-    [_renderFinishedExpectation fulfill];
-    _renderFinishedExpectation = nil;
-}
-
-#pragma mark - Utilities
-
-- (void)waitForMapViewToBeRendered {
-    [self.mapView setNeedsDisplay];
-    _renderFinishedExpectation = [self expectationWithDescription:@"Map view should be rendered"];
-    [self waitForExpectations:@[_renderFinishedExpectation] timeout:1];
-}
-
-- (MGLStyle *)style {
-    return self.mapView.style;
-}
+@implementation MBGLIntegrationTests
 
 #pragma mark - Tests
+
+- (void)waitForMapViewToBeRendered {
+    [self waitForMapViewToBeRenderedWithTimeout:1];
+}
 
 // This test does not strictly need to be in this test file/target. Including here for convenience.
 - (void)testOpenGLLayerDoesNotLeakWhenCreatedAndDestroyedWithoutAddingToStyle {
@@ -220,9 +160,9 @@
     MGLStyleLayer *layer2 = [self.mapView.style layerWithIdentifier:@"gl-layer"];
 
     NSURL *styleURL = [[NSBundle bundleForClass:[self class]] URLForResource:@"one-liner" withExtension:@"json"];
-    _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+    self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
     [self.mapView setStyleURL:styleURL];
-    [self waitForExpectations:@[_styleLoadingExpectation] timeout:10];
+    [self waitForExpectations:@[self.styleLoadingExpectation] timeout:10];
 
     // At this point the C++ CustomLayer will have been destroyed, and the rawLayer pointer has been NULLed
     XCTAssert(weakLayer == layer2);
@@ -245,7 +185,7 @@
 
         XCTAssertNil(mapView2.style);
 
-        _styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
+        self.styleLoadingExpectation = [self expectationWithDescription:@"Map view should finish loading style."];
         [self waitForExpectationsWithTimeout:1 handler:nil];
 
         MGLOpenGLStyleLayer *layer = [[MGLOpenGLStyleLayer alloc] initWithIdentifier:@"gl-layer"];
