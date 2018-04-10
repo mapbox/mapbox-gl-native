@@ -44,6 +44,25 @@ NS_ASSUME_NONNULL_BEGIN
  */
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
+/**
+ Attempts to localize the receiver into the given locale.
+ 
+ This method assumes the receiver is used with a style layer property such as
+ `MGLStyleLayer.text` and refers to the feature attributes that are available in
+ vector tiles supplied by the
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
+ On iOS, the user can set the system’s preferred language in Settings, General
+ Settings, Language & Region. On macOS, the user can set the system’s preferred
+ language in the Language & Region pane of System Preferences.
+ 
+ @param locale The locale into which labels should be localized. To use the
+    system’s preferred language, if supported, specify `nil`. To use the local
+    language, specify a locale with the identifier `mul`.
+ @param replacesTokens `YES` to localize `{token}` syntax in constant value
+    subexpressions; `NO` otherwise.
+ */
+- (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale replacingTokens:(BOOL)replacesTokens;
+
 @end
 
 NS_ASSUME_NONNULL_END

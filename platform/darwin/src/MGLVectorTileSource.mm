@@ -96,7 +96,7 @@
             mostSpecificLanguage = language;
         }
     }
-    return mostSpecificLanguage ?: @"en";
+    return mostSpecificLanguage;
 }
 
 - (BOOL)isMapboxStreets {

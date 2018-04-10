@@ -421,7 +421,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
 }
 
 - (void)updateLabels {
-    self.mapView.style.localizesLabels = _isLocalizingLabels;
+    [self.mapView.style localizeLabelsIntoLocale:_isLocalizingLabels ? [NSLocale localeWithLocaleIdentifier:@"mul"] : nil];
 }
 
 - (void)applyPendingState {

@@ -1108,4 +1108,54 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     return expressionObject;
 }
 
+#pragma mark Localization
+
+NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale, BOOL replacesTokens) {
+    __block NSMutableDictionary *localizedStops;
+    [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        NSExpression *localizedValue = [value mgl_expressionLocalizedIntoLocale:locale replacingTokens:replacesTokens];
+        if (![localizedValue isEqual:value]) {
+            if (!localizedStops) {
+                localizedStops = [stops mutableCopy];
+            }
+            localizedStops[zoomLevel] = localizedValue;
+        }
+    }];
+    return localizedStops ?: stops;
+};
+
+- (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale replacingTokens:(BOOL)replacesTokens {
+    NSString *localizedKeyPath = locale ? [NSString stringWithFormat:@"name_%@", locale.localeIdentifier] : @"name";
+    switch (self.expressionType) {
+        case NSConstantValueExpressionType: {
+            if (replacesTokens) {
+                NSString *constantValue = self.constantValue;
+                if ([constantValue isKindOfClass:[NSString class]]
+                    && ([constantValue containsString:@"{name}"] || [constantValue containsString:@"{name_"])) {
+                    return [NSExpression expressionForKeyPath:localizedKeyPath];
+                }
+            }
+            NSDictionary *stops = self.constantValue;
+            // TODO: Check whether the dictionary’s key and value types are consistent with stop dictionaries. Or have the caller pass in whether this is a stop dictionary.
+            if ([stops isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *localizedStops = MGLLocalizedStopDictionary(stops, locale, replacesTokens);
+                if (![localizedStops isEqual:stops]) {
+                    return [NSExpression expressionForConstantValue:localizedStops];
+                }
+            }
+            return self;
+        }
+            
+        case NSKeyPathExpressionType: {
+            if ([self.keyPath isEqualToString:@"name"] || [self.keyPath hasPrefix:@"name_"]) {
+                return [NSExpression expressionForKeyPath:localizedKeyPath];
+            }
+            return self;
+        }
+            
+        default:
+            return self;
+    }
+}
+
 @end

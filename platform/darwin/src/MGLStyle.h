@@ -493,17 +493,20 @@ MGL_EXPORT
 #pragma mark Localizing Map Content
 
 /**
- A Boolean value that determines whether the style attempts to localize labels in 
- the style into the system’s preferred language.
+ Attempts to localize labels in the style into the given locale.
  
- When this property is enabled, the style automatically modifies the text property 
- of any symbol style layer whose source is the 
- <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox 
- Streets source</a>. On iOS, the user can set the system’s preferred language in 
- Settings, General Settings, Language & Region. On macOS, the user can set the 
- system’s preferred language in the Language & Region pane of System Preferences.
+ This method automatically modifies the text property of any symbol style layer
+ in the style whose source is the
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
+ On iOS, the user can set the system’s preferred language in Settings, General
+ Settings, Language & Region. On macOS, the user can set the system’s preferred
+ language in the Language & Region pane of System Preferences.
+ 
+ @param locale The locale into which labels should be localized. To use the
+    system’s preferred language, if supported, specify `nil`. To use the local
+    language, specify a locale with the identifier `mul`.
  */
-@property (nonatomic) BOOL localizesLabels;
+- (void)localizeLabelsIntoLocale:(nullable NSLocale *)locale;
 
 @end
 

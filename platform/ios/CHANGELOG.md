@@ -12,13 +12,14 @@ The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iO
 * Added Danish and Hebrew localizations. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967), [#11136](https://github.com/mapbox/mapbox-gl-native/pull/11134))
 * Removed methods, properties, and constants that had been deprecated as of v3.7.4. ([#11205](https://github.com/mapbox/mapbox-gl-native/pull/11205))
 
-### Styles and rendering
+### Styles
 
 * Added support for a new layer type: `MGLHeatmapStyleLayer`, a powerful way to visualize point data distributions using heatmaps, fully customizable through runtime styling. [#11046](https://github.com/mapbox/mapbox-gl-native/pull/11046)
 * The layout and paint properties on subclasses of `MGLStyleLayer` are now of type `NSExpression` instead of `MGLStyleValue`. A new “Predicates and Expressions” guide provides an overview of the supported operators. ([#10726](https://github.com/mapbox/mapbox-gl-native/pull/10726))
 * Renamed `MGLRasterSource` to `MGLRasterTileSource` and `MGLVectorSource` to `MGLVectorTileSource`. ([#11568](https://github.com/mapbox/mapbox-gl-native/pull/11568))
 * Added an `MGLComputedShapeSource` class that allows applications to supply vector data to a style layer on a per-tile basis. ([#9983](https://github.com/mapbox/mapbox-gl-native/pull/9983))
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
+* Replaced the `MGLStyle.localizesLabels` property with an `-[MGLStyle localizeLabelsIntoLocale:]` method that allows you to specify the language to localize into. Also added an `-[NSExpression(MGLAdditions) mgl_expressionLocalizedIntoLocale:replacingTokens:]` method for localizing an individual value used with `MGLSymbolStyleLayer.text`. ([#11651](https://github.com/mapbox/mapbox-gl-native/pull/11651))
 * The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
 * Added `MGLShapeSourceOptionWrapsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be wrapped to accommodate coordinates with longitudes beyond −180 and 180; and `MGLShapeSourceOptionClipsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be clipped at the edge of each tile. ([#11041](https://github.com/mapbox/mapbox-gl-native/pull/11041))
 * The layer filtering predicate's format strings now can contain arithmetic and calls to built-in `NSExpression` functions. ([#11587](https://github.com/mapbox/mapbox-gl-native/pull/11587))
