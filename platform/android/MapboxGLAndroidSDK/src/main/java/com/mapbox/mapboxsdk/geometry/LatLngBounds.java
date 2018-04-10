@@ -67,7 +67,7 @@ public class LatLngBounds implements Parcelable {
     double latCenter = (this.latitudeNorth + this.latitudeSouth) / 2.0;
     double longCenter;
 
-    if (this.longitudeEast > this.longitudeWest) {
+    if (this.longitudeEast >= this.longitudeWest) {
       longCenter = (this.longitudeEast + this.longitudeWest) / 2;
     } else {
       double halfSpan = (GeometryConstants.LONGITUDE_SPAN + this.longitudeEast - this.longitudeWest) / 2.0;
@@ -180,7 +180,7 @@ public class LatLngBounds implements Parcelable {
    */
   public double getLongitudeSpan() {
     double longSpan = Math.abs(this.longitudeEast - this.longitudeWest);
-    if (this.longitudeEast > this.longitudeWest) {
+    if (this.longitudeEast >= this.longitudeWest) {
       return longSpan;
     }
 
@@ -191,7 +191,7 @@ public class LatLngBounds implements Parcelable {
 
   static double getLongitudeSpan(final double longEast, final double longWest) {
     double longSpan = Math.abs(longEast - longWest);
-    if (longEast > longWest) {
+    if (longEast >= longWest) {
       return longSpan;
     }
 
@@ -240,7 +240,6 @@ public class LatLngBounds implements Parcelable {
         westLon = temp;
       }
     } else {
-      lonSpan = GeometryConstants.LONGITUDE_SPAN - lonSpan;
       if (westLon < eastLon) {
         double temp = eastLon;
         eastLon = westLon;
