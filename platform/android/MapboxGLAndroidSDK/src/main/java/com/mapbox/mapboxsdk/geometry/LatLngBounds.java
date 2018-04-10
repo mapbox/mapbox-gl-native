@@ -394,7 +394,7 @@ public class LatLngBounds implements Parcelable {
   }
 
   static boolean containsLongitude(final double eastLon, final double westLon, final double longitude) {
-    if (eastLon > westLon) {
+    if (eastLon >= westLon) {
       return (longitude <= eastLon)
         && (longitude >= westLon);
     }
