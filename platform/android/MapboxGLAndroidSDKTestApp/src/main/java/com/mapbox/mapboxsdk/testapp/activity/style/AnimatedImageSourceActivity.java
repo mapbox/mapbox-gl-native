@@ -35,7 +35,7 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
   private MapView mapView;
   private MapboxMap mapboxMap;
 
-  private Handler handler;
+  private Handler handler = new Handler();
   private Runnable runnable;
 
   @Override
@@ -65,7 +65,6 @@ public class AnimatedImageSourceActivity extends AppCompatActivity implements On
     mapboxMap.addLayer(layer);
 
     // loop refresh geojson
-    handler = new Handler();
     runnable = new RefreshImageRunnable(mapboxMap, handler);
     handler.postDelayed(runnable, 100);
   }
