@@ -683,6 +683,11 @@ endif
 android-configuration: platform/android/gradle/configuration.gradle
 	cat platform/android/gradle/configuration.gradle
 
+# Creates a dependency graph using Graphviz
+.PHONY: android-graph
+android-graph:
+	cd platform/android && $(MBGL_ANDROID_GRADLE) -Pmapbox.abis=none :MapboxGLAndroidSDK:generateDependencyGraphMapboxLibraries
+
 #### Miscellaneous targets #####################################################
 
 .PHONY: style-code
