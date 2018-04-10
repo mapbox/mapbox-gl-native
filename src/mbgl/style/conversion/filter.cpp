@@ -171,12 +171,16 @@ std::unique_ptr<Expression> convertHasOp(std::string property) {
     } else if (property == "$id") {
         return createExpression("filter-has-id", {});
     } else {
-        return createExpression("filter-has", { std::make_unique<Literal>(property) });
+        std::vector<std::unique_ptr<Expression>> args;
+        args.push_back(std::make_unique<Literal>(property));
+        return createExpression("filter-has", std::move(args));
     }
 }
 
 std::unique_ptr<Expression> convertNegation(std::unique_ptr<Expression> expression) {
-    return createExpression("!", { std::move(expression) });
+    std::vector<std::unique_ptr<Expression>> args;
+    args.push_back(std::move(expression));
+    return createExpression("!", std::move(args));
 }
     
 std::unique_ptr<Expression> convertNegation(std::unique_ptr<Expression> expression, Error&) {
