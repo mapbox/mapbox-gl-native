@@ -197,6 +197,27 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void includesOrderDoesNotMatter() {
+    LatLngBounds sameLongitudeFirst = new LatLngBounds.Builder()
+      .include(new LatLng(50, 10))  // southWest
+      .include(new LatLng(60, 10))
+      .include(new LatLng(60, 20))  // northEast
+      .include(new LatLng(50, 20))
+      .include(new LatLng(50, 10))  // southWest again
+      .build();
+
+    LatLngBounds sameLatitudeFirst = new LatLngBounds.Builder()
+      .include(new LatLng(50, 20))
+      .include(new LatLng(50, 10))  // southWest
+      .include(new LatLng(60, 10))
+      .include(new LatLng(60, 20))  // northEast
+      .include(new LatLng(50, 20))
+      .build();
+
+    assertEquals(sameLatitudeFirst, sameLongitudeFirst);
+  }
+
+  @Test
   public void includesOverDateline1() {
 
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
