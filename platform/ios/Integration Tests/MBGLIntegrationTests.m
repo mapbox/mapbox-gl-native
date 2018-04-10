@@ -1,5 +1,4 @@
 #import "MGLMapViewIntegrationTest.h"
-#import <objc/message.h>
 
 @interface MBGLIntegrationTests : MGLMapViewIntegrationTest
 @end
