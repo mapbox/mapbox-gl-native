@@ -227,7 +227,8 @@ public:
     }
     
     void operator()(const ExpressionFilter& filter) {
-        stringify(writer, filter.expression->serialize());
+        if (!filter.expression) writer.Null();
+        else stringify(writer, filter.expression->serialize());
     }
 
 private:

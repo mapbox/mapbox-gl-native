@@ -213,6 +213,9 @@ bool FilterEvaluator::operator()(const NotHasIdentifierFilter&) const {
 }
 
 bool FilterEvaluator::operator()(const ExpressionFilter& filter) const {
+    // TODO What is our fallback behvaiour?
+    if (!filter.expression) return true;
+    
     const expression::EvaluationResult result = filter.expression->evaluate(context);
     if (result) {
         const optional<bool> typed = expression::fromExpressionValue<bool>(*result);
