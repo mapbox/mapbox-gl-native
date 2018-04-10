@@ -2848,6 +2848,134 @@ public class Expression {
   }
 
   /**
+   * Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of
+   * input and output values (\"stops\"). The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
+   * Stop inputs must be numeric literals in strictly ascending order.
+   * Returns the output value of the stop just less than the input,
+   * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(1.0f, 0.0f,
+   *         literal(1.0f), literal(2.5f),
+   *         literal(10.0f), literal(5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
+   *
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
+   */
+  public static Expression step(@NonNull Number input, @NonNull Number defaultOutput, Expression... stops) {
+    return step(literal(input), defaultOutput, stops);
+  }
+
+  /**
+   * Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of
+   * input and output values (\"stops\"). The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
+   * Stop inputs must be numeric literals in strictly ascending order.
+   * Returns the output value of the stop just less than the input,
+   * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), 0.0f,
+   *         literal(1.0f), literal(2.5f),
+   *         literal(10.0f), literal(5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
+   *
+   * @param input         the input expression
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
+   */
+  public static Expression step(@NonNull Expression input, @NonNull Number defaultOutput, Expression... stops) {
+    return step(input, literal(defaultOutput), stops);
+  }
+
+  /**
+   * Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of
+   * input and output values (\"stops\"). The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
+   * Stop inputs must be numeric literals in strictly ascending order.
+   * Returns the output value of the stop just less than the input,
+   * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), 0.0f,
+   *         stop(1, 2.5f),
+   *         stop(10, 5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
+   *
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
+   */
+  public static Expression step(@NonNull Number input, @NonNull Number defaultOutput, Stop... stops) {
+    return step(literal(input), defaultOutput, Stop.toExpressionArray(stops));
+  }
+
+  /**
+   * Produces discrete, stepped results by evaluating a piecewise-constant function defined by pairs of
+   * input and output values (\"stops\"). The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
+   * Stop inputs must be numeric literals in strictly ascending order.
+   * Returns the output value of the stop just less than the input,
+   * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), 0.0f,
+   *         stop(1, 2.5f),
+   *         stop(10, 5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
+   *
+   * @param input         the input value
+   * @param defaultOutput the default output expression
+   * @param stops         pair of input and output values
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step">Style specification</a>
+   */
+  public static Expression step(@NonNull Expression input, @NonNull Number defaultOutput, Stop... stops) {
+    return step(input, defaultOutput, Stop.toExpressionArray(stops));
+  }
+
+  /**
    * Produces continuous, smooth results by interpolating between pairs of input and output values (\"stops\").
    * The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
    * Stop inputs must be numeric literals in strictly ascending order.
