@@ -21,7 +21,6 @@ The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iO
 * A style can now display smooth hillshading and customize its appearance at runtime using the `MGLHillshadeStyleLayer` class. Hillshading is based on a rasterized digital elevation model supplied by the `MGLRasterDEMSource` class. ([#10642](https://github.com/mapbox/mapbox-gl-native/pull/10642))
 * The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
 * Added `MGLShapeSourceOptionWrapsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be wrapped to accommodate coordinates with longitudes beyond −180 and 180; and `MGLShapeSourceOptionClipsCoordinates`, to specify whether the shape of an `MGLComputedShapeSource` should be clipped at the edge of each tile. ([#11041](https://github.com/mapbox/mapbox-gl-native/pull/11041))
-* Added support for Mapzen Terrarium DEM encoding. ([#11274](https://github.com/mapbox/mapbox-gl-native/pull/11274))
 * The layer filtering predicate's format strings now can contain arithmetic and calls to built-in `NSExpression` functions. ([#11587](https://github.com/mapbox/mapbox-gl-native/pull/11587))
 * The layer filtering predicate's key paths now may need to be cast to `NSString` or `NSNumber`. ([#11587](https://github.com/mapbox/mapbox-gl-native/pull/11587))
 
