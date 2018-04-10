@@ -662,7 +662,8 @@ final class MapGestureDetector {
 
         @Override
         public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setZoom((Float) animation.getAnimatedValue(), scalePointBegin, 0, true);
+          PointF scalePoint = focalPoint != null ? focalPoint : scalePointBegin;
+          transform.setZoom((Float) animation.getAnimatedValue(), scalePoint, 0, true);
         }
       });
       animator.addListener(new AnimatorListenerAdapter() {
