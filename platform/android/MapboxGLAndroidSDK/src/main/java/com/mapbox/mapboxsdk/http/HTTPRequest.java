@@ -123,35 +123,37 @@ class HTTPRequest implements Callback {
       log(DEBUG, String.format("[HTTP] Request with response code = %s: %s", response.code(), message));
     }
 
-    ResponseBody responseBody = response.body();
-    if (responseBody == null) {
-      log(ERROR, "[HTTP] Received empty response body");
-      return;
-    }
+    try (ResponseBody responseBody = response.body()) {
+      if (responseBody == null) {
+        log(ERROR, "[HTTP] Received empty response body");
+        response.close();
+        return;
+      }
 
-    byte[] body;
-    try {
-      body = responseBody.bytes();
-    } catch (IOException ioException) {
-      onFailure(call, ioException);
-      // throw ioException;
-      return;
-    } finally {
-      response.close();
-    }
+      byte[] body;
+      try {
+        body = responseBody.bytes();
+      } catch (IOException ioException) {
+        onFailure(call, ioException);
+        // throw ioException;
+        return;
+      } finally {
+        response.close();
+      }
 
-    lock.lock();
-    if (nativePtr != 0) {
-      nativeOnResponse(response.code(),
-        response.header("ETag"),
-        response.header("Last-Modified"),
-        response.header("Cache-Control"),
-        response.header("Expires"),
-        response.header("Retry-After"),
-        response.header("x-rate-limit-reset"),
-        body);
+      lock.lock();
+      if (nativePtr != 0) {
+        nativeOnResponse(response.code(),
+          response.header("ETag"),
+          response.header("Last-Modified"),
+          response.header("Cache-Control"),
+          response.header("Expires"),
+          response.header("Retry-After"),
+          response.header("x-rate-limit-reset"),
+          body);
+      }
+      lock.unlock();
     }
-    lock.unlock();
   }
 
   @Override

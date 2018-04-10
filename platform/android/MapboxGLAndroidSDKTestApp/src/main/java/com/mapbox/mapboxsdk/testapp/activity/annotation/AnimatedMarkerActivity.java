@@ -135,7 +135,7 @@ public class AnimatedMarkerActivity extends AppCompatActivity {
 
   protected void addRandomCar() {
     markerViews.add(createCarMarker(getLatLngInBounds(), R.drawable.ic_car_top,
-      markerView -> randomlyMoveMarker(markerView)));
+      this::randomlyMoveMarker));
   }
 
   private void randomlyMoveMarker(final MarkerView marker) {

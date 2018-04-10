@@ -101,19 +101,16 @@ public class OfflineManager {
 
   private void deleteAmbientDatabase(final Context context) {
     // Delete the file in a separate thread to avoid affecting the UI
-    new Thread(new Runnable() {
-      @Override
-      public void run() {
-        try {
-          String path = context.getCacheDir().getAbsolutePath() + File.separator + "mbgl-cache.db";
-          File file = new File(path);
-          if (file.exists()) {
-            file.delete();
-            Timber.d("Old ambient cache database deleted to save space: %s", path);
-          }
-        } catch (Exception exception) {
-          Timber.e(exception, "Failed to delete old ambient cache database: ");
+    new Thread(() -> {
+      try {
+        String path = context.getCacheDir().getAbsolutePath() + File.separator + "mbgl-cache.db";
+        File file = new File(path);
+        if (file.exists()) {
+          file.delete();
+          Timber.d("Old ambient cache database deleted to save space: %s", path);
         }
+      } catch (Exception exception) {
+        Timber.e(exception, "Failed to delete old ambient cache database: ");
       }
     }).start();
   }
@@ -155,23 +152,17 @@ public class OfflineManager {
 
       @Override
       public void onList(final OfflineRegion[] offlineRegions) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            fileSource.deactivate();
-            callback.onList(offlineRegions);
-          }
+        getHandler().post(() -> {
+          fileSource.deactivate();
+          callback.onList(offlineRegions);
         });
       }
 
       @Override
       public void onError(final String error) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            fileSource.deactivate();
-            callback.onError(error);
-          }
+        getHandler().post(() -> {
+          fileSource.deactivate();
+          callback.onError(error);
         });
       }
     });
@@ -209,25 +200,19 @@ public class OfflineManager {
 
       @Override
       public void onCreate(final OfflineRegion offlineRegion) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            ConnectivityReceiver.instance(context).deactivate();
-            FileSource.getInstance(context).deactivate();
-            callback.onCreate(offlineRegion);
-          }
+        getHandler().post(() -> {
+          ConnectivityReceiver.instance(context).deactivate();
+          FileSource.getInstance(context).deactivate();
+          callback.onCreate(offlineRegion);
         });
       }
 
       @Override
       public void onError(final String error) {
-        getHandler().post(new Runnable() {
-          @Override
-          public void run() {
-            ConnectivityReceiver.instance(context).deactivate();
-            FileSource.getInstance(context).deactivate();
-            callback.onError(error);
-          }
+        getHandler().post(() -> {
+          ConnectivityReceiver.instance(context).deactivate();
+          FileSource.getInstance(context).deactivate();
+          callback.onError(error);
         });
       }
     });

@@ -100,7 +100,7 @@ public class CustomGeometrySource extends Source {
   @NonNull
   public List<Feature> querySourceFeatures(@Nullable Expression filter) {
     Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
   protected native void initialize(String sourceId, Object options);

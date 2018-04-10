@@ -430,14 +430,11 @@ public class MapSnapshotter {
    * @param snapshot the generated snapshot
    */
   protected void onSnapshotReady(final MapSnapshot snapshot) {
-    new Handler().post(new Runnable() {
-      @Override
-      public void run() {
-        if (callback != null) {
-          addOverlay(snapshot);
-          callback.onSnapshotReady(snapshot);
-          reset();
-        }
+    new Handler().post(() -> {
+      if (callback != null) {
+        addOverlay(snapshot);
+        callback.onSnapshotReady(snapshot);
+        reset();
       }
     });
   }

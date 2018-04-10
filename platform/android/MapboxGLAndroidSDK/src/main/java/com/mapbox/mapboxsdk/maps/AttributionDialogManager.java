@@ -96,28 +96,19 @@ public class AttributionDialogManager implements View.OnClickListener, DialogInt
     AlertDialog.Builder builder = new AlertDialog.Builder(context);
     builder.setTitle(R.string.mapbox_attributionTelemetryTitle);
     builder.setMessage(R.string.mapbox_attributionTelemetryMessage);
-    builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
-        Telemetry.obtainTelemetry().enable();
-        dialog.cancel();
-      }
+    builder.setPositiveButton(R.string.mapbox_attributionTelemetryPositive, (dialog, which) -> {
+      TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.ENABLED);
+      Telemetry.obtainTelemetry().enable();
+      dialog.cancel();
     });
-    builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        showWebPage(context.getResources().getString(R.string.mapbox_telemetryLink));
-        dialog.cancel();
-      }
+    builder.setNeutralButton(R.string.mapbox_attributionTelemetryNeutral, (dialog, which) -> {
+      showWebPage(context.getResources().getString(R.string.mapbox_telemetryLink));
+      dialog.cancel();
     });
-    builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, new DialogInterface.OnClickListener() {
-      @Override
-      public void onClick(DialogInterface dialog, int which) {
-        Telemetry.obtainTelemetry().disable();
-        TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
-        dialog.cancel();
-      }
+    builder.setNegativeButton(R.string.mapbox_attributionTelemetryNegative, (dialog, which) -> {
+      Telemetry.obtainTelemetry().disable();
+      TelemetryEnabler.updateTelemetryState(TelemetryEnabler.State.DISABLED);
+      dialog.cancel();
     });
     builder.show();
   }

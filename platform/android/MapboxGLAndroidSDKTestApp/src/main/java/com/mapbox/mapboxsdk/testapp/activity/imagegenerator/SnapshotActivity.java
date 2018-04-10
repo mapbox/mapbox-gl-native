@@ -1,6 +1,5 @@
 package com.mapbox.mapboxsdk.testapp.activity.imagegenerator;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.ContextCompat;
@@ -78,12 +77,7 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   protected void onPause() {
     super.onPause();
-    mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
-      @Override
-      public void onSnapshotReady(Bitmap snapshot) {
-        Timber.e("Regression test for https://github.com/mapbox/mapbox-gl-native/pull/11358");
-      }
-    });
+    mapboxMap.snapshot(snapshot -> Timber.e("Regression test for https://github.com/mapbox/mapbox-gl-native/pull/11358"));
     mapView.onPause();
   }
 

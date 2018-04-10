@@ -257,12 +257,7 @@ final class MapGestureDetector {
   /**
    * Posted on main thread with {@link #animationsTimeoutHandler}. Cancels all scheduled animators if needed.
    */
-  private Runnable cancelAnimatorsRunnable = new Runnable() {
-    @Override
-    public void run() {
-      cancelAnimators();
-    }
-  };
+  private Runnable cancelAnimatorsRunnable = this::cancelAnimators;
 
   /**
    * Schedules a velocity animator to be executed when user lift fingers,
@@ -700,16 +695,11 @@ final class MapGestureDetector {
       ValueAnimator animator = ValueAnimator.ofFloat(angularVelocity, 0f);
       animator.setDuration(animationTime);
       animator.setInterpolator(new DecelerateInterpolator());
-      animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-        @Override
-        public void onAnimationUpdate(ValueAnimator animation) {
-          transform.setBearing(
-            transform.getRawBearing() + (float) animation.getAnimatedValue(),
-            rotateFocalPoint.x, rotateFocalPoint.y,
-            0L
-          );
-        }
-      });
+      animator.addUpdateListener(animation -> transform.setBearing(
+        transform.getRawBearing() + (float) animation.getAnimatedValue(),
+        rotateFocalPoint.x, rotateFocalPoint.y,
+        0L
+      ));
 
       animator.addListener(new AnimatorListenerAdapter() {
 
@@ -816,13 +806,8 @@ final class MapGestureDetector {
     ValueAnimator animator = ValueAnimator.ofFloat((float) currentZoom, (float) (currentZoom + zoomAddition));
     animator.setDuration(animationTime);
     animator.setInterpolator(new DecelerateInterpolator());
-    animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-
-      @Override
-      public void onAnimationUpdate(ValueAnimator animation) {
-        transform.setZoom((Float) animation.getAnimatedValue(), animationFocalPoint);
-      }
-    });
+    animator.addUpdateListener(animation ->
+      transform.setZoom((Float) animation.getAnimatedValue(), animationFocalPoint));
 
     animator.addListener(new AnimatorListenerAdapter() {
 

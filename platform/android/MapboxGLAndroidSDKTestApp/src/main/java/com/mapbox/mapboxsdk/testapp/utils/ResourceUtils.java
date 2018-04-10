@@ -17,16 +17,18 @@ public class ResourceUtils {
   public static String readRawResource(Context context, @RawRes int rawResource) throws IOException {
     String json = "";
     if (context != null) {
-      Writer writer = new StringWriter();
-      char[] buffer = new char[1024];
-      try (InputStream is = context.getResources().openRawResource(rawResource)) {
-        Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-        int numRead;
-        while ((numRead = reader.read(buffer)) != -1) {
-          writer.write(buffer, 0, numRead);
+      try (Writer writer = new StringWriter()) {
+        char[] buffer = new char[1024];
+        try (InputStream is = context.getResources().openRawResource(rawResource)) {
+          try (Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"))) {
+            int numRead;
+            while ((numRead = reader.read(buffer)) != -1) {
+              writer.write(buffer, 0, numRead);
+            }
+          }
         }
+        json = writer.toString();
       }
-      json = writer.toString();
     }
     return json;
   }

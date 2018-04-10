@@ -347,7 +347,7 @@ public class MapboxMapTest extends BaseActivityTest {
   public void addPolygonsEmpty() {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.addPolygons(new ArrayList<PolygonOptions>());
+      mapboxMap.addPolygons(new ArrayList<>());
       assertEquals("Polygons size should be 0", 0, mapboxMap.getPolygons().size());
     }));
   }
@@ -410,7 +410,7 @@ public class MapboxMapTest extends BaseActivityTest {
   public void testAddPolylinesEmpty() {
     validateTestSetup();
     onView(withId(R.id.mapView)).perform(new MapboxMapAction((uiController, view) -> {
-      mapboxMap.addPolylines(new ArrayList<PolylineOptions>());
+      mapboxMap.addPolylines(new ArrayList<>());
       assertEquals("Polygons size should be 0", 0, mapboxMap.getPolylines().size());
     }));
   }

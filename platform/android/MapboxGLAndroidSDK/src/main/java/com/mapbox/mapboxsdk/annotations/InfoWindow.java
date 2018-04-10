@@ -32,7 +32,7 @@ import java.lang.ref.WeakReference;
 public class InfoWindow {
 
   private WeakReference<Marker> boundMarker;
-  private WeakReference<MapboxMap> mapboxMap;
+  private WeakReference<MapboxMap> mapboxMapReference;
   protected WeakReference<View> view;
 
   private float markerHeightOffset;
@@ -55,46 +55,40 @@ public class InfoWindow {
   }
 
   private void initialize(View view, MapboxMap mapboxMap) {
-    this.mapboxMap = new WeakReference<>(mapboxMap);
+    this.mapboxMapReference = new WeakReference<>(mapboxMap);
     isVisible = false;
     this.view = new WeakReference<>(view);
 
-    view.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
-        if (mapboxMap != null) {
-          MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener = mapboxMap.getOnInfoWindowClickListener();
-          boolean handledDefaultClick = false;
-          if (onInfoWindowClickListener != null) {
-            handledDefaultClick = onInfoWindowClickListener.onInfoWindowClick(getBoundMarker());
-          }
+    view.setOnClickListener(v -> {
+      MapboxMap map = InfoWindow.this.mapboxMapReference.get();
+      if (map != null) {
+        MapboxMap.OnInfoWindowClickListener onInfoWindowClickListener = map.getOnInfoWindowClickListener();
+        boolean handledDefaultClick = false;
+        if (onInfoWindowClickListener != null) {
+          handledDefaultClick = onInfoWindowClickListener.onInfoWindowClick(getBoundMarker());
+        }
 
-          if (!handledDefaultClick) {
-            // default behavior: close it when clicking on the tooltip:
-            closeInfoWindow();
-          }
+        if (!handledDefaultClick) {
+          // default behavior: close it when clicking on the tooltip:
+          closeInfoWindow();
         }
       }
     });
 
-    view.setOnLongClickListener(new View.OnLongClickListener() {
-      @Override
-      public boolean onLongClick(View v) {
-        MapboxMap mapboxMap = InfoWindow.this.mapboxMap.get();
-        if (mapboxMap != null) {
-          MapboxMap.OnInfoWindowLongClickListener listener = mapboxMap.getOnInfoWindowLongClickListener();
-          if (listener != null) {
-            listener.onInfoWindowLongClick(getBoundMarker());
-          }
+    view.setOnLongClickListener(v -> {
+      MapboxMap map = InfoWindow.this.mapboxMapReference.get();
+      if (map != null) {
+        MapboxMap.OnInfoWindowLongClickListener listener = map.getOnInfoWindowLongClickListener();
+        if (listener != null) {
+          listener.onInfoWindowLongClick(getBoundMarker());
         }
-        return true;
       }
+      return true;
     });
   }
 
   private void closeInfoWindow() {
-    MapboxMap mapbox = mapboxMap.get();
+    MapboxMap mapbox = mapboxMapReference.get();
     Marker marker = boundMarker.get();
     if (marker != null && mapbox != null) {
       mapbox.deselectMarker(marker);
@@ -119,7 +113,7 @@ public class InfoWindow {
     MapView.LayoutParams lp = new MapView.LayoutParams(MapView.LayoutParams.WRAP_CONTENT,
       MapView.LayoutParams.WRAP_CONTENT);
 
-    MapboxMap mapboxMap = this.mapboxMap.get();
+    MapboxMap mapboxMap = this.mapboxMapReference.get();
     View view = this.view.get();
     if (view != null && mapboxMap != null) {
       view.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
@@ -210,7 +204,7 @@ public class InfoWindow {
    * @return This {@link InfoWindow}
    */
   InfoWindow close() {
-    MapboxMap mapboxMap = this.mapboxMap.get();
+    MapboxMap mapboxMap = this.mapboxMapReference.get();
     if (isVisible && mapboxMap != null) {
       isVisible = false;
       View view = this.view.get();
@@ -241,7 +235,7 @@ public class InfoWindow {
       view = LayoutInflater.from(mapView.getContext()).inflate(layoutRes, mapView, false);
       initialize(view, mapboxMap);
     }
-    this.mapboxMap = new WeakReference<>(mapboxMap);
+    this.mapboxMapReference = new WeakReference<>(mapboxMap);
     String title = overlayItem.getTitle();
     TextView titleTextView = ((TextView) view.findViewById(R.id.infowindow_title));
     if (!TextUtils.isEmpty(title)) {
@@ -277,7 +271,7 @@ public class InfoWindow {
    * Will result in getting this {@link InfoWindow} and updating the view being displayed.
    */
   public void update() {
-    MapboxMap mapboxMap = this.mapboxMap.get();
+    MapboxMap mapboxMap = this.mapboxMapReference.get();
     Marker marker = boundMarker.get();
     View view = this.view.get();
     if (mapboxMap != null && marker != null && view != null) {

@@ -73,7 +73,7 @@ public class VectorSource extends Source {
     Feature[] features = querySourceFeatures(
       sourceLayerIds,
       filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
   /**

@@ -38,7 +38,7 @@ public class GeoJsonSource extends Source {
    */
   public GeoJsonSource(String id) {
     initialize(id, null);
-    setGeoJson(FeatureCollection.fromFeatures(new ArrayList<Feature>()));
+    setGeoJson(FeatureCollection.fromFeatures(new ArrayList<>()));
   }
 
   /**
@@ -49,7 +49,7 @@ public class GeoJsonSource extends Source {
    */
   public GeoJsonSource(String id, GeoJsonOptions options) {
     initialize(id, options);
-    setGeoJson(FeatureCollection.fromFeatures(new ArrayList<Feature>()));
+    setGeoJson(FeatureCollection.fromFeatures(new ArrayList<>()));
   }
 
   /**
@@ -244,7 +244,7 @@ public class GeoJsonSource extends Source {
   @NonNull
   public List<Feature> querySourceFeatures(@Nullable Expression filter) {
     Feature[] features = querySourceFeatures(filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
   protected native void initialize(String layerId, Object options);
