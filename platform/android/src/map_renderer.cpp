@@ -136,7 +136,7 @@ void MapRenderer::render(JNIEnv&) {
     renderer->render(*params);
 
     // Deliver the snapshot if requested
-    if (snapshotCallback) {
+    if (snapshotCallback && !paused) {
         snapshotCallback->operator()(backend->readFramebuffer());
         snapshotCallback.reset();
     }
@@ -174,6 +174,14 @@ void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
     requestRender();
 }
 
+void MapRenderer::onResume(JNIEnv&) {
+    paused = false;
+}
+
+void MapRenderer::onPause(JNIEnv&) {
+    paused = true;
+}
+
 // Static methods //
 
 jni::Class<MapRenderer> MapRenderer::javaClass;
@@ -192,7 +200,11 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
                                          METHOD(&MapRenderer::onSurfaceCreated,
                                                 "nativeOnSurfaceCreated"),
                                          METHOD(&MapRenderer::onSurfaceChanged,
-                                                "nativeOnSurfaceChanged"));
+                                                "nativeOnSurfaceChanged"),
+                                         METHOD(&MapRenderer::onResume,
+                                                "nativeOnResume"),
+                                         METHOD(&MapRenderer::onPause,
+                                                "nativeOnPause"));
 }
 
 MapRenderer& MapRenderer::getNativePeer(JNIEnv& env, jni::Object<MapRenderer> jObject) {
