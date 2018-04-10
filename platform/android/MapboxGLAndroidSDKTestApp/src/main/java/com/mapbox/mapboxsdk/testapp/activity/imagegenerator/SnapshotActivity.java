@@ -17,6 +17,8 @@ import com.mapbox.mapboxsdk.testapp.R;
 
 import java.util.Locale;
 
+import timber.log.Timber;
+
 /**
  * Test activity showcasing the Snapshot API to create and display a bitmap of the current shown Map.
  */
@@ -79,6 +81,12 @@ public class SnapshotActivity extends AppCompatActivity implements OnMapReadyCal
   @Override
   protected void onPause() {
     super.onPause();
+    mapboxMap.snapshot(new MapboxMap.SnapshotReadyCallback() {
+      @Override
+      public void onSnapshotReady(Bitmap snapshot) {
+        Timber.e("Regression test for https://github.com/mapbox/mapbox-gl-native/pull/11358");
+      }
+    });
     mapView.onPause();
   }
 
