@@ -2,6 +2,14 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 5.5.2 - April 10, 2018
+ - Correct animation scale point [#11643](https://github.com/mapbox/mapbox-gl-native/pull/11643)
+ - Re-bind uniform locations after re-linking program [#11583](https://github.com/mapbox/mapbox-gl-native/pull/11583)
+ - Invalidate camera position before delivering onMapReady [#11585](https://github.com/mapbox/mapbox-gl-native/pull/11585)
+ - Null java peer callback [#11358](https://github.com/mapbox/mapbox-gl-native/pull/11358)
+ - Add missing delete local reference [#11608](https://github.com/mapbox/mapbox-gl-native/pull/11608)
+ - Release local refs [#11599](https://github.com/mapbox/mapbox-gl-native/pull/11599)
+
 ## 5.5.1 - March 26, 2018
  - Verify optional access of FileSource deactivation [#11480](https://github.com/mapbox/mapbox-gl-native/pull/11480)
  - Prevent default style loading when style json was set [#11519](https://github.com/mapbox/mapbox-gl-native/pull/11519)
