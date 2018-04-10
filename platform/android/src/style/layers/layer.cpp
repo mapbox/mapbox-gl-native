@@ -26,7 +26,6 @@
 // C++ -> Java conversion
 #include "../conversion/property_value.hpp"
 #include <mbgl/style/filter.hpp>
-#include "../conversion/gson.hpp"
 
 #include <string>
 
@@ -153,20 +152,19 @@ namespace android {
         }
     };
 
-    jni::Object<gson::JsonArray> Layer::getFilter(jni::JNIEnv& env) {
+    jni::Object<gson::JsonElement> Layer::getFilter(jni::JNIEnv& env) {
         using namespace mbgl::style;
         using namespace mbgl::style::conversion;
 
         Filter filter = layer.accept(GetFilterEvaluator());
 
-        jni::jobject* converted = nullptr;
+        jni::Object<gson::JsonElement> converted;
         if (filter.is<ExpressionFilter>()) {
             ExpressionFilter filterExpression = filter.get<ExpressionFilter>();
             mbgl::Value expressionValue = filterExpression.expression.get()->serialize();
-            conversion::JsonEvaluator jsonEvaluator{env};
-            converted = apply_visitor(jsonEvaluator, expressionValue);
+            converted = gson::JsonElement::New(env, expressionValue);
         }
-        return jni::Object<gson::JsonArray>(converted);
+        return converted;
     }
 
     struct SetSourceLayerEvaluator {

@@ -6,7 +6,22 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
-std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv &env, jni::Object<JsonArray> jsonArray) {
+jni::Object<JsonArray> JsonArray::New(jni::JNIEnv& env, const std::vector<mapbox::geometry::value>& values){
+    static auto constructor = JsonArray::javaClass.GetConstructor(env);
+    static auto addMethod = JsonArray::javaClass.GetMethod<void (jni::Object<JsonElement>)>(env, "add");
+
+    auto jsonArray = JsonArray::javaClass.New(env, constructor);
+
+    for (const auto &v : values) {
+        auto jsonElement = JsonElement::New(env, v);
+        jsonArray.Call(env, addMethod, jsonElement);
+        jni::DeleteLocalRef(env, jsonElement);
+    }
+
+    return jsonArray;
+}
+
+std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv& env, const jni::Object<JsonArray> jsonArray) {
     std::vector<mapbox::geometry::value> values;
 
     if (jsonArray) {
@@ -28,7 +43,7 @@ std::vector<mapbox::geometry::value> JsonArray::convert(jni::JNIEnv &env, jni::O
     return values;
 }
 
-void JsonArray::registerNative(jni::JNIEnv &env) {
+void JsonArray::registerNative(jni::JNIEnv& env) {
     // Lookup the class
     javaClass = *jni::Class<JsonArray>::Find(env).NewGlobalRef(env).release();
 }

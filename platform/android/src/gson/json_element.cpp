@@ -11,6 +11,34 @@ namespace mbgl {
 namespace android {
 namespace gson {
 
+/**
+ * Turn mapbox::geometry::value into Java Gson JsonElement
+ */
+class JsonElementEvaluator {
+public:
+
+    jni::JNIEnv& env;
+
+    jni::Object<JsonElement> operator()(const JsonPrimitive::value value) const {
+        return jni::Cast(env, JsonPrimitive::New(env, value), JsonElement::javaClass);
+    }
+
+    jni::Object<JsonElement> operator()(const std::vector<mapbox::geometry::value> &values) const {
+        return jni::Cast(env, JsonArray::New(env, values), JsonElement::javaClass);
+    }
+
+    jni::Object<JsonElement> operator()(const std::unordered_map<std::string, mapbox::geometry::value> &values) const {
+        return jni::Cast(env, JsonObject::New(env, values), JsonElement::javaClass);
+    }
+
+};
+
+
+jni::Object<JsonElement> JsonElement::New(jni::JNIEnv& env, const mapbox::geometry::value& value) {
+  JsonElementEvaluator evaluator { env } ;
+  return mapbox::geometry::value::visit(value, evaluator);
+}
+
 mapbox::geometry::value JsonElement::convert(jni::JNIEnv &env, jni::Object<JsonElement> jsonElement) {
     mapbox::geometry::value value;
 

@@ -294,6 +294,13 @@ public class SymbolGeneratorActivity extends AppCompatActivity implements OnMapR
     Expression textFieldExpressionResult = symbolLayer.getTextField().getExpression();
     Expression textColorExpressionResult = symbolLayer.getTextColor().getExpression();
 
+    // log expressions
+    Timber.e(iconImageExpressionResult.toString());
+    Timber.e(iconSizeExpressionResult.toString());
+    Timber.e(textSizeExpressionResult.toString());
+    Timber.e(textFieldExpressionResult.toString());
+    Timber.e(textColorExpressionResult.toString());
+
     // reset expressions
     symbolLayer.setProperties(
       iconImage(iconImageExpressionResult),

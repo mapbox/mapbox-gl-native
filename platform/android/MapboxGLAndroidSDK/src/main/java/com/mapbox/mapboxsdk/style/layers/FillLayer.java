@@ -99,7 +99,7 @@ public class FillLayer extends Layer {
   @Nullable
   public Expression getFilter() {
     Expression expression = null;
-    JsonArray array = nativeGetFilter();
+    JsonArray array = (JsonArray) nativeGetFilter();
     if (array != null) {
       expression = Expression.Converter.convert(array);
     }

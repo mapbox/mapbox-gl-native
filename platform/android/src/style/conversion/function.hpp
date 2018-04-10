@@ -7,7 +7,8 @@
 #include "../../java/lang.hpp"
 
 #include <jni/jni.hpp>
-#include "gson.hpp"
+#include "../../gson/json_element.hpp"
+
 #include <tuple>
 #include <map>
 
@@ -16,41 +17,32 @@ namespace android {
 namespace conversion {
 
 template <class T>
-struct Converter<jni::jobject*, mbgl::style::CameraFunction<T>> {
+struct Converter<jni::Object<android::gson::JsonElement>, mbgl::style::CameraFunction<T>> {
 
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::CameraFunction<T>& value) const {
+    Result<jni::Object<android::gson::JsonElement>> operator()(jni::JNIEnv& env, const mbgl::style::CameraFunction<T>& value) const {
         // Convert expressions
         mbgl::Value expressionValue = value.getExpression().serialize();
-        JsonEvaluator jsonEvaluator{env};
-        jni::jobject* converted = apply_visitor(jsonEvaluator, expressionValue);
-
-        return converted;
+        return gson::JsonElement::New(env, expressionValue);
     }
 };
 
 template <class T>
-struct Converter<jni::jobject*, mbgl::style::SourceFunction<T>> {
+struct Converter<jni::Object<android::gson::JsonElement>, mbgl::style::SourceFunction<T>> {
 
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::SourceFunction<T>& value) const {
+    Result<jni::Object<android::gson::JsonElement>> operator()(jni::JNIEnv& env, const mbgl::style::SourceFunction<T>& value) const {
         // Convert expressions
         mbgl::Value expressionValue = value.getExpression().serialize();
-        JsonEvaluator jsonEvaluator{env};
-        jni::jobject* converted = apply_visitor(jsonEvaluator, expressionValue);
-
-        return converted;
+        return gson::JsonElement::New(env, expressionValue);
     }
 };
 
 template <class T>
-struct Converter<jni::jobject*, mbgl::style::CompositeFunction<T>> {
+struct Converter<jni::Object<android::gson::JsonElement>, mbgl::style::CompositeFunction<T>> {
 
-    Result<jni::jobject*> operator()(jni::JNIEnv& env, const mbgl::style::CompositeFunction<T>& value) const {
+    Result<jni::Object<android::gson::JsonElement>> operator()(jni::JNIEnv& env, const mbgl::style::CompositeFunction<T>& value) const {
         // Convert expressions
         mbgl::Value expressionValue = value.getExpression().serialize();
-        JsonEvaluator jsonEvaluator{env};
-        jni::jobject* converted = apply_visitor(jsonEvaluator, expressionValue);
-
-        return converted;
+        return gson::JsonElement::New(env, expressionValue);
     }
 };
 
