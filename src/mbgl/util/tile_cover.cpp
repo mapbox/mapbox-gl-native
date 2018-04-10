@@ -3,6 +3,7 @@
 #include <mbgl/util/interpolate.hpp>
 #include <mbgl/map/transform_state.hpp>
 #include <mbgl/util/tile_cover_impl.hpp>
+#include <mbgl/util/tile_coordinate.hpp>
 
 #include <functional>
 #include <list>
@@ -246,15 +247,15 @@ TileCover::TileCover(const LatLngBounds&bounds_, int32_t z) {
     auto nw = Projection::project(bounds.northwest(), z);
 
     Polygon<double> p({ {sw, nw, ne, se, sw} });
-    impl = new TileCoverImpl(z, p, false);
+    impl = std::make_unique<TileCover::Impl>(z, p, false);
 }
 
-TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/) {
-    impl = new TileCoverImpl(z, geom, project);
+TileCover::TileCover(const Geometry<double>& geom, int32_t z, bool project/* = true*/)
+ : impl( std::make_unique<TileCover::Impl>(z, geom, project)) {
 }
 
 TileCover::~TileCover() {
-    delete impl;
+
 }
 
 bool TileCover::next() {

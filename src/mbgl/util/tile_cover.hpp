@@ -2,10 +2,10 @@
 
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/types.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/geometry.hpp>
 
 #include <vector>
+#include <memory>
 
 namespace mbgl {
 
@@ -14,7 +14,6 @@ class LatLngBounds;
 
 namespace util {
 
-class TileCoverImpl;
 using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
 // Helper class to stream tile-cover results per row
@@ -32,7 +31,8 @@ public:
     bool getTiles(ScanLine&);
 
 private:
-    TileCoverImpl* impl;
+    class Impl;
+    std::unique_ptr<Impl> impl;
 };
 
 int32_t coveringZoomLevel(double z, style::SourceType type, uint16_t tileSize);

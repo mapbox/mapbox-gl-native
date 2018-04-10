@@ -1,5 +1,6 @@
 #pragma once
 
+#include <mbgl/util/tile_cover.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/geometry.hpp>
@@ -28,8 +29,13 @@ struct x_range {
 struct bound {
     point_list points;
     size_t currentPointIndex = 0;
-    double currentX;
-    bool winding;
+    bool winding = false;
+    bound() = default;
+    bound(const bound& rhs) {
+        points = rhs.points;
+        currentPointIndex = rhs.currentPointIndex;
+        winding = rhs.winding;
+    }
 
     double interpolate(uint32_t y) {
         const auto& p0 = points[currentPointIndex];
@@ -37,25 +43,26 @@ struct bound {
 
         const auto dx = p1.x - p0.x;
         const auto dy = p1.y - p0.y;
-        currentX = p0.x;
+        auto x = p0.x;
         if (dx == 0) {
-            return currentX;
+            return x;
         } else if (dy == 0){
             return y <= p0.y ? p0.x : p1.x;
         }
-        if (y < p0.y) return currentX;
+        if (y < p0.y) return x;
         if (y > p1.y) return p1.x;
-        currentX = (dx / dy) * (y - p0.y) + p0.x;
-        return currentX;
+        x = (dx / dy) * (y - p0.y) + p0.x;
+        return x;
     }
 };
 
 using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
 
-class TileCoverImpl {
+class TileCover::Impl {
 
 public:
-    TileCoverImpl(int32_t z, const Geometry<double>& geom, bool project = true);
+    Impl(int32_t z, const Geometry<double>& geom, bool project = true);
+    ~Impl() = default;
     bool scanRow(ScanLine& );
     bool next();
     void reset();

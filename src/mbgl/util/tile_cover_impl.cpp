@@ -105,12 +105,10 @@ void build_edge_table(point_list& points, uint32_t maxTile, edge_table& et, bool
         if (to_max.points.size() > 0) {
             // Projections may result in values beyond the bounds due to double precision
             const auto y = static_cast<uint32_t>(std::floor(clamp(to_max.points.front().y, 0.0, (double)maxTile)));
-            to_max.interpolate(y);
             et[y].push_back(std::move(to_max));
         }
         if (to_min.points.size() > 0) {
             const auto y = static_cast<uint32_t>(std::floor(clamp(to_min.points.front().y, 0.0, (double)maxTile)));
-            to_min.interpolate(y);
             et[y].push_back(std::move(to_min));
         }
     }
@@ -231,7 +229,7 @@ struct ToEdgeTable {
     }
 };
 
-TileCoverImpl::TileCoverImpl(int32_t z, const Geometry<double>& geom, bool project): maxY(1 << z) {
+TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project): maxY(1 << z) {
     ToFeatureType toFeatureType;
     isClosed = apply_visitor(toFeatureType, geom) == FeatureType::Polygon;
 
@@ -240,16 +238,18 @@ TileCoverImpl::TileCoverImpl(int32_t z, const Geometry<double>& geom, bool proje
     reset();
 }
 
-void TileCoverImpl::reset() {
+void TileCover::Impl::reset() {
+    if (edgeTable.size() == 0) return;
+
     activeEdgeTable = edgeTable.begin()->second;
     currentRow = edgeTable.begin()->first;
 }
 
-bool TileCoverImpl::next() {
+bool TileCover::Impl::next() {
     return activeEdgeTable.size() != 0 && currentRow < maxY;
 }
 
-bool TileCoverImpl::scanRow(ScanLine& scanCover) {
+bool TileCover::Impl::scanRow(ScanLine& scanCover) {
     if (!next()) { return false; }
 
     auto xps = util::scan_row(currentRow, activeEdgeTable);
@@ -257,7 +257,7 @@ bool TileCoverImpl::scanRow(ScanLine& scanCover) {
 
     auto x_min = xps[0].x0;
     auto x_max = xps[0].x1;
-    int8_t nzRule = xps[0].winding ? 1 : -1;
+    int32_t nzRule = xps[0].winding ? 1 : -1;
     for (size_t i = 1; i < xps.size(); i++) {
         auto xp = xps[i];
         if (!(isClosed && nzRule != 0)) {
