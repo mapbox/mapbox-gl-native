@@ -19,7 +19,6 @@ import java.util.List;
  * The value for any layout property, paint property, or filter may be specified as an expression.
  * An expression defines a formula for computing the value of the property using the operators described below.
  * The set of expression operators provided by Mapbox GL includes:
- * <p>
  * <ul>
  * <li>Element</li>
  * <li>Mathematical operators for performing arithmetic and other operations on numeric values</li>
@@ -28,7 +27,6 @@ import java.util.List;
  * <li>Data operators, providing access to the properties of source features</li>
  * <li>Camera operators, providing access to the parameters defining the current map view</li>
  * </ul>
- * </p>
  * <p>
  * Expressions are represented as JSON arrays.
  * The first element of an expression array is a string naming the expression operator,
@@ -51,6 +49,39 @@ import java.util.List;
  * Such composite expressions allows a layer's appearance to be determined by
  * a combination of the zoom level and individual feature properties.
  * </p>
+ * <p>
+ * Example expression:
+ * </p>
+ * <pre>
+ * {@code
+ * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+ * fillLayer.setProperties(
+ *   fillColor(
+ *     interpolate( linear(), zoom(),
+ *       stop(12, step(get("stroke-width"),
+ *         color(Color.BLACK),
+ *         stop(1f, color(Color.RED)),
+ *         stop(2f, color(Color.WHITE)),
+ *         stop(3f, color(Color.BLUE))
+ *       )),
+ *       stop(15, step(get("stroke-width"),
+ *         color(Color.BLACK),
+ *         stop(1f, color(Color.YELLOW)),
+ *         stop(2f, color(Color.LTGRAY)),
+ *         stop(3f, color(Color.CYAN))
+ *       )),
+ *       stop(18, step(get("stroke-width"),
+ *         color(Color.BLACK),
+ *         stop(1f, color(Color.WHITE)),
+ *         stop(2f, color(Color.GRAY)),
+ *         stop(3f, color(Color.GREEN))
+ *       ))
+ *     )
+ *   )
+ * )
+ * }
+ * </pre>
+ *
  */
 public class Expression {
 
@@ -78,6 +109,17 @@ public class Expression {
 
   /**
    * Create a literal number expression.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(literal(10.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number
    * @return the expression
@@ -88,6 +130,17 @@ public class Expression {
 
   /**
    * Create a literal string expression.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(literal("Text"))
+   * );
+   * }
+   * </pre>
    *
    * @param string the string
    * @return the expression
@@ -98,6 +151,17 @@ public class Expression {
 
   /**
    * Create a literal boolean expression.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillAntialias(literal(true))
+   * );
+   * }
+   * </pre>
    *
    * @param bool the boolean
    * @return the expression
@@ -131,6 +195,17 @@ public class Expression {
 
   /**
    * Expression literal utility method to convert a color int to an color expression
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(color(Color.GREEN))
+   * );
+   * }
+   * </pre>
    *
    * @param color the int color
    * @return the color expression
@@ -145,6 +220,23 @@ public class Expression {
    * <p>
    * If any component is out of range, the expression is an error.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *         rgb(
+   *             literal(255.0f),
+   *             literal(255.0f),
+   *             literal(255.0f)
+   *         )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param red   red color expression
    * @param green green color expression
@@ -162,6 +254,19 @@ public class Expression {
    * <p>
    * If any component is out of range, the expression is an error.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *         rgb(255.0f, 255.0f, 255.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param red   red color value
    * @param green green color value
@@ -179,6 +284,24 @@ public class Expression {
    * <p>
    * If any component is out of range, the expression is an error.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *         rgba(
+   *             literal(255.0f),
+   *             literal(255.0f),
+   *             literal(255.0f),
+   *             literal(1.0f)
+   *         )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param red   red color value
    * @param green green color value
@@ -198,6 +321,19 @@ public class Expression {
    * <p>
    * If any component is out of range, the expression is an error.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *         rgb(255.0f, 255.0f, 255.0f, 1.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param red   red color value
    * @param green green color value
@@ -224,6 +360,17 @@ public class Expression {
   /**
    * Returns true if the input values are equal, false otherwise.
    * The inputs must be numbers, strings, or booleans, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     eq(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second expression
@@ -236,6 +383,17 @@ public class Expression {
 
   /**
    * Returns true if the input values are equal, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     eq(get("keyToValue"), true)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second boolean
@@ -248,6 +406,17 @@ public class Expression {
 
   /**
    * Returns true if the input values are equal, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     eq(get("keyToValue"), "value")
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
@@ -260,6 +429,17 @@ public class Expression {
 
   /**
    * Returns true if the input values are equal, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     eq(get("keyToValue"), 2.0f)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
@@ -273,6 +453,17 @@ public class Expression {
   /**
    * Returns true if the input values are not equal, false otherwise.
    * The inputs must be numbers, strings, or booleans, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     neq(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second expression
@@ -285,6 +476,17 @@ public class Expression {
 
   /**
    * Returns true if the input values are equal, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     neq(get("keyToValue"), true)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second boolean
@@ -294,9 +496,20 @@ public class Expression {
   public static Expression neq(Expression compareOne, boolean compareTwo) {
     return new Expression("!=", literal(compareOne), literal(compareTwo));
   }
-//fixme
+
   /**
    * Returns `true` if the input values are not equal, `false` otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     neq(get("keyToValue"), "value"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second string
@@ -309,6 +522,17 @@ public class Expression {
 
   /**
    * Returns `true` if the input values are not equal, `false` otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     neq(get("keyToValue"), 2.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
@@ -322,11 +546,22 @@ public class Expression {
   /**
    * Returns true if the first input is strictly greater than the second, false otherwise.
    * The inputs must be numbers or strings, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     gt(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression(">", compareOne, compareTwo);
@@ -334,11 +569,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is strictly greater than the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     gt(get("keyToValue"), 2.0f)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
@@ -346,11 +592,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is strictly greater than the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     gt(get("keyToValue"), "value")
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E">Style specification</a>
    */
   public static Expression gt(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression(">", literal(compareOne), literal(compareTwo));
@@ -359,11 +616,22 @@ public class Expression {
   /**
    * Returns true if the first input is strictly less than the second, false otherwise.
    * The inputs must be numbers or strings, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lt(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression("<", compareOne, compareTwo);
@@ -371,11 +639,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is strictly less than the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lt(get("keyToValue"), 2.0f)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
@@ -383,11 +662,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is strictly less than the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lt(get("keyToValue"), "value"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C">Style specification</a>
    */
   public static Expression lt(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression("<", literal(compareOne), literal(compareTwo));
@@ -396,11 +686,22 @@ public class Expression {
   /**
    * Returns true if the first input is greater than or equal to the second, false otherwise.
    * The inputs must be numbers or strings, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     gte(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E%3D">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression(">=", compareOne, compareTwo);
@@ -408,11 +709,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is greater than or equal to the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     gte(get("keyToValue"), 2.0f)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E%3D">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
@@ -420,11 +732,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is greater than or equal to the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     neq(get("keyToValue"), "value")
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions->=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3E%3D">Style specification</a>
    */
   public static Expression gte(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression(">=", literal(compareOne), literal(compareTwo));
@@ -433,11 +756,22 @@ public class Expression {
   /**
    * Returns true if the first input is less than or equal to the second, false otherwise.
    * The inputs must be numbers or strings, and both of the same type.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lte(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second expression
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C%3D">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull Expression compareTwo) {
     return new Expression("<=", compareOne, compareTwo);
@@ -445,11 +779,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is less than or equal to the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lte(get("keyToValue"), 2.0f)
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C%3D">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull Number compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
@@ -457,11 +802,22 @@ public class Expression {
 
   /**
    * Returns true if the first input is less than or equal to the second, false otherwise.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     lte(get("keyToValue"), "value")
+   * );
+   * }
+   * </pre>
    *
    * @param compareOne the first expression
    * @param compareTwo the second string
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-<=">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%3C%3D">Style specification</a>
    */
   public static Expression lte(@NonNull Expression compareOne, @NonNull String compareTwo) {
     return new Expression("<=", literal(compareOne), literal(compareTwo));
@@ -474,6 +830,17 @@ public class Expression {
    * once an input expression evaluates to `false`,
    * the result is `false` and no further input expressions are evaluated.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     all(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -490,6 +857,17 @@ public class Expression {
    * once an input expression evaluates to `true`,
    * the result is `true` and no further input expressions are evaluated.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     any(get("keyToValue"), get("keyToOtherValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -501,6 +879,17 @@ public class Expression {
 
   /**
    * Logical negation. Returns `true` if the input is `false`, and `false` if the input is `true`.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     not(get("keyToValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -512,6 +901,17 @@ public class Expression {
 
   /**
    * Logical negation. Returns `true` if the input is `false`, and `false` if the input is `true`.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     not(false)
+   * );
+   * }
+   * </pre>
    *
    * @param input boolean input
    * @return expression
@@ -527,6 +927,23 @@ public class Expression {
    * For each case a condition and an output should be provided.
    * The last parameter should provide the default output.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     iconSize(
+   *         switchCase(
+   *             get(KEY_TO_BOOLEAN), literal(3.0f),
+   *             get(KEY_TO_OTHER_BOOLEAN), literal(5.0f)
+   *             literal(1.0f) // default value
+   *         )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -540,6 +957,23 @@ public class Expression {
    * Selects the output whose label value matches the input value, or the fallback value if no match is found.
    * The `input` can be any string or number expression.
    * Each label can either be a single literal value or an array of values.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textColor(
+   *         match(get("keyToValue"),
+   *             literal(1), rgba(255, 0, 0, 1.0f),
+   *             literal(2), rgba(0, 0, 255.0f, 1.0f),
+   *             rgba(0.0f, 255.0f, 0.0f, 1.0f)
+   *         );
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -553,6 +987,23 @@ public class Expression {
    * Selects the output whose label value matches the input value, or the fallback value if no match is found.
    * The `input` can be any string or number expression.
    * Each label can either be a single literal value or an array of values.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textColor(
+   *         match(get("keyToValue"),
+   *             literal(1), rgba(255, 0, 0, 1.0f),
+   *             literal(2), rgba(0, 0, 255.0f, 1.0f),
+   *             rgba(0.0f, 255.0f, 0.0f, 1.0f)
+   *         );
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -569,6 +1020,22 @@ public class Expression {
 
   /**
    * Evaluates each expression in turn until the first non-null value is obtained, and returns that value.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textColor(
+   *         coalesce(
+   *             get("keyToNullValue"),
+   *             get("keyToNonNullValue")
+   *         );
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -583,7 +1050,17 @@ public class Expression {
    * <p>
    * Note that in some cases, it may be more efficient to use {@link #get(Expression)}} instead.
    * </p>
-   *
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(get("key-to-value", properties())))
+   * );
+   * }
+   * </pre>
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties">Style specification</a>
    */
@@ -593,7 +1070,17 @@ public class Expression {
 
   /**
    * Gets the feature's geometry type: Point, MultiPoint, LineString, MultiLineString, Polygon, MultiPolygon.
-   *
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(concat(get("key-to-value"), literal(" "), geometryType())
+   * );
+   * }
+   * </pre>
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-geometry-types">Style specification</a>
    */
@@ -603,6 +1090,17 @@ public class Expression {
 
   /**
    * Gets the feature's id, if it has one.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(id())
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-id">Style specification</a>
@@ -615,6 +1113,24 @@ public class Expression {
    * Gets the kernel density estimation of a pixel in a heatmap layer,
    * which is a relative measure of how many data points are crowded around a particular pixel.
    * Can only be used in the `heatmap-color` property.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * HeatmapLayer layer = new HeatmapLayer("layer-id", "source-id");
+   * layer.setProperties(
+   *     heatmapColor(interpolate(linear(), heatmapDensity(),
+   *         literal(0), rgba(33, 102, 172, 0),
+   *         literal(0.2), rgb(103, 169, 207),
+   *         literal(0.4), rgb(209, 229, 240),
+   *         literal(0.6), rgb(253, 219, 199),
+   *         literal(0.8), rgb(239, 138, 98),
+   *         literal(1), rgb(178, 24, 43)
+   *     )
+   * )
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-heatmap-density">Style specification</a>
@@ -651,6 +1167,17 @@ public class Expression {
    * Retrieves a property value from the current feature's properties,
    * or from another object if a second argument is provided.
    * Returns null if the requested property is missing.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(get("key-to-feature"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -664,6 +1191,17 @@ public class Expression {
    * Retrieves a property value from the current feature's properties,
    * or from another object if a second argument is provided.
    * Returns null if the requested property is missing.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(get("key-to-feature"))
+   * );
+   * }
+   * </pre>
    *
    * @param input string input
    * @return expression
@@ -676,6 +1214,17 @@ public class Expression {
   /**
    * Retrieves a property value from another object.
    * Returns null if the requested property is missing.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(get("key-to-property", get("key-to-object")))
+   * );
+   * }
+   * </pre>
    *
    * @param key    a property value key
    * @param object an expression object
@@ -689,6 +1238,17 @@ public class Expression {
   /**
    * Retrieves a property value from another object.
    * Returns null if the requested property is missing.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(get("key-to-property", get("key-to-object")))
+   * );
+   * }
+   * </pre>
    *
    * @param key    a property value key
    * @param object an expression object
@@ -701,6 +1261,17 @@ public class Expression {
 
   /**
    * Tests for the presence of an property value in the current feature's properties.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     has(get("keyToValue"))
+   * );
+   * }
+   * </pre>
    *
    * @param key the expression property value key
    * @return expression
@@ -712,6 +1283,17 @@ public class Expression {
 
   /**
    * Tests for the presence of an property value in the current feature's properties.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     has("keyToValue")
+   * );
+   * }
+   * </pre>
    *
    * @param key the property value key
    * @return expression
@@ -723,6 +1305,17 @@ public class Expression {
 
   /**
    * Tests for the presence of an property value from another object.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     has(get("keyToValue"), get("keyToObject"))
+   * );
+   * }
+   * </pre>
    *
    * @param key    the expression property value key
    * @param object an expression object
@@ -735,6 +1328,17 @@ public class Expression {
 
   /**
    * Tests for the presence of an property value from another object.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setFilter(
+   *     has("keyToValue", get("keyToObject))
+   * );
+   * }
+   * </pre>
    *
    * @param key    the property value key
    * @param object an expression object
@@ -769,6 +1373,17 @@ public class Expression {
 
   /**
    * Returns mathematical constant ln(2).
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(product(literal(10.0f), ln2())))
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-ln2">Style specification</a>
@@ -779,6 +1394,17 @@ public class Expression {
 
   /**
    * Returns the mathematical constant pi.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(product(literal(10.0f), pi())))
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-pi">Style specification</a>
@@ -789,6 +1415,17 @@ public class Expression {
 
   /**
    * Returns the mathematical constant e.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(product(literal(10.0f), e())))
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-e">Style specification</a>
@@ -799,6 +1436,17 @@ public class Expression {
 
   /**
    * Returns the sum of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sum(literal(10.0f), ln2(), pi())))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers the numbers to calculate the sum for
    * @return expression
@@ -810,6 +1458,17 @@ public class Expression {
 
   /**
    * Returns the sum of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sum(10.0f, 5.0f, 3.0f)))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers the numbers to calculate the sum for
    * @return expression
@@ -825,6 +1484,17 @@ public class Expression {
 
   /**
    * Returns the product of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(product(literal(10.0f), ln2())))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers the numbers to calculate the product for
    * @return expression
@@ -836,6 +1506,17 @@ public class Expression {
 
   /**
    * Returns the product of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(product(10.0f, 2.0f)))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers the numbers to calculate the product for
    * @return expression
@@ -851,6 +1532,17 @@ public class Expression {
 
   /**
    * Returns the result of subtracting a number from 0.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(subtract(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number subtract from 0
    * @return expression
@@ -862,6 +1554,17 @@ public class Expression {
 
   /**
    * Returns the result of subtracting a number from 0.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(subtract(10.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number subtract from 0
    * @return expression
@@ -873,6 +1576,17 @@ public class Expression {
 
   /**
    * Returns the result of subtracting the second input from the first.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(subtract(literal(10.0f), pi())))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
@@ -885,6 +1599,17 @@ public class Expression {
 
   /**
    * Returns the result of subtracting the second input from the first.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(subtract(10.0f, 20.0f)))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
@@ -897,6 +1622,17 @@ public class Expression {
 
   /**
    * Returns the result of floating point division of the first input by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(division(literal(10.0f), pi())))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
@@ -909,6 +1645,17 @@ public class Expression {
 
   /**
    * Returns the result of floating point division of the first input by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(division(10.0f, 20.0f)))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
@@ -921,11 +1668,22 @@ public class Expression {
 
   /**
    * Returns the remainder after integer division of the first input by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(mod(literal(10.0f), pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%25">Style specification</a>
    */
   public static Expression mod(@NonNull Expression first, @NonNull Expression second) {
     return new Expression("%", first, second);
@@ -933,11 +1691,22 @@ public class Expression {
 
   /**
    * Returns the remainder after integer division of the first input by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(mod(10.0f, 10.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%25">Style specification</a>
    */
   public static Expression mod(@NonNull Number first, @NonNull Number second) {
     return mod(literal(first), literal(second));
@@ -945,11 +1714,22 @@ public class Expression {
 
   /**
    * Returns the result of raising the first input to the power specified by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(pow(pi(), literal(2.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%5E">Style specification</a>
    */
   public static Expression pow(@NonNull Expression first, @NonNull Expression second) {
     return new Expression("^", first, second);
@@ -957,11 +1737,22 @@ public class Expression {
 
   /**
    * Returns the result of raising the first input to the power specified by the second.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(pow(5.0f, 2.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param first  the first number
    * @param second the second number
    * @return expression
-   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-^">Style specification</a>
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-%5E">Style specification</a>
    */
   public static Expression pow(@NonNull Number first, @NonNull Number second) {
     return pow(literal(first), literal(second));
@@ -969,6 +1760,17 @@ public class Expression {
 
   /**
    * Returns the square root of the input
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sqrt(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take the square root from
    * @return expression
@@ -980,6 +1782,17 @@ public class Expression {
 
   /**
    * Returns the square root of the input
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sqrt(25.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take the square root from
    * @return expression
@@ -991,6 +1804,17 @@ public class Expression {
 
   /**
    * Returns the base-ten logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(log10(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take base-ten logarithm from
    * @return expression
@@ -1002,6 +1826,17 @@ public class Expression {
 
   /**
    * Returns the base-ten logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(log10(10))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take base-ten logarithm from
    * @return expression
@@ -1013,6 +1848,17 @@ public class Expression {
 
   /**
    * Returns the natural logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(ln(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take natural logarithm from
    * @return expression
@@ -1024,6 +1870,17 @@ public class Expression {
 
   /**
    * Returns the natural logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(ln(10))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take natural logarithm from
    * @return expression
@@ -1035,6 +1892,17 @@ public class Expression {
 
   /**
    * Returns the base-two logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(log2(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take base-two logarithm from
    * @return expression
@@ -1046,6 +1914,17 @@ public class Expression {
 
   /**
    * Returns the base-two logarithm of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(log2(2))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to take base-two logarithm from
    * @return expression
@@ -1057,6 +1936,17 @@ public class Expression {
 
   /**
    * Returns the sine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sin(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the sine for
    * @return expression
@@ -1068,6 +1958,17 @@ public class Expression {
 
   /**
    * Returns the sine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(sin(90.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the sine for
    * @return expression
@@ -1079,6 +1980,17 @@ public class Expression {
 
   /**
    * Returns the cosine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(cos(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the cosine for
    * @return expression
@@ -1090,6 +2002,17 @@ public class Expression {
 
   /**
    * Returns the cosine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(cos(0)))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the cosine for
    * @return expression
@@ -1101,6 +2024,17 @@ public class Expression {
 
   /**
    * Returns the tangent of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(tan(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the tangent for
    * @return expression
@@ -1112,6 +2046,17 @@ public class Expression {
 
   /**
    * Returns the tangent of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(tan(45.0f))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the tangent for
    * @return expression
@@ -1123,6 +2068,17 @@ public class Expression {
 
   /**
    * Returns the arcsine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(asin(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arcsine for
    * @return expression
@@ -1134,6 +2090,17 @@ public class Expression {
 
   /**
    * Returns the arcsine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(asin(90))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arcsine for
    * @return expression
@@ -1145,6 +2112,17 @@ public class Expression {
 
   /**
    * Returns the arccosine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(acos(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arccosine for
    * @return expression
@@ -1156,6 +2134,17 @@ public class Expression {
 
   /**
    * Returns the arccosine of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(acos(0))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arccosine for
    * @return expression
@@ -1167,6 +2156,17 @@ public class Expression {
 
   /**
    * Returns the arctangent of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(asin(pi()))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arctangent for
    * @return expression
@@ -1178,6 +2178,17 @@ public class Expression {
 
   /**
    * Returns the arctangent of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(atan(90))
+   * );
+   * }
+   * </pre>
    *
    * @param number the number to calculate the arctangent for
    * @return expression
@@ -1189,6 +2200,17 @@ public class Expression {
 
   /**
    * Returns the minimum value of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(min(pi(), literal(3.14f), literal(3.15f))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers varargs of numbers to get the minimum from
    * @return expression
@@ -1200,6 +2222,17 @@ public class Expression {
 
   /**
    * Returns the minimum value of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(min(3.141, 3.14f, 3.15f))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers varargs of numbers to get the minimum from
    * @return expression
@@ -1215,6 +2248,17 @@ public class Expression {
 
   /**
    * Returns the maximum value of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(max(pi(), 3.14f, 3.15f))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers varargs of numbers to get the maximum from
    * @return expression
@@ -1226,6 +2270,17 @@ public class Expression {
 
   /**
    * Returns the maximum value of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(max(3.141, 3.14f, 3.15f))
+   * );
+   * }
+   * </pre>
    *
    * @param numbers varargs of numbers to get the maximum from
    * @return expression
@@ -1245,6 +2300,17 @@ public class Expression {
    * Follows the Unicode Default Case Conversion algorithm
    * and the locale-insensitive case mappings in the Unicode Character Database.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(upcase(get("key-to-string-value"))
+   * );
+   * }
+   * </pre>
    *
    * @param string the string to upcase
    * @return expression
@@ -1260,6 +2326,17 @@ public class Expression {
    * Follows the Unicode Default Case Conversion algorithm
    * and the locale-insensitive case mappings in the Unicode Character Database.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(upcase("text"))
+   * );
+   * }
+   * </pre>
    *
    * @param string string to upcase
    * @return expression
@@ -1275,6 +2352,17 @@ public class Expression {
    * Follows the Unicode Default Case Conversion algorithm
    * and the locale-insensitive case mappings in the Unicode Character Database.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(downcase(get("key-to-string-value"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1290,6 +2378,17 @@ public class Expression {
    * Follows the Unicode Default Case Conversion algorithm
    * and the locale-insensitive case mappings in the Unicode Character Database.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(upcase("key-to-string-value")
+   * );
+   * }
+   * </pre>
    *
    * @param input string to downcase
    * @return expression
@@ -1301,6 +2400,17 @@ public class Expression {
 
   /**
    * Returns a string consisting of the concatenation of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(concat(get("key-to-string-value"), literal("other string"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1312,6 +2422,17 @@ public class Expression {
 
   /**
    * Returns a string consisting of the concatenation of the inputs.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(concat("foo", "bar"))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1353,6 +2474,7 @@ public class Expression {
    * Asserts that the input value is a string.
    * If multiple values are provided, each one is evaluated in order until a string value is obtained.
    * If none of the inputs are strings, the expression is an error.
+   * The asserted input value is returned as result.
    *
    * @param input expression input
    * @return expression
@@ -1366,6 +2488,7 @@ public class Expression {
    * Asserts that the input value is a number.
    * If multiple values are provided, each one is evaluated in order until a number value is obtained.
    * If none of the inputs are numbers, the expression is an error.
+   * The asserted input value is returned as result.
    *
    * @param input expression input
    * @return expression
@@ -1379,6 +2502,7 @@ public class Expression {
    * Asserts that the input value is a boolean.
    * If multiple values are provided, each one is evaluated in order until a boolean value is obtained.
    * If none of the inputs are booleans, the expression is an error.
+   * The asserted input value is returned as result.
    *
    * @param input expression input
    * @return expression
@@ -1390,6 +2514,7 @@ public class Expression {
 
   /**
    * Asserts that the input value is an object. If it is not, the expression is an error
+   * The asserted input value is returned as result.
    *
    * @param input expression input
    * @return expression
@@ -1408,6 +2533,17 @@ public class Expression {
    * where `r`, `g`, and `b` are numerals ranging from 0 to 255, and `a` ranges from 0 to 1.
    * Otherwise, the input is converted to a string in the format specified by the JSON.stringify in the ECMAScript
    * Language Specification.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * SymbolLayer symbolLayer = new SymbolLayer("layer-id", "source-id");
+   * symbolLayer.setProperties(
+   *     textField(toString(get("key-to-number-value")))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1424,6 +2560,17 @@ public class Expression {
    * If the input is a string, it is converted to a number as specified by the ECMAScript Language Specification.
    * If multiple values are provided, each one is evaluated in order until the first successful conversion is obtained.
    * If none of the inputs can be converted, the expression is an error.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(toNumber(get("key-to-string-value")))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1434,8 +2581,19 @@ public class Expression {
   }
 
   /**
-   * "Converts the input value to a boolean. The result is `false` when then input is an empty string, 0, false,
+   * Converts the input value to a boolean. The result is `false` when then input is an empty string, 0, false,
    * null, or NaN; otherwise it is true.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(toBool(get("key-to-value"));
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1449,6 +2607,17 @@ public class Expression {
    * Converts the input value to a color. If multiple values are provided,
    * each one is evaluated in order until the first successful conversion is obtained.
    * If none of the inputs can be converted, the expression is an error.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new FillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(toColor(get("keyStringValue")))
+   * );
+   * }
+   * </pre>
    *
    * @param input expression input
    * @return expression
@@ -1498,6 +2667,24 @@ public class Expression {
    * Note that in style layout and paint properties,
    * zoom may only appear as the input to a top-level step or interpolate expression.
    * </p>
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         exponential(0.5f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-zoom">Style specification</a>
@@ -1508,6 +2695,21 @@ public class Expression {
 
   /**
    * Produces a stop value to be used as part of the step expression.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), literal(0.0f),
+   *         stop(1.0f, 2.5f),
+   *         stop(10.0f, 5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param stop  the stop input
    * @param value the stop output
@@ -1523,6 +2725,21 @@ public class Expression {
    * Stop inputs must be numeric literals in strictly ascending order.
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), literal(0.0f),
+   *         literal(1.0f), literal(2.5f),
+   *         literal(10.0f), literal(5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input         the input value
    * @param defaultOutput the default output expression
@@ -1540,6 +2757,21 @@ public class Expression {
    * Stop inputs must be numeric literals in strictly ascending order.
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), literal(0.0f),
+   *         literal(1.0f), literal(2.5f),
+   *         literal(10.0f), literal(5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input         the input expression
    * @param defaultOutput the default output expression
@@ -1557,6 +2789,21 @@ public class Expression {
    * Stop inputs must be numeric literals in strictly ascending order.
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), literal(0.0f),
+   *         stop(1, 2.5f),
+   *         stop(10, 5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input         the input value
    * @param defaultOutput the default output expression
@@ -1574,6 +2821,21 @@ public class Expression {
    * Stop inputs must be numeric literals in strictly ascending order.
    * Returns the output value of the stop just less than the input,
    * or the first input if the input is less than the first stop.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(
+   *         step(zoom(), literal(0.0f),
+   *         stop(1, 2.5f),
+   *         stop(10, 5.0f)
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param input         the input value
    * @param defaultOutput the default output expression
@@ -1590,6 +2852,24 @@ public class Expression {
    * The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
    * Stop inputs must be numeric literals in strictly ascending order.
    * The output type must be `number`, `array&lt;number&gt;`, or `color`.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         exponential(0.5f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param interpolation type of interpolation
    * @param number        the input expression
@@ -1607,6 +2887,24 @@ public class Expression {
    * The `input` may be any numeric expression (e.g., `[\"get\", \"population\"]`).
    * Stop inputs must be numeric literals in strictly ascending order.
    * The output type must be `number`, `array&lt;number&gt;`, or `color`.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         exponential(0.5f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param interpolation type of interpolation
    * @param number        the input expression
@@ -1621,6 +2919,24 @@ public class Expression {
 
   /**
    * interpolates linearly between the pair of stops just less than and just greater than the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         linear(), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
@@ -1634,6 +2950,24 @@ public class Expression {
    * `base` controls the rate at which the output increases:
    * higher values make the output increase more towards the high end of the range.
    * With values close to 1 the output increases linearly.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         exponential(0.5f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param base value controlling the route at which the output increases
    * @return expression
@@ -1648,7 +2982,24 @@ public class Expression {
    * The parameter controls the rate at which the output increases:
    * higher values make the output increase more towards the high end of the range.
    * With values close to 1 the output increases linearly.
-   *
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         exponential(get("keyToValue"), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    * @param expression base number expression
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>
@@ -1659,6 +3010,24 @@ public class Expression {
 
   /**
    * Interpolates using the cubic bezier curve defined by the given control points.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         cubicBezier(0.42f, 0.0f, 1.0f, 1.0f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param x1 x value of the first point of a cubic bezier, ranges from 0 to 1
    * @param y1 y value of the first point of a cubic bezier, ranges from 0 to 1
@@ -1674,6 +3043,24 @@ public class Expression {
 
   /**
    * Interpolates using the cubic bezier curve defined by the given control points.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * FillLayer fillLayer = new fillLayer("layer-id", "source-id");
+   * fillLayer.setProperties(
+   *     fillColor(
+   *       interpolate(
+   *         cubicBezier(0.42f, 0.0f, 1.0f, 1.0f), zoom(),
+   *         literal(1.0f), color(Color.RED),
+   *         literal(5.0f, color(Color.BLUE),
+   *         literal(10.0f, color(Color.GREEN)
+   *       )
+   *     )
+   * );
+   * }
+   * </pre>
    *
    * @param x1 x value of the first point of a cubic bezier, ranges from 0 to 1
    * @param y1 y value of the first point of a cubic bezier, ranges from 0 to 1
@@ -1999,6 +3386,9 @@ public class Expression {
     }
   }
 
+  /**
+   * Expression to wrap Object[] as a literal
+   */
   private static class ExpressionArray extends Expression {
 
     private Object[] array;
