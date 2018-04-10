@@ -1,12 +1,3 @@
-//
-//  MGLMapViewIntegrationTest.m
-//  integration
-//
-//  Created by Julian Rex on 4/5/18.
-//  Copyright © 2018 Mapbox. All rights reserved.
-//
-
-
 #import "MGLMapViewIntegrationTest.h"
 
 @implementation MGLMapViewIntegrationTest
