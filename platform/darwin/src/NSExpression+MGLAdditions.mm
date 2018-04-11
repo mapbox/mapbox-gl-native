@@ -1125,7 +1125,10 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
 };
 
 - (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale replacingTokens:(BOOL)replacesTokens {
-    NSString *localizedKeyPath = locale ? [NSString stringWithFormat:@"name_%@", locale.localeIdentifier] : @"name";
+    NSString *localizedKeyPath = @"name";
+    if (locale && ![locale.localeIdentifier isEqualToString:@"mul"]) {
+        localizedKeyPath = [NSString stringWithFormat:@"name_%@", locale.localeIdentifier];
+    }
     switch (self.expressionType) {
         case NSConstantValueExpressionType: {
             if (replacesTokens) {
