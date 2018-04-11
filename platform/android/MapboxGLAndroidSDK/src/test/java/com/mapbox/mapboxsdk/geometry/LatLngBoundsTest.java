@@ -111,6 +111,14 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void zeroLongitudeSpan() {
+    latLngBounds = LatLngBounds.from(10, 10, -10, 10);
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 0),
+      latLngSpan);
+  }
+
+  @Test
   public void nearDateLineCenter1() {
     latLngBounds = LatLngBounds.from(10, -175, -10, 165);
     LatLng center = latLngBounds.getCenter();
@@ -145,6 +153,19 @@ public class LatLngBoundsTest {
     assertEquals("Center should match", new LatLng(0, 90), center);
   }
 
+  @Test
+  public void centerForBoundsWithSameLongitude() {
+    latLngBounds = LatLngBounds.from(10, 10, -10, 10);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, 10), center);
+  }
+
+  @Test
+  public void centerForBoundsWithSameLatitude() {
+    latLngBounds = LatLngBounds.from(10, 10, 10, -10);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(10, 0), center);
+  }
 
   @Test
   public void center() {
