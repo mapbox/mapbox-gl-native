@@ -6,6 +6,7 @@
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/platform.hpp>
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -362,6 +363,11 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return result;
     });
     
+    define("round", [](double x) -> Result<double> { return std::round(x); });
+    define("floor", [](double x) -> Result<double> { return std::floor(x); });
+    define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
+    define("abs", [](double x) -> Result<double> { return std::abs(x); });
+
     define(">", [](double lhs, double rhs) -> Result<bool> { return lhs > rhs; });
     define(">", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs > rhs; });
     define(">=", [](double lhs, double rhs) -> Result<bool> { return lhs >= rhs; });

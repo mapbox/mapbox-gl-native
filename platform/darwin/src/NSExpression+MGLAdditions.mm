@@ -58,6 +58,7 @@
     // Install method-like functions, taking the number of arguments implied by
     // the selector name.
     INSTALL_METHOD(mgl_join:);
+    INSTALL_METHOD(mgl_round:);
     INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
     INSTALL_METHOD(mgl_step:from:stops:);
     INSTALL_METHOD(mgl_coalesce:);
@@ -81,6 +82,14 @@
  */
 - (NSString *)mgl_join:(NSArray<NSString *> *)components {
     return [components componentsJoinedByString:@""];
+}
+
+/**
+ Rounds the given number to the nearest integer. If the number is halfway
+ between two integers, this method rounds it away from zero.
+ */
+- (NSNumber *)mgl_round:(NSNumber *)number {
+    return @(round(number.doubleValue));
 }
 
 /**
@@ -487,6 +496,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"sqrt": @"sqrt:",
             @"log10": @"log:",
             @"ln": @"ln:",
+            @"abs": @"abs:",
+            @"round": @"mgl_round:",
+            @"floor": @"floor:",
+            @"ceil": @"ceiling:",
             @"^": @"raise:toPower:",
             @"upcase": @"uppercase:",
             @"downcase": @"lowercase:",
@@ -720,9 +733,13 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"log:": @"log10",
             @"ln:": @"ln",
             @"raise:toPower:": @"^",
+            @"ceiling:": @"ceil",
+            @"abs:": @"abs",
+            @"floor:": @"floor",
             @"uppercase:": @"upcase",
             @"lowercase:": @"downcase",
             @"length:": @"length",
+            @"mgl_round:": @"round",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
             @"MGL_LET": @"let",
             @"MGL_LET:": @"let",
@@ -826,17 +843,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return [@[@"max"] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"exp:"]) {
                 return [NSExpression expressionForFunction:@"raise:toPower:" arguments:@[@(M_E), self.arguments.firstObject]].mgl_jsonExpressionObject;
-            } else if ([function isEqualToString:@"ceiling:"]) {
-                return [NSExpression expressionWithFormat:@"trunc:(%@) + TERNARY(modulus:by:(%@, 1) > 0, 1, 0)",
-                        self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"trunc:"]) {
                 return [NSExpression expressionWithFormat:@"%@ - modulus:by:(%@, 1)",
-                        self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
-            } else if ([function isEqualToString:@"abs:"]) {
-                return [NSExpression expressionWithFormat:@"%@ * TERNARY(%@ > 0, 1, -1)",
-                        self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
-            } else if ([function isEqualToString:@"floor:"]) {
-                return [NSExpression expressionWithFormat:@"trunc:(%@) - TERNARY(modulus:by:(%@, 1) < 0, 1, 0)",
                         self.arguments.firstObject, self.arguments.firstObject].mgl_jsonExpressionObject;
             } else if ([function isEqualToString:@"mgl_join:"]) {
                 NSArray *arguments = [self.arguments.firstObject.collection valueForKeyPath:@"mgl_jsonExpressionObject"];

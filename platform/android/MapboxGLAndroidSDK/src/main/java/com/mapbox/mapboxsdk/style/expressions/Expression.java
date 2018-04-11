@@ -81,7 +81,6 @@ import java.util.List;
  * )
  * }
  * </pre>
- *
  */
 public class Expression {
 
@@ -1061,6 +1060,7 @@ public class Expression {
    * );
    * }
    * </pre>
+   *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties">Style specification</a>
    */
@@ -1081,6 +1081,7 @@ public class Expression {
    * );
    * }
    * </pre>
+   *
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-geometry-types">Style specification</a>
    */
@@ -2295,6 +2296,185 @@ public class Expression {
   }
 
   /**
+   * Rounds the input to the nearest integer.
+   * Halfway values are rounded away from zero.
+   * For example `[\"round\", -1.5]` evaluates to -2.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(round(pi()))
+   * );
+   * }
+   * </pre>
+   *
+   * @param expression number expression to round
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-round">Style specification</a>
+   */
+  public static Expression round(Expression expression) {
+    return new Expression("round", expression);
+  }
+
+  /**
+   * Rounds the input to the nearest integer.
+   * Halfway values are rounded away from zero.
+   * For example `[\"round\", -1.5]` evaluates to -2.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(round(3.14159265359f))
+   * );
+   * }
+   * </pre>
+   *
+   * @param number number to round
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-round">Style specification</a>
+   */
+  public static Expression round(Number number) {
+    return round(literal(number));
+  }
+
+  /**
+   * Returns the absolute value of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(abs(subtract(pi())))
+   * );
+   * }
+   * </pre>
+   *
+   * @param expression number expression to get absolute value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression abs(Expression expression) {
+    return new Expression("abs", expression);
+  }
+
+  /**
+   * Returns the absolute value of the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(abs(-3.14159265359f))
+   * );
+   * }
+   * </pre>
+   *
+   * @param number number to get absolute value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression abs(Number number) {
+    return abs(literal(number));
+  }
+
+  /**
+   * Returns the smallest integer that is greater than or equal to the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(ceil(pi()))
+   * );
+   * }
+   * </pre>
+   *
+   * @param expression number expression to get value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression ceil(Expression expression) {
+    return new Expression("ceil", expression);
+  }
+
+  /**
+   * Returns the smallest integer that is greater than or equal to the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(ceil(3.14159265359))
+   * );
+   * }
+   * </pre>
+   * @param number number to get value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression ceil(Number number) {
+    return ceil(literal(number));
+  }
+
+  /**
+   * Returns the largest integer that is less than or equal to the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(floor(pi()))
+   * );
+   * }
+   * </pre>
+   *
+   * @param expression number expression to get value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression floor(Expression expression) {
+    return new Expression("floor", expression);
+  }
+
+  /**
+   * Returns the largest integer that is less than or equal to the input.
+   * <p>
+   * Example usage:
+   * </p>
+   * <pre>
+   * {@code
+   * CircleLayer circleLayer = new CircleLayer("layer-id", "source-id");
+   * circleLayer.setProperties(
+   *     circleRadius(floor(pi()))
+   * );
+   * }
+   * </pre>
+   *
+   * @param number number to get value from
+   * @return expression
+   * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-abs">Style specification</a>
+   */
+  public static Expression floor(Number number) {
+    return floor(literal(number));
+  }
+
+  /**
    * Returns the input string converted to uppercase.
    * <p>
    * Follows the Unicode Default Case Conversion algorithm
@@ -3128,6 +3308,7 @@ public class Expression {
    * );
    * }
    * </pre>
+   *
    * @param expression base number expression
    * @return expression
    * @see <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate">Style specification</a>

@@ -379,11 +379,14 @@ In style specification | Method, function, or predicate type | Format string syn
 `%`                    | `modulus:by:` |
 `^`                    | `raise:toPower:` | `2 ** 2`
 `+`                    | `add:to:` | `1 + 2`
+`abs`                  | `abs:` | `abs(-1)`
 `acos`                 | |
 `asin`                 | |
 `atan`                 | |
+`ceil`                 | `ceiling:` | `ceiling(0.99999)`
 `cos`                  | |
 `e`                    | | `%@` representing `NSNumber` containing `M_E`
+`floor`                | `floor:` | `floor(-0.99999)`
 `ln`                   | `ln:` | `ln(2)`
 `ln2`                  | | `%@` representing `NSNumber` containing `M_LN2`
 `log10`                | `log:` | `log(1)`
@@ -391,6 +394,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
 `min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
 `pi`                   | | `%@` representing `NSNumber` containing `M_PI`
+`round`                | `mgl_round:` | `mgl_round(1.5)`
 `sin`                  | |
 `sqrt`                 | `sqrt:` | `sqrt(2)`
 `tan`                  | |

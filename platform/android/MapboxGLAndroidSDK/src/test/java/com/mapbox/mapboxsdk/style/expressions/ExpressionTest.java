@@ -6,6 +6,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.abs;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.acos;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.all;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.any;
@@ -14,6 +15,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.asin;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.at;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.atan;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.bool;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.ceil;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.coalesce;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.concat;
@@ -24,6 +26,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.downcase;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.e;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.floor;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.geometryType;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.gt;
@@ -56,6 +59,7 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.product;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.properties;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.round;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.sin;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.sqrt;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
@@ -1104,5 +1108,61 @@ public class ExpressionTest {
       stop(16f, lineOpacity(0f))
     );
     expression.toArray();
+  }
+
+  @Test
+  public void testRound() {
+    Object[] expected = new Object[] {"round", 2.2f};
+    Object[] actual = round(2.2f).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testRoundLiteral() {
+    Object[] expected = new Object[] {"round", 2.2f};
+    Object[] actual = round(literal(2.2f)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testAbs() {
+    Object[] expected = new Object[] {"abs", -2.2f};
+    Object[] actual = abs(-2.2f).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testAbsLiteral() {
+    Object[] expected = new Object[] {"abs", -2.2f};
+    Object[] actual = abs(literal(-2.2f)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testCeil() {
+    Object[] expected = new Object[] {"ceil", 2.2f};
+    Object[] actual = ceil(2.2f).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testCeilLiteral() {
+    Object[] expected = new Object[] {"ceil", 2.2f};
+    Object[] actual = ceil(literal(2.2f)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testFloor() {
+    Object[] expected = new Object[] {"floor", 2.2f};
+    Object[] actual = floor(2.2f).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
+  }
+
+  @Test
+  public void testFloorLiteral() {
+    Object[] expected = new Object[] {"floor", 2.2f};
+    Object[] actual = floor(literal(2.2f)).toArray();
+    assertTrue("expression should match", Arrays.deepEquals(expected, actual));
   }
 }

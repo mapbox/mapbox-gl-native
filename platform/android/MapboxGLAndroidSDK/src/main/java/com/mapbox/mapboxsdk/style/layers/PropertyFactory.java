@@ -1856,7 +1856,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Name of image in sprite to use for drawing an image background.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1866,7 +1866,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Name of image in sprite to use for drawing an image background.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2036,7 +2036,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Value to use for a text label.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2046,7 +2046,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Value to use for a text label.
    *
    * @param value a String value
    * @return property wrapper around String
