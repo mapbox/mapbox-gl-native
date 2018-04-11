@@ -7,43 +7,6 @@
 
 @implementation NSComparisonPredicate (MGLAdditions)
 
-- (mbgl::style::Filter)mgl_filter {
-
-    switch (self.predicateOperatorType) {
-        case NSEqualToPredicateOperatorType:
-        case NSNotEqualToPredicateOperatorType:
-        case NSGreaterThanPredicateOperatorType:
-        case NSGreaterThanOrEqualToPredicateOperatorType:
-        case NSLessThanPredicateOperatorType:
-        case NSLessThanOrEqualToPredicateOperatorType:
-        case NSInPredicateOperatorType:
-        case NSContainsPredicateOperatorType:
-        case NSBetweenPredicateOperatorType: {
-            mbgl::style::conversion::Error valueError;
-            NSArray *jsonObject = self.mgl_jsonExpressionObject;
-            auto value = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::expression::Expression>>(mbgl::style::conversion::makeConvertible(jsonObject), valueError, mbgl::style::expression::type::Boolean);
-            mbgl::style::ExpressionFilter filter;
-            if (!value) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"Invalid property value: %@", @(valueError.message.c_str())];
-                return {};
-            }
-            filter.expression = std::move(*value);
-            
-            return filter;
-        }
-        case NSMatchesPredicateOperatorType:
-        case NSLikePredicateOperatorType:
-        case NSBeginsWithPredicateOperatorType:
-        case NSEndsWithPredicateOperatorType:
-        case NSCustomSelectorPredicateOperatorType:
-            [NSException raise:NSInvalidArgumentException
-                        format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
-    }
-
-    return {};
-}
-
 - (NSString *)mgl_keyPath {
     NSExpression *leftExpression = self.leftExpression;
     NSExpression *rightExpression = self.rightExpression;
@@ -183,6 +146,7 @@
         id rightExpression = self.rightExpression.mgl_jsonExpressionObject;
         
         switch (self.predicateOperatorType) {
+            case NSEqualToPredicateOperatorType:
             case NSLessThanPredicateOperatorType:
             case NSLessThanOrEqualToPredicateOperatorType:
             case NSGreaterThanPredicateOperatorType:

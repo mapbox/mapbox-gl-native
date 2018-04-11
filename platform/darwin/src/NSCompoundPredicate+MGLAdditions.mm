@@ -18,32 +18,6 @@
     return filters;
 }
 
-- (mbgl::style::Filter)mgl_filter
-{
-    switch (self.compoundPredicateType) {
-        case NSNotPredicateType:
-        case NSOrPredicateType:
-        case NSAndPredicateType: {
-            mbgl::style::conversion::Error valueError;
-            NSArray *jsonObject = self.mgl_jsonExpressionObject;
-            auto value = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::expression::Expression>>(mbgl::style::conversion::makeConvertible(jsonObject), valueError, mbgl::style::expression::type::Boolean);
-            mbgl::style::ExpressionFilter filter;
-            if (!value) {
-                [NSException raise:NSInvalidArgumentException
-                            format:@"Invalid property value: %@", @(valueError.message.c_str())];
-                return {};
-            }
-            filter.expression = std::move(*value);
-            
-            return filter;
-        }
-    }
-
-    [NSException raise:@"Compound predicate type not handled"
-                format:@""];
-    return {};
-}
-
 @end
 
 @implementation NSCompoundPredicate (MGLExpressionAdditions)

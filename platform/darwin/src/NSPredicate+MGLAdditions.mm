@@ -206,25 +206,18 @@ public:
 
 - (mbgl::style::Filter)mgl_filter
 {
-    if ([self isEqual:[NSPredicate predicateWithValue:YES]])
-    {
-        return mbgl::style::AllFilter();
-    }
-
-    if ([self isEqual:[NSPredicate predicateWithValue:NO]])
-    {
-        return mbgl::style::AnyFilter();
-    }
-
-    if ([self.predicateFormat hasPrefix:@"BLOCKPREDICATE("])
-    {
+    mbgl::style::conversion::Error valueError;
+    NSArray *jsonObject = self.mgl_jsonExpressionObject;
+    auto value = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::expression::Expression>>(mbgl::style::conversion::makeConvertible(jsonObject), valueError, mbgl::style::expression::type::Boolean);
+    mbgl::style::ExpressionFilter filter;
+    if (!value) {
         [NSException raise:NSInvalidArgumentException
-                    format:@"Block-based predicates are not supported."];
+                    format:@"Invalid filter value: %@", @(valueError.message.c_str())];
+        return {};
     }
-
-    [NSException raise:NSInvalidArgumentException
-                format:@"Unrecognized predicate type."];
-    return {};
+    filter.expression = std::move(*value);
+    
+    return filter;
 }
 
 + (instancetype)mgl_predicateWithFilter:(mbgl::style::Filter)filter
@@ -240,10 +233,39 @@ public:
 NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     NSMutableArray *subpredicates = [NSMutableArray arrayWithCapacity:objects.count];
     for (id object in objects) {
-        NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:object];
+        id json = object;
+        if ([object isKindOfClass:[NSArray class]]) {
+            NSArray *array = (NSArray *)object;
+            NSString *op = array.firstObject;
+            if ([op isEqualToString:@"number"] ||
+                [op isEqualToString:@"string"] ||
+                [op isEqualToString:@"boolean"]) {
+                json = [array subarrayWithRange:NSMakeRange(1, array.count - 1)];
+            }
+        }
+        NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:json];
         [subpredicates addObject:predicate];
     }
     return subpredicates;
+}
+
+NSArray *MGLSanitizeJSONObjects(NSArray *objects) {
+    NSMutableArray *sanitizedObjects = [NSMutableArray arrayWithCapacity:objects.count];
+    for (id object in objects) {
+        id json = object;
+        if ([object isKindOfClass:[NSArray class]]) {
+            NSArray *array = (NSArray *)object;
+            NSString *op = array.firstObject;
+            if ([op isEqualToString:@"number"] ||
+                [op isEqualToString:@"string"] ||
+                [op isEqualToString:@"boolean"]) {
+                json = array[1];
+            }
+        }
+    
+        [sanitizedObjects addObject:json];
+    }
+    return sanitizedObjects;
 }
 
 + (instancetype)mgl_predicateWithJSONObject:(id)object {
@@ -259,7 +281,8 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     NSString *op = objects.firstObject;
     
     if ([op isEqualToString:@"=="]) {
-        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *sanitizedObjects = MGLSanitizeJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(sanitizedObjects);
         return [NSPredicate predicateWithFormat:@"%@ == %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"!="]) {
@@ -267,19 +290,23 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSPredicate predicateWithFormat:@"%@ != %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"<"]) {
-        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *sanitizedObjects = MGLSanitizeJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(sanitizedObjects);
         return [NSPredicate predicateWithFormat:@"%@ < %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"<="]) {
-        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *sanitizedObjects = MGLSanitizeJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(sanitizedObjects);
         return [NSPredicate predicateWithFormat:@"%@ <= %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@">"]) {
-        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *sanitizedObjects = MGLSanitizeJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(sanitizedObjects);
         return [NSPredicate predicateWithFormat:@"%@ > %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@">="]) {
-        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *sanitizedObjects = MGLSanitizeJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(sanitizedObjects);
         return [NSPredicate predicateWithFormat:@"%@ >= %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"!"]) {
