@@ -10,10 +10,10 @@
 
 CATransform3D CATransform3DMake(std::array<double, 16> array) {
     CATransform3D t = {
-        .m11 = array[0], .m12 = array[1], .m13 = array[2], .m14 = array[3],
-        .m21 = array[4], .m22 = array[5], .m23 = array[6], .m24 = array[7],
-        .m31 = array[8], .m32 = array[9], .m33 = array[10], .m34 = array[11],
-        .m41 = array[12], .m42 = array[13], .m43 = array[14], .m44 = array[15]
+        .m11 = static_cast<CGFloat>(array[0]), .m12 = static_cast<CGFloat>(array[1]), .m13 = static_cast<CGFloat>(array[2]), .m14 = static_cast<CGFloat>(array[3]),
+        .m21 = static_cast<CGFloat>(array[4]), .m22 = static_cast<CGFloat>(array[5]), .m23 = static_cast<CGFloat>(array[6]), .m24 = static_cast<CGFloat>(array[7]),
+        .m31 = static_cast<CGFloat>(array[8]), .m32 = static_cast<CGFloat>(array[9]), .m33 = static_cast<CGFloat>(array[10]), .m34 = static_cast<CGFloat>(array[11]),
+        .m41 = static_cast<CGFloat>(array[12]), .m42 = static_cast<CGFloat>(array[13]), .m43 = static_cast<CGFloat>(array[14]), .m44 = static_cast<CGFloat>(array[15])
     };
     return t;
 }
