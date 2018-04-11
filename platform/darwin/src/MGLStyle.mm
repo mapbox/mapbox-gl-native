@@ -588,7 +588,6 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         locale = [NSLocale localeWithLocaleIdentifier:@"mul"];
     }
     
-    NSMutableDictionary *localizedKeysByKeyBySourceIdentifier = [NSMutableDictionary dictionary];
     for (MGLSymbolStyleLayer *layer in self.layers) {
         if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
             continue;
