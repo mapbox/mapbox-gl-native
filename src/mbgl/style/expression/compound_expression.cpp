@@ -230,14 +230,6 @@ Value featurePropertyAsExpressionValue(EvaluationContext params, const std::stri
     return property ? toExpressionValue(*property) : Null;
 };
     
-optional<FeatureType> stringAsFeatureType(const std::string &type) {
-    if (type == "Point") return FeatureType::Point;
-    else if (type == "LineString") return FeatureType::LineString;
-    else if (type == "Polygon") return FeatureType::Polygon;
-    else if (type == "Unknown") return FeatureType::Unknown;
-    else return optional<FeatureType>();
-};
-    
 optional<std::string> featureTypeAsString(FeatureType type) {
     if (type == FeatureType::Point) return optional<std::string>("Point");
     else if (type == FeatureType::LineString) return optional<std::string>("LineString");
@@ -496,7 +488,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
     define("filter-type-==", [](const EvaluationContext& params, const std::string &lhs) -> Result<bool> {
         if (!params.feature) return false;
-        return params.feature->getType() == stringAsFeatureType(lhs);
+        return featureTypeAsString(params.feature->getType()) == lhs;
     });
 
     define("filter-<", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
