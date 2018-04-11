@@ -1,5 +1,6 @@
 #include <mbgl/tile/vector_tile_data.hpp>
 #include <mbgl/util/constants.hpp>
+#include <mbgl/util/logging.hpp>
 
 namespace mbgl {
 
@@ -109,11 +110,16 @@ struct GeometryHandler {
 GeometryCollection VectorTileFeature::getGeometries() const {
     const float scale = float(util::EXTENT) / layer.extent();
     const vtzero::geometry geometry = feature.geometry();
-    GeometryCollection lines = vtzero::decode_geometry(geometry, GeometryHandler(scale));
-    if (layer.version() >= 2 || feature.geometry_type() != vtzero::GeomType::POLYGON) {
-        return lines;
-    } else {
-        return fixupPolygons(lines);
+    try {
+        GeometryCollection lines = vtzero::decode_geometry(geometry, GeometryHandler(scale));
+        if (layer.version() >= 2 || feature.geometry_type() != vtzero::GeomType::POLYGON) {
+            return lines;
+        } else {
+            return fixupPolygons(lines);
+        }
+    } catch (const std::exception& e) {
+        Log::Warning(Event::ParseTile, std::string("vtzero: ") + e.what());
+        return {};
     }
 }
 
