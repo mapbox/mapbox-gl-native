@@ -11,7 +11,7 @@ Our annotations API includes the `MGLAnnotationImage`, and `MGLAnnotationView` c
 | `MGLAnnotationImage` | `MGLAnnotationView` |
 
 **MGLAnnotationImage** is an annotation class that is easily customizable with any `UIImage`.
-It is highly performant, as the images are rendered directly using OpenGL. However, if you need to animate your annotations or control z-layer ordering, consider working with **MGLAnnotationView** which supports any animation that can be applied to a `UIView`. View hierarchy can also be manipulated by using `zPosition` property on `CALayer` to order an individual view, or by using other instance methods available on `UIView` such as `-[UIView bringSubviewToFront:]`.
+It is highly performant, as the images are rendered directly using OpenGL. However, if you need to animate your annotations or control z-layer ordering, consider working with **MGLAnnotationView** which supports any animation that can be applied to a `UIView`. View hierarchy can be manipulated by using instance methods available on `UIView` such as `-[UIView bringSubviewToFront:]`.
 
 **MGLAnnotationView** is an annotation class that is an easily customizable `UIView`. Use this class if you need your markers to be dynamic or animated. `MGLAnnotationView` has a significant advantage over `MGLAnnotationImage` when you need every annotation to be unique. For example, annotation views are ideal for showing user locations on a map using high-resolution profile pictures. However, the map can slow down when many annotation views are visible at the same time, so if you need to add a very large number of markers, consider using our runtime styling APIs instead.
 
@@ -25,7 +25,7 @@ Our runtime styling API is the most powerful option if you need to create rich d
 
 The runtime styling API includes our `MGLSymbolStyleLayer` and `MGLCircleStyleLayer` classes that can be used to dynamically display on markers on map when used in conjunction with either an `MGLVectorSource` or an `MGLShapeSource`.
 
-If you need to implement callouts with the `MGLSymbolStyleLayer` or `MGLCircleStyleLayer`, you will need to implement your own tap gesture recognizer that calls `-[MGLMapView visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:]` to get the tapped point feature, then show a `UIView` you provide. Additionally, if you need to animate markers when using the runtime styling APIs, consider using an timer to update the source data coordinates accordingly.
+If you need to implement callouts with the `MGLSymbolStyleLayer` or `MGLCircleStyleLayer`, you will need to implement your own tap gesture recognizer that calls `-[MGLMapView visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:]` to get the tapped point feature, then show a `UIView` you provide. Additionally, if you need to animate markers when using the runtime styling APIs, consider using a timer to update the source data coordinates accordingly.
 
 | <img src="img/adding-points-to-a-map/circle-layer.png" alt="MGLCircleStyleLayer" style="height: 500px;"/>               | <img src="img/adding-points-to-a-map/symbol-layer.png" alt="MGLSymbolStyleLayer" style="height: 500px;"/>              |
 |----------------------|---------------------|
