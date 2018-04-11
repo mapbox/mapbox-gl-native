@@ -1,7 +1,6 @@
 package com.mapbox.mapboxsdk.testapp.utils;
 
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.text.TextUtils;
 
 import com.mapbox.geojson.Feature;
@@ -24,11 +23,9 @@ public class GeoParseUtil {
     if (TextUtils.isEmpty(fileName)) {
       throw new NullPointerException("No GeoJSON File Name passed in.");
     }
-    try (AssetManager as = context.getAssets()) {
-      try (InputStream is = as.open(fileName)) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        return readAll(rd);
-      }
+    try (InputStream is = context.getAssets().open(fileName)) {
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+      return readAll(rd);
     }
   }
 
