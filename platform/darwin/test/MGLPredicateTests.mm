@@ -506,27 +506,24 @@ namespace mbgl {
 }
 
 - (void)testSymmetry {
-    [self testSymmetryWithFormat:@"a = 1" reverseFormat:@"1 = a" mustRoundTrip:YES];
-    [self testSymmetryWithFormat:@"a != 1" reverseFormat:@"1 != a" mustRoundTrip:YES];
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a = b"].mgl_filter, NSException, NSInvalidArgumentException);
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"1 = 1"].mgl_filter, NSException, NSInvalidArgumentException);
+    [self testSymmetryWithFormat:@"a = 1" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a != 1" mustRoundTrip:YES];
 
     // In the predicate format language, $ is a special character denoting a
     // variable. Use %K to escape the special feature attribute $id.
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"$id == 670861802"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a = $id"].mgl_filter, NSException, NSInvalidArgumentException);
 
-    [self testSymmetryWithFormat:@"a = nil" reverseFormat:@"nil = a" mustRoundTrip:YES];
-    [self testSymmetryWithFormat:@"a != nil" reverseFormat:@"nil != a" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a = nil" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a != nil" mustRoundTrip:YES];
 
-    [self testSymmetryWithFormat:@"a < 1" reverseFormat:@"1 > a" mustRoundTrip:YES];
-    [self testSymmetryWithFormat:@"a <= 1" reverseFormat:@"1 >= a" mustRoundTrip:YES];
-    [self testSymmetryWithFormat:@"a > 1" reverseFormat:@"1 < a" mustRoundTrip:YES];
-    [self testSymmetryWithFormat:@"a >= 1" reverseFormat:@"1 <= a" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a < 1" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a <= 1" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a > 1" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a >= 1" mustRoundTrip:YES];
 
-    [self testSymmetryWithFormat:@"a BETWEEN {1, 2}" reverseFormat:@"1 <= a && 2 >= a" mustRoundTrip:YES];
+    [self testSymmetryWithFormat:@"a BETWEEN {1, 2}" mustRoundTrip:YES];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"a BETWEEN %@", @[@1, @2]]
-                   reversePredicate:[NSPredicate predicateWithFormat:@"1 <= a && 2 >= a"]
                       mustRoundTrip:YES];
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"{1, 2} BETWEEN a"].mgl_filter, NSException, NSInvalidArgumentException);
     NSPredicate *betweenSetPredicate = [NSPredicate predicateWithFormat:@"a BETWEEN %@", [NSSet setWithObjects:@1, @2, nil]];
@@ -534,47 +531,40 @@ namespace mbgl {
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BETWEEN {1}"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BETWEEN {1, 2, 3}"].mgl_filter, NSException, NSInvalidArgumentException);
 
-    [self testSymmetryWithFormat:@"a IN {1, 2}" reverseFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
+    [self testSymmetryWithFormat:@"a IN {1, 2}" mustRoundTrip:NO];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"a IN %@", @[@1, @2]]
-                   reversePredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
                       mustRoundTrip:YES];
 
     // The reverse formats here are a bit backwards because we canonicalize
     // a reverse CONTAINS to a forward IN.
-    [self testSymmetryWithFormat:@"{1, 2} CONTAINS a" reverseFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
+    [self testSymmetryWithFormat:@"{1, 2} CONTAINS a" mustRoundTrip:NO];
     [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
-                   reversePredicate:[NSPredicate predicateWithFormat:@"%@ CONTAINS a", @[@1, @2]]
                       mustRoundTrip:NO];
 }
 
-- (void)testSymmetryWithFormat:(NSString *)forwardFormat reverseFormat:(NSString *)reverseFormat mustRoundTrip:(BOOL)mustRoundTrip {
+- (void)testSymmetryWithFormat:(NSString *)forwardFormat mustRoundTrip:(BOOL)mustRoundTrip {
     NSPredicate *forwardPredicate = [NSPredicate predicateWithFormat:forwardFormat];
-    NSPredicate *reversePredicate = reverseFormat ? [NSPredicate predicateWithFormat:reverseFormat] : nil;
-    [self testSymmetryWithPredicate:forwardPredicate reversePredicate:reversePredicate mustRoundTrip:mustRoundTrip];
+    [self testSymmetryWithPredicate:forwardPredicate mustRoundTrip:mustRoundTrip];
 }
 
-- (void)testSymmetryWithPredicate:(NSPredicate *)forwardPredicate reversePredicate:(NSPredicate *)reversePredicate mustRoundTrip:(BOOL)mustRoundTrip {
+- (void)testSymmetryWithPredicate:(NSPredicate *)forwardPredicate mustRoundTrip:(BOOL)mustRoundTrip {
     auto forwardFilter = forwardPredicate.mgl_filter;
     NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
     if (mustRoundTrip) {
         // A collection of ints may turn into an aggregate of longs, for
         // example, so compare formats instead of the predicates themselves.
         XCTAssertEqualObjects(forwardPredicate.predicateFormat, forwardPredicateAfter.predicateFormat);
-    }
-
-    if (reversePredicate) {
-        auto reverseFilter = reversePredicate.mgl_filter;
-        NSPredicate *reversePredicateAfter = [NSPredicate mgl_predicateWithFilter:reverseFilter];
-        XCTAssertNotEqualObjects(reversePredicate, reversePredicateAfter);
-
-        XCTAssertEqualObjects(forwardPredicateAfter, reversePredicateAfter);
+    } else {
+        XCTAssertEqualObjects(forwardPredicate, forwardPredicateAfter);
     }
 }
 
 - (void)testComparisonExpressionArray {
     {
-        NSArray *expected = @[@"==", @1, @2];
-        XCTAssertEqualObjects([NSPredicate predicateWithFormat:@"1 = 2"].mgl_jsonExpressionObject, expected);
+        NSArray *expected = @[@"==",  @[@"number", @1],  @[@"number", @2]];
+        XCTAssertEqualObjects([NSPredicate predicateWithFormat:@"1 == 2"].mgl_jsonExpressionObject, expected);
+        [self testSymmetryWithPredicate:[NSPredicate predicateWithFormat:@"1 == 2"]
+                          mustRoundTrip:NO];
     }
     {
         NSArray *expected = @[@"all", @[@"<=", @10, @[@"get", @"x"]], @[@"<=", @[@"get", @"x"], @100]];
@@ -643,63 +633,83 @@ namespace mbgl {
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x == YES"];
-        NSArray *jsonExpression = @[@"==", @[@"get", @"x"], @YES];
+        NSArray *jsonExpression = @[@"==", @[@"get", @"x"],  @[@"boolean", @YES]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x < 5"];
         NSArray *jsonExpression = @[@"<", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x > 5"];
         NSArray *jsonExpression = @[@">", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x <= 5"];
         NSArray *jsonExpression = @[@"<=", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x >= 5"];
         NSArray *jsonExpression = @[@">=", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x < y"];
-        NSArray *jsonExpression = @[@"<", @[@"get", @"x"], @[@"get", @"y"]];
+        NSArray *jsonExpression = @[@"<", @[@"number", @[@"get", @"x"]], @[@"number", @[@"get", @"y"]]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x > y"];
-        NSArray *jsonExpression = @[@">", @[@"get", @"x"], @[@"get", @"y"]];
+        NSArray *jsonExpression = @[@">", @[@"number", @[@"get", @"x"]], @[@"number", @[@"get", @"y"]]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x <= y"];
-        NSArray *jsonExpression = @[@"<=", @[@"get", @"x"], @[@"get", @"y"]];
+        NSArray *jsonExpression = @[@"<=", @[@"number", @[@"get", @"x"]], @[@"number", @[@"get", @"y"]]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x >= y"];
-        NSArray *jsonExpression = @[@">=", @[@"get", @"x"], @[@"get", @"y"]];
+        NSArray *jsonExpression = @[@">=", @[@"number", @[@"get", @"x"]], @[@"number", @[@"get", @"y"]]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
     {
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x > 'value'"];
         NSArray *jsonExpression = @[@">",  @[@"string", @[@"get", @"x"]], @[@"string", @"value"]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
+        [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
+                          mustRoundTrip:NO];
     }
 }
 
