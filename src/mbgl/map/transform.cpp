@@ -666,7 +666,10 @@ void Transform::updateTransitions(const TimePoint& now) {
 
     if (transition) {
         transition(now);
-        transitionFrameFn = transition;
+
+        // Only reset the transition function if we haven't already finished.
+        if (transitionFinishFn)
+            transitionFrameFn = transition;
     }
 }
 
