@@ -122,8 +122,8 @@ optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& 
     return { ExpressionFilter { std::move(*expression) } };
 }
 
-std::unique_ptr<Expression> convertComparisonOp(const Convertible& values, Error& error) {
-    optional<std::string> op = toString(arrayMember(values, 0));
+    std::unique_ptr<Expression> convertComparisonOp(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
+    optional<std::string> op = opOverride ? opOverride : toString(arrayMember(values, 0));
     optional<std::string> property = toString(arrayMember(values, 1));
     
     if (!property) {
@@ -188,12 +188,12 @@ std::unique_ptr<Expression> convertLegacyFilter(const Convertible& values, Error
         return std::make_unique<Literal>(*op != "any");
     } else {
         return (
-            *op == "==" ? convertComparisonOp(values, error) :
-            *op == "!=" ? convertNegation(convertComparisonOp(values, error), error) :
+            *op == "==" ||
             *op == "<" ||
             *op == ">" ||
             *op == "<=" ||
             *op == ">=" ? convertComparisonOp(values, error) :
+            *op == "!=" ? convertNegation(convertComparisonOp(values, error, {"=="}), error) :
             *op == "any" ? createExpression("any", createLegacyFilter2Array(values, error, 1), error) :
             *op == "all" ? createExpression("all", createLegacyFilter2Array(values, error, 1), error) :
             *op == "none" ? convertNegation(createExpression("any", createLegacyFilter2Array(values, error, 1), error), error) :

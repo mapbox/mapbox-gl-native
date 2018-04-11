@@ -252,6 +252,8 @@ optional<double> featurePropertyAsDouble(EvaluationContext params, const std::st
     if (!property) return optional<double>();
     return property->match(
         [](double value) { return value; },
+        [](uint64_t value) { return optional<double>(value); },
+        [](int64_t value) { return optional<double>(value); },
         [](auto) { return optional<double>(); }
     );
 };
@@ -261,10 +263,10 @@ optional<double> featureIdAsDouble(EvaluationContext params) {
     auto id = params.feature->getID();
     if (!id) return optional<double>();
     return id->match(
-       [](std::string) { return optional<double>(); },
-       [](uint64_t value) { return optional<double>(static_cast<double>(value)); },
-       [](int64_t value) { return optional<double>(static_cast<double>(value)); },
-       [](double value) { return optional<double>(value); }
+        [](double value) { return value; },
+        [](uint64_t value) { return optional<double>(static_cast<double>(value)); },
+        [](int64_t value) { return optional<double>(static_cast<double>(value)); },
+        [](auto) { return optional<double>(); }
     );
 };
 
