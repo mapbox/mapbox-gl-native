@@ -302,6 +302,10 @@ public:
             .concat(paintPropertyBinders.attributeBindings(currentProperties));
     }
 
+    static uint32_t activeBindingCount(const typename Attributes::Bindings& allAttributeBindings) {
+        return Attributes::activeBindingCount(allAttributeBindings);
+    }
+
     template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,

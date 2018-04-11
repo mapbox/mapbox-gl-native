@@ -1,14 +1,20 @@
 #include <mbgl/gl/attribute.hpp>
+#include <mbgl/gl/context.hpp>
 #include <mbgl/gl/gl.hpp>
 
 namespace mbgl {
 namespace gl {
 
-void bindAttributeLocation(ProgramID id, AttributeLocation location, const char* name) {
-    if (location >= MAX_ATTRIBUTES) {
-        throw gl::Error("too many vertex attributes");
+void bindAttributeLocation(Context& context, ProgramID id, AttributeLocation location, const char* name) {
+    // We're using sequentially numberered attribute locations starting with 0. Therefore we can use
+    // the location as a proxy for the number of attributes.
+    if (location >= context.maximumVertexBindingCount) {
+        // Don't bind the location on this hardware since it exceeds the limit (otherwise we'd get
+        // an OpenGL error). This means we'll see rendering errors, and possibly slow rendering due
+        // to unbound attributes.
+    } else {
+        MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
     }
-    MBGL_CHECK_ERROR(glBindAttribLocation(id, location, name));
 }
 
 std::set<std::string> getActiveAttributes(ProgramID id) {

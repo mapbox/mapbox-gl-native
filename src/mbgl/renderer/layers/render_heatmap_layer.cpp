@@ -112,6 +112,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 evaluated
             );
 
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
             programInstance.draw(
                 parameters.context,
                 gl::Triangles(),
@@ -156,6 +158,8 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             paintAttributeData,
             properties
         );
+
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
         programInstance.draw(
             parameters.context,

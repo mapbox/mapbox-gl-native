@@ -107,6 +107,8 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             evaluated
         );
 
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
         programInstance.draw(
             parameters.context,
             gl::Triangles(),

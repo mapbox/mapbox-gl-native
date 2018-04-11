@@ -93,6 +93,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             evaluated
         );
 
+        checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
         programInstance.draw(
             parameters.context,
             gl::Triangles(),
@@ -146,6 +148,8 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 paintAttributeData,
                 properties
             );
+
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
             programInstance.draw(
                 parameters.context,

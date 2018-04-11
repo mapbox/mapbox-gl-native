@@ -105,6 +105,8 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
                 paintProperties
             );
 
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
             programInstance.draw(
                 parameters.context,
                 gl::Triangles(),

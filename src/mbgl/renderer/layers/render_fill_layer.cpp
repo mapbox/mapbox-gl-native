@@ -92,6 +92,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated
                 );
 
+                checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
                 programInstance.draw(
                     parameters.context,
                     drawMode,
@@ -178,6 +180,8 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     paintPropertyBinders,
                     evaluated
                 );
+
+                checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
 
                 programInstance.draw(
                     parameters.context,

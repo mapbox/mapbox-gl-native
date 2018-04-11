@@ -78,6 +78,8 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
                 evaluated
             );
 
+            checkRenderability(parameters, programInstance.activeBindingCount(allAttributeBindings));
+
             programInstance.draw(
                 parameters.context,
                 gl::Triangles(),

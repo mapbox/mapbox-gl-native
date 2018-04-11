@@ -62,6 +62,8 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
             properties
         );
 
+        checkRenderability(parameters, program.activeBindingCount(allAttributeBindings));
+
         program.draw(
             parameters.context,
             gl::Triangles(),
