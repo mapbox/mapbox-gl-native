@@ -598,6 +598,18 @@ namespace mbgl {
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
+    {
+        NSArray *expected = @[@"match", @[@"id"], @[@"literal", @[@6, @5, @4, @3]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier IN { 6, 5, 4, 3}"];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @[@"literal", @[@6, @5, @4, @3]]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT x IN { 6, 5, 4, 3}"];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
 }
 
 @end

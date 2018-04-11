@@ -333,11 +333,14 @@
                                                                                          options:0];
             return @[op, leftHandPredicate.mgl_jsonExpressionObject, rightHandPredicate.mgl_jsonExpressionObject];
         }
+        case NSInPredicateOperatorType: {
+            op = @"match";
+            break;
+        }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
         case NSBeginsWithPredicateOperatorType:
         case NSEndsWithPredicateOperatorType:
-        case NSInPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
         case NSContainsPredicateOperatorType:
             [NSException raise:NSInvalidArgumentException

@@ -319,6 +319,10 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
         return [NSCompoundPredicate orPredicateWithSubpredicates:subpredicates];
     }
+    if ([op isEqualToString:@"match"]) {
+        NSArray *subpredicates = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        return [NSPredicate predicateWithFormat:@"%@ IN %@" argumentArray:subpredicates];
+    }
     
     NSAssert(NO, @"Unrecognized expression conditional operator %@.", op);
     return nil;
