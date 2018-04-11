@@ -145,10 +145,9 @@ public final class IconFactory {
    * @return The Icon that was loaded from the asset or null if failed to load.
    */
   public Icon fromAsset(@NonNull String assetName) {
-    try (AssetManager as = context.getAssets()) {
-      try (InputStream is = as.open(assetName)) {
-        return fromInputStream(is);
-      }
+    try (AssetManager as = context.getAssets();
+         InputStream is = as.open(assetName)) {
+      return fromInputStream(is);
     } catch (IOException ioException) {
       return null;
     }

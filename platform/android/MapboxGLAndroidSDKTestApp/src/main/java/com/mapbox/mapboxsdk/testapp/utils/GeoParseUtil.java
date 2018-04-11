@@ -24,11 +24,10 @@ public class GeoParseUtil {
     if (TextUtils.isEmpty(fileName)) {
       throw new NullPointerException("No GeoJSON File Name passed in.");
     }
-    try (AssetManager as = context.getAssets()) {
-      try (InputStream is = as.open(fileName)) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
-        return readAll(rd);
-      }
+    try (AssetManager as = context.getAssets();
+         InputStream is = as.open(fileName)) {
+      BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
+      return readAll(rd);
     }
   }
 
