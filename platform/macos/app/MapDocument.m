@@ -1067,7 +1067,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         menuItem.state = menuItem.tag == _isLocalizingLabels ? NSOnState: NSOffState;
         if (menuItem.tag) {
             NSLocale *locale = [NSLocale localeWithLocaleIdentifier:[NSBundle mainBundle].developmentLocalization];
-            NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguage];
+            NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguage] ?: @"en";
             menuItem.title = [locale displayNameForKey:NSLocaleIdentifier value:preferredLanguage];
         }
         return YES;
