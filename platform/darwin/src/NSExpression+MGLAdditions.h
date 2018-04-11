@@ -45,7 +45,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
 
 /**
- Attempts to localize the receiver into the given locale.
+ Returns a copy of the receiver localized into the given locale.
  
  This method assumes the receiver is used with a style layer property such as
  `MGLStyleLayer.text` and refers to the feature attributes that are available in
