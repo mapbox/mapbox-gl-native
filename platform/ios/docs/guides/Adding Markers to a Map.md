@@ -6,7 +6,7 @@ Mapbox offers a few different ways to add markers to a map, each with different 
 
 Our annotations API includes the `MGLAnnotationImage`, and `MGLAnnotationView` classes. These are most similar to MapKit’s annotation class and provide a familiar interface for working with markers and callouts.
 
-| ![MGLAnnotationImage](img/adding-points-to-a-map/annotation-image.png "MGLAnnotationImage")               | ![MGLAnnotationView](img/adding-points-to-a-map/annotation-view.png "MGLAnnotationView")              |
+| <img src="img/adding-points-to-a-map/annotation-image.png" alt="MGLAnnotationImage" style="height: 500px;"/>               | <img src="img/adding-points-to-a-map/annotation-view.png" alt="MGLAnnotationView" style="height: 500px;"/>              |
 |----------------------|---------------------|
 | `MGLAnnotationImage` | `MGLAnnotationView` |
 
@@ -27,7 +27,7 @@ The runtime styling API includes our `MGLSymbolStyleLayer` and `MGLCircleStyleLa
 
 If you need to implement callouts with the `MGLSymbolStyleLayer` or `MGLCircleStyleLayer`, you will need to implement your own tap gesture recognizer that calls `-[MGLMapView visibleFeaturesAtPoint:inStyleLayersWithIdentifiers:]` to get the tapped point feature, then show a `UIView` you provide. Additionally, if you need to animate markers when using the runtime styling APIs, consider using an timer to update the source data coordinates accordingly.
 
-| ![`MGLCircleStyleLayer`](img/adding-points-to-a-map/circle-layer.png "MGLCircleStyleLayer")               | ![`MGLSymbolStyleLayer`](img/adding-points-to-a-map/symbol-layer.png "MGLSymbolStyleLayer")              |
+| <img src="img/adding-points-to-a-map/circle-layer.png" alt="MGLCircleStyleLayer" style="height: 500px;"/>               | <img src="img/adding-points-to-a-map/symbol-layer.png" alt="MGLSymbolStyleLayer" style="height: 500px;"/>              |
 |----------------------|---------------------|
 | `MGLCircleStyleLayer` | `MGLSymbolStyleLayer` |
 
