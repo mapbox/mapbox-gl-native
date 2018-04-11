@@ -9,7 +9,7 @@
 namespace mbgl {
 namespace util {
 
-void start_list_on_local_minimum(point_list& points) {
+void start_list_on_local_minimum(PointList& points) {
     assert(points.size() > 2);
     // Find the first local minimum going forward in the list
     auto prev_pt = std::prev(points.end(), 2);
@@ -26,15 +26,15 @@ void start_list_on_local_minimum(point_list& points) {
         if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
     }
     //Re-close the linear ring
-    points.erase(std::prev(points.end()));
+    points.pop_back();
     std::rotate(points.begin(), pt, points.end());
     points.push_back(*points.begin());
 }
 
-bound create_bound_towards_maximum(point_list& points, point_list::iterator& pt) {
-    if (std::distance(pt, points.end()) < 2) { return {}; };
+Bound create_bound_towards_maximum(PointList& points, PointList::iterator& pt) {
+    if (std::distance(pt, points.end()) < 2) { return {}; }
     if (std::distance(pt, points.end()) == 2) {
-        bound bnd;
+        Bound bnd;
         if (points[0].y < points[1].y) std::copy(pt, points.end(), std::back_inserter(bnd.points));
         else std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
         pt = points.end();
@@ -54,7 +54,7 @@ bound create_bound_towards_maximum(point_list& points, point_list::iterator& pt)
         if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
     }
 
-    bound bnd;
+    Bound bnd;
     if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::copy(begin, next_pt, std::back_inserter(bnd.points));
@@ -62,10 +62,10 @@ bound create_bound_towards_maximum(point_list& points, point_list::iterator& pt)
     return bnd;
 }
 
-bound create_bound_towards_minimum(point_list& points, point_list::iterator& pt) {
-    if (std::distance(pt, points.end()) < 2) { return {}; };
+Bound create_bound_towards_minimum(PointList& points, PointList::iterator& pt) {
+    if (std::distance(pt, points.end()) < 2) { return {}; }
     if (std::distance(pt, points.end()) == 2) {
-        bound bnd;
+        Bound bnd;
         if (pt->y < std::next(pt)->y) std::copy(pt, points.end(), std::back_inserter(bnd.points));
         else std::reverse_copy(pt, points.end(), std::back_inserter(bnd.points));
         pt = points.end();
@@ -85,7 +85,7 @@ bound create_bound_towards_minimum(point_list& points, point_list::iterator& pt)
         if (next_pt == points.end()) { next_pt = std::next(points.begin()); }
     }
 
-    bound bnd;
+    Bound bnd;
     if (std::next(pt) == points.end()) { next_pt = points.end(); pt++; };
     bnd.points.reserve(static_cast<std::size_t>(std::distance(begin, next_pt)));
     std::reverse_copy(begin, next_pt, std::back_inserter(bnd.points));
@@ -93,14 +93,14 @@ bound create_bound_towards_minimum(point_list& points, point_list::iterator& pt)
     return bnd;
 }
 
-void build_edge_table(point_list& points, uint32_t maxTile, edge_table& et, bool closed = false) {
+void build_edge_table(PointList& points, uint32_t maxTile, EdgeTable& et, bool closed = false) {
     if (closed) {
         start_list_on_local_minimum(points);
     }
     auto pointsIter = points.begin();
     while (pointsIter != points.end()) {
-        bound to_max = create_bound_towards_maximum(points, pointsIter);
-        bound to_min = create_bound_towards_minimum(points, pointsIter);
+        Bound to_max = create_bound_towards_maximum(points, pointsIter);
+        Bound to_min = create_bound_towards_minimum(points, pointsIter);
 
         if (to_max.points.size() > 0) {
             // Projections may result in values beyond the bounds due to double precision
@@ -115,14 +115,15 @@ void build_edge_table(point_list& points, uint32_t maxTile, edge_table& et, bool
     assert(pointsIter == points.end());
 }
 
-std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
-    std::vector<x_range> tile_range;
+std::vector<TileCoverRange> scan_row(uint32_t y, BoundList& aet) {
+    std::vector<TileCoverRange> tile_range;
     tile_range.reserve(aet.size());
 
-    for(bound& b: aet) {
-        x_range xp = { INT_MAX, 0 , b.winding };
+    for(Bound& b: aet) {
+        TileCoverRange xp = { INT_MAX, 0 , b.winding };
         double x;
         const auto numEdges = b.points.size() - 1;
+        assert(numEdges >= 1);
         while (b.currentPointIndex < numEdges) {
             x = b.interpolate(y);
             xp.x0 = std::min(xp.x0, static_cast<int32_t>(std::floor(x)));
@@ -157,7 +158,7 @@ std::vector<x_range> scan_row(uint32_t y, bound_list& aet) {
         }
     }
     // Sort the X-extents of each crossing bound by x_min, x_max
-    std::sort(tile_range.begin(), tile_range.end(), [] (x_range& a, x_range& b) {
+    std::sort(tile_range.begin(), tile_range.end(), [] (TileCoverRange& a, TileCoverRange& b) {
         return std::tie(a.x0, a.x1) < std::tie(b.x0, b.x1);
     });
 
@@ -169,8 +170,8 @@ struct ToEdgeTable {
     bool project = false;
     ToEdgeTable(int32_t z, bool p): zoom(z), project(p) {}
 
-    void buildTable(const std::vector<Point<double>>& points, edge_table& et, bool closed = false) const {
-        point_list projectedPoints;
+    void buildTable(const std::vector<Point<double>>& points, EdgeTable& et, bool closed = false) const {
+        PointList projectedPoints;
         if (project) {
             projectedPoints.reserve(points.size());
             for(const auto&p : points) {
@@ -182,49 +183,71 @@ struct ToEdgeTable {
         }
         build_edge_table(projectedPoints, 1 << zoom, et, closed);
     }
-    
-    void buildPolygonTable(const Polygon<double>& polygon, edge_table& et) const {
+
+    void buildPolygonTable(const Polygon<double>& polygon, EdgeTable& et) const {
         for(const auto&ring : polygon) {
             buildTable(ring, et, true);
         }
     }
-    edge_table operator()(const Point<double>&) const {
-        return { };
+    EdgeTable operator()(const Point<double>&p) const {
+        Bound bnd;
+        auto point = p;
+        if(project) {
+            point = Projection::project(LatLng{p.y, p.x}, zoom);
+        }
+        bnd.points.insert(bnd.points.end(), 2, point);
+        bnd.winding = false;
+        EdgeTable et;
+        const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
+        et[y].push_back(bnd);
+        return et;
     }
 
-    edge_table operator()(const MultiPoint<double>&) const {
-        return { };
+    EdgeTable operator()(const MultiPoint<double>& points) const {
+        EdgeTable et;
+        for (const Point<double>& p: points) {
+            Bound bnd;
+            auto point = p;
+            if(project) {
+                point = Projection::project(LatLng{p.y, p.x}, zoom);
+            }
+            bnd.points.insert(bnd.points.end(), 2, point);
+            bnd.winding = false;
+            const auto y = static_cast<uint32_t>(std::floor(clamp(point.y, 0.0, (double)(1 << zoom))));
+            et[y].push_back(bnd);
+        }
+        return et;
     }
 
-    edge_table operator()(const LineString<double>& lines) const {
-        edge_table et;
+    EdgeTable operator()(const LineString<double>& lines) const {
+        EdgeTable et;
         buildTable(lines, et);
         return et;
     }
 
-    edge_table operator()(const MultiLineString<double>& lines) const {
-        edge_table et;
+    EdgeTable operator()(const MultiLineString<double>& lines) const {
+        EdgeTable et;
         for(const auto&line : lines) {
             buildTable(line, et);
         }
         return et;
     }
 
-    edge_table operator()(const Polygon<double>& polygon) const {
-        edge_table et;
+    EdgeTable operator()(const Polygon<double>& polygon) const {
+        EdgeTable et;
         buildPolygonTable(polygon, et);
         return et;
     }
 
-    edge_table operator()(const MultiPolygon<double>& polygons) const {
-        edge_table et;
+    EdgeTable operator()(const MultiPolygon<double>& polygons) const {
+        EdgeTable et;
         for(const auto& polygon: polygons) {
             buildPolygonTable(polygon, et);
         }
         return et;
     }
 
-    edge_table operator()(const mapbox::geometry::geometry_collection<double>&) const {
+    EdgeTable operator()(const mapbox::geometry::geometry_collection<double>&) const {
         return {};
     }
 };
@@ -240,9 +263,9 @@ TileCover::Impl::Impl(int32_t z, const Geometry<double>& geom, bool project): ma
 
 void TileCover::Impl::reset() {
     if (edgeTable.size() == 0) return;
-
-    activeEdgeTable = edgeTable.begin()->second;
-    currentRow = edgeTable.begin()->first;
+    currentEdgeTable = edgeTable.begin();
+    activeEdgeTable = currentEdgeTable->second;
+    currentRow = currentEdgeTable->first;
 }
 
 bool TileCover::Impl::next() {
@@ -274,11 +297,19 @@ bool TileCover::Impl::scanRow(ScanLine& scanCover) {
 
     // Update AET for next row
     currentRow++;
-    auto nextRow = edgeTable.find(currentRow);
+    auto nextRow = std::next(currentEdgeTable);
     if (nextRow != edgeTable.end()) {
-        activeEdgeTable.insert(activeEdgeTable.end(), nextRow->second.begin(), nextRow->second.end());
+        if (activeEdgeTable.size() == 0 && nextRow->first > currentRow) {
+            //For multi-geoms: Use the next row with an edge table starting point
+            currentRow = nextRow->first;
+        }
+        if (currentRow == nextRow->first) {
+            activeEdgeTable.insert(activeEdgeTable.end(), nextRow->second.begin(), nextRow->second.end());
+            currentEdgeTable++;
+        }
     }
     return next();
+
 }
 
 } // namespace util

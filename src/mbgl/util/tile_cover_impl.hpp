@@ -15,23 +15,23 @@ class LatLngBounds;
 
 namespace util {
 
-struct bound;
+struct Bound;
 
-using point_list = std::vector<Point<double>>;
-using bound_list = std::vector<bound>;
-using edge_table = std::map<uint32_t, bound_list>;
-struct x_range {
+using PointList = std::vector<Point<double>>;
+using BoundList = std::vector<Bound>;
+using EdgeTable = std::map<uint32_t, BoundList>;
+struct TileCoverRange {
     int32_t x0;
     int32_t x1;
     bool winding;
 };
     
-struct bound {
-    point_list points;
+struct Bound {
+    PointList points;
     size_t currentPointIndex = 0;
     bool winding = false;
-    bound() = default;
-    bound(const bound& rhs) {
+    Bound() = default;
+    Bound(const Bound& rhs) {
         points = rhs.points;
         currentPointIndex = rhs.currentPointIndex;
         winding = rhs.winding;
@@ -69,9 +69,10 @@ public:
 private:
     bool isClosed;
     uint32_t currentRow;
-    bound_list activeEdgeTable;
-    edge_table edgeTable;
-    uint32_t maxY;
+    BoundList activeEdgeTable;
+    EdgeTable edgeTable;
+    EdgeTable::iterator currentEdgeTable;
+    const uint32_t maxY;
 };
 
 

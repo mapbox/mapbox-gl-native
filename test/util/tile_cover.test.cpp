@@ -114,6 +114,21 @@ TEST(TileCover, SanFranciscoZ0Wrapped) {
               util::tileCover(sanFranciscoWrapped, 0));
 }
 
+TEST(TileCover, GeomPoint) {
+    auto point = Point<double>{ -122.5744, 37.6609 };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ {2 ,0 ,1 } }),
+              util::tileCover(point, 2));
+}
+
+TEST(TileCover, GeomMultiPoint) {
+    auto points = MultiPoint<double>{ { -122.5, 37.76 }, { -122.4, 37.76} };
+
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+        {20, 167480, 405351}, {20, 167772, 405351} }),
+              util::tileCover(points, 20));
+}
+
 TEST(TileCover, GeomLineZ10) {
     auto lineCover = util::tileCover(LineString<double>{
         {-121.49368286132812,38.57903714667459},
@@ -149,7 +164,9 @@ TEST(TileCover, GeomMultiLineString) {
 
     EXPECT_EQ((std::vector<UnwrappedTileID>{
         {14, 2616, 6333}, {14, 2617, 6333}, {14, 2618, 6333},
-        {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333} }),
+        {14, 2619, 6333}, {14, 2620, 6333}, {14, 2621, 6333},
+        {14, 2616, 6335}, {14, 2617, 6335}, {14, 2618, 6335},
+        {14, 2619, 6335}, {14, 2620, 6335}, {14, 2621, 6335}}),
               util::tileCover(geom, 14));
 }
 
