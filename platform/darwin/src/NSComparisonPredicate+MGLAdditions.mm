@@ -146,7 +146,6 @@
         id rightExpression = self.rightExpression.mgl_jsonExpressionObject;
         
         switch (self.predicateOperatorType) {
-            case NSEqualToPredicateOperatorType:
             case NSLessThanPredicateOperatorType:
             case NSLessThanOrEqualToPredicateOperatorType:
             case NSGreaterThanPredicateOperatorType:

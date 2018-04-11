@@ -233,17 +233,7 @@ public:
 NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     NSMutableArray *subpredicates = [NSMutableArray arrayWithCapacity:objects.count];
     for (id object in objects) {
-        id json = object;
-        if ([object isKindOfClass:[NSArray class]]) {
-            NSArray *array = (NSArray *)object;
-            NSString *op = array.firstObject;
-            if ([op isEqualToString:@"number"] ||
-                [op isEqualToString:@"string"] ||
-                [op isEqualToString:@"boolean"]) {
-                json = [array subarrayWithRange:NSMakeRange(1, array.count - 1)];
-            }
-        }
-        NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:json];
+        NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:object];
         [subpredicates addObject:predicate];
     }
     return subpredicates;
