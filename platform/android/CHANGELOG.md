@@ -2,6 +2,29 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0-beta.7 - April 12, 2018
+ - Add abs, round, floor, ceil expression operators [#11653](https://github.com/mapbox/mapbox-gl-native/pull/11653)
+ - LatLngBounds correct center calculation [#11650](https://github.com/mapbox/mapbox-gl-native/pull/11650)
+ - Bump telemetry to 3.0.0 final [#11658](https://github.com/mapbox/mapbox-gl-native/pull/11658)
+ - Correctly calculate LatLngBounds [#11647](https://github.com/mapbox/mapbox-gl-native/pull/11647)
+ - Add convenience step expression [#11641](https://github.com/mapbox/mapbox-gl-native/pull/11641)
+ - Add javadoc examples for Android [#11540](https://github.com/mapbox/mapbox-gl-native/pull/11540)
+ - Add paused state to map renderer, don't render snapshots after onPause [#11358](https://github.com/mapbox/mapbox-gl-native/pull/11358)
+ - Rework internal expression conversion [#11490](https://github.com/mapbox/mapbox-gl-native/pull/11490)
+ - Fixed gesture event listeners javadoc [#11630](https://github.com/mapbox/mapbox-gl-native/pull/11630)
+ - Add delete local reference on jni strings [#11608](https://github.com/mapbox/mapbox-gl-native/pull/11608)
+ - Release local references early [#11599](https://github.com/mapbox/mapbox-gl-native/pull/11599)
+ - Re-bind uniform locations after re-linking program [#11618](https://github.com/mapbox/mapbox-gl-native/pull/11618)
+ - Bump mapbox-sdk-services to 3.0.1 [#11593](https://github.com/mapbox/mapbox-gl-native/pull/11593)
+
+## 5.5.2 - April 10, 2018
+ - Correct animation scale point [#11643](https://github.com/mapbox/mapbox-gl-native/pull/11643)
+ - Re-bind uniform locations after re-linking program [#11583](https://github.com/mapbox/mapbox-gl-native/pull/11583)
+ - Invalidate camera position before delivering onMapReady [#11585](https://github.com/mapbox/mapbox-gl-native/pull/11585)
+ - Null java peer callback [#11358](https://github.com/mapbox/mapbox-gl-native/pull/11358)
+ - Add missing delete local reference [#11608](https://github.com/mapbox/mapbox-gl-native/pull/11608)
+ - Release local refs [#11599](https://github.com/mapbox/mapbox-gl-native/pull/11599)
+
 ## 6.0.0-beta.6 - April 4, 2018
  - Fix race condition crash for heavily modified annotations [#11551](https://github.com/mapbox/mapbox-gl-native/pull/11551)
  - Throw exception when converting PropertyValue with an expression [#11572](https://github.com/mapbox/mapbox-gl-native/pull/11572)
