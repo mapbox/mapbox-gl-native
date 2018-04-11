@@ -323,6 +323,10 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         NSArray *subpredicates = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
         return [NSPredicate predicateWithFormat:@"%@ IN %@" argumentArray:subpredicates];
     }
+    if ([op isEqualToString:@"has"]) {
+        NSArray *subpredicates = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        return [NSPredicate predicateWithFormat:@"%@ CONTAINS %@" argumentArray:subpredicates];
+    }
     
     NSAssert(NO, @"Unrecognized expression conditional operator %@.", op);
     return nil;

@@ -610,6 +610,18 @@ namespace mbgl {
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
+    {
+        NSArray *expected = @[@"has", @[@"literal", @[@6, @5, @4, @3]], @[@"get", @"x"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS x"];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"has", @[@"literal", @[@6, @5, @4, @3]], @[@"id"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $mgl_featureIdentifier"];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
 }
 
 @end
