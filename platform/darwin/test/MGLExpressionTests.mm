@@ -463,6 +463,30 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @-2);
     }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_round:" arguments:@[MGLConstantExpression(@1.5)]];
+        NSArray *jsonExpression = @[@"round", @1.5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @2);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_round:" arguments:@[MGLConstantExpression(@-1.5)]];
+        NSArray *jsonExpression = @[@"round", @-1.5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @-2);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_round:" arguments:@[MGLConstantExpression(@2.5)]];
+        NSArray *jsonExpression = @[@"round", @2.5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @3);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_round:" arguments:@[MGLConstantExpression(@-2.5)]];
+        NSArray *jsonExpression = @[@"round", @-2.5];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @-3);
+    }
 }
 
 - (void)testTrigonometricExpressionObject {

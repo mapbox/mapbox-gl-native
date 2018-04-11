@@ -58,6 +58,7 @@
     // Install method-like functions, taking the number of arguments implied by
     // the selector name.
     INSTALL_METHOD(mgl_join:);
+    INSTALL_METHOD(mgl_round:);
     INSTALL_METHOD(mgl_interpolate:withCurveType:parameters:stops:);
     INSTALL_METHOD(mgl_step:from:stops:);
     INSTALL_METHOD(mgl_coalesce:);
@@ -81,6 +82,14 @@
  */
 - (NSString *)mgl_join:(NSArray<NSString *> *)components {
     return [components componentsJoinedByString:@""];
+}
+
+/**
+ Rounds the given number to the nearest integer. If the number is halfway
+ between two integers, this method rounds it away from zero.
+ */
+- (NSNumber *)mgl_round:(NSNumber *)number {
+    return @(round(number.doubleValue));
 }
 
 /**
@@ -488,6 +497,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"log10": @"log:",
             @"ln": @"ln:",
             @"abs": @"abs:",
+            @"round": @"mgl_round:",
             @"floor": @"floor:",
             @"ceil": @"ceiling:",
             @"^": @"raise:toPower:",
@@ -729,6 +739,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"uppercase:": @"upcase",
             @"lowercase:": @"downcase",
             @"length:": @"length",
+            @"mgl_round:": @"round",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
             @"MGL_LET": @"let",
             @"MGL_LET:": @"let",

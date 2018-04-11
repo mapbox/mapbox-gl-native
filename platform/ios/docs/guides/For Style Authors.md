@@ -379,7 +379,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
 `min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
 `pi`                   | | `%@` representing `NSNumber` containing `M_PI`
-`round`                | |
+`round`                | `mgl_round:` | `mgl_round(1.5)`
 `sin`                  | |
 `sqrt`                 | `sqrt:` | `sqrt(2)`
 `tan`                  | |
