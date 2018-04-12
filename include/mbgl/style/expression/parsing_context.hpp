@@ -74,6 +74,9 @@ public:
         omitTypeAnnotations
     };
 
+    /*
+        Parse the given style-spec JSON value as an expression.
+    */
     ParseResult parseExpression(const mbgl::style::conversion::Convertible& value,
                                 TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
 
@@ -86,7 +89,7 @@ public:
                                 TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
 
     /*
-        Parse a child expression.
+        Parse a child expression. For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t,
@@ -94,7 +97,7 @@ public:
                       TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
     
     /*
-        Parse a child expression.
+        Parse a child expression.  For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t index,
