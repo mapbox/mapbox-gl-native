@@ -328,6 +328,107 @@
     return {};
 }
 
+// Selectors of functions that can contain tokens in arguments.
+static NSArray * const MGLTokenizedFunctions = @[
+    @"mgl_interpolateWithCurveType:parameters:stops:",
+    @"mgl_interpolate:withCurveType:parameters:stops:",
+    @"mgl_stepWithMinimum:stops:",
+    @"mgl_step:from:stops:",
+];
+
+/**
+ Returns a copy of the given collection with tokens replaced by key path
+ expressions.
+ 
+ If no replacements take place, this method returns the original collection.
+ */
+NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
+    __block NSMutableArray *upgradedCollection;
+    [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
+        if (upgradedItem != item) {
+            if (!upgradedCollection) {
+                upgradedCollection = [collection mutableCopy];
+            }
+            upgradedCollection[idx] = upgradedItem;
+        }
+    }];
+    return upgradedCollection ?: collection;
+};
+
+/**
+ Returns a copy of the given stop dictionary with tokens replaced by key path
+ expressions.
+ 
+ If no replacements take place, this method returns the original stop
+ dictionary.
+ */
+NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
+    __block NSMutableDictionary *upgradedStops;
+    [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        NSExpression *upgradedValue = value.mgl_expressionByReplacingTokensWithKeyPaths;
+        if (upgradedValue != value) {
+            if (!upgradedStops) {
+                upgradedStops = [stops mutableCopy];
+            }
+            upgradedStops[zoomLevel] = upgradedValue;
+        }
+    }];
+    return upgradedStops ?: stops;
+};
+
+- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths {
+    switch (self.expressionType) {
+        case NSConstantValueExpressionType: {
+            NSString *constantValue = self.constantValue;
+            if ([constantValue isKindOfClass:[NSString class]] &&
+                [constantValue containsString:@"{"] && [constantValue containsString:@"}"]) {
+                NSMutableArray *components = [NSMutableArray array];
+                NSScanner *scanner = [NSScanner scannerWithString:constantValue];
+                scanner.charactersToBeSkipped = nil;
+                while (!scanner.isAtEnd) {
+                    NSString *string;
+                    if ([scanner scanUpToString:@"{" intoString:&string]) {
+                        [components addObject:[NSExpression expressionForConstantValue:string]];
+                    }
+                    
+                    NSString *token;
+                    if ([scanner scanString:@"{" intoString:NULL]
+                        && [scanner scanUpToString:@"}" intoString:&token]
+                        && [scanner scanString:@"}" intoString:NULL]) {
+                        [components addObject:[NSExpression expressionForKeyPath:token]];
+                    }
+                }
+                return [NSExpression expressionForFunction:@"mgl_join:"
+                                                 arguments:@[[NSExpression expressionForAggregate:components]]];
+            }
+            NSDictionary *stops = self.constantValue;
+            // TODO: Check whether the dictionary’s key and value types are consistent with stop dictionaries. Or have the caller pass in whether this is a stop dictionary.
+            if ([stops isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *localizedStops = MGLStopDictionaryByReplacingTokensWithKeyPaths(stops);
+                if (localizedStops != stops) {
+                    return [NSExpression expressionForConstantValue:localizedStops];
+                }
+            }
+            return self;
+        }
+            
+        case NSFunctionExpressionType: {
+            if ([MGLTokenizedFunctions containsObject:self.function]) {
+                NSArray *arguments = self.arguments;
+                NSArray *localizedArguments = MGLCollectionByReplacingTokensWithKeyPaths(arguments);
+                if (localizedArguments != arguments) {
+                    return [NSExpression expressionForFunction:self.operand selectorName:self.function arguments:localizedArguments];
+                }
+            }
+            return self;
+        }
+            
+        default:
+            return self;
+    }
+}
+
 @end
 
 @implementation NSObject (MGLExpressionAdditions)
@@ -1109,107 +1210,6 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
 }
 
 #pragma mark Localization
-
-// Selectors of functions that can contain tokens in arguments.
-static NSArray * const MGLTokenizedFunctions = @[
-    @"mgl_interpolateWithCurveType:parameters:stops:",
-    @"mgl_interpolate:withCurveType:parameters:stops:",
-    @"mgl_stepWithMinimum:stops:",
-    @"mgl_step:from:stops:",
-];
-
-/**
- Returns a copy of the given collection with tokens replaced by key path
- expressions.
- 
- If no replacements take place, this method returns the original collection.
- */
-NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
-    __block NSMutableArray *upgradedCollection;
-    [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
-        NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
-        if (upgradedItem != item) {
-            if (!upgradedCollection) {
-                upgradedCollection = [collection mutableCopy];
-            }
-            upgradedCollection[idx] = upgradedItem;
-        }
-    }];
-    return upgradedCollection ?: collection;
-};
-
-/**
- Returns a copy of the given stop dictionary with tokens replaced by key path
- expressions.
- 
- If no replacements take place, this method returns the original stop
- dictionary.
- */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
-    __block NSMutableDictionary *upgradedStops;
-    [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
-        NSExpression *upgradedValue = value.mgl_expressionByReplacingTokensWithKeyPaths;
-        if (upgradedValue != value) {
-            if (!upgradedStops) {
-                upgradedStops = [stops mutableCopy];
-            }
-            upgradedStops[zoomLevel] = upgradedValue;
-        }
-    }];
-    return upgradedStops ?: stops;
-};
-
-- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths {
-    switch (self.expressionType) {
-        case NSConstantValueExpressionType: {
-            NSString *constantValue = self.constantValue;
-            if ([constantValue isKindOfClass:[NSString class]] &&
-                [constantValue containsString:@"{"] && [constantValue containsString:@"}"]) {
-                NSMutableArray *components = [NSMutableArray array];
-                NSScanner *scanner = [NSScanner scannerWithString:constantValue];
-                scanner.charactersToBeSkipped = nil;
-                while (!scanner.isAtEnd) {
-                    NSString *string;
-                    if ([scanner scanUpToString:@"{" intoString:&string]) {
-                        [components addObject:[NSExpression expressionForConstantValue:string]];
-                    }
-                    
-                    NSString *token;
-                    if ([scanner scanString:@"{" intoString:NULL]
-                        && [scanner scanUpToString:@"}" intoString:&token]
-                        && [scanner scanString:@"}" intoString:NULL]) {
-                        [components addObject:[NSExpression expressionForKeyPath:token]];
-                    }
-                }
-                return [NSExpression expressionForFunction:@"mgl_join:"
-                                                 arguments:@[[NSExpression expressionForAggregate:components]]];
-            }
-            NSDictionary *stops = self.constantValue;
-            // TODO: Check whether the dictionary’s key and value types are consistent with stop dictionaries. Or have the caller pass in whether this is a stop dictionary.
-            if ([stops isKindOfClass:[NSDictionary class]]) {
-                NSDictionary *localizedStops = MGLStopDictionaryByReplacingTokensWithKeyPaths(stops);
-                if (localizedStops != stops) {
-                    return [NSExpression expressionForConstantValue:localizedStops];
-                }
-            }
-            return self;
-        }
-            
-        case NSFunctionExpressionType: {
-            if ([MGLTokenizedFunctions containsObject:self.function]) {
-                NSArray *arguments = self.arguments;
-                NSArray *localizedArguments = MGLCollectionByReplacingTokensWithKeyPaths(arguments);
-                if (localizedArguments != arguments) {
-                    return [NSExpression expressionForFunction:self.operand selectorName:self.function arguments:localizedArguments];
-                }
-            }
-            return self;
-        }
-            
-        default:
-            return self;
-    }
-}
 
 /**
  Returns a localized copy of the given collection.

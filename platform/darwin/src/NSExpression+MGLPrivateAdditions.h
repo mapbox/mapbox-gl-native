@@ -27,6 +27,11 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, readonly) mbgl::FeatureIdentifier mgl_featureIdentifier;
 @property (nonatomic, readonly) std::vector<mbgl::FeatureIdentifier> mgl_aggregateFeatureIdentifier;
 
+/**
+ Returns a copy of the receiver with tokens replaced by key path expressions.
+ */
+- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths;
+
 @end
 
 @interface NSNull (MGLExpressionAdditions)
@@ -71,11 +76,6 @@ NS_ASSUME_NONNULL_BEGIN
 @end
 
 @interface NSExpression (MGLExpressionAdditions)
-
-/**
- Returns a copy of the receiver with tokens replaced by key path expressions.
- */
-- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths;
 
 - (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context;
 
