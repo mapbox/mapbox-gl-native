@@ -67,11 +67,9 @@ TEST(TileCoverStream, Arctic) {
     util::TileCover tc(bounds, zoom);
     auto results = util::tileCover(bounds, zoom);
     std::vector<UnwrappedTileID> t;
-    while(tc.getTiles([&](int32_t x0, int32_t x1, int32_t y) {
-        for (auto x = x0; x < x1; x++) {
-            t.emplace_back(zoom, x, y);
-        }
-    })) {};
+    while(tc.hasNext()) {
+            t.push_back(*tc.next());
+    };
     EXPECT_EQ(t.size(), results.size());
 }
 
@@ -79,11 +77,9 @@ TEST(TileCoverStream, WorldZ1) {
     auto zoom = 1;
     util::TileCover tc(LatLngBounds::world(), zoom);
     std::vector<UnwrappedTileID> t;
-    while(tc.getTiles([&](int32_t x0, int32_t x1, int32_t y) {
-        for (auto x = x0; x < x1; x++) {
-            t.emplace_back(zoom, x, y);
-        }
-    })){};
+    while(tc.hasNext()) {
+        t.push_back(*tc.next());
+    };
     EXPECT_EQ((std::vector<UnwrappedTileID>{
         { 1, 0, 0 }, { 1, 1, 0 }, { 1, 0, 1 }, { 1, 1, 1 },
     }), t);
@@ -263,6 +259,20 @@ TEST(TileCover, GeomSanFranciscoPoly) {
     }), util::tileCover(sanFranciscoGeom, 12));
 }
 
+TEST(TileCover, GeomInvalid) {
+    auto point = Point<double>{ -122.5744, 97.6609 };
+    EXPECT_THROW(util::tileCover(point, 2), std::domain_error);
+
+    auto badPoly = Polygon<double> { { {1.0,  35.0} } };
+    EXPECT_EQ((std::vector<UnwrappedTileID>{ }), util::tileCover(badPoly, 16));
+
+    //Should handle open polygons.
+    badPoly = Polygon<double> { { {1.0,  34.2}, {1.0, 34.4}, {0.5, 34.3} } };
+    EXPECT_EQ((std::vector<UnwrappedTileID>{
+        { 10, 513, 407 }, { 10, 514, 407},
+        { 10, 513, 408 }, { 10, 514, 408}
+    }), util::tileCover(badPoly, 10));
+}
 
 
 TEST(TileCount, World) {

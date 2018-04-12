@@ -3,6 +3,7 @@
 #include <mbgl/tile/tile_id.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <memory>
@@ -14,8 +15,6 @@ class LatLngBounds;
 
 namespace util {
 
-using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
-
 // Helper class to stream tile-cover results per row
 class TileCover {
 public:
@@ -24,11 +23,8 @@ public:
     TileCover(const Geometry<double>&, int32_t z, bool project = true);
     ~TileCover();
 
-    //Returns false when there are no more rows to cover
-    bool next();
-    //Invokes the ScanLine callback to indicate tiles coverd for the row from [x0,x1)
-    // ScanLine may be invoked with duplcaite or overlapping ranges.
-    bool getTiles(ScanLine&);
+    optional<UnwrappedTileID> next();
+    bool hasNext();
 
 private:
     class Impl;

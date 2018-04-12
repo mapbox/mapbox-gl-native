@@ -12,6 +12,8 @@ namespace mbgl {
 
 namespace {
 
+using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
+
 // Taken from polymaps src/Layer.js
 // https://github.com/simplegeo/polymaps/blob/master/src/Layer.js#L333-L383
 struct edge {
@@ -31,7 +33,7 @@ struct edge {
 };
 
 // scan-line conversion
-static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, util::ScanLine scanLine) {
+static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, ScanLine scanLine) {
     double y0 = ::fmax(ymin, std::floor(e1.y0));
     double y1 = ::fmin(ymax, std::ceil(e1.y1));
 
@@ -55,7 +57,7 @@ static void scanSpans(edge e0, edge e1, int32_t ymin, int32_t ymax, util::ScanLi
 }
 
 // scan-line conversion
-static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, util::ScanLine& scanLine) {
+static void scanTriangle(const Point<double>& a, const Point<double>& b, const Point<double>& c, int32_t ymin, int32_t ymax, ScanLine& scanLine) {
     edge ab = edge(a, b);
     edge bc = edge(b, c);
     edge ca = edge(c, a);
@@ -171,27 +173,12 @@ std::vector<UnwrappedTileID> tileCover(const TransformState& state, int32_t z) {
 }
 
 std::vector<UnwrappedTileID> tileCover(const Geometry<double>& geometry, int32_t z) {
-    struct ID {
-        int32_t x, y;
-    };
-
-    std::list<ID> t;
-    auto scanCover = [&](int32_t x0, int32_t x1, int32_t y) {
-        for (auto x = x0; x < x1; x++) {
-            t.emplace_back(ID{ x, y });
-        }
-    };
-
-    TileCover tc(geometry, z, true);
-    while (tc.next()) {
-        tc.getTiles(scanCover);
-    };
-
     std::vector<UnwrappedTileID> result;
-    result.reserve(t.size());
-    for (const auto& id : t) {
-        result.emplace_back(z, id.x, id.y);
-    }
+    TileCover tc(geometry, z, true);
+    while (tc.hasNext()) {
+        result.push_back(*tc.next());
+    };
+
     return result;
 }
 
@@ -216,16 +203,11 @@ uint64_t tileCount(const LatLngBounds& bounds, uint8_t zoom){
 }
 
 uint64_t tileCount(const Geometry<double>& geometry, uint8_t z) {
-    uint64_t tileCount;
-    auto scanCover = [&](int32_t x0, int32_t x1, int32_t) {
-        for (auto x = x0; x < x1; x++) {
-            tileCount+= (x1 - x0);
-        }
-    };
+    uint64_t tileCount = 0;
 
     TileCover tc(geometry, z, true);
     while (tc.next()) {
-        tc.getTiles(scanCover);
+        tileCount++;
     };
     return tileCount;
 }
@@ -258,12 +240,12 @@ TileCover::~TileCover() {
 
 }
 
-bool TileCover::next() {
+optional<UnwrappedTileID> TileCover::next() {
     return impl->next();
 }
 
-bool TileCover::getTiles(ScanLine& scanCover) {
-    return impl->scanRow(scanCover);
+bool TileCover::hasNext() {
+    return impl->hasNext();
 }
 
 } // namespace util

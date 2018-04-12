@@ -1,12 +1,12 @@
 #pragma once
 
 #include <mbgl/util/tile_cover.hpp>
-#include <mbgl/style/types.hpp>
-#include <mbgl/util/tile_coordinate.hpp>
 #include <mbgl/util/geometry.hpp>
+#include <mbgl/util/optional.hpp>
 
 #include <vector>
 #include <map>
+#include <queue>
 
 namespace mbgl {
 
@@ -17,29 +17,33 @@ namespace util {
 
 struct Bound;
 
-using PointList = std::vector<Point<double>>;
-using BoundList = std::vector<Bound>;
-using EdgeTable = std::map<uint32_t, BoundList>;
-struct TileCoverRange {
-    int32_t x0;
-    int32_t x1;
-    bool winding;
-};
-    
+using Bounds = std::vector<Bound>;
+using BoundsMap = std::map<uint32_t, Bounds>;
+
+// A chain of points from a local minimum to a local maximum. `winding` indicates
+//  the direction of the original geometry.
 struct Bound {
-    PointList points;
-    size_t currentPointIndex = 0;
+    std::vector<Point<double>> points;
+    size_t currentPoint = 0;
     bool winding = false;
+
     Bound() = default;
     Bound(const Bound& rhs) {
         points = rhs.points;
-        currentPointIndex = rhs.currentPointIndex;
+        currentPoint = rhs.currentPoint;
         winding = rhs.winding;
     }
+    Bound& operator=(Bound&& rhs) {
+        points = std::move(rhs.points);
+        currentPoint = rhs.currentPoint;
+        winding = rhs.winding;
+        return *this;
+    }
 
+    // Compute the interpolated x coordinate at y for the current edge
     double interpolate(uint32_t y) {
-        const auto& p0 = points[currentPointIndex];
-        const auto& p1 = points[currentPointIndex + 1];
+        const auto& p0 = points[currentPoint];
+        const auto& p1 = points[currentPoint + 1];
 
         const auto dx = p1.x - p0.x;
         const auto dy = p1.y - p0.y;
@@ -56,25 +60,31 @@ struct Bound {
     }
 };
 
-using ScanLine = const std::function<void(int32_t x0, int32_t x1, int32_t y)>;
-
 class TileCover::Impl {
-
 public:
     Impl(int32_t z, const Geometry<double>& geom, bool project = true);
     ~Impl() = default;
-    bool scanRow(ScanLine& );
-    bool next();
-    void reset();
-private:
-    bool isClosed;
-    uint32_t currentRow;
-    BoundList activeEdgeTable;
-    EdgeTable edgeTable;
-    EdgeTable::iterator currentEdgeTable;
-    const uint32_t maxY;
-};
 
+    optional<UnwrappedTileID> next();
+    bool hasNext() const;
+
+private:
+    using TileSpans = std::queue<std::pair<int32_t, int32_t>>;
+
+    void nextRow();
+
+    const int32_t zoom;
+    bool isClosed;
+
+    BoundsMap boundsMap;
+    BoundsMap::iterator currentBounds;
+    // List of bounds that begin at or before `tileY`
+    Bounds activeBounds;
+
+    TileSpans tileXSpans;
+    uint32_t tileY;
+    int32_t tileX;
+};
 
 } // namespace util
 } // namespace mbgl
