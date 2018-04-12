@@ -295,7 +295,7 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     }
     if ([op isEqualToString:@"all"]) {
         NSArray *jsonObjects = [objects subarrayWithRange:NSMakeRange(1, objects.count - 1)];
-        NSArray *subpredicates = MGLSubpredicatesWithJSONObjects(jsonObjects);
+        NSArray<NSPredicate *> *subpredicates = MGLSubpredicatesWithJSONObjects(jsonObjects);
         if (jsonObjects.count == 2) {
             // Determine if the expression is of BETWEEN type
             if ([jsonObjects[0] isKindOfClass:[NSArray class]] &&
@@ -304,26 +304,28 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
                 NSArray *rightCondition = jsonObjects[1];
                 NSString *leftOperator = leftCondition.firstObject;
                 NSString *rightOperator = rightCondition.firstObject;
+                
                 NSArray *limits;
                 NSExpression *leftConditionExpression;
+                
                 if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@"<="]) {
-                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]];
-                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[1]];
+                    limits = @[((NSComparisonPredicate *)subpredicates[0]).rightExpression, ((NSComparisonPredicate *)subpredicates[1]).rightExpression];
+                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).leftExpression;
                 
                 } else if ([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@"<="]) {
-                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]];
-                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[2]];
+                    limits = @[((NSComparisonPredicate *)subpredicates[0]).leftExpression, ((NSComparisonPredicate *)subpredicates[1]).rightExpression];
+                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).rightExpression;
                 
                 } else if([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@">="]) {
-                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]];
-                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[2]];
+                    limits = @[((NSComparisonPredicate *)subpredicates[0]).leftExpression, ((NSComparisonPredicate *)subpredicates[1]).leftExpression];
+                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).rightExpression;
                 
                 } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@">="]) {
-                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]];
-                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[1]];
+                    limits = @[((NSComparisonPredicate *)subpredicates[0]).rightExpression, ((NSComparisonPredicate *)subpredicates[1]).leftExpression];
+                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).leftExpression;
                 }
                 
-                if (limits && limits) {
+                if (limits && leftConditionExpression) {
                      return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", leftConditionExpression, [NSExpression expressionForAggregate:limits]];
                 }
             }

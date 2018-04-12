@@ -323,21 +323,35 @@
             NSArray *limits = self.rightExpression.constantValue;
             NSPredicate *leftHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:limits[0]
                                                                                 rightExpression:self.leftExpression
-                                                                                       modifier:NSAllPredicateModifier
+                                                                                       modifier:NSDirectPredicateModifier
                                                                                            type:NSLessThanOrEqualToPredicateOperatorType
                                                                                         options:0];
             NSPredicate *rightHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.leftExpression
                                                                                  rightExpression:limits[1]
-                                                                                        modifier:NSAllPredicateModifier
+                                                                                        modifier:NSDirectPredicateModifier
                                                                                             type:NSLessThanOrEqualToPredicateOperatorType
                                                                                          options:0];
             return @[op, leftHandPredicate.mgl_jsonExpressionObject, rightHandPredicate.mgl_jsonExpressionObject];
         }
         case NSInPredicateOperatorType: {
-            return [self mgl_jsonMatchObjectWithExpression:self.leftExpression options:self.rightExpression];
+            NSMutableArray *elements = [NSMutableArray arrayWithObjects:@"match", self.leftExpression.mgl_jsonExpressionObject, nil];
+            NSArray *optionsExpressions = self.rightExpression.constantValue;
+            NSEnumerator *optionsEnumerator = optionsExpressions.objectEnumerator;
+            while (id object = optionsEnumerator.nextObject) {
+                id option = ((NSExpression *)object).mgl_jsonExpressionObject;
+                [elements addObject:option];
+                [elements addObject:@YES];
+            }
+            [elements addObject:@NO];
+            return elements;
         }
         case NSContainsPredicateOperatorType: {
-            return [self mgl_jsonMatchObjectWithExpression:self.rightExpression options:self.leftExpression];
+            NSPredicate *inPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.rightExpression
+                                                                          rightExpression:self.leftExpression
+                                                                                 modifier:self.comparisonPredicateModifier
+                                                                                     type:NSInPredicateOperatorType
+                                                                                  options:self.options];
+            return inPredicate.mgl_jsonExpressionObject;
         }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
@@ -351,20 +365,6 @@
         return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
     }
     return nil;
-}
-
-- (id)mgl_jsonMatchObjectWithExpression:(NSExpression *)operand options:(NSExpression *)options {
-    NSMutableArray *elements = [NSMutableArray arrayWithObjects:@"match", operand.mgl_jsonExpressionObject, nil];
-    NSArray *optionsExpressions = options.constantValue;
-    NSEnumerator *optionsEnumerator = optionsExpressions.objectEnumerator;
-    while (id object = optionsEnumerator.nextObject) {
-        id option = ((NSExpression *)object).mgl_jsonExpressionObject;
-        [elements addObject:option];
-        [elements addObject:[NSExpression expressionForConstantValue:@YES].mgl_jsonExpressionObject];
-    }
-    [elements addObject:[NSExpression expressionForConstantValue:@NO].mgl_jsonExpressionObject];
-    
-    return elements;
 }
 
 @end
