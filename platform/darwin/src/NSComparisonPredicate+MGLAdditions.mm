@@ -318,14 +318,45 @@
         case NSNotEqualToPredicateOperatorType:
             op = @"!=";
             break;
+        case NSBetweenPredicateOperatorType: {
+            op = @"all";
+            NSArray *limits = self.rightExpression.constantValue;
+            NSPredicate *leftHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:limits[0]
+                                                                                rightExpression:self.leftExpression
+                                                                                       modifier:NSDirectPredicateModifier
+                                                                                           type:NSLessThanOrEqualToPredicateOperatorType
+                                                                                        options:0];
+            NSPredicate *rightHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.leftExpression
+                                                                                 rightExpression:limits[1]
+                                                                                        modifier:NSDirectPredicateModifier
+                                                                                            type:NSLessThanOrEqualToPredicateOperatorType
+                                                                                         options:0];
+            return @[op, leftHandPredicate.mgl_jsonExpressionObject, rightHandPredicate.mgl_jsonExpressionObject];
+        }
+        case NSInPredicateOperatorType: {
+            NSMutableArray *elements = [NSMutableArray arrayWithObjects:@"match", self.leftExpression.mgl_jsonExpressionObject, nil];
+            NSArray *optionsExpressions = self.rightExpression.constantValue;
+            for (id object in optionsExpressions) {
+                id option = ((NSExpression *)object).mgl_jsonExpressionObject;
+                [elements addObject:option];
+                [elements addObject:@YES];
+            }
+            [elements addObject:@NO];
+            return elements;
+        }
+        case NSContainsPredicateOperatorType: {
+            NSPredicate *inPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.rightExpression
+                                                                          rightExpression:self.leftExpression
+                                                                                 modifier:self.comparisonPredicateModifier
+                                                                                     type:NSInPredicateOperatorType
+                                                                                  options:self.options];
+            return inPredicate.mgl_jsonExpressionObject;
+        }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
         case NSBeginsWithPredicateOperatorType:
         case NSEndsWithPredicateOperatorType:
-        case NSInPredicateOperatorType:
         case NSCustomSelectorPredicateOperatorType:
-        case NSContainsPredicateOperatorType:
-        case NSBetweenPredicateOperatorType:
             [NSException raise:NSInvalidArgumentException
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
