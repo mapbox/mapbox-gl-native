@@ -410,7 +410,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion/coordinate.hpp
     include/mbgl/style/conversion/custom_geometry_source_options.hpp
     include/mbgl/style/conversion/data_driven_property_value.hpp
-    include/mbgl/style/conversion/expression.hpp
     include/mbgl/style/conversion/filter.hpp
     include/mbgl/style/conversion/function.hpp
     include/mbgl/style/conversion/geojson.hpp
