@@ -4,6 +4,8 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.0.0
 
+The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iOS deployment version will increase to iOS 9.0 in a future release.
+
 ### Packaging
 
 * Removed support for 32-bit simulators. ([#10962](https://github.com/mapbox/mapbox-gl-native/pull/10962))
