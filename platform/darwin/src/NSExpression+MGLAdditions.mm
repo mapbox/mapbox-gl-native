@@ -1167,6 +1167,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
                 [constantValue containsString:@"{"] && [constantValue containsString:@"}"]) {
                 NSMutableArray *components = [NSMutableArray array];
                 NSScanner *scanner = [NSScanner scannerWithString:constantValue];
+                scanner.charactersToBeSkipped = nil;
                 while (!scanner.isAtEnd) {
                     NSString *string;
                     if ([scanner scanUpToString:@"{" intoString:&string]) {
