@@ -617,40 +617,30 @@ namespace mbgl {
         NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSString *mglMatch = @"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
-        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO) == YES"];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
     {
         NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO]];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT x IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"NOT MGL_MATCH(x, 6, YES, 5, YES, 4, YES, 3, YES, NO) == YES"];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
     {
         NSArray *expected = @[@"match", @[@"get", @"x"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS x"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSString *mglMatch = @"MGL_MATCH(x, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
-        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(x, 6, YES, 5, YES, 4, YES, 3, YES, NO) == YES"];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
     {
         NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $mgl_featureIdentifier"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSString *mglMatch = @"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
-        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO) == YES"];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
-}
-
-- (NSPredicate *)matchPredicateWithFormat:(NSString *)format {
-    NSPredicate *predicate = [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionWithFormat:format]
-                                                                rightExpression:[NSExpression expressionForConstantValue:@YES]
-                                                                       modifier:NSDirectPredicateModifier
-                                                                           type:NSNotEqualToPredicateOperatorType
-                                                                        options:0];
-    return predicate;
 }
 
 @end

@@ -294,35 +294,36 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSPredicate predicateWithValue:YES];
     }
     if ([op isEqualToString:@"all"]) {
-        NSArray *jsonObjects = [objects subarrayWithRange:NSMakeRange(1, objects.count - 1)];
-        NSArray<NSPredicate *> *subpredicates = MGLSubpredicatesWithJSONObjects(jsonObjects);
-        if (jsonObjects.count == 2) {
+        NSArray<NSPredicate *> *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        if (subpredicates.count == 2) {
             // Determine if the expression is of BETWEEN type
-            if ([jsonObjects[0] isKindOfClass:[NSArray class]] &&
-                [jsonObjects[1] isKindOfClass:[NSArray class]]) {
-                NSArray *leftCondition = jsonObjects[0];
-                NSArray *rightCondition = jsonObjects[1];
-                NSString *leftOperator = leftCondition.firstObject;
-                NSString *rightOperator = rightCondition.firstObject;
+            if ([subpredicates[0] isKindOfClass:[NSComparisonPredicate class]] &&
+                [subpredicates[1] isKindOfClass:[NSComparisonPredicate class]]) {
+                NSComparisonPredicate *leftCondition = (NSComparisonPredicate *)subpredicates[0];
+                NSComparisonPredicate *rightCondition = (NSComparisonPredicate *)subpredicates[1];
                 
                 NSArray *limits;
                 NSExpression *leftConditionExpression;
                 
-                if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@"<="]) {
-                    limits = @[((NSComparisonPredicate *)subpredicates[0]).rightExpression, ((NSComparisonPredicate *)subpredicates[1]).rightExpression];
-                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).leftExpression;
+                if(leftCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType &&
+                   rightCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.rightExpression, rightCondition.rightExpression];
+                    leftConditionExpression = leftCondition.leftExpression;
+                    
+                } else if (leftCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType &&
+                           rightCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.leftExpression, rightCondition.rightExpression];
+                    leftConditionExpression = leftCondition.rightExpression;
                 
-                } else if ([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@"<="]) {
-                    limits = @[((NSComparisonPredicate *)subpredicates[0]).leftExpression, ((NSComparisonPredicate *)subpredicates[1]).rightExpression];
-                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).rightExpression;
+                } else if(leftCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType &&
+                          rightCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.leftExpression, rightCondition.leftExpression];
+                    leftConditionExpression = leftCondition.rightExpression;
                 
-                } else if([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@">="]) {
-                    limits = @[((NSComparisonPredicate *)subpredicates[0]).leftExpression, ((NSComparisonPredicate *)subpredicates[1]).leftExpression];
-                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).rightExpression;
-                
-                } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@">="]) {
-                    limits = @[((NSComparisonPredicate *)subpredicates[0]).rightExpression, ((NSComparisonPredicate *)subpredicates[1]).leftExpression];
-                    leftConditionExpression = ((NSComparisonPredicate *)subpredicates[0]).leftExpression;
+                } else if(leftCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType &&
+                          rightCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.rightExpression, rightCondition.leftExpression];
+                    leftConditionExpression = leftCondition.leftExpression;
                 }
                 
                 if (limits && leftConditionExpression) {
@@ -336,17 +337,14 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
         return [NSCompoundPredicate orPredicateWithSubpredicates:subpredicates];
     }
-    if ([op isEqualToString:@"match"]) {
-        NSExpression *expression = [NSExpression mgl_expressionWithJSONObject:object];
-        return [NSComparisonPredicate predicateWithLeftExpression:expression
-                                                  rightExpression:[NSExpression expressionForConstantValue:@YES]
-                                                         modifier:NSDirectPredicateModifier
-                                                             type:NSNotEqualToPredicateOperatorType
-                                                          options:0];
-    }
     
-    NSAssert(NO, @"Unrecognized expression conditional operator %@.", op);
-    return nil;
+    NSExpression *expression = [NSExpression expressionWithMGLJSONObject:object];
+    return [NSComparisonPredicate predicateWithLeftExpression:expression
+                                              rightExpression:[NSExpression expressionForConstantValue:@YES]
+                                                     modifier:NSDirectPredicateModifier
+                                                         type:NSEqualToPredicateOperatorType
+                                                      options:0];
+
 }
 
 - (id)mgl_jsonExpressionObject {

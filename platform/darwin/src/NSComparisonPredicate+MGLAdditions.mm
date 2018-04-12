@@ -336,8 +336,7 @@
         case NSInPredicateOperatorType: {
             NSMutableArray *elements = [NSMutableArray arrayWithObjects:@"match", self.leftExpression.mgl_jsonExpressionObject, nil];
             NSArray *optionsExpressions = self.rightExpression.constantValue;
-            NSEnumerator *optionsEnumerator = optionsExpressions.objectEnumerator;
-            while (id object = optionsEnumerator.nextObject) {
+            for (id object in optionsExpressions) {
                 id option = ((NSExpression *)object).mgl_jsonExpressionObject;
                 [elements addObject:option];
                 [elements addObject:@YES];
