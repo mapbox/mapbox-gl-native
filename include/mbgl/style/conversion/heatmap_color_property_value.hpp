@@ -21,7 +21,7 @@ struct Converter<HeatmapColorPropertyValue> {
         if (isUndefined(value)) {
             return HeatmapColorPropertyValue();
         } else if (isExpression(value)) {
-            ParsingContext ctx({type::Color});
+            ParsingContext ctx(optional<type::Type>{type::Color});
             ParseResult expression = ctx.parseLayerPropertyExpression(value);
             if (!expression) {
                 error = { ctx.getCombinedErrors() };

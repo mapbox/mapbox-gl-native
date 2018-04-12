@@ -236,7 +236,7 @@ optional<Filter> convertCompoundFilter(const Convertible& value, Error& error) {
 }
     
 optional<Filter> convertExpressionFilter(const Convertible& value, Error& error) {
-    expression::ParsingContext ctx({expression::type::Boolean});
+    expression::ParsingContext ctx(optional<expression::type::Type>{expression::type::Boolean});
     expression::ParseResult expression = ctx.parseExpression(value);
     if (!expression) {
         error = { ctx.getCombinedErrors() };
