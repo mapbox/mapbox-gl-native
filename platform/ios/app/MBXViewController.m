@@ -967,9 +967,14 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                       @10.0f: [UIColor redColor],
                                       @12.0f: [UIColor greenColor],
                                       @14.0f: [UIColor blueColor]};
+    NSExpression *fillColorExpression = [NSExpression mgl_expressionForInterpolateFunction:NSExpression.mgl_zoomLevelVariableExpression
+                                                                                 curveType:MGLExpressionInterpolationModeLinear
+                                                                                parameters:nil
+                                                                                     steps:[NSExpression expressionForConstantValue:waterColorStops]];
     waterLayer.fillColor = [NSExpression expressionWithFormat:
                             @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
                             waterColorStops];
+    waterLayer.fillColor = fillColorExpression;
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
                                            @12: @NO,
@@ -1467,10 +1472,16 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
     // source, categorical function that sets any feature with a "fill" attribute value of true to red color and anything without to green
     MGLFillStyleLayer *fillStyleLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fill-layer" source:shapeSource];
-    fillStyleLayer.fillColor = [NSExpression expressionWithFormat:@"TERNARY(fill == YES, %@, %@)", [UIColor greenColor], [UIColor redColor]];
+    fillStyleLayer.fillColor = [NSExpression mgl_expressionForConditional:[NSPredicate predicateWithFormat:@"fill == YES"]
+                                                           trueExpression:[NSExpression expressionForConstantValue:[UIColor greenColor]]
+                                                         falseExpresssion:[NSExpression expressionForConstantValue:[UIColor redColor]]];
+                                                               
+    
 
     // source, identity function that sets any feature with an "opacity" attribute to use that value and anything without to 1.0
-    fillStyleLayer.fillOpacity = [NSExpression expressionWithFormat:@"TERNARY(opacity != nil, opacity, 1.0)"];
+    fillStyleLayer.fillOpacity = [NSExpression mgl_expressionForConditional:[NSPredicate predicateWithFormat:@"opacity != nil"]
+                                                             trueExpression:[NSExpression expressionForKeyPath:@"opacity"] 
+                                                           falseExpresssion:[NSExpression expressionForConstantValue:@1.0]];
     [self.mapView.style addLayer:fillStyleLayer];
 }
 
