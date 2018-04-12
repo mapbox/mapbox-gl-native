@@ -47,7 +47,7 @@ extern MGL_EXPORT const MGLTileSourceOption MGLTileSourceOptionTileSize;
      .maximumZoomLevel: 16,
      .tileSize: 512,
      .attributionInfos: [
-         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
      ]
  ])
  mapView.style?.addSource(source)

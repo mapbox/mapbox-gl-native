@@ -47,6 +47,7 @@
 * The `-[MGLMapView convertRect:toCoordinateBoundsFromView:]` method and the `MGLMapView.visibleCoordinateBounds` property’s getter now indicate that the coordinate bounds straddles the antimeridian by extending one side beyond ±180 degrees longitude. ([#11265](https://github.com/mapbox/mapbox-gl-native/pull/11265))
 * Feature querying results now account for the `MGLSymbolStyleLayer.circleStrokeWidth` property. ([#10897](https://github.com/mapbox/mapbox-gl-native/pull/10897))
 * Removed methods, properties, and constants that had been deprecated as of v0.6.1. ([#11205](https://github.com/mapbox/mapbox-gl-native/pull/11205))
+* Refined certain Swift interfaces by converting them from class methods to class properties. ([#11674](https://github.com/mapbox/mapbox-gl-native/pull/11674))
 
 ## v0.6.1 - January 16, 2018
 

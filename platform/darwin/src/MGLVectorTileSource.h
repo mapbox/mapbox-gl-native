@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
      .minimumZoomLevel: 9,
      .maximumZoomLevel: 16,
      .attributionInfos: [
-         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+         MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
      ]
  ])
  mapView.style?.addSource(source)

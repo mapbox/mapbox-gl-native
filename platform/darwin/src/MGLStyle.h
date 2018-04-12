@@ -68,7 +68,7 @@ MGL_EXPORT
     `-streetsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)streetsStyleURL;
+@property (class, nonatomic, readonly) NSURL *streetsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -98,7 +98,7 @@ MGL_EXPORT
     `-outdoorsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)outdoorsStyleURL;
+@property (class, nonatomic, readonly) NSURL *outdoorsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -122,7 +122,7 @@ MGL_EXPORT
     `-lightStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)lightStyleURL;
+@property (class, nonatomic, readonly) NSURL *lightStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -147,7 +147,7 @@ MGL_EXPORT
     `-darkStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)darkStyleURL;
+@property (class, nonatomic, readonly) NSURL *darkStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -172,7 +172,7 @@ MGL_EXPORT
     `-satelliteStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)satelliteStyleURL;
+@property (class, nonatomic, readonly) NSURL *satelliteStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -203,7 +203,7 @@ MGL_EXPORT
     `-satelliteStreetsStyleURLWithVersion:` method instead. Such details may
     change significantly from version to version.
  */
-+ (NSURL *)satelliteStreetsStyleURL;
+@property (class, nonatomic, readonly) NSURL *satelliteStreetsStyleURL;
 
 /**
  Returns the URL to the given version of the

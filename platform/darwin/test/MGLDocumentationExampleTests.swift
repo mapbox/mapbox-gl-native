@@ -80,7 +80,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             .maximumZoomLevel: 16,
             .tileSize: 512,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -115,7 +115,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             .minimumZoomLevel: 9,
             .maximumZoomLevel: 16,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -280,7 +280,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             .maximumZoomLevel: 16,
             .tileSize: 512,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -300,7 +300,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
             .maximumZoomLevel: 16,
             .tileSize: 256,
             .attributionInfos: [
-                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "http://mapbox.com"))
+                MGLAttributionInfo(title: NSAttributedString(string: "© Mapbox"), url: URL(string: "https://mapbox.com"))
             ]
         ])
         mapView.style?.addSource(source)
@@ -370,7 +370,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         #endif
         
         class MGLStyle {
-            static func satelliteStreetsStyleURL() -> URL {
+            static var satelliteStreetsStyleURL: URL {
                 return MGLDocumentationExampleTests.styleURL
             }
         }
@@ -378,7 +378,7 @@ class MGLDocumentationExampleTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let camera = MGLMapCamera(lookingAtCenter: CLLocationCoordinate2D(latitude: 37.7184, longitude: -122.4365), fromDistance: 100, pitch: 20, heading: 0)
 
-        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL(), camera: camera, size: CGSize(width: 320, height: 480))
+        let options = MGLMapSnapshotOptions(styleURL: MGLStyle.satelliteStreetsStyleURL, camera: camera, size: CGSize(width: 320, height: 480))
         options.zoomLevel = 10
 
         let snapshotter = MGLMapSnapshotter(options: options)

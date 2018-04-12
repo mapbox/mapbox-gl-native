@@ -170,7 +170,7 @@ MGL_EXPORT
 /**
  Returns the shared offline storage object.
  */
-+ (instancetype)sharedOfflineStorage;
+@property (class, nonatomic, readonly) MGLOfflineStorage *sharedOfflineStorage;
 
 #pragma mark - Accessing the Delegate
 
