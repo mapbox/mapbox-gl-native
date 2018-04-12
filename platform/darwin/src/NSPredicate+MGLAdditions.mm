@@ -304,12 +304,27 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
                 NSArray *rightCondition = jsonObjects[1];
                 NSString *leftOperator = leftCondition.firstObject;
                 NSString *rightOperator = rightCondition.firstObject;
-                if ([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@"<="]) {
-                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[2]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]]];
-                } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@"<="]) {
-                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[1]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]]];
+                NSArray *limits;
+                NSExpression *leftConditionExpression;
+                if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@"<="]) {
+                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]];
+                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[1]];
+                
+                } else if ([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@"<="]) {
+                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[2]]];
+                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[2]];
+                
+                } else if([leftOperator isEqualToString:@"<="] && [rightOperator isEqualToString:@">="]) {
+                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[1]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]];
+                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[2]];
+                
                 } else if([leftOperator isEqualToString:@">="] && [rightOperator isEqualToString:@">="]) {
-                    return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", [NSExpression mgl_expressionWithJSONObject:leftCondition[1]], @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]]];
+                    limits = @[[NSExpression mgl_expressionWithJSONObject:leftCondition[2]], [NSExpression mgl_expressionWithJSONObject:rightCondition[1]]];
+                    leftConditionExpression = [NSExpression mgl_expressionWithJSONObject:leftCondition[1]];
+                }
+                
+                if (limits && limits) {
+                     return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", leftConditionExpression, [NSExpression expressionForAggregate:limits]];
                 }
             }
         }
@@ -320,12 +335,12 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSCompoundPredicate orPredicateWithSubpredicates:subpredicates];
     }
     if ([op isEqualToString:@"match"]) {
-        NSArray *subpredicates = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
-        return [NSPredicate predicateWithFormat:@"%@ IN %@" argumentArray:subpredicates];
-    }
-    if ([op isEqualToString:@"has"]) {
-        NSArray *subpredicates = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
-        return [NSPredicate predicateWithFormat:@"%@ CONTAINS %@" argumentArray:subpredicates];
+        NSExpression *expression = [NSExpression mgl_expressionWithJSONObject:object];
+        return [NSComparisonPredicate predicateWithLeftExpression:expression
+                                                  rightExpression:[NSExpression expressionForConstantValue:@YES]
+                                                         modifier:NSDirectPredicateModifier
+                                                             type:NSNotEqualToPredicateOperatorType
+                                                          options:0];
     }
     
     NSAssert(NO, @"Unrecognized expression conditional operator %@.", op);

@@ -320,25 +320,25 @@
             break;
         case NSBetweenPredicateOperatorType: {
             op = @"all";
-            NSArray *arguments = self.rightExpression.constantValue;
-            NSPredicate *leftHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:arguments[0]
+            NSArray *limits = self.rightExpression.constantValue;
+            NSPredicate *leftHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:limits[0]
                                                                                 rightExpression:self.leftExpression
                                                                                        modifier:NSAllPredicateModifier
                                                                                            type:NSLessThanOrEqualToPredicateOperatorType
                                                                                         options:0];
             NSPredicate *rightHandPredicate = [NSComparisonPredicate predicateWithLeftExpression:self.leftExpression
-                                                                                 rightExpression:arguments[1]
+                                                                                 rightExpression:limits[1]
                                                                                         modifier:NSAllPredicateModifier
                                                                                             type:NSLessThanOrEqualToPredicateOperatorType
                                                                                          options:0];
             return @[op, leftHandPredicate.mgl_jsonExpressionObject, rightHandPredicate.mgl_jsonExpressionObject];
         }
-        case NSInPredicateOperatorType:
-            op = @"match";
-            break;
-        case NSContainsPredicateOperatorType:
-            op = @"has";
-            break;
+        case NSInPredicateOperatorType: {
+            return [self mgl_jsonMatchObjectWithExpression:self.leftExpression options:self.rightExpression];
+        }
+        case NSContainsPredicateOperatorType: {
+            return [self mgl_jsonMatchObjectWithExpression:self.rightExpression options:self.leftExpression];
+        }
         case NSMatchesPredicateOperatorType:
         case NSLikePredicateOperatorType:
         case NSBeginsWithPredicateOperatorType:
@@ -351,6 +351,20 @@
         return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
     }
     return nil;
+}
+
+- (id)mgl_jsonMatchObjectWithExpression:(NSExpression *)operand options:(NSExpression *)options {
+    NSMutableArray *elements = [NSMutableArray arrayWithObjects:@"match", operand.mgl_jsonExpressionObject, nil];
+    NSArray *optionsExpressions = options.constantValue;
+    NSEnumerator *optionsEnumerator = optionsExpressions.objectEnumerator;
+    while (id object = optionsEnumerator.nextObject) {
+        id option = ((NSExpression *)object).mgl_jsonExpressionObject;
+        [elements addObject:option];
+        [elements addObject:[NSExpression expressionForConstantValue:@YES].mgl_jsonExpressionObject];
+    }
+    [elements addObject:[NSExpression expressionForConstantValue:@NO].mgl_jsonExpressionObject];
+    
+    return elements;
 }
 
 @end

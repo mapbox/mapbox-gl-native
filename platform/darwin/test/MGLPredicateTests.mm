@@ -578,18 +578,33 @@ namespace mbgl {
     }
     {
         NSArray *expected = @[@"all", @[@"<=", @10, @[@"get", @"x"]], @[@"<=", @[@"get", @"x"], @100]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN {10, 100}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
     {
         NSArray *expected = @[@"all", @[@">=",  @[@"get", @"x"], @10], @[@"<=", @[@"get", @"x"], @100]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"all", @[@"<=", @10, @[@"get", @"x"]], @[@"<=", @[@"get", @"x"], @100]];
+        NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
+        XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+    }
+    {
+        NSArray *expected = @[@"all", @[@"<=", @10, @[@"get", @"x"]], @[@">=", @100, @[@"get", @"x"]]];
+        NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
     {
         NSArray *expected = @[@"all", @[@">=",  @[@"get", @"x"], @10], @[@">=", @100, @[@"get", @"x"]]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", @[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
     {
@@ -599,29 +614,43 @@ namespace mbgl {
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
     {
-        NSArray *expected = @[@"match", @[@"id"], @[@"literal", @[@6, @5, @4, @3]]];
+        NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+        NSString *mglMatch = @"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
+        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
     {
-        NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @[@"literal", @[@6, @5, @4, @3]]]];
+        NSArray *expected = @[@"!", @[@"match", @[@"get", @"x"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO]];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"NOT x IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
     }
     {
-        NSArray *expected = @[@"has", @[@"literal", @[@6, @5, @4, @3]], @[@"get", @"x"]];
+        NSArray *expected = @[@"match", @[@"get", @"x"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS x"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+        NSString *mglMatch = @"MGL_MATCH(x, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
+        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
     {
-        NSArray *expected = @[@"has", @[@"literal", @[@6, @5, @4, @3]], @[@"id"]];
+        NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
         NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $mgl_featureIdentifier"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
+        NSString *mglMatch = @"MGL_MATCH($mgl_featureIdentifier, 6, YES, 5, YES, 4, YES, 3, YES, NO)";
+        NSPredicate *predicateAfter = [self matchPredicateWithFormat:mglMatch];
+        XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicateAfter);
     }
+}
+
+- (NSPredicate *)matchPredicateWithFormat:(NSString *)format {
+    NSPredicate *predicate = [NSComparisonPredicate predicateWithLeftExpression:[NSExpression expressionWithFormat:format]
+                                                                rightExpression:[NSExpression expressionForConstantValue:@YES]
+                                                                       modifier:NSDirectPredicateModifier
+                                                                           type:NSNotEqualToPredicateOperatorType
+                                                                        options:0];
+    return predicate;
 }
 
 @end
