@@ -47,9 +47,8 @@ NS_ASSUME_NONNULL_BEGIN
 /**
  Returns a copy of the receiver localized into the given locale.
  
- This method assumes the receiver is used with a style layer property such as
- `MGLStyleLayer.text` and refers to the feature attributes that are available in
- vector tiles supplied by the
+ This method assumes the receiver refers to the feature attributes that are
+ available in vector tiles supplied by the
  <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
  On iOS, the user can set the system’s preferred language in Settings, General
  Settings, Language & Region. On macOS, the user can set the system’s preferred
@@ -58,10 +57,8 @@ NS_ASSUME_NONNULL_BEGIN
  @param locale The locale into which labels should be localized. To use the
     system’s preferred language, if supported, specify `nil`. To use the local
     language, specify a locale with the identifier `mul`.
- @param replacesTokens `YES` to localize `{token}` syntax in constant value
-    subexpressions; `NO` otherwise.
  */
-- (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale replacingTokens:(BOOL)replacesTokens;
+- (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale;
 
 @end
 

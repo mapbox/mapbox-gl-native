@@ -136,7 +136,12 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefault<%- camelize(originalPropertyName(property)) %>();
     }
+<% if (property.tokenized) { -%>
+    NSExpression *expression = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
+    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+<% } else { -%>
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
+<% } -%>
 }
 
 <% if (property.original) { -%>

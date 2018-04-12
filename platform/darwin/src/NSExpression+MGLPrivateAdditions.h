@@ -72,7 +72,13 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface NSExpression (MGLExpressionAdditions)
 
+/**
+ Returns a copy of the receiver with tokens replaced by key path expressions.
+ */
+- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths;
+
 - (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context;
+
 
 - (id)mgl_has:(id)element;
 

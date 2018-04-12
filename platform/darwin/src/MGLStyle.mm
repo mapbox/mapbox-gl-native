@@ -597,7 +597,7 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         }
         
         NSExpression *text = layer.text;
-        NSExpression *localizedText = [layer.text mgl_expressionLocalizedIntoLocale:locale replacingTokens:YES];
+        NSExpression *localizedText = [text mgl_expressionLocalizedIntoLocale:locale];
         if (![localizedText isEqual:text]) {
             layer.text = localizedText;
         }
