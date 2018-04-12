@@ -478,13 +478,13 @@ static NSDictionary<NSString *, NSString *> *MGLExpressionOperatorsByFunctionNam
 NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     NSMutableArray *subexpressions = [NSMutableArray arrayWithCapacity:objects.count];
     for (id object in objects) {
-        NSExpression *expression = [NSExpression mgl_expressionWithJSONObject:object];
+        NSExpression *expression = [NSExpression expressionWithMGLJSONObject:object];
         [subexpressions addObject:expression];
     }
     return subexpressions;
 }
 
-+ (instancetype)mgl_expressionWithJSONObject:(id)object {
++ (instancetype)expressionWithMGLJSONObject:(id)object {
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         MGLFunctionNamesByExpressionOperator = @{
@@ -521,7 +521,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     if ([object isKindOfClass:[NSDictionary class]]) {
         NSMutableDictionary *dictionary = [NSMutableDictionary dictionaryWithCapacity:[object count]];
         [object enumerateKeysAndObjectsUsingBlock:^(id _Nonnull key, id _Nonnull obj, BOOL * _Nonnull stop) {
-            dictionary[key] = [NSExpression mgl_expressionWithJSONObject:obj];
+            dictionary[key] = [NSExpression expressionWithMGLJSONObject:obj];
         }];
         return [NSExpression expressionForConstantValue:dictionary];
     }
@@ -550,12 +550,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([argumentObjects.firstObject isKindOfClass:[NSArray class]]) {
                 return [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects.firstObject)];
             }
-            return [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            return [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"to-boolean"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
         } else if ([op isEqualToString:@"to-number"] || [op isEqualToString:@"number"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             if (argumentObjects.count == 1) {
                 return [NSExpression expressionWithFormat:@"CAST(%@, 'NSNumber')", operand];
             }
@@ -563,15 +563,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             return [NSExpression expressionForFunction:operand selectorName:@"mgl_numberWithFallbackValues:" arguments:subexpressions];
         } else if ([op isEqualToString:@"to-string"]) {
-            NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
-                NSExpression *operand = [NSExpression mgl_expressionWithJSONObject:argumentObjects.lastObject];
+                NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.lastObject];
                 if ([argumentObjects.firstObject isKindOfClass:[NSString class]]) {
                     return [NSExpression expressionWithFormat:@"%@.%K", operand, argumentObjects.firstObject];
                 }
-                NSExpression *key = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+                NSExpression *key = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
                 return [NSExpression expressionWithFormat:@"%@.%@", operand, key];
             }
             return [NSExpression expressionForKeyPath:argumentObjects.firstObject];
@@ -618,32 +618,32 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"interpolate"]) {
             NSArray *interpolationOptions = argumentObjects.firstObject;
             NSString *curveType = interpolationOptions.firstObject;
-            NSExpression *curveTypeExpression = [NSExpression mgl_expressionWithJSONObject:curveType];
+            NSExpression *curveTypeExpression = [NSExpression expressionWithMGLJSONObject:curveType];
             id curveParameters;
             if ([curveType isEqual:@"exponential"]) {
                 curveParameters = interpolationOptions[1];
             } else if ([curveType isEqualToString:@"cubic-bezier"]) {
                 curveParameters = @[@"literal", [interpolationOptions subarrayWithRange:NSMakeRange(1, 4)]];
             }
-            NSExpression *curveParameterExpression = [NSExpression mgl_expressionWithJSONObject:curveParameters];
+            NSExpression *curveParameterExpression = [NSExpression expressionWithMGLJSONObject:curveParameters];
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
-            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects.firstObject];
+            NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
             NSEnumerator *stopEnumerator = stopExpressions.objectEnumerator;
             while (NSNumber *key = stopEnumerator.nextObject) {
                 NSExpression *valueExpression = stopEnumerator.nextObject;
-                stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                stops[key] = [NSExpression expressionWithMGLJSONObject:valueExpression];
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
             return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
                                              arguments:@[inputExpression, curveTypeExpression, curveParameterExpression, stopExpression]];
         } else if ([op isEqualToString:@"step"]) {
-            NSExpression *inputExpression = [NSExpression mgl_expressionWithJSONObject:argumentObjects[0]];
+            NSExpression *inputExpression = [NSExpression expressionWithMGLJSONObject:argumentObjects[0]];
             NSArray *stopExpressions = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSExpression *minimum;
             if (stopExpressions.count % 2) {
-                minimum = [NSExpression mgl_expressionWithJSONObject:stopExpressions.firstObject];
+                minimum = [NSExpression expressionWithMGLJSONObject:stopExpressions.firstObject];
                 stopExpressions = [stopExpressions subarrayWithRange:NSMakeRange(1, stopExpressions.count - 1)];
             }
             NSMutableDictionary *stops = [NSMutableDictionary dictionaryWithCapacity:stopExpressions.count / 2];
@@ -651,9 +651,9 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             while (NSNumber *key = stopEnumerator.nextObject) {
                 NSExpression *valueExpression = stopEnumerator.nextObject;
                 if (minimum) {
-                    stops[key] = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                    stops[key] = [NSExpression expressionWithMGLJSONObject:valueExpression];
                 } else {
-                    minimum = [NSExpression mgl_expressionWithJSONObject:valueExpression];
+                    minimum = [NSExpression expressionWithMGLJSONObject:valueExpression];
                 }
             }
             NSExpression *stopExpression = [NSExpression expressionForConstantValue:stops];
@@ -680,7 +680,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     NSExpression *argument = [NSExpression expressionForConstantValue:predicate];
                     [arguments addObject:argument];
                 } else {
-                    [arguments addObject:[NSExpression mgl_expressionWithJSONObject:argumentObjects[index]]];
+                    [arguments addObject:[NSExpression expressionWithMGLJSONObject:argumentObjects[index]]];
                 }
             }
             
@@ -695,7 +695,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             NSMutableArray *optionsArray = [NSMutableArray array];
             NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
             while (id object = optionsEnumerator.nextObject) {
-                NSExpression *option = [NSExpression mgl_expressionWithJSONObject:object];
+                NSExpression *option = [NSExpression expressionWithMGLJSONObject:object];
                 [optionsArray addObject:option];
             }
         
@@ -704,7 +704,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"coalesce"]) {
             NSMutableArray *expressions = [NSMutableArray array];
             for (id operand in argumentObjects) {
-                [expressions addObject:[NSExpression mgl_expressionWithJSONObject:operand]];
+                [expressions addObject:[NSExpression expressionWithMGLJSONObject:operand]];
             }
             
             return [NSExpression expressionWithFormat:@"mgl_coalesce(%@)", expressions];
