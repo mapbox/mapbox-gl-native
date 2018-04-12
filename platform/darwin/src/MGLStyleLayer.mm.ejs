@@ -136,7 +136,7 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefault<%- camelize(originalPropertyName(property)) %>();
     }
-<% if (property.tokenized) { -%>
+<% if (property.type === 'string') { -%>
     NSExpression *expression = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
     return expression.mgl_expressionByReplacingTokensWithKeyPaths;
 <% } else { -%>
@@ -179,7 +179,12 @@ namespace mbgl {
     if (propertyValue.isUndefined()) {
         propertyValue = self.rawLayer->getDefault<%- camelize(originalPropertyName(property)) %>();
     }
+<% if (property.type === 'string') { -%>
+    NSExpression *expression = MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
+    return expression.mgl_expressionByReplacingTokensWithKeyPaths;
+<% } else { -%>
     return MGLStyleValueTransformer<<%- valueTransformerArguments(property).join(', ') %>>().toExpression(propertyValue);
+<% } -%>
 }
 <% if (property["transition"]) { -%>
 

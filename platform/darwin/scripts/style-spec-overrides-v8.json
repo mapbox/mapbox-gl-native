@@ -46,12 +46,10 @@
       "doc": "Offset distance of icon from its anchor."
     },
     "icon-image": {
-      "doc": "Name of a style image to use for drawing an image background.\n\nUse the `+[MGLStyle setImage:forName:]` method to associate an image with a name that you can set this property to.\n\nWithin a constant string value, a feature attribute name enclosed in curly braces (e.g., `{token}`) is replaced with the value of the named attribute. Tokens inside non-constant expressions are ignored; instead, use `mgl_join:` and key path expressions.",
-      "tokenized": true
+      "doc": "Name of a style image to use for drawing an image background.\n\nUse the `+[MGLStyle setImage:forName:]` method to associate an image with a name that you can set this property to.\n\nWithin a constant string value, a feature attribute name enclosed in curly braces (e.g., `{token}`) is replaced with the value of the named attribute. Tokens inside non-constant expressions are ignored; instead, use `mgl_join:` and key path expressions."
     },
     "text-field": {
-      "doc": "Value to use for a text label.\n\nWithin a constant string value, a feature attribute name enclosed in curly braces (e.g., `{token}`) is replaced with the value of the named attribute. Tokens inside non-constant expressions are ignored; instead, use `mgl_join:` and key path expressions.",
-      "tokenized": true
+      "doc": "Value to use for a text label.\n\nWithin a constant string value, a feature attribute name enclosed in curly braces (e.g., `{token}`) is replaced with the value of the named attribute. Tokens inside non-constant expressions are ignored; instead, use `mgl_join:` and key path expressions."
     },
     "text-font": {
       "doc": "An array of font face names used to display the text.\n\nEach font name must be included in the `{fontstack}` portion of the JSON stylesheet’s <a href=\"https://www.mapbox.com/mapbox-gl-style-spec/#glyphs\"><code>glyphs</code></a> property. You can register a custom font when designing the style in Mapbox Studio. Fonts installed on the system are not used.\n\nThe first font named in the array is applied to the text. For each character in the text, if the first font lacks a glyph for the character, the next font is applied as a fallback, and so on."
