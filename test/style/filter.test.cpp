@@ -4,7 +4,6 @@
 #include <mbgl/test/stub_geometry_tile_feature.hpp>
 
 #include <mbgl/style/filter.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/style/conversion/json.hpp>
 #include <mbgl/style/conversion/filter.hpp>
 

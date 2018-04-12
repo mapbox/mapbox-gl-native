@@ -360,7 +360,6 @@ set(MBGL_CORE_FILES
     include/mbgl/style/conversion.hpp
     include/mbgl/style/data_driven_property_value.hpp
     include/mbgl/style/filter.hpp
-    include/mbgl/style/filter_evaluator.hpp
     include/mbgl/style/heatmap_color_property_value.hpp
     include/mbgl/style/image.hpp
     include/mbgl/style/layer.hpp
@@ -377,7 +376,6 @@ set(MBGL_CORE_FILES
     src/mbgl/style/custom_tile_loader.cpp
     src/mbgl/style/custom_tile_loader.hpp
     src/mbgl/style/filter.cpp
-    src/mbgl/style/filter_evaluator.cpp
     src/mbgl/style/image.cpp
     src/mbgl/style/image_impl.cpp
     src/mbgl/style/image_impl.hpp

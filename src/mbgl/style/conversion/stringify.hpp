@@ -126,19 +126,9 @@ void stringify(Writer& writer, const FeatureIdentifier& id) {
 }
 
 template <class Writer>
-class StringifyFilter {
-public:
-    Writer& writer;
-    
-    void operator()(const ExpressionFilter& filter) {
-        if (!filter.expression) writer.Null();
-        else stringify(writer, filter.expression->serialize());
-    }
-};
-
-template <class Writer>
-void stringify(Writer& writer, const Filter& f) {
-    Filter::visit(f, StringifyFilter<Writer> { writer });
+void stringify(Writer& writer, const Filter& filter) {
+    if (!filter.expression) writer.Null();
+    else stringify(writer, filter.expression->serialize());
 }
 
 template <class Writer>

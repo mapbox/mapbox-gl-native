@@ -119,7 +119,7 @@ optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& 
     
     if (!expression) return {};
     
-    return { ExpressionFilter { std::move(*expression) } };
+    return { Filter { std::move(*expression) } };
 }
 
     std::unique_ptr<Expression> convertComparisonOp(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {

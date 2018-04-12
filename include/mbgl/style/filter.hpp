@@ -11,28 +11,24 @@
 
 namespace mbgl {
 namespace style {
-
-class Filter;
     
-class ExpressionFilter {
+class Filter {
 public:
     std::shared_ptr<const expression::Expression> expression;
+    
+    bool operator()(const expression::EvaluationContext& context) const;
 
-    friend bool operator==(const ExpressionFilter& lhs, const ExpressionFilter& rhs) {
+    friend bool operator==(const Filter& lhs, const Filter& rhs) {
         if (!lhs.expression || !rhs.expression) {
             return ((bool) lhs.expression) == ((bool) rhs.expression);
         } else {
             return *(lhs.expression) == *(rhs.expression);
         }
     }
-};
-
-using FilterBase = variant<class ExpressionFilter>;
-
-class Filter : public FilterBase {
-public:
-    using FilterBase::FilterBase;
-    bool operator()(const expression::EvaluationContext& context) const;
+    
+    friend bool operator!=(const Filter& lhs, const Filter& rhs) {
+        return !(lhs == rhs);
+    }
 };
 
 } // namespace style
