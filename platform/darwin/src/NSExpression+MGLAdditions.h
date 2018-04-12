@@ -17,7 +17,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  The Foundation object is interpreted according to the
  [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
- See the “[Predicates and Expressions](../predicates-and-expressions.html)”
+ See the
+ “[Information for Style Authors](../for-style-authors.html#setting-attribute-values)”
  guide for a correspondence of operators and types between the style
  specification and the `NSExpression` representation used by this SDK.
  
@@ -33,7 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
  
  The Foundation object conforms to the
  [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
- See the “[Predicates and Expressions](../predicates-and-expressions.html)”
+ See the
+ “[Information for Style Authors](../for-style-authors.html#setting-attribute-values)”
  guide for a correspondence of operators and types between the style
  specification and the `NSExpression` representation used by this SDK.
  
