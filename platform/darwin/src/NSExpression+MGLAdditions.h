@@ -26,7 +26,7 @@ NS_ASSUME_NONNULL_BEGIN
  @return An initialized expression equivalent to `object`, suitable for use as
     the value of a style layer attribute.
  */
-+ (instancetype)mgl_expressionWithJSONObject:(id)object;
++ (instancetype)expressionWithMGLJSONObject:(id)object NS_SWIFT_NAME(init(mglJSONObject:));
 
 /**
  An equivalent Foundation object that can be serialized as JSON.
