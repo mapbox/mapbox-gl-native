@@ -14,7 +14,7 @@
   "license": "BSD-2-Clause",
   "dependencies": {
     "nan": "~2.8",
-    "node-pre-gyp": "^0.6.37",
+    "node-pre-gyp": "^0.6.39",
     "npm-run-all": "^4.0.2"
   },
   "devDependencies": {
