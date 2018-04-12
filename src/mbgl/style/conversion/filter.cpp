@@ -2,7 +2,7 @@
 #include <mbgl/util/geometry.hpp>
 #include <mbgl/style/expression/expression.hpp>
 #include <mbgl/style/expression/type.hpp>
-#include <mbgl/style/conversion/expression.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 
 namespace mbgl {
 namespace style {
@@ -236,10 +236,13 @@ optional<Filter> convertCompoundFilter(const Convertible& value, Error& error) {
 }
     
 optional<Filter> convertExpressionFilter(const Convertible& value, Error& error) {
-    optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(value, error, expression::type::Boolean);
+    expression::ParsingContext ctx({expression::type::Boolean});
+    expression::ParseResult expression = ctx.parseExpression(value);
     if (!expression) {
+        error = { ctx.getCombinedErrors() };
         return {};
     }
+
     return { ExpressionFilter { std::move(*expression) } };
 }
 

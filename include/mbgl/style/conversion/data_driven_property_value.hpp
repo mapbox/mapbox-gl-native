@@ -4,12 +4,12 @@
 #include <mbgl/style/conversion.hpp>
 #include <mbgl/style/conversion/constant.hpp>
 #include <mbgl/style/conversion/function.hpp>
-#include <mbgl/style/conversion/expression.hpp>
 #include <mbgl/style/expression/is_expression.hpp>
 #include <mbgl/style/expression/is_constant.hpp>
 #include <mbgl/style/expression/find_zoom_curve.hpp>
 #include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/expression/value.hpp>
+#include <mbgl/style/expression/parsing_context.hpp>
 
 #include <unordered_set>
 
@@ -22,15 +22,15 @@ template <class T>
 struct Converter<DataDrivenPropertyValue<T>> {
 
     optional<DataDrivenPropertyValue<T>> operator()(const Convertible& value, Error& error) const {
+        using namespace mbgl::style::expression;
+        
         if (isUndefined(value)) {
             return DataDrivenPropertyValue<T>();
-        } else if (expression::isExpression(value)) {
-            optional<std::unique_ptr<Expression>> expression = convert<std::unique_ptr<Expression>>(
-                value,
-                error,
-                valueTypeToExpressionType<T>());
-            
+        } else if (isExpression(value)) {
+            ParsingContext ctx(valueTypeToExpressionType<T>());
+            ParseResult expression = ctx.parseLayerPropertyExpression(value);
             if (!expression) {
+                error = { ctx.getCombinedErrors() };
                 return {};
             }
             

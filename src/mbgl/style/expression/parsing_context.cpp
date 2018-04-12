@@ -206,8 +206,16 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
         }
     }
 
-    // if this is the root expression, enforce constraints on the use ["zoom"].
-    if (key.size() == 0 && !isZoomConstant(**parsed)) {
+    return parsed;
+}
+
+ParseResult ParsingContext::parseExpression(const Convertible& value, TypeAnnotationOption typeAnnotationOption) {
+    return parse(value, typeAnnotationOption);
+}
+
+ParseResult ParsingContext::parseLayerPropertyExpression(const Convertible& value, TypeAnnotationOption typeAnnotationOption) {
+    ParseResult parsed = parse(value, typeAnnotationOption);
+    if (parsed && !isZoomConstant(**parsed)) {
         optional<variant<const InterpolateBase*, const Step*, ParsingError>> zoomCurve = findZoomCurve(parsed->get());
         if (!zoomCurve) {
             error(R"("zoom" expression may only be used as input to a top-level "step" or "interpolate" expression.)");
@@ -217,8 +225,21 @@ ParseResult ParsingContext::parse(const Convertible& value, TypeAnnotationOption
             return ParseResult();
         }
     }
-
     return parsed;
+}
+
+const std::string ParsingContext::getCombinedErrors() const {
+    std::string combinedError;
+    for (const ParsingError& parsingError : *errors) {
+        if (combinedError.size() > 0) {
+            combinedError += "\n";
+        }
+        if (parsingError.key.size() > 0) {
+            combinedError += parsingError.key + ": ";
+        }
+        combinedError += parsingError.message;
+    }
+    return combinedError;
 }
 
 optional<std::string> ParsingContext::checkType(const type::Type& t) {

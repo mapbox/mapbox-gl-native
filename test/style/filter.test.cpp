@@ -11,14 +11,19 @@
 using namespace mbgl;
 using namespace mbgl::style;
 
-bool filter(const char * json, const PropertyMap& featureProperties = {{}}, optional<FeatureIdentifier> featureId = {}, FeatureType featureType = FeatureType::Point, GeometryCollection featureGeometry = {}) {
+bool filter(const char * json,
+            const PropertyMap& featureProperties = {{}},
+            optional<FeatureIdentifier> featureId = {},
+            FeatureType featureType = FeatureType::Point,
+            GeometryCollection featureGeometry = {},
+            float zoom = 0.0f) {
     conversion::Error error;
     optional<Filter> filter = conversion::convertJSON<Filter>(json, error);
     EXPECT_TRUE(bool(filter));
     EXPECT_EQ(error.message, "");
     
     StubGeometryTileFeature feature { featureId, featureType, featureGeometry, featureProperties };
-    expression::EvaluationContext context = { &feature };
+    expression::EvaluationContext context = { zoom, &feature };
     
     return (*filter)(context);
 }
@@ -108,4 +113,9 @@ TEST(Filter, Expression) {
 TEST(Filter, PropertyExpression) {
     ASSERT_TRUE(filter("[\"==\", [\"get\", \"two\"], 2]", {{"two", int64_t(2)}}));
     ASSERT_FALSE(filter("[\"==\", [\"get\", \"two\"], 4]", {{"two", int64_t(2)}}));
+}
+
+TEST(Filter, ZoomExpressionNested) {
+    ASSERT_TRUE(filter(R"(["==", ["get", "two"], ["zoom"]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));
+    ASSERT_FALSE(filter(R"(["==", ["get", "two"], ["+", ["zoom"], 1]])", {{"two", int64_t(2)}}, {}, FeatureType::Point, {}, 2.0f));
 }
