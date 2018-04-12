@@ -1006,4 +1006,54 @@ using namespace std::string_literals;
     }
 }
 
+- (void)testConvenienceInitializers {
+    {
+        NSExpression *expression = [NSExpression mgl_expressionForConditional:[NSPredicate predicateWithFormat:@"1 = 2"]
+                                                               trueExpression:MGLConstantExpression(@YES)
+                                                             falseExpresssion:MGLConstantExpression(@NO)];
+        
+        NSArray *jsonExpression = @[@"case", @[@"==", @1, @2], @YES, @NO];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @NO);
+    }
+    {
+        NSDictionary *stops = @{@0: MGLConstantExpression(@111), @1: MGLConstantExpression(@1111)};
+        NSExpression *expression = [NSExpression mgl_expressionForStepFunction:[NSExpression expressionForKeyPath:@"x"]
+                                                                          from:[NSExpression expressionForConstantValue:@11]
+                                                                         stops:[NSExpression expressionForConstantValue:stops]];
+        NSArray *jsonExpression = @[@"step", @[@"get", @"x"], @11, @0, @111, @1, @1111];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSDictionary *stops = @{@0: MGLConstantExpression(@100), @10: MGLConstantExpression(@200)};
+        NSExpression *expression = [NSExpression mgl_expressionForInterpolateFunction:[NSExpression expressionForKeyPath:@"x"]
+                                                                            curveType:MGLExpressionInterpolationModeLinear
+                                                                           parameters:nil
+                                                                                steps:[NSExpression expressionForConstantValue:stops]];
+        NSArray *jsonExpression = @[@"interpolate", @[@"linear"], @[@"get", @"x"], @0, @100, @10, @200];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [[NSExpression expressionForConstantValue:@"Old"] mgl_expressionByAppendingExpression:[NSExpression expressionForConstantValue:@"MacDonald"]];
+
+        NSArray *jsonExpression = @[@"concat", @"Old", @"MacDonald"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @"OldMacDonald");
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSArray *values = @[MGLConstantExpression(@1), MGLConstantExpression(@"one")];
+        NSExpression *expression = [NSExpression mgl_expressionForMatchFunction:[NSExpression expressionWithFormat:@"2 * 1"]
+                                                                         values:[NSExpression expressionForConstantValue:values]
+                                                                   defaultValue:[NSExpression expressionForConstantValue:@"default"]];
+        NSArray *jsonExpression =  @[@"match", @[@"*", @2, @1], @1, @"one", @"default"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+}
+
+
 @end
