@@ -55,7 +55,7 @@ class ParsingContext {
 public:
     ParsingContext() : errors(std::make_shared<std::vector<ParsingError>>()) {}
     ParsingContext(std::string key_) : key(std::move(key_)), errors(std::make_shared<std::vector<ParsingError>>()) {}
-    explicit ParsingContext(optional<type::Type> expected_)
+    explicit ParsingContext(type::Type expected_)
         : expected(std::move(expected_)),
           errors(std::make_shared<std::vector<ParsingError>>())
     {}

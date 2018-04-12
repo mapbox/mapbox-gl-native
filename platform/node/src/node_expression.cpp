@@ -75,7 +75,7 @@ void NodeExpression::Parse(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     auto expr = info[0];
 
     try {
-        ParsingContext ctx(expected);
+        ParsingContext ctx = expected ? ParsingContext(*expected) : ParsingContext();
         ParseResult parsed = ctx.parseLayerPropertyExpression(mbgl::style::conversion::Convertible(expr));
         if (parsed) {
             assert(ctx.getErrors().size() == 0);
