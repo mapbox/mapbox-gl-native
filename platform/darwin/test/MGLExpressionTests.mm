@@ -866,4 +866,47 @@ using namespace std::string_literals;
     }
 }
 
+#pragma mark - Localization tests
+
+- (void)testTokenReplacement {
+    {
+        NSExpression *tokenized = MGLConstantExpression(@"");
+        NSExpression *expected = tokenized;
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *tokenized = MGLConstantExpression(@"{");
+        NSExpression *expected = tokenized;
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *tokenized = MGLConstantExpression(@"{token");
+        NSExpression *expected = tokenized;
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *tokenized = MGLConstantExpression(@"{token}");
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"token"];
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *tokenized = MGLConstantExpression(@"{token} {token}");
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_join({token, ' ', token})"];
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *tokenized = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, '{short}', %@)", @{
+            @1: MGLConstantExpression(@"{short}"),
+            @2: @"…",
+            @3: @"{long}",
+        }];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
+            @1: [NSExpression expressionForKeyPath:@"short"],
+            @2: @"…",
+            @3: [NSExpression expressionForKeyPath:@"long"],
+        }];
+        XCTAssertEqualObjects(tokenized.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+}
+
 @end

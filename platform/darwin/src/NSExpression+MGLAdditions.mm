@@ -366,6 +366,9 @@ NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY
 NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
     __block NSMutableDictionary *upgradedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        if (![value isKindOfClass:[NSExpression class]]) {
+            value = [NSExpression expressionForConstantValue:value];
+        }
         NSExpression *upgradedValue = value.mgl_expressionByReplacingTokensWithKeyPaths;
         if (upgradedValue != value) {
             if (!upgradedStops) {
@@ -398,6 +401,9 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
                         && [scanner scanString:@"}" intoString:NULL]) {
                         [components addObject:[NSExpression expressionForKeyPath:token]];
                     }
+                }
+                if (components.count == 1) {
+                    return components.firstObject;
                 }
                 return [NSExpression expressionForFunction:@"mgl_join:"
                                                  arguments:@[[NSExpression expressionForAggregate:components]]];
