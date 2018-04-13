@@ -10,6 +10,7 @@
 #endif
 #import "NSPredicate+MGLAdditions.h"
 #import "NSValue+MGLStyleAttributeAdditions.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import <objc/runtime.h>
 
@@ -1245,6 +1246,9 @@ NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) 
 NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
     __block NSMutableDictionary *localizedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        if (![value isKindOfClass:[NSExpression class]]) {
+            value = [NSExpression expressionForConstantValue:value];
+        }
         NSExpression *localizedValue = [value mgl_expressionLocalizedIntoLocale:locale];
         if (localizedValue != value) {
             if (!localizedStops) {
@@ -1273,8 +1277,12 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
         case NSKeyPathExpressionType: {
             if ([self.keyPath isEqualToString:@"name"] || [self.keyPath hasPrefix:@"name_"]) {
                 NSString *localizedKeyPath = @"name";
-                if (locale && ![locale.localeIdentifier isEqualToString:@"mul"]) {
-                    localizedKeyPath = [NSString stringWithFormat:@"name_%@", locale.localeIdentifier];
+                if (![locale.localeIdentifier isEqualToString:@"mul"]) {
+                    NSArray *preferences = locale ? @[locale.localeIdentifier] : [NSLocale preferredLanguages];
+                    NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences];
+                    if (preferredLanguage) {
+                        localizedKeyPath = [NSString stringWithFormat:@"name_%@", preferredLanguage];
+                    }
                 }
                 return [NSExpression expressionForKeyPath:localizedKeyPath];
             }

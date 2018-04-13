@@ -578,16 +578,6 @@ static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
         }]];
     NSSet<NSString *> *streetsSourceIdentifiers = [streetsSources valueForKey:@"identifier"];
     
-    if (!locale) {
-        NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguage];
-        if (preferredLanguage) {
-            locale = [NSLocale localeWithLocaleIdentifier:preferredLanguage];
-        }
-    }
-    if (!locale) {
-        locale = [NSLocale localeWithLocaleIdentifier:@"mul"];
-    }
-    
     for (MGLSymbolStyleLayer *layer in self.layers) {
         if (![layer isKindOfClass:[MGLSymbolStyleLayer class]]) {
             continue;

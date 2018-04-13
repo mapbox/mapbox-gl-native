@@ -75,26 +75,53 @@
 
 @implementation MGLVectorTileSource (Private)
 
+/**
+ An array of locale codes with dedicated name fields in the Mapbox Streets
+ source.
+ 
+ https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
+ */
+static NSArray * const MGLMapboxStreetsLanguages = @[
+    @"ar", @"de", @"en", @"es", @"fr", @"pt", @"ru", @"zh", @"zh-Hans",
+];
+
+/**
+ Like `MGLMapboxStreetsLanguages`, but deanglicized for use with
+ `+[NSBundle preferredLocalizationsFromArray:forPreferences:]`.
+ */
+static NSArray * const MGLMapboxStreetsAlternativeLanguages = @[
+    @"mul", @"ar", @"de", @"es", @"fr", @"pt", @"ru", @"zh", @"zh-Hans",
+];
+
 + (NS_SET_OF(NSString *) *)mapboxStreetsLanguages {
-    // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
     static dispatch_once_t onceToken;
     static NS_SET_OF(NSString *) *mapboxStreetsLanguages;
     dispatch_once(&onceToken, ^{
-        // https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview
-        mapboxStreetsLanguages = [NSSet setWithObjects:@"ar", @"de", @"en", @"es", @"fr", @"pt", @"ru", @"zh", @"zh-Hans", nil];
+        mapboxStreetsLanguages = [NSSet setWithArray:MGLMapboxStreetsLanguages];
     });
     return mapboxStreetsLanguages;
 }
 
 + (NSString *)preferredMapboxStreetsLanguage {
-    NSArray<NSString *> *supportedLanguages = [MGLVectorTileSource mapboxStreetsLanguages].allObjects;
-    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:supportedLanguages
-                                                                         forPreferences:[NSLocale preferredLanguages]];
+    return [self preferredMapboxStreetsLanguageForPreferences:[NSLocale preferredLanguages]];
+}
+
++ (NSString *)preferredMapboxStreetsLanguageForPreferences:(NSArray<NSString *> *)preferencesArray {
+    BOOL acceptsEnglish = [preferencesArray filteredArrayUsingPredicate:
+                           [NSPredicate predicateWithBlock:^BOOL(NSString * _Nullable language, NSDictionary<NSString *,id> * _Nullable bindings) {
+        return [[NSLocale localeWithLocaleIdentifier:language].languageCode isEqualToString:@"en"];
+    }]].count;
+    
+    NSArray<NSString *> *preferredLanguages = [NSBundle preferredLocalizationsFromArray:MGLMapboxStreetsAlternativeLanguages
+                                                                         forPreferences:preferencesArray];
     NSString *mostSpecificLanguage;
     for (NSString *language in preferredLanguages) {
         if (language.length > mostSpecificLanguage.length) {
             mostSpecificLanguage = language;
         }
+    }
+    if ([mostSpecificLanguage isEqualToString:@"mul"]) {
+        return acceptsEnglish ? @"en" : nil;
     }
     return mostSpecificLanguage;
 }
