@@ -249,8 +249,6 @@ public:
 
     BOOL _opaque;
 
-    NS_MUTABLE_ARRAY_OF(NSURL *) *_bundledStyleURLs;
-
     MGLAnnotationTagContextMap _annotationContextsByAnnotationTag;
     MGLAnnotationObjectTagMap _annotationTagsByAnnotation;
 
@@ -3489,50 +3487,11 @@ public:
     return mbgl::Projection::getMetersPerPixelAtLatitude(latitude, self.zoomLevel);
 }
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude
-{
-    return [self metersPerPointAtLatitude:latitude];
-}
-
 #pragma mark - Camera Change Reason -
 
 - (void)resetCameraChangeReason
 {
     self.cameraChangeReasonBitmask = MGLCameraChangeReasonNone;
-}
-
-#pragma mark - Styling -
-
-- (NS_ARRAY_OF(NSURL *) *)bundledStyleURLs
-{
-    if ( ! _bundledStyleURLs)
-    {
-        _bundledStyleURLs = [NSMutableArray array];
-        for (NSUInteger i = 0; i < mbgl::util::default_styles::numOrderedStyles; i++)
-        {
-            NSURL *styleURL = [NSURL URLWithString:@(mbgl::util::default_styles::orderedStyles[i].url)];
-            [_bundledStyleURLs addObject:styleURL];
-        }
-    }
-
-    return [NSArray arrayWithArray:_bundledStyleURLs];
-}
-
-- (nullable NSString *)styleID
-{
-    [NSException raise:@"Method unavailable" format:
-     @"%s has been replaced by -[MGLMapView styleURL].",
-     __PRETTY_FUNCTION__];
-    return nil;
-}
-
-- (void)setStyleID:(nullable NSString *)styleID
-{
-    [NSException raise:@"Method unavailable" format:
-     @"%s has been replaced by -[MGLMapView setStyleURL:].\n\n"
-     @"If you previously set this style ID in a storyboard inspectable, select the MGLMapView in Interface Builder and delete the “styleID” entry from the User Defined Runtime Attributes section of the Identity inspector. "
-     @"Then go to the Attributes inspector and enter “mapbox://styles/%@” into the “Style URL” field.",
-     __PRETTY_FUNCTION__, styleID];
 }
 
 #pragma mark - Annotations -
@@ -4779,12 +4738,8 @@ public:
             userLocationAnnotationView = (MGLUserLocationAnnotationView *)[self.delegate mapView:self viewForAnnotation:self.userLocation];
             if (userLocationAnnotationView && ! [userLocationAnnotationView isKindOfClass:MGLUserLocationAnnotationView.class])
             {
-                static dispatch_once_t onceToken;
-                dispatch_once(&onceToken, ^{
-                    NSLog(@"Ignoring user location annotation view with type %@. User location annotation view must be a kind of MGLUserLocationAnnotationView. This warning is only shown once and will become an error in a future version.", NSStringFromClass(userLocationAnnotationView.class));
-                });
-
-                userLocationAnnotationView = nil;
+                [NSException raise:@"MGLUserLocationAnnotationTypeException"
+                            format:@"User location annotation view must be a kind of MGLUserLocationAnnotationView. %@", userLocationAnnotationView.debugDescription];
             }
         }
 

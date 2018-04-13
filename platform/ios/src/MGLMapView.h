@@ -286,13 +286,13 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (IBAction)showAttribution:(id)sender;
 
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("This property is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
 
