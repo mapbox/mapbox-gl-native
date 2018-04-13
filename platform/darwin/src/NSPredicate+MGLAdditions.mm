@@ -3,6 +3,8 @@
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
 
+#include <mbgl/style/conversion/filter.hpp>
+
 class FilterEvaluator {
 public:
 
@@ -208,14 +210,14 @@ public:
 {
     mbgl::style::conversion::Error valueError;
     NSArray *jsonObject = self.mgl_jsonExpressionObject;
-    auto value = mbgl::style::conversion::convert<std::unique_ptr<mbgl::style::expression::Expression>>(mbgl::style::conversion::makeConvertible(jsonObject), valueError, mbgl::style::expression::type::Boolean);
-    mbgl::style::ExpressionFilter filter;
+    auto value = mbgl::style::conversion::convert<mbgl::style::Filter>(mbgl::style::conversion::makeConvertible(jsonObject), valueError);
+    
     if (!value) {
         [NSException raise:NSInvalidArgumentException
                     format:@"Invalid filter value: %@", @(valueError.message.c_str())];
         return {};
     }
-    filter.expression = std::move(*value);
+    mbgl::style::Filter filter = std::move(*value);
     
     return filter;
 }

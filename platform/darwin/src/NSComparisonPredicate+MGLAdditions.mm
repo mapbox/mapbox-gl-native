@@ -142,16 +142,16 @@
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
     if (op) {
-        id leftExpression = self.leftExpression.mgl_jsonExpressionObject;
-        id rightExpression = self.rightExpression.mgl_jsonExpressionObject;
+        id leftJSONExpressionObject = self.leftExpression.mgl_jsonExpressionObject;
+        id rightJSONExpressionObject = self.rightExpression.mgl_jsonExpressionObject;
         
         switch (self.predicateOperatorType) {
             case NSLessThanPredicateOperatorType:
             case NSLessThanOrEqualToPredicateOperatorType:
             case NSGreaterThanPredicateOperatorType:
             case NSGreaterThanOrEqualToPredicateOperatorType: {
-                leftExpression = [self mgl_expressionWithExpressionType:self.leftExpression fallbackExpression:self.rightExpression];
-                rightExpression = [self mgl_expressionWithExpressionType:self.rightExpression fallbackExpression:self.leftExpression];
+                leftJSONExpressionObject = [self mgl_typedJSONWithExpressionObject:self.leftExpression fallbackExpression:self.rightExpression];
+                rightJSONExpressionObject = [self mgl_typedJSONWithExpressionObject:self.rightExpression fallbackExpression:self.leftExpression];
                 break;
             }
  
@@ -159,13 +159,17 @@
                 break;
         }
         
-        return @[op, leftExpression, rightExpression];
+        return @[op, leftJSONExpressionObject, rightJSONExpressionObject];
     }
     return nil;
 }
 
-- (id)mgl_expressionWithExpressionType:(NSExpression *)expressionElement fallbackExpression:(NSExpression *)fallbackExpression {
-    NSExpression *expression = expressionElement.expressionType == NSConstantValueExpressionType ? expressionElement : fallbackExpression;
+/**
+ Infers the expressionObject type if it can not then tries to infer the type using fallbackExpression.
+ ExpressionFilters of type >, >=, <, <= requires that each compared value provides its type.
+ */
+- (id)mgl_typedJSONWithExpressionObject:(NSExpression *)expressionObject fallbackExpression:(NSExpression *)fallbackExpression {
+    NSExpression *expression = expressionObject.expressionType == NSConstantValueExpressionType ? expressionObject : fallbackExpression;
     NSString *type;
     if (expression.expressionType == NSConstantValueExpressionType && [expression.constantValue isKindOfClass:NSNumber.class]) {
         NSNumber *number = (NSNumber *)expression.constantValue;
@@ -180,10 +184,10 @@
     }
     
     if (type) {
-        return @[type, expressionElement.mgl_jsonExpressionObject];
+        return @[type, expressionObject.mgl_jsonExpressionObject];
     }
     
-    return expressionElement.mgl_jsonExpressionObject;
+    return expressionObject.mgl_jsonExpressionObject;
 }
 
 @end

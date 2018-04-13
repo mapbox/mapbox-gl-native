@@ -394,7 +394,6 @@ using namespace std::string_literals;
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"ceiling:" arguments:@[MGLConstantExpression(@1.5)]];
         NSArray *jsonExpression = @[@"ceil", @1.5];
-        NSArray *jsonExpression = @[@"+", jsonTruncation, @[@"case", @[@">", @[@"number", @[@"%", @1.5, @1]], @[@"number", @0]], @1, @0]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @2);
     }
@@ -407,7 +406,6 @@ using namespace std::string_literals;
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"ceiling:" arguments:@[MGLConstantExpression(@2)]];
         NSArray *jsonExpression = @[@"ceil", @2];
-        NSArray *jsonExpression = @[@"+", jsonTruncation, @[@"case", @[@">", @[@"number", @[@"%", @2, @1]], @[@"number", @0]], @1, @0]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @2);
     }
@@ -766,8 +764,8 @@ using namespace std::string_literals;
             @"case",
             @[
                 @"<",
-                @[@"get", @"area"],
-                @80000
+                @[@"number", @[@"get", @"area"]],
+                @[@"number", @80000]
             ],
             @[@"get", @"abbr"],
             @[@"get", @"name_en"]
