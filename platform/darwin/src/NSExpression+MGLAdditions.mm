@@ -366,7 +366,7 @@ NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY
  */
 NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
     __block NSMutableDictionary *upgradedStops;
-    [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+    [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
             value = [NSExpression expressionForConstantValue:value];
         }
@@ -410,7 +410,6 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
                                                  arguments:@[[NSExpression expressionForAggregate:components]]];
             }
             NSDictionary *stops = self.constantValue;
-            // TODO: Check whether the dictionary’s key and value types are consistent with stop dictionaries. Or have the caller pass in whether this is a stop dictionary.
             if ([stops isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *localizedStops = MGLStopDictionaryByReplacingTokensWithKeyPaths(stops);
                 if (localizedStops != stops) {
@@ -1245,7 +1244,7 @@ NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) 
  */
 NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
     __block NSMutableDictionary *localizedStops;
-    [stops enumerateKeysAndObjectsUsingBlock:^(NSNumber * _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+    [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
             value = [NSExpression expressionForConstantValue:value];
         }
@@ -1264,7 +1263,6 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
     switch (self.expressionType) {
         case NSConstantValueExpressionType: {
             NSDictionary *stops = self.constantValue;
-            // TODO: Check whether the dictionary’s key and value types are consistent with stop dictionaries. Or have the caller pass in whether this is a stop dictionary.
             if ([stops isKindOfClass:[NSDictionary class]]) {
                 NSDictionary *localizedStops = MGLLocalizedStopDictionary(stops, locale);
                 if (localizedStops != stops) {
