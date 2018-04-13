@@ -551,7 +551,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 return [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects.firstObject)];
             }
             return [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
-        } else if ([op isEqualToString:@"to-boolean"] || [op isEqualToString:@"boolean"]) {
+        } else if ([op isEqualToString:@"to-boolean"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionForFunction:operand selectorName:@"boolValue" arguments:@[]];
         } else if ([op isEqualToString:@"to-number"] || [op isEqualToString:@"number"]) {

@@ -30,8 +30,8 @@
     XCTAssertNil(layer.sourceLayerIdentifier);
 
     XCTAssertNil(layer.predicate);
-    layer.predicate = [NSPredicate predicateWithValue:NO];
-    XCTAssertEqualObjects(layer.predicate, [NSPredicate predicateWithValue:NO]);
+    layer.predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier = 1"];
+    XCTAssertEqualObjects(layer.predicate,  [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier = 1"]);
     layer.predicate = nil;
     XCTAssertNil(layer.predicate);
 }
