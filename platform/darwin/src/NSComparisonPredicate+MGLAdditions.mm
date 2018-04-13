@@ -142,52 +142,9 @@
                         format:@"NSPredicateOperatorType:%lu is not supported.", (unsigned long)self.predicateOperatorType];
     }
     if (op) {
-        id leftJSONExpressionObject = self.leftExpression.mgl_jsonExpressionObject;
-        id rightJSONExpressionObject = self.rightExpression.mgl_jsonExpressionObject;
-        
-        switch (self.predicateOperatorType) {
-            case NSLessThanPredicateOperatorType:
-            case NSLessThanOrEqualToPredicateOperatorType:
-            case NSGreaterThanPredicateOperatorType:
-            case NSGreaterThanOrEqualToPredicateOperatorType: {
-                leftJSONExpressionObject = [self mgl_typedJSONWithExpressionObject:self.leftExpression fallbackExpression:self.rightExpression];
-                rightJSONExpressionObject = [self mgl_typedJSONWithExpressionObject:self.rightExpression fallbackExpression:self.leftExpression];
-                break;
-            }
- 
-            default:
-                break;
-        }
-        
-        return @[op, leftJSONExpressionObject, rightJSONExpressionObject];
+        return @[op, self.leftExpression.mgl_jsonExpressionObject, self.rightExpression.mgl_jsonExpressionObject];
     }
     return nil;
-}
-
-/**
- Infers the expressionObject type if it can not then tries to infer the type using fallbackExpression.
- ExpressionFilters of type >, >=, <, <= requires that each compared value provides its type.
- */
-- (id)mgl_typedJSONWithExpressionObject:(NSExpression *)expressionObject fallbackExpression:(NSExpression *)fallbackExpression {
-    NSExpression *expression = expressionObject.expressionType == NSConstantValueExpressionType ? expressionObject : fallbackExpression;
-    NSString *type;
-    if (expression.expressionType == NSConstantValueExpressionType && [expression.constantValue isKindOfClass:NSNumber.class]) {
-        NSNumber *number = (NSNumber *)expression.constantValue;
-        if ((strcmp([number objCType], @encode(char)) == 0) ||
-            (strcmp([number objCType], @encode(BOOL)) == 0)) {
-            type = @"boolean";
-        } else {
-            type = @"number";
-        }
-    } else if (expression.expressionType == NSConstantValueExpressionType && [expression.constantValue isKindOfClass:NSString.class]) {
-        type = @"string";
-    }
-    
-    if (type) {
-        return @[type, expressionObject.mgl_jsonExpressionObject];
-    }
-    
-    return expressionObject.mgl_jsonExpressionObject;
 }
 
 @end

@@ -764,8 +764,8 @@ using namespace std::string_literals;
             @"case",
             @[
                 @"<",
-                @[@"number", @[@"get", @"area"]],
-                @[@"number", @80000]
+                @[@"get", @"area"],
+                @80000
             ],
             @[@"get", @"abbr"],
             @[@"get", @"name_en"]

@@ -247,40 +247,40 @@ namespace mbgl {
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x < 5"];
-        NSArray *jsonExpression = @[@"<", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') < 5"];
+        NSArray *jsonExpression = @[@"<", @[@"to-number", @[@"get", @"x"]], @5];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x > 5"];
-        NSArray *jsonExpression = @[@">", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') > 5"];
+        NSArray *jsonExpression = @[@">", @[@"to-number", @[@"get", @"x"]], @5];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x <= 5"];
-        NSArray *jsonExpression = @[@"<=", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') <= 5"];
+        NSArray *jsonExpression = @[@"<=", @[@"to-number", @[@"get", @"x"]], @5];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x >= 5"];
-        NSArray *jsonExpression = @[@">=", @[@"number", @[@"get", @"x"]], @[@"number", @5]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') >= 5"];
+        NSArray *jsonExpression = @[@">=", @[@"to-number", @[@"get", @"x"]], @5];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x > 'value'"];
-        NSArray *jsonExpression = @[@">",  @[@"string", @[@"get", @"x"]], @[@"string", @"value"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSString') > 'value'"];
+        NSArray *jsonExpression = @[@">",  @[@"to-string", @[@"get", @"x"]], @"value"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
@@ -357,40 +357,40 @@ namespace mbgl {
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a < 'b'"];
-        NSArray *jsonExpression = @[@"<", @[@"string", @[@"get", @"a"]], @[@"string", @"b"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') < 'b'"];
+        NSArray *jsonExpression = @[@"<", @[@"to-string", @[@"get", @"a"]], @"b"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a <= 'b'"];
-        NSArray *jsonExpression = @[@"<=", @[@"string", @[@"get", @"a"]], @[@"string", @"b"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') <= 'b'"];
+        NSArray *jsonExpression = @[@"<=", @[@"to-string", @[@"get", @"a"]], @"b"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a > 'b'"];
-        NSArray *jsonExpression = @[@">", @[@"string", @[@"get", @"a"]], @[@"string", @"b"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') > 'b'"];
+        NSArray *jsonExpression = @[@">", @[@"to-string", @[@"get", @"a"]], @"b"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a >= 'b'"];
-        NSArray *jsonExpression = @[@">=", @[@"string", @[@"get", @"a"]], @[@"string", @"b"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') >= 'b'"];
+        NSArray *jsonExpression = @[@">=", @[@"to-string", @[@"get", @"a"]], @"b"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"a BETWEEN {'b', 'z'}"];
-        NSArray *jsonExpression =@[@"all", @[@"<=", @[@"string", @"b"], @[@"string", @[@"get", @"a"]]], @[@"<=", @[@"string", @[@"get", @"a"]], @[@"string", @"z"]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(a, 'NSString') BETWEEN {'b', 'z'}"];
+        NSArray *jsonExpression =@[@"all", @[@"<=", @"b", @[@"to-string", @[@"get", @"a"]]], @[@"<=", @[@"to-string", @[@"get", @"a"]], @"z"]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
@@ -398,33 +398,33 @@ namespace mbgl {
     }
     {
         NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
-        NSArray *jsonExpression = @[@"all", @[@">=", @[@"number", @[@"get", @"x"]], @[@"number", @10]], @[@"<=", @[@"number", @[@"get", @"x"]], @[@"number", @100]]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') BETWEEN %@", limits];
+        NSArray *jsonExpression = @[@"all", @[@">=", @[@"to-number", @[@"get", @"x"]], @10], @[@"<=", @[@"to-number", @[@"get", @"x"]], @100]];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:jsonExpression], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:jsonExpression]
                           mustRoundTrip:NO];
     }
     {
-        NSArray *expected = @[@"all", @[@"<=", @[@"number", @10], @[@"number", @[@"get", @"x"]]], @[@"<=", @[@"number", @[@"get", @"x"]], @[@"number", @100]]];
+        NSArray *expected = @[@"all", @[@"<=", @10, @[@"to-number", @[@"get", @"x"]]], @[@"<=", @[@"to-number", @[@"get", @"x"]], @100]];
         NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') BETWEEN %@", limits];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:expected]
                           mustRoundTrip:NO];
     }
     {
-        NSArray *expected = @[@"all", @[@"<=", @[@"number", @10], @[@"number", @[@"get", @"x"]]], @[@">=", @[@"number", @100], @[@"number", @[@"get", @"x"]]]];
+        NSArray *expected = @[@"all", @[@"<=", @10, @[@"to-number", @[@"get", @"x"]]], @[@">=", @100, @[@"to-number", @[@"get", @"x"]]]];
         NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') BETWEEN %@", limits];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:expected]
                           mustRoundTrip:NO];
     }
     {
-        NSArray *expected = @[@"all", @[@">=", @[@"number", @[@"get", @"x"]], @[@"number", @10]], @[@">=", @[@"number", @100], @[@"number", @[@"get", @"x"]]]];
+        NSArray *expected = @[@"all", @[@">=", @[@"to-number", @[@"get", @"x"]], @10], @[@">=", @100, @[@"to-number", @[@"get", @"x"]]]];
         NSExpression *limits = [NSExpression expressionForAggregate:@[[NSExpression expressionForConstantValue:@10], [NSExpression expressionForConstantValue:@100]]];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"x BETWEEN %@", limits];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"CAST(x, 'NSNumber') BETWEEN %@", limits];
         XCTAssertEqualObjects([NSPredicate mgl_predicateWithJSONObject:expected], predicate);
         [self testSymmetryWithPredicate:[NSPredicate mgl_predicateWithJSONObject:expected]
                           mustRoundTrip:NO];
