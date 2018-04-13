@@ -2874,7 +2874,11 @@ public class Expression {
   }
 
   /**
-   * Produces a stop value to be used as part of the step expression.
+   * Produces a stop value.
+   * <p>
+   * Can be used for {@link #stop(Object, Object)} as part of varargs parameter in
+   * {@link #step(Number, Expression, Stop...)} or {@link #interpolate(Interpolator, Expression, Stop...)}.
+   * </p>
    * <p>
    * Example usage:
    * </p>
