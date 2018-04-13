@@ -58,24 +58,32 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
     static const style::Properties<>::PossiblyEvaluated properties {};
     static const DebugProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
+    auto& programInstance = parameters.programs.debug;
+
     for (auto matrix : matrices) {
-        parameters.programs.debug.draw(
+        programInstance.draw(
             parameters.context,
             gl::LineStrip { 4.0f * parameters.pixelRatio },
             gl::DepthMode::disabled(),
             gl::StencilMode::disabled(),
             gl::ColorMode::unblended(),
-            DebugProgram::UniformValues {
-             uniforms::u_matrix::Value{ matrix },
-             uniforms::u_color::Value{ Color::red() }
-            },
-            parameters.staticData.tileVertexBuffer,
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            paintAttributeData,
-            properties,
-            parameters.state.getZoom(),
-            "debug"
+            programInstance.allUniformValues(
+                DebugProgram::UniformValues {
+                    uniforms::u_matrix::Value{ matrix },
+                    uniforms::u_color::Value{ Color::red() }
+                },
+                paintAttributeData,
+                properties,
+                parameters.state.getZoom()
+            ),
+            programInstance.allAttributeBindings(
+                parameters.staticData.tileVertexBuffer,
+                paintAttributeData,
+                properties
+            ),
+            "image"
         );
     }
 }

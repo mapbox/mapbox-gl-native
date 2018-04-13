@@ -73,16 +73,15 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
     if (parameters.pass != RenderPass::Translucent)
         return;
 
+    RasterProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
+
     auto draw = [&] (const mat4& matrix,
                      const auto& vertexBuffer,
                      const auto& indexBuffer,
                      const auto& segments) {
-        parameters.programs.raster.draw(
-            parameters.context,
-            gl::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            gl::StencilMode::disabled(),
-            parameters.colorModeForRenderPass(),
+        auto& programInstance = parameters.programs.raster;
+
+        const auto allUniformValues = programInstance.allUniformValues(
             RasterProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image0::Value{ 0 },
@@ -98,12 +97,26 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                 uniforms::u_scale_parent::Value{ 1.0f },
                 uniforms::u_tl_parent::Value{ std::array<float, 2> {{ 0.0f, 0.0f }} },
             },
+            paintAttributeData,
+            evaluated,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.allAttributeBindings(
             vertexBuffer,
+            paintAttributeData,
+            evaluated
+        );
+
+        programInstance.draw(
+            parameters.context,
+            gl::Triangles(),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
             indexBuffer,
             segments,
-            RasterProgram::PaintPropertyBinders { evaluated, 0 },
-            evaluated,
-            parameters.state.getZoom(),
+            allUniformValues,
+            allAttributeBindings,
             getID()
         );
     };

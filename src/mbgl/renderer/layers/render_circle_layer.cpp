@@ -59,14 +59,11 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
         assert(dynamic_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl)));
         CircleBucket& bucket = *reinterpret_cast<CircleBucket*>(tile.tile.getBucket(*baseImpl));
 
-        parameters.programs.circle.get(evaluated).draw(
-            parameters.context,
-            gl::Triangles(),
-            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
-            parameters.mapMode != MapMode::Continuous
-                ? parameters.stencilModeForClipping(tile.clip)
-                : gl::StencilMode::disabled(),
-            parameters.colorModeForRenderPass(),
+        const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+
+        auto& programInstance = parameters.programs.circle.get(evaluated);
+   
+        const auto allUniformValues = programInstance.allUniformValues(
             CircleProgram::UniformValues {
                 uniforms::u_matrix::Value{
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
@@ -82,12 +79,28 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
                 uniforms::u_camera_to_center_distance::Value{ parameters.state.getCameraToCenterDistance() },
                 uniforms::u_pitch_with_map::Value{ pitchWithMap }
             },
+            paintPropertyBinders,
+            evaluated,
+            parameters.state.getZoom()
+        );
+        const auto allAttributeBindings = programInstance.allAttributeBindings(
             *bucket.vertexBuffer,
+            paintPropertyBinders,
+            evaluated
+        );
+
+        programInstance.draw(
+            parameters.context,
+            gl::Triangles(),
+            parameters.depthModeForSublayer(0, gl::DepthMode::ReadOnly),
+            parameters.mapMode != MapMode::Continuous
+                ? parameters.stencilModeForClipping(tile.clip)
+                : gl::StencilMode::disabled(),
+            parameters.colorModeForRenderPass(),
             *bucket.indexBuffer,
             bucket.segments,
-            bucket.paintPropertyBinders.at(getID()),
-            evaluated,
-            parameters.state.getZoom(),
+            allUniformValues,
+            allAttributeBindings,
             getID()
         );
     }

@@ -278,35 +278,41 @@ public:
             Shaders::fragmentSource)) {
     }
 
+    static typename AllUniforms::Values allUniformValues(
+        const UniformValues& uniformValues,
+        const SymbolSizeBinder& symbolSizeBinder,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties,
+        float currentZoom) {
+        return uniformValues.concat(symbolSizeBinder.uniformValues(currentZoom))
+            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
+    }
+
+    static typename Attributes::Bindings allAttributeBindings(
+        const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
+        const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
+        const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
+        const PaintPropertyBinders& paintPropertyBinders,
+        const typename PaintProperties::PossiblyEvaluated& currentProperties) {
+        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
+               layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
+        return LayoutAttributes::bindings(layoutVertexBuffer)
+            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
+            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
+            .concat(paintPropertyBinders.attributeBindings(currentProperties));
+    }
+
     template <class DrawMode>
     void draw(gl::Context& context,
               DrawMode drawMode,
               gl::DepthMode depthMode,
               gl::StencilMode stencilMode,
               gl::ColorMode colorMode,
-              const UniformValues& uniformValues,
-              const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
-              const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
-              const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,
-              const SymbolSizeBinder& symbolSizeBinder,
               const gl::IndexBuffer<DrawMode>& indexBuffer,
               const SegmentVector<Attributes>& segments,
-              const PaintPropertyBinders& paintPropertyBinders,
-              const typename PaintProperties::PossiblyEvaluated& currentProperties,
-              float currentZoom,
+              const typename AllUniforms::Values& allUniformValues,
+              const typename Attributes::Bindings& allAttributeBindings,
               const std::string& layerID) {
-        typename AllUniforms::Values allUniformValues = uniformValues
-            .concat(symbolSizeBinder.uniformValues(currentZoom))
-            .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
-
-        typename Attributes::Bindings allAttributeBindings = LayoutAttributes::bindings(layoutVertexBuffer)
-            .concat(SymbolDynamicLayoutAttributes::bindings(dynamicLayoutVertexBuffer))
-            .concat(SymbolOpacityAttributes::bindings(opacityVertexBuffer))
-            .concat(paintPropertyBinders.attributeBindings(currentProperties));
-
-        assert(layoutVertexBuffer.vertexCount == dynamicLayoutVertexBuffer.vertexCount &&
-                layoutVertexBuffer.vertexCount == opacityVertexBuffer.vertexCount);
-
         for (auto& segment : segments) {
             auto vertexArrayIt = segment.vertexArrays.find(layerID);
 
