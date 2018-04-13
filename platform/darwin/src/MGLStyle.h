@@ -416,25 +416,14 @@ MGL_EXPORT
 
 #pragma mark Managing Style Classes
 
-/**
- Support for style classes has been removed. This property always returns an empty array.
- */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("This property is non-functional.")));
 
-/**
- Support for style classes has been removed. This method always returns NO.
- */
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
-/**
- Support for style classes has been removed. This method is a no-op.
- */
-- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-/**
- Support for style classes has been removed. This method is a no-op.
- */
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
+
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Managing a Style’s Images
 
