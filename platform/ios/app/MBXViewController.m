@@ -971,9 +971,6 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                                                                  curveType:MGLExpressionInterpolationModeLinear
                                                                                 parameters:nil
                                                                                      steps:[NSExpression expressionForConstantValue:waterColorStops]];
-    waterLayer.fillColor = [NSExpression expressionWithFormat:
-                            @"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)",
-                            waterColorStops];
     waterLayer.fillColor = fillColorExpression;
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
@@ -981,9 +978,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                            @13: @YES,
                                            @14: @NO,
                                            @15: @YES};
-    waterLayer.fillAntialiased = [NSExpression expressionWithFormat:
-                                  @"mgl_step:from:stops:($zoomLevel, false, %@)",
-                                  fillAntialiasedStops];
+    waterLayer.fillAntialiased = [NSExpression mgl_expressionForStepFunction:NSExpression.mgl_zoomLevelVariableExpression
+                                                                        from:[NSExpression expressionForConstantValue:@NO]
+                                                                       stops:[NSExpression expressionForConstantValue:fillAntialiasedStops]];
 }
 
 - (void)styleRoadLayer
