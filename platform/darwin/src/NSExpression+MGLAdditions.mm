@@ -618,7 +618,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
                                      arguments:optionsArray];
 }
 
-- (instancetype)mgl_expressionByAppendingExpression:(NSExpression *)expression {
+- (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression {
     NSExpression *subexpression = [NSExpression expressionForAggregate:@[self, expression]];
     return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];
 }

@@ -87,7 +87,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param trueExpression The expression for conditions equal to true.
  @param falseExpression The expression for conditions equal to false.
  */
-+ (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression;
++ (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression NS_SWIFT_NAME(mgl_conditional(_:trueExpression:falseExpression:));
 
 /**
  Returns a step function expression specifying the function operator, default expression
@@ -97,7 +97,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param from The expression which could be a constant or function expression.
  @param stops The stops dictionay must be numeric literals in strictly ascending order.
  */
-+ (instancetype)mgl_expressionForStepFunction:(nonnull NSExpression*)input from:(nonnull NSExpression *)from stops:(nonnull NSExpression*)stops;
++ (instancetype)mgl_expressionForStepFunction:(nonnull NSExpression*)input from:(nonnull NSExpression *)from stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(mgl_stepFunction(input:from:stops:));
 
 /**
  Returns an interpolated function expression specifying the function operator, curve type,
@@ -110,18 +110,26 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param parameters The parameters expression.
  @param steps The steps expression.
  */
-+ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)input curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps;
-
-+ (instancetype)mgl_expressionForMatchFunction:(nonnull NSExpression*)condition values:(nonnull NSExpression *)values defaultValue:(nonnull NSExpression *)defaultValue;
++ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)input curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps NS_SWIFT_NAME(mgl_interpolateFunction(input:curveType:parameters:steps:));
 
 /**
- Returns a string constant expression appending the passed expression.
+ Returns a match function expression specifying the condition, lookup values,
+ and default value.
  
- @param string The string to append.
+ @param condition The expression condition.
+ @param values The lookup values expression.
+ @param defaultValue The defaultValue expression to be used in case there is no match.
+ */
++ (instancetype)mgl_expressionForMatchFunction:(nonnull NSExpression*)condition values:(nonnull NSExpression *)values defaultValue:(nonnull NSExpression *)defaultValue NS_SWIFT_NAME(mgl_matchFunction(condition:values:defaultValue:));
+
+/**
+ Returns a constant expression appending the passed expression.
+ 
+ @param expression The expression to append to the receiver.
     system’s preferred language, if supported, specify `nil`. To use the local
     language, specify a locale with the identifier `mul`.
  */
-- (instancetype)mgl_expressionByAppendingExpression:(NSExpression *)string;
+- (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression NS_SWIFT_NAME(mgl_appending(_:));
 
 @end
 
