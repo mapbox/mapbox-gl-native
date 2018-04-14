@@ -19,6 +19,17 @@ based on the feature’s attributes. Use the `MGLVectorStyleLayer.predicate`
 property to include only the features in the source layer that satisfy a
 condition that you define.
 
+When a predicate is used for filtering vector data the key should be cast
+explicitly into the key's type. A number based key will become: `CAST(key, 'NSNumber')`
+
+`NSPredicateOperatorType`                     | Format string syntax
+----------------------------------------------|---------------------
+`NSGreaterThanOrEqualToPredicateOperatorType` | `CAST(key, 'valueType') >= value`<br />`CAST(key, 'valueType') => value`
+`NSLessThanOrEqualToPredicateOperatorType`    | `CAST(key, 'valueType') <= value`<br />`CAST(key, 'valueType') =< value`
+`NSGreaterThanPredicateOperatorType`          | `CAST(key, 'valueType') > value`
+`NSLessThanPredicateOperatorType`             | `CAST(key, 'valueType') < value`
+
+
 The following comparison operators are supported:
 
 `NSPredicateOperatorType`                     | Format string syntax
