@@ -3,6 +3,8 @@
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
 
+#include <mbgl/style/conversion/filter.hpp>
+
 class FilterEvaluator {
 public:
 
@@ -206,25 +208,18 @@ public:
 
 - (mbgl::style::Filter)mgl_filter
 {
-    if ([self isEqual:[NSPredicate predicateWithValue:YES]])
-    {
-        return mbgl::style::AllFilter();
-    }
-
-    if ([self isEqual:[NSPredicate predicateWithValue:NO]])
-    {
-        return mbgl::style::AnyFilter();
-    }
-
-    if ([self.predicateFormat hasPrefix:@"BLOCKPREDICATE("])
-    {
+    mbgl::style::conversion::Error valueError;
+    NSArray *jsonObject = self.mgl_jsonExpressionObject;
+    auto value = mbgl::style::conversion::convert<mbgl::style::Filter>(mbgl::style::conversion::makeConvertible(jsonObject), valueError);
+    
+    if (!value) {
         [NSException raise:NSInvalidArgumentException
-                    format:@"Block-based predicates are not supported."];
+                    format:@"Invalid filter value: %@", @(valueError.message.c_str())];
+        return {};
     }
-
-    [NSException raise:NSInvalidArgumentException
-                format:@"Unrecognized predicate type."];
-    return {};
+    mbgl::style::Filter filter = std::move(*value);
+    
+    return filter;
 }
 
 + (instancetype)mgl_predicateWithFilter:(mbgl::style::Filter)filter

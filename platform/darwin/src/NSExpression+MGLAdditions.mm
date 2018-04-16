@@ -562,7 +562,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             argumentObjects = [argumentObjects subarrayWithRange:NSMakeRange(1, argumentObjects.count - 1)];
             NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(argumentObjects);
             return [NSExpression expressionForFunction:operand selectorName:@"mgl_numberWithFallbackValues:" arguments:subexpressions];
-        } else if ([op isEqualToString:@"to-string"]) {
+        } else if ([op isEqualToString:@"to-string"] || [op isEqualToString:@"string"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
         } else if ([op isEqualToString:@"get"]) {

@@ -31,6 +31,9 @@ The following comparison operators are supported:
 `NSNotEqualToPredicateOperatorType`           | `key != value`<br />`key <> value`
 `NSBetweenPredicateOperatorType`              | `key BETWEEN { 32, 212 }`
 
+The `key` may be cast explicitly into the key's type. Example: `CAST(key, 'NSNumber')` or
+`CAST(key, 'NSString')`
+
 The following compound operators are supported:
 
 `NSCompoundPredicateType` | Format string syntax
@@ -56,8 +59,11 @@ Format String Syntax” chapter of the
 _[Predicate Programming Guide](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Predicates/AdditionalChapters/Introduction.html)_
 in Apple developer documentation.
 
-The predicate's left-hand expression must be a string that identifies a feature
-attribute or, alternatively, one of the following special attributes:
+Either the predicate’s left-hand or right-hand expression can be an `NSString` 
+(to match strings) or `NSNumber` (to match numbers, including Boolean values) 
+or an array of `NSString`s or `NSNumber`s, depending on the operator and the 
+type of values expected for the attribute being tested  or, alternatively, 
+one of the following special attributes:
 
 <table>
 <thead>
@@ -101,12 +107,8 @@ attribute or, alternatively, one of the following special attributes:
 </tbody>
 </table>
 
-The predicate’s right-hand expression must be an `NSString` (to match strings)
-or `NSNumber` (to match numbers, including Boolean values) or an array of
-`NSString`s or `NSNumber`s, depending on the operator and the type of values
-expected for the attribute being tested. For floating-point values, use
-`-[NSNumber numberWithDouble:]` instead of `-[NSNumber numberWithFloat:]`
-to avoid precision issues.
+For floating-point values, use `-[NSNumber numberWithDouble:]` instead of 
+`-[NSNumber numberWithFloat:]` to avoid precision issues.
 
 Automatic type casting is not performed. Therefore, a feature only matches this
 predicate if its value for the attribute in question is of the same type as the
@@ -116,10 +118,10 @@ sensitivity) are unsupported for comparison and aggregate operators that are
 used in the predicate.
 
 It is possible to create expressions that contain special characters in the
-predicate format syntax. This includes the `$` in the `$id` and `$type` special
-style attributes and also `hyphen-minus` and `tag:subtag`. However, you must use
-`%K` in the format string to represent these variables:
-`@"%K == 'LineString'", @"$type"`.
+predicate format syntax. This includes the `$` in the `$featureIdentifier` and 
+`$geometryType` special style attributes and also `hyphen-minus` and `tag:subtag`. 
+However, you must use `%@` in the format string to represent these variables:
+`@"$geometryType == 'LineString'"`.
 
 ## Using expressions to configure layout and paint attributes
 
