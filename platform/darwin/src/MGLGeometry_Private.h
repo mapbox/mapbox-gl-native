@@ -128,3 +128,5 @@ MGLRadianCoordinate2D MGLRadianCoordinateAtDistanceFacingDirection(MGLRadianCoor
 CLLocationDirection MGLDirectionBetweenCoordinates(CLLocationCoordinate2D firstCoordinate, CLLocationCoordinate2D secondCoordinate);
 
 CGPoint MGLPointRounded(CGPoint point);
+
+MGLMatrix4 MGLMatrix4Make(std::array<double, 16> mat);

@@ -3,20 +3,10 @@
 #import "MGLMapView_Private.h"
 #import "MGLStyle_Private.h"
 #import "MGLStyleLayer_Private.h"
+#import "MGLGeometry_Private.h"
 
 #include <mbgl/style/layers/custom_layer.hpp>
 #include <mbgl/math/wrap.hpp>
-
-
-CATransform3D CATransform3DMake(std::array<double, 16> array) {
-    CATransform3D t = {
-        .m11 = static_cast<CGFloat>(array[0]), .m12 = static_cast<CGFloat>(array[1]), .m13 = static_cast<CGFloat>(array[2]), .m14 = static_cast<CGFloat>(array[3]),
-        .m21 = static_cast<CGFloat>(array[4]), .m22 = static_cast<CGFloat>(array[5]), .m23 = static_cast<CGFloat>(array[6]), .m24 = static_cast<CGFloat>(array[7]),
-        .m31 = static_cast<CGFloat>(array[8]), .m32 = static_cast<CGFloat>(array[9]), .m33 = static_cast<CGFloat>(array[10]), .m34 = static_cast<CGFloat>(array[11]),
-        .m41 = static_cast<CGFloat>(array[12]), .m42 = static_cast<CGFloat>(array[13]), .m43 = static_cast<CGFloat>(array[14]), .m44 = static_cast<CGFloat>(array[15])
-    };
-    return t;
-}
 
 class MGLOpenGLLayerHost : public mbgl::style::CustomLayerHost {
 public:
@@ -42,7 +32,7 @@ public:
             .direction = mbgl::util::wrap(params.bearing, 0., 360.),
             .pitch = static_cast<CGFloat>(params.pitch),
             .fieldOfView = static_cast<CGFloat>(params.fieldOfView),
-            .projectionMatrix = CATransform3DMake(params.projectionMatrix)
+            .projectionMatrix = MGLMatrix4Make(params.projectionMatrix)
         };
         [layer drawInMapView:layer.style.mapView withContext:drawingContext];
     }

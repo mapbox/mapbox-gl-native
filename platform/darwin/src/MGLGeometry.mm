@@ -111,3 +111,11 @@ MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double z
     mbgl::Point<double> projectedCoordinate = mbgl::Projection::project(MGLLatLngFromLocationCoordinate2D(coordinate), std::pow(2.0, zoomLevel));
     return MGLMapPointMake(projectedCoordinate.x, projectedCoordinate.y, zoomLevel);
 }
+
+MGLMatrix4 MGLMatrix4Make(std::array<double, 16>  array) {
+    MGLMatrix4 mat4;
+    for(uint8_t i = 0; i< 16; i++) {
+        mat4.m[i] = array[i];
+    }
+    return mat4;
+}
