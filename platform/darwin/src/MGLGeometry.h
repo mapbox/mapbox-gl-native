@@ -24,17 +24,13 @@ typedef struct __attribute__((objc_boxable)) MGLMapPoint {
     CGFloat zoomLevel;
 } MGLMapPoint;
 
-union __attribute__((aligned(16))) _MGLMatrix4 {
-    struct
-    {
-        double m00, m01, m02, m03;
-        double m10, m11, m12, m13;
-        double m20, m21, m22, m23;
-        double m30, m31, m32, m33;
-    };
-    double m[16];
-};
-typedef union _MGLMatrix4 MGLMatrix4;
+/* Defines a 4x4 matrix. */
+typedef struct MGLMatrix4 {
+    double m00, m01, m02, m03;
+    double m10, m11, m12, m13;
+    double m20, m21, m22, m23;
+    double m30, m31, m32, m33;
+} MGLMatrix4;
 
 /**
  Creates a new `MGLCoordinateSpan` from the given latitudinal and longitudinal
