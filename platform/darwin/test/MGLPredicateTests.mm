@@ -294,21 +294,21 @@ namespace mbgl {
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_geometryType = 'Point'"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$geometryType = 'Point'"];
         NSArray *jsonExpression = @[@"==", @[@"geometry-type"], @"Point"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier = 67086180"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier = 67086180"];
         NSArray *jsonExpression = @[@"==", @[@"id"], @67086180];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier = nil"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier = nil"];
         NSArray *jsonExpression = @[@"==", @[@"id"], [NSNull null]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
@@ -322,21 +322,21 @@ namespace mbgl {
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_geometryType != 'Point'"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$geometryType != 'Point'"];
         NSArray *jsonExpression = @[@"!=", @[@"geometry-type"], @"Point"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier != 67086180"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier != 67086180"];
         NSArray *jsonExpression = @[@"!=", @[@"id"], @67086180];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
                           mustRoundTrip:NO];
     }
     {
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier != nil"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier != nil"];
         NSArray *jsonExpression = @[@"!=", @[@"id"],  [NSNull null]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, jsonExpression);
         [self testSymmetryWithPredicate:predicate
@@ -431,9 +431,9 @@ namespace mbgl {
     }
     {
         NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$mgl_featureIdentifier IN { 6, 5, 4, 3}"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"$featureIdentifier IN { 6, 5, 4, 3}"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($mgl_featureIdentifier, 'NSNumber'), 3, YES, 4, YES, 5, YES, 6, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($featureIdentifier, 'NSNumber'), 3, YES, 4, YES, 5, YES, 6, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate mgl_predicateWithJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -458,9 +458,9 @@ namespace mbgl {
     }
     {
         NSArray *expected = @[@"match", @[@"geometry-type"], @"LineString", @YES, @"Polygon", @YES, @NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", [NSExpression expressionForVariable:@"mgl_geometryType"], @[@"LineString", @"Polygon"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ IN %@", [NSExpression expressionForVariable:@"geometryType"], @[@"LineString", @"Polygon"]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($mgl_geometryType, 'LineString', YES, 'Polygon', YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($geometryType, 'LineString', YES, 'Polygon', YES, NO) == YES"];
         auto forwardFilter = [NSPredicate mgl_predicateWithJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
@@ -476,18 +476,18 @@ namespace mbgl {
     }
     {
         NSArray *expected = @[@"match", @[@"geometry-type"], @"LineString", @YES, @"Polygon", @YES, @NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"LineString", @"Polygon"], [NSExpression expressionForVariable:@"mgl_geometryType"]];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"%@ CONTAINS %@", @[@"LineString", @"Polygon"], [NSExpression expressionForVariable:@"geometryType"]];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($mgl_geometryType, 'LineString', YES, 'Polygon', YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH($geometryType, 'LineString', YES, 'Polygon', YES, NO) == YES"];
         auto forwardFilter = [NSPredicate mgl_predicateWithJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
     }
     {
         NSArray *expected = @[@"match", @[@"id"], @6, @YES, @5, @YES, @4, @YES, @3, @YES, @NO];
-        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $mgl_featureIdentifier"];
+        NSPredicate *predicate = [NSPredicate predicateWithFormat:@"{ 6, 5, 4, 3} CONTAINS $featureIdentifier"];
         XCTAssertEqualObjects(predicate.mgl_jsonExpressionObject, expected);
-        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($mgl_featureIdentifier, 'NSNumber'), 3, YES, 4, YES, 5, YES, 6, YES, NO) == YES"];
+        NSPredicate *predicateAfter = [NSPredicate predicateWithFormat:@"MGL_MATCH(CAST($featureIdentifier, 'NSNumber'), 3, YES, 4, YES, 5, YES, 6, YES, NO) == YES"];
         auto forwardFilter = [NSPredicate mgl_predicateWithJSONObject:expected].mgl_filter;
         NSPredicate *forwardPredicateAfter = [NSPredicate mgl_predicateWithFilter:forwardFilter];
         XCTAssertEqualObjects(predicateAfter, forwardPredicateAfter);
