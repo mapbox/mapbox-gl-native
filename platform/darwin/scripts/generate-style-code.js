@@ -664,13 +664,13 @@ function duplicatePlatformDecls(src) {
     // Look for a documentation comment that contains “MGLColor” or “UIColor”
     // and the subsequent function, method, or property declaration. Try not to
     // match greedily.
-    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\*\/)(\s*[^;]+?\b(?:MGL|NS|UI)(?:Color|EdgeInsets(?:Zero)?)\b[^;]+?;)/g,
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\b(?:MGL|NS|UI)Color\b[\s\S]*?\*\/)(\s*.+?;)/g,
                        (match, comment, decl) => {
-        let macosComment = comment.replace(/\b(?:MGL|UI)(Color|EdgeInsets(?:Zero)?)\b/g, 'NS$1')
+        let macosComment = comment.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor')
             // Use the correct indefinite article.
-            .replace(/\ba(\s+`?NS(?:Color|EdgeInsets))\b/gi, 'an$1');
-        let iosDecl = decl.replace(/\bMGL(Color|EdgeInsets)\b/g, 'UI$1');
-        let macosDecl = decl.replace(/\b(?:MGL|UI)(Color|EdgeInsets)\b/g, 'NS$1');
+            .replace(/\ba(\s+`?NSColor)\b/gi, 'an$1');
+        let iosDecl = decl.replace(/\bMGLColor\b/g, 'UIColor');
+        let macosDecl = decl.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor');
         return `\
 #if TARGET_OS_IPHONE
 ${comment}${iosDecl}

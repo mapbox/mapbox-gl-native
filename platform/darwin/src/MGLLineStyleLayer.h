@@ -248,6 +248,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition lineBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the line will be drawn.
  
@@ -268,6 +269,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *lineColor;
+#else
+/**
+ The color with which the line will be drawn.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `linePattern` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *lineColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `lineColor` property.

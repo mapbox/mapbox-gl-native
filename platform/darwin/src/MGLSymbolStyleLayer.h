@@ -1470,6 +1470,7 @@ MGL_EXPORT
 
 #pragma mark - Accessing the Paint Attributes
 
+#if TARGET_OS_IPHONE
 /**
  The tint color to apply to the icon. The `iconImageName` property must be set
  to a template image.
@@ -1491,6 +1492,29 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *iconColor;
+#else
+/**
+ The tint color to apply to the icon. The `iconImageName` property must be set
+ to a template image.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *iconColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `iconColor` property.
@@ -1528,6 +1552,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition iconHaloBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the icon’s halo. The `iconImageName` property must be set to a
  template image.
@@ -1549,6 +1574,29 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *iconHaloColor;
+#else
+/**
+ The color of the icon’s halo. The `iconImageName` property must be set to a
+ template image.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.clearColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *iconHaloColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `iconHaloColor` property.
@@ -1714,6 +1762,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
  
@@ -1734,6 +1783,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textColor;
+#else
+/**
+ The color with which the text will be drawn.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `textColor` property.
@@ -1771,6 +1842,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition textHaloBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
@@ -1791,6 +1863,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textHaloColor;
+#else
+/**
+ The color of the text's halo, which helps it stand out from backgrounds.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.clearColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textHaloColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `textHaloColor` property.

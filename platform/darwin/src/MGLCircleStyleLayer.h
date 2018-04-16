@@ -137,6 +137,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition circleBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The fill color of the circle.
  
@@ -154,6 +155,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *circleColor;
+#else
+/**
+ The fill color of the circle.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *circleColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `circleColor` property.
@@ -265,6 +285,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *circlePitchScale __attribute__((unavailable("Use circleScaleAlignment instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The stroke color of the circle.
  
@@ -282,6 +303,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *circleStrokeColor;
+#else
+/**
+ The stroke color of the circle.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *circleStrokeColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `circleStrokeColor` property.
