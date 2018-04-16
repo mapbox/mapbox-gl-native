@@ -87,43 +87,46 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param trueExpression The expression for conditions equal to true.
  @param falseExpression The expression for conditions equal to false.
  */
-+ (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression NS_SWIFT_NAME(mgl_conditional(_:trueExpression:falseExpression:));
++ (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression NS_SWIFT_NAME(init(forMGLConditional:trueExpression:falseExpression:));
 
 /**
- Returns a step function expression specifying the function operator, default expression
+ Returns a step function expression specifying the stepping, from expression
  and stops.
  
- @param input The input expression.
- @param from The expression which could be a constant or function expression.
- @param stops The stops dictionay must be numeric literals in strictly ascending order.
+ @param steppingExpression The stepping expression.
+ @param fromExpression The expression which could be a constant or function expression.
+ @param stops The stops must be an `NSDictionary` constant `NSExpression`.
+ The wrapped dictionary must be numeric expression literals in strictly ascending order.
  */
-+ (instancetype)mgl_expressionForStepFunction:(nonnull NSExpression*)input from:(nonnull NSExpression *)from stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(mgl_stepFunction(input:from:stops:));
++ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)fromExpression stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLStepping:from:stops:));
 
 /**
  Returns an interpolated function expression specifying the function operator, curve type,
  parameters and steps.
  
- @param input The expression input.
+ @param interpolatingExpression The interpolating expression input.
  @param curveType The curve type could be `MGLExpressionInterpolationModeLinear`,
  `MGLExpressionInterpolationModeExponential` and
  `MGLExpressionInterpolationModeCubicBezier`.
  @param parameters The parameters expression.
- @param steps The steps expression.
+ @param stops The stops expression.
  */
-+ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)input curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps NS_SWIFT_NAME(mgl_interpolateFunction(input:curveType:parameters:steps:));
++ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)interpolatingExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLInterpolating:curveType:parameters:stops:));
 
 /**
- Returns a match function expression specifying the condition, lookup values,
+ Returns a match function expression specifying the input, matching values,
  and default value.
  
- @param condition The expression condition.
- @param values The lookup values expression.
- @param defaultValue The defaultValue expression to be used in case there is no match.
+ @param matchingExpression The matching expression.
+ @param matchedExpressions The matched values expression dictionary must be condition : value.
+ @param defaultExpression The defaultValue expression to be used in case there is no match.
  */
-+ (instancetype)mgl_expressionForMatchFunction:(nonnull NSExpression*)condition values:(nonnull NSExpression *)values defaultValue:(nonnull NSExpression *)defaultValue NS_SWIFT_NAME(mgl_matchFunction(condition:values:defaultValue:));
-
++ (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)matchingExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:matched:default:));
 /**
  Returns a constant expression appending the passed expression.
+ 
+ @note Both the receiver and the given expression must be an `NSString` constant
+ expression type; otherwise, an exception is rised.
  
  @param expression The expression to append to the receiver.
     system’s preferred language, if supported, specify `nil`. To use the local

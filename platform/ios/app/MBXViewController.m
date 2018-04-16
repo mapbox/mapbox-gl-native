@@ -967,10 +967,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                       @10.0f: [UIColor redColor],
                                       @12.0f: [UIColor greenColor],
                                       @14.0f: [UIColor blueColor]};
-    NSExpression *fillColorExpression = [NSExpression mgl_expressionForInterpolateFunction:NSExpression.mgl_zoomLevelVariableExpression
-                                                                                 curveType:MGLExpressionInterpolationModeLinear
-                                                                                parameters:nil
-                                                                                     steps:[NSExpression expressionForConstantValue:waterColorStops]];
+    NSExpression *fillColorExpression = [NSExpression mgl_expressionForInterpolatingExpression:NSExpression.zoomLevelVariableExpression
+                                                                                 withCurveType:MGLExpressionInterpolationModeLinear
+                                                                                    parameters:nil
+                                                                                         stops:[NSExpression expressionForConstantValue:waterColorStops]];
     waterLayer.fillColor = fillColorExpression;
 
     NSDictionary *fillAntialiasedStops = @{@11: @YES,
@@ -978,9 +978,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                                            @13: @YES,
                                            @14: @NO,
                                            @15: @YES};
-    waterLayer.fillAntialiased = [NSExpression mgl_expressionForStepFunction:NSExpression.mgl_zoomLevelVariableExpression
-                                                                        from:[NSExpression expressionForConstantValue:@NO]
-                                                                       stops:[NSExpression expressionForConstantValue:fillAntialiasedStops]];
+    waterLayer.fillAntialiased = [NSExpression mgl_expressionForSteppingExpression:NSExpression.zoomLevelVariableExpression
+                                                                    fromExpression:[NSExpression expressionForConstantValue:@NO]
+                                                                             stops:[NSExpression expressionForConstantValue:fillAntialiasedStops]];
 }
 
 - (void)styleRoadLayer

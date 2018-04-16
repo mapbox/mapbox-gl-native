@@ -599,21 +599,27 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
     }
 }
 
-+ (instancetype)mgl_expressionForStepFunction:(NSExpression *)input from:(NSExpression *)from stops:(nonnull NSExpression *)stops {
++ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)fromExpression stops:(nonnull NSExpression*)stops {
     return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
-                                     arguments:@[input, from, stops]];
+                                     arguments:@[steppingExpression, fromExpression, stops]];
 }
 
-+ (instancetype)mgl_expressionForInterpolateFunction:(nonnull NSExpression*)input curveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters steps:(nonnull NSExpression*)steps {
++ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)interpolatingExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops {
     NSExpression *sanitizeParams = parameters ? parameters : [NSExpression expressionForConstantValue:nil];
     return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
-                                     arguments:@[input, [NSExpression expressionForConstantValue:curveType], sanitizeParams, steps]];
+                                     arguments:@[interpolatingExpression, [NSExpression expressionForConstantValue:curveType], sanitizeParams, stops]];
 }
 
-+ (instancetype)mgl_expressionForMatchFunction:(nonnull NSExpression*)condition values:(nonnull NSExpression *)values defaultValue:(nonnull NSExpression *)defaultValue {
-    NSMutableArray *optionsArray = [NSMutableArray arrayWithArray:values.constantValue];
-    [optionsArray insertObject:condition atIndex:0];
-    [optionsArray addObject:defaultValue];
++ (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)matchingExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression {
+    NSMutableArray *optionsArray = [NSMutableArray arrayWithObjects:matchingExpression, nil];
+    
+    NSEnumerator *matchEnumerator = matchedExpressions.keyEnumerator;
+    while (NSExpression *key = matchEnumerator.nextObject) {
+        [optionsArray addObject:key];
+        [optionsArray addObject:[matchedExpressions objectForKey:key]];
+    }
+    
+    [optionsArray addObject:defaultExpression];
     return [NSExpression expressionForFunction:@"MGL_MATCH"
                                      arguments:optionsArray];
 }
