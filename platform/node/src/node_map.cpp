@@ -74,6 +74,7 @@ void NodeMap::Init(v8::Local<v8::Object> target) {
     Nan::SetPrototypeMethod(tpl, "removeLayer", RemoveLayer);
     Nan::SetPrototypeMethod(tpl, "addImage", AddImage);
     Nan::SetPrototypeMethod(tpl, "removeImage", RemoveImage);
+    Nan::SetPrototypeMethod(tpl, "setLayerZoomRange", SetLayerZoomRange);
     Nan::SetPrototypeMethod(tpl, "setLayoutProperty", SetLayoutProperty);
     Nan::SetPrototypeMethod(tpl, "setPaintProperty", SetPaintProperty);
     Nan::SetPrototypeMethod(tpl, "setFilter", SetFilter);
@@ -739,6 +740,33 @@ void NodeMap::RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     }
 
     nodeMap->map->getStyle().removeImage(*Nan::Utf8String(info[0]));
+}
+    
+void NodeMap::SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+    using namespace mbgl::style;
+
+    auto nodeMap = Nan::ObjectWrap::Unwrap<NodeMap>(info.Holder());
+    if (!nodeMap->map) return Nan::ThrowError(releasedMessage());
+    
+    if (info.Length() != 3) {
+        return Nan::ThrowTypeError("Three arguments required");
+    }
+    
+    if (!info[0]->IsString()) {
+        return Nan::ThrowTypeError("First argument must be a string");
+    }
+    
+    if (!info[1]->IsNumber() || !info[2]->IsNumber()) {
+        return Nan::ThrowTypeError("Second and third arguments must be numbers");
+    }
+    
+    mbgl::style::Layer* layer = nodeMap->map->getStyle().getLayer(*Nan::Utf8String(info[0]));
+    if (!layer) {
+        return Nan::ThrowTypeError("layer not found");
+    }
+
+    layer->setMinZoom(info[1]->NumberValue());
+    layer->setMaxZoom(info[2]->NumberValue());
 }
 
 void NodeMap::SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>& info) {
