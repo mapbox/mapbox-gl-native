@@ -41,39 +41,39 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
 @interface NSExpression (MGLVariableAdditions)
 
 /**
- `NSExpression` attribute that corresponds to the
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-zoom"><code>zoom</code></a>
  expression reference in the Mapbox Style Specification.
  */
-+ (NSExpression *)mgl_zoomLevelVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *zoomLevelVariableExpression;
 
 /**
- `NSExpression` attribute that corresponds to the
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-heatmap-density"><code>heatmap-density</code></a>
  expression reference in the Mapbox Style Specification.
  */
-+ (NSExpression *)mgl_heatmapDensityVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *heatmapDensityVariableExpression;
 
 /**
- `NSExpression` attribute that corresponds to the
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#eexpressions-geometry-type"><code>geometry-type</code></a>
  expression reference in the Mapbox Style Specification.
  */
-+ (NSExpression *)mgl_geometryTypeVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *geometryTypeVariableExpression;
 
 /**
- `NSExpression` attribute that corresponds to the
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-id"><code>id</code></a>
  expression reference in the Mapbox Style Specification.
  */
-+ (NSExpression *)mgl_featureIdentifierVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *featureIdentifierVariableExpression;
 
 /**
- `NSExpression` attribute that corresponds to the
+ `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties"><code>properties</code></a>
  expression reference in the Mapbox Style Specification.
  */
-+ (NSExpression *)mgl_featurePropertiesVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression;
 
 @end
 
