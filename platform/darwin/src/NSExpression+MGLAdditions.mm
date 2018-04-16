@@ -664,11 +664,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"heatmap-density"]) {
             return [NSExpression expressionForVariable:@"heatmapDensity"];
         } else if ([op isEqualToString:@"geometry-type"]) {
-            return [NSExpression expressionForVariable:@"mgl_geometryType"];
+            return [NSExpression expressionForVariable:@"geometryType"];
         } else if ([op isEqualToString:@"id"]) {
-            return [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
+            return [NSExpression expressionForVariable:@"featureIdentifier"];
         }  else if ([op isEqualToString:@"properties"]) {
-            return [NSExpression expressionForVariable:@"mgl_featureProperties"];
+            return [NSExpression expressionForVariable:@"featureProperties"];
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
@@ -754,13 +754,13 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([self.variable isEqualToString:@"zoomLevel"]) {
                 return @[@"zoom"];
             }
-            if ([self.variable isEqualToString:@"mgl_geometryType"]) {
+            if ([self.variable isEqualToString:@"geometryType"]) {
                 return @[@"geometry-type"];
             }
-            if ([self.variable isEqualToString:@"mgl_featureIdentifier"]) {
+            if ([self.variable isEqualToString:@"featureIdentifier"]) {
                 return @[@"id"];
             }
-            if ([self.variable isEqualToString:@"mgl_featureProperties"]) {
+            if ([self.variable isEqualToString:@"featureProperties"]) {
                 return @[@"properties"];
             }
             return @[@"var", self.variable];

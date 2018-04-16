@@ -65,7 +65,7 @@ attribute or, alternatively, one of the following special attributes:
 </thead>
 <tbody>
 <tr>
-   <td><code>$id</code></td>
+   <td><code>$featureIdentifier</code></td>
    <td>
        A value that uniquely identifies the feature in the containing source.
        For details on the types of values that may be associated with this key,
@@ -74,7 +74,7 @@ attribute or, alternatively, one of the following special attributes:
    </td>
 </tr>
 <tr>
-   <td><code>$type</code></td>
+   <td><code>$geometryType</code></td>
    <td>
        The type of geometry represented by the feature. A feature’s type is
        guaranteed to be one of the following strings:

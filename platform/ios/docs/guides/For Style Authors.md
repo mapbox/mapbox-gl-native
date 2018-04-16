@@ -329,9 +329,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
 `to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
-`geometry-type`        | |`$mgl_geometryType`
-`id`                   | |`$mgl_featureIdentifier`
-`properties`           | |`$mgl_featureProperties`
+`geometry-type`        | |`$geometryType`
+`id`                   | |`$featureIdentifier`
+`properties`           | |`$featureProperties`
 `at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
 `has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`

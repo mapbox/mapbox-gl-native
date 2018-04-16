@@ -171,21 +171,21 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:context], @1);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"mgl_geometryType"];
+        NSExpression *expression = [NSExpression expressionForVariable:@"geometryType"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"geometry-type"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$mgl_geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$geometryType"].mgl_jsonExpressionObject, @[@"geometry-type"]);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"geometry-type"]], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"mgl_featureIdentifier"];
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureIdentifier"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"id"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$mgl_featureIdentifier"].mgl_jsonExpressionObject, @[@"id"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureIdentifier"].mgl_jsonExpressionObject, @[@"id"]);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"id"]], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"mgl_featureProperties"];
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureProperties"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$mgl_featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"properties"]], expression);
     }
     {
@@ -817,7 +817,7 @@ using namespace std::string_literals;
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"mgl_does:have:"
-                                                             arguments:@[[NSExpression expressionForVariable:@"mgl_featureProperties"],
+                                                             arguments:@[[NSExpression expressionForVariable:@"featureProperties"],
                                                                          [NSExpression expressionForConstantValue:@"x"]]];
         NSArray *jsonExpression = @[@"has", @"x", @[@"properties"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
