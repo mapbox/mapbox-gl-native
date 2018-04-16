@@ -12,6 +12,8 @@
 * Fixed incorrect color calibration on macOS 10.13 High Sierra when using color-related methods of `MGLStyleLayer` subclasses, as well as when displaying an `MGLAttributionInfo`. It is no longer necessary to explicitly convert an `NSColor` to the sRGB color space before using these classes on High Sierra. ([#11391](https://github.com/mapbox/mapbox-gl-native/pull/11391))
 * The `MGLSymbolStyleLayer.textFontNames` property can now depend on a feature’s attributes. ([#10850](https://github.com/mapbox/mapbox-gl-native/pull/10850))
 * Properties such as `MGLSymbolStyleLayer.iconAllowsOverlap` and `MGLSymbolStyleLayer.iconIgnoresPlacement` now account for symbols in other sources. ([#10436](https://github.com/mapbox/mapbox-gl-native/pull/10436))
+* The layer filtering predicate's format strings now can contain arithmetic and calls to built-in `NSExpression` functions. ([#11587](https://github.com/mapbox/mapbox-gl-native/pull/11587))
+* The layer filtering predicate's key paths now may need to be cast to `NSString` or `NSNumber`. ([#11587](https://github.com/mapbox/mapbox-gl-native/pull/11587))
 
 ### Map rendering
 
