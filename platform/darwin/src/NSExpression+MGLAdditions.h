@@ -166,7 +166,6 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  guide for a correspondence of operators and types between the style
  specification and the `NSExpression` representation used by this SDK.
  
- @param locale The locale into which labels should be localized. To use the
  You can use `NSJSONSerialization` to serialize the Foundation object as data to
  write to a file.
  */
