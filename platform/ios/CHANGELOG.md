@@ -9,7 +9,7 @@ The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iO
 ### Packaging
 
 * Removed support for 32-bit simulators. ([#10962](https://github.com/mapbox/mapbox-gl-native/pull/10962))
-* Added Danish and Hebrew localizations. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967), [#11136](https://github.com/mapbox/mapbox-gl-native/pull/11134))
+* Added Danish, Hebrew, and European Portuguese localizations. ([#10967](https://github.com/mapbox/mapbox-gl-native/pull/10967), [#11136](https://github.com/mapbox/mapbox-gl-native/pull/11134), [#11695](https://github.com/mapbox/mapbox-gl-native/pull/11695))
 * Removed methods, properties, and constants that had been deprecated as of v3.7.6. ([#11205](https://github.com/mapbox/mapbox-gl-native/pull/11205), [#11681](https://github.com/mapbox/mapbox-gl-native/pull/11681))
 * Refined certain Swift interfaces by converting them from class methods to class properties. ([#11674](https://github.com/mapbox/mapbox-gl-native/pull/11674))
 
