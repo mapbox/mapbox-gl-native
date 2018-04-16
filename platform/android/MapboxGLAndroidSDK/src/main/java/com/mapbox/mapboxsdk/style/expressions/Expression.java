@@ -956,6 +956,8 @@ public class Expression {
    * Selects the output whose label value matches the input value, or the fallback value if no match is found.
    * The `input` can be any string or number expression.
    * Each label can either be a single literal value or an array of values.
+   * If types of the input and keys don't match, or the input value doesn't exist,
+   * the expresion will fail without falling back to the default value.
    * <p>
    * Example usage:
    * </p>
@@ -986,6 +988,8 @@ public class Expression {
    * Selects the output whose label value matches the input value, or the fallback value if no match is found.
    * The `input` can be any string or number expression.
    * Each label can either be a single literal value or an array of values.
+   * If types of the input and keys don't match, or the input value doesn't exist,
+   * the expresion will fail without falling back to the default value.
    * <p>
    * Example usage:
    * </p>
