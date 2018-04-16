@@ -101,6 +101,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition fillExtrusionBaseTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The base color of this layer. The extrusion's surfaces will be shaded
  differently based on this color in combination with the `light` settings. If
@@ -124,6 +125,31 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillExtrusionColor;
+#else
+/**
+ The base color of this layer. The extrusion's surfaces will be shaded
+ differently based on this color in combination with the `light` settings. If
+ this color is specified with an alpha component, the alpha component will be
+ ignored; use `fillExtrusionOpacity` to set layer opacityco.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `fillExtrusionPattern` is set to
+ `nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillExtrusionColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillExtrusionColor` property.

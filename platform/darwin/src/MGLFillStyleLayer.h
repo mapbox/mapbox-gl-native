@@ -95,6 +95,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *fillAntialias __attribute__((unavailable("Use fillAntialiased instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The color of the filled part of this layer.
  
@@ -115,6 +116,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillColor;
+#else
+/**
+ The color of the filled part of this layer.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `fillPattern` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillColor` property.
@@ -148,6 +171,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition fillOpacityTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The outline color of the fill. Matches the value of `fillColor` if unspecified.
  
@@ -165,6 +189,25 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillOutlineColor;
+#else
+/**
+ The outline color of the fill. Matches the value of `fillColor` if unspecified.
+ 
+ This property is only applied to the style if `fillPattern` is set to `nil`,
+ and `fillAntialiased` is set to an expression that evaluates to `YES`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillOutlineColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillOutlineColor` property.

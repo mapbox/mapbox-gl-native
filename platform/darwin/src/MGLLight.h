@@ -128,6 +128,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition positionTransition;
 
+#if TARGET_OS_IPHONE
 /**
  Color tint for lighting extruded geometries.
  
@@ -150,6 +151,30 @@ MGL_EXPORT
  light property in the Mapbox Style Specification.
  */
 @property (nonatomic) NSExpression *color;
+#else
+/**
+ Color tint for lighting extruded geometries.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.whiteColor`.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable
+ 
+ This property does not support applying interpolation or step functions to
+ feature attributes.
+
+ This property corresponds to the <a
+ href="https://www.mapbox.com/mapbox-gl-js/style-spec/#light-color"><code>color</code></a>
+ light property in the Mapbox Style Specification.
+ */
+@property (nonatomic) NSExpression *color;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `color` property.
