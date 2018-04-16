@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "NSBundle+MGLAdditions.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import <mbgl/util/default_styles.hpp>
 
@@ -417,6 +418,47 @@
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer2.identifier);
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer3.identifier);
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer4.identifier);
+}
+
+#pragma mark Localization tests
+
+- (void)testLanguageMatching {
+    {
+        NSArray *preferences = @[@"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"en-US"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"fr"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"fr");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hans"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"zh-Hans");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hans", @"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"zh-Hans");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hant"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
+    {
+        NSArray *preferences = @[@"tlh"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
+    {
+        NSArray *preferences = @[@"tlh", @"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"mul"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
 }
 
 @end

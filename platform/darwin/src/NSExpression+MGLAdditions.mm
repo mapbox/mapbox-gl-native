@@ -10,6 +10,7 @@
 #endif
 #import "NSPredicate+MGLAdditions.h"
 #import "NSValue+MGLStyleAttributeAdditions.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import <objc/runtime.h>
 
@@ -326,6 +327,112 @@
     }
 
     return {};
+}
+
+// Selectors of functions that can contain tokens in arguments.
+static NSArray * const MGLTokenizedFunctions = @[
+    @"mgl_interpolateWithCurveType:parameters:stops:",
+    @"mgl_interpolate:withCurveType:parameters:stops:",
+    @"mgl_stepWithMinimum:stops:",
+    @"mgl_step:from:stops:",
+];
+
+/**
+ Returns a copy of the given collection with tokens replaced by key path
+ expressions.
+ 
+ If no replacements take place, this method returns the original collection.
+ */
+NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
+    __block NSMutableArray *upgradedCollection;
+    [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
+        if (upgradedItem != item) {
+            if (!upgradedCollection) {
+                upgradedCollection = [collection mutableCopy];
+            }
+            upgradedCollection[idx] = upgradedItem;
+        }
+    }];
+    return upgradedCollection ?: collection;
+};
+
+/**
+ Returns a copy of the given stop dictionary with tokens replaced by key path
+ expressions.
+ 
+ If no replacements take place, this method returns the original stop
+ dictionary.
+ */
+NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
+    __block NSMutableDictionary *upgradedStops;
+    [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        if (![value isKindOfClass:[NSExpression class]]) {
+            value = [NSExpression expressionForConstantValue:value];
+        }
+        NSExpression *upgradedValue = value.mgl_expressionByReplacingTokensWithKeyPaths;
+        if (upgradedValue != value) {
+            if (!upgradedStops) {
+                upgradedStops = [stops mutableCopy];
+            }
+            upgradedStops[zoomLevel] = upgradedValue;
+        }
+    }];
+    return upgradedStops ?: stops;
+};
+
+- (NSExpression *)mgl_expressionByReplacingTokensWithKeyPaths {
+    switch (self.expressionType) {
+        case NSConstantValueExpressionType: {
+            NSString *constantValue = self.constantValue;
+            if ([constantValue isKindOfClass:[NSString class]] &&
+                [constantValue containsString:@"{"] && [constantValue containsString:@"}"]) {
+                NSMutableArray *components = [NSMutableArray array];
+                NSScanner *scanner = [NSScanner scannerWithString:constantValue];
+                scanner.charactersToBeSkipped = nil;
+                while (!scanner.isAtEnd) {
+                    NSString *string;
+                    if ([scanner scanUpToString:@"{" intoString:&string]) {
+                        [components addObject:[NSExpression expressionForConstantValue:string]];
+                    }
+                    
+                    NSString *token;
+                    if ([scanner scanString:@"{" intoString:NULL]
+                        && [scanner scanUpToString:@"}" intoString:&token]
+                        && [scanner scanString:@"}" intoString:NULL]) {
+                        [components addObject:[NSExpression expressionForKeyPath:token]];
+                    }
+                }
+                if (components.count == 1) {
+                    return components.firstObject;
+                }
+                return [NSExpression expressionForFunction:@"mgl_join:"
+                                                 arguments:@[[NSExpression expressionForAggregate:components]]];
+            }
+            NSDictionary *stops = self.constantValue;
+            if ([stops isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *localizedStops = MGLStopDictionaryByReplacingTokensWithKeyPaths(stops);
+                if (localizedStops != stops) {
+                    return [NSExpression expressionForConstantValue:localizedStops];
+                }
+            }
+            return self;
+        }
+            
+        case NSFunctionExpressionType: {
+            if ([MGLTokenizedFunctions containsObject:self.function]) {
+                NSArray *arguments = self.arguments;
+                NSArray *localizedArguments = MGLCollectionByReplacingTokensWithKeyPaths(arguments);
+                if (localizedArguments != arguments) {
+                    return [NSExpression expressionForFunction:self.operand selectorName:self.function arguments:localizedArguments];
+                }
+            }
+            return self;
+        }
+            
+        default:
+            return self;
+    }
 }
 
 @end
@@ -1106,6 +1213,128 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         [expressionObject addObject:operand.mgl_jsonExpressionObject];
     }
     return expressionObject;
+}
+
+#pragma mark Localization
+
+/**
+ Returns a localized copy of the given collection.
+ 
+ If no localization takes place, this method returns the original collection.
+ */
+NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) *collection, NSLocale * _Nullable locale) {
+    __block NSMutableArray *localizedCollection;
+    [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
+        NSExpression *localizedItem = [item mgl_expressionLocalizedIntoLocale:locale];
+        if (localizedItem != item) {
+            if (!localizedCollection) {
+                localizedCollection = [collection mutableCopy];
+            }
+            localizedCollection[idx] = localizedItem;
+        }
+    }];
+    return localizedCollection ?: collection;
+};
+
+/**
+ Returns a localized copy of the given stop dictionary.
+ 
+ If no localization takes place, this method returns the original stop
+ dictionary.
+ */
+NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
+    __block NSMutableDictionary *localizedStops;
+    [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
+        if (![value isKindOfClass:[NSExpression class]]) {
+            value = [NSExpression expressionForConstantValue:value];
+        }
+        NSExpression *localizedValue = [value mgl_expressionLocalizedIntoLocale:locale];
+        if (localizedValue != value) {
+            if (!localizedStops) {
+                localizedStops = [stops mutableCopy];
+            }
+            localizedStops[zoomLevel] = localizedValue;
+        }
+    }];
+    return localizedStops ?: stops;
+};
+
+- (NSExpression *)mgl_expressionLocalizedIntoLocale:(nullable NSLocale *)locale {
+    switch (self.expressionType) {
+        case NSConstantValueExpressionType: {
+            NSDictionary *stops = self.constantValue;
+            if ([stops isKindOfClass:[NSDictionary class]]) {
+                NSDictionary *localizedStops = MGLLocalizedStopDictionary(stops, locale);
+                if (localizedStops != stops) {
+                    return [NSExpression expressionForConstantValue:localizedStops];
+                }
+            }
+            return self;
+        }
+            
+        case NSKeyPathExpressionType: {
+            if ([self.keyPath isEqualToString:@"name"] || [self.keyPath hasPrefix:@"name_"]) {
+                NSString *localizedKeyPath = @"name";
+                if (![locale.localeIdentifier isEqualToString:@"mul"]) {
+                    NSArray *preferences = locale ? @[locale.localeIdentifier] : [NSLocale preferredLanguages];
+                    NSString *preferredLanguage = [MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences];
+                    if (preferredLanguage) {
+                        localizedKeyPath = [NSString stringWithFormat:@"name_%@", preferredLanguage];
+                    }
+                }
+                return [NSExpression expressionForKeyPath:localizedKeyPath];
+            }
+            return self;
+        }
+            
+        case NSFunctionExpressionType: {
+            NSExpression *operand = self.operand;
+            NSExpression *localizedOperand = [operand mgl_expressionLocalizedIntoLocale:locale];
+            
+            NSArray *arguments = self.arguments;
+            NSArray *localizedArguments = MGLLocalizedCollection(arguments, locale);
+            if (localizedArguments != arguments) {
+                return [NSExpression expressionForFunction:localizedOperand
+                                              selectorName:self.function
+                                                 arguments:localizedArguments];
+            }
+            if (localizedOperand != operand) {
+                return [NSExpression expressionForFunction:localizedOperand
+                                              selectorName:self.function
+                                                 arguments:self.arguments];
+            }
+            return self;
+        }
+            
+        case NSConditionalExpressionType: {
+            if (@available(iOS 9.0, *)) {
+                NSExpression *trueExpression = self.trueExpression;
+                NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
+                NSExpression *falseExpression = self.falseExpression;
+                NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
+                if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
+                    return [NSExpression expressionForConditional:self.predicate
+                                                   trueExpression:localizedTrueExpression
+                                                  falseExpression:localizedFalseExpression];
+                }
+            }
+            return self;
+        }
+            
+        case NSAggregateExpressionType: {
+            NSArray *collection = self.collection;
+            if ([collection isKindOfClass:[NSArray class]]) {
+                NSArray *localizedCollection = MGLLocalizedCollection(collection, locale);
+                if (localizedCollection != collection) {
+                    return [NSExpression expressionForAggregate:localizedCollection];
+                }
+            }
+            return self;
+        }
+            
+        default:
+            return self;
+    }
 }
 
 @end

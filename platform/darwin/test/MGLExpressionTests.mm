@@ -866,4 +866,144 @@ using namespace std::string_literals;
     }
 }
 
+#pragma mark - Localization tests
+
+- (void)testTokenReplacement {
+    {
+        NSExpression *original = MGLConstantExpression(@"");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"{");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"{token");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"{token}");
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"token"];
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"{token} {token}");
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_join({token, ' ', token})"];
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, '{short}', %@)", @{
+            @1: MGLConstantExpression(@"{short}"),
+            @2: @"…",
+            @3: @"{long}",
+        }];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
+            @1: [NSExpression expressionForKeyPath:@"short"],
+            @2: @"…",
+            @3: [NSExpression expressionForKeyPath:@"long"],
+        }];
+        XCTAssertEqualObjects(original.mgl_expressionByReplacingTokensWithKeyPaths, expected);
+    }
+}
+
+- (void)testLocalization {
+    {
+        NSExpression *original = MGLConstantExpression(@"");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"Old MacDonald");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = MGLConstantExpression(@"{name_en}");
+        NSExpression *expected = original;
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
+        NSExpression *expected = original;
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:nil], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"name"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"mul"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"name_fr"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"fr-CA"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"name_zh-Hans"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"zh-Hans"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionForKeyPath:@"name_en"];
+        NSExpression *expected = [NSExpression expressionForKeyPath:@"name"];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"tlh"]], expected);
+    }
+    {
+        NSExpression *original = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
+            @1: [NSExpression expressionForKeyPath:@"abbr"],
+            @2: @"…",
+            @3: [NSExpression expressionForKeyPath:@"name_fr"],
+        }];
+        NSExpression *expected = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, short, %@)", @{
+            @1: [NSExpression expressionForKeyPath:@"abbr"],
+            @2: @"…",
+            @3: [NSExpression expressionForKeyPath:@"name_es"],
+        }];
+        XCTAssertEqualObjects([original mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"es-PR"]], expected);
+    }
+    {
+        NSArray *jsonExpression = @[
+            @"step",
+            @[@"zoom"],
+            @[
+                @"case",
+                @[
+                    @"<",
+                    @[
+                        @"to-number",
+                        @[@"get", @"area"]
+                    ],
+                    @80000
+                ],
+                @[@"get", @"abbr"],
+                @[@"get", @"name_en"]
+            ],
+            @5, @[@"get", @"name_en"]
+        ];
+        NSArray *localizedJSONExpression = @[
+            @"step",
+            @[@"zoom"],
+            @[
+                @"case",
+                @[
+                    @"<",
+                    @[
+                        @"to-number",
+                        @[@"get", @"area"]
+                    ],
+                    @80000
+                ],
+                @[@"get", @"abbr"],
+                @[@"get", @"name"]
+            ],
+            @5, @[@"get", @"name"]
+        ];
+        NSExpression *expression = [NSExpression expressionWithMGLJSONObject:jsonExpression];
+        NSExpression *localizedExpression = [expression mgl_expressionLocalizedIntoLocale:[NSLocale localeWithLocaleIdentifier:@"mul"]];
+        XCTAssertEqualObjects(localizedExpression.mgl_jsonExpressionObject, localizedJSONExpression);
+    }
+}
+
 @end
