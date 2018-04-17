@@ -504,6 +504,13 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_log2:" arguments:@[MGLConstantExpression(@1024)]];
+        NSArray *jsonExpression = @[@"log2", @1024];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @10);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForFunction:@"raise:toPower:" arguments:arguments];
         NSArray *jsonExpression = @[@"^", @1, @1];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
