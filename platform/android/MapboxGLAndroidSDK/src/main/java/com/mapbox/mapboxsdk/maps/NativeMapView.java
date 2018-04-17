@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -38,11 +39,24 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import timber.log.Timber;
 
 // Class that wraps the native methods for convenience
 final class NativeMapView {
+
+  //Hold a reference to prevent it from being GC'd as long as it's used on the native side
+  private final FileSource fileSource;
+
+  // Used to schedule work on the MapRenderer Thread
+  private final MapRenderer mapRenderer;
+
+  // Used for callbacks
+  private ViewCallback viewCallback;
+
+  // Device density
+  private final float pixelRatio;
 
   // Flag to indicating destroy was called
   private boolean destroyed = false;
@@ -50,20 +64,10 @@ final class NativeMapView {
   // Holds the pointer to JNI NativeMapView
   private long nativePtr = 0;
 
-  // Used for callbacks
-  private MapView mapView;
-
-  //Hold a reference to prevent it from being GC'd as long as it's used on the native side
-  private final FileSource fileSource;
-
-  // Used to schedule work on the MapRenderer Thread
-  private MapRenderer mapRenderer;
-
-  // Device density
-  private final float pixelRatio;
-
   // Listener invoked to return a bitmap of the map
   private MapboxMap.SnapshotReadyCallback snapshotReadyCallback;
+
+  private final CopyOnWriteArrayList<MapView.OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
   static {
     LibraryLoader.load();
@@ -73,14 +77,11 @@ final class NativeMapView {
   // Constructors
   //
 
-  public NativeMapView(final MapView mapView, MapRenderer mapRenderer) {
+  public NativeMapView(final Context context, final ViewCallback viewCallback, final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
-    this.mapView = mapView;
-
-    Context context = mapView.getContext();
-    fileSource = FileSource.getInstance(context);
-    pixelRatio = context.getResources().getDisplayMetrics().density;
-
+    this.viewCallback = viewCallback;
+    this.fileSource = FileSource.getInstance(context);
+    this.pixelRatio = context.getResources().getDisplayMetrics().density;
     nativeInitialize(this, fileSource, mapRenderer, pixelRatio);
   }
 
@@ -100,7 +101,7 @@ final class NativeMapView {
 
   public void destroy() {
     nativeDestroy();
-    mapView = null;
+    viewCallback = null;
     destroyed = true;
   }
 
@@ -861,8 +862,12 @@ final class NativeMapView {
   //
 
   protected void onMapChanged(int rawChange) {
-    if (mapView != null) {
-      mapView.onMapChange(rawChange);
+    for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+      try {
+        onMapChangedListener.onMapChanged(rawChange);
+      } catch (RuntimeException err) {
+        Timber.e(err, "Exception in MapView.OnMapChangedListener");
+      }
     }
   }
 
@@ -871,7 +876,7 @@ final class NativeMapView {
       return;
     }
 
-    Bitmap viewContent = BitmapUtils.createBitmapFromView(mapView);
+    Bitmap viewContent = viewCallback.getViewContent();
     if (snapshotReadyCallback != null && mapContent != null && viewContent != null) {
       snapshotReadyCallback.onSnapshotReady(BitmapUtils.mergeBitmap(mapContent, viewContent));
     }
@@ -1069,14 +1074,14 @@ final class NativeMapView {
     if (isDestroyedOn("")) {
       return 0;
     }
-    return mapView.getWidth();
+    return viewCallback.getWidth();
   }
 
   int getHeight() {
     if (isDestroyedOn("")) {
       return 0;
     }
-    return mapView.getHeight();
+    return viewCallback.getHeight();
   }
 
   //
@@ -1084,13 +1089,13 @@ final class NativeMapView {
   //
 
   void addOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    if (mapView != null) {
-      mapView.addOnMapChangedListener(listener);
-    }
+    onMapChangedListeners.add(listener);
   }
 
   void removeOnMapChangedListener(@NonNull MapView.OnMapChangedListener listener) {
-    mapView.removeOnMapChangedListener(listener);
+    if (onMapChangedListeners.contains(listener)) {
+      onMapChangedListeners.remove(listener);
+    }
   }
 
   //
@@ -1106,15 +1111,15 @@ final class NativeMapView {
   }
 
   public void setOnFpsChangedListener(final MapboxMap.OnFpsChangedListener listener) {
+    final Handler handler = new Handler();
     mapRenderer.queueEvent(new Runnable() {
 
       @Override
       public void run() {
         mapRenderer.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
-
           @Override
           public void onFpsChanged(final double fps) {
-            mapView.post(new Runnable() {
+            handler.post(new Runnable() {
 
               @Override
               public void run() {
@@ -1123,13 +1128,11 @@ final class NativeMapView {
 
             });
           }
-
         });
       }
 
     });
   }
-
 
   //
   // Image conversion
@@ -1179,5 +1182,13 @@ final class NativeMapView {
         nativeMapView.nativeAddImages(images.toArray(new Image[images.size()]));
       }
     }
+  }
+
+  public interface ViewCallback {
+    int getWidth();
+
+    int getHeight();
+
+    Bitmap getViewContent();
   }
 }
