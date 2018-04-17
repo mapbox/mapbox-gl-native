@@ -365,24 +365,24 @@ In style specification | Method, function, or predicate type | Format string syn
 `^`                    | `raise:toPower:` | `2 ** 2`
 `+`                    | `add:to:` | `1 + 2`
 `abs`                  | `abs:` | `abs(-1)`
-`acos`                 | |
-`asin`                 | |
-`atan`                 | |
+`acos`                 | `mgl_acos:` | `mgl_acos(1)`
+`asin`                 | `mgl_asin:` | `mgl_asin(0)`
+`atan`                 | `mgl_atan:` | `mgl_atan(20)`
 `ceil`                 | `ceiling:` | `ceiling(0.99999)`
-`cos`                  | |
+`cos`                  | `mgl_cos:` | `mgl_cos(0)`
 `e`                    | | `%@` representing `NSNumber` containing `M_E`
 `floor`                | `floor:` | `floor(-0.99999)`
 `ln`                   | `ln:` | `ln(2)`
 `ln2`                  | | `%@` representing `NSNumber` containing `M_LN2`
 `log10`                | `log:` | `log(1)`
-`log2`                 | |
+`log2`                 | `mgl_log2:` | `mgl_log2(1024)`
 `max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
 `min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
 `pi`                   | | `%@` representing `NSNumber` containing `M_PI`
 `round`                | `mgl_round:` | `mgl_round(1.5)`
-`sin`                  | |
+`sin`                  | `mgl_sin:` | `mgl_sin(0)`
 `sqrt`                 | `sqrt:` | `sqrt(2)`
-`tan`                  | |
+`tan`                  | `mgl_tan:` | `mgl_tan(0)`
 `zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoom`
 `heatmap-density`      | `NSExpression.heatmapDensityVariableExpression` | `$heatmapDensity`
 
