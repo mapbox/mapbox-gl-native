@@ -74,11 +74,6 @@ TEST(Stringify, Value) {
     ASSERT_EQ(stringify(Value(1.2)), "1.2");
 }
 
-TEST(Stringify, Filter) {
-    ASSERT_EQ(stringify(NullFilter()), "null");
-    ASSERT_EQ(stringify(EqualsFilter { "a", 1.0 }), "[\"==\",\"a\",1.0]");
-}
-
 TEST(Stringify, CameraFunction) {
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
         "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0]");
