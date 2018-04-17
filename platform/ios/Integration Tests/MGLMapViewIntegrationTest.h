@@ -1,11 +1,14 @@
 #import <XCTest/XCTest.h>
 #import <Mapbox/Mapbox.h>
 
-#define TestFailWithSelf(myself, ...) \
+#define MGLTestFail(myself, ...) \
     _XCTPrimitiveFail(myself, __VA_ARGS__)
 
-#define TestAssertWithSelf(expression, myself, ...) \
+#define MGLTestAssert(myself, expression, ...) \
     _XCTPrimitiveAssertTrue(myself, expression, @#expression, __VA_ARGS__)
+
+#define MGLTestAssertEqualWithAccuracy(myself, expression1, expression2, accuracy, ...) \
+    _XCTPrimitiveAssertEqualWithAccuracy(myself, expression1, @#expression1, expression2, @#expression2, accuracy, @#accuracy, __VA_ARGS__)
 
 @interface MGLMapViewIntegrationTest : XCTestCase <MGLMapViewDelegate>
 @property (nonatomic) MGLMapView *mapView;

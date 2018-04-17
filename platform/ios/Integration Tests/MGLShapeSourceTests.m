@@ -56,7 +56,7 @@
         // See https://github.com/mapbox/mapbox-gl-native/issues/11180
 
         if (delegateCallCount > 10) {
-            TestFailWithSelf(strongSelf);
+            MGLTestFail(strongSelf);
         }
         else {
             shapeSource.shape = nil;
@@ -107,7 +107,7 @@
         delegateCallCount++;
 
         if (delegateCallCount > 1) {
-            TestFailWithSelf(weakself);
+            MGLTestFail(weakself);
         }
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
