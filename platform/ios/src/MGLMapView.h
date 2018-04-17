@@ -218,7 +218,7 @@ MGL_EXPORT IB_DESIGNABLE
  the server, calling this method does not necessarily ensure that the map view
  reflects those changes.
  */
-- (IBAction)reloadStyle:(id)sender;
+- (IBAction)reloadStyle:(nullable id)sender;
 
 /**
  A Boolean value indicating whether the map may display scale information.
