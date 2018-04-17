@@ -618,9 +618,7 @@ void Transform::startTransition(const CameraOptions& camera,
         transitionFrameFn = nullptr;
         transitionFinishFn = nullptr;
 
-        auto shouldFinish = update(Clock::now());
-        assert(shouldFinish);
-
+        update(Clock::now());
         finish();
     }
 }
