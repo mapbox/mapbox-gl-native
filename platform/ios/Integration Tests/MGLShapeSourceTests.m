@@ -8,10 +8,10 @@
 
 #import "MGLMapViewIntegrationTest.h"
 
-@interface MBShapeSourceTests : MGLMapViewIntegrationTest
+@interface MGLShapeSourceTests : MGLMapViewIntegrationTest
 @end
 
-@implementation MBShapeSourceTests
+@implementation MGLShapeSourceTests
 
 - (void)testSettingShapeSourceToNilInRegionDidChange {
 
@@ -40,9 +40,9 @@
     __weak typeof(self) weakself = self;
     __block NSInteger delegateCallCount = 0;
 
-    self.regionDidChange = ^(MGLMapView *mapView, BOOL animated) {
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
-        MBShapeSourceTests *strongSelf = weakself;
+        MGLShapeSourceTests *strongSelf = weakself;
 
         if (!strongSelf)
             return;
@@ -98,15 +98,11 @@
     __weak typeof(self) weakself = self;
 
     self.regionIsChanging = ^(MGLMapView *mapView) {
-        // Setting the shapeSource.shape = nil, was causing an infinite loop, so here
-        // we check for a runaway call. 10 here is arbitrary. We could argue that this
-        // should check that the call count is only 1, however in this case we particularly
-        // want to check for the infinite loop.
         // See https://github.com/mapbox/mapbox-gl-native/issues/11180
         shapeSource.shape = nil;
     };
 
-    self.regionDidChange = ^(MGLMapView *mapView, BOOL animated) {
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
         delegateCallCount++;
 
