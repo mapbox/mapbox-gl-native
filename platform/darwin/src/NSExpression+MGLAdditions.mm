@@ -69,6 +69,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_METHOD(mgl_coalesce:);
     INSTALL_METHOD(mgl_does:have:);
     INSTALL_METHOD(mgl_acos:);
+    INSTALL_METHOD(mgl_cos:);
     INSTALL_METHOD(mgl_asin:);
     INSTALL_METHOD(mgl_atan:);
     
@@ -105,6 +106,13 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
  */
 - (NSNumber *)mgl_acos:(NSNumber *)number {
     return @(acos(number.doubleValue));
+}
+
+/**
+ Computes the principal value of the cosine.
+ */
+- (NSNumber *)mgl_cos:(NSNumber *)number {
+    return @(cos(number.doubleValue));
 }
 
 /**
@@ -700,6 +708,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"abs": @"abs:",
             @"round": @"mgl_round:",
             @"acos" : @"mgl_acos:",
+            @"cos" : @"mgl_cos:",
             @"asin" : @"mgl_asin:",
             @"atan" : @"mgl_atan:",
             @"floor": @"floor:",
@@ -945,6 +954,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"length:": @"length",
             @"mgl_round:": @"round",
             @"mgl_acos:" : @"acos",
+            @"mgl_cos:" : @"cos",
             @"mgl_asin:" : @"asin",
             @"mgl_atan:" : @"atan",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.

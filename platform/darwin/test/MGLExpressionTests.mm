@@ -539,6 +539,13 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_cos:" arguments:@[MGLConstantExpression(@0)]];
+        NSArray *jsonExpression = @[@"cos", @0];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @1);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForFunction:@"mgl_asin:" arguments:@[MGLConstantExpression(@0)]];
         NSArray *jsonExpression = @[@"asin", @0];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
