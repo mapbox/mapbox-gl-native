@@ -108,7 +108,7 @@ afterEvaluate { project ->
 
     task androidJavadocs(type: Javadoc) {
         source = android.sourceSets.main.java.sourceFiles
-        classpath = files(android.bootClasspath)
+        classpath = files(android.bootstrapClasspath)
     }
 
     task androidJavadocsJar(type: Jar, dependsOn: androidJavadocs) {
