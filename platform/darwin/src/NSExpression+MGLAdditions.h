@@ -9,7 +9,7 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
-typedef NSString *MGLExpressionInterpolationMode NS_TYPED_EXTENSIBLE_ENUM;
+typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
 
 /**
  An `NSString` identifying the `linear` interpolation type in an `NSExpression`.
@@ -94,34 +94,33 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  and stops.
  
  @param steppingExpression The stepping expression.
- @param fromExpression The expression which could be a constant or function expression.
+ @param minimumExpression The expression which could be a constant or function expression.
  @param stops The stops must be an `NSDictionary` constant `NSExpression`.
- The wrapped dictionary must be numeric expression literals in strictly ascending order.
  */
-+ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)fromExpression stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLStepping:from:stops:));
++ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLStepping:from:stops:));
 
 /**
  Returns an interpolated function expression specifying the function operator, curve type,
  parameters and steps.
  
- @param interpolatingExpression The interpolating expression input.
+ @param inputExpression The interpolating expression input.
  @param curveType The curve type could be `MGLExpressionInterpolationModeLinear`,
  `MGLExpressionInterpolationModeExponential` and
  `MGLExpressionInterpolationModeCubicBezier`.
  @param parameters The parameters expression.
  @param stops The stops expression.
  */
-+ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)interpolatingExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLInterpolating:curveType:parameters:stops:));
++ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)inputExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLInterpolating:curveType:parameters:stops:));
 
 /**
  Returns a match function expression specifying the input, matching values,
  and default value.
  
- @param matchingExpression The matching expression.
+ @param inputExpression The matching expression.
  @param matchedExpressions The matched values expression dictionary must be condition : value.
  @param defaultExpression The defaultValue expression to be used in case there is no match.
  */
-+ (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)matchingExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:matched:default:));
++ (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)inputExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:in:default:));
 /**
  Returns a constant expression appending the passed expression.
  
@@ -129,8 +128,6 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  expression type; otherwise, an exception is rised.
  
  @param expression The expression to append to the receiver.
-    system’s preferred language, if supported, specify `nil`. To use the local
-    language, specify a locale with the identifier `mul`.
  */
 - (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression NS_SWIFT_NAME(mgl_appending(_:));
 
