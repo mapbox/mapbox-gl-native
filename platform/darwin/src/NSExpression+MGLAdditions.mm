@@ -68,6 +68,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_METHOD(mgl_step:from:stops:);
     INSTALL_METHOD(mgl_coalesce:);
     INSTALL_METHOD(mgl_does:have:);
+    INSTALL_METHOD(mgl_acos:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -95,6 +96,13 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
  */
 - (NSNumber *)mgl_round:(NSNumber *)number {
     return @(round(number.doubleValue));
+}
+
+/**
+  Computes the principal value of the arc cosine of number.
+ */
+- (NSNumber *)mgl_acos:(NSNumber *)number {
+    return @(acos(number.doubleValue));
 }
 
 /**
@@ -675,6 +683,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"ln": @"ln:",
             @"abs": @"abs:",
             @"round": @"mgl_round:",
+            @"acos" : @"mgl_acos:",
             @"floor": @"floor:",
             @"ceil": @"ceiling:",
             @"^": @"raise:toPower:",
@@ -917,6 +926,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"lowercase:": @"downcase",
             @"length:": @"length",
             @"mgl_round:": @"round",
+            @"mgl_acos:" : @"acos",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
             @"MGL_LET": @"let",
             @"MGL_LET:": @"let",
