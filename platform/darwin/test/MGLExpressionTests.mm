@@ -545,6 +545,14 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([expression expressionValueWithObject:nil context:nil], @0);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+        NSExpression *expression = [NSExpression expressionForFunction:@"mgl_atan:" arguments:@[MGLConstantExpression(@20)]];
+        NSArray *jsonExpression = @[@"atan", @20];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        NSNumber *value = [expression expressionValueWithObject:nil context:nil];
+        XCTAssertEqualWithAccuracy(value.doubleValue, 1.52, 0.001);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testStringFormattingExpressionObject {

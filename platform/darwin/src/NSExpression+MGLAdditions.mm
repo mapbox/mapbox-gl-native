@@ -70,6 +70,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_METHOD(mgl_does:have:);
     INSTALL_METHOD(mgl_acos:);
     INSTALL_METHOD(mgl_asin:);
+    INSTALL_METHOD(mgl_atan:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -100,17 +101,24 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
 }
 
 /**
-  Computes the principal value of the arc cosine.
+  Computes the principal value of the inverse cosine.
  */
 - (NSNumber *)mgl_acos:(NSNumber *)number {
     return @(acos(number.doubleValue));
 }
 
 /**
- Computes the principal value of the arc sine.
+ Computes the principal value of the inverse sine.
  */
 - (NSNumber *)mgl_asin:(NSNumber *)number {
     return @(asin(number.doubleValue));
+}
+
+/**
+ Computes the principal value of the inverse tangent.
+ */
+- (NSNumber *)mgl_atan:(NSNumber *)number {
+    return @(atan(number.doubleValue));
 }
 
 /**
@@ -693,6 +701,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"round": @"mgl_round:",
             @"acos" : @"mgl_acos:",
             @"asin" : @"mgl_asin:",
+            @"atan" : @"mgl_atan:",
             @"floor": @"floor:",
             @"ceil": @"ceiling:",
             @"^": @"raise:toPower:",
@@ -937,6 +946,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"mgl_round:": @"round",
             @"mgl_acos:" : @"acos",
             @"mgl_asin:" : @"asin",
+            @"mgl_atan:" : @"atan",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
             @"MGL_LET": @"let",
             @"MGL_LET:": @"let",
