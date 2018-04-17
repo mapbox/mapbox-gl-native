@@ -329,9 +329,9 @@ In style specification | Method, function, or predicate type | Format string syn
 `to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
 `to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
-`geometry-type`        | |`$geometryType`
-`id`                   | |`$featureIdentifier`
-`properties`           | |`$featureProperties`
+`geometry-type`        | `NSExpression.geometryTypeVariableExpression` | `$geometryType`
+`id`                   | `NSExpression.featureIdentifierVariableExpression` | `$featureIdentifier`
+`properties`           | `NSExpression.featurePropertiesVariableExpression` | `$featureProperties`
 `at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
 `has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
@@ -345,14 +345,14 @@ In style specification | Method, function, or predicate type | Format string syn
 `>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
 `all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
 `any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
-`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or `MGL_IF` | `TERNARY(1 = 2, YES, NO)` or `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or `MGL_IF` or `+[NSExpression mgl_expressionForConditional:trueExpression:falseExpresssion:]` | `TERNARY(1 = 2, YES, NO)` or `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`
 `coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
-`match`                | `MGL_MATCH` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
-`interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` |
-`step`                 | `mgl_step:withMinimum:stops:` |
+`match`                | `MGL_MATCH` or `+[NSExpression mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
+`interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` or `+[NSExpression mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` |
+`step`                 | `mgl_step:withMinimum:stops:` or `+[NSExpression mgl_expressionForSteppingExpression:fromExpression:stops:]` |
 `let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
 `var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
-`concat`               | `mgl_join:` | `mgl_join({'Old', ' ', 'MacDonald'})`
+`concat`               | `mgl_join:` or `-[NSExpression mgl_expressionByAppendingExpression:]` | `mgl_join({'Old', ' ', 'MacDonald'})`
 `downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
 `rgb`                  | `+[UIColor colorWithRed:green:blue:alpha:]` |
@@ -383,8 +383,8 @@ In style specification | Method, function, or predicate type | Format string syn
 `sin`                  | |
 `sqrt`                 | `sqrt:` | `sqrt(2)`
 `tan`                  | |
-`zoom`                 | | `$zoom`
-`heatmap-density`      | | `$heatmapDensity`
+`zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoom`
+`heatmap-density`      | `NSExpression.heatmapDensityVariableExpression` | `$heatmapDensity`
 
 For operators that have no corresponding `NSExpression` symbol, use the
 `MGL_FUNCTION()` format string syntax.

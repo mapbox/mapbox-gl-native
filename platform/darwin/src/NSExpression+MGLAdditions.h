@@ -9,6 +9,130 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
+
+/**
+ An `NSString` identifying the `linear` interpolation type in an `NSExpression`.
+ 
+ This attribute corresponds to the `linear` value in the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear;
+
+/**
+ An `NSString` identifying the `expotential` interpolation type in an `NSExpression`.
+ 
+ This attribute corresponds to the `exponential` value in the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential;
+
+/**
+ An `NSString` identifying the `cubic-bezier` interpolation type in an `NSExpression`.
+ 
+ This attribute corresponds to the `cubic-bezier` value in the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier;
+
+@interface NSExpression (MGLVariableAdditions)
+
+/**
+ `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-zoom"><code>zoom</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *zoomLevelVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-heatmap-density"><code>heatmap-density</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *heatmapDensityVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#eexpressions-geometry-type"><code>geometry-type</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *geometryTypeVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-id"><code>id</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *featureIdentifierVariableExpression;
+
+/**
+ `NSExpression` variable that corresponds to the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties"><code>properties</code></a>
+ expression reference in the Mapbox Style Specification.
+ */
+@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression;
+
+@end
+
+@interface NSExpression (MGLInitializerAdditions)
+
+/**
+ Returns a conditional function expression specifying the string predicate, and
+ expressions for each condition.
+ 
+ @param conditionPredicate The predicate to get evaluated.
+ @param trueExpression The expression for conditions equal to true.
+ @param falseExpression The expression for conditions equal to false.
+ */
++ (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression NS_SWIFT_NAME(init(forMGLConditional:trueExpression:falseExpression:));
+
+/**
+ Returns a step function expression specifying the stepping, from expression
+ and stops.
+ 
+ @param steppingExpression The stepping expression.
+ @param minimumExpression The expression which could be a constant or function expression.
+ @param stops The stops must be an `NSDictionary` constant `NSExpression`.
+ */
++ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLStepping:from:stops:));
+
+/**
+ Returns an interpolated function expression specifying the function operator, curve type,
+ parameters and steps.
+ 
+ @param inputExpression The interpolating expression input.
+ @param curveType The curve type could be `MGLExpressionInterpolationModeLinear`,
+ `MGLExpressionInterpolationModeExponential` and
+ `MGLExpressionInterpolationModeCubicBezier`.
+ @param parameters The parameters expression.
+ @param stops The stops expression.
+ */
++ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)inputExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops NS_SWIFT_NAME(init(forMGLInterpolating:curveType:parameters:stops:));
+
+/**
+ Returns a match function expression specifying the input, matching values,
+ and default value.
+ 
+ @param inputExpression The matching expression.
+ @param matchedExpressions The matched values expression dictionary must be condition : value.
+ @param defaultExpression The defaultValue expression to be used in case there is no match.
+ */
++ (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)inputExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:in:default:));
+/**
+ Returns a constant expression appending the passed expression.
+ 
+ @note Both the receiver and the given expression must be an `NSString` constant
+ expression type; otherwise, an exception is rised.
+ 
+ @param expression The expression to append to the receiver.
+ */
+- (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression NS_SWIFT_NAME(mgl_appending(_:));
+
+@end
+
 @interface NSExpression (MGLAdditions)
 
 /**
