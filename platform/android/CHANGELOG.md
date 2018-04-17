@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone.  If you'd like to do so please see the [`Contributing Guide`](https://github.com/mapbox/mapbox-gl-native/blob/master/CONTRIBUTING.md) first to get started.
 
+## 6.0.0 - April 17, 2018
+ - Bump telemetry version to 3.0.1 [#11700](https://github.com/mapbox/mapbox-gl-native/pull/11700)
+ - Update layer when changing its min/max zoom [#11687](https://github.com/mapbox/mapbox-gl-native/pull/11687)
+
 ## 6.0.0-beta.7 - April 12, 2018
  - Add abs, round, floor, ceil expression operators [#11653](https://github.com/mapbox/mapbox-gl-native/pull/11653)
  - LatLngBounds correct center calculation [#11650](https://github.com/mapbox/mapbox-gl-native/pull/11650)
