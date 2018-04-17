@@ -73,6 +73,7 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
     INSTALL_METHOD(mgl_asin:);
     INSTALL_METHOD(mgl_sin:);
     INSTALL_METHOD(mgl_atan:);
+    INSTALL_METHOD(mgl_tan:);
     
     // Install functions that resemble control structures, taking arbitrary
     // numbers of arguments. Vararg aftermarket functions need to be declared
@@ -135,6 +136,13 @@ const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier =
  */
 - (NSNumber *)mgl_atan:(NSNumber *)number {
     return @(atan(number.doubleValue));
+}
+
+/**
+ Computes the principal value of the tangent.
+ */
+- (NSNumber *)mgl_tan:(NSNumber *)number {
+    return @(tan(number.doubleValue));
 }
 
 /**
@@ -720,6 +728,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"asin" : @"mgl_asin:",
             @"sin" : @"mgl_sin:",
             @"atan" : @"mgl_atan:",
+            @"tan" : @"mgl_tan:",
             @"floor": @"floor:",
             @"ceil": @"ceiling:",
             @"^": @"raise:toPower:",
@@ -967,6 +976,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             @"mgl_asin:" : @"asin",
             @"mgl_sin:" : @"sin",
             @"mgl_atan:" : @"atan",
+            @"mgl_tan:" : @"tan",
             // Vararg aftermarket expressions need to be declared with an explicit and implicit first argument.
             @"MGL_LET": @"let",
             @"MGL_LET:": @"let",
