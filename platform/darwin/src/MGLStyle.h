@@ -497,6 +497,8 @@ MGL_EXPORT
  */
 - (void)localizeLabelsIntoLocale:(nullable NSLocale *)locale;
 
+@property (nonatomic) BOOL localizesLabels __attribute__((unavailable("Use -localizeLabelsIntoLocale: instead.")));
+
 @end
 
 NS_ASSUME_NONNULL_END
