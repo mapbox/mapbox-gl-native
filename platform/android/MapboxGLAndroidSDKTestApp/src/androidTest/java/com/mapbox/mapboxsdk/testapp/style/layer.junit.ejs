@@ -176,7 +176,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
         layer.setProperties(
           <%- camelizeWithLeadingLowercase(property.name) %>(
             zoom(
-<% if (property.function == 'piecewise-constant') { -%>
+<% if (!isInterpolable(property)) { -%>
               interval(
                 stop(2, <%- camelizeWithLeadingLowercase(property.name) %>(<%- defaultValueJava(property) %>))
               )
@@ -193,7 +193,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
         assertNotNull(layer.get<%- camelize(property.name) %>());
         assertNotNull(layer.get<%- camelize(property.name) %>().getFunction());
         assertEquals(CameraFunction.class, layer.get<%- camelize(property.name) %>().getFunction().getClass());
-<% if (property.function == 'piecewise-constant') { -%>
+<% if (!isInterpolable(property)) { -%>
         assertEquals(IntervalStops.class, layer.get<%- camelize(property.name) %>().getFunction().getStops().getClass());
         assertEquals(1, ((IntervalStops) layer.get<%- camelize(property.name) %>().getFunction().getStops()).size());
 <% } else { -%>
@@ -231,7 +231,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       }
     });
   }
-<% if (property.function == 'piecewise-constant') { -%>
+<% if (!isInterpolable(property)) { -%>
 
   @Test
   public void test<%- camelize(property.name) %>AsIntervalSourceFunction() {

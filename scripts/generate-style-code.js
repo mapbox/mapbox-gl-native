@@ -16,7 +16,7 @@ function parseCSSColor(str) {
 }
 
 global.isDataDriven = function (property) {
-  return property['property-function'] === true;
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 global.isLightProperty = function (property) {
@@ -168,6 +168,9 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
   }, []);
 
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
+    // not yet implemented
+    if (name === 'line-gradient') return memo;
+
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
     return memo;

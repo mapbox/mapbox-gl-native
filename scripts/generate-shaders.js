@@ -42,7 +42,7 @@ ${shaders.prelude.fragmentSource}
 `);
 
 for (const key in shaders) {
-    if (key === 'prelude')
+    if (key === 'prelude' || key === 'lineGradient')
         continue;
 
     const shaderName = key.replace(/[A-Z]+/g, (match) => `_${match.toLowerCase()}`);

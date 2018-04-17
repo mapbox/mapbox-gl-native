@@ -258,7 +258,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -268,7 +268,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -279,7 +279,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -565,7 +565,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale. Also note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -575,7 +575,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale. Also note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -586,7 +586,7 @@ public class PropertyFactory {
 
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale. Also note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for Float[]
@@ -598,7 +598,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -608,7 +608,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -619,7 +619,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -1790,7 +1790,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -1800,7 +1800,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -1811,7 +1811,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -2391,7 +2391,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2401,7 +2401,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -2412,7 +2412,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512).
+   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param <Z> the zoom parameter type
    * @param function a wrapper {@link CameraFunction} for String
@@ -2905,7 +2905,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Name of image in sprite to use for drawing an image background.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2915,7 +2915,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Name of image in sprite to use for drawing an image background.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -2926,7 +2926,7 @@ public class PropertyFactory {
 
 
   /**
-   * Name of image in sprite to use for drawing an image background. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Name of image in sprite to use for drawing an image background.
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
@@ -3193,7 +3193,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Value to use for a text label.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -3203,7 +3203,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Value to use for a text label.
    *
    * @param value a String value
    * @return property wrapper around String
@@ -3214,7 +3214,7 @@ public class PropertyFactory {
 
 
   /**
-   * Value to use for a text label. Within literal values and zoom functions, property names enclosed in curly brackets (e.g. `{token}`) are replaced with the value of the named property. Expressions and property functions do not support this syntax; for equivalent functionality in expressions, use the [`concat`](#expressions-concat) and [`get`](#expressions-get) operators.
+   * Value to use for a text label.
    *
    * @param <T> the function input type
    * @param function a wrapper function for String
