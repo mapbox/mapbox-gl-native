@@ -25,8 +25,12 @@
 
 + (instancetype)mgl_predicateWithFilter:(mbgl::style::Filter)filter
 {
-    id jsonObject = MGLJSONObjectFromMBGLExpression(*filter.expression);
-    return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
+    if (filter.expression) {
+        id jsonObject = MGLJSONObjectFromMBGLExpression(*filter.expression);
+        return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
+    } else {
+        return nil;
+    }
 }
 
 @end
