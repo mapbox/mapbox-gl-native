@@ -712,6 +712,31 @@ using namespace std::string_literals;
     }
 }
 
+- (void)testInterpolationExpressionObjectWithEmptyStopsDictionary {
+    {
+        NSDictionary *stops = @{};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(x, 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
+        @try {
+            (void)expression.mgl_jsonExpressionObject;
+            XCTFail();
+        }
+        @catch (NSException *e){
+            XCTAssert(e.name == NSInvalidArgumentException);
+        }
+    }
+    {
+        NSDictionary *stops = @{};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, 11, %@)", stops];
+        @try {
+            (void)expression.mgl_jsonExpressionObject;
+            XCTFail();
+        }
+        @catch (NSException *e){
+            XCTAssert(e.name == NSInvalidArgumentException);
+        }
+    }
+}
+
 - (void)testMatchExpressionObject {
     {
         NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(2 - 1,  %@, %@, %@, %@, 'default')", MGLConstantExpression(@1),
