@@ -133,7 +133,7 @@ void GeometryTile::onLayout(LayoutResult result, const uint64_t resultCorrelatio
     
     buckets = std::move(result.buckets);
     
-    featureIndexPendingCommit = { std::move(result.featureIndex) };
+    latestFeatureIndex = std::move(result.featureIndex);
 
     if (result.glyphAtlasImage) {
         glyphAtlasImage = std::move(*result.glyphAtlasImage);
@@ -201,22 +201,12 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     return it->second.get();
 }
 
-void GeometryTile::commitFeatureIndex() {
-    // We commit our pending FeatureIndex when a global placement has run,
-    // synchronizing the global CollisionIndex with the latest buckets/FeatureIndex
-    if (featureIndexPendingCommit) {
-        featureIndex = std::move(*featureIndexPendingCommit);
-        featureIndexPendingCommit = nullopt;
-    }
-}
-
 void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
-    const RenderedQueryOptions& options,
-    const CollisionIndex& collisionIndex) {
+    const RenderedQueryOptions& options) {
 
     if (!getData()) return;
 
@@ -229,17 +219,15 @@ void GeometryTile::queryRenderedFeatures(
         }
     }
 
-    featureIndex->query(result,
-                        queryGeometry,
-                        transformState.getAngle(),
-                        util::tileSize * id.overscaleFactor(),
-                        std::pow(2, transformState.getZoom() - id.overscaledZ),
-                        options,
-                        id.toUnwrapped(),
-                        sourceID,
-                        layers,
-                        collisionIndex,
-                        additionalRadius);
+    latestFeatureIndex->query(result,
+                              queryGeometry,
+                              transformState.getAngle(),
+                              util::tileSize * id.overscaleFactor(),
+                              std::pow(2, transformState.getZoom() - id.overscaledZ),
+                              options,
+                              id.toUnwrapped(),
+                              layers,
+                              additionalRadius);
 }
 
 void GeometryTile::querySourceFeatures(

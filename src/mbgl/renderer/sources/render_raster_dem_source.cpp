@@ -146,8 +146,7 @@ std::unordered_map<std::string, std::vector<Feature>>
 RenderRasterDEMSource::queryRenderedFeatures(const ScreenLineString&,
                                           const TransformState&,
                                           const std::vector<const RenderLayer*>&,
-                                          const RenderedQueryOptions&,
-                                          const CollisionIndex& ) const {
+                                          const RenderedQueryOptions&) const {
     return std::unordered_map<std::string, std::vector<Feature>> {};
 }
 
