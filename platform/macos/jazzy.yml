@@ -20,7 +20,7 @@ custom_categories:
       - Working with GeoJSON Data
       - Predicates and Expressions
       - For Style Authors
-      - Using Style Functions at Runtime
+      - Style Layers Using Expressions
       - Tile URL Templates
       - Info.plist Keys
   - name: Maps
