@@ -30,6 +30,8 @@ var layers = Object.keys(spec.layer.type.values).map((type) => {
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
     // disabled for now, see https://github.com/mapbox/mapbox-gl-native/issues/11172
     if (name === 'heatmap-color') return memo;
+    // not yet implemented
+    if (name === 'line-gradient') return memo;
 
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
@@ -252,8 +254,12 @@ global.propertyValueDoc = function (property, value) {
 };
 
 global.isDataDriven = function (property) {
-  return property['property-function'] === true;
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
+
+global.isInterpolable = function(property) {
+  return property.expression && property.expression.interpolated;
+}
 
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
@@ -302,11 +308,11 @@ global.evaluatedType = function (property) {
 };
 
 global.supportsZoomFunction = function (property) {
-  return property['zoom-function'] === true;
+  return property.expression && property.expression.parameters.indexOf('zoom') > -1;
 };
 
 global.supportsPropertyFunction = function (property) {
-  return property['property-function'] === true;
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 // Template processing //

@@ -309,9 +309,9 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';
         const inputVariable = property.name === 'heatmap-color' ? '$heatmapDensity' : '$zoomLevel';
-        if (property["property-function"]) {
+        if (isDataDriven(property)) {
             doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable and/or feature attributes\n`;
-        } else if (property.function === "interpolated") {
+        } else if (property.expression && property.expression.interpolated) {
             doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable\n\n` +
                 'This property does not support applying interpolation or step functions to feature attributes.';
         } else {
@@ -320,6 +320,10 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         }
     }
     return doc;
+};
+
+global.isDataDriven = function (property) {
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 global.propertyReqs = function (property, propertiesByName, type) {
@@ -633,6 +637,9 @@ const layers = _(spec.layer.type.values).map((value, layerType) => {
     }, []);
 
     const paintProperties = Object.keys(spec[`paint_${layerType}`]).reduce((memo, name) => {
+        // not yet implemented
+        if (name === 'line-gradient') return memo;
+
         spec[`paint_${layerType}`][name].name = name;
         memo.push(spec[`paint_${layerType}`][name]);
         return memo;
