@@ -96,37 +96,64 @@ Through expressions, you can also cast attribute values in order to use them. On
 <%- guideExample(guide, 'Cast', os) %>
 
 <% if (iOS) { -%>
-  ## Migrating from Style Functions to Expressions
 
-  For constant values that do not necessarily change based on camera or attribute values, use `[NSExpression expressionForConstantValue:]` (previously `[MGLStyleValue valueWithRawValue:]`. Expressions support format string syntax, as shown above, as well as convenience methods that include those listed below.
+  ##Migrating from Style Functions to Expressions
 
-  |             | Syntax pre-v4.0.0                                                                                                                                                                                                                                                                                     | v4.0.0 syntax                                                                                                                                                                                                                                                                                                  |
-  | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-  | Linear      | MGLStyleValue(interpolationMode: .exponential,
-                                    sourceStops: stops,
-                                    attributeName: "mag",
-                                    options: nil)                                                                                          | NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "mag"),
-                                           curveType: MGLExpressionInterpolationMode.linear,
-                                           parameters: nil,
-                                           stops: NSExpression(forConstantValue: stops)) |
-  | Exponential | MGLStyleValue(interpolationMode: .exponential,
-                                    sourceStops: stops,
-                                    attributeName: “mag”,
-                                     options:  [.interpolationBase: 1.5])                                                                  |                                                                                                                                                                                                                                                                                                                |
-  | Interval    | MGLStyleValue(interpolationMode: .interval,
-                                    sourceStops: [0: UIColor.yellow, 2.5: UIColor.orange],
-                                    attributeName: "mag",
-                                    options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])    | NSExpression(forMGLStepping: NSExpression(forKeyPath: "mag"),
-                                               from: NSExpression(forConstantValue: UIColor.green),
-                                               stops: [0: UIColor.yellow, 2.5: UIColor.orange])                                                  |
-  | Categorical | MGLStyleValue(interpolationMode: *.*categorical,
+  For constant values that do not necessarily change based on camera or attribute values, use `[NSExpression expressionForConstantValue:]` (previously `[MGLStyleValue valueWithRawValue:]`). Expressions support format string syntax, as shown above, as well as convenience methods that include those listed below.
+
+
+<table>
+<thead>
+<tr><th>Interpolation mode</th><th>Syntax prior to v4.0.0</th><th>Current syntax</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>Linear </td>
+  <td><code>MGLStyleValue(interpolationMode: .exponential,
+                                        sourceStops: stops,
+                                        attributeName: "mag",
+                                        options: nil) </code></td>
+  <td><code>NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "mag"),
+                  curveType: MGLExpressionInterpolationMode.linear,
+                  parameters: nil,
+                  stops: NSExpression(forConstantValue: stops)) </code></td>
+</tr>
+<tr>
+  <td>Exponential</td>
+  <td><code>MGLStyleValue(interpolationMode: .exponential,
+                                        sourceStops: stops,
+                                        attributeName: “mag”,
+                                         options:  [.interpolationBase: 1.5])</code></td>
+  <td><code>layer.circleRadius = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+                                          stops)</code></td>
+</tr>
+<tr>
+  <td>Interval</td>
+  <td><code>MGLStyleValue(interpolationMode: .interval,
+                                        sourceStops: [0: UIColor.yellow, 2.5: UIColor.orange],
+                                        attributeName: "mag",
+                                        options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])</code></td>
+  <td><code>NSExpression(forMGLStepping: NSExpression(forKeyPath: "mag"),
+                                   from: NSExpression(forConstantValue: UIColor.green),
+                                  stops: [0: UIColor.yellow, 2.5: UIColor.orange])</code></td>
+</tr>
+<tr>
+  <td>Categorical</td>
+  <td><code>MGLStyleValue(interpolationMode: *.*categorical,
                                     sourceStops: [featureValue : UIColor.green],
                                     attributeName: "type",
-                                    options: [*.*defaultValue: MGLStyleValue*<*UIColor*>*(rawValue: *.*blue)]) | NSExpression(format: “MGL_MATCH(type, ‘earthquake’, %@,  %@)”, UIColor.green, UIColor.blue)                                                                                                                                                                                                                    |
-  | Identity    | MGLStyleValue(interpolationMode: .identity,
+                                    options: [*.*defaultValue: MGLStyleValue*<*UIColor*>*(rawValue: *.*blue)])</code></td>
+  <td><code>NSExpression(format: “MGL_MATCH(type, ‘earthquake’, %@,  %@)”, UIColor.green, UIColor.blue) </code></td>
+</tr>
+<tr>
+  <td>Identity</td>
+  <td><code>MGLStyleValue(interpolationMode: .identity,
                                      sourceStops: nil,
                                      attributeName: "mag",
-                                     options: nil)                                                                                            | NSExpression(forConstantValue: “mag”)                                                                                                                                                                                                                                                                          |
+                                     options: nil)</code></td>
+  <td><code>NSExpression(forConstantValue: “mag”)</code></td>
+</tbody>
+</table>
 
   In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoom')` as the attribute key.
 
