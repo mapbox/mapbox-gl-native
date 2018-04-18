@@ -802,6 +802,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"to-string"] || [op isEqualToString:@"string"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
+        } else if ([op isEqualToString:@"to-rgba"]) {
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+#if TARGET_OS_IPHONE
+            return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
+#else
+            return [NSExpression expressionWithFormat:@"CAST(%@, 'NSColor')", operand];
+#endif
+            
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.lastObject];
@@ -1165,6 +1173,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 } else if ([type isEqualToString:@"NSNumber"]) {
                     return @[@"to-number", object];
                 }
+#if TARGET_OS_IPHONE
+                else if ([type isEqualToString:@"UIColor"]) {
+                    return @[@"to-rgba", object];
+                }
+#else
+                else if ([type isEqualToString:@"NSColor"]) {
+                    return @[@"to-rgba", object];
+                }
+#endif
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];
             } else if ([function isEqualToString:@"MGL_FUNCTION"]) {

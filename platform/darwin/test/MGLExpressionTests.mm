@@ -668,6 +668,17 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([compatibilityExpression expressionValueWithObject:@{@"number": @1.5} context:nil], @"1.5");
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+#if TARGET_OS_IPHONE
+        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(x, 'UIColor')"];
+#else
+        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(x, 'NSColor')"];
+#endif
+        
+        NSArray *jsonExpression = @[@"to-rgba", @[@"get", @"x"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testInterpolationExpressionObject {
