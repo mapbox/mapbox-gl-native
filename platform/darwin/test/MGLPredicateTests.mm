@@ -16,10 +16,6 @@
 @implementation MGLPredicateTests
 
 - (void)testUnsupportedFilterPredicates {
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"1 == 2"].mgl_filter, NSException, NSInvalidArgumentException);
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"1 == 1"].mgl_filter, NSException, NSInvalidArgumentException);
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithValue:YES].mgl_filter, NSException, NSInvalidArgumentException);
-    XCTAssertThrowsSpecificNamed([NSPredicate predicateWithValue:NO].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a BEGINSWITH 'L'"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a ENDSWITH 'itude'"].mgl_filter, NSException, NSInvalidArgumentException);
     XCTAssertThrowsSpecificNamed([NSPredicate predicateWithFormat:@"a LIKE 'glob?trotter'"].mgl_filter, NSException, NSInvalidArgumentException);
