@@ -241,8 +241,7 @@ void TilePyramid::update(const std::vector<Immutable<style::Layer::Impl>>& layer
 std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRenderedFeatures(const ScreenLineString& geometry,
                                            const TransformState& transformState,
                                            const std::vector<const RenderLayer*>& layers,
-                                           const RenderedQueryOptions& options,
-                                           const CollisionIndex& collisionIndex) const {
+                                           const RenderedQueryOptions& options) const {
     std::unordered_map<std::string, std::vector<Feature>> result;
     if (renderTiles.empty() || geometry.empty()) {
         return result;
@@ -285,8 +284,7 @@ std::unordered_map<std::string, std::vector<Feature>> TilePyramid::queryRendered
                                               tileSpaceQueryGeometry,
                                               transformState,
                                               layers,
-                                              options,
-                                              collisionIndex);
+                                              options);
     }
 
     return result;

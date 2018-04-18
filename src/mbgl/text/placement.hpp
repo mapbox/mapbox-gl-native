@@ -44,7 +44,21 @@ public:
     // visible right away.
     const bool skipFade;
 };
-
+    
+struct RetainedQueryData {
+    uint32_t bucketInstanceId;
+    std::shared_ptr<FeatureIndex> featureIndex;
+    OverscaledTileID tileID;
+    std::shared_ptr<std::vector<size_t>> featureSortOrder;
+    
+    RetainedQueryData(uint32_t bucketInstanceId_,
+                      std::shared_ptr<FeatureIndex> featureIndex_,
+                      OverscaledTileID tileID_)
+        : bucketInstanceId(bucketInstanceId_)
+        , featureIndex(std::move(featureIndex_))
+        , tileID(std::move(tileID_)) {}
+};
+    
 class Placement {
 public:
     Placement(const TransformState&, MapMode mapMode);
@@ -59,6 +73,8 @@ public:
     bool stillRecent(TimePoint now) const;
     void setRecent(TimePoint now);
     void setStale();
+    
+    const RetainedQueryData& getQueryData(uint32_t bucketInstanceId) const;
 private:
 
     void placeLayerBucket(
@@ -85,6 +101,8 @@ private:
 
     TimePoint recentUntil;
     bool stale = false;
+    
+    std::unordered_map<uint32_t, RetainedQueryData> retainedQueryData;
 };
 
 } // namespace mbgl

@@ -53,8 +53,7 @@ public:
     queryRenderedFeatures(const ScreenLineString& geometry,
                           const TransformState& transformState,
                           const std::vector<const RenderLayer*>&,
-                          const RenderedQueryOptions& options,
-                          const CollisionIndex& collisionIndex) const;
+                          const RenderedQueryOptions& options) const;
 
     std::vector<Feature> querySourceFeatures(const SourceQueryOptions&) const;
 

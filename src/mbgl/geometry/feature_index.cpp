@@ -32,14 +32,6 @@ void FeatureIndex::insert(const GeometryCollection& geometries,
     }
 }
 
-static bool topDown(const IndexedSubfeature& a, const IndexedSubfeature& b) {
-    return a.sortIndex > b.sortIndex;
-}
-
-static bool topDownSymbols(const IndexedSubfeature& a, const IndexedSubfeature& b) {
-    return a.sortIndex < b.sortIndex;
-}
-
 void FeatureIndex::query(
         std::unordered_map<std::string, std::vector<Feature>>& result,
         const GeometryCoordinates& queryGeometry,
@@ -48,9 +40,7 @@ void FeatureIndex::query(
         const double scale,
         const RenderedQueryOptions& queryOptions,
         const UnwrappedTileID& tileID,
-        const std::string& sourceID,
         const std::vector<const RenderLayer*>& layers,
-        const CollisionIndex& collisionIndex,
         const float additionalQueryRadius) const {
     
     if (!tileData) {
@@ -67,7 +57,9 @@ void FeatureIndex::query(
                                                            convertPoint<float>(box.max + additionalRadius) });
 
 
-    std::sort(features.begin(), features.end(), topDown);
+    std::sort(features.begin(), features.end(), [](const IndexedSubfeature& a, const IndexedSubfeature& b) {
+        return a.sortIndex > b.sortIndex;
+    });
     size_t previousSortIndex = std::numeric_limits<size_t>::max();
     for (const auto& indexedFeature : features) {
 
@@ -75,23 +67,55 @@ void FeatureIndex::query(
         if (indexedFeature.sortIndex == previousSortIndex) continue;
         previousSortIndex = indexedFeature.sortIndex;
 
-        addFeature(result, indexedFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
+        addFeature(result, indexedFeature, queryOptions, tileID.canonical, layers, queryGeometry, bearing, pixelsToTileUnits);
     }
+}
+    
+std::unordered_map<std::string, std::vector<Feature>> FeatureIndex::lookupSymbolFeatures(const std::vector<IndexedSubfeature>& symbolFeatures,
+                                                                                         const RenderedQueryOptions& queryOptions,
+                                                                                         const std::vector<const RenderLayer*>& layers,
+                                                                                         const OverscaledTileID& tileID,
+                                                                                        const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const {
+    std::unordered_map<std::string, std::vector<Feature>> result;
+    if (!tileData) {
+        return result;
+    }
+    std::vector<IndexedSubfeature> sortedFeatures(symbolFeatures.begin(), symbolFeatures.end());
 
-    std::vector<IndexedSubfeature> symbolFeatures = collisionIndex.queryRenderedSymbols(queryGeometry, tileID, sourceID);
-    std::sort(symbolFeatures.begin(), symbolFeatures.end(), topDownSymbols);
-    for (const auto& symbolFeature : symbolFeatures) {
-        addFeature(result, symbolFeature, queryGeometry, queryOptions, tileID.canonical, layers, bearing, pixelsToTileUnits);
+    std::sort(sortedFeatures.begin(), sortedFeatures.end(), [featureSortOrder](const IndexedSubfeature& a, const IndexedSubfeature& b) {
+        // Same idea as the non-symbol sort order, but symbol features may have changed their sort order
+        // since their corresponding IndexedSubfeature was added to the CollisionIndex
+        // The 'featureSortOrder' is relatively inefficient for querying but cheap to build on every bucket sort
+        if (featureSortOrder) {
+            // queryRenderedSymbols documentation says we'll return features in
+            // "top-to-bottom" rendering order (aka last-to-first).
+            // Actually there can be multiple symbol instances per feature, so
+            // we sort each feature based on the first matching symbol instance.
+            auto sortedA = std::find(featureSortOrder->begin(), featureSortOrder->end(), a.index);
+            auto sortedB = std::find(featureSortOrder->begin(), featureSortOrder->end(), b.index);
+            assert(sortedA != featureSortOrder->end());
+            assert(sortedB != featureSortOrder->end());
+            return sortedA > sortedB;
+        } else {
+            // Bucket hasn't been re-sorted based on angle, so use same "reverse of appearance in source data"
+            // logic as non-symboles
+            return a.sortIndex > b.sortIndex;
+        }
+    });
+
+    for (const auto& symbolFeature : sortedFeatures) {
+        addFeature(result, symbolFeature, queryOptions, tileID.canonical, layers, GeometryCoordinates(), 0, 0);
     }
+    return result;
 }
 
 void FeatureIndex::addFeature(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const IndexedSubfeature& indexedFeature,
-    const GeometryCoordinates& queryGeometry,
     const RenderedQueryOptions& options,
     const CanonicalTileID& tileID,
     const std::vector<const RenderLayer*>& layers,
+    const GeometryCoordinates& queryGeometry,
     const float bearing,
     const float pixelsToTileUnits) const {
 
