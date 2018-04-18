@@ -6,8 +6,6 @@
   "query-tests/geometry/multilinestring": "needs investigation",
   "query-tests/geometry/multipolygon": "needs investigation",
   "query-tests/geometry/polygon": "needs investigation",
-  "query-tests/symbol/panned-after-insert": "https://github.com/mapbox/mapbox-gl-native/issues/10408",
-  "query-tests/symbol/rotated-after-insert": "https://github.com/mapbox/mapbox-gl-native/issues/10408",
   "query-tests/world-wrapping/box": "skip - needs issue",
   "query-tests/world-wrapping/point": "skip - needs issue",
   "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",

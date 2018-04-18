@@ -200,8 +200,12 @@ void SymbolBucket::sortFeatures(const float angle) {
     text.triangles.clear();
     icon.triangles.clear();
 
+    featureSortOrder = std::make_unique<std::vector<size_t>>();
+    featureSortOrder->reserve(symbolInstanceIndexes.size());
+    
     for (auto i : symbolInstanceIndexes) {
         const SymbolInstance& symbolInstance = symbolInstances[i];
+        featureSortOrder->push_back(symbolInstance.featureIndex);
 
         if (symbolInstance.placedTextIndex) {
             addPlacedSymbol(text.triangles, text.placedSymbols[*symbolInstance.placedTextIndex]);

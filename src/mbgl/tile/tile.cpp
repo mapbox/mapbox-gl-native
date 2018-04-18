@@ -37,8 +37,7 @@ void Tile::queryRenderedFeatures(
         const GeometryCoordinates&,
         const TransformState&,
         const std::vector<const RenderLayer*>&,
-        const RenderedQueryOptions&,
-        const CollisionIndex&) {}
+        const RenderedQueryOptions&) {}
 
 void Tile::querySourceFeatures(
         std::vector<Feature>&,

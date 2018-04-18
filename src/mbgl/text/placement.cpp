@@ -49,8 +49,11 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         if (!renderTile.tile.isRenderable()) {
             continue;
         }
-
-        auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
+        assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
+        GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
+        
+        
+        auto bucket = geometryTile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
 
@@ -58,8 +61,8 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
 
         const float pixelsToTileUnits = renderTile.id.pixelsToTileUnits(1, state.getZoom());
 
-        const float scale = std::pow(2, state.getZoom() - renderTile.tile.id.overscaledZ);
-        const float textPixelRatio = (util::tileSize * renderTile.tile.id.overscaleFactor()) / util::EXTENT;
+        const float scale = std::pow(2, state.getZoom() - geometryTile.id.overscaledZ);
+        const float textPixelRatio = (util::tileSize * geometryTile.id.overscaleFactor()) / util::EXTENT;
 
         mat4 posMatrix;
         state.matrixFor(posMatrix, renderTile.id);
@@ -76,7 +79,14 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
                 layout.get<style::IconRotationAlignment>() == style::AlignmentType::Map,
                 state,
                 pixelsToTileUnits);
-
+        
+        
+        // As long as this placement lives, we have to hold onto this bucket's
+        // matching FeatureIndex/data for querying purposes
+        retainedQueryData.emplace(std::piecewise_construct,
+                                  std::forward_as_tuple(symbolBucket.bucketInstanceId),
+                                  std::forward_as_tuple(symbolBucket.bucketInstanceId, geometryTile.getFeatureIndex(), geometryTile.id));
+        
         placeLayerBucket(symbolBucket, posMatrix, textLabelPlaneMatrix, iconLabelPlaneMatrix, scale, textPixelRatio, showCollisionBoxes, seenCrossTileIDs, renderTile.tile.holdForFade());
     }
 }
@@ -150,11 +160,11 @@ void Placement::placeLayerBucket(
             }
 
             if (placeText) {
-                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.textCollisionFeature, bucket.layout.get<style::TextIgnorePlacement>(), bucket.bucketInstanceId);
             }
 
             if (placeIcon) {
-                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>());
+                collisionIndex.insertFeature(symbolInstance.iconCollisionFeature, bucket.layout.get<style::IconIgnorePlacement>(), bucket.bucketInstanceId);
             }
 
             assert(symbolInstance.crossTileID != 0);
@@ -305,6 +315,10 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 
     bucket.updateOpacity();
     bucket.sortFeatures(state.getAngle());
+    auto retainedData = retainedQueryData.find(bucket.bucketInstanceId);
+    if (retainedData != retainedQueryData.end()) {
+        retainedData->second.featureSortOrder = bucket.featureSortOrder;
+    }
 }
 
 float Placement::symbolFadeChange(TimePoint now) const {
@@ -336,6 +350,14 @@ void Placement::setStale() {
 
 const CollisionIndex& Placement::getCollisionIndex() const {
     return collisionIndex;
+}
+    
+const RetainedQueryData& Placement::getQueryData(uint32_t bucketInstanceId) const {
+    auto it = retainedQueryData.find(bucketInstanceId);
+    if (it == retainedQueryData.end()) {
+        throw std::runtime_error("Placement::getQueryData with unrecognized bucketInstanceId");
+    }
+    return it->second;
 }
 
 } // namespace mbgl

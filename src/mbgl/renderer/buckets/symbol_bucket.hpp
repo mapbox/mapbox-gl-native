@@ -131,6 +131,8 @@ public:
 
     uint32_t bucketInstanceId = 0;
     bool justReloaded = false;
+    
+    std::shared_ptr<std::vector<size_t>> featureSortOrder;
 };
 
 } // namespace mbgl
