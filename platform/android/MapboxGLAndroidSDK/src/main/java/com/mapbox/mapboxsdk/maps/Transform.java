@@ -76,13 +76,10 @@ final class Transform implements MapView.OnMapChangedListener {
     if (change == REGION_DID_CHANGE_ANIMATED) {
       updateCameraPosition(invalidateCameraPosition());
       if (cameraCancelableCallback != null) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            if (cameraCancelableCallback != null) {
-              cameraCancelableCallback.onFinish();
-              cameraCancelableCallback = null;
-            }
+        handler.post(() -> {
+          if (cameraCancelableCallback != null) {
+            cameraCancelableCallback.onFinish();
+            cameraCancelableCallback = null;
           }
         });
       }
@@ -100,12 +97,9 @@ final class Transform implements MapView.OnMapChangedListener {
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
       cameraChangeDispatcher.onCameraIdle();
       invalidateCameraPosition();
-      handler.post(new Runnable() {
-        @Override
-        public void run() {
-          if (callback != null) {
-            callback.onFinish();
-          }
+      handler.post(() -> {
+        if (callback != null) {
+          callback.onFinish();
         }
       });
     }
@@ -183,12 +177,7 @@ final class Transform implements MapView.OnMapChangedListener {
     if (cameraCancelableCallback != null) {
       final MapboxMap.CancelableCallback callback = cameraCancelableCallback;
       cameraChangeDispatcher.onCameraIdle();
-      handler.post(new Runnable() {
-        @Override
-        public void run() {
-          callback.onCancel();
-        }
-      });
+      handler.post(callback::onCancel);
       cameraCancelableCallback = null;
     }
 

@@ -38,9 +38,7 @@ public class BackgroundLayerTest extends BaseActivityTest {
 
   private void setupLayer() {
     Timber.i("Retrieving layer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      layer = mapboxMap.getLayerAs("background");
-    });
+    invoke(mapboxMap, (uiController, mapboxMap) -> layer = mapboxMap.getLayerAs("background"));
   }
 
   @Test

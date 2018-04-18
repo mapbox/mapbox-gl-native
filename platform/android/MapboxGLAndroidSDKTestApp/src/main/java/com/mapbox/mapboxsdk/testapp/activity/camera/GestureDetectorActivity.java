@@ -29,7 +29,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback;
 import com.mapbox.mapboxsdk.testapp.R;
 import com.mapbox.mapboxsdk.testapp.utils.FontCache;
 import com.mapbox.mapboxsdk.testapp.utils.ResourceUtils;
@@ -66,12 +65,9 @@ public class GestureDetectorActivity extends AppCompatActivity {
 
     mapView = (MapView) findViewById(R.id.mapView);
     mapView.onCreate(savedInstanceState);
-    mapView.getMapAsync(new OnMapReadyCallback() {
-      @Override
-      public void onMapReady(MapboxMap mapboxMap) {
-        GestureDetectorActivity.this.mapboxMap = mapboxMap;
-        initializeMap();
-      }
+    mapView.getMapAsync(mapboxMap -> {
+      GestureDetectorActivity.this.mapboxMap = mapboxMap;
+      initializeMap();
     });
 
     recyclerView = (RecyclerView) findViewById(R.id.alerts_recycler);

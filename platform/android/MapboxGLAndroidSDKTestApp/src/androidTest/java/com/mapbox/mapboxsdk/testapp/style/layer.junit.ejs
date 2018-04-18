@@ -43,9 +43,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
   private void setupLayer() {
 <% if (type === 'background') { -%>
     Timber.i("Retrieving layer");
-    invoke(mapboxMap, (uiController, mapboxMap) -> {
-      layer = mapboxMap.getLayerAs("background");
-    });
+    invoke(mapboxMap, (uiController, mapboxMap) -> layer = mapboxMap.getLayerAs("background"));
 <% } else { -%>
     Timber.i("Retrieving layer");
     invoke(mapboxMap, (uiController, mapboxMap) -> {

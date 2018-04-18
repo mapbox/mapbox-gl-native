@@ -805,7 +805,7 @@ final class NativeMapView {
     }
     Feature[] features = nativeQueryRenderedFeaturesForPoint(coordinates.x / pixelRatio,
       coordinates.y / pixelRatio, layerIds, filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
   @NonNull
@@ -822,7 +822,7 @@ final class NativeMapView {
       coordinates.bottom / pixelRatio,
       layerIds,
       filter != null ? filter.toArray() : null);
-    return features != null ? Arrays.asList(features) : new ArrayList<Feature>();
+    return features != null ? Arrays.asList(features) : new ArrayList<>();
   }
 
   public void setApiBaseUrl(String baseUrl) {
@@ -1102,28 +1102,11 @@ final class NativeMapView {
   }
 
   public void setOnFpsChangedListener(final MapboxMap.OnFpsChangedListener listener) {
-    mapRenderer.queueEvent(new Runnable() {
-
-      @Override
-      public void run() {
-        mapRenderer.setOnFpsChangedListener(new MapboxMap.OnFpsChangedListener() {
-
-          @Override
-          public void onFpsChanged(final double fps) {
-            mapView.post(new Runnable() {
-
-              @Override
-              public void run() {
-                listener.onFpsChanged(fps);
-              }
-
-            });
-          }
-
-        });
-      }
-
-    });
+    mapRenderer.queueEvent(() -> mapRenderer.setOnFpsChangedListener(
+      fps -> mapView.post(
+        () -> listener.onFpsChanged(fps))
+      )
+    );
   }
 
 

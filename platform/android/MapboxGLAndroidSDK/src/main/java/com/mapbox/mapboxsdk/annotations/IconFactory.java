@@ -2,6 +2,7 @@ package com.mapbox.mapboxsdk.annotations;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
@@ -144,13 +145,12 @@ public final class IconFactory {
    * @return The Icon that was loaded from the asset or null if failed to load.
    */
   public Icon fromAsset(@NonNull String assetName) {
-    InputStream is;
-    try {
-      is = context.getAssets().open(assetName);
+    try (AssetManager as = context.getAssets();
+         InputStream is = as.open(assetName)) {
+      return fromInputStream(is);
     } catch (IOException ioException) {
       return null;
     }
-    return fromInputStream(is);
   }
 
   /**
@@ -174,13 +174,13 @@ public final class IconFactory {
    * Using the Internal Storage</a>
    */
   public Icon fromFile(@NonNull String fileName) {
-    FileInputStream is;
-    try {
-      is = context.openFileInput(fileName);
+    try (FileInputStream is = context.openFileInput(fileName)) {
+      return fromInputStream(is);
     } catch (FileNotFoundException fileNotFoundException) {
       return null;
+    } catch (IOException ex) {
+      return null;
     }
-    return fromInputStream(is);
   }
 
   /**

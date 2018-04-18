@@ -66,10 +66,8 @@ public class DynamicInfoWindowAdapterActivity extends AppCompatActivity implemen
         // Set the new text on the text view in the info window
         TextView textView  = (TextView) infoWindow.getView();
         textView.setText(String.format(Locale.getDefault(), "%.2fkm", distanceKm));
-        textView.post(() -> {
-          // Update the info window position (as the text length changes)
-          infoWindow.update();
-        });
+        // Update the info window position (as the text length changes)
+        textView.post(infoWindow::update);
       }
     });
 

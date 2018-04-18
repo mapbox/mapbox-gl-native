@@ -249,12 +249,9 @@ public class OfflineRegion {
       @Override
       public void onStatusChanged(final OfflineRegionStatus status) {
         if (deliverMessages()) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (observer != null) {
-                observer.onStatusChanged(status);
-              }
+          handler.post(() -> {
+            if (observer != null) {
+              observer.onStatusChanged(status);
             }
           });
         }
@@ -263,12 +260,9 @@ public class OfflineRegion {
       @Override
       public void onError(final OfflineRegionError error) {
         if (deliverMessages()) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (observer != null) {
-                observer.onError(error);
-              }
+          handler.post(() -> {
+            if (observer != null) {
+              observer.onError(error);
             }
           });
         }
@@ -277,12 +271,9 @@ public class OfflineRegion {
       @Override
       public void mapboxTileCountLimitExceeded(final long limit) {
         if (deliverMessages()) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              if (observer != null) {
-                observer.mapboxTileCountLimitExceeded(limit);
-              }
+          handler.post(() -> {
+            if (observer != null) {
+              observer.mapboxTileCountLimitExceeded(limit);
             }
           });
         }
@@ -321,23 +312,17 @@ public class OfflineRegion {
     getOfflineRegionStatus(new OfflineRegionStatusCallback() {
       @Override
       public void onStatus(final OfflineRegionStatus status) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onStatus(status);
-            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
-          }
+        handler.post(() -> {
+          callback.onStatus(status);
+          FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
         });
       }
 
       @Override
       public void onError(final String error) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onError(error);
-            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
-          }
+        handler.post(() -> {
+          callback.onError(error);
+          FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
         });
       }
     });
@@ -367,25 +352,19 @@ public class OfflineRegion {
       deleteOfflineRegion(new OfflineRegionDeleteCallback() {
         @Override
         public void onDelete() {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              callback.onDelete();
-              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
-              OfflineRegion.this.finalize();
-            }
+          handler.post(() -> {
+            callback.onDelete();
+            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            OfflineRegion.this.finalize();
           });
         }
 
         @Override
         public void onError(final String error) {
-          handler.post(new Runnable() {
-            @Override
-            public void run() {
-              isDeleted = false;
-              FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
-              callback.onError(error);
-            }
+          handler.post(() -> {
+            isDeleted = false;
+            FileSource.getInstance(Mapbox.getApplicationContext()).deactivate();
+            callback.onError(error);
           });
         }
       });
@@ -406,23 +385,15 @@ public class OfflineRegion {
     updateOfflineRegionMetadata(bytes, new OfflineRegionUpdateMetadataCallback() {
       @Override
       public void onUpdate(final byte[] metadata) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            OfflineRegion.this.metadata = metadata;
-            callback.onUpdate(metadata);
-          }
+        handler.post(() -> {
+          OfflineRegion.this.metadata = metadata;
+          callback.onUpdate(metadata);
         });
       }
 
       @Override
       public void onError(final String error) {
-        handler.post(new Runnable() {
-          @Override
-          public void run() {
-            callback.onError(error);
-          }
-        });
+        handler.post(() -> callback.onError(error));
       }
     });
   }

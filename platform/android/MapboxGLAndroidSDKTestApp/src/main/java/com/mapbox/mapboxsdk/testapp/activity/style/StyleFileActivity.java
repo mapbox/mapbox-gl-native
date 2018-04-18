@@ -121,14 +121,8 @@ public class StyleFileActivity extends AppCompatActivity {
     }
 
     private void writeToFile(File file, String contents) throws IOException {
-      BufferedWriter writer = null;
-      try {
-        writer = new BufferedWriter(new FileWriter(file));
+      try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
         writer.write(contents);
-      } finally {
-        if (writer != null) {
-          writer.close();
-        }
       }
     }
   }

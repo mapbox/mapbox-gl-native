@@ -8,7 +8,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.maps.MapView;
@@ -23,6 +22,7 @@ import java.io.IOException;
 
 import timber.log.Timber;
 
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
@@ -34,7 +34,6 @@ import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
-import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
@@ -75,14 +74,9 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
 
   private void setupDebugZoomView() {
     final TextView textView = (TextView) findViewById(R.id.textZoom);
-    mapboxMap.setOnCameraChangeListener(new MapboxMap.OnCameraChangeListener() {
-      @Override
-      public void onCameraChange(CameraPosition position) {
-        textView.setText(String.format(getString(R.string.debug_zoom), position.zoom));
-      }
-    });
+    mapboxMap.setOnCameraChangeListener(position ->
+      textView.setText(String.format(getString(R.string.debug_zoom), position.zoom)));
   }
-
 
   @Override
   public boolean onCreateOptionsMenu(Menu menu) {

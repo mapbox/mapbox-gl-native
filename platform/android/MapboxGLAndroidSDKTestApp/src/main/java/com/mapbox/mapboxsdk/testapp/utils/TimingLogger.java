@@ -111,8 +111,8 @@ public class TimingLogger {
       return;
     }
     if (splits == null) {
-      splits = new ArrayList<Long>();
-      splitLabels = new ArrayList<String>();
+      splits = new ArrayList<>();
+      splitLabels = new ArrayList<>();
     } else {
       splits.clear();
       splitLabels.clear();

@@ -208,12 +208,7 @@ public class MapView extends FrameLayout {
   }
 
   private FocalPointChangeListener createFocalPointChangeListener() {
-    return new FocalPointChangeListener() {
-      @Override
-      public void onFocalPointChanged(PointF pointF) {
-        focalPoint = pointF;
-      }
-    };
+    return pointF -> focalPoint = pointF;
   }
 
   private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(final CameraChangeDispatcher
@@ -233,19 +228,16 @@ public class MapView extends FrameLayout {
   }
 
   private OnClickListener createCompassClickListener(final CameraChangeDispatcher cameraChangeDispatcher) {
-    return new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (mapboxMap != null && compassView != null) {
-          if (focalPoint != null) {
-            mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
-          } else {
-            mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
-          }
-          cameraChangeDispatcher.onCameraMoveStarted(MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION);
-          compassView.isAnimating(true);
-          compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
+    return v -> {
+      if (mapboxMap != null && compassView != null) {
+        if (focalPoint != null) {
+          mapboxMap.setFocalBearing(0, focalPoint.x, focalPoint.y, TIME_MAP_NORTH_ANIMATION);
+        } else {
+          mapboxMap.setFocalBearing(0, mapboxMap.getWidth() / 2, mapboxMap.getHeight() / 2, TIME_MAP_NORTH_ANIMATION);
         }
+        cameraChangeDispatcher.onCameraMoveStarted(MapboxMap.OnCameraMoveStartedListener.REASON_API_ANIMATION);
+        compassView.isAnimating(true);
+        compassView.postDelayed(compassView, TIME_WAIT_IDLE + TIME_MAP_NORTH_ANIMATION);
       }
     };
   }
@@ -313,14 +305,11 @@ public class MapView extends FrameLayout {
 
   private void onSurfaceCreated() {
     hasSurface = true;
-    post(new Runnable() {
-      @Override
-      public void run() {
-        // Initialise only when not destroyed and only once
-        if (!destroyed && mapboxMap == null) {
-          MapView.this.initialiseMap();
-          mapboxMap.onStart();
-        }
+    post(() -> {
+      // Initialise only when not destroyed and only once
+      if (!destroyed && mapboxMap == null) {
+        MapView.this.initialiseMap();
+        mapboxMap.onStart();
       }
     });
   }
