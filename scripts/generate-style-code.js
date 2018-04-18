@@ -168,6 +168,9 @@ const layers = Object.keys(spec.layer.type.values).map((type) => {
   }, []);
 
   const paintProperties = Object.keys(spec[`paint_${type}`]).reduce((memo, name) => {
+    // Skip line-gradient until it is ported from gl-js
+    if (name === 'line-gradient') return memo;
+
     spec[`paint_${type}`][name].name = name;
     memo.push(spec[`paint_${type}`][name]);
     return memo;

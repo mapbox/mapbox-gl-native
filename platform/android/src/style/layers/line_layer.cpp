@@ -236,6 +236,12 @@ namespace android {
         layer.as<mbgl::style::LineLayer>()->LineLayer::setLinePatternTransition(options);
     }
 
+    jni::Object<jni::ObjectTag> LineLayer::getLineGradient(jni::JNIEnv& env) {
+        using namespace mbgl::android::conversion;
+        Result<jni::jobject*> converted = convert<jni::jobject*>(env, layer.as<mbgl::style::LineLayer>()->LineLayer::getLineGradient());
+        return jni::Object<jni::ObjectTag>(*converted);
+    }
+
 
     jni::Class<LineLayer> LineLayer::javaClass;
 
@@ -287,7 +293,8 @@ namespace android {
             METHOD(&LineLayer::getLineDasharray, "nativeGetLineDasharray"),
             METHOD(&LineLayer::getLinePatternTransition, "nativeGetLinePatternTransition"),
             METHOD(&LineLayer::setLinePatternTransition, "nativeSetLinePatternTransition"),
-            METHOD(&LineLayer::getLinePattern, "nativeGetLinePattern"));
+            METHOD(&LineLayer::getLinePattern, "nativeGetLinePattern"),
+            METHOD(&LineLayer::getLineGradient, "nativeGetLineGradient"));
     }
 
 } // namespace android

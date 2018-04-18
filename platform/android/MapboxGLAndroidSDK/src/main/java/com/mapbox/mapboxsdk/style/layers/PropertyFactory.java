@@ -356,7 +356,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
@@ -366,7 +366,7 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width.
+   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale.
    *
    * @param expression an expression statement
    * @return property wrapper around an expression statement
@@ -393,6 +393,36 @@ public class PropertyFactory {
    */
   public static PropertyValue<Expression> linePattern(Expression expression) {
     return new PaintPropertyValue<>("line-pattern", expression);
+  }
+
+  /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param value a int color value
+   * @return property wrapper around String color
+   */
+  public static PropertyValue<String> lineGradient(@ColorInt int value) {
+    return new PaintPropertyValue<>("line-gradient", colorToRgbaString(value));
+  }
+
+  /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param value a String value
+   * @return property wrapper around String
+   */
+  public static PropertyValue<String> lineGradient(String value) {
+    return new PaintPropertyValue<>("line-gradient", value);
+  }
+
+  /**
+   * Defines a gradient with which to color a line feature. Can only be used with GeoJSON sources that specify `"lineMetrics": true`.
+   *
+   * @param expression an expression statement
+   * @return property wrapper around an expression statement
+   */
+  public static PropertyValue<Expression> lineGradient(Expression expression) {
+    return new PaintPropertyValue<>("line-gradient", expression);
   }
 
   /**

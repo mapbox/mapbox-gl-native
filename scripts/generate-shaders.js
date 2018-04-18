@@ -45,6 +45,10 @@ for (const key in shaders) {
     if (key === 'prelude')
         continue;
 
+    // Skip line-gradient until it is ported from gl-js
+    if (key === 'lineGradient')
+        continue;
+
     const shaderName = key.replace(/[A-Z]+/g, (match) => `_${match.toLowerCase()}`);
 
     writeIfModified(path.join(outputPath, `${shaderName}.hpp`), `// NOTE: DO NOT CHANGE THIS FILE. IT IS AUTOMATICALLY GENERATED.

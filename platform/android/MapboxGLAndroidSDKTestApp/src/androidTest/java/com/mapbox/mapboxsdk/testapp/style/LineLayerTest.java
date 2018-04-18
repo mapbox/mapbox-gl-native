@@ -545,4 +545,32 @@ public class LineLayerTest extends BaseActivityTest {
       assertEquals((String) layer.getLinePattern().getValue(), (String) "pedestrian-polygon");
     });
   }
+
+  @Test
+  public void testLineGradientAsConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-gradient");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      layer.setProperties(lineGradient("rgba(0, 0, 0, 1)"));
+      assertEquals((String) layer.getLineGradient().getValue(), (String) "rgba(0, 0, 0, 1)");
+    });
+  }
+
+  @Test
+  public void testLineGradientAsIntConstant() {
+    validateTestSetup();
+    setupLayer();
+    Timber.i("line-gradient");
+    invoke(mapboxMap, (uiController, mapboxMap) -> {
+      assertNotNull(layer);
+
+      // Set and Get
+      layer.setProperties(lineGradient(Color.RED));
+      assertEquals(layer.getLineGradientAsInt(), Color.RED);
+    });
+  }
 }
