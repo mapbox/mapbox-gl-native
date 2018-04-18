@@ -25,27 +25,24 @@ public:
         , sourceLayerName(std::move(sourceLayerName_))
         , bucketName(std::move(bucketName_))
         , sortIndex(sortIndex_)
-        , tileID(0, 0, 0)
+        , bucketInstanceId(0)
     {}
     
-    IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_,
-                      std::string sourceID_, CanonicalTileID tileID_)
-        : index(index_)
-        , sourceLayerName(std::move(sourceLayerName_))
-        , bucketName(std::move(bucketName_))
-        , sortIndex(std::move(sortIndex_))
-        , sourceID(std::move(sourceID_))
-        , tileID(std::move(tileID_))
-    {}
     
+    IndexedSubfeature(const IndexedSubfeature& other, uint32_t bucketInstanceId_)
+        : index(other.index)
+        , sourceLayerName(other.sourceLayerName)
+        , bucketName(other.bucketName)
+        , sortIndex(other.sortIndex)
+        , bucketInstanceId(bucketInstanceId_)
+    {}
     size_t index;
     std::string sourceLayerName;
     std::string bucketName;
     size_t sortIndex;
 
     // Only used for symbol features
-    std::string sourceID;
-    CanonicalTileID tileID;
+    uint32_t bucketInstanceId;
 };
 
 class FeatureIndex {
@@ -64,9 +61,7 @@ public:
             const double scale,
             const RenderedQueryOptions& options,
             const UnwrappedTileID&,
-            const std::string&,
             const std::vector<const RenderLayer*>&,
-            const CollisionIndex&,
             const float additionalQueryRadius) const;
 
     static optional<GeometryCoordinates> translateQueryGeometry(
@@ -77,15 +72,22 @@ public:
             const float pixelsToTileUnits);
 
     void setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs);
+    
+    std::unordered_map<std::string, std::vector<Feature>> lookupSymbolFeatures(
+           const std::vector<IndexedSubfeature>& symbolFeatures,
+           const RenderedQueryOptions& options,
+           const std::vector<const RenderLayer*>& layers,
+           const OverscaledTileID& tileID,
+           const std::shared_ptr<std::vector<size_t>>& featureSortOrder) const;
 
 private:
     void addFeature(
             std::unordered_map<std::string, std::vector<Feature>>& result,
             const IndexedSubfeature&,
-            const GeometryCoordinates& queryGeometry,
             const RenderedQueryOptions& options,
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
+            const GeometryCoordinates& queryGeometry,
             const float bearing,
             const float pixelsToTileUnits) const;
 

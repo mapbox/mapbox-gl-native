@@ -441,8 +441,7 @@ void GeometryTileWorker::performSymbolLayout() {
             }
 
             symbolLayout->prepare(glyphMap, glyphAtlas.positions,
-                                  imageMap, imageAtlas.positions,
-                                  id, sourceID);
+                                  imageMap, imageAtlas.positions);
         }
 
         symbolLayoutsNeedPreparation = false;
