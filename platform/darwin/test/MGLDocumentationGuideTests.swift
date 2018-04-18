@@ -174,8 +174,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
                 NSColor.orange, NSColor.red, NSColor.yellow, defaultColor)
         #else
             let defaultColor = UIColor.blue
-            layer.circleColor = NSExpression(
-            format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, %@)",
+            layer.circleColor = NSExpression(format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, %@)",
                 UIColor.orange, UIColor.red, UIColor.yellow, defaultColor)
         #endif
         //#-end-example-code

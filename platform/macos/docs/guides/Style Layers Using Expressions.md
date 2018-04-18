@@ -10,7 +10,6 @@
 Runtime styling removes the inconvenience of manually calculating intermediate values between different zoom levels or creating a multitude of style layers to handle homogeneous features in the map content. For example, if your content source indicates the prices of hotels in an area, you can color-code the hotels by price, relying on a data expression to smoothly interpolate among desired colors without having to specify the color for each exact price.
 *Data-driven styling* specifically refers to the use of non-constant expressions to vary the map’s appearance based on data in a content source.
 You can also specify expressions in a style JSON file, to be applied automatically when the map loads. See the [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#types-function) for details.
-![available bikes](img/data-driven-styling/citibikes.png) ![subway lines](img/data-driven-styling/polylineExample.png)
 
 This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php) and data-driven styling to style a map based on attributes. For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide. To learn more about supported expressions functions, see our [Predicates and Expressions](predicates-and-expressions.html) guide. The Predicates and Expressions guide also outlines Mapbox custom functions that can be used to dynamically style a map.
 
@@ -67,7 +66,7 @@ layer.circleRadius = NSExpression(forConstantValue: 10)
 mapView.style?.insertLayer(layer, below: symbolLayer)
 ```
 
-![exponential mode](img/data-driven-styling/exponential.png)
+![exponential mode](img/data-driven-styling/linear.png)
 
 ### Exponential
 
@@ -142,6 +141,8 @@ Some built-in expressions functions can be applied to attribute values to style 
 layer.circleRadius = NSExpression(forFunction: "multiply:by:", arguments: [NSExpression(forKeyPath: "mag"), 3])
 ```
 
+![multiply magnitude](img/data-driven-styling/multiply.png)
+
 Through expressions, you can also cast attribute values in order to use them. One example is to cast an integer as an `NSString` and use it as a text value.
 
 ```swift
@@ -149,6 +150,8 @@ let magnitudeLayer = MGLSymbolStyleLayer(identifier: "mag-layer", source: source
 magnitudeLayer.text = NSExpression(format: "CAST(mag, 'NSString')")
 mapView.style?.addLayer(magnitudeLayer)
 ```
+
+![cast a value](img/data-driven-styling/cast.png)
 
 ##Resources
 
