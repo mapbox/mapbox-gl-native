@@ -640,8 +640,8 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     std::vector<std::unique_ptr<mbgl::style::expression::Expression>> args;
     args.push_back(std::make_unique<mbgl::style::expression::Literal>(mbgl::style::expression::Value(std::string("extrude"))));
     args.push_back(std::make_unique<mbgl::style::expression::Literal>(mbgl::style::expression::Value(std::string("true"))));
-    mbgl::style::expression::ParsingContext context;
-    extrusionLayer->setFilter(mbgl::style::Filter { std::move(*mbgl::style::expression::createCompoundExpression("filter-==", std::move(args), context)) });
+    mbgl::style::expression::ParsingContext parsingContext;
+    extrusionLayer->setFilter(mbgl::style::Filter { std::move(*mbgl::style::expression::createCompoundExpression("filter-==", std::move(args), parsingContext)) });
 
     auto colorFn = mbgl::style::SourceFunction<mbgl::Color> { "height",
         mbgl::style::ExponentialStops<mbgl::Color> {
