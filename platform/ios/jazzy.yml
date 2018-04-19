@@ -19,7 +19,7 @@ custom_categories:
     children:
       - Adding Markers to a Map
       - Runtime Styling
-      - Style Layers Using Expressions
+      - Migrating to Expressions
       - Working with Mapbox Studio
       - Working with GeoJSON Data
       - Predicates and Expressions

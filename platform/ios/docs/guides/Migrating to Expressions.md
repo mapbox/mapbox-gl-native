@@ -89,7 +89,7 @@ layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:paramet
 
 ### Interval
 
-Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the format string `'mgl_step:from:stops:'` for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument. 
+Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the format string `'mgl_step:from:stops:'` for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument.
 
 When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 ```swift
@@ -151,11 +151,12 @@ mapView.style?.addLayer(magnitudeLayer)
 
 ![cast a value](img/data-driven-styling/cast.png)
 
-## Constant Values
+### Constant Values
 
 For constant values that do not necessarily change based on camera or attribute values, use `[NSExpression expressionForConstantValue:]` (previously `[MGLStyleValue valueWithRawValue:]`).
 
-  ## Resources
+  
+## Resources
 
 * [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
 * [For Style Authors](for-style-authors.html)
