@@ -2249,8 +2249,16 @@ public:
     // The annotation's anchor will bounce to the current click.
     NSRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
 
+    // Check for invalid (zero) positioning rect
+    if (NSEqualRects(positioningRect, NSZeroRect)) {
+        CLLocationCoordinate2D origin = annotation.coordinate;
+        positioningRect.origin = [self convertCoordinate:origin toPointToView:self];
+    }
+
     if (!moveOnscreen && NSIsEmptyRect(NSIntersectionRect(positioningRect, self.bounds))) {
-        positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
+        if (!NSEqualPoints(gesturePoint, NSZeroPoint)) {
+            positioningRect = CGRectMake(gesturePoint.x, gesturePoint.y, positioningRect.size.width, positioningRect.size.height);
+        }
     }
 
     self.selectedAnnotation = annotation;
@@ -2463,6 +2471,8 @@ public:
     NSPopover *callout = self.calloutForSelectedAnnotation;
     if (callout) {
         NSRect rect = [self positioningRectForCalloutForAnnotationWithTag:_selectedAnnotationTag];
+
+        NSAssert(!NSEqualRects(rect, NSZeroRect), @"Positioning rect should be non-zero");
 
         if (!NSIsEmptyRect(NSIntersectionRect(rect, self.bounds))) {
 
