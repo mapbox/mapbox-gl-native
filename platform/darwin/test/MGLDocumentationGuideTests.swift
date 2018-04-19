@@ -85,7 +85,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         mapView.style?.addSource(source)
         
         #if os(macOS)
-            let stops: [Float: NSColor] = [
+            let stops: [NSNumber: NSColor] = [
                 0: .yellow,
                 2.5: .orange,
                 5: .red,
@@ -93,7 +93,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
                 10: .white,
             ]
         #else
-            let stops: [Float: UIColor] = [
+            let stops: [NSNumber: UIColor] = [
                 0: .yellow,
                 2.5: .orange,
                 5: .red,
@@ -120,7 +120,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
         #if os(macOS)
-        let stops: [Float: NSColor] = [
+        let stops: [NSNumber: NSColor] = [
             0: .yellow,
             2.5: .orange,
             5: .red,
@@ -128,7 +128,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
             10: .white,
             ]
         #else
-        let stops: [Float: UIColor] = [
+        let stops: [NSNumber: UIColor] = [
             0: .yellow,
             2.5: .orange,
             5: .red,
@@ -138,7 +138,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         #endif
         
         //#-example-code
-        layer.circleColor = NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "mag"), curveType: MGLExpressionInterpolationMode.linear, parameters: nil, stops: NSExpression(forConstantValue: stops))
+        layer.circleColor = NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "mag"), curveType: .linear, parameters: nil, stops: NSExpression(forConstantValue: stops))
         //#-end-example-code
         
         layer.circleRadius = NSExpression(forConstantValue: 10)
@@ -181,7 +181,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         
         //#-example-code
         #if os(macOS)
-            let stops: [Float: NSColor] = [
+            let stops: [NSNumber: NSColor] = [
                 0: .yellow,
                 2.5: .orange,
                 5: .red,
@@ -192,7 +192,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
             layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
                                              NSColor.green, stops)
         #else
-            let stops: [Float: UIColor] = [
+            let stops: [NSNumber: UIColor] = [
                 0: .yellow,
                 2.5: .orange,
                 5: .red,
