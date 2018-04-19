@@ -79,7 +79,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
         let symbolSource = MGLSource(identifier: "source")
-        let symbolLayer = mapView.style?.layer(withIdentifier: "place-city-sm")!
+        let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: source)
         
         let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
         mapView.style?.addSource(source)
@@ -142,7 +142,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
         
         layer.circleRadius = NSExpression(forConstantValue: 10)
-        mapView.style?.insertLayer(layer, below: symbolLayer)
+        mapView.style?.addLayer(layer)
         
     }
     func testMigratingToExpressions$Exponential() {
@@ -224,6 +224,28 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
+    func testMigratingToExpressions$CategoricalValue() {
+        let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
+        let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
+        
+        //#-example-code
+        #if os(macOS)
+        let stops : [String : NSColor] = ["earthquake" : NSColor.orange,
+                                           "explosion" : NSColor.red,
+                                        "quarry blast" : NSColor.yellow]
+        layer.circleColor = NSExpression(
+            format: "FUNCTION(%@, 'valueForKeyPath:', type)",
+            stops)
+        #else
+        let stops : [String : UIColor] = ["earthquake" : UIColor.orange,
+                                          "explosion" : UIColor.red,
+                                          "quarry blast" : UIColor.yellow]
+        layer.circleColor = NSExpression(
+            format: "FUNCTION(%@, 'valueForKeyPath:', type)",
+            stops)
+        #endif
+        //#-end-example-code
+    }
     func testMigratingToExpressions$Identity() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)

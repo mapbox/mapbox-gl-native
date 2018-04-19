@@ -67,13 +67,17 @@ When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, w
 
 ### Categorical
 
-Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH()`.
+Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH`.
 
 `MGL_MATCH` takes an initial condition, which in this case is an attribute key. This is follow by possible matches for that key and the value to assign to the layer property if there is a match. The final argument can be a default style value that is to be used if none of the specified values match.
 
 There are three main types of events in the USGS dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of blue to catch any events that do not fall into any of those categories.
 
 <%- guideExample(guide, 'Categorical', os) %>
+
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:".
+
+<%- guideExample(guide, 'CategoricalValue', os) %>
 
 ![categorical mode](img/data-driven-styling/categorical1.png) ![categorical mode](img/data-driven-styling/categorical2.png)
 

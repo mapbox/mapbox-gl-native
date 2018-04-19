@@ -44,7 +44,7 @@ The stops dictionary below, for example, shows colors that continuously shift fr
 ```swift
 let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
 let symbolSource = MGLSource(identifier: "source")
-let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
+let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: source)
 
 let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
 mapView.style?.addSource(source)
@@ -109,7 +109,7 @@ layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
 
 ### Categorical
 
-Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH()`.
+Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH`.
 
 `MGL_MATCH` takes an initial condition, which in this case is an attribute key. This is follow by possible matches for that key and the value to assign to the layer property if there is a match. The final argument can be a default style value that is to be used if none of the specified values match.
 
@@ -119,6 +119,17 @@ There are three main types of events in the USGS dataset: earthquakes, explosion
 let defaultColor = UIColor.blue
 layer.circleColor = NSExpression(format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, %@)",
     UIColor.orange, UIColor.red, UIColor.yellow, defaultColor)
+```
+
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:".
+
+```swift
+let stops : [String : UIColor] = ["earthquake" : UIColor.orange,
+                              "explosion" : UIColor.red,
+                              "quarry blast" : UIColor.yellow]
+layer.circleColor = NSExpression(
+format: "FUNCTION(%@, 'valueForKeyPath:', type)",
+stops)
 ```
 
 ![categorical mode](img/data-driven-styling/categorical1.png) ![categorical mode](img/data-driven-styling/categorical2.png)

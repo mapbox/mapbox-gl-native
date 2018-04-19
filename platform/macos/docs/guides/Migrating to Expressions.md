@@ -44,7 +44,7 @@ The stops dictionary below, for example, shows colors that continuously shift fr
 ```swift
 let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
 let symbolSource = MGLSource(identifier: "source")
-let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
+let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: source)
 
 let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
 mapView.style?.addSource(source)
@@ -89,7 +89,7 @@ layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:paramet
 
 ### Interval
 
-Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the format string `'mgl_step:from:stops:'` for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument. 
+Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the format string `'mgl_step:from:stops:'` for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument.
 
 When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 ```swift
@@ -109,7 +109,7 @@ layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
 
 ### Categorical
 
-Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH()`.
+Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH`.
 
 `MGL_MATCH` takes an initial condition, which in this case is an attribute key. This is follow by possible matches for that key and the value to assign to the layer property if there is a match. The final argument can be a default style value that is to be used if none of the specified values match.
 
@@ -120,6 +120,17 @@ let defaultColor = NSColor.blue
 layer.circleColor = NSExpression(
 format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, %@)",
     NSColor.orange, NSColor.red, NSColor.yellow, defaultColor)
+```
+
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:".
+
+```swift
+let stops : [String : NSColor] = ["earthquake" : NSColor.orange,
+                               "explosion" : NSColor.red,
+                            "quarry blast" : NSColor.yellow]
+layer.circleColor = NSExpression(
+format: "FUNCTION(%@, 'valueForKeyPath:', type)",
+stops)
 ```
 
 ![categorical mode](img/data-driven-styling/categorical1.png) ![categorical mode](img/data-driven-styling/categorical2.png)
@@ -152,7 +163,8 @@ mapView.style?.addLayer(magnitudeLayer)
 
 ![cast a value](img/data-driven-styling/cast.png)
 
-## Constant Values
+### Constant Values
+
 ## Resources
 
 * [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
