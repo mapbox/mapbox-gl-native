@@ -198,6 +198,46 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssert(reasonAfter == MGLCameraChangeReasonNone, @"Camera should not have moved");
 }
 
+- (void)checkDefaultPropertiesForAnnotationView:(MGLAnnotationView*)view {
+    XCTAssertNil(view.annotation);
+    XCTAssertNil(view.reuseIdentifier);
+    XCTAssertEqual(view.centerOffset.dx, 0.0);
+    XCTAssertEqual(view.centerOffset.dy, 0.0);
+    XCTAssertFalse(view.scalesWithViewingDistance);
+    XCTAssertFalse(view.rotatesToMatchCamera);
+    XCTAssertFalse(view.isSelected);
+    XCTAssert(view.isEnabled);
+    XCTAssertFalse(view.isDraggable);
+    XCTAssertEqual(view.dragState, MGLAnnotationViewDragStateNone);
+}
+
+- (void)testAnnotationViewInitWithFrame {
+    CGRect frame = CGRectMake(10.0, 10.0, 100.0, 100.0);
+    MGLAnnotationView *view = [[MGLAnnotationView alloc] initWithFrame:frame];
+    [self checkDefaultPropertiesForAnnotationView:view];
+}
+
+- (void)testAnnotationViewInitWithReuseIdentifier {
+    MGLAnnotationView *view = [[MGLAnnotationView alloc] initWithReuseIdentifier:nil];
+    [self checkDefaultPropertiesForAnnotationView:view];
+}
+
+- (void)testSelectingADisabledAnnotationView {
+    self.prepareAnnotationView = ^(MGLAnnotationView *view) {
+        view.enabled = NO;
+    };
+    
+    // Create annotation
+    MGLPointFeature *point = [[MGLPointFeature alloc] init];
+    point.title = NSStringFromSelector(_cmd);
+    point.coordinate = CLLocationCoordinate2DMake(0.0, 0.0);
+    
+    XCTAssert(self.mapView.selectedAnnotations.count == 0, @"There should be 0 selected annotations");
+    
+    [self.mapView selectAnnotation:point animated:NO];
+    
+    XCTAssert(self.mapView.selectedAnnotations.count == 0, @"There should be 0 selected annotations");
+}
 
 #pragma mark - MGLMapViewDelegate -
 
