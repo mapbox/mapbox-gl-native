@@ -122,7 +122,7 @@ format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, 
     NSColor.orange, NSColor.red, NSColor.yellow, defaultColor)
 ```
 
-If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:".
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:"``.
 
 ```swift
 let stops : [String : NSColor] = ["earthquake" : NSColor.orange,

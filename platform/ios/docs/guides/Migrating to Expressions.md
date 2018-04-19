@@ -121,7 +121,7 @@ layer.circleColor = NSExpression(format: "MGL_MATCH(type, 'earthquake', %@, 'exp
     UIColor.orange, UIColor.red, UIColor.yellow, defaultColor)
 ```
 
-If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:".
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:"``.
 
 ```swift
 let stops : [String : UIColor] = ["earthquake" : UIColor.orange,
