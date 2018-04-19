@@ -50,7 +50,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         styleLoadingExpectation.fulfill()
     }
     
-    func testStyleLayersUsingExpressions$Stops() {
+    func testMigratingToExpressions$Stops() {
         //#-example-code
         #if os(macOS)
             let stops: [NSNumber: NSColor] = [
@@ -75,7 +75,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
                              stops[0]!, stops)
     }
     
-    func testStyleLayersUsingExpressions$Linear() {
+    func testMigratingToExpressions$Linear() {
         //#-example-code
         let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
         let symbolSource = MGLSource(identifier: "source")
@@ -115,7 +115,37 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Exponential() {
+    func testMigratingToExpressions$LinearConvenience() {
+        let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
+        let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
+        
+        #if os(macOS)
+        let stops: [Float: NSColor] = [
+            0: .yellow,
+            2.5: .orange,
+            5: .red,
+            7.5: .blue,
+            10: .white,
+            ]
+        #else
+        let stops: [Float: UIColor] = [
+            0: .yellow,
+            2.5: .orange,
+            5: .red,
+            7.5: .blue,
+            10: .white,
+            ]
+        #endif
+        
+        //#-example-code
+        layer.circleColor = NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "mag"), curveType: MGLExpressionInterpolationMode.linear, parameters: nil, stops: NSExpression(forConstantValue: stops))
+        //#-end-example-code
+        
+        layer.circleRadius = NSExpression(forConstantValue: 10)
+        mapView.style?.insertLayer(layer, below: symbolLayer)
+        
+    }
+    func testMigratingToExpressions$Exponential() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
@@ -131,7 +161,21 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Interval() {
+    func testMigratingToExpressions$ExponentialConvenience() {
+        let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
+        let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
+        
+        //#-example-code
+        let stops = [
+            12: 0.5,
+            14: 2,
+            18: 18,
+            ]
+        
+        layer.circleRadius =  NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "$zoomLevel"), curveType: MGLExpressionInterpolationMode.exponential, parameters: NSExpression(forConstantValue: 1.5), stops: NSExpression(forConstantValue: stops))
+        //#-end-example-code
+    }
+    func testMigratingToExpressions$Interval() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
@@ -162,7 +206,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Categorical() {
+    func testMigratingToExpressions$Categorical() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
@@ -180,7 +224,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Identity() {
+    func testMigratingToExpressions$Identity() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
@@ -189,7 +233,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Multiply() {
+    func testMigratingToExpressions$Multiply() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         let layer = MGLCircleStyleLayer(identifier: "circles", source: source)
         
@@ -198,7 +242,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-end-example-code
     }
     
-    func testStyleLayersUsingExpressions$Cast() {
+    func testMigratingToExpressions$Cast() {
         let source = MGLShapeSource(identifier: "circles", shape: nil, options: nil)
         
         //#-example-code
