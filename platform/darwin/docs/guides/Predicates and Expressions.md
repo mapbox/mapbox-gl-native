@@ -356,6 +356,61 @@ order. Compared to the
 function, this function takes only one argument, which is an aggregate
 expression containing the strings to concatenate.
 
+### `mgl_acos:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_acos:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_acos(1)</code></dd>
+</dl>
+
+Returns the arccosine of the number.
+
+### `mgl_asin:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_asin:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_asin(0)</code></dd>
+</dl>
+
+Returns the arcsine of the number.
+
+### `mgl_atan:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_atan:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_atan(20)</code></dd>
+</dl>
+
+Returns the arctangent of the number.
+
+### `mgl_cos:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_cos:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_cos(0)</code></dd>
+</dl>
+
+Returns the cosine of the number.
+
+### `mgl_log2:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_log2:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_log2(1024)</code></dd>
+</dl>
+
+Returns the base-2 logarithm of the number.
+
 ### `mgl_round:`
 
 <dl>
@@ -367,6 +422,28 @@ expression containing the strings to concatenate.
 
 Returns the number rounded to the nearest integer. If the number is halfway
 between two integers, this function rounds it away from zero.
+
+### `mgl_sin:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_sin:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_sin(0)</code></dd>
+</dl>
+
+Returns the sine of the number.
+
+### `mgl_tan:`
+
+<dl>
+<dt>Selector:</dt>
+<dd><code>mgl_tan:</code></dd>
+<dt>Format string syntax:</dt>
+<dd><code>mgl_tan(0)</code></dd>
+</dl>
+
+Returns the tangent of the number.
 
 ### `mgl_coalesce:`
 
