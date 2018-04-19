@@ -79,7 +79,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
         let symbolSource = MGLSource(identifier: "source")
-        let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
+        let symbolLayer = mapView.style?.layer(withIdentifier: "place-city-sm")!
         
         let source = MGLShapeSource(identifier: "earthquakes", url: url, options: nil)
         mapView.style?.addSource(source)
