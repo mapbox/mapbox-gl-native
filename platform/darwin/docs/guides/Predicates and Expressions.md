@@ -622,7 +622,7 @@ defined in the context dictionary.
 <dt>Format string syntax:</dt>
 <dd>
    <code>FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', NIL, %@)</code>
-   with a dictionary containing zoom levels as keys
+   with a dictionary containing zoom levels or other constant values as keys
 </dd>
 <dt>Target:</dt>
 <dd>
@@ -659,6 +659,12 @@ defined in the context dictionary.
 
 A value interpolated along the continuous mathematical function defined by the
 arguments, with the target as the input to the function.
+
+The input expression is matched against the keys in the stop dictionary. The
+keys may be feature attribute values, zoom levels, or heatmap densities. The
+values may be constant values or `NSExpression` objects. For example, you can
+use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
+yellow, orange, and red as the values.
 
 ### `mgl_numberWithFallbackValues:`
 
@@ -702,7 +708,7 @@ A numeric representation of the target:
 <dt>Format string syntax:</dt>
 <dd>
    <code>FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', 0, %@)</code> with
-   a dictionary with zoom levels as keys
+   a dictionary with zoom levels or other constant values as keys
 </dd>
 <dt>Target:</dt>
 <dd>
@@ -723,6 +729,12 @@ A numeric representation of the target:
 
 The output value of the stop whose key is just less than the evaluated target,
 or the minimum value if the target is less than the least of the stops’ keys.
+
+The input expression is matched against the keys in the stop dictionary. The
+keys may be feature attribute values, zoom levels, or heatmap densities. The
+values may be constant values or `NSExpression` objects. For example, you can
+use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
+yellow, orange, and red as the values.
 
 ### `stringByAppendingString:`
 
