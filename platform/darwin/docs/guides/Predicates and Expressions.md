@@ -19,6 +19,8 @@ based on the feature’s attributes. Use the `MGLVectorStyleLayer.predicate`
 property to include only the features in the source layer that satisfy a
 condition that you define.
 
+### Operators
+
 The following comparison operators are supported:
 
 `NSPredicateOperatorType`                     | Format string syntax
@@ -31,8 +33,10 @@ The following comparison operators are supported:
 `NSNotEqualToPredicateOperatorType`           | `key != value`<br />`key <> value`
 `NSBetweenPredicateOperatorType`              | `key BETWEEN { 32, 212 }`
 
-The `key` may be cast explicitly into the key's type. Example: `CAST(key, 'NSNumber')` or
-`CAST(key, 'NSString')`
+To test whether a feature has or lacks a specific attribute, compare the
+attribute to `NULL` or `NIL`. Predicates created using the
+`+[NSPredicate predicateWithValue:]` method are also supported. String
+operators and custom operators are not supported.
 
 The following compound operators are supported:
 
@@ -49,81 +53,52 @@ The following aggregate operators are supported:
 `NSInPredicateOperatorType`       | `key IN { 'iOS', 'macOS', 'tvOS', 'watchOS' }`
 `NSContainsPredicateOperatorType` | `{ 'iOS', 'macOS', 'tvOS', 'watchOS' } CONTAINS key`
 
-To test whether a feature has or lacks a specific attribute, compare the
-attribute to `NULL` or `NIL`. Predicates created using the
-`+[NSPredicate predicateWithValue:]` method are also supported. String
-operators and custom operators are not supported.
+Operator modifiers such as `c` (for case insensitivity), `d` (for diacritic
+insensitivity), and `l` (for locale sensitivity) are unsupported for comparison
+and aggregate operators that are used in the predicate.
+
+### Operands
+
+Operands in predicates can be [variables](#variables), [key paths](#key-paths),
+or almost anything else that can appear
+[inside an expression](#using-expressions-to-configure-layout-and-paint-attributes).
+
+Automatic type casting is not performed. Therefore, a feature only matches a
+predicate if its value for the attribute in question is of the same type as the
+value specified in the predicate. Use the `CAST()` operator to convert a key
+path or variable into a matching type:
+
+* To cast a value to a number, use `CAST(key, 'NSNumber')`.
+* To cast a value to a string, use `CAST(key, 'NSString')`.
 
 For details about the predicate format string syntax, consult the “Predicate
 Format String Syntax” chapter of the
 _[Predicate Programming Guide](https://developer.apple.com/library/content/documentation/Cocoa/Conceptual/Predicates/AdditionalChapters/Introduction.html)_
 in Apple developer documentation.
 
-Either the predicate’s left-hand or right-hand expression can be an `NSString` 
-(to match strings) or `NSNumber` (to match numbers, including Boolean values) 
-or an array of `NSString`s or `NSNumber`s, depending on the operator and the 
-type of values expected for the attribute being tested  or, alternatively, 
-one of the following special attributes:
-
-<table>
-<thead>
-<tr><th>Attribute</th><th>Meaning</th></tr>
-</thead>
-<tbody>
-<tr>
-   <td><code>$featureIdentifier</code></td>
-   <td>
-       A value that uniquely identifies the feature in the containing source.
-       For details on the types of values that may be associated with this key,
-       consult the documentation for the <code>MGLFeature</code> protocol’s
-       <code>identifier</code> property.
-   </td>
-</tr>
-<tr>
-   <td><code>$geometryType</code></td>
-   <td>
-       The type of geometry represented by the feature. A feature’s type is
-       guaranteed to be one of the following strings:
-       <ul>
-           <li>
-               <code>Point</code> for point features, corresponding to the
-               <code>MGLPointAnnotation</code> class
-           </li>
-           <li>
-               <code>LineString</code> for polyline features, corresponding to
-               the <code>MGLPolyline</code> class
-           </li>
-           <li>
-               <code>Polygon</code> for polygon features, corresponding to the
-               <code>MGLPolygon</code> class
-           </li>
-       </ul>
-   </td>
-</tr>
-<tr>
-   <td><code>point_count</code></td>
-   <td>The number of point features in a given cluster.</td>
-</tr>
-</tbody>
-</table>
-
-For floating-point values, use `-[NSNumber numberWithDouble:]` instead of 
-`-[NSNumber numberWithFloat:]` to avoid precision issues.
-
-Automatic type casting is not performed. Therefore, a feature only matches this
-predicate if its value for the attribute in question is of the same type as the
-value specified in the predicate. Also, operator modifiers such as `c` (for
-case insensitivity), `d` (for diacritic insensitivity), and `l` (for locale
-sensitivity) are unsupported for comparison and aggregate operators that are
-used in the predicate.
-
-It is possible to create expressions that contain special characters in the
-predicate format syntax. This includes the `$` in the `$featureIdentifier` and 
-`$geometryType` special style attributes and also `hyphen-minus` and `tag:subtag`. 
-However, you must use `%@` in the format string to represent these variables:
-`@"$geometryType == 'LineString'"`.
-
 ## Using expressions to configure layout and paint attributes
+
+An expression can contain subexpressions of various types. Each of the supported
+types of expressions is discussed below.
+
+### Constant values
+
+A constant value can be of any of the following types:
+
+In Objective-C        | In Swift
+----------------------|---------
+`NSColor` (macOS)<br>`UIColor` (iOS) | `NSColor` (macOS)<br>`UIColor` (iOS)
+`NSString`            | `String`
+`NSString`            | `String`
+`NSNumber.boolValue`  | `NSNumber.boolValue`
+`NSNumber.doubleValue` | `NSNumber.doubleValue`
+`NSArray<NSNumber>` | `[Float]`
+`NSArray<NSString>` | `[String]`
+`NSValue.CGVectorValue` (iOS)<br>`NSValue` containing `CGVector` (macOS) | `NSValue.cgVectorValue` (iOS)<br>`NSValue` containing `CGVector` (macOS)
+`NSValue.UIEdgeInsetsValue` (iOS)<br>`NSValue.edgeInsetsValue` (macOS) | `NSValue.uiEdgeInsetsValue` (iOS)<br>`NSValue.edgeInsetsValue` (macOS)
+
+For literal floating-point values, use `-[NSNumber numberWithDouble:]` instead
+of `-[NSNumber numberWithFloat:]` to avoid precision issues.
 
 ### Key paths
 
@@ -132,6 +107,34 @@ evaluated for display. For example, if a polygon’s `MGLFeature.attributes`
 dictionary contains the `floorCount` key, then the key path `floorCount` refers
 to the value of the `floorCount` attribute when evaluating that particular
 polygon.
+
+The following special attribute is also available on features that are produced
+as a result of clustering multiple point features together in a shape source:
+
+<table>
+<thead>
+<tr><th>Attribute</th><th>Type</th><th>Meaning</th></tr>
+</thead>
+<tbody>
+<tr>
+   <td><code>point_count</code></td>
+   <td>Number</td>
+   <td>The number of point features in a given cluster.</td>
+</tr>
+</tbody>
+</table>
+
+Some characters may not be used directly as part of a key path in a format
+string. For example, if a feature’s attribute is named `ISO 3166-1:2006`, an
+expression format string of `lowercase(ISO 3166-1:2006)` or a predicate format
+string of `ISO 3166-1:2006 == 'US-OH'` would raise an exception. Instead, use a
+`%K` placeholder or the `+[NSExpression expressionForKeyPath:]` initializer:
+
+```swift
+NSPredicate(format: "%K == 'US-OH'", "ISO 3166-1:2006")
+NSExpression(forFunction: "lowercase:",
+             arguments: [NSExpression(forKeyPath: "ISO 3166-1:2006")])
+```
 
 ### Predefined functions
 
@@ -399,6 +402,20 @@ The Mapbox Style Specification defines some operators for which no custom
 function is available. To use these operators in an `NSExpression`, call the
 `MGL_FUNCTION()` function with the same arguments that the operator expects.
 
+### Conditionals
+
+Conditionals are supported via the built-in
+`+[NSExpression expressionForConditional:trueExpression:falseExpression:]`
+method and `TERNARY()` operator. If you need to express multiple cases
+(“else-if”), you can either nest a conditional within a conditional or use the
+`MGL_IF()` or `MGL_MATCH()` function.
+
+### Aggregates
+
+Aggregate expressions can contain arrays of expressions. In some cases, it is
+possible to use the array itself instead of wrapping the array in an aggregate
+expression.
+
 ### Variables
 
 The following variables are defined by this SDK for use with style layers:
@@ -408,6 +425,38 @@ The following variables are defined by this SDK for use with style layers:
 <tr><th>Variable</th><th>Type</th><th>Meaning</th></tr>
 </thead>
 <tbody>
+<tr>
+   <td><code>$featureIdentifier</code></td>
+   <td>
+      Any
+      <a href="working-with-geojson-data.html#about-geojson-deserialization">GeoJSON data type</a>
+   </td>
+   <td>
+      A value that uniquely identifies the feature in the containing source.
+   </td>
+</tr>
+<tr>
+   <td><code>$geometryType</code></td>
+   <td>String</td>
+   <td>
+       The type of geometry represented by the feature. A feature’s type is one
+       of the following strings:
+       <ul>
+           <li>
+               <code>Point</code> for point features, corresponding to the
+               <code>MGLPointAnnotation</code> class
+           </li>
+           <li>
+               <code>LineString</code> for polyline features, corresponding to
+               the <code>MGLPolyline</code> class
+           </li>
+           <li>
+               <code>Polygon</code> for polygon features, corresponding to the
+               <code>MGLPolygon</code> class
+           </li>
+       </ul>
+   </td>
+</tr>
 <tr>
    <td><code>$heatmapDensity</code></td>
    <td>Number</td>
