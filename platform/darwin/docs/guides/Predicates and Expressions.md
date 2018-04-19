@@ -526,7 +526,7 @@ passed into this function must be wrapped in a constant expression.
 <dt>Arguments:</dt>
 <dd>
    Any arguments required by the expression operator, as defined in the
-   [Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
+   <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions">Mapbox Style Specification</a>.
 </dd>
 </dl>
 
