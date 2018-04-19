@@ -27,7 +27,7 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     anchor(anchor_),
     line(line_),
     index(index_),
-    hasText(shapedTextOrientations.first || shapedTextOrientations.second),
+    hasText(false),
     hasIcon(shapedIcon),
 
     // Create the collision features that will be used to check whether this symbol instance can be placed
@@ -48,6 +48,8 @@ SymbolInstance::SymbolInstance(Anchor& anchor_,
     if (shapedTextOrientations.second) {
         verticalGlyphQuads = getGlyphQuads(shapedTextOrientations.second, layout, textPlacement, positions);
     }
+    // 'hasText' depends on finding at least one glyph in the shaping that's also in the GlyphPositionMap
+    hasText = horizontalGlyphQuads.size() > 0 || verticalGlyphQuads.size() > 0;
 
     if (shapedTextOrientations.first && shapedTextOrientations.second) {
         writingModes = WritingModeType::Horizontal | WritingModeType::Vertical;
