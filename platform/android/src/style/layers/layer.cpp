@@ -157,14 +157,12 @@ namespace android {
         using namespace mbgl::style::conversion;
 
         Filter filter = layer.accept(GetFilterEvaluator());
-
-        jni::Object<gson::JsonElement> converted;
-        if (filter.is<ExpressionFilter>()) {
-            ExpressionFilter filterExpression = filter.get<ExpressionFilter>();
-            mbgl::Value expressionValue = filterExpression.expression.get()->serialize();
-            converted = gson::JsonElement::New(env, expressionValue);
+        if (filter.expression) {
+            mbgl::Value expressionValue = filter.expression.get()->serialize();
+            return gson::JsonElement::New(env, expressionValue);
+        } else {
+            return jni::Object<gson::JsonElement>();
         }
-        return converted;
     }
 
     struct SetSourceLayerEvaluator {
