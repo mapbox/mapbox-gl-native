@@ -52,6 +52,8 @@ The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iO
 * The `MGLMapView.selectedAnnotations` property (backed by `-[MGLMapView setSelectedAnnotations:]`) now selects annotations that are off-screen. ([#9790](https://github.com/mapbox/mapbox-gl-native/issues/9790))
 * The `animated` parameter to `-[MGLMapView selectAnnotation:animated:]` now controls whether the annotation and its callout are brought on-screen. If `animated` is `NO` then the annotation is selected if offscreen, but the map is not panned. Currently only point annotations are supported. Setting the `MGLMapView.selectedAnnotations` property now animates. ([#3249](https://github.com/mapbox/mapbox-gl-native/issues/3249))
 * Fixed a crash when rapidly adding and removing annotations. ([#11551](https://github.com/mapbox/mapbox-gl-native/issues/11551), [#11575](https://github.com/mapbox/mapbox-gl-native/issues/11575))
+* Marked protocol method `-[MGLCalloutView presentCalloutFromRect:inView:constrainedToView:animated:]` as unavailble. Please use `-[MGLCalloutView presentCalloutFromRect:inView:constrainedToRect:animated:]` instead (enabling moving off-screen annotations on-screen).
+
 
 ### Map snapshots
 
