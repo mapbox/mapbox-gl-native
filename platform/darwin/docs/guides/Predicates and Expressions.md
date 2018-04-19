@@ -299,7 +299,7 @@ string syntax:
 
 <dl>
 <dt>Selector:</dt>
-<dd>`mgl_does:have:`</dd>
+<dd><code>mgl_does:have:</code></dd>
 <dt>Format string syntax:</dt>
 <dd><code>mgl_does:have:(SELF, 'key')</code> or <code>mgl_does:have:(%@, 'key')</code></dd>
 </dl>
@@ -483,7 +483,7 @@ expression that contains references to those variables.
 <dt>Selector:</dt>
 <dd><code>MGL_MATCH:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`</code></dd>
+<dd><code>MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')</code></dd>
 <dt>Arguments:</dt>
 <dd>
    An input expression, then any number of argument pairs, followed by a default
@@ -501,7 +501,7 @@ values.
 <dt>Selector:</dt>
 <dd><code>MGL_IF:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`</code></dd>
+<dd><code>MGL_IF(1 = 2, YES, 2 = 2, YES, NO)</code></dd>
 <dt>Arguments:</dt>
 <dd>
    Alternating <code>NSPredicate</code> conditionals and resulting expressions,
@@ -522,7 +522,7 @@ passed into this function must be wrapped in a constant expression.
 <dt>Selector:</dt>
 <dd><code>MGL_FUNCTION:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`MGL_FUNCTION('typeof', mystery)`</code></dd>
+<dd><code>MGL_FUNCTION('typeof', mystery)</code></dd>
 <dt>Arguments:</dt>
 <dd>
    Any arguments required by the expression operator, as defined in the
@@ -552,7 +552,7 @@ that the operator expects.
 <dt>Selector:</dt>
 <dd><code>boolValue</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`FUNCTION(1, 'boolValue')`</code></dd>
+<dd><code>FUNCTION(1, 'boolValue')</code></dd>
 <dt>Target:</dt>
 <dd>
    An <code>NSExpression</code> that evaluates to a number or string.
@@ -571,7 +571,7 @@ otherwise <code>TRUE</code>.
 <dt>Selector:</dt>
 <dd><code>mgl_has:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`FUNCTION($featureProperties, 'mgl_has:', '🧀🍔')`</code></dd>
+<dd><code>FUNCTION($featureProperties, 'mgl_has:', '🧀🍔')</code></dd>
 <dt>Target:</dt>
 <dd>
    An <code>NSExpression</code> that evaluates to an <code>NSDictionary</code>
@@ -595,8 +595,8 @@ object has a value for the feature attribute.
 <dd><code>mgl_expressionWithContext:</code></dd>
 <dt>Format string syntax:</dt>
 <dd>
-   <code>`FUNCTION($ios + $macos, 'mgl_expressionWithContext:', %@)`</code> with
-   a dictionary containing `ios` and `macos` keys
+   <code>FUNCTION($ios + $macos, 'mgl_expressionWithContext:', %@)</code> with
+   a dictionary containing <code>ios</code> and <code>macos</code> keys
 </dd>
 <dt>Target:</dt>
 <dd>
@@ -621,7 +621,7 @@ defined in the context dictionary.
 <dd><code>mgl_interpolateWithCurveType:parameters:stops:</code></dd>
 <dt>Format string syntax:</dt>
 <dd>
-   <code>`FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', NIL, %@)`</code>
+   <code>FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'linear', NIL, %@)</code>
    with a dictionary containing zoom levels as keys
 </dd>
 <dt>Target:</dt>
@@ -671,7 +671,7 @@ arguments, with the target as the input to the function.
    <code>decimalValue</code>
 </dd>
 <dt>Format string syntax:</dt>
-<dd><code>`FUNCTION(ele, 'mgl_numberWithFallbackValues:', 0)`</code></dd>
+<dd><code>FUNCTION(ele, 'mgl_numberWithFallbackValues:', 0)</code></dd>
 <dt>Target:</dt>
 <dd>
    An <code>NSExpression</code> that evaluates to a Boolean value, number, or
@@ -701,7 +701,7 @@ A numeric representation of the target:
 <dd><code>mgl_stepWithMinimum:stops:</code></dd>
 <dt>Format string syntax:</dt>
 <dd>
-   <code>`FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', 0, %@)`</code> with
+   <code>FUNCTION($zoomLevel, 'mgl_stepWithMinimum:stops:', 0, %@)</code> with
    a dictionary with zoom levels as keys
 </dd>
 <dt>Target:</dt>
@@ -730,7 +730,7 @@ or the minimum value if the target is less than the least of the stops’ keys.
 <dt>Selector:</dt>
 <dd><code>stringByAppendingString:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`FUNCTION('Old', 'stringByAppendingString:', 'MacDonald')`</code></dd>
+<dd><code>FUNCTION('Old', 'stringByAppendingString:', 'MacDonald')</code></dd>
 <dt>Target:</dt>
 <dd>An <code>NSExpression</code> that evaluates to a string.</dd>
 <dt>Arguments:</dt>
@@ -745,7 +745,7 @@ The target string with each of the argument strings appended in order.
 <dt>Selector:</dt>
 <dd><code>stringValue</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>`FUNCTION(ele, 'stringValue')`</code></dd>
+<dd><code>FUNCTION(ele, 'stringValue')</code></dd>
 <dt>Target:</dt>
 <dd>
    An <code>NSExpression</code> that evaluates to a Boolean value, number, or
