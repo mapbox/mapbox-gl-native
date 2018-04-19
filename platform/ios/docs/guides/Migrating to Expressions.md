@@ -21,8 +21,21 @@ For more information about how to work with GeoJSON data in our iOS SDK, please 
 Mapbox supports some convenience methods that can be used in the place of format string syntax.
 
 ## Stops
-Stops are dictionary keys that are associated with layer attribute values. You can use feature attribute values, zoom levels, and heatmap point density as keys, with an constant value or expression for the value. For example, you can use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors yellow, orange, and red as the values. Constant values no longer need to be wrapped as style values.
+Stops are dictionary keys that are associated with layer attribute values. Constant values no longer need to be wrapped as style values when they are values in a stops dictionary.
 
+
+Style Function Syntax:
+```
+let stops = [
+    0: MGLStyleValue<UIColor>(rawValue: .yellow),
+    2.5: MGLStyleValue(rawValue: .orange),
+    5: MGLStyleValue(rawValue: .red),
+    7.5: MGLStyleValue(rawValue: .blue),
+    10: MGLStyleValue(rawValue: .white),
+]
+```
+
+Current Syntax:
 ```swift
 let stops: [NSNumber: UIColor] = [
     0: .yellow,
