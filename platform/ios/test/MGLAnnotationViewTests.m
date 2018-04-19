@@ -3,6 +3,13 @@
 
 static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReuseIdentifer";
 
+
+@interface MGLMapView (Tests)
+@property (nonatomic) MGLCameraChangeReason cameraChangeReasonBitmask;
+@end
+
+
+
 @interface MGLCustomAnnotationView : MGLAnnotationView
 
 @end
@@ -60,6 +67,7 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
 @property (nonatomic) MGLMapView *mapView;
 @property (nonatomic, weak) MGLAnnotationView *annotationView;
 @property (nonatomic) NSInteger annotationSelectedCount;
+@property (nonatomic) void (^prepareAnnotationView)(MGLAnnotationView*);
 @end
 
 @implementation MGLAnnotationViewTests
@@ -154,6 +162,43 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssertEqual(selectionCount, self.annotationSelectedCount, @"-mapView:didSelectAnnotation: should be called for each selection");
 }
 
+- (void)testSelectingOnscreenAnnotationThatHasNotBeenAdded {
+    // See https://github.com/mapbox/mapbox-gl-native/issues/11476
+
+    // This bug occurs under the following conditions:
+    //
+    // - There are content insets (e.g. navigation bar) for the compare against
+    //      CGRectZero (now CGRectNull)
+    // - annotationView.enabled == NO - Currently this can happen if you use
+    //      `-initWithFrame:` rather than one of the provided initializers
+    //
+
+    self.prepareAnnotationView = ^(MGLAnnotationView *view) {
+        view.enabled = NO;
+    };
+
+    self.mapView.contentInset = UIEdgeInsetsMake(10.0, 10.0, 10.0, 10.0);
+
+    MGLCameraChangeReason reasonBefore = self.mapView.cameraChangeReasonBitmask;
+    XCTAssert(reasonBefore == MGLCameraChangeReasonNone, @"Camera should not have moved at start of test");
+
+    // Create annotation
+    MGLPointFeature *point = [[MGLPointFeature alloc] init];
+    point.title = NSStringFromSelector(_cmd);
+    point.coordinate = CLLocationCoordinate2DMake(0.0, 0.0);
+
+    MGLCoordinateBounds coordinateBounds = [self.mapView convertRect:self.mapView.bounds toCoordinateBoundsFromView:self.mapView];
+    XCTAssert(MGLCoordinateInCoordinateBounds(point.coordinate, coordinateBounds), @"The test point should be within the visible map view");
+
+    // Select on screen annotation (DO NOT ADD FIRST).
+    [self.mapView selectAnnotation:point animated:YES];
+
+    // Expect - the camera NOT to move.
+    MGLCameraChangeReason reasonAfter = self.mapView.cameraChangeReasonBitmask;
+    XCTAssert(reasonAfter == MGLCameraChangeReasonNone, @"Camera should not have moved");
+}
+
+
 #pragma mark - MGLMapViewDelegate -
 
 - (MGLAnnotationView *)mapView:(MGLMapView *)mapView viewForAnnotation:(id<MGLAnnotation>)annotation
@@ -163,6 +208,10 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     if (!annotationView)
     {
         annotationView = [[MGLAnnotationView alloc] initWithAnnotation:annotation reuseIdentifier:MGLTestAnnotationReuseIdentifer];
+    }
+
+    if (self.prepareAnnotationView) {
+        self.prepareAnnotationView(annotationView);
     }
 
     _annotationView = annotationView;
