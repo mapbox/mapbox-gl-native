@@ -130,6 +130,12 @@ expression format string of `lowercase(ISO 3166-1:2006)` or a predicate format
 string of `ISO 3166-1:2006 == 'US-OH'` would raise an exception. Instead, use a
 `%K` placeholder or the `+[NSExpression expressionForKeyPath:]` initializer:
 
+```objc
+[NSPredicate predicateWithFormat:@"%K == 'US-OH'", @"ISO 3166-1:2006"];
+[NSExpression expressionForFunction:@"lowercase:"
+                          arguments:@[[NSExpression expressionForKeyPath:@"ISO 3166-1:2006"]]]
+```
+
 ```swift
 NSPredicate(format: "%K == 'US-OH'", "ISO 3166-1:2006")
 NSExpression(forFunction: "lowercase:",
