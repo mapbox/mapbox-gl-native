@@ -218,7 +218,8 @@ MGL_EXPORT
 
 /**
  Name of image in sprite to use for drawing image fills. For seamless patterns,
- image width and height must be a factor of two (2, 4, 8, ..., 512).
+ image width and height must be a factor of two (2, 4, 8, ..., 512). Note that
+ zoom-dependent expressions will be evaluated only at integer zoom levels.
  
  You can set this property to an expression containing any of the following:
  
