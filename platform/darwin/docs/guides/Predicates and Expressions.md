@@ -227,6 +227,8 @@ The following variables are defined by this SDK for use with style layers:
    </td>
    <td>
       A value that uniquely identifies the feature in the containing source.
+      This variable corresponds to the
+      <code>NSExpression.featureIdentifierVariableExpression</code> property.
    </td>
 </tr>
 <tr>
@@ -249,6 +251,8 @@ The following variables are defined by this SDK for use with style layers:
                <code>MGLPolygon</code> class
            </li>
        </ul>
+       This variable corresponds to the
+       <code>NSExpression.geometryTypeVariableExpression</code> property.
    </td>
 </tr>
 <tr>
@@ -260,6 +264,8 @@ The following variables are defined by this SDK for use with style layers:
       of a screen point in a heatmap layer; in other words, a relative measure
       of how many data points are crowded around a particular pixel. This
       variable can only be used with the <code>heatmapColor</code> property.
+      This variable corresponds to the
+      <code>NSExpression.heatmapDensityVariableExpression</code> property.
    </td>
 </tr>
 <tr>
@@ -268,7 +274,8 @@ The following variables are defined by this SDK for use with style layers:
    <td>
       The current zoom level. In style layout and paint properties, this
       variable may only appear as the target of a top-level interpolation or
-      step expression.
+      step expression. This variable corresponds to the
+      <code>NSExpression.zoomLevelVariableExpression</code> property.
    </td>
 </tr>
 </tbody>
@@ -301,7 +308,7 @@ string syntax:
 <dt>Selector:</dt>
 <dd><code>mgl_does:have:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>mgl_does:have:(SELF, 'key')</code> or <code>mgl_does:have:(%@, 'key')</code></dd>
+<dd><code>mgl_does:have:(SELF, '🧀🍔')</code> or <code>mgl_does:have:(%@, '🧀🍔')</code></dd>
 </dl>
 
 Returns a Boolean value indicating whether the dictionary has a value for the
@@ -367,6 +374,10 @@ expression containing the strings to concatenate.
 
 Returns the arccosine of the number.
 
+This function corresponds to the
+[`acos`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-acos)
+operator in the Mapbox Style Specification.
+
 ### `mgl_asin:`
 
 <dl>
@@ -377,6 +388,10 @@ Returns the arccosine of the number.
 </dl>
 
 Returns the arcsine of the number.
+
+This function corresponds to the
+[`asin`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-asin)
+operator in the Mapbox Style Specification.
 
 ### `mgl_atan:`
 
@@ -389,6 +404,10 @@ Returns the arcsine of the number.
 
 Returns the arctangent of the number.
 
+This function corresponds to the
+[`atan`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-atan)
+operator in the Mapbox Style Specification.
+
 ### `mgl_cos:`
 
 <dl>
@@ -400,6 +419,10 @@ Returns the arctangent of the number.
 
 Returns the cosine of the number.
 
+This function corresponds to the
+[`cos`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-cos)
+operator in the Mapbox Style Specification.
+
 ### `mgl_log2:`
 
 <dl>
@@ -410,6 +433,10 @@ Returns the cosine of the number.
 </dl>
 
 Returns the base-2 logarithm of the number.
+
+This function corresponds to the
+[`log2`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-log2)
+operator in the Mapbox Style Specification.
 
 ### `mgl_round:`
 
@@ -423,6 +450,10 @@ Returns the base-2 logarithm of the number.
 Returns the number rounded to the nearest integer. If the number is halfway
 between two integers, this function rounds it away from zero.
 
+This function corresponds to the
+[`round`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-round)
+operator in the Mapbox Style Specification.
+
 ### `mgl_sin:`
 
 <dl>
@@ -433,6 +464,10 @@ between two integers, this function rounds it away from zero.
 </dl>
 
 Returns the sine of the number.
+
+This function corresponds to the
+[`sin`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-sin)
+operator in the Mapbox Style Specification.
 
 ### `mgl_tan:`
 
@@ -445,6 +480,10 @@ Returns the sine of the number.
 
 Returns the tangent of the number.
 
+This function corresponds to the
+[`tan`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-tan)
+operator in the Mapbox Style Specification.
+
 ### `mgl_coalesce:`
 
 <dl>
@@ -455,6 +494,10 @@ Returns the tangent of the number.
 </dl>
 
 Returns the first non-`nil` value from an array of expressions.
+
+This function corresponds to the
+[`coalesce`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-coalesce)
+operator in the Mapbox Style Specification.
 
 ### `MGL_LET`
 
@@ -495,6 +538,12 @@ expression that contains references to those variables.
 Returns the result of matching the input expression against the given constant
 values.
 
+This function corresponds to the
+`+[NSExpression(MGLInitializerAdditions) mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]`
+method and the
+[`match`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match)
+operator in the Mapbox Style Specification.
+
 ### `MGL_IF`
 
 <dl>
@@ -516,6 +565,12 @@ the `TERNARY()` syntax, this function can accept multiple “if else” conditio
 and is supported on iOS 8._x_ and macOS 10.10._x_; however, each conditional
 passed into this function must be wrapped in a constant expression.
 
+This function corresponds to the
+`+[NSExpression(MGLInitializerAdditions) mgl_expressionForConditional:trueExpression:falseExpresssion:]`
+method and the
+[`case`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-case)
+operator in the Mapbox Style Specification.
+
 ### `MGL_FUNCTION`
 
 <dl>
@@ -525,10 +580,12 @@ passed into this function must be wrapped in a constant expression.
 <dd><code>MGL_FUNCTION('typeof', mystery)</code></dd>
 <dt>Arguments:</dt>
 <dd>
-   Any arguments required by the expression operator, as defined in the
-   <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions">Mapbox Style Specification</a>.
+   Any arguments required by the expression operator.
 </dd>
 </dl>
+
+An expression exactly as defined by the
+[Mapbox Style Specification](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions).
 
 ## Custom functions
 
@@ -588,6 +645,14 @@ otherwise <code>TRUE</code>.
 <code>true</code> if the dictionary has a value for the key or if the evaluated
 object has a value for the feature attribute.
 
+This function corresponds to the
+[`has`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-has)
+operator in the Mapbox Style Specification. See also the
+[`mgl_does:have:`](#code-mgl_does-have-code) function, which is used on its own
+without the `FUNCTION()` operator. You can also check whether an object has an
+attribute by comparing the key path to `NIL`, for example `cheeseburger != NIL`
+or `burger.cheese != NIL`
+
 ### `mgl_expressionWithContext:`
 
 <dl>
@@ -613,6 +678,12 @@ object has a value for the feature attribute.
 
 The target expression with variable subexpressions replaced with the values
 defined in the context dictionary.
+
+This function corresponds to the
+[`let`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-let)
+operator in the Mapbox Style Specification. See also the
+[`MGL_LET`](#code-mgl_let-code) function, which is used on its own without the
+`FUNCTION()` operator.
 
 ### `mgl_interpolateWithCurveType:parameters:stops:`
 
@@ -666,6 +737,14 @@ values may be constant values or `NSExpression` objects. For example, you can
 use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
 yellow, orange, and red as the values.
 
+This function corresponds to the
+`+[NSExpression(MGLInitializerAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]`
+method and the
+[`interpolate`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate)
+operator in the Mapbox Style Specification. See also the
+[`mgl_interpolate:withCurveType:parameters:stops:`](#code-mgl_interpolate-withcurvetype-parameters-stops-code)
+function, which is used on its own without the `FUNCTION()` operator.
+
 ### `mgl_numberWithFallbackValues:`
 
 <dl>
@@ -699,6 +778,12 @@ A numeric representation of the target:
     algorithm of the ECMAScript Language Specification.
   * If multiple values are provided, each one is evaluated in order until the
     first successful conversion is obtained.
+
+This function corresponds to the
+[`to-number`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-number)
+operator in the Mapbox Style Specification. You can also cast a value to a
+number by passing the value and the string `NSNumber` into the `CAST()`
+operator.
 
 ### `mgl_stepWithMinimum:stops:`
 
@@ -736,6 +821,12 @@ values may be constant values or `NSExpression` objects. For example, you can
 use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
 yellow, orange, and red as the values.
 
+This function corresponds to the
+`+[NSExpression(MGLInitializerAdditions) mgl_expressionForSteppingExpression:fromExpression:stops:]`
+method and the
+[`step`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
+operator in the Mapbox Style Specification.
+
 ### `stringByAppendingString:`
 
 <dl>
@@ -750,6 +841,14 @@ yellow, orange, and red as the values.
 </dl>
 
 The target string with each of the argument strings appended in order.
+
+This function corresponds to the
+`-[NSExpression(MGLInitializerAdditions) mgl_expressionByAppendingExpression:]`
+method and is similar to the
+[`concat`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat)
+operator in the Mapbox Style Specification. See also the
+[`mgl_join:`](#code-mgl_join-code) function, which concatenates multiple
+expressions and is used on its own without the `FUNCTION()` operator.
 
 ### `stringValue`
 
@@ -780,3 +879,9 @@ A string representation of the target:
 * Otherwise, the target is converted to a string in the format specified by the
   [`JSON.stringify()`](https://tc39.github.io/ecma262/#sec-json.stringify)
   function of the ECMAScript Language Specification.
+
+This function corresponds to the
+[`to-string`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-types-to-string)
+operator in the Mapbox Style Specification. You can also cast a value to a
+string by passing the value and the string `NSString` into the `CAST()`
+operator.
