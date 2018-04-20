@@ -183,10 +183,14 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"id"]], expression);
     }
     {
+        NSExpression *expression = [NSExpression expressionForVariable:@"featureAttributes"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureAttributes"].mgl_jsonExpressionObject, @[@"properties"]);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"properties"]], expression);
+    }
+    {
         NSExpression *expression = [NSExpression expressionForVariable:@"featureProperties"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
-        XCTAssertEqualObjects([NSExpression expressionWithFormat:@"$featureProperties"].mgl_jsonExpressionObject, @[@"properties"]);
-        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"properties"]], expression);
     }
     {
         NSExpression *expression = [NSExpression expressionForVariable:@"loremIpsum"];
@@ -867,7 +871,7 @@ using namespace std::string_literals;
     }
     {
         NSExpression *expression = [NSExpression expressionForFunction:@"mgl_does:have:"
-                                                             arguments:@[[NSExpression expressionForVariable:@"featureProperties"],
+                                                             arguments:@[[NSExpression expressionForVariable:@"featureAttributes"],
                                                                          [NSExpression expressionForConstantValue:@"x"]]];
         NSArray *jsonExpression = @[@"has", @"x", @[@"properties"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);

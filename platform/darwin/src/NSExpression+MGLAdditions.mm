@@ -656,6 +656,10 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
     return [NSExpression expressionForVariable:@"featureIdentifier"];
 }
 
++ (NSExpression *)featureAttributesVariableExpression {
+    return [NSExpression expressionForVariable:@"featureAttributes"];
+}
+
 + (NSExpression *)featurePropertiesVariableExpression {
     return [NSExpression expressionForVariable:@"featureProperties"];
 }
@@ -901,7 +905,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"id"]) {
             return NSExpression.featureIdentifierVariableExpression;
         }  else if ([op isEqualToString:@"properties"]) {
-            return NSExpression.featurePropertiesVariableExpression;
+            return NSExpression.featureAttributesVariableExpression;
         } else if ([op isEqualToString:@"var"]) {
             return [NSExpression expressionForVariable:argumentObjects.firstObject];
         } else if ([op isEqualToString:@"case"]) {
@@ -1000,7 +1004,8 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([self.variable isEqualToString:@"featureIdentifier"]) {
                 return @[@"id"];
             }
-            if ([self.variable isEqualToString:@"featureProperties"]) {
+            if ([self.variable isEqualToString:@"featureProperties"] ||
+                [self.variable isEqualToString:@"featureAttributes"]) {
                 return @[@"properties"];
             }
             return @[@"var", self.variable];
