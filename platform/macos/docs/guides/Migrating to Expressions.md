@@ -121,7 +121,8 @@ Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](wo
 The example below increases a layer’s `circleRadius` exponentially based on a map’s zoom level. The interpolation base is `1.5`.
 
 Style function syntax:
-```
+
+```swift
 let stops = [
     12: MGLStyleValue<NSNumber>(rawValue: 0.5),
     14: MGLStyleValue(rawValue: 2),
