@@ -5,26 +5,25 @@
 
 # Migrating from Style Functions to Expressions
 
-[Runtime Styling](runtime-styling.html) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Users can specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
-With Maps SDK for iOS v4.0.0 and for macOS v0.7.0, style functions have been replaced with expressions. These provide even more tools for users who want to style their maps dynamically. This guide outlines some tips for migrating from style functions to expressions, and offers an overview of some things that users can do with expressions.
+[Runtime Styling](runtime-styling.html) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Developers can specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
+
+With Maps SDK for iOS v4.0.0 and for macOS v0.7.0, style functions have been replaced with expressions. These provide even more tools for developers who want to style their maps dynamically. This guide outlines some tips for migrating from style functions to expressions, and offers an overview of some things that developers can do with expressions.
 
 An expression is represented at runtime by the `NSExpression` class. Expressions can be used to style paint and layout properties based on zoom level, data attributes, or a combination of the two.
 
 A constant expression can also be assigned to a style property. For example, the opacity of a fill style layer can be set to a constant value between 0 and 1.
 
-The documentation for each individual style layer property notes which non-constant expressions are enabled for that property.
+The documentation for each individual style layer property notes which non-constant expressions are enabled for that property. Style functions supported four interpolation modes: exponential, interval, categorical, and identity.
 
-Style functions supported four interpolation modes: exponential, interval, categorical, and identity. This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php. Under each interpolation mode, the style function implementation will be shown, followed by the current syntax.
+This guide uses earthquake data from the [U.S. Geological Survey](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php). Under each interpolation mode, the style function implementation will be shown, followed by the current syntax.
 
 For more information about how to work with GeoJSON data in our iOS SDK, please see our [working with GeoJSON data](working-with-geojson-data.html) guide. To learn more about supported expressions, see our ["Predicates and Expressions"](predicates-and-expressions.html) guide. The "Predicates and Expressions" guide also outlines Mapbox custom functions that can be used to dynamically style a map.
-
-Mapbox supports some convenience methods that can be used in the place of format string syntax.
 
 ## Stops
 Stops are dictionary keys that are associated with layer attribute values. Constant values no longer need to be wrapped as style values when they are values in a stops dictionary.
 
 
-Style Function Syntax:
+### Style function syntax:
 ```
 let stops = [
     0: MGLStyleValue<UIColor>(rawValue: .yellow),
@@ -35,7 +34,7 @@ let stops = [
 ]
 ```
 
-Current Syntax:
+### Current syntax:
 ```swift
 let stops: [NSNumber: UIColor] = [
     0: .yellow,
@@ -54,9 +53,10 @@ Style functions supported four interpolation modes: exponential/linear, interval
 ### Linear
 
 Previously, exponential interpolation mode handled both linear and exponential interpolation. These have been separated in v4.0.0. `mgl_interpolate:withCurveType:parameters:stops:` is a custom function that takes the interpolation type as a parameter. If you previously used the default interpolation base, use curve type `'linear'`.
-The stops dictionary below, for example, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
-Style Function Syntax:
+The stops dictionary below, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
+
+#### Style function syntax:
 ```
 let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
 let symbolSource = MGLSource(identifier: "source")
@@ -82,7 +82,7 @@ layer.circleRadius = MGLStyleValue(rawValue: 10)
 mapView.style?.insertLayer(layer, below: symbolLayer)
 ```
 
-Current Syntax:
+Current syntax:
 
 ```swift
 let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
@@ -118,7 +118,7 @@ Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](wo
 
 The example below increases a layer’s `circleRadius` exponentially based on a map’s zoom level. The interpolation base is `1.5`.
 
-Style Function Syntax:
+Style function syntax:
 ```
 let stops = [
     12: MGLStyleValue<NSNumber>(rawValue: 0.5),
@@ -131,7 +131,7 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .exponential,
                                    options: [.interpolationBase: 1.5])
 ```
 
-Current Syntax:
+Current syntax:
 
 ```swift
 let stops = [
@@ -150,7 +150,7 @@ Steps, or intervals, create a range using the keys from the stops dictionary. Th
 
 When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
-Style Function Syntax:
+Style function syntax:
 ```
 let stops = [
     0: MGLStyleValue<UIColor>(rawValue: .yellow),
@@ -166,7 +166,7 @@ layer.circleColor = MGLStyleValue(interpolationMode: .interval,
                                   options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .green)])
 ````
 
-Current Syntax:
+Current syntax:
 
 ```swift
 let stops: [NSNumber: UIColor] = [
@@ -185,11 +185,11 @@ layer.circleColor = NSExpression(format: "mgl_step:from:stops:(mag, %@, %@)",
 
 Categorical interpolation mode took a stops dictionary. If the value for a specified feature attribute name matched one in that stops dictionary, the style value for that attribute value would be used. Categorical style functions can now be replaced with `MGL_MATCH`.
 
-`MGL_MATCH` takes an initial condition, which in this case is an attribute key. This is follow by possible matches for that key and the value to assign to the layer property if there is a match. The final argument can be a default style value that is to be used if none of the specified values match.
+`MGL_MATCH` takes an initial condition, which in this case is an attribute key. This is followed by possible matches for that key and the value to assign to the layer property if there is a match. The final argument can be a default style value that is to be used if none of the specified values match.
 
 There are three main types of events in the USGS dataset: earthquakes, explosions, and quarry blasts. In this case, the color of the circle layer will be determined by the type of event, with a default value of blue to catch any events that do not fall into any of those categories.
 
-Style Function Syntax:
+Style function syntax:
 
 ```
 let categoricalStops = [
@@ -204,20 +204,20 @@ layer.circleColor = MGLStyleValue(interpolationMode: .categorical,
                                   options: [.defaultValue: MGLStyleValue<UIColor>(rawValue: .blue)])
 ```
 
-Current Syntax:
+Current syntax:
 ```swift
 let defaultColor = UIColor.blue
 layer.circleColor = NSExpression(format: "MGL_MATCH(type, 'earthquake', %@, 'explosion', %@, 'quarry blast', %@, %@)",
     UIColor.orange, UIColor.red, UIColor.yellow, defaultColor)
 ```
 
-If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:"``.
+If your use case does not require a default value, you can either apply a predicate to your layer prior to styling it, or use the format string `"valueForKeyPath:"`.
 
 ### Identity
 
 Identity interpolation mode used the attribute’s value as the style layer property value. In this example, you might set the `circleRadius` to the earthquake’s magnitude. In order to use a feature attribute value to style a layer property, set the property value to `[NSExpression expressionForKeyPath:]`, which take the feature attribute name as an argument.
 
-Style Function Syntax:
+Style function syntax:
 ```
 layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
                                    sourceStops: nil,
@@ -225,14 +225,14 @@ layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
                                    options: [.defaultValue: MGLStyleValue<NSNumber>(rawValue: 0)])
 ```
 
-Current Syntax:
+Current syntax:
 ```swift
 layer.circleRadius = NSExpression(forKeyPath: "mag")
 ```
 
 ![identity mode](img/data-driven-styling/identity.png)
 
-Some built-in functions can be applied to attribute values to style layer property values. To set the circle radius to 3 times the earthquake’s magnitude, create a `multiply:by:` function that takes the attribute value and the multiplier as arguments, or use a format string.
+Some built-in functions can be applied to attribute values to style layer property values. To set the circle radius to three times the earthquake’s magnitude, create a `multiply:by:` function that takes the attribute value and the multiplier as arguments, or use a format string.
 
 ```swift
 layer.circleRadius = NSExpression(forFunction: "multiply:by:", arguments: [NSExpression(forKeyPath: "mag"), 3])
@@ -256,6 +256,6 @@ For constant values that do not necessarily change based on camera or attribute 
 
 ## Resources
 
-* [USGS](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
+* [USGS Earthquake Feed](https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php)
 * [For Style Authors](for-style-authors.html)
 * [Predicates and Expressions](predicates-and-expressions.html)
