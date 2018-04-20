@@ -7,7 +7,7 @@
 
 [Runtime Styling](runtime-styling.html) enables you to modify every aspect of the map’s appearance dynamically as a user interacts with your application. Developers can specify in advance how a layout or paint attribute will vary as the zoom level changes or how the appearance of individual features vary based on metadata provided by a content source.
 
-With Maps SDK for iOS v4.0.0 and for macOS v0.7.0, style functions have been replaced with expressions. These provide even more tools for developers who want to style their maps dynamically. This guide outlines some tips for migrating from style functions to expressions, and offers an overview of some things that developers can do with expressions.
+With Mapbox Maps SDK for iOS v4.0.0, style functions have been replaced with expressions. These provide even more tools for developers who want to style their maps dynamically. This guide outlines some tips for migrating from style functions to expressions, and offers an overview of some things that developers can do with expressions.
 
 An expression is represented at runtime by the `NSExpression` class. Expressions can be used to style paint and layout properties based on zoom level, data attributes, or a combination of the two.
 
@@ -53,7 +53,7 @@ Style functions supported four interpolation modes: exponential/linear, interval
 
 ### Linear
 
-Previously, exponential interpolation mode handled both linear and exponential interpolation. These have been separated in v4.0.0. `mgl_interpolate:withCurveType:parameters:stops:` is a custom function that takes the interpolation type as a parameter. If you previously used the default interpolation base, use curve type `'linear'`.
++[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:] takes the interpolation type as a parameter. If you previously used the default interpolation base, use the curve type MGLExpressionInterpolationMode.linear. See the [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code) documentation for more details.
 
 The stops dictionary below, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
@@ -111,7 +111,7 @@ mapView.style?.insertLayer(layer, below: symbolLayer)
 
 ### Exponential
 
-If you previously used an interpolation base greater than `0` (other than `1`), you can use `'exponential'` as the curve type for `mgl_interpolate:withCurveType:parameters:stops:`. The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
+If you previously used an interpolation base greater than `0` (other than `1`), you can use `MGLExpressionInterpolationMode.linear` as the curve type for `+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` or `'exponential'` as the curve type for [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code). The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
 
 Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](working-with-mapbox-studio.html)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
 
@@ -149,7 +149,7 @@ layer.circleRadius = NSExpression(format: "mgl_interpolate:withCurveType:paramet
 
 ### Interval
 
-Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the format string `'mgl_step:from:stops:'` for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument.
+Steps, or intervals, create a range using the keys from the stops dictionary. The range is from the given key to just less than the next key. The attribute values that fall into that range are then styled using the layout or paint value assigned to that key. You can use the `+[NSExpression(MGLAdditions) mgl_expressionForSteppingExpression:fromExpression:stops:]` method or the custom function [`mgl_step:from:stops:`](predicates-and-expressions.html#code-mgl_step-from-stops-code) for cases where you previously used interval interpolation mode. The first parameter takes the feature attribute name and the second parameter (`from:`) optionally takes the default or fallback value for that function. The final parameter takes a stops dictionary as an argument.
 
 When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
