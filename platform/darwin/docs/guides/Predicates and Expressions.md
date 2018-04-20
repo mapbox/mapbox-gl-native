@@ -145,7 +145,9 @@ NSExpression(forFunction: "lowercase:",
 ### Functions
 
 Of the
-[functions predefined by the `+[NSExpression expressionForFunction:arguments:]` method](https://developer.apple.com/documentation/foundation/nsexpression/1413747-init#discussion),
+[functions predefined](https://developer.apple.com/documentation/foundation/nsexpression/1413747-init#discussion)
+by the
+[`+[NSExpression expressionForFunction:arguments:]` method](https://developer.apple.com/documentation/foundation/nsexpression/1413747-init),
 the following subset is supported in layer attribute values:
 
 Initializer parameter | Format string syntax
@@ -175,7 +177,7 @@ Initializer parameter | Format string syntax
 `length:`             | `length('Wapakoneta')`
 `castObject:toType:`  | `CAST(ele, 'NSString')`<br>`CAST(ele, 'NSNumber')`
 
-A number of [Mapbox-specific functions](#mapbox-specific-funcions) are also
+A number of [Mapbox-specific functions](#mapbox-specific-functions) are also
 available.
 
 The following predefined functions are **not** supported:
