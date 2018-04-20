@@ -622,6 +622,22 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 
 @end
 
+@implementation NSExpression (MGLExpressionAdditions)
+
+- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
+    [NSException raise:NSInternalInconsistencyException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return self;
+}
+
+- (id)mgl_has:(id)element {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Has expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
+@end
+
 @implementation NSExpression (MGLAdditions)
 
 + (NSExpression *)zoomLevelVariableExpression {
@@ -643,22 +659,6 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 + (NSExpression *)featurePropertiesVariableExpression {
     return [NSExpression expressionForVariable:@"featureProperties"];
 }
-
-- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
-    [NSException raise:NSInternalInconsistencyException
-                format:@"Assignment expressions lack underlying Objective-C implementations."];
-    return self;
-}
-
-- (id)mgl_has:(id)element {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Has expressions lack underlying Objective-C implementations."];
-    return nil;
-}
-
-@end
-
-@implementation NSExpression (MGLAdditions)
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
     if (@available(iOS 9.0, *)) {
