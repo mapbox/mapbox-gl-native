@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 4.0.0
+## 4.0.0 - April 19, 2018
 
 The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iOS deployment version will increase to iOS 9.0 in a future release.
 
