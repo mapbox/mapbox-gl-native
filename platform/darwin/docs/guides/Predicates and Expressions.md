@@ -541,7 +541,7 @@ Returns the result of matching the input expression against the given constant
 values.
 
 This function corresponds to the
-`+[NSExpression(MGLInitializerAdditions) mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]`
+`+[NSExpression(MGLAdditions) mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]`
 method and the
 [`match`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match)
 operator in the Mapbox Style Specification.
@@ -568,7 +568,7 @@ and is supported on iOS 8._x_ and macOS 10.10._x_; however, each conditional
 passed into this function must be wrapped in a constant expression.
 
 This function corresponds to the
-`+[NSExpression(MGLInitializerAdditions) mgl_expressionForConditional:trueExpression:falseExpresssion:]`
+`+[NSExpression(MGLAdditions) mgl_expressionForConditional:trueExpression:falseExpresssion:]`
 method and the
 [`case`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-case)
 operator in the Mapbox Style Specification.
@@ -740,7 +740,7 @@ use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
 yellow, orange, and red as the values.
 
 This function corresponds to the
-`+[NSExpression(MGLInitializerAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]`
+`+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]`
 method and the
 [`interpolate`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate)
 operator in the Mapbox Style Specification. See also the
@@ -824,7 +824,7 @@ use a stop dictionary with the zoom levels 0, 10, and 20 as keys and the colors
 yellow, orange, and red as the values.
 
 This function corresponds to the
-`+[NSExpression(MGLInitializerAdditions) mgl_expressionForSteppingExpression:fromExpression:stops:]`
+`+[NSExpression(MGLAdditions) mgl_expressionForSteppingExpression:fromExpression:stops:]`
 method and the
 [`step`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
 operator in the Mapbox Style Specification.
@@ -845,7 +845,7 @@ operator in the Mapbox Style Specification.
 The target string with each of the argument strings appended in order.
 
 This function corresponds to the
-`-[NSExpression(MGLInitializerAdditions) mgl_expressionByAppendingExpression:]`
+`-[NSExpression(MGLAdditions) mgl_expressionByAppendingExpression:]`
 method and is similar to the
 [`concat`](https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-concat)
 operator in the Mapbox Style Specification. See also the

@@ -16,7 +16,7 @@ typedef NSString *MGLExpressionInterpolationMode NS_TYPED_ENUM;
  
  This attribute corresponds to the `linear` value in the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeLinear;
 
@@ -25,7 +25,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  
  This attribute corresponds to the `exponential` value in the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeExponential;
 
@@ -34,50 +34,55 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  
  This attribute corresponds to the `cubic-bezier` value in the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-interpolate"><code>interpolate</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolationModeCubicBezier;
 
-@interface NSExpression (MGLVariableAdditions)
+/**
+ Methods for creating expressions that use Mapbox-specific functionality and for
+ converting to and from the JSON format defined in the
+ <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions">Mapbox Style Specification</a>.
+ */
+@interface NSExpression (MGLAdditions)
+
+#pragma mark Creating Variable Expressions
 
 /**
  `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-zoom"><code>zoom</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 @property (class, nonatomic, readonly) NSExpression *zoomLevelVariableExpression;
 
 /**
  `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-heatmap-density"><code>heatmap-density</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 @property (class, nonatomic, readonly) NSExpression *heatmapDensityVariableExpression;
 
 /**
  `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#eexpressions-geometry-type"><code>geometry-type</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 @property (class, nonatomic, readonly) NSExpression *geometryTypeVariableExpression;
 
 /**
  `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-id"><code>id</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 @property (class, nonatomic, readonly) NSExpression *featureIdentifierVariableExpression;
 
 /**
  `NSExpression` variable that corresponds to the
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties"><code>properties</code></a>
- expression reference in the Mapbox Style Specification.
+ expression operator in the Mapbox Style Specification.
  */
 @property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression;
 
-@end
-
-@interface NSExpression (MGLInitializerAdditions)
+#pragma mark Creating Conditional Expressions
 
 /**
  Returns a conditional function expression specifying the string predicate, and
@@ -88,6 +93,8 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param falseExpression The expression for conditions equal to false.
  */
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression NS_SWIFT_NAME(init(forMGLConditional:trueExpression:falseExpression:));
+
+#pragma mark Creating Ramp, Scale, and Curve Expressions
 
 /**
  Returns a step function expression specifying the stepping, from expression
@@ -121,6 +128,9 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  @param defaultExpression The defaultValue expression to be used in case there is no match.
  */
 + (instancetype)mgl_expressionForMatchingExpression:(nonnull NSExpression *)inputExpression inDictionary:(nonnull NSDictionary<NSExpression *, NSExpression *> *)matchedExpressions defaultExpression:(nonnull NSExpression *)defaultExpression NS_SWIFT_NAME(init(forMGLMatchingKey:in:default:));
+
+#pragma mark Concatenating String Expressions
+
 /**
  Returns a constant expression appending the passed expression.
  
@@ -131,9 +141,7 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  */
 - (instancetype)mgl_expressionByAppendingExpression:(nonnull NSExpression *)expression NS_SWIFT_NAME(mgl_appending(_:));
 
-@end
-
-@interface NSExpression (MGLAdditions)
+#pragma mark Converting JSON Expressions
 
 /**
  Returns an expression equivalent to the given Foundation object deserialized
@@ -167,6 +175,8 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  write to a file.
  */
 @property (nonatomic, readonly) id mgl_jsonExpressionObject;
+
+#pragma mark Localizing the Expression
 
 /**
  Returns a copy of the receiver localized into the given locale.

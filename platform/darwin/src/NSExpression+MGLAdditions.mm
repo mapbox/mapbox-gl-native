@@ -621,7 +621,8 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 }
 
 @end
-@implementation NSExpression (MGLVariableAdditions)
+
+@implementation NSExpression (MGLAdditions)
 
 + (NSExpression *)zoomLevelVariableExpression {
     return [NSExpression expressionForVariable:@"zoomLevel"];
@@ -643,9 +644,21 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
     return [NSExpression expressionForVariable:@"featureProperties"];
 }
 
+- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
+    [NSException raise:NSInternalInconsistencyException
+                format:@"Assignment expressions lack underlying Objective-C implementations."];
+    return self;
+}
+
+- (id)mgl_has:(id)element {
+    [NSException raise:NSInvalidArgumentException
+                format:@"Has expressions lack underlying Objective-C implementations."];
+    return nil;
+}
+
 @end
 
-@implementation NSExpression (MGLInitializerAdditions)
+@implementation NSExpression (MGLAdditions)
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
     if (@available(iOS 9.0, *)) {
@@ -655,12 +668,12 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
     }
 }
 
-+ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression*)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression*)stops {
++ (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression *)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression *)stops {
     return [NSExpression expressionForFunction:@"mgl_step:from:stops:"
                                      arguments:@[steppingExpression, minimumExpression, stops]];
 }
 
-+ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression*)inputExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression*)stops {
++ (instancetype)mgl_expressionForInterpolatingExpression:(nonnull NSExpression *)inputExpression withCurveType:(nonnull MGLExpressionInterpolationMode)curveType parameters:(nullable NSExpression *)parameters stops:(nonnull NSExpression *)stops {
     NSExpression *sanitizeParams = parameters ? parameters : [NSExpression expressionForConstantValue:nil];
     return [NSExpression expressionForFunction:@"mgl_interpolate:withCurveType:parameters:stops:"
                                      arguments:@[inputExpression, [NSExpression expressionForConstantValue:curveType], sanitizeParams, stops]];
@@ -684,26 +697,6 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
     NSExpression *subexpression = [NSExpression expressionForAggregate:@[self, expression]];
     return [NSExpression expressionForFunction:@"mgl_join:" arguments:@[subexpression]];
 }
-
-@end
-
-@implementation NSExpression (MGLExpressionAdditions)
-
-- (NSExpression *)mgl_expressionWithContext:(NSDictionary<NSString *, NSExpression *> *)context {
-    [NSException raise:NSInternalInconsistencyException
-                format:@"Assignment expressions lack underlying Objective-C implementations."];
-    return self;
-}
-
-- (id)mgl_has:(id)element {
-    [NSException raise:NSInvalidArgumentException
-                format:@"Has expressions lack underlying Objective-C implementations."];
-    return nil;
-}
-
-@end
-
-@implementation NSExpression (MGLAdditions)
 
 static NSDictionary<NSString *, NSString *> *MGLFunctionNamesByExpressionOperator;
 static NSDictionary<NSString *, NSString *> *MGLExpressionOperatorsByFunctionNames;
