@@ -20,7 +20,7 @@ public:
 
     friend bool operator==(const Filter& lhs, const Filter& rhs) {
         if (!lhs.expression || !rhs.expression) {
-            return ((bool) lhs.expression) == ((bool) rhs.expression);
+            return lhs.expression == rhs.expression;
         } else {
             return *(lhs.expression) == *(rhs.expression);
         }
