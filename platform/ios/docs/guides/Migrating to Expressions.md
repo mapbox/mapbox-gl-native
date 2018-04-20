@@ -23,8 +23,9 @@ For more information about how to work with GeoJSON data in our iOS SDK, please 
 Stops are dictionary keys that are associated with layer attribute values. Constant values no longer need to be wrapped as style values when they are values in a stops dictionary.
 
 
-### Style function syntax:
-```
+Style function syntax:
+
+```swift
 let stops = [
     0: MGLStyleValue<UIColor>(rawValue: .yellow),
     2.5: MGLStyleValue(rawValue: .orange),
@@ -34,7 +35,7 @@ let stops = [
 ]
 ```
 
-### Current syntax:
+Current syntax:
 ```swift
 let stops: [NSNumber: UIColor] = [
     0: .yellow,
@@ -56,8 +57,9 @@ Previously, exponential interpolation mode handled both linear and exponential i
 
 The stops dictionary below, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
-#### Style function syntax:
-```
+Style function syntax:
+
+```swift
 let url = URL(string: "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson")!
 let symbolSource = MGLSource(identifier: "source")
 let symbolLayer = MGLSymbolStyleLayer(identifier: "place-city-sm", source: symbolSource)
@@ -151,7 +153,8 @@ Steps, or intervals, create a range using the keys from the stops dictionary. Th
 When we use the stops dictionary given above with an `'mgl_step:from:stops:'`, we create ranges where earthquakes with a magnitude of 0 to just less than 2.5 would be yellow, 2.5 to just less than 5 would be orange, and so on.
 
 Style function syntax:
-```
+
+```swift
 let stops = [
     0: MGLStyleValue<UIColor>(rawValue: .yellow),
     2.5: MGLStyleValue(rawValue: .orange),
@@ -191,7 +194,7 @@ There are three main types of events in the USGS dataset: earthquakes, explosion
 
 Style function syntax:
 
-```
+```swift
 let categoricalStops = [
     "earthquake": MGLStyleValue<UIColor>(rawValue: .orange),
     "explosion": MGLStyleValue(rawValue: .red),
@@ -218,7 +221,8 @@ If your use case does not require a default value, you can either apply a predic
 Identity interpolation mode used the attribute’s value as the style layer property value. In this example, you might set the `circleRadius` to the earthquake’s magnitude. In order to use a feature attribute value to style a layer property, set the property value to `[NSExpression expressionForKeyPath:]`, which take the feature attribute name as an argument.
 
 Style function syntax:
-```
+
+```swift
 layer.circleRadius = MGLStyleValue(interpolationMode: .identity,
                                    sourceStops: nil,
                                    attributeName: "mag",
