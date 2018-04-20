@@ -111,8 +111,7 @@ run-benchmark-%: benchmark
 	$(MACOS_OUTPUT_PATH)/$(BUILDTYPE)/mbgl-benchmark --benchmark_filter=$* ${BENCHMARK_ARGS}
 
 .PHONY: node-benchmark
-node-benchmark: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'node-benchmark' build $(XCPRETTY)
+node-benchmark: node
 
 .PHONY: run-node-benchmark
 run-node-benchmark: node-benchmark
@@ -136,7 +135,11 @@ offline: $(MACOS_PROJ_PATH)
 
 .PHONY: node
 node: $(MACOS_PROJ_PATH)
-	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node' build $(XCPRETTY)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (Active ABI)' build $(XCPRETTY)
+
+.PHONY: node-all
+node-all: $(MACOS_PROJ_PATH)
+	set -o pipefail && $(MACOS_XCODEBUILD) -scheme 'mbgl-node (All ABIs)' build $(XCPRETTY)
 
 .PHONY: macos-test
 macos-test: $(MACOS_PROJ_PATH)
@@ -362,7 +365,11 @@ run-glfw-app: glfw-app
 
 .PHONY: node
 node: $(LINUX_BUILD)
-	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.active
+
+.PHONY: node-all
+node-all: $(LINUX_BUILD)
+	$(NINJA) $(NINJA_ARGS) -j$(JOBS) -C $(LINUX_OUTPUT_PATH) mbgl-node.all
 
 .PHONY: compdb
 compdb: $(LINUX_BUILD)
@@ -706,6 +713,7 @@ codestyle:
 .PHONY: clean
 clean:
 	-rm -rf ./build \
+	        ./lib/*.node \
 	        ./platform/android/gradle/configuration.gradle \
 	        ./platform/android/MapboxGLAndroidSDK/build \
 	        ./platform/android/MapboxGLAndroidSDK/.externalNativeBuild \
