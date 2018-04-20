@@ -172,7 +172,7 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
             18: 18,
             ]
         
-        layer.circleRadius =  NSExpression(forMGLInterpolating: NSExpression(forKeyPath: "$zoomLevel"), curveType: MGLExpressionInterpolationMode.exponential, parameters: NSExpression(forConstantValue: 1.5), stops: NSExpression(forConstantValue: stops))
+        layer.circleRadius =  NSExpression(forMGLInterpolating: NSExpression.zoomLevelVariable, curveType: MGLExpressionInterpolationMode.exponential, parameters: NSExpression(forConstantValue: 1.5), stops: NSExpression(forConstantValue: stops))
         //#-end-example-code
     }
     func testMigratingToExpressions$Interval() {
@@ -231,8 +231,8 @@ class MGLDocumentationGuideTests: XCTestCase, MGLMapViewDelegate {
         //#-example-code
         #if os(macOS)
         let stops : [String : NSColor] = ["earthquake" : NSColor.orange,
-                                           "explosion" : NSColor.red,
-                                        "quarry blast" : NSColor.yellow]
+                                          "explosion" : NSColor.red,
+                                          "quarry blast" : NSColor.yellow]
         layer.circleColor = NSExpression(
             format: "FUNCTION(%@, 'valueForKeyPath:', type)",
             stops)
