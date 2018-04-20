@@ -661,7 +661,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 }
 
 + (NSExpression *)featurePropertiesVariableExpression {
-    return [NSExpression expressionForVariable:@"featureProperties"];
+    return [self featureAttributesVariableExpression];
 }
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
@@ -1004,8 +1004,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             if ([self.variable isEqualToString:@"featureIdentifier"]) {
                 return @[@"id"];
             }
-            if ([self.variable isEqualToString:@"featureProperties"] ||
-                [self.variable isEqualToString:@"featureAttributes"]) {
+            if ([self.variable isEqualToString:@"featureAttributes"]) {
                 return @[@"properties"];
             }
             return @[@"var", self.variable];

@@ -189,10 +189,6 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:@[@"properties"]], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionForVariable:@"featureProperties"];
-        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, @[@"properties"]);
-    }
-    {
         NSExpression *expression = [NSExpression expressionForVariable:@"loremIpsum"];
         NSArray *jsonExpression = @[@"var", @"loremIpsum"];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
