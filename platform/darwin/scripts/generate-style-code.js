@@ -626,7 +626,7 @@ const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
-const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
+const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Migrating to Expressions.md.ejs', 'utf8'), { strict: true });
 const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
 
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
@@ -757,10 +757,10 @@ writeIfModified(`platform/macos/docs/guides/For Style Authors.md`, forStyleAutho
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-writeIfModified(`platform/ios/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/ios/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'iOS',
 }));
-writeIfModified(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/macos/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'macOS',
 }));
 writeIfModified(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({

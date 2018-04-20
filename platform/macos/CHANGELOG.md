@@ -2,7 +2,7 @@
 
 ## 0.7.0
 
-The 0.7._x_ series of releases will be the last to support macOS 10.10. The minimum iOS deployment version will increase to macOS 10.11.0 in a future release.
+The 0.7._x_ series of releases will be the last to support macOS 10.10. The minimum macOS deployment version will increase to macOS 10.11.0 in a future release.
 
 ### Packaging
 
