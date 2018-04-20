@@ -113,7 +113,12 @@ h2 {
 }
 
 h3 {
-  @include heading(14px, 1em 0 0.3em);
+  @include heading(1.2rem, 1em 0 0.3em);
+}
+
+h3 > code {
+  font-weight: bold;
+  font-size: 1.2rem;
 }
 
 h4 {
