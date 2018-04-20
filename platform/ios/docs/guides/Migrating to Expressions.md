@@ -53,7 +53,7 @@ Style functions supported four interpolation modes: exponential/linear, interval
 
 ### Linear
 
-+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:] takes the interpolation type as a parameter. If you previously used the default interpolation base, use the curve type MGLExpressionInterpolationMode.linear. See the [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code) documentation for more details.
+`+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` takes the interpolation type as a parameter. If you previously used the default interpolation base, use the curve type `MGLExpressionInterpolationMode.linear`. See the [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code) documentation for more details.
 
 The stops dictionary below, shows colors that continuously shift from yellow to orange to red to blue to white based on the attribute value.
 
@@ -111,7 +111,7 @@ mapView.style?.insertLayer(layer, below: symbolLayer)
 
 ### Exponential
 
-If you previously used an interpolation base greater than `0` (other than `1`), you can use `MGLExpressionInterpolationMode.linear` as the curve type for `+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` or `'exponential'` as the curve type for [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code). The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
+If you previously used an interpolation base greater than `0` (other than `1`), you can use `MGLExpressionInterpolationMode.exponential` as the curve type for `+[NSExpression(MGLAdditions) mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` or `'exponential'` as the curve type for [`mgl_interpolate:withCurveType:parameters:stops:`](predicates-and-expressions.html#code-mgl_interpolate-withcurvetype-parameters-stops-code). The `parameters` argument takes that interpolation base. This interpolates between values exponentially, creating an accelerated ramp effect.
 
 Here’s a visualization from Mapbox Studio (see [Working with Mapbox Studio](working-with-mapbox-studio.html)) comparing interpolation base values of `1.5` and `0.5` based on zoom. In order to convert camera style functions, use `$zoomLevel` or `MGL_FUNCTION('zoomLevel')` as the attribute key.
 
