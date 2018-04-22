@@ -43,6 +43,10 @@ typedef NS_ENUM(NSUInteger, MGLAnnotationVerticalAlignment) {
     MGLAnnotationVerticalAlignmentTop,
     /** Aligns the annotation vertically at the bottom of the map view. */
     MGLAnnotationVerticalAlignmentBottom,
+    /** Aligns the annotation vertically between center and bottom of the map view. */
+    MGLAnnotationVerticalAlignmentMidBottom,
+    /** Aligns the annotation vertically between center and top of the map view. */
+    MGLAnnotationVerticalAlignmentMidTop,
 };
 
 /**
