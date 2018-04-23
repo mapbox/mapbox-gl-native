@@ -706,6 +706,24 @@ ParseResult createCompoundExpression(const Definition& definition,
     
     return ParseResult();
 }
+    
+ParseResult createCompoundExpression(const std::string& name,
+                                     std::unique_ptr<Expression> arg1,
+                                     ParsingContext& ctx) {
+    std::vector<std::unique_ptr<Expression>> args;
+    args.push_back(std::move(arg1));
+    return createCompoundExpression(name, std::move(args), ctx);
+}
+
+ParseResult createCompoundExpression(const std::string& name,
+                                     std::unique_ptr<Expression> arg1,
+                                     std::unique_ptr<Expression> arg2,
+                                     ParsingContext& ctx) {
+    std::vector<std::unique_ptr<Expression>> args;
+    args.push_back(std::move(arg1));
+    args.push_back(std::move(arg2));
+    return createCompoundExpression(name, std::move(args), ctx);
+}
 
 } // namespace expression
 } // namespace style

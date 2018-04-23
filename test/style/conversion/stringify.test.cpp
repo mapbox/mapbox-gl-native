@@ -78,10 +78,7 @@ TEST(Stringify, Filter) {
     ASSERT_EQ(stringify(Filter()), "null");
     
     expression::ParsingContext context;
-    std::vector<std::unique_ptr<expression::Expression>> args;
-    args.push_back(std::make_unique<expression::Literal>(std::string("a")));
-    args.push_back(std::make_unique<expression::Literal>(1.0));
-    ASSERT_EQ(stringify(Filter(expression::createCompoundExpression("filter-==", std::move(args), context))), "[\"filter-==\",\"a\",1.0]");
+    ASSERT_EQ(stringify(Filter(expression::createCompoundExpression("filter-==", std::make_unique<expression::Literal>(std::string("a")), std::make_unique<expression::Literal>(1.0), context))), "[\"filter-==\",\"a\",1.0]");
 }
 
 TEST(Stringify, CameraFunction) {

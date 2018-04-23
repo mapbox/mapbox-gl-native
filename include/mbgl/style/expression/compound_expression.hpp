@@ -142,6 +142,16 @@ ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx);
 
+ParseResult createCompoundExpression(const std::string& name,
+                                     std::unique_ptr<Expression> arg1,
+                                     ParsingContext& ctx);
+
+    
+ParseResult createCompoundExpression(const std::string& name,
+                                     std::unique_ptr<Expression> arg1,
+                                     std::unique_ptr<Expression> arg2,
+                                     ParsingContext& ctx);
+
 } // namespace expression
 } // namespace style
 } // namespace mbgl
