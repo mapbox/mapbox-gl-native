@@ -675,9 +675,14 @@ using namespace std::string_literals;
         NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(x, 'NSColor')"];
 #endif
         
-        NSArray *jsonExpression = @[@"to-rgba", @[@"get", @"x"]];
+        NSArray *jsonExpression = @[@"to-color", @[@"get", @"x"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(x, 'MGLColor')"];
+        NSArray *jsonExpression = @[@"to-color", @[@"get", @"x"]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
     }
 }
 

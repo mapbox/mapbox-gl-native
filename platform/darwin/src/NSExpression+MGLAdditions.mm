@@ -802,7 +802,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"to-string"] || [op isEqualToString:@"string"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
-        } else if ([op isEqualToString:@"to-rgba"]) {
+        } else if ([op isEqualToString:@"to-color"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
 #if TARGET_OS_IPHONE
             return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
@@ -1174,12 +1174,12 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     return @[@"to-number", object];
                 }
 #if TARGET_OS_IPHONE
-                else if ([type isEqualToString:@"UIColor"]) {
-                    return @[@"to-rgba", object];
+                else if ([type isEqualToString:@"UIColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
                 }
 #else
-                else if ([type isEqualToString:@"NSColor"]) {
-                    return @[@"to-rgba", object];
+                else if ([type isEqualToString:@"NSColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
                 }
 #endif
                 [NSException raise:NSInvalidArgumentException
