@@ -4,12 +4,6 @@
 #import "NSPredicate+MGLPrivateAdditions.h"
 #import "MGLValueEvaluator.h"
 
-#define MGLAssertEqualFilters(actual, expected, ...) \
-    XCTAssertTrue(actual.is<__typeof__(expected)>()); \
-    if (actual.is<__typeof__(expected)>()) { \
-        XCTAssertEqual(actual.get<__typeof__(expected)>(), expected, __VA_ARGS__); \
-    }
-
 @interface MGLPredicateTests : XCTestCase
 @end
 
