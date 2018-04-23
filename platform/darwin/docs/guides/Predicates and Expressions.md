@@ -630,7 +630,7 @@ otherwise <code>TRUE</code>.
 <dt>Selector:</dt>
 <dd><code>mgl_has:</code></dd>
 <dt>Format string syntax:</dt>
-<dd><code>FUNCTION($featureProperties, 'mgl_has:', '🧀🍔')</code></dd>
+<dd><code>FUNCTION($featureAttributes, 'mgl_has:', '🧀🍔')</code></dd>
 <dt>Target:</dt>
 <dd>
    An <code>NSExpression</code> that evaluates to an <code>NSDictionary</code>

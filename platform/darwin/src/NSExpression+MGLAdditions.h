@@ -80,7 +80,9 @@ extern MGL_EXPORT const MGLExpressionInterpolationMode MGLExpressionInterpolatio
  <a href="https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-properties"><code>properties</code></a>
  expression operator in the Mapbox Style Specification.
  */
-@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression;
+@property (class, nonatomic, readonly) NSExpression *featureAttributesVariableExpression;
+
+@property (class, nonatomic, readonly) NSExpression *featurePropertiesVariableExpression __attribute__((deprecated("Use -featureAttributesVariableExpression.")));
 
 #pragma mark Creating Conditional Expressions
 

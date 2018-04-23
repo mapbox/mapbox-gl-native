@@ -1,5 +1,11 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## 0.7.1
+
+### Style layers
+
+* Deprecated `+[NSExpression featurePropertiesVariableExpression]` use `+[NSExpression featureAttributesVariableExpression]` instead. ([#11748](https://github.com/mapbox/mapbox-gl-native/pull/11748))
+
 ## 0.7.0 - April 19, 2018
 
 The 0.7._x_ series of releases will be the last to support macOS 10.10. The minimum macOS deployment version will increase to macOS 10.11.0 in a future release.

@@ -331,7 +331,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `typeof`               | |
 `geometry-type`        | `NSExpression.geometryTypeVariableExpression` | `$geometryType`
 `id`                   | `NSExpression.featureIdentifierVariableExpression` | `$featureIdentifier`
-`properties`           | `NSExpression.featurePropertiesVariableExpression` | `$featureProperties`
+`properties`           | `NSExpression.featureAttributesVariableExpression` | `$featureAttributes`
 `at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
 `has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
