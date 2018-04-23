@@ -1,5 +1,9 @@
 #import "NSString+MGLAdditions.h"
 
+#if TARGET_OS_OSX
+    #import <Availability.h>
+#endif
+
 @implementation NSString (MGLAdditions)
 
 - (NSRange)mgl_wholeRange {
@@ -13,7 +17,7 @@
 - (NSString *)mgl_titleCasedStringWithLocale:(NSLocale *)locale {
     NSMutableString *string = self.mutableCopy;
     NSOrthography *orthography;
-#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000
+#if __IPHONE_OS_VERSION_MAX_ALLOWED >= 110000 || __MAC_OS_X_VERSION_MAX_ALLOWED >= 101300
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wunguarded-availability-new"
     if ([NSOrthography respondsToSelector:@selector(defaultOrthographyForLanguage:)]) {

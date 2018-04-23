@@ -1,10 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="description_user_location_tracking">Tracks the location of the user</string>
-    <string name="description_user_location_customization">Customize the location of the user</string>
-    <string name="description_user_location_dot_color">Customize the user location color</string>
-    <string name="description_user_location_toggle">Toggle location of the user on and off</string>
-    <string name="description_custom_location_engine">Customize location engine</string>
     <string name="description_custom_layer">Overlay a custom native layer on the map</string>
     <string name="description_info_window_adapter">Learn how to create a custom InfoWindow</string>
     <string name="description_cameraposition">CameraPosition capabilities</string>
@@ -67,8 +62,10 @@
     <string name="description_textureview_debug">Use TextureView to render the map</string>
     <string name="description_textureview_resize">Resize a map rendered on a TextureView</string>
     <string name="description_textureview_animate">Animate a map rendered on a TextureView</string>
+    <string name="description_textureview_transparent">Enable a transparent surface on TextureView</string>
     <string name="description_grid_source">Example Custom Geometry Source</string>
     <string name="description_local_glyph">Suzhou using Droid Sans for Chinese glyphs</string>
     <string name="description_hillshade">Example raster-dem source and hillshade layer</string>
     <string name="description_heatmaplayer">Use HeatmapLayer to visualise earthquakes</string>
+    <string name="description_gesture_detector">Manipulate gestures detector\'s settings</string>
 </resources>

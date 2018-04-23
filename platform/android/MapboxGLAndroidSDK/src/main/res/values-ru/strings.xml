@@ -1,15 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="mapbox_compassContentDescription">Компас. Активируйте, чтобы повернуть карту на Север.</string>
-    <string name="mapbox_attributionsIconContentDescription">Иконка атрибутов. Активируйте, чтобы показать диалог.</string>
-    <string name="mapbox_myLocationViewContentDescription">Местоположение. Отображает ваше местоположение на карте.</string>
-    <string name="mapbox_mapActionDescription">Отображает карту, созданную при помощи Mapbox. Протисните при помощи двух пальцев. Приблизьте, соединением пальцев. </string>
-    <string name="mapbox_attributionsDialogTitle">Mapbox Android SDK</string>
+    <string name="mapbox_compassContentDescription">Компас. Активируйте, чтобы развернуть карту на север.</string>
+    <string name="mapbox_attributionsIconContentDescription">Значок атрибутов. Активируйте, чтобы показать диалог.</string>
+    <string name="mapbox_myLocationViewContentDescription">Местоположение. Отображает вашу позицию на карте.</string>
+    <string name="mapbox_mapActionDescription">Отображает карту, созданную при помощи Mapbox. Пролистывайте двумя пальцами. Меняйте масштаб сведением пальцев.</string>
+    <string name="mapbox_attributionsDialogTitle">Mapbox Maps SDK для Android</string>
     <string name="mapbox_attributionTelemetryTitle">Сделать карты Mapbox лучше</string>
-    <string name="mapbox_attributionTelemetryMessage">Вы помогаете сделать карты OpenStreetMap и Mapbox лучше путем предоставления анонимных данных об использовании.</string>
+    <string name="mapbox_attributionTelemetryMessage">Вы помогаете улучшать карты OpenStreetMap и Mapbox, предоставляя обезличенные данные об использовании.</string>
     <string name="mapbox_attributionTelemetryPositive">Согласен</string>
     <string name="mapbox_attributionTelemetryNegative">Не согласен</string>
     <string name="mapbox_attributionTelemetryNeutral">Дополнительная информация</string>
-    <string name="mapbox_offline_error_region_definition_invalid">Запрошенный OfflineRegionDefinition не входит в допустимые границы: %s</string>
-
+    <string name="mapbox_attributionErrorNoBrowser">На устройстве нет веб-браузера, нельзя показать веб-страницу.</string>
+    <string name="mapbox_offline_error_region_definition_invalid">Запрошенный OfflineRegionDefinition не входит в допустимые границы: %s</string>
+    <string name="mapbox_telemetrySettings">Настройки телеметрии</string>
     </resources>

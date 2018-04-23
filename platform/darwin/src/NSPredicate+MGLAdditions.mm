@@ -3,6 +3,8 @@
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
 
+#include <mbgl/style/conversion/filter.hpp>
+
 class FilterEvaluator {
 public:
 
@@ -206,25 +208,18 @@ public:
 
 - (mbgl::style::Filter)mgl_filter
 {
-    if ([self isEqual:[NSPredicate predicateWithValue:YES]])
-    {
-        return mbgl::style::AllFilter();
-    }
-
-    if ([self isEqual:[NSPredicate predicateWithValue:NO]])
-    {
-        return mbgl::style::AnyFilter();
-    }
-
-    if ([self.predicateFormat hasPrefix:@"BLOCKPREDICATE("])
-    {
+    mbgl::style::conversion::Error valueError;
+    NSArray *jsonObject = self.mgl_jsonExpressionObject;
+    auto value = mbgl::style::conversion::convert<mbgl::style::Filter>(mbgl::style::conversion::makeConvertible(jsonObject), valueError);
+    
+    if (!value) {
         [NSException raise:NSInvalidArgumentException
-                    format:@"Block-based predicates are not supported."];
+                    format:@"Invalid filter value: %@", @(valueError.message.c_str())];
+        return {};
     }
-
-    [NSException raise:NSInvalidArgumentException
-                format:@"Unrecognized predicate type."];
-    return {};
+    mbgl::style::Filter filter = std::move(*value);
+    
+    return filter;
 }
 
 + (instancetype)mgl_predicateWithFilter:(mbgl::style::Filter)filter
@@ -280,7 +275,7 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     }
     if ([op isEqualToString:@">="]) {
         NSArray *subexpressions = MGLSubexpressionsWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
-        return [NSPredicate predicateWithFormat:@"%K >= %@" argumentArray:subexpressions];
+        return [NSPredicate predicateWithFormat:@"%@ >= %@" argumentArray:subexpressions];
     }
     if ([op isEqualToString:@"!"]) {
         NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
@@ -294,7 +289,43 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSPredicate predicateWithValue:YES];
     }
     if ([op isEqualToString:@"all"]) {
-        NSArray *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        NSArray<NSPredicate *> *subpredicates = MGLSubpredicatesWithJSONObjects([objects subarrayWithRange:NSMakeRange(1, objects.count - 1)]);
+        if (subpredicates.count == 2) {
+            // Determine if the expression is of BETWEEN type
+            if ([subpredicates[0] isKindOfClass:[NSComparisonPredicate class]] &&
+                [subpredicates[1] isKindOfClass:[NSComparisonPredicate class]]) {
+                NSComparisonPredicate *leftCondition = (NSComparisonPredicate *)subpredicates[0];
+                NSComparisonPredicate *rightCondition = (NSComparisonPredicate *)subpredicates[1];
+                
+                NSArray *limits;
+                NSExpression *leftConditionExpression;
+                
+                if(leftCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType &&
+                   rightCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.rightExpression, rightCondition.rightExpression];
+                    leftConditionExpression = leftCondition.leftExpression;
+                    
+                } else if (leftCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType &&
+                           rightCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.leftExpression, rightCondition.rightExpression];
+                    leftConditionExpression = leftCondition.rightExpression;
+                
+                } else if(leftCondition.predicateOperatorType == NSLessThanOrEqualToPredicateOperatorType &&
+                          rightCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.leftExpression, rightCondition.leftExpression];
+                    leftConditionExpression = leftCondition.rightExpression;
+                
+                } else if(leftCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType &&
+                          rightCondition.predicateOperatorType == NSGreaterThanOrEqualToPredicateOperatorType) {
+                    limits = @[leftCondition.rightExpression, rightCondition.leftExpression];
+                    leftConditionExpression = leftCondition.leftExpression;
+                }
+                
+                if (limits && leftConditionExpression) {
+                     return [NSPredicate predicateWithFormat:@"%@ BETWEEN %@", leftConditionExpression, [NSExpression expressionForAggregate:limits]];
+                }
+            }
+        }
         return [NSCompoundPredicate andPredicateWithSubpredicates:subpredicates];
     }
     if ([op isEqualToString:@"any"]) {
@@ -302,8 +333,13 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
         return [NSCompoundPredicate orPredicateWithSubpredicates:subpredicates];
     }
     
-    NSAssert(NO, @"Unrecognized expression conditional operator %@.", op);
-    return nil;
+    NSExpression *expression = [NSExpression expressionWithMGLJSONObject:object];
+    return [NSComparisonPredicate predicateWithLeftExpression:expression
+                                              rightExpression:[NSExpression expressionForConstantValue:@YES]
+                                                     modifier:NSDirectPredicateModifier
+                                                         type:NSEqualToPredicateOperatorType
+                                                      options:0];
+
 }
 
 - (id)mgl_jsonExpressionObject {
@@ -321,6 +357,37 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     
     [NSException raise:NSInvalidArgumentException
                 format:@"Unrecognized predicate type."];
+    return nil;
+}
+
+- (id)mgl_if:(id)firstValue, ... {
+
+    if ([self evaluateWithObject:nil]) {
+            return firstValue;
+        }
+
+    id eachExpression;
+    va_list argumentList;
+    va_start(argumentList, firstValue);
+
+    while ((eachExpression = va_arg(argumentList, id))) {
+            if ([eachExpression isKindOfClass:[NSComparisonPredicate class]]) {
+                    id valueExpression = va_arg(argumentList, id);
+                    if ([eachExpression evaluateWithObject:nil]) {
+                            return valueExpression;
+                        }
+                } else {
+                        return eachExpression;
+                    }
+        }
+    va_end(argumentList);
+
+    return nil;
+}
+
+- (id)mgl_match:(NSExpression *)firstCase, ... {
+    [NSException raise:NSInvalidArgumentException
+                      format:@"Match expressions lack underlying Objective-C implementations."];
     return nil;
 }
 

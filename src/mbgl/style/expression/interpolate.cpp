@@ -223,7 +223,11 @@ mbgl::Value Interpolate<T>::serialize() const {
     
     interpolator.match(
         [&](const ExponentialInterpolator& exponential) {
-            serialized.emplace_back(std::vector<mbgl::Value>{{ std::string("exponential"), exponential.base }});
+            if (exponential.base == 1) {
+                serialized.emplace_back(std::vector<mbgl::Value>{{ std::string("linear") }});
+            } else {
+                serialized.emplace_back(std::vector<mbgl::Value>{{ std::string("exponential"), exponential.base }});
+            }
         },
         [&](const CubicBezierInterpolator& cubicBezier) {
             static const std::string cubicBezierTag("cubic-bezier");

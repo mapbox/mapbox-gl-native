@@ -58,7 +58,7 @@ public:
         if (mbglValue.isUndefined()) {
             return nil;
         }
-        return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
+        return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
     }
 
     /**
@@ -333,15 +333,15 @@ private: // Private utilities for converting from mbgl to mgl values
         }
 
         NSExpression *operator()(const mbgl::style::CameraFunction<MBGLType> &mbglValue) const {
-            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
+            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
 
         NSExpression *operator()(const mbgl::style::SourceFunction<MBGLType> &mbglValue) const {
-            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
+            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
 
         NSExpression *operator()(const mbgl::style::CompositeFunction<MBGLType> &mbglValue) const {
-            return [NSExpression mgl_expressionWithJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
+            return [NSExpression expressionWithMGLJSONObject:MGLJSONObjectFromMBGLExpression(mbglValue.getExpression())];
         }
     };
 };

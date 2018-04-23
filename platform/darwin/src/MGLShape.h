@@ -12,21 +12,23 @@ NS_ASSUME_NONNULL_BEGIN
 
  Create instances of `MGLPointAnnotation`, `MGLPointCollection`, `MGLPolyline`,
  `MGLMultiPolyline`, `MGLPolygon`, `MGLMultiPolygon`, or `MGLShapeCollection` in
- order to use `MGLShape`'s methods. Do not create instances of `MGLShape` directly,
- and do not create your own subclasses of this class. The shape classes correspond
- to the <a href="https://tools.ietf.org/html/rfc7946#section-3.1">Geometry</a> object
+ order to use `MGLShape`'s methods. Do not create instances of `MGLShape`
+ directly, and do not create your own subclasses of this class. The shape
+ classes correspond to the
+ <a href="https://tools.ietf.org/html/rfc7946#section-3.1">Geometry</a> object
  types in the GeoJSON standard, but some have nonstandard names for backwards
  compatibility.
 
  Although you do not create instances of this class directly, you can use its
  `+[MGLShape shapeWithData:encoding:error:]` factory method to create one of the
- concrete subclasses of `MGLShape` noted above from GeoJSON data.
+ concrete subclasses of `MGLShape` noted above from GeoJSON data. To access a
+ shape’s attributes, use the corresponding `MGLFeature` class instead.
 
  You can add shapes to the map by adding them to an `MGLShapeSource` object.
- Configure the appearance of an `MGLShapeSource`’s or `MGLVectorSource`’s shapes
- collectively using a concrete instance of `MGLVectorStyleLayer`. Alternatively,
- you can add some kinds of shapes directly to a map view as annotations or
- overlays.
+ Configure the appearance of an `MGLShapeSource`’s or `MGLVectorTileSource`’s
+ shapes collectively using a concrete instance of `MGLVectorStyleLayer`.
+ Alternatively, you can add some kinds of shapes directly to a map view as
+ annotations or overlays.
  */
 MGL_EXPORT
 @interface MGLShape : NSObject <MGLAnnotation, NSSecureCoding>

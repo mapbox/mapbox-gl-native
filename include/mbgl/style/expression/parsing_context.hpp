@@ -55,7 +55,7 @@ class ParsingContext {
 public:
     ParsingContext() : errors(std::make_shared<std::vector<ParsingError>>()) {}
     ParsingContext(std::string key_) : key(std::move(key_)), errors(std::make_shared<std::vector<ParsingError>>()) {}
-    explicit ParsingContext(optional<type::Type> expected_)
+    explicit ParsingContext(type::Type expected_)
         : expected(std::move(expected_)),
           errors(std::make_shared<std::vector<ParsingError>>())
     {}
@@ -67,6 +67,7 @@ public:
     std::string getKey() const { return key; }
     optional<type::Type> getExpected() const { return expected; }
     const std::vector<ParsingError>& getErrors() const { return *errors; }
+    const std::string getCombinedErrors() const;
 
     enum TypeAnnotationOption {
         includeTypeAnnotations,
@@ -74,16 +75,21 @@ public:
     };
 
     /*
-        Parse the given style-spec JSON value into an Expression object.
-        Specifically, this function is responsible for determining the expression
-        type (either Literal, or the one named in value[0]) and dispatching to the
-        appropriate ParseXxxx::parse(const V&, ParsingContext) method.
+        Parse the given style-spec JSON value as an expression.
     */
-    ParseResult parse(const mbgl::style::conversion::Convertible& value,
-                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
+    ParseResult parseExpression(const mbgl::style::conversion::Convertible& value,
+                                TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
 
     /*
-        Parse a child expression.
+        Parse the given style-spec JSON value as an expression intended to be used
+        in a layout or paint property.  This entails checking additional constraints
+        that exist in that context but not, e.g., for filters.
+    */
+    ParseResult parseLayerPropertyExpression(const mbgl::style::conversion::Convertible& value,
+                                TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
+
+    /*
+        Parse a child expression. For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t,
@@ -91,7 +97,7 @@ public:
                       TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
     
     /*
-        Parse a child expression.
+        Parse a child expression.  For use by individual Expression::parse() methods.
     */
     ParseResult parse(const mbgl::style::conversion::Convertible&,
                       std::size_t index,
@@ -140,6 +146,16 @@ private:
           scope(std::move(scope_)),
         errors(std::move(errors_))
     {}
+    
+    
+    /*
+        Parse the given style-spec JSON value into an Expression object.
+        Specifically, this function is responsible for determining the expression
+        type (either Literal, or the one named in value[0]) and dispatching to the
+        appropriate ParseXxxx::parse(const V&, ParsingContext) method.
+    */
+    ParseResult parse(const mbgl::style::conversion::Convertible& value,
+                      TypeAnnotationOption typeAnnotationOption = includeTypeAnnotations);
     
     std::string key;
     optional<type::Type> expected;

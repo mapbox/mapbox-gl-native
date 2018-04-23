@@ -50,8 +50,10 @@ public:
 
 class FeatureIndex {
 public:
-    FeatureIndex();
+    FeatureIndex(std::unique_ptr<const GeometryTileData> tileData_);
 
+    const GeometryTileData* getData() { return tileData.get(); }
+    
     void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketName);
 
     void query(
@@ -61,7 +63,6 @@ public:
             const double tileSize,
             const double scale,
             const RenderedQueryOptions& options,
-            const GeometryTileData&,
             const UnwrappedTileID&,
             const std::string&,
             const std::vector<const RenderLayer*>&,
@@ -83,7 +84,6 @@ private:
             const IndexedSubfeature&,
             const GeometryCoordinates& queryGeometry,
             const RenderedQueryOptions& options,
-            const GeometryTileData&,
             const CanonicalTileID&,
             const std::vector<const RenderLayer*>&,
             const float bearing,
@@ -93,5 +93,6 @@ private:
     unsigned int sortIndex = 0;
 
     std::unordered_map<std::string, std::vector<std::string>> bucketLayerIDs;
+    std::unique_ptr<const GeometryTileData> tileData;
 };
 } // namespace mbgl

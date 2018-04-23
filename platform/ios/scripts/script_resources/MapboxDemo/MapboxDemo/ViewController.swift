@@ -110,7 +110,7 @@ class ViewController: UIViewController {
         // You can obtain your own access token from the
         // [Mapbox account page](https://www.mapbox.com/studio/account/tokens/)
         // and add it to this application's Info.plist as the value for MGLMapboxAccessToken
-        if MGLAccountManager.accessToken() == "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNqYThuNnZ3NTA5MGMyd3F1cmF1eW1xaGEifQ.TdBTSHHPeT1pfLZ_6x_1vA" {
+        if MGLAccountManager.accessToken == "pk.eyJ1IjoibWFwYm94IiwiYSI6ImNqYThuNnZ3NTA5MGMyd3F1cmF1eW1xaGEifQ.TdBTSHHPeT1pfLZ_6x_1vA" {
             accessTokenWarningView.isHidden = false
         }
         

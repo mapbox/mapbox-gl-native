@@ -4,7 +4,7 @@ This document explains how to build the Mapbox Maps SDK for iOS from source. It 
 
 ## Requirements
 
-The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above.
+The Mapbox Maps SDK for iOS and iosapp demo application require iOS 8.0 or above. _Note: Support for iOS 8 will be removed in a future release and the minimum iOS deployment version will increase to iOS 9.0._
 
 The Mapbox Maps SDK for iOS requires Xcode 9.1 or above to compile from source.
 
@@ -139,6 +139,8 @@ To add an example code listing to the documentation for a class or class member:
    to [MGLDocumentationExampleTests](test/MGLDocumentationExampleTests.swift).
    Wrap the code you’d like to appear in the documentation within
    `//#-example-code` and `//#-end-example-code` comments.
+1. If the header doesn’t already have an example code listing, add the path to
+   the header to platform/darwin/scripts/update-examples.list.
 1. Insert the code listings into the headers:
 
 ```bash

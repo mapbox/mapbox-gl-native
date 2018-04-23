@@ -12,7 +12,6 @@ import com.mapbox.mapboxsdk.camera.CameraUpdate;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.geometry.LatLng;
-import com.mapbox.mapboxsdk.maps.widgets.MyLocationView;
 
 import timber.log.Timber;
 
@@ -30,8 +29,6 @@ final class Transform implements MapView.OnMapChangedListener {
 
   private final NativeMapView mapView;
   private final MarkerViewManager markerViewManager;
-  private final TrackingSettings trackingSettings;
-  private final MyLocationView myLocationView;
   private final Handler handler = new Handler();
 
   private CameraPosition cameraPosition;
@@ -41,12 +38,10 @@ final class Transform implements MapView.OnMapChangedListener {
 
   private CameraChangeDispatcher cameraChangeDispatcher;
 
-  Transform(NativeMapView mapView, MarkerViewManager markerViewManager, TrackingSettings trackingSettings,
+  Transform(NativeMapView mapView, MarkerViewManager markerViewManager,
             CameraChangeDispatcher cameraChangeDispatcher) {
     this.mapView = mapView;
     this.markerViewManager = markerViewManager;
-    this.trackingSettings = trackingSettings;
-    this.myLocationView = trackingSettings.getMyLocationView();
     this.cameraChangeDispatcher = cameraChangeDispatcher;
   }
 
@@ -73,9 +68,6 @@ final class Transform implements MapView.OnMapChangedListener {
 
   @UiThread
   void updateCameraPosition(@NonNull CameraPosition position) {
-    if (myLocationView != null) {
-      myLocationView.setCameraPosition(position);
-    }
     markerViewManager.setTilt((float) position.tilt);
   }
 
@@ -103,7 +95,6 @@ final class Transform implements MapView.OnMapChangedListener {
   final void moveCamera(MapboxMap mapboxMap, CameraUpdate update, final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
       mapView.jumpTo(cameraPosition.bearing, cameraPosition.target, cameraPosition.tilt, cameraPosition.zoom);
@@ -125,7 +116,6 @@ final class Transform implements MapView.OnMapChangedListener {
                         final MapboxMap.CancelableCallback callback, boolean isDismissable) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, isDismissable);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
@@ -143,7 +133,6 @@ final class Transform implements MapView.OnMapChangedListener {
                            final MapboxMap.CancelableCallback callback) {
     CameraPosition cameraPosition = update.getCameraPosition(mapboxMap);
     if (isValidCameraPosition(cameraPosition)) {
-      trackingSettings.resetTrackingModesIfRequired(this.cameraPosition, cameraPosition, false);
       cancelTransitions();
       cameraChangeDispatcher.onCameraMoveStarted(OnCameraMoveStartedListener.REASON_API_ANIMATION);
 
@@ -237,31 +226,15 @@ final class Transform implements MapView.OnMapChangedListener {
     return mapView.getZoom();
   }
 
-  void zoomIn(@NonNull PointF focalPoint) {
-    CameraPosition cameraPosition = invalidateCameraPosition();
-    if (cameraPosition != null) {
-      int newZoom = (int) Math.round(cameraPosition.zoom + 1);
-      setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION);
-    }
-  }
-
-  void zoomOut(@NonNull PointF focalPoint) {
-    CameraPosition cameraPosition = invalidateCameraPosition();
-    if (cameraPosition != null) {
-      int newZoom = (int) Math.round(cameraPosition.zoom - 1);
-      setZoom(newZoom, focalPoint, MapboxConstants.ANIMATION_DURATION);
-    }
-  }
-
   void zoomBy(double zoomAddition, @NonNull PointF focalPoint) {
-    setZoom(mapView.getZoom() + zoomAddition, focalPoint, 0);
+    setZoom(mapView.getZoom() + zoomAddition, focalPoint);
   }
 
   void setZoom(double zoom, @NonNull PointF focalPoint) {
     setZoom(zoom, focalPoint, 0);
   }
 
-  void setZoom(double zoom, @NonNull PointF focalPoint, long duration) {
+  void setZoom(double zoom, @NonNull PointF focalPoint, final long duration) {
     if (mapView != null) {
       mapView.addOnMapChangedListener(new MapView.OnMapChangedListener() {
         @Override
@@ -297,23 +270,14 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setBearing(double bearing) {
-    if (myLocationView != null) {
-      myLocationView.setBearing(bearing);
-    }
     mapView.setBearing(bearing);
   }
 
   void setBearing(double bearing, float focalX, float focalY) {
-    if (myLocationView != null) {
-      myLocationView.setBearing(bearing);
-    }
     mapView.setBearing(bearing, focalX, focalY);
   }
 
   void setBearing(double bearing, float focalX, float focalY, long duration) {
-    if (myLocationView != null) {
-      myLocationView.setBearing(bearing);
-    }
     mapView.setBearing(bearing, focalX, focalY, duration);
   }
 
@@ -335,9 +299,6 @@ final class Transform implements MapView.OnMapChangedListener {
   }
 
   void setTilt(Double pitch) {
-    if (myLocationView != null) {
-      myLocationView.setTilt(pitch);
-    }
     markerViewManager.setTilt(pitch.floatValue());
     mapView.setPitch(pitch, 0);
   }

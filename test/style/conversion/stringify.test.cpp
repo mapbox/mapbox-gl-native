@@ -80,23 +80,25 @@ TEST(Stringify, Filter) {
 }
 
 TEST(Stringify, CameraFunction) {
+    ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
+        "[\"interpolate\",[\"linear\"],[\"zoom\"],0.0,1.0]");
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 })),
-        "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+        "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0]");
     ASSERT_EQ(stringify(CameraFunction<float>(IntervalStops<float> { {{0, 1}} })),
-        "{\"type\":\"interval\",\"stops\":[[0.0,1.0]]}");
+        "[\"step\",[\"zoom\"],0.0,1.0]");
 }
 
 TEST(Stringify, SourceFunction) {
     ASSERT_EQ(stringify(SourceFunction<float>("property", ExponentialStops<float> { {{0, 1}}, 2 })),
-        "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+        "[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0]");
     ASSERT_EQ(stringify(SourceFunction<float>("property", IntervalStops<float> { {{0, 1}} })),
-        "{\"property\":\"property\",\"type\":\"interval\",\"stops\":[[0.0,1.0]]}");
+        "[\"step\",[\"number\",[\"get\",\"property\"]],0.0,1.0]");
     ASSERT_EQ(stringify(SourceFunction<float>("property", CategoricalStops<float> { {{CategoricalValue(true), 1}} })),
-        "{\"property\":\"property\",\"type\":\"categorical\",\"stops\":[[true,1.0]]}");
+        "[\"case\",[\"boolean\",[\"get\",\"property\"]],1.0,[\"error\"]]");
     ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {})),
-        "{\"property\":\"property\",\"type\":\"identity\"}");
+        "[\"number\",[\"get\",\"property\"]]");
     ASSERT_EQ(stringify(SourceFunction<float>("property", IdentityStops<float> {}, 0.0f)),
-        "{\"property\":\"property\",\"type\":\"identity\",\"default\":0.0}");
+        "[\"number\",[\"get\",\"property\"]]");
 }
 
 TEST(Stringify, CompositeFunction) {
@@ -108,16 +110,17 @@ TEST(Stringify, CompositeFunction) {
             },
             2
         }, 0.0f)),
-        "{\"property\":\"property\",\"type\":\"exponential\",\"base\":2.0,"
-        "\"stops\":["
-            "[{\"zoom\":0.0,\"value\":0.0},1.0],"
-            "[{\"zoom\":1.0,\"value\":0.0},1.0]],\"default\":0.0}");
+        "[\"interpolate\","
+            "[\"linear\"],"
+            "[\"zoom\"],"
+            "0.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0],"
+            "1.0,[\"interpolate\",[\"exponential\",2.0],[\"number\",[\"get\",\"property\"]],0.0,1.0]]");
 }
 
 TEST(Stringify, PropertyValue) {
     ASSERT_EQ(stringify(PropertyValue<float>(1)), "1.0");
     ASSERT_EQ(stringify(PropertyValue<float>(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 2 }))),
-        "{\"type\":\"exponential\",\"base\":2.0,\"stops\":[[0.0,1.0]]}");
+        "[\"interpolate\",[\"exponential\",2.0],[\"zoom\"],0.0,1.0]");
 }
 
 TEST(Stringify, Layout) {

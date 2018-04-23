@@ -2,6 +2,7 @@
 
 #import "MGLAttributionInfo_Private.h"
 #import "MGLGeometry_Private.h"
+#import "MGLRasterDEMSource.h"
 #import "NSString+MGLAdditions.h"
 #import "NSValue+MGLAdditions.h"
 

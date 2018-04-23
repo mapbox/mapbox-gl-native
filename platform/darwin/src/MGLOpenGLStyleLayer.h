@@ -1,9 +1,11 @@
 #import <Foundation/Foundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import <QuartzCore/QuartzCore.h>
 
 #import "MGLFoundation.h"
 #import "MGLStyleValue.h"
 #import "MGLStyleLayer.h"
+#import "MGLGeometry.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -17,6 +19,7 @@ typedef struct MGLStyleLayerDrawingContext {
     CLLocationDirection direction;
     CGFloat pitch;
     CGFloat fieldOfView;
+    MGLMatrix4 projectionMatrix;
 } MGLStyleLayerDrawingContext;
 
 MGL_EXPORT

@@ -75,6 +75,7 @@
 
     <!-- Use TextureView-->
     <public name="mapbox_renderTextureMode" type="attr" />
+    <public name="mapbox_renderTextureTranslucentSurface" type="attr" />
 
     <public name="mapbox_enableTilePrefetch" type="attr" />
     <public name="mapbox_enableZMediaOverlay" type="attr" />

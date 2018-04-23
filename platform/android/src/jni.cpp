@@ -14,6 +14,7 @@
 #include "geojson/feature.hpp"
 #include "geojson/feature_collection.hpp"
 #include "geojson/geometry.hpp"
+#include "geojson/geometry_collection.hpp"
 #include "geojson/line_string.hpp"
 #include "geojson/multi_line_string.hpp"
 #include "geojson/multi_point.hpp"
@@ -40,17 +41,13 @@
 #include "offline/offline_region_error.hpp"
 #include "offline/offline_region_status.hpp"
 #include "style/transition_options.hpp"
-#include "style/functions/categorical_stops.hpp"
-#include "style/functions/exponential_stops.hpp"
-#include "style/functions/identity_stops.hpp"
-#include "style/functions/interval_stops.hpp"
-#include "style/functions/stop.hpp"
 #include "style/layers/layers.hpp"
 #include "style/sources/source.hpp"
 #include "style/light.hpp"
 #include "snapshotter/map_snapshotter.hpp"
 #include "snapshotter/map_snapshot.hpp"
 #include "text/local_glyph_rasterizer_jni.hpp"
+#include "java/lang.hpp"
 
 namespace mbgl {
 namespace android {
@@ -116,11 +113,17 @@ void registerNatives(JavaVM *vm) {
     java::util::registerNative(env);
     PointF::registerNative(env);
     RectF::registerNative(env);
+    java::lang::Number::registerNative(env);
+    java::lang::Float::registerNative(env);
+    java::lang::Boolean::registerNative(env);
+    java::lang::Double::registerNative(env);
+    java::lang::Long::registerNative(env);
 
     // GeoJSON
     geojson::Feature::registerNative(env);
     geojson::FeatureCollection::registerNative(env);
     geojson::Geometry::registerNative(env);
+    geojson::GeometryCollection::registerNative(env);
     geojson::LineString::registerNative(env);
     geojson::MultiLineString::registerNative(env);
     geojson::MultiPoint::registerNative(env);
@@ -163,11 +166,6 @@ void registerNatives(JavaVM *vm) {
     Source::registerNative(env);
     Light::registerNative(env);
     Position::registerNative(env);
-    Stop::registerNative(env);
-    CategoricalStops::registerNative(env);
-    ExponentialStops::registerNative(env);
-    IdentityStops::registerNative(env);
-    IntervalStops::registerNative(env);
 
     // Map
     CameraPosition::registerNative(env);

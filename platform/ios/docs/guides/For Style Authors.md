@@ -127,21 +127,22 @@ source object is a member of one of the following subclasses of `MGLSource`:
 
 In style JSON | In the SDK
 --------------|-----------
+`vector`      | `MGLVectorTileSource`
+`raster`      | `MGLRasterTileSource`
+`raster-dem`  | `MGLRasterDEMSource`
 `geojson`     | `MGLShapeSource`
-`raster`      | `MGLRasterSource`
-`vector`      | `MGLVectorSource`
 `image`       | `MGLImageSource`
 
 `canvas` and `video` sources are not supported.
 
 ### Tile sources
 
-Raster and vector sources may be defined in TileJSON configuration files. This
-SDK supports the properties defined in the style specification, which are a
+Raster and vector tile sources may be defined in TileJSON configuration files.
+This SDK supports the properties defined in the style specification, which are a
 subset of the keys defined in version 2.1.0 of the
 [TileJSON](https://github.com/mapbox/tilejson-spec/tree/master/2.1.0)
 specification. As an alternative to authoring a custom TileJSON file, you may
-supply various tile source options when creating a raster or vector source.
+supply various tile source options when creating a raster or vector tile source.
 These options are detailed in the `MGLTileSourceOption` documentation:
 
 In style JSON | In TileJSON   | In the SDK
@@ -311,6 +312,11 @@ defined by the style specification.
 
 ### Expression operators
 
+Many expression operators defined in the style specification have corresponding
+symbols to be used with the `+[NSExpression expressionWithFormat:]`,
+`+[NSExpression expressionForFunction:arguments:]`, or
+`+[NSExpression expressionForFunction:selectorName:arguments:]` method:
+
 In style specification | Method, function, or predicate type | Format string syntax
 -----------------------|-------------------------------------|---------------------
 `array`                | |
@@ -320,15 +326,15 @@ In style specification | Method, function, or predicate type | Format string syn
 `string`               | |
 `to-boolean`           | `boolValue` |
 `to-color`             | |
-`to-number`            | `mgl_numberWithFallbackValues:` |
-`to-string`            | `stringValue` |
+`to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
+`to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
-`geometry-type`        | |
-`id`                   | |
-`properties`           | |
-`at`                   | |
+`geometry-type`        | `NSExpression.geometryTypeVariableExpression` | `$geometryType`
+`id`                   | `NSExpression.featureIdentifierVariableExpression` | `$featureIdentifier`
+`properties`           | `NSExpression.featureAttributesVariableExpression` | `$featureAttributes`
+`at`                   | `objectFrom:withIndex:` | `array[n]`
 `get`                  | `+[NSExpression expressionForKeyPath:]` | Key path
-`has`                  | |
+`has`                  | `mgl_does:have:` | `mgl_does:have:(self, 'key')`
 `length`               | `count:` | `count({1, 2, 2, 3, 4, 7, 9})`
 `!`                    | `NSNotPredicateType` | `NOT (p0 OR … OR pn)`
 `!=`                   | `NSNotEqualToPredicateOperatorType` | `key != value`
@@ -339,17 +345,16 @@ In style specification | Method, function, or predicate type | Format string syn
 `>=`                   | `NSGreaterThanOrEqualToPredicateOperatorType` | `key >= value`
 `all`                  | `NSAndPredicateType` | `p0 AND … AND pn`
 `any`                  | `NSOrPredicateType` | `p0 OR … OR pn`
-`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` | `TERNARY(condition, trueExpression, falseExpression)`
-`coalesce`             | |
-`match`                | |
-`interpolate`          | `mgl_interpolateWithCurveType:parameters:stops:` |
-`step`                 | `mgl_stepWithMinimum:stops:` |
-`let`                  | `mgl_expressionWithContext:` |
+`case`                 | `+[NSExpression expressionForConditional:trueExpression:falseExpression:]` or `MGL_IF` or `+[NSExpression mgl_expressionForConditional:trueExpression:falseExpresssion:]` | `TERNARY(1 = 2, YES, NO)` or `MGL_IF(1 = 2, YES, 2 = 2, YES, NO)`
+`coalesce`             | `mgl_coalesce:` | `mgl_coalesce({x, y, z})`
+`match`                | `MGL_MATCH` or `+[NSExpression mgl_expressionForMatchingExpression:inDictionary:defaultExpression:]` | `MGL_MATCH(x, 0, 'zero match', 1, 'one match', 'two match', 'default')`
+`interpolate`          | `mgl_interpolate:withCurveType:parameters:stops:` or `+[NSExpression mgl_expressionForInterpolatingExpression:withCurveType:parameters:stops:]` |
+`step`                 | `mgl_step:withMinimum:stops:` or `+[NSExpression mgl_expressionForSteppingExpression:fromExpression:stops:]` |
+`let`                  | `mgl_expressionWithContext:` | `MGL_LET('ios', 11, 'macos', 10.13, $ios + $macos)`
 `var`                  | `+[NSExpression expressionForVariable:]` | `$variable`
-`concat`               | `stringByAppendingString:` |
+`concat`               | `mgl_join:` or `-[NSExpression mgl_expressionByAppendingExpression:]` | `mgl_join({'Old', ' ', 'MacDonald'})`
 `downcase`             | `lowercase:` | `lowercase('DOWNTOWN')`
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
-
 `rgb`                  | `+[UIColor colorWithRed:green:blue:alpha:]` |
 `rgba`                 | `+[UIColor colorWithRed:green:blue:alpha:]` |
 `to-rgba`              | |
@@ -359,27 +364,34 @@ In style specification | Method, function, or predicate type | Format string syn
 `%`                    | `modulus:by:` |
 `^`                    | `raise:toPower:` | `2 ** 2`
 `+`                    | `add:to:` | `1 + 2`
-`acos`                 | |
-`asin`                 | |
-`atan`                 | |
-`cos`                  | |
+`abs`                  | `abs:` | `abs(-1)`
+`acos`                 | `mgl_acos:` | `mgl_acos(1)`
+`asin`                 | `mgl_asin:` | `mgl_asin(0)`
+`atan`                 | `mgl_atan:` | `mgl_atan(20)`
+`ceil`                 | `ceiling:` | `ceiling(0.99999)`
+`cos`                  | `mgl_cos:` | `mgl_cos(0)`
 `e`                    | | `%@` representing `NSNumber` containing `M_E`
+`floor`                | `floor:` | `floor(-0.99999)`
 `ln`                   | `ln:` | `ln(2)`
 `ln2`                  | | `%@` representing `NSNumber` containing `M_LN2`
 `log10`                | `log:` | `log(1)`
-`log2`                 | |
+`log2`                 | `mgl_log2:` | `mgl_log2(1024)`
 `max`                  | `max:` | `max({1, 2, 2, 3, 4, 7, 9})`
 `min`                  | `min:` | `min({1, 2, 2, 3, 4, 7, 9})`
 `pi`                   | | `%@` representing `NSNumber` containing `M_PI`
-`sin`                  | |
+`round`                | `mgl_round:` | `mgl_round(1.5)`
+`sin`                  | `mgl_sin:` | `mgl_sin(0)`
 `sqrt`                 | `sqrt:` | `sqrt(2)`
-`tan`                  | |
-`zoom`                 | | `$zoom`
-`heatmap-density`      | | `$heatmapDensity`
+`tan`                  | `mgl_tan:` | `mgl_tan(0)`
+`zoom`                 | `NSExpression.zoomLevelVariableExpression` | `$zoom`
+`heatmap-density`      | `NSExpression.heatmapDensityVariableExpression` | `$heatmapDensity`
+
+For operators that have no corresponding `NSExpression` symbol, use the
+`MGL_FUNCTION()` format string syntax.
 
 ## Filtering sources
 
-You can filter a shape or vector source by setting the
+You can filter a shape or vector tile source by setting the
 `MGLVectorStyleLayer.predicate` property to an `NSPredicate` object. Below is a
 table of style JSON operators and the corresponding operators used in the
 predicate format string:

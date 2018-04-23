@@ -30,15 +30,15 @@ public:
             IdentityStops<T>>>;
 
     SourceFunction(std::unique_ptr<expression::Expression> expression_)
-        : expression(std::move(expression_))
+        : isExpression(true),
+          expression(std::move(expression_))
     {
         assert(expression::isZoomConstant(*expression));
         assert(!expression::isFeatureConstant(*expression));
     }
     
-    SourceFunction(std::string property_, Stops stops_, optional<T> defaultValue_ = {})
-        : property(std::move(property_)),
-          stops(std::move(stops_)),
+    SourceFunction(const std::string& property, const Stops& stops, optional<T> defaultValue_ = {})
+        : isExpression(false),
           defaultValue(std::move(defaultValue_)),
           expression(stops.match([&] (const IdentityStops<T>&) {
               return expression::Convert::fromIdentityFunction(expression::valueTypeToExpressionType<T>(), property);
@@ -67,15 +67,12 @@ public:
     }
 
     bool useIntegerZoom = false;
+    bool isExpression;
 
     const expression::Expression& getExpression() const { return *expression; }
 
-    // retained for compatibility with pre-expression function API
-    std::string property;
-    Stops stops;
-    optional<T> defaultValue;
-
 private:
+    optional<T> defaultValue;
     std::shared_ptr<expression::Expression> expression;
 };
 

@@ -6,20 +6,8 @@ namespace mbgl {
 namespace style {
 
 CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerContextLostFunction contextLost,
-                         CustomLayerDeinitializeFunction deinit,
-                         void* context)
-        : Layer(makeMutable<Impl>(layerID, init, render, contextLost, deinit, context)) {
-}
-
-CustomLayer::CustomLayer(const std::string& layerID,
-                         CustomLayerInitializeFunction init,
-                         CustomLayerRenderFunction render,
-                         CustomLayerDeinitializeFunction deinit,
-                         void* context)
-    : Layer(makeMutable<Impl>(layerID, init, render, nullptr, deinit, context)) {
+                         std::unique_ptr<CustomLayerHost> host)
+    : Layer(makeMutable<Impl>(layerID, std::move(host))) {
 }
 
 CustomLayer::~CustomLayer() = default;

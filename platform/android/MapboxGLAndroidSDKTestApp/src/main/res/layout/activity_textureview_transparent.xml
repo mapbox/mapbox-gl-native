@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.design.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/coordinator_layout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="@null"/>
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@+id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:mapbox_cameraTargetLat="48.507879"
+        app:mapbox_cameraTargetLng="8.363795"
+        app:mapbox_cameraZoom="2"
+        app:mapbox_renderTextureMode="true"
+        app:mapbox_renderTextureTranslucentSurface="true"
+        app:mapbox_styleUrl="mapbox://styles/agerace-globant/cja02de7193b02suvy4gpbt2c"/>
+
+</android.support.design.widget.CoordinatorLayout>
+

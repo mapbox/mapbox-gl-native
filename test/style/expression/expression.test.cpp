@@ -49,7 +49,7 @@ TEST_P(ExpressionEqualityTest, ExpressionEquality) {
         assert(!document.HasParseError());
         const JSValue* expression = &document;
         expression::ParsingContext ctx;
-        expression::ParseResult parsed = ctx.parse(conversion::Convertible(expression));
+        expression::ParseResult parsed = ctx.parseExpression(conversion::Convertible(expression));
         if (!parsed) {
             error_ = ctx.getErrors().size() > 0 ? ctx.getErrors()[0].message : "failed to parse";
         };

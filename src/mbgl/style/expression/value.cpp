@@ -106,12 +106,13 @@ Value ValueConverter<mbgl::Value>::toExpressionValue(const mbgl::Value& value) {
 mbgl::Value ValueConverter<mbgl::Value>::fromExpressionValue(const Value& value) {
     return value.match(
         [&](const Color& color)->mbgl::Value {
+            std::array<double, 4> array = color.toArray();
             return std::vector<mbgl::Value>{
                 std::string("rgba"),
-                double(255 * color.r / color.a),
-                double(255 * color.g / color.a),
-                double(255 * color.b / color.a),
-                double(color.a)
+                array[0],
+                array[1],
+                array[2],
+                array[3],
             };
         },
         [&](const std::vector<Value>& values)->mbgl::Value {

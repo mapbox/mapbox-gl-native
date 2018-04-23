@@ -39,7 +39,14 @@ NS_ASSUME_NONNULL_BEGIN
  Presents a callout view by adding it to `view` and pointing at the given rect
  of `view`’s bounds. Constrains the callout to the bounds of the given view.
  */
-- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated;
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToView:(UIView *)constrainedView animated:(BOOL)animated __attribute__((unavailable("Use -presentCalloutFromRect:inView:constrainedToRect:animated: instead.")));
+
+
+/**
+ Presents a callout view by adding it to `view` and pointing at the given rect
+ of `view`’s bounds. Constrains the callout to the rect in the space of `view`.
+ */
+- (void)presentCalloutFromRect:(CGRect)rect inView:(UIView *)view constrainedToRect:(CGRect)constrainedRect animated:(BOOL)animated;
 
 /**
  Dismisses the callout view.
@@ -47,6 +54,24 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)dismissCalloutAnimated:(BOOL)animated;
 
 @optional
+
+/**
+ If implemented, should provide margins to expand the rect the callout is presented from.
+
+ These are used to determine positioning. Currently only the top and bottom properties of the return
+ value are used. For example, `{ .top = -50.0, .left = -10.0, .bottom = 0.0, .right = -10.0 }` indicates
+ a 50 point margin above the presentation origin rect (and 10 point margins to the left and the right)
+ in which the callout is assumed to be displayed.
+
+ There are no assumed defaults for these margins, as they should be calculated from the callout that
+ is to be presented. For example, `SMCalloutView` generates the top margin from the callout height, but
+ the left and right margins from a minimum width that the callout should have.
+
+ @param rect Rect that the callout is presented from. This should be the same as the one passed in
+ `-[MGLCalloutView presentCalloutFromRect:inView:constrainedToRect:animated:]`
+ @return `UIEdgeInsets` representing the margins. Values should be negative.
+ */
+- (UIEdgeInsets)marginInsetsHintForPresentationFromRect:(CGRect)rect NS_SWIFT_NAME(marginInsetsHintForPresentation(from:));
 
 /**
  A Boolean value indicating whether the callout view should be anchored to

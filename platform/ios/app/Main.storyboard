@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="12121" systemVersion="16G8c" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="13771" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="PSe-Ot-7Ff">
     <device id="retina4_7" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12089"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="13772"/>
         <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="Constraints with non-1.0 multipliers" minToolsVersion="5.1"/>
         <capability name="Navigation items with more than one left or right bar item" minToolsVersion="7.0"/>
@@ -26,40 +26,44 @@
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="kNe-zV-9ha" customClass="MGLMapView">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                                <subviews>
+                                    <button hidden="YES" opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
+                                        <rect key="frame" x="8" y="102" width="40" height="20"/>
+                                        <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
+                                        <accessibility key="accessibilityConfiguration">
+                                            <accessibilityTraits key="traits" button="YES" notEnabled="YES"/>
+                                        </accessibility>
+                                        <constraints>
+                                            <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="viz-kn-dfK"/>
+                                            <constraint firstAttribute="height" constant="20" id="zSU-Mb-f1v"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <inset key="contentEdgeInsets" minX="4" minY="2" maxX="4" maxY="2"/>
+                                        <userDefinedRuntimeAttributes>
+                                            <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                                                <integer key="value" value="2"/>
+                                            </userDefinedRuntimeAttribute>
+                                        </userDefinedRuntimeAttributes>
+                                    </button>
+                                </subviews>
                                 <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <gestureRecognizers/>
+                                <constraints>
+                                    <constraint firstItem="58y-pX-YyB" firstAttribute="top" secondItem="kNe-zV-9ha" secondAttribute="topMargin" constant="30" id="89S-qk-mPR"/>
+                                    <constraint firstItem="58y-pX-YyB" firstAttribute="leading" secondItem="kNe-zV-9ha" secondAttribute="leadingMargin" id="cXU-Qh-ilW"/>
+                                    <constraint firstAttribute="trailing" relation="greaterThanOrEqual" secondItem="58y-pX-YyB" secondAttribute="trailing" id="txU-Gp-2du"/>
+                                </constraints>
                                 <connections>
                                     <outlet property="delegate" destination="WaX-pd-UZQ" id="za0-3B-qR6"/>
                                     <outletCollection property="gestureRecognizers" destination="lfd-mn-7en" appends="YES" id="0PH-gH-GRm"/>
                                 </connections>
                             </view>
-                            <button opaque="NO" userInteractionEnabled="NO" alpha="0.69999999999999996" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="58y-pX-YyB">
-                                <rect key="frame" x="319" y="606" width="40" height="21"/>
-                                <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="calibratedRGB"/>
-                                <accessibility key="accessibilityConfiguration">
-                                    <accessibilityTraits key="traits" button="YES" notEnabled="YES"/>
-                                </accessibility>
-                                <constraints>
-                                    <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="40" id="OL2-l5-I2f"/>
-                                    <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="20" id="xHg-ye-wzT"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                <inset key="contentEdgeInsets" minX="4" minY="2" maxX="4" maxY="2"/>
-                                <userDefinedRuntimeAttributes>
-                                    <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
-                                        <integer key="value" value="2"/>
-                                    </userDefinedRuntimeAttribute>
-                                </userDefinedRuntimeAttributes>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="kNe-zV-9ha" firstAttribute="leading" secondItem="Z9X-fc-PUC" secondAttribute="leading" id="53e-Tz-QxF"/>
                             <constraint firstItem="kNe-zV-9ha" firstAttribute="bottom" secondItem="m8o-i7-QIy" secondAttribute="top" id="Etp-BC-E1N"/>
                             <constraint firstAttribute="trailing" secondItem="kNe-zV-9ha" secondAttribute="trailing" id="MGr-8G-VEb"/>
-                            <constraint firstItem="58y-pX-YyB" firstAttribute="trailing" secondItem="Z9X-fc-PUC" secondAttribute="trailingMargin" id="O3a-bR-boI"/>
-                            <constraint firstItem="58y-pX-YyB" firstAttribute="leading" relation="greaterThanOrEqual" secondItem="Z9X-fc-PUC" secondAttribute="leadingMargin" id="ceH-yz-ewY"/>
-                            <constraint firstItem="m8o-i7-QIy" firstAttribute="top" secondItem="58y-pX-YyB" secondAttribute="bottom" constant="40" id="cjh-ZS-Mv4"/>
                             <constraint firstItem="kNe-zV-9ha" firstAttribute="top" secondItem="Z9X-fc-PUC" secondAttribute="top" id="qMm-e9-jxH"/>
                         </constraints>
                     </view>
@@ -133,14 +137,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Inactive Offline Pack" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="JtH-Ce-MI5">
-                                            <rect key="frame" x="15" y="6" width="174.5" height="19.5"/>
+                                            <rect key="frame" x="16" y="6" width="174.5" height="19.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="456 resources (789 MB)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="tTJ-jv-U9v">
-                                            <rect key="frame" x="15" y="25.5" width="128" height="13.5"/>
+                                            <rect key="frame" x="16" y="25.5" width="128.5" height="13.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -157,14 +161,14 @@
                                     <autoresizingMask key="autoresizingMask"/>
                                     <subviews>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="My Active Offline Pack" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="9ZK-gS-wJ4">
-                                            <rect key="frame" x="15" y="6" width="163" height="19.5"/>
+                                            <rect key="frame" x="16" y="6" width="163" height="19.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="16"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Downloading 123 of 456 resources… (789 MB downloaded)" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="0xK-p8-Mmh">
-                                            <rect key="frame" x="15" y="25.5" width="310.5" height="13.5"/>
+                                            <rect key="frame" x="16" y="25.5" width="311" height="13.5"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <fontDescription key="fontDescription" type="system" pointSize="11"/>
                                             <color key="textColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -201,7 +205,7 @@
                 <navigationController automaticallyAdjustsScrollViewInsets="NO" id="PSe-Ot-7Ff" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="ONr-CS-J5X">
-                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <rect key="frame" x="0.0" y="20" width="375" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>

@@ -169,12 +169,12 @@ MGL_EXPORT
  value of this property is `NO` or the map’s pitch is zero, the annotation view
  remains the same size regardless of its position on-screen.
 
- The default value of this property is `YES`. Set this property to `NO` if the
- view’s legibility is important.
+ The default value of this property is `NO`. Keep this property set to `NO` if
+ the view’s legibility is important.
 
  @note Scaling many on-screen annotation views can contribute to poor map
-    performance. Consider disabling this property if your use case involves
-    hundreds or thousands of annotation views.
+    performance. Consider keeping this property disabled if your use case
+    involves hundreds or thousands of annotation views.
  */
 @property (nonatomic, assign) BOOL scalesWithViewingDistance;
 

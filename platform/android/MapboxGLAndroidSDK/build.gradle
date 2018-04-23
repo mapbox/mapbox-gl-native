@@ -8,11 +8,6 @@ dependencies {
     implementation dependenciesList.supportFragmentV4
     implementation dependenciesList.timber
     implementation dependenciesList.okhttp3
-    compileOnly(dependenciesList.lost) {
-        exclude group: 'com.google.guava'
-        exclude group: 'com.android.support'
-    }
-    testImplementation dependenciesList.lost
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
@@ -111,8 +106,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
     }
 
     lintOptions {

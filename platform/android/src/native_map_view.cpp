@@ -288,13 +288,15 @@ void NativeMapView::setLatLng(jni::JNIEnv&, jni::jdouble latitude, jni::jdouble 
     map->setLatLng(mbgl::LatLng(latitude, longitude), insets, mbgl::AnimationOptions{mbgl::Milliseconds(duration)});
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds) {
-    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), insets));
+jni::Object<CameraPosition> NativeMapView::getCameraForLatLngBounds(jni::JNIEnv& env, jni::Object<LatLngBounds> jBounds, double top, double left, double bottom, double right) {
+    mbgl::EdgeInsets padding = {top, left, bottom, right};
+    return CameraPosition::New(env, map->cameraForLatLngBounds(mbgl::android::LatLngBounds::getLatLngBounds(env, jBounds), padding));
 }
 
-jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double bearing) {
+jni::Object<CameraPosition> NativeMapView::getCameraForGeometry(jni::JNIEnv& env, jni::Object<geojson::Geometry> jGeometry, double bearing, double top, double left, double bottom, double right) {
     auto geometry = geojson::Geometry::convert(env, jGeometry);
-    return CameraPosition::New(env, map->cameraForGeometry(geometry, insets, bearing));
+    mbgl::EdgeInsets padding = {top, left, bottom, right};
+    return CameraPosition::New(env, map->cameraForGeometry(geometry, padding, bearing));
 }
 
 void NativeMapView::setReachability(jni::JNIEnv&, jni::jboolean reachable) {
@@ -893,16 +895,9 @@ void NativeMapView::removeSource(JNIEnv& env, jni::Object<Source> obj, jlong sou
     source->removeFromMap(env, obj, *map);
 }
 
-void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::jint w, jni::jint h, jni::jfloat scale, jni::Array<jbyte> pixels) {
-    jni::NullCheck(env, &pixels);
-    std::size_t size = pixels.Length(env);
-
-    mbgl::PremultipliedImage premultipliedImage({ static_cast<uint32_t>(w), static_cast<uint32_t>(h) });
-    if (premultipliedImage.bytes() != uint32_t(size)) {
-        throw mbgl::util::SpriteImageException("Sprite image pixel count mismatch");
-    }
-
-    jni::GetArrayRegion(env, *pixels, 0, size, reinterpret_cast<jbyte*>(premultipliedImage.data.get()));
+void NativeMapView::addImage(JNIEnv& env, jni::String name, jni::Object<Bitmap> bitmap, jni::jfloat scale) {
+    jni::NullCheck(env, &bitmap);
+    mbgl::PremultipliedImage premultipliedImage = Bitmap::GetImage(env, bitmap);
 
     map->getStyle().addImage(std::make_unique<mbgl::style::Image>(
         jni::Make<std::string>(env, name),

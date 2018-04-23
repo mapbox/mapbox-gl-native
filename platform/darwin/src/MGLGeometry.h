@@ -14,6 +14,24 @@ typedef struct __attribute__((objc_boxable)) MGLCoordinateSpan {
     CLLocationDegrees longitudeDelta;
 } MGLCoordinateSpan;
 
+/* Defines a point on the map in Mercator projection for a specific zoom level. */
+typedef struct __attribute__((objc_boxable)) MGLMapPoint {
+    /** X coordinate representing a longitude in Mercator projection. */
+    CGFloat x;
+    /** Y coordinate representing  a latitide in Mercator projection. */
+    CGFloat y;
+    /** Zoom level at which the X and Y coordinates are valid. */
+    CGFloat zoomLevel;
+} MGLMapPoint;
+
+/* Defines a 4x4 matrix. */
+typedef struct MGLMatrix4 {
+    double m00, m01, m02, m03;
+    double m10, m11, m12, m13;
+    double m20, m21, m22, m23;
+    double m30, m31, m32, m33;
+} MGLMatrix4;
+
 /**
  Creates a new `MGLCoordinateSpan` from the given latitudinal and longitudinal
  deltas.
@@ -23,6 +41,17 @@ NS_INLINE MGLCoordinateSpan MGLCoordinateSpanMake(CLLocationDegrees latitudeDelt
     span.latitudeDelta = latitudeDelta;
     span.longitudeDelta = longitudeDelta;
     return span;
+}
+
+/**
+ Creates a new `MGLMapPoint` from the given X and Y coordinates, and zoom level.
+ */
+NS_INLINE MGLMapPoint MGLMapPointMake(CGFloat x, CGFloat y, CGFloat zoomLevel) {
+    MGLMapPoint point;
+    point.x = x;
+    point.y = y;
+    point.zoomLevel = zoomLevel;
+    return point;
 }
 
 /**
@@ -180,5 +209,8 @@ NS_INLINE CGFloat MGLRadiansFromDegrees(CLLocationDegrees degrees) {
 NS_INLINE CLLocationDegrees MGLDegreesFromRadians(CGFloat radians) {
     return radians * 180 / M_PI;
 }
+
+/** Returns Mercator projection of a WGS84 coordinate at the specified zoom level. */
+extern MGL_EXPORT MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel);
 
 NS_ASSUME_NONNULL_END

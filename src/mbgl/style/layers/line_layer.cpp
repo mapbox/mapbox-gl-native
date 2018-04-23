@@ -82,12 +82,14 @@ void LineLayer::setMinZoom(float minZoom) {
     auto impl_ = mutableImpl();
     impl_->minZoom = minZoom;
     baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
 void LineLayer::setMaxZoom(float maxZoom) {
     auto impl_ = mutableImpl();
     impl_->maxZoom = maxZoom;
     baseImpl = std::move(impl_);
+    observer->onLayerChanged(*this);
 }
 
 // Layout properties

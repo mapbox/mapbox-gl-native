@@ -4,7 +4,7 @@
 #import "MGLFeature.h"
 
 #import "MGLGeometry_Private.h"
-#import "MGLVectorSource_Private.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import "NSBundle+MGLAdditions.h"
 #import "NSOrthography+MGLAdditions.h"
@@ -48,7 +48,7 @@
     if (self = [super initWithAccessibilityContainer:container]) {
         _feature = feature;
         
-        NSString *languageCode = [MGLVectorSource preferredMapboxStreetsLanguage];
+        NSString *languageCode = [MGLVectorTileSource preferredMapboxStreetsLanguage];
         NSString *nameAttribute = [NSString stringWithFormat:@"name_%@", languageCode];
         NSString *name = [feature attributeForKey:nameAttribute];
 

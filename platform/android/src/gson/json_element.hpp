@@ -13,6 +13,8 @@ class JsonElement : private mbgl::util::noncopyable {
 public:
     static constexpr auto Name() { return "com/google/gson/JsonElement"; };
 
+    static jni::Object<JsonElement> New(jni::JNIEnv&, const mapbox::geometry::value&);
+
     static mapbox::geometry::value convert(JNIEnv&, jni::Object<JsonElement>);
 
     static bool isJsonObject(JNIEnv&, jni::Object<JsonElement>);

@@ -34,19 +34,8 @@ void main() {
 // layer implementation because it is intended to reflect how someone using custom layers
 // might actually write their own implementation.
 
-class TestLayer {
+class TestLayer : public mbgl::style::CustomLayerHost {
 public:
-    ~TestLayer() {
-        if (program) {
-            MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
-            MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
-            MBGL_CHECK_ERROR(glDetachShader(program, fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteShader(vertexShader));
-            MBGL_CHECK_ERROR(glDeleteShader(fragmentShader));
-            MBGL_CHECK_ERROR(glDeleteProgram(program));
-        }
-    }
-
     void initialize() {
         program = MBGL_CHECK_ERROR(glCreateProgram());
         vertexShader = MBGL_CHECK_ERROR(glCreateShader(GL_VERTEX_SHADER));
@@ -67,12 +56,25 @@ public:
         MBGL_CHECK_ERROR(glBufferData(GL_ARRAY_BUFFER, 6 * sizeof(GLfloat), triangle, GL_STATIC_DRAW));
     }
 
-    void render() {
+    void render(const mbgl::style::CustomLayerRenderParameters&) {
         MBGL_CHECK_ERROR(glUseProgram(program));
         MBGL_CHECK_ERROR(glBindBuffer(GL_ARRAY_BUFFER, buffer));
         MBGL_CHECK_ERROR(glEnableVertexAttribArray(a_pos));
         MBGL_CHECK_ERROR(glVertexAttribPointer(a_pos, 2, GL_FLOAT, GL_FALSE, 0, nullptr));
         MBGL_CHECK_ERROR(glDrawArrays(GL_TRIANGLE_STRIP, 0, 3));
+    }
+
+    void contextLost() {}
+
+    void deinitialize() {
+         if (program) {
+                MBGL_CHECK_ERROR(glDeleteBuffers(1, &buffer));
+                MBGL_CHECK_ERROR(glDetachShader(program, vertexShader));
+                MBGL_CHECK_ERROR(glDetachShader(program, fragmentShader));
+                MBGL_CHECK_ERROR(glDeleteShader(vertexShader));
+                MBGL_CHECK_ERROR(glDeleteShader(fragmentShader));
+                MBGL_CHECK_ERROR(glDeleteProgram(program));
+            }
     }
 
     GLuint program = 0;
@@ -95,15 +97,7 @@ TEST(CustomLayer, Basic) {
     map.setLatLngZoom({ 37.8, -122.5 }, 10);
     map.getStyle().addLayer(std::make_unique<CustomLayer>(
         "custom",
-        [] (void* context) {
-            reinterpret_cast<TestLayer*>(context)->initialize();
-        },
-        [] (void* context, const CustomLayerRenderParameters&) {
-            reinterpret_cast<TestLayer*>(context)->render();
-        },
-        [] (void* context) {
-            delete reinterpret_cast<TestLayer*>(context);
-        }, new TestLayer()));
+        std::make_unique<TestLayer>()));
 
     auto layer = std::make_unique<FillLayer>("landcover", "mapbox");
     layer->setSourceLayer("landcover");

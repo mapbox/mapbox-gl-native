@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.mapbox.mapboxsdk.testapp.activity.camera.GestureDetectorActivity">
+
+    <com.mapbox.mapboxsdk.maps.MapView
+        android:id="@id/mapView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:mapbox_cameraTargetLat="51.50325"
+        app:mapbox_cameraTargetLng="-0.11968"
+        app:mapbox_cameraZoom="15" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/alerts_recycler"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#97cdcfd3" />
+
+</RelativeLayout>

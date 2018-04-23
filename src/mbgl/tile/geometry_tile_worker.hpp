@@ -8,6 +8,8 @@
 #include <mbgl/util/optional.hpp>
 #include <mbgl/util/immutable.hpp>
 #include <mbgl/style/layer_impl.hpp>
+#include <mbgl/geometry/feature_index.hpp>
+#include <mbgl/renderer/bucket.hpp>
 
 #include <atomic>
 #include <memory>
@@ -43,8 +45,8 @@ public:
 
 private:
     void coalesced();
-    void redoLayout();
-    void attemptPlacement();
+    void parse();
+    void performSymbolLayout();
     
     void coalesce();
 
@@ -53,6 +55,7 @@ private:
    
     void symbolDependenciesChanged();
     bool hasPendingSymbolDependencies() const;
+    bool hasPendingParseResult() const;
 
     ActorRef<GeometryTileWorker> self;
     ActorRef<GeometryTile> parent;
@@ -62,12 +65,15 @@ private:
     const std::atomic<bool>& obsolete;
     const MapMode mode;
     const float pixelRatio;
+    
+    std::unique_ptr<FeatureIndex> featureIndex;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
 
     enum State {
         Idle,
         Coalescing,
-        NeedLayout,
-        NeedPlacement
+        NeedsParse,
+        NeedsSymbolLayout
     };
 
     State state = Idle;

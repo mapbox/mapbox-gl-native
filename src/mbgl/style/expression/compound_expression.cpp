@@ -6,6 +6,7 @@
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/platform.hpp>
+#include <cmath>
 
 namespace mbgl {
 namespace style {
@@ -209,12 +210,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         );
     });
     define("to-rgba", [](const Color& color) -> Result<std::array<double, 4>> {
-        return std::array<double, 4> {{ 
-            255 * color.r / color.a, 
-            255 * color.g / color.a,
-            255 * color.b / color.a, 
-            color.a 
-        }};
+        return color.toArray();
     });
     
     define("rgba", rgba);
@@ -269,13 +265,6 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             return Null;
         }
         return object.at(key);
-    });
-    
-    define("length", [](const std::vector<Value>& arr) -> Result<double> {
-        return arr.size();
-    });
-    define("length", [] (const std::string s) -> Result<double> {
-        return s.size();
     });
     
     define("properties", [](const EvaluationContext& params) -> Result<std::unordered_map<std::string, Value>> {
@@ -374,6 +363,11 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return result;
     });
     
+    define("round", [](double x) -> Result<double> { return std::round(x); });
+    define("floor", [](double x) -> Result<double> { return std::floor(x); });
+    define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
+    define("abs", [](double x) -> Result<double> { return std::abs(x); });
+
     define(">", [](double lhs, double rhs) -> Result<bool> { return lhs > rhs; });
     define(">", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs > rhs; });
     define(">=", [](double lhs, double rhs) -> Result<bool> { return lhs >= rhs; });

@@ -446,7 +446,6 @@ CameraOptions Map::cameraForGeometry(const Geometry<double>& geometry, const Edg
         latLngs.push_back({ pt.y, pt.x });
     });
     return cameraForLatLngs(latLngs, padding, bearing);
-
 }
 
 LatLngBounds Map::latLngBoundsForCamera(const CameraOptions& camera) const {

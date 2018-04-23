@@ -3,7 +3,7 @@
 @interface MGLAccountManager (Private)
 
 /// Returns the shared instance of the `MGLAccountManager` class.
-+ (instancetype)sharedManager;
+@property (class, nonatomic, readonly) MGLAccountManager *sharedManager;
 
 /// The current global access token.
 @property (atomic) NSString *accessToken;

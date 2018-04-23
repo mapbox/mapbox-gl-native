@@ -9,6 +9,9 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.geometry.VisibleRegion;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * A projection is used to translate between on screen location and geographic coordinates on
  * the surface of the Earth. Screen location is in screen pixels (not display pixels)
@@ -24,25 +27,17 @@ public class Projection {
     this.contentPadding = new int[] {0, 0, 0, 0};
   }
 
-  void setContentPadding(int[] contentPadding, int[] userLocationViewPadding) {
+  void setContentPadding(int[] contentPadding) {
     this.contentPadding = contentPadding;
-
-    int[] padding = new int[] {
-      contentPadding[0] + userLocationViewPadding[0],
-      contentPadding[1] + userLocationViewPadding[1],
-      contentPadding[2] + userLocationViewPadding[2],
-      contentPadding[3] + userLocationViewPadding[3]
-    };
-
-    nativeMapView.setContentPadding(padding);
+    nativeMapView.setContentPadding(contentPadding);
   }
 
   int[] getContentPadding() {
     return contentPadding;
   }
 
-  public void invalidateContentPadding(int[] userLocationViewPadding) {
-    setContentPadding(contentPadding, userLocationViewPadding);
+  public void invalidateContentPadding() {
+    setContentPadding(contentPadding);
   }
 
   /**
@@ -103,14 +98,49 @@ public class Projection {
     LatLng bottomRight = fromScreenLocation(new PointF(right, bottom));
     LatLng bottomLeft = fromScreenLocation(new PointF(left, bottom));
 
-    return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
-      new LatLngBounds.Builder()
-        .include(topRight)
-        .include(bottomLeft)
-        .include(bottomRight)
-        .include(topLeft)
-        .build()
-    );
+    // Map can be rotated, find correct LatLngBounds that encompasses the visible region (that might be rotated)
+    List<LatLng> boundsPoints = new ArrayList<>();
+    boundsPoints.add(topLeft);
+    boundsPoints.add(topRight);
+    boundsPoints.add(bottomRight);
+    boundsPoints.add(bottomLeft);
+
+    // order so that two most northern point are put first
+    while ((boundsPoints.get(0).getLatitude() < boundsPoints.get(3).getLatitude())
+      || (boundsPoints.get(1).getLatitude() < boundsPoints.get(2).getLatitude())) {
+      LatLng first = boundsPoints.remove(0);
+      boundsPoints.add(first);
+    }
+
+    double north = boundsPoints.get(0).getLatitude();
+    if (north < boundsPoints.get(1).getLatitude()) {
+      north = boundsPoints.get(1).getLatitude();
+    }
+
+    double south = boundsPoints.get(2).getLatitude();
+    if (south > boundsPoints.get(3).getLatitude()) {
+      south = boundsPoints.get(3).getLatitude();
+    }
+
+    double firstLon = boundsPoints.get(0).getLongitude();
+    double secondLon = boundsPoints.get(1).getLongitude();
+    double thridLon = boundsPoints.get(2).getLongitude();
+    double fourthLon = boundsPoints.get(3).getLongitude();
+
+    // if it does not go over the date line
+    if (secondLon > fourthLon && firstLon < thridLon)  {
+      return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
+        LatLngBounds.from(north,
+          secondLon > thridLon ? secondLon : thridLon,
+          south,
+          firstLon < fourthLon ? firstLon : fourthLon));
+    } else {
+      return new VisibleRegion(topLeft, topRight, bottomLeft, bottomRight,
+        LatLngBounds.from(north,
+          secondLon < thridLon ? secondLon : thridLon,
+          south,
+          firstLon > fourthLon ? firstLon : fourthLon));
+    }
   }
 
   /**

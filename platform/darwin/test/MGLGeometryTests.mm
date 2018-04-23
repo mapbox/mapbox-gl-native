@@ -163,4 +163,13 @@
                           [NSValue valueWithMGLCoordinate:quad.bottomRight],
                           @"Quad bottom right should be computed correctly.");
 }
+
+- (void)testMGLMapPoint {
+    MGLMapPoint point = MGLMapPointForCoordinate(CLLocationCoordinate2DMake(37.936, -80.425), 0.0);
+    
+    MGLMapPoint roundTrippedPoint = [NSValue valueWithMGLMapPoint:point].MGLMapPointValue;
+    XCTAssertEqual(point.x, roundTrippedPoint.x);
+    XCTAssertEqual(point.y, roundTrippedPoint.y);
+    XCTAssertEqual(point.zoomLevel, roundTrippedPoint.zoomLevel);
+}
 @end

@@ -26,13 +26,9 @@ const NSNotificationName MGLOfflinePackErrorNotification = @"MGLOfflinePackError
 const NSNotificationName MGLOfflinePackMaximumMapboxTilesReachedNotification = @"MGLOfflinePackMaximumMapboxTilesReached";
 
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyState = @"State";
-NSString * const MGLOfflinePackStateUserInfoKey = MGLOfflinePackUserInfoKeyState;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyProgress = @"Progress";
-NSString * const MGLOfflinePackProgressUserInfoKey = MGLOfflinePackUserInfoKeyProgress;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyError = @"Error";
-NSString * const MGLOfflinePackErrorUserInfoKey = MGLOfflinePackUserInfoKeyError;
 const MGLOfflinePackUserInfoKey MGLOfflinePackUserInfoKeyMaximumCount = @"MaximumCount";
-NSString * const MGLOfflinePackMaximumCountUserInfoKey = MGLOfflinePackUserInfoKeyMaximumCount;
 
 @interface MGLOfflineStorage ()
 

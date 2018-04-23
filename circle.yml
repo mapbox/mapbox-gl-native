@@ -32,8 +32,9 @@ workflows:
       - linux-gcc5-release-qt4
       - linux-gcc5-release-qt5
       - ios-debug
-      #- ios-sanitize-address
-      - ios-sanitize-thread
+      - ios-sanitize
+      - ios-sanitize-address
+      - ios-static-analyzer
       - ios-release:
           filters:
             tags:
@@ -150,8 +151,7 @@ step-library:
       run:
         name: Install macOS dependencies
         command: |
-          brew install cmake
-          brew install ccache
+          brew install cmake ccache
 
   - &install-macos-node4-dependencies
       run:
@@ -171,14 +171,12 @@ step-library:
       run:
         name: Install macOS Qt dependencies
         command: |
-          sudo chown -R $USER /usr/local
           brew install qt
           brew link qt --force
-          brew linkapps qt
           export HOMEBREW_QT5_CELLAR=$(brew --cellar qt)
           export HOMEBREW_QT5_VERSION=$(brew list --versions qt | rev | cut -d' ' -f1 | rev)
-          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
-          ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
+          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/mkspecs /usr/local/mkspecs
+          sudo ln -s $HOMEBREW_QT5_CELLAR/$HOMEBREW_QT5_VERSION/plugins /usr/local/plugins
 
   - &run-node-macos-tests
       run:
@@ -222,6 +220,18 @@ step-library:
       store_artifacts:
         path: mapbox-gl-js/test/integration/render-tests/index-recycle-map.html
         destination: render-tests
+
+  - &collect-xcode-build-logs
+      run:
+        name: Collect Xcode build logs
+        when: always
+        command: |
+          export XCODE_LOG_DIR=build/logs
+          mkdir -p $XCODE_LOG_DIR
+          cp build/*.log $XCODE_LOG_DIR
+  - &upload-xcode-build-logs
+      store_artifacts:
+        path: build/logs
 
 jobs:
   nitpick:
@@ -395,6 +405,9 @@ jobs:
       - run:
           name: Build package
           command: make apackage
+      - run:
+          name: Build release Test App
+          command: make android
       - *show-ccache-stats
       - *save-cache
       - *save-gradle-cache
@@ -409,7 +422,7 @@ jobs:
       - deploy:
           name: Publish to Maven
           command: |
-            if [ "${CIRCLE_BRANCH}" == "master" ]; then make run-android-upload-archives ; fi
+            if [ "${CIRCLE_BRANCH}" == "release-boba" ]; then make run-android-upload-archives ; fi
 
 
 # ------------------------------------------------------------------------------
@@ -706,7 +719,7 @@ jobs:
 # ------------------------------------------------------------------------------
   ios-debug:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -727,11 +740,34 @@ jobs:
           command: scripts/nitpick/generated-code.js darwin
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
+
+# ------------------------------------------------------------------------------
+  ios-sanitize:
+    macos:
+      xcode: "9.3.0"
+    environment:
+      BUILDTYPE: Debug
+      HOMEBREW_NO_AUTO_UPDATE: 1
+    steps:
+      - checkout
+      - *install-macos-dependencies
+      - *generate-cache-key
+      - *restore-cache
+      - *reset-ccache-stats
+      - run:
+          name: Build and run SDK unit tests with thread and undefined behavior sanitizers
+          command: make ios-sanitize
+      - *show-ccache-stats
+      - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-sanitize-address:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -746,11 +782,13 @@ jobs:
           command: make ios-sanitize-address
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
-  ios-sanitize-thread:
+  ios-static-analyzer:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -761,15 +799,17 @@ jobs:
       - *restore-cache
       - *reset-ccache-stats
       - run:
-          name: Build and run SDK unit tests with thread sanitizer
-          command: make ios-sanitize-thread
+          name: Build and run SDK unit tests with the static analyzer
+          command: make ios-static-analyzer
       - *show-ccache-stats
       - *save-cache
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   ios-release:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       HOMEBREW_NO_AUTO_UPDATE: 1
     shell: /bin/bash --login -eo pipefail
@@ -797,7 +837,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-debug:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: Debug
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -820,6 +860,8 @@ jobs:
       - store_artifacts:
           path: test/fixtures
           destination: test/fixtures
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-debug-qt5:
@@ -849,7 +891,7 @@ jobs:
 # ------------------------------------------------------------------------------
   macos-release-node4:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -866,11 +908,13 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs
 
 # ------------------------------------------------------------------------------
   macos-release-node6:
     macos:
-      xcode: "9.2.0"
+      xcode: "9.3.0"
     environment:
       BUILDTYPE: RelWithDebInfo
       HOMEBREW_NO_AUTO_UPDATE: 1
@@ -887,3 +931,5 @@ jobs:
       - *run-node-macos-tests
       - *publish-node-package
       - *upload-render-tests
+      - *collect-xcode-build-logs
+      - *upload-xcode-build-logs

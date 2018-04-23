@@ -110,8 +110,7 @@ PremultipliedImage Bitmap::GetImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap
     }
 
     if (info.format != ANDROID_BITMAP_FORMAT_RGBA_8888) {
-        // TODO: convert
-        throw std::runtime_error("bitmap decoding: bitmap format invalid");
+        bitmap = Bitmap::Copy(env, bitmap);
     }
 
     const PixelGuard guard(env, bitmap);
@@ -126,6 +125,13 @@ PremultipliedImage Bitmap::GetImage(jni::JNIEnv& env, jni::Object<Bitmap> bitmap
     }
 
     return { Size{ info.width, info.height }, std::move(pixels) };
+}
+
+jni::Object<Bitmap> Bitmap::Copy(jni::JNIEnv& env, jni::Object<Bitmap> bitmap) {
+    using Signature = jni::Object<Bitmap>(jni::Object<Config>, jni::jboolean);
+    auto static method = _class.GetMethod<Signature>(env, "copy");
+    auto config = Bitmap::Config::Create(env, Bitmap::Config::Value::ARGB_8888);
+    return bitmap.Call(env, method, config, (jni::jboolean) false);
 }
 
 } // namespace android

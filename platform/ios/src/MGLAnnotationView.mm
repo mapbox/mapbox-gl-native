@@ -45,7 +45,7 @@
     _lastAppliedScaleTransform = CATransform3DIdentity;
     _annotation = annotation;
     _reuseIdentifier = [reuseIdentifier copy];
-    _scalesWithViewingDistance = YES;
+    _scalesWithViewingDistance = NO;
     _enabled = YES;
 }
 
