@@ -1065,7 +1065,7 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (CLLocationDistance)metersPerPointAtLatitude:(CLLocationDegrees)latitude;
 
-- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((deprecated("Use -metersPerPointAtLatitude:.")));
+- (CLLocationDistance)metersPerPixelAtLatitude:(CLLocationDegrees)latitude __attribute__((unavailable("Use -metersPerPointAtLatitude:.")));
 
 #pragma mark Annotating the Map
 
