@@ -1,5 +1,6 @@
 #include <mbgl/test/util.hpp>
 
+#include <mbgl/style/expression/literal.hpp>
 #include <mbgl/style/conversion/stringify.hpp>
 #include <mbgl/style/types.hpp>
 #include <mbgl/style/layers/symbol_layer_properties.hpp>
@@ -75,10 +76,12 @@ TEST(Stringify, Value) {
 }
 
 TEST(Stringify, Filter) {
+    using namespace mbgl::style::expression;
+    
     ASSERT_EQ(stringify(Filter()), "null");
     
-    expression::ParsingContext context;
-    ASSERT_EQ(stringify(Filter(expression::createCompoundExpression("filter-==", std::make_unique<expression::Literal>(std::string("a")), std::make_unique<expression::Literal>(1.0), context))), "[\"filter-==\",\"a\",1.0]");
+    ParsingContext context;
+    ASSERT_EQ(stringify(Filter(createCompoundExpression("filter-==", createLiteral("a"), createLiteral(1.0), context))), "[\"filter-==\",\"a\",1.0]");
 }
 
 TEST(Stringify, CameraFunction) {
