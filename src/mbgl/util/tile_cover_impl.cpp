@@ -339,7 +339,7 @@ void TileCover::Impl::nextRow() {
 }
 
 bool TileCover::Impl::hasNext() const {
-    return (!tileXSpans.empty() && tileX < tileXSpans.front().second && tileY < (1 << zoom));
+    return (!tileXSpans.empty() && tileX < tileXSpans.front().second && tileY < (1u << zoom));
 }
 
 optional<UnwrappedTileID> TileCover::Impl::next() {
