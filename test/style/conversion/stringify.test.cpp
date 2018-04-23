@@ -74,11 +74,15 @@ TEST(Stringify, Value) {
     ASSERT_EQ(stringify(Value(1.2)), "1.2");
 }
 
-// TODO write new test
-//TEST(Stringify, Filter) {
-//    ASSERT_EQ(stringify(NullFilter()), "null");
-//    ASSERT_EQ(stringify(EqualsFilter { "a", 1.0 }), "[\"==\",\"a\",1.0]");
-//}
+TEST(Stringify, Filter) {
+    ASSERT_EQ(stringify(Filter()), "null");
+    
+    expression::ParsingContext context;
+    std::vector<std::unique_ptr<expression::Expression>> args;
+    args.push_back(std::make_unique<expression::Literal>(std::string("a")));
+    args.push_back(std::make_unique<expression::Literal>(1.0));
+    ASSERT_EQ(stringify(Filter { std::move(*expression::createCompoundExpression("filter-==", std::move(args), context)) }), "[\"filter-==\",\"a\",1.0]");
+}
 
 TEST(Stringify, CameraFunction) {
     ASSERT_EQ(stringify(CameraFunction<float>(ExponentialStops<float> { {{0, 1}}, 1 })),
