@@ -16,6 +16,10 @@ class Filter {
 public:
     std::shared_ptr<const expression::Expression> expression;
     
+    Filter() {}
+    
+    Filter(expression::ParseResult parseResult):expression(std::move(*parseResult)) {}
+    
     bool operator()(const expression::EvaluationContext& context) const;
 
     friend bool operator==(const Filter& lhs, const Filter& rhs) {
