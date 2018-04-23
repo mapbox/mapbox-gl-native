@@ -612,8 +612,8 @@ void Transform::startTransition(const CameraOptions& camera,
     };
 
     if (!isAnimated) {
-        auto update = transitionFrameFn;
-        auto finish = transitionFinishFn;
+        auto update = std::move(transitionFrameFn);
+        auto finish = std::move(transitionFinishFn);
 
         transitionFrameFn = nullptr;
         transitionFinishFn = nullptr;
@@ -640,13 +640,13 @@ void Transform::updateTransitions(const TimePoint& now) {
     // By temporarily nulling the `transitionFrameFn` (and then restoring it
     // after the temporary has been called) we stop this recursion.
 
-    auto transition = transitionFrameFn;
+    auto transition = std::move(transitionFrameFn);
     transitionFrameFn = nullptr;
 
     if (transition && transition(now)) {
         // If the transition indicates that it is complete, then we should call
         // the finish lambda (going via a temporary as above)
-        auto finish = transitionFinishFn;
+        auto finish = std::move(transitionFinishFn);
 
         transitionFinishFn = nullptr;
         transitionFrameFn = nullptr;
@@ -656,7 +656,7 @@ void Transform::updateTransitions(const TimePoint& now) {
         }
     }
     else {
-        transitionFrameFn = transition;
+        transitionFrameFn = std::move(transition);
     }
 }
 

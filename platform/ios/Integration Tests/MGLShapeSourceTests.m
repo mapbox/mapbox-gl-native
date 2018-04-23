@@ -63,11 +63,12 @@
         }
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:5.0];
+        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
+    // setCenterCoordinate is NOT animated here.
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(10.0, 10.0)];
-    [self waitForExpectations:@[expectation] timeout:30.0];
+    [self waitForExpectations:@[expectation] timeout:5.0];
 }
 
 - (void)testSettingShapeSourceToNilInRegionIsChanging {
@@ -111,11 +112,12 @@
         }
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:1.0];
+        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
+    // Should take MGLAnimationDuration seconds (0.3)
     [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(10.0, 10.0) animated:YES];
-    [self waitForExpectations:@[expectation] timeout:30.0];
+    [self waitForExpectations:@[expectation] timeout:1.0];
 }
 
 

@@ -1,4 +1,5 @@
 #import "MGLMapViewIntegrationTest.h"
+#import "../../darwin/src/MGLGeometry_Private.h"
 
 @interface MBCameraTransitionTests : MGLMapViewIntegrationTest
 @end
@@ -28,13 +29,13 @@
         }
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:5.0];
+        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
     [self.mapView setDirection:90 animated:YES];
 
     // loop, render, and wait
-    [self waitForExpectations:@[expectation] timeout:10.0];
+    [self waitForExpectations:@[expectation] timeout:1.5];
 
     XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
@@ -62,11 +63,11 @@
         }
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:5.0];
+        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
     [self.mapView setDirection:90 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:10.0];
+    [self waitForExpectations:@[expectation] timeout:1.5];
 
     XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
@@ -145,6 +146,7 @@
                                                @"center coordinate latitude should be at target");
 
                 // Now set another coordinate.
+                // Should take MGLAnimationDuration seconds (0.3s)
                 [mapView setCenterCoordinate:target2 animated:YES];
                 break;
             }
@@ -176,11 +178,12 @@
         delegateCallCount++;
 
         [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:5.0];
+        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
+    // Should take MGLAnimationDuration seconds (0.3)
     [self.mapView setCenterCoordinate:target zoomLevel:15.0 animated:YES];
-    [self waitForExpectations:@[expectation] timeout:10.0];
+    [self waitForExpectations:@[expectation] timeout:1.5];
 
     XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
@@ -193,9 +196,16 @@
     __block NSInteger delegateCallCount = 0;
 
     CLLocationCoordinate2D target = CLLocationCoordinate2DMake(40.0, 40.0);
-    CLLocationCoordinate2D target2 = CLLocationCoordinate2DMake(-40.0, -40.0);
+    CLLocationCoordinate2D target2 = CLLocationCoordinate2DMake(30.0, 30.0);
 
     __block BOOL runloop = YES;
+
+    NSTimeInterval stop0 = CACurrentMediaTime();
+    __block NSTimeInterval stop1 = 0.0;
+    __block NSTimeInterval stop2 = 0.0;
+
+    double zoomLevel = 5.0;
+    double altitude = MGLAltitudeForZoomLevel(zoomLevel, 0.0, target.latitude, self.mapView.frame.size);
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
@@ -210,6 +220,8 @@
         switch(delegateCallCount) {
             case 0:
             {
+                stop1 = CACurrentMediaTime();
+
                 // Our center coordinate should match our target (assuming we're not
                 // constrained by zoom level)
                 MGLTestAssertEqualWithAccuracy(strongSelf,
@@ -226,13 +238,15 @@
 
                 // Now set another coordinate.
                 MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:target2
-                                                                        fromDistance:10
+                                                                        fromDistance:altitude
                                                                                pitch:0.0
                                                                              heading:0.0];
 
+                // flyToCamera can take a while...
                 [mapView flyToCamera:camera completionHandler:^{
                     MGLTestAssert(strongSelf, !runloop, @"Completion block should be called after delegate method");
                     [expectation fulfill];
+                    stop2 = CACurrentMediaTime();
                 }];
                 break;
             }
@@ -265,14 +279,17 @@
         delegateCallCount++;
     };
 
-    [self.mapView setCenterCoordinate:target zoomLevel:15.0 animated:YES];
+    // Should take MGLAnimationDuration
+    [self.mapView setCenterCoordinate:target zoomLevel:zoomLevel animated:YES];
 
     // Run the loop, so the camera can fly to the new camera
     while (runloop) {
         [[NSRunLoop mainRunLoop] runMode:NSDefaultRunLoopMode beforeDate:[NSDate distantFuture]];
     }
+    [self waitForExpectations:@[expectation] timeout:0.5];
 
-    [self waitForExpectations:@[expectation] timeout:1.0];
+    NSLog(@"setCenterCoordinate: %0.4fs", stop1 - stop0);
+    NSLog(@"flyToCamera: %0.4fs", stop2 - stop1);
 
     XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
