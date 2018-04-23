@@ -640,7 +640,7 @@ void GLFWView::toggle3DExtrusions(bool visible) {
     extrusionLayer->setSourceLayer("building");
     extrusionLayer->setMinZoom(15.0f);
     
-    extrusionLayer->setFilter(Filter(createCompoundExpression("filter-==", "extrude", "true", ParsingContext())) });
+    extrusionLayer->setFilter(Filter(createCompoundExpression("filter-==", createLiteral("extrude"), createLiteral("true"), ParsingContext())) });
 
     auto colorFn = mbgl::style::SourceFunction<mbgl::Color> { "height",
         mbgl::style::ExponentialStops<mbgl::Color> {

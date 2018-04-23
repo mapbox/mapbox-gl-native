@@ -16,7 +16,7 @@ class Filter {
 public:
     std::shared_ptr<const expression::Expression> expression;
     
-    Filter() {}
+    Filter():expression({}) {}
     
     Filter(expression::ParseResult parseResult):expression(std::move(*parseResult)) {}
     
