@@ -13,6 +13,7 @@
 
 using namespace mbgl;
 using namespace mbgl::style;
+using namespace mbgl::style::expression;
 
 namespace {
 
@@ -65,24 +66,24 @@ TEST(Query, QueryRenderedFeaturesFilterLayer) {
     EXPECT_EQ(features4.size(), 1u);
 }
 
-// TODO write new tests
-//TEST(Query, QueryRenderedFeaturesFilter) {
-//    QueryTest test;
-//
-//    auto zz = test.map.pixelForLatLng({ 0, 0 });
-//
-//    const EqualsFilter eqFilter = { "key1", std::string("value1") };
-//    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{}, { eqFilter }});
-//    EXPECT_EQ(features1.size(), 1u);
-//
-//    const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
-//    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{{ "layer4" }}, { idNotEqFilter }});
-//    EXPECT_EQ(features2.size(), 0u);
-//
-//    const GreaterThanFilter gtFilter = { "key2", 1.0 };
-//    auto features3 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{ }, { gtFilter }});
-//    EXPECT_EQ(features3.size(), 1u);
-//}
+TEST(Query, QueryRenderedFeaturesFilter) {
+    QueryTest test;
+    ParsingContext context;
+
+    auto zz = test.map.pixelForLatLng({ 0, 0 });
+
+    const Filter eqFilter(createCompoundExpression("filter-==", createLiteral("key1"), createLiteral("value1"), context));
+    auto features1 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{}, { eqFilter }});
+    EXPECT_EQ(features1.size(), 1u);
+
+    const Filter idNotEqFilter(createCompoundExpression("!", std::move(*createCompoundExpression("filter-id-==", createLiteral("feature1"), context)), context));
+    auto features2 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{{ "layer4" }}, { idNotEqFilter }});
+    EXPECT_EQ(features2.size(), 0u);
+
+    const Filter gtFilter(createCompoundExpression("filter->", createLiteral("key2"), createLiteral(1.0), context));
+    auto features3 = test.frontend.getRenderer()->queryRenderedFeatures(zz, {{ }, { gtFilter }});
+    EXPECT_EQ(features3.size(), 1u);
+}
 
 TEST(Query, QuerySourceFeatures) {
     QueryTest test;
@@ -107,20 +108,20 @@ TEST(Query, QuerySourceFeaturesOptionValidation) {
     ASSERT_EQ(features.size(), 0u);
 }
 
-// TODO write new tests
-//TEST(Query, QuerySourceFeaturesFilter) {
-//    QueryTest test;
-//
-//    const EqualsFilter eqFilter = { "key1", std::string("value1") };
-//    auto features1 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { eqFilter }});
-//    EXPECT_EQ(features1.size(), 1u);
-//
-//    const IdentifierNotEqualsFilter idNotEqFilter = { std::string("feature1") };
-//    auto features2 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { idNotEqFilter }});
-//    EXPECT_EQ(features2.size(), 0u);
-//
-//    const GreaterThanFilter gtFilter = { "key2", 1.0 };
-//    auto features3 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { gtFilter }});
-//    EXPECT_EQ(features3.size(), 1u);
-//}
+TEST(Query, QuerySourceFeaturesFilter) {
+    QueryTest test;
+    ParsingContext context;
+
+    const Filter eqFilter(createCompoundExpression("filter-==", createLiteral("key1"), createLiteral("value1"), context));
+    auto features1 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { eqFilter }});
+    EXPECT_EQ(features1.size(), 1u);
+
+    const Filter idNotEqFilter(createCompoundExpression("!", std::move(*createCompoundExpression("filter-id-==", createLiteral("feature1"), context)), context));
+    auto features2 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { idNotEqFilter }});
+    EXPECT_EQ(features2.size(), 0u);
+
+    const Filter gtFilter(createCompoundExpression("filter->", createLiteral("key2"), createLiteral(1.0), context));
+    auto features3 = test.frontend.getRenderer()->querySourceFeatures("source4", {{}, { gtFilter }});
+    EXPECT_EQ(features3.size(), 1u);
+}
 

@@ -707,6 +707,10 @@ ParseResult createCompoundExpression(const Definition& definition,
     return ParseResult();
 }
     
+ParseResult createCompoundExpression(const std::string& name, ParsingContext& ctx) {
+    return createCompoundExpression(name, std::vector<std::unique_ptr<Expression>>(), ctx);
+}
+    
 ParseResult createCompoundExpression(const std::string& name,
                                      std::unique_ptr<Expression> arg1,
                                      ParsingContext& ctx) {

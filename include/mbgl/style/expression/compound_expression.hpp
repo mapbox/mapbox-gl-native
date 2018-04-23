@@ -141,6 +141,8 @@ ParseResult createCompoundExpression(const CompoundExpressionRegistry::Definitio
 ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx);
+    
+ParseResult createCompoundExpression(const std::string& name, ParsingContext& ctx);
 
 ParseResult createCompoundExpression(const std::string& name,
                                      std::unique_ptr<Expression> arg1,
