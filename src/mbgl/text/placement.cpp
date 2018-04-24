@@ -46,9 +46,10 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
     std::unordered_set<uint32_t> seenCrossTileIDs;
 
     for (RenderTile& renderTile : symbolLayer.renderTiles) {
-        if (!renderTile.tile.isRenderable() || !dynamic_cast<GeometryTile*>(&renderTile.tile)) {
+        if (!renderTile.tile.isRenderable()) {
             continue;
         }
+        assert(dynamic_cast<GeometryTile*>(&renderTile.tile));
         GeometryTile& geometryTile = static_cast<GeometryTile&>(renderTile.tile);
         
         
@@ -314,8 +315,9 @@ void Placement::updateBucketOpacities(SymbolBucket& bucket, std::set<uint32_t>& 
 
     bucket.updateOpacity();
     bucket.sortFeatures(state.getAngle());
-    if (retainedQueryData.find(bucket.bucketInstanceId) != retainedQueryData.end()) {
-        retainedQueryData.find(bucket.bucketInstanceId)->second.featureSortOrder = bucket.featureSortOrder;
+    auto retainedData = retainedQueryData.find(bucket.bucketInstanceId);
+    if (retainedData != retainedQueryData.end()) {
+        retainedData->second.featureSortOrder = bucket.featureSortOrder;
     }
 }
 
