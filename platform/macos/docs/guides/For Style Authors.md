@@ -318,7 +318,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `number`               | |
 `string`               | |
 `to-boolean`           | `boolValue` |
-`to-color`             | |
+`to-color`             | | `CAST(var, 'NScolor')`
 `to-number`            | `mgl_numberWithFallbackValues:` | `CAST(zipCode, 'NSNumber')`
 `to-string`            | `stringValue` | `CAST(ele, 'NSString')`
 `typeof`               | |
@@ -350,7 +350,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
 `rgb`                  | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
 `rgba`                 | `+[NSColor colorWithCalibratedRed:green:blue:alpha:]` |
-`to-rgba`              | | `CAST(var, 'UIColor')` or `CAST(var, 'NSColor')`
+`to-rgba`              | | `CAST(var, 'NSArray')`
 `-`                    | `from:subtract:` | `2 - 1`
 `*`                    | `multiply:by:` | `1 * 2`
 `/`                    | `divide:by:` | `1 / 2`
