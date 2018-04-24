@@ -410,6 +410,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   @UiThread
   public void onDestroy() {
     destroyed = true;
+    onMapChangedListeners.clear();
     mapCallback.clearOnMapReadyCallbacks();
 
     if (nativeMapView != null && hasSurface) {
