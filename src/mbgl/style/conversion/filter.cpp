@@ -88,17 +88,22 @@ std::unique_ptr<expression::Expression> createExpression(std::string op, std::un
     args.push_back(std::move(expression));
     return createExpression(op, std::move(args), error);
 }
-    
-std::unique_ptr<expression::Expression> convertLiteral(const Convertible& convertible) {
-    optional<mapbox::geometry::value> value = toValue(convertible);
-    expression::Value expressionValue = value ? expression::toExpressionValue(*value) : expression::Null;
-    return std::make_unique<expression::Literal>(expressionValue);
+
+std::unique_ptr<expression::Expression> convertLiteral(const Convertible& convertible, Error& error) {
+    expression::ParsingContext parsingContext;
+    expression::ParseResult parseResult = expression::Literal::parse(convertible, parsingContext);
+    if (parseResult) {
+        return std::move(*parseResult);
+    } else {
+        error = { parsingContext.getCombinedErrors() };
+        return {};
+    }
 }
 
-std::vector<std::unique_ptr<expression::Expression>> convertLiteralArray(const Convertible &input, std::size_t startIndex = 0) {
+std::vector<std::unique_ptr<expression::Expression>> convertLiteralArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
     std::vector<std::unique_ptr<expression::Expression>> output;
     for (std::size_t i = startIndex; i < arrayLength(input); i++) {
-        output.push_back(convertLiteral(arrayMember(input, i)));
+        output.push_back(convertLiteral(arrayMember(input, i), error));
     }
     return output;
 }
@@ -111,11 +116,11 @@ std::unique_ptr<expression::Expression> convertLegacyComparisonFilter(const Conv
         error = { "filter property must be a string" };
         return {};
     } else if (*property == "$type") {
-        return createExpression("filter-type-" + *op, convertLiteralArray(values, 2), error);
+        return createExpression("filter-type-" + *op, convertLiteralArray(values, error, 2), error);
     } else if (*property == "$id") {
-        return createExpression("filter-id-" + *op, convertLiteralArray(values, 2), error);
+        return createExpression("filter-id-" + *op, convertLiteralArray(values, error, 2), error);
     } else {
-        return createExpression("filter-" + *op, convertLiteralArray(values, 1), error);
+        return createExpression("filter-" + *op, convertLiteralArray(values, error, 1), error);
     }
 }
     
@@ -138,11 +143,11 @@ std::unique_ptr<expression::Expression> convertLegacyInFilter(const Convertible&
     } else if (arrayLength(values) == 0) {
         return std::make_unique<expression::Literal>(false);
     } else if (*property == "$type") {
-        return createExpression("filter-type-in", convertLiteralArray(values, 2), error);
+        return createExpression("filter-type-in", convertLiteralArray(values, error, 2), error);
     } else if (*property == "id") {
-        return createExpression("filter-id-in", convertLiteralArray(values, 2), error);
+        return createExpression("filter-id-in", convertLiteralArray(values, error, 2), error);
     } else {
-        return createExpression("filter-in", convertLiteralArray(values, 1), error);
+        return createExpression("filter-in", convertLiteralArray(values, error, 1), error);
     }
 }
 
