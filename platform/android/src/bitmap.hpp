@@ -43,6 +43,7 @@ public:
 
     static PremultipliedImage GetImage(jni::JNIEnv&, jni::Object<Bitmap>);
     static jni::Object<Bitmap> CreateBitmap(jni::JNIEnv&, const PremultipliedImage&);
+    static jni::Object<Bitmap> Copy(jni::JNIEnv&, jni::Object<Bitmap>);
 
 private:
     static jni::Class<Bitmap> _class;

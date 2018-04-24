@@ -68,7 +68,7 @@ MGL_EXPORT
     `-streetsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)streetsStyleURL;
+@property (class, nonatomic, readonly) NSURL *streetsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -83,13 +83,7 @@ MGL_EXPORT
  */
 + (NSURL *)streetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/blog/emerald-gl/">Mapbox Emerald</a> style.
-
- Emerald is a tactile style with subtle textures and dramatic hillshading.
- */
-+ (NSURL *)emeraldStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
++ (NSURL *)emeraldStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/emerald-v8”.")));
 
 /**
  Returns the URL to the current version of the
@@ -104,7 +98,7 @@ MGL_EXPORT
     `-outdoorsStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)outdoorsStyleURL;
+@property (class, nonatomic, readonly) NSURL *outdoorsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -128,7 +122,7 @@ MGL_EXPORT
     `-lightStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)lightStyleURL;
+@property (class, nonatomic, readonly) NSURL *lightStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -153,7 +147,7 @@ MGL_EXPORT
     `-darkStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)darkStyleURL;
+@property (class, nonatomic, readonly) NSURL *darkStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -178,7 +172,7 @@ MGL_EXPORT
     `-satelliteStyleURLWithVersion:` method instead. Such details may change
     significantly from version to version.
  */
-+ (NSURL *)satelliteStyleURL;
+@property (class, nonatomic, readonly) NSURL *satelliteStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -191,16 +185,8 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 8 of the
- <a href="https://www.mapbox.com/maps/satellite/">Mapbox Satellite Streets</a>
- style.
 
- Satellite Streets combines the high-resolution satellite and aerial imagery of
- Mapbox Satellite with unobtrusive labels and translucent roads from Mapbox
- Streets.
- */
-+ (NSURL *)hybridStyleURL __attribute__((deprecated("Use -satelliteStreetsStyleURL.")));
++ (NSURL *)hybridStyleURL __attribute__((unavailable("Use -satelliteStreetsStyleURL.")));
 
 /**
  Returns the URL to the current version of the
@@ -217,7 +203,7 @@ MGL_EXPORT
     `-satelliteStreetsStyleURLWithVersion:` method instead. Such details may
     change significantly from version to version.
  */
-+ (NSURL *)satelliteStreetsStyleURL;
+@property (class, nonatomic, readonly) NSURL *satelliteStreetsStyleURL;
 
 /**
  Returns the URL to the given version of the
@@ -232,39 +218,14 @@ MGL_EXPORT
  */
 + (NSURL *)satelliteStreetsStyleURLWithVersion:(NSInteger)version;
 
-/**
- Returns the URL to version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style.
 
- */
-+ (NSURL *)trafficDayStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
++ (NSURL *)trafficDayStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));
 
-/**
- Returns the URL to the given version of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Day</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
-+ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
++ (NSURL *)trafficDayStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-day-v2”.")));;
 
-/**
- Returns the URL to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style.
++ (NSURL *)trafficNightStyleURL __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
- */
-+ (NSURL *)trafficNightStyleURL __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
-
-/**
- Returns the URL to to the version 2 of the
- <a href="https://www.mapbox.com/blog/live-traffic-maps/">Mapbox Traffic Night</a>
- style as of publication.
- 
- @param version A specific version of the style.
- */
-+ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((deprecated("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
++ (NSURL *)trafficNightStyleURLWithVersion:(NSInteger)version __attribute__((unavailable("Create an NSURL object with the string “mapbox://styles/mapbox/traffic-night-v2”.")));
 
 #pragma mark Accessing Metadata About the Style
 
@@ -455,25 +416,14 @@ MGL_EXPORT
 
 #pragma mark Managing Style Classes
 
-/**
- Support for style classes has been removed. This property always returns an empty array.
- */
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
 
-/**
- Support for style classes has been removed. This method always returns NO.
- */
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
-/**
- Support for style classes has been removed. This method is a no-op.
- */
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-/**
- Support for style classes has been removed. This method is a no-op.
- */
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
+
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Managing a Style’s Images
 
@@ -532,17 +482,22 @@ MGL_EXPORT
 #pragma mark Localizing Map Content
 
 /**
- A Boolean value that determines whether the style attempts to localize labels in 
- the style into the system’s preferred language.
+ Attempts to localize labels in the style into the given locale.
  
- When this property is enabled, the style automatically modifies the text property 
- of any symbol style layer whose source is the 
- <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox 
- Streets source</a>. On iOS, the user can set the system’s preferred language in 
- Settings, General Settings, Language & Region. On macOS, the user can set the 
- system’s preferred language in the Language & Region pane of System Preferences.
+ This method automatically modifies the text property of any symbol style layer
+ in the style whose source is the
+ <a href="https://www.mapbox.com/vector-tiles/mapbox-streets-v7/#overview">Mapbox Streets source</a>.
+ On iOS, the user can set the system’s preferred language in Settings, General
+ Settings, Language & Region. On macOS, the user can set the system’s preferred
+ language in the Language & Region pane of System Preferences.
+ 
+ @param locale The locale into which labels should be localized. To use the
+    system’s preferred language, if supported, specify `nil`. To use the local
+    language, specify a locale with the identifier `mul`.
  */
-@property (nonatomic) BOOL localizesLabels;
+- (void)localizeLabelsIntoLocale:(nullable NSLocale *)locale;
+
+@property (nonatomic) BOOL localizesLabels __attribute__((unavailable("Use -localizeLabelsIntoLocale: instead.")));
 
 @end
 

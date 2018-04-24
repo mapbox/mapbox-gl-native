@@ -111,6 +111,14 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void zeroLongitudeSpan() {
+    latLngBounds = LatLngBounds.from(10, 10, -10, 10);
+    LatLngSpan latLngSpan = latLngBounds.getSpan();
+    assertEquals("LatLngSpan should be shortest distance", new LatLngSpan(20, 0),
+      latLngSpan);
+  }
+
+  @Test
   public void nearDateLineCenter1() {
     latLngBounds = LatLngBounds.from(10, -175, -10, 165);
     LatLng center = latLngBounds.getCenter();
@@ -145,6 +153,19 @@ public class LatLngBoundsTest {
     assertEquals("Center should match", new LatLng(0, 90), center);
   }
 
+  @Test
+  public void centerForBoundsWithSameLongitude() {
+    latLngBounds = LatLngBounds.from(10, 10, -10, 10);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(0, 10), center);
+  }
+
+  @Test
+  public void centerForBoundsWithSameLatitude() {
+    latLngBounds = LatLngBounds.from(10, 10, 10, -10);
+    LatLng center = latLngBounds.getCenter();
+    assertEquals("Center should match", new LatLng(10, 0), center);
+  }
 
   @Test
   public void center() {
@@ -194,6 +215,27 @@ public class LatLngBoundsTest {
       .build();
 
     assertEquals("LatLngBounds should match", latLngBounds1, latLngBounds2);
+  }
+
+  @Test
+  public void includesOrderDoesNotMatter() {
+    LatLngBounds sameLongitudeFirst = new LatLngBounds.Builder()
+      .include(new LatLng(50, 10))  // southWest
+      .include(new LatLng(60, 10))
+      .include(new LatLng(60, 20))  // northEast
+      .include(new LatLng(50, 20))
+      .include(new LatLng(50, 10))  // southWest again
+      .build();
+
+    LatLngBounds sameLatitudeFirst = new LatLngBounds.Builder()
+      .include(new LatLng(50, 20))
+      .include(new LatLng(50, 10))  // southWest
+      .include(new LatLng(60, 10))
+      .include(new LatLng(60, 20))  // northEast
+      .include(new LatLng(50, 20))
+      .build();
+
+    assertEquals(sameLatitudeFirst, sameLongitudeFirst);
   }
 
   @Test
@@ -336,6 +378,27 @@ public class LatLngBoundsTest {
         .include(LAT_LNG_NULL_ISLAND)
         .build());
   }
+
+  @Test
+  public void unionOverDateLine() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, 170))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, -170))
+      .include(new LatLng(-10, -160))
+      .build();
+
+    assertEquals("outer union should match",
+      latLngBounds1.union(latLngBounds2),
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+  }
+
 
   @Test
   public void northWest() {
@@ -495,5 +558,12 @@ public class LatLngBoundsTest {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("longitude must not be infinite");
     LatLngBounds.from(20, 20, 0, Double.POSITIVE_INFINITY);
+  }
+
+  @Test
+  public void testConstructorCheckLatSouthGreaterLatNorth() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("LatSouth cannot be less than latNorth");
+    LatLngBounds.from(0, 20, 20, 0);
   }
 }

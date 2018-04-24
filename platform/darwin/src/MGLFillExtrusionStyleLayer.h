@@ -29,9 +29,10 @@ typedef NS_ENUM(NSUInteger, MGLFillExtrusionTranslationAnchor) {
  extruded polygons on the map.
  
  Use a fill-extrusion style layer to configure the visual appearance of polygon
- or multipolygon features in vector tiles loaded by an `MGLVectorSource` object
- or `MGLPolygon`, `MGLPolygonFeature`, `MGLMultiPolygon`, or
- `MGLMultiPolygonFeature` instances in an `MGLShapeSource` object.
+ or multipolygon features. These features can come from vector tiles loaded by
+ an `MGLVectorTileSource` object, or they can be `MGLPolygon`,
+ `MGLPolygonFeature`, `MGLMultiPolygon`, or `MGLMultiPolygonFeature` instances
+ in an `MGLShapeSource` or `MGLComputedShapeSource` object.
 
  You can access an existing fill-extrusion style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -77,14 +78,14 @@ MGL_EXPORT
  This property is measured in meters.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `fillExtrusionHeight` is
  non-`nil`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -100,6 +101,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition fillExtrusionBaseTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The base color of this layer. The extrusion's surfaces will be shaded
  differently based on this color in combination with the `light` settings. If
@@ -123,6 +125,31 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *fillExtrusionColor;
+#else
+/**
+ The base color of this layer. The extrusion's surfaces will be shaded
+ differently based on this color in combination with the `light` settings. If
+ this color is specified with an alpha component, the alpha component will be
+ ignored; use `fillExtrusionOpacity` to set layer opacityco.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `fillExtrusionPattern` is set to
+ `nil`. Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *fillExtrusionColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `fillExtrusionColor` property.
@@ -137,11 +164,11 @@ MGL_EXPORT
  This property is measured in meters.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -162,11 +189,11 @@ MGL_EXPORT
  per-layer, not per-feature, basis, and data-driven styling is not available.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables

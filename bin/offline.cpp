@@ -21,6 +21,7 @@ int main(int argc, char *argv[]) {
     args::ValueFlag<std::string> tokenValue(argumentParser, "key", "Mapbox access token", {'t', "token"});
     args::ValueFlag<std::string> styleValue(argumentParser, "URL", "Map stylesheet", {'s', "style"});
     args::ValueFlag<std::string> outputValue(argumentParser, "file", "Output database file name", {'o', "output"});
+    args::ValueFlag<std::string> apiBaseValue(argumentParser, "URL", "API Base URL", {'a', "apiBaseURL"});
 
     args::ValueFlag<double> northValue(argumentParser, "degrees", "North latitude", {"north"});
     args::ValueFlag<double> westValue(argumentParser, "degrees", "West longitude", {"west"});
@@ -60,6 +61,8 @@ int main(int argc, char *argv[]) {
 
     const char* tokenEnv = getenv("MAPBOX_ACCESS_TOKEN");
     const std::string token = tokenValue ? args::get(tokenValue) : (tokenEnv ? tokenEnv : std::string());
+    
+    const std::string apiBaseURL = apiBaseValue ? args::get(apiBaseValue) : mbgl::util::API_BASE_URL;
 
     using namespace mbgl;
 
@@ -68,6 +71,7 @@ int main(int argc, char *argv[]) {
     std::unique_ptr<OfflineRegion> region;
 
     fileSource.setAccessToken(token);
+    fileSource.setAPIBaseURL(apiBaseURL);
 
     LatLngBounds boundingBox = LatLngBounds::hull(LatLng(north, west), LatLng(south, east));
     OfflineTilePyramidRegionDefinition definition(style, boundingBox, minZoom, maxZoom, pixelRatio);

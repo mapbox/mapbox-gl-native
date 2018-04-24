@@ -9,7 +9,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString *const MGLMapboxMetricsProfile;
 
-+ (nullable instancetype)sharedConfig;
+@property (class, nullable, nonatomic, readonly) MGLTelemetryConfig *sharedConfig;
 
 - (void)configurationFromKey:(NSString *)key;
 

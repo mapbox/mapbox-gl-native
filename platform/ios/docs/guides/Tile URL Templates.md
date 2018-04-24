@@ -4,12 +4,12 @@
 -->
 # Tile URL Templates
 
-`MGLTileSource` objects, specifically `MGLRasterSource` and `MGLVectorSource`
-objects, can be created using an initializer that accepts an array of tile URL
-templates. Tile URL templates are strings that specify the URLs of the vector
-tiles or raster tile images to load. A template resembles an absolute URL, but
-with any number of placeholder strings that the source evaluates based on the
-tile it needs to load. For example:
+`MGLTileSource` objects, specifically `MGLRasterTileSource` and
+`MGLVectorTileSource` objects, can be created using an initializer that accepts
+an array of tile URL templates. Tile URL templates are strings that specify the
+URLs of the vector tiles or raster tile images to load. A template resembles an
+absolute URL, but with any number of placeholder strings that the source
+evaluates based on the tile it needs to load. For example:
 
 * `http://www.example.com/tiles/{z}/{x}/{y}.pbf` could be
    evaluated as `http://www.example.com/tiles/14/6/9.pbf`.
@@ -56,7 +56,7 @@ all of which are optional:
     <td>The tile’s zoom level. At zoom level 0, each tile covers the entire
        world map; at zoom level 1, it covers ¼ of the world; at zoom level 2,
        <sup>1</sup>⁄<sub>16</sub> of the world, and so on. For tiles loaded by
-       a <code>MGLRasterSource</code> object, whether the tile zoom level
+       a <code>MGLRasterTileSource</code> object, whether the tile zoom level
        matches the map’s current zoom level depends on the value of the
        source’s tile size as specified in the
        <code>MGLTileSourceOptionTileSize</code> key of the <code>options</code>

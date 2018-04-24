@@ -4,6 +4,7 @@
 
 #include <cassert>
 #include <string>
+#include <array>
 
 namespace mbgl {
 
@@ -37,6 +38,7 @@ public:
 
     static optional<Color> parse(const std::string&);
     std::string stringify() const;
+    std::array<double, 4> toArray() const;
 };
 
 inline bool operator==(const Color& colorA, const Color& colorB) {

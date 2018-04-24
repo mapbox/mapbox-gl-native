@@ -23,16 +23,18 @@ import java.io.IOException;
 
 import timber.log.Timber;
 
-import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.exponential;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.interpolate;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.linear;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.match;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.rgb;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.rgba;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.step;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.stop;
 import static com.mapbox.mapboxsdk.style.expressions.Expression.zoom;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.color;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillAntialias;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillColor;
 import static com.mapbox.mapboxsdk.style.layers.PropertyFactory.fillOpacity;
@@ -165,7 +167,6 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     }
   }
 
-
   private void addExponentialZoomFunction() {
     Timber.i("Add exponential zoom function");
     FillLayer layer = mapboxMap.getLayerAs("water");
@@ -191,10 +192,10 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     layer.setProperties(
       fillColor(
         step(zoom(),
-          color(Color.CYAN),
-          stop(1, color(Color.RED)),
-          stop(5, color(Color.BLUE)),
-          stop(10, color(Color.GREEN))
+          rgba(0.0f, 255.0f, 255.0f, 1.0f),
+          stop(1, rgba(255.0f, 0.0f, 0.0f, 1.0f)),
+          stop(5, rgba(0.0f, 0.0f, 255.0f, 1.0f)),
+          stop(10, rgba(0.0f, 255.0f, 0.0f, 1.0f))
         )
       )
     );
@@ -211,9 +212,9 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
         interpolate(
           exponential(0.5f),
           get("stroke-width"),
-          stop(1f, color(Color.RED)),
-          stop(5f, color(Color.BLUE)),
-          stop(10f, color(Color.GREEN))
+          stop(1f, rgba(255.0f, 0.0f, 0.0f, 1.0f)),
+          stop(5f, rgba(0.0f, 0.0f, 255.0f, 1.0f)),
+          stop(10f, rgba(0.0f, 255.0f, 0.0f, 1.0f))
         )
       )
     );
@@ -229,10 +230,10 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
       fillColor(
         match(
           get("name"),
-          literal("Westerpark"), color(Color.RED),
-          literal("Jordaan"), color(Color.BLUE),
-          literal("Prinseneiland"), color(Color.GREEN),
-          color(Color.CYAN)
+          literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+          literal("Jordaan"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+          literal("Prinseneiland"), rgba(0.0f, 255.0f, 0.0f, 1.0f),
+          rgba(0.0f, 255.0f, 255.0f, 1.0f)
         )
       )
     );
@@ -261,10 +262,10 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
       fillColor(
         step(
           get("stroke-width"),
-          color(Color.CYAN),
-          stop(1f, color(Color.RED)),
-          stop(2f, color(Color.BLUE)),
-          stop(3f, color(Color.GREEN))
+          rgba(0.0f, 255.0f, 255.0f, 1.0f),
+          stop(1f, rgba(255.0f, 0.0f, 0.0f, 1.0f)),
+          stop(2f, rgba(0.0f, 0.0f, 255.0f, 1.0f)),
+          stop(3f, rgba(0.0f, 255.0f, 0.0f, 1.0f))
         )
       )
     );
@@ -283,24 +284,24 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
           zoom(),
           stop(12, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.RED)),
-            stop(2f, color(Color.WHITE)),
-            stop(3f, color(Color.BLUE))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(255.0f, 0.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(0.0f, 0.0f, 0.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 0.0f, 255.0f, 1.0f))
           )),
           stop(15, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.YELLOW)),
-            stop(2f, color(Color.LTGRAY)),
-            stop(3f, color(Color.CYAN))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(255.0f, 255.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(211.0f, 211.0f, 211.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 255.0f, 255.0f, 1.0f))
           )),
           stop(18, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.WHITE)),
-            stop(2f, color(Color.GRAY)),
-            stop(3f, color(Color.GREEN)))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(0.0f, 0.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(128.0f, 128.0f, 128.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 255.0f, 0.0f, 1.0f)))
           )
         )
       )
@@ -320,24 +321,24 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
           zoom(),
           stop(12, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.RED)),
-            stop(2f, color(Color.WHITE)),
-            stop(3f, color(Color.BLUE))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(255.0f, 0.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(0.0f, 0.0f, 0.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 0.0f, 255.0f, 1.0f))
           )),
           stop(15, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.YELLOW)),
-            stop(2f, color(Color.LTGRAY)),
-            stop(3f, color(Color.CYAN))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(255.0f, 255.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(211.0f, 211.0f, 211.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 255.0f, 255.0f, 1.0f))
           )),
           stop(18, step(
             get("stroke-width"),
-            color(Color.BLACK),
-            stop(1f, color(Color.WHITE)),
-            stop(2f, color(Color.GRAY)),
-            stop(3f, color(Color.GREEN))
+            rgba(255.0f, 255.0f, 255.0f, 1.0f),
+            stop(1f, rgba(0.0f, 0.0f, 0.0f, 1.0f)),
+            stop(2f, rgba(128.0f, 128.0f, 128.0f, 1.0f)),
+            stop(3f, rgba(0.0f, 255.0f, 0.0f, 1.0f))
           ))
         )
       )
@@ -353,89 +354,89 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     layer.setProperties(
       fillColor(
         step(zoom(),
-          color(Color.BLACK),
+          rgba(255.0f, 255.0f, 255.0f, 1.0f),
           stop(7f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(8f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(9f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(10f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(11f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(12f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(13f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(14f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            literal("Jordaan"), color(Color.GREEN),
-            literal("PrinsenEiland"), color(Color.WHITE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            literal("Jordaan"), rgba(0.0f, 255.0f, 0.0f, 1.0f),
+            literal("PrinsenEiland"), rgba(0.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(15f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(16f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(17f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(18f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            literal("Jordaan"), color(Color.CYAN),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            literal("Jordaan"), rgba(0.0f, 255.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(19f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(20f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(21f, match(
             get("name"),
-            literal("Westerpark"), color(Color.RED),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(255.0f, 0.0f, 0.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           )),
           stop(22f, match(
             get("name"),
-            literal("Westerpark"), color(Color.BLUE),
-            color(Color.BLACK)
+            literal("Westerpark"), rgba(0.0f, 0.0f, 255.0f, 1.0f),
+            rgba(255.0f, 255.0f, 255.0f, 1.0f)
           ))
         )
       )
@@ -461,8 +462,8 @@ public class DataDrivenStyleActivity extends AppCompatActivity {
     // Add a fill layer
     mapboxMap.addLayer(new FillLayer(AMSTERDAM_PARKS_LAYER, source.getId())
       .withProperties(
-        fillColor(Color.BLACK),
-        fillOutlineColor(Color.BLUE),
+        fillColor(color(Color.GREEN)),
+        fillOutlineColor(rgb(0, 0, 255)),
         fillAntialias(true)
       )
     );

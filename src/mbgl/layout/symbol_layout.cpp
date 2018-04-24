@@ -126,7 +126,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
         
         if (hasText) {
             std::string u8string = layout.evaluate<TextField>(zoom, ft);
-            if (layout.get<TextField>().isConstant()) {
+            if (layout.get<TextField>().isConstant() && !leader.layout.get<TextField>().isExpression()) {
                 u8string = util::replaceTokens(u8string, getValue);
             }
             
@@ -159,7 +159,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
 
         if (hasIcon) {
             std::string icon = layout.evaluate<IconImage>(zoom, ft);
-            if (layout.get<IconImage>().isConstant()) {
+            if (layout.get<IconImage>().isConstant() && !leader.layout.get<IconImage>().isExpression()) {
                 icon = util::replaceTokens(icon, getValue);
             }
             ft.icon = icon;

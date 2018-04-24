@@ -71,7 +71,9 @@ void MapSnapshotter::start(JNIEnv& env) {
         if (err) {
             // error handler callback
             static auto onSnapshotFailed = javaClass.GetMethod<void (jni::String)>(*_env, "onSnapshotFailed");
-            javaPeer->Call(*_env, onSnapshotFailed, jni::Make<jni::String>(*_env, util::toString(err)));
+            auto message = jni::Make<jni::String>(*_env, util::toString(err));
+            javaPeer->Call(*_env, onSnapshotFailed, message);
+            jni::DeleteLocalRef(*_env, message);
         } else {
             // Create the wrapper
             auto mapSnapshot = android::MapSnapshot::New(*_env, std::move(image), pixelRatio, attributions, showLogo, pointForFn);

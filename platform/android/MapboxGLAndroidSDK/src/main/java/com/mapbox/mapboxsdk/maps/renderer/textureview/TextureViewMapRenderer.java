@@ -17,17 +17,22 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class TextureViewMapRenderer extends MapRenderer {
   private TextureViewRenderThread renderThread;
+  private boolean translucentSurface;
 
   /**
    * Create a {@link MapRenderer} for the given {@link TextureView}
    *
-   * @param context     the current Context
-   * @param textureView the TextureView
+   * @param context                  the current Context
+   * @param textureView              the TextureView
+   * @param localIdeographFontFamily the local font family
+   * @param translucentSurface    the translucency flag
    */
   public TextureViewMapRenderer(@NonNull Context context,
                                 @NonNull TextureView textureView,
-                                String localIdeographFontFamily) {
+                                String localIdeographFontFamily,
+                                boolean translucentSurface) {
     super(context, localIdeographFontFamily);
+    this.translucentSurface = translucentSurface;
     renderThread = new TextureViewRenderThread(textureView, this);
     renderThread.start();
   }
@@ -94,5 +99,9 @@ public class TextureViewMapRenderer extends MapRenderer {
   @Override
   public void onDestroy() {
     renderThread.onDestroy();
+  }
+
+  public boolean isTranslucentSurface() {
+    return translucentSurface;
   }
 }

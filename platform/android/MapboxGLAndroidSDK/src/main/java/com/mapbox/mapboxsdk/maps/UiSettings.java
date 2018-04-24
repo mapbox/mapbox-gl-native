@@ -45,21 +45,23 @@ public final class UiSettings {
   private float pixelRatio;
 
   private boolean rotateGesturesEnabled = true;
-  private boolean rotateGestureChangeAllowed = true;
 
   private boolean tiltGesturesEnabled = true;
-  private boolean tiltGestureChangeAllowed = true;
 
   private boolean zoomGesturesEnabled = true;
-  private boolean zoomGestureChangeAllowed = true;
 
   private boolean scrollGesturesEnabled = true;
-  private boolean scrollGestureChangeAllowed = true;
 
   private boolean zoomControlsEnabled;
 
   private boolean doubleTapGesturesEnabled = true;
-  private boolean doubleTapGestureChangeAllowed = true;
+
+  private boolean scaleVelocityAnimationEnabled = true;
+  private boolean rotateVelocityAnimationEnabled = true;
+  private boolean flingVelocityAnimationEnabled = true;
+
+  private boolean increaseRotateThresholdWhenScaling = true;
+  private boolean increaseScaleThresholdWhenRotating = true;
 
   private boolean deselectMarkersOnTap = true;
 
@@ -108,42 +110,39 @@ public final class UiSettings {
 
   private void initialiseGestures(MapboxMapOptions options) {
     setZoomGesturesEnabled(options.getZoomGesturesEnabled());
-    setZoomGestureChangeAllowed(options.getZoomGesturesEnabled());
     setScrollGesturesEnabled(options.getScrollGesturesEnabled());
-    setScrollGestureChangeAllowed(options.getScrollGesturesEnabled());
     setRotateGesturesEnabled(options.getRotateGesturesEnabled());
-    setRotateGestureChangeAllowed(options.getRotateGesturesEnabled());
     setTiltGesturesEnabled(options.getTiltGesturesEnabled());
-    setTiltGestureChangeAllowed(options.getTiltGesturesEnabled());
     setZoomControlsEnabled(options.getZoomControlsEnabled());
     setDoubleTapGesturesEnabled(options.getDoubleTapGesturesEnabled());
-    setDoubleTapGestureChangeAllowed(options.getDoubleTapGesturesEnabled());
   }
 
   private void saveGestures(Bundle outState) {
     outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED, isZoomGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE, isZoomGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED, isScrollGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE, isScrollGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED, isRotateGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE, isRotateGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED, isTiltGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE, isTiltGestureChangeAllowed());
     outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED, isDoubleTapGesturesEnabled());
-    outState.putBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE, isDoubleTapGestureChangeAllowed());
+    outState.putBoolean(MapboxConstants.STATE_SCALE_ANIMATION_ENABLED, isScaleVelocityAnimationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_ROTATE_ANIMATION_ENABLED, isRotateVelocityAnimationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_FLING_ANIMATION_ENABLED, isFlingVelocityAnimationEnabled());
+    outState.putBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD, isIncreaseRotateThresholdWhenScaling());
+    outState.putBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD, isIncreaseScaleThresholdWhenRotating());
   }
 
   private void restoreGestures(Bundle savedInstanceState) {
     setZoomGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED));
-    setZoomGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ZOOM_ENABLED_CHANGE));
     setScrollGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED));
-    setScrollGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_SCROLL_ENABLED_CHANGE));
     setRotateGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED));
-    setRotateGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ENABLED_CHANGE));
     setTiltGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED));
-    setTiltGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_TILT_ENABLED_CHANGE));
     setDoubleTapGesturesEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED));
-    setDoubleTapGestureChangeAllowed(savedInstanceState.getBoolean(MapboxConstants.STATE_DOUBLE_TAP_ENABLED_CHANGE));
+    setScaleVelocityAnimationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_SCALE_ANIMATION_ENABLED));
+    setRotateVelocityAnimationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_ROTATE_ANIMATION_ENABLED));
+    setFlingVelocityAnimationEnabled(savedInstanceState.getBoolean(MapboxConstants.STATE_FLING_ANIMATION_ENABLED));
+    setIncreaseRotateThresholdWhenScaling(
+      savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_ROTATE_THRESHOLD));
+    setIncreaseScaleThresholdWhenRotating(
+      savedInstanceState.getBoolean(MapboxConstants.STATE_INCREASE_SCALE_THRESHOLD));
   }
 
   private void initialiseCompass(MapboxMapOptions options, Resources resources) {
@@ -658,9 +657,7 @@ public final class UiSettings {
    * @param rotateGesturesEnabled If true, rotating is enabled.
    */
   public void setRotateGesturesEnabled(boolean rotateGesturesEnabled) {
-    if (rotateGestureChangeAllowed) {
-      this.rotateGesturesEnabled = rotateGesturesEnabled;
-    }
+    this.rotateGesturesEnabled = rotateGesturesEnabled;
   }
 
   /**
@@ -670,14 +667,6 @@ public final class UiSettings {
    */
   public boolean isRotateGesturesEnabled() {
     return rotateGesturesEnabled;
-  }
-
-  void setRotateGestureChangeAllowed(boolean rotateGestureChangeAllowed) {
-    this.rotateGestureChangeAllowed = rotateGestureChangeAllowed;
-  }
-
-  boolean isRotateGestureChangeAllowed() {
-    return rotateGestureChangeAllowed;
   }
 
   /**
@@ -693,9 +682,8 @@ public final class UiSettings {
    * @param tiltGesturesEnabled If true, tilting is enabled.
    */
   public void setTiltGesturesEnabled(boolean tiltGesturesEnabled) {
-    if (tiltGestureChangeAllowed) {
-      this.tiltGesturesEnabled = tiltGesturesEnabled;
-    }
+    this.tiltGesturesEnabled = tiltGesturesEnabled;
+
   }
 
   /**
@@ -705,14 +693,6 @@ public final class UiSettings {
    */
   public boolean isTiltGesturesEnabled() {
     return tiltGesturesEnabled;
-  }
-
-  void setTiltGestureChangeAllowed(boolean tiltGestureChangeAllowed) {
-    this.tiltGestureChangeAllowed = tiltGestureChangeAllowed;
-  }
-
-  boolean isTiltGestureChangeAllowed() {
-    return tiltGestureChangeAllowed;
   }
 
   /**
@@ -728,9 +708,7 @@ public final class UiSettings {
    * @param zoomGesturesEnabled If true, zooming is enabled.
    */
   public void setZoomGesturesEnabled(boolean zoomGesturesEnabled) {
-    if (zoomGestureChangeAllowed) {
-      this.zoomGesturesEnabled = zoomGesturesEnabled;
-    }
+    this.zoomGesturesEnabled = zoomGesturesEnabled;
   }
 
   /**
@@ -740,14 +718,6 @@ public final class UiSettings {
    */
   public boolean isZoomGesturesEnabled() {
     return zoomGesturesEnabled;
-  }
-
-  void setZoomGestureChangeAllowed(boolean zoomGestureChangeAllowed) {
-    this.zoomGestureChangeAllowed = zoomGestureChangeAllowed;
-  }
-
-  boolean isZoomGestureChangeAllowed() {
-    return zoomGestureChangeAllowed;
   }
 
   /**
@@ -788,9 +758,7 @@ public final class UiSettings {
    * @param doubleTapGesturesEnabled If true, zooming with a double tap is enabled.
    */
   public void setDoubleTapGesturesEnabled(boolean doubleTapGesturesEnabled) {
-    if (doubleTapGestureChangeAllowed) {
-      this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
-    }
+    this.doubleTapGesturesEnabled = doubleTapGesturesEnabled;
   }
 
   /**
@@ -800,14 +768,6 @@ public final class UiSettings {
    */
   public boolean isDoubleTapGesturesEnabled() {
     return doubleTapGesturesEnabled;
-  }
-
-  void setDoubleTapGestureChangeAllowed(boolean doubleTapGestureChangeAllowed) {
-    this.doubleTapGestureChangeAllowed = doubleTapGestureChangeAllowed;
-  }
-
-  boolean isDoubleTapGestureChangeAllowed() {
-    return doubleTapGestureChangeAllowed;
   }
 
   private void restoreDeselectMarkersOnTap(Bundle savedInstanceState) {
@@ -851,9 +811,7 @@ public final class UiSettings {
    * @param scrollGesturesEnabled If true, scrolling is enabled.
    */
   public void setScrollGesturesEnabled(boolean scrollGesturesEnabled) {
-    if (scrollGestureChangeAllowed) {
-      this.scrollGesturesEnabled = scrollGesturesEnabled;
-    }
+    this.scrollGesturesEnabled = scrollGesturesEnabled;
   }
 
   /**
@@ -865,12 +823,105 @@ public final class UiSettings {
     return scrollGesturesEnabled;
   }
 
-  void setScrollGestureChangeAllowed(boolean scrollGestureChangeAllowed) {
-    this.scrollGestureChangeAllowed = scrollGestureChangeAllowed;
+  /**
+   * Returns whether scale velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, scale velocity animation is enabled.
+   */
+  public boolean isScaleVelocityAnimationEnabled() {
+    return scaleVelocityAnimationEnabled;
   }
 
-  boolean isScrollGestureChangeAllowed() {
-    return scrollGestureChangeAllowed;
+  /**
+   * Set whether scale velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param scaleVelocityAnimationEnabled If true, scale velocity animation will be enabled.
+   */
+  public void setScaleVelocityAnimationEnabled(boolean scaleVelocityAnimationEnabled) {
+    this.scaleVelocityAnimationEnabled = scaleVelocityAnimationEnabled;
+  }
+
+  /**
+   * Returns whether rotate velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, rotate velocity animation is enabled.
+   */
+  public boolean isRotateVelocityAnimationEnabled() {
+    return rotateVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether rotate velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param rotateVelocityAnimationEnabled If true, rotate velocity animation will be enabled.
+   */
+  public void setRotateVelocityAnimationEnabled(boolean rotateVelocityAnimationEnabled) {
+    this.rotateVelocityAnimationEnabled = rotateVelocityAnimationEnabled;
+  }
+
+  /**
+   * Returns whether fling velocity animation should execute after users finishes a gesture.
+   *
+   * @return If true, fling velocity animation is enabled.
+   */
+  public boolean isFlingVelocityAnimationEnabled() {
+    return flingVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether fling velocity animation should execute after users finishes a gesture. True by default.
+   *
+   * @param flingVelocityAnimationEnabled If true, fling velocity animation will be enabled.
+   */
+  public void setFlingVelocityAnimationEnabled(boolean flingVelocityAnimationEnabled) {
+    this.flingVelocityAnimationEnabled = flingVelocityAnimationEnabled;
+  }
+
+  /**
+   * Set whether all velocity animations should execute after users finishes a gesture.
+   *
+   * @param allVelocityAnimationsEnabled If true, all velocity animations will be enabled.
+   */
+  public void setAllVelocityAnimationsEnabled(boolean allVelocityAnimationsEnabled) {
+    setScaleVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+    setRotateVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+    setFlingVelocityAnimationEnabled(allVelocityAnimationsEnabled);
+  }
+
+  /**
+   * Returns whether rotation threshold should be increase whenever scale is detected.
+   *
+   * @return If true, rotation threshold will be increased.
+   */
+  public boolean isIncreaseRotateThresholdWhenScaling() {
+    return increaseRotateThresholdWhenScaling;
+  }
+
+  /**
+   * Set whether rotation threshold should be increase whenever scale is detected.
+   *
+   * @param increaseRotateThresholdWhenScaling If true, rotation threshold will be increased.
+   */
+  public void setIncreaseRotateThresholdWhenScaling(boolean increaseRotateThresholdWhenScaling) {
+    this.increaseRotateThresholdWhenScaling = increaseRotateThresholdWhenScaling;
+  }
+
+  /**
+   * Returns whether scale threshold should be increase whenever rotation is detected.
+   *
+   * @return If true, scale threshold will be increased.
+   */
+  public boolean isIncreaseScaleThresholdWhenRotating() {
+    return increaseScaleThresholdWhenRotating;
+  }
+
+  /**
+   * set whether scale threshold should be increase whenever rotation is detected.
+   *
+   * @param increaseScaleThresholdWhenRotating If true, scale threshold will be increased.
+   */
+  public void setIncreaseScaleThresholdWhenRotating(boolean increaseScaleThresholdWhenRotating) {
+    this.increaseScaleThresholdWhenRotating = increaseScaleThresholdWhenRotating;
   }
 
   /**

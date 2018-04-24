@@ -189,13 +189,7 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic, readonly, nullable) MGLStyle *style;
 
-/**
- URLs of the styles bundled with the library.
-
- @deprecated Call the relevant class method of `MGLStyle` for the URL of a
-    particular default style.
- */
-@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((deprecated("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
+@property (nonatomic, readonly) NS_ARRAY_OF(NSURL *) *bundledStyleURLs __attribute__((unavailable("Call the relevant class method of MGLStyle for the URL of a particular default style.")));
 
 /**
  URL of the style currently displayed in the receiver.
@@ -224,11 +218,20 @@ MGL_EXPORT IB_DESIGNABLE
  the server, calling this method does not necessarily ensure that the map view
  reflects those changes.
  */
-- (IBAction)reloadStyle:(id)sender;
+- (IBAction)reloadStyle:(nullable id)sender;
+
+/**
+ A Boolean value indicating whether the map may display scale information.
+
+ The scale bar may not be shown at all zoom levels. The view controlled by this
+ property is available at `scaleBar`. The default value of this property is
+ `NO`.
+ */
+@property (nonatomic, assign) BOOL showsScale;
 
 /**
  A control indicating the scale of the map. The scale bar is positioned in the
- upper-left corner. The scale bar is hidden by default.
+ upper-left corner. Enable the scale bar via `showsScale`.
  */
 @property (nonatomic, readonly) UIView *scaleBar;
 
@@ -283,17 +286,13 @@ MGL_EXPORT IB_DESIGNABLE
  */
 - (IBAction)showAttribution:(id)sender;
 
-/// :nodoc: Support for style classes has been removed. This property always returns an empty array.
-@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((deprecated("This property is non-functional.")));
+@property (nonatomic) NS_ARRAY_OF(NSString *) *styleClasses __attribute__((unavailable("Support for style classes has been removed.")));
 
-/// :nodoc: Support for style classes has been removed. This property always returns NO.
-- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (BOOL)hasStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)addStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)addStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
-/// :nodoc: Support for style classes has been removed. This property is a no-op.
-- (void)removeStyleClass:(NSString *)styleClass __attribute__((deprecated("This method is non-functional.")));
+- (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
 
@@ -494,6 +493,19 @@ MGL_EXPORT IB_DESIGNABLE
 @property(nonatomic, getter=isPitchEnabled) BOOL pitchEnabled;
 
 /**
+ A Boolean value that determines whether the user will receive haptic feedback
+ for certain interactions with the map.
+
+ When this property is set to `YES`, the default, a `UIImpactFeedbackStyleLight`
+ haptic feedback event be played when the user rotates the map to due north
+ (0°).
+
+ This feature requires a device that supports haptic feedback, running iOS 10 or
+ newer.
+ */
+@property(nonatomic, getter=isHapticFeedbackEnabled) BOOL hapticFeedbackEnabled;
+
+/**
  A floating-point value that determines the rate of deceleration after the user
  lifts their finger.
 
@@ -669,11 +681,10 @@ MGL_EXPORT IB_DESIGNABLE
  want to animate the change, call `-setVisibleCoordinateBounds:animated:`
  instead.
  
- If a longitude is less than −180 degrees or greater than 180 degrees, the visible
- bounds straddles the antimeridian or international date line.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ visible bounds straddles the antimeridian or international date line. For
+ example, if both Tokyo and San Francisco are visible, the visible bounds might
+ extend from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
@@ -681,11 +692,10 @@ MGL_EXPORT IB_DESIGNABLE
  Changes the receiver’s viewport to fit the given coordinate bounds,
  optionally animating the change.
  
- To make the visible bounds go across the antimeridian or international date line,
- specify some longitudes less than −180 degrees or greater than 180 degrees.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling
@@ -696,6 +706,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit the given coordinate bounds and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param insets The minimum padding (in screen points) that will be visible
@@ -708,6 +723,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -722,6 +742,11 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Changes the receiver’s viewport to fit all of the given coordinates and
  optionally some additional padding on each side.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible coordinates to (35.68476, −220.24257) and (37.78428, −122.41310).
 
  @param coordinates The coordinates that the viewport will show.
  @param count The number of coordinates. This number must not be greater than
@@ -1004,6 +1029,9 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
+ 
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ bounding box straddles the antimeridian or international date line.
 
  @param rect The rectangle to convert.
  @param view The view in whose coordinate system the rectangle is expressed.
@@ -1172,17 +1200,32 @@ MGL_EXPORT IB_DESIGNABLE
 
  Assigning a new array to this property selects only the first annotation in
  the array.
+
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the camera
+ will animate to bring the annotation and its callout just on screen. If you
+ need finer control, consider using `-selectAnnotation:animated:`.
+
+ @note In versions prior to `4.0.0` if the annotation was offscreen it was not
+ selected.
  */
 @property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
 
 /**
- Selects an annotation and displays a callout view for it.
+ Selects an annotation and displays its callout view.
 
- If the given annotation is not visible within the current viewport, this
- method has no effect.
+ The `animated` parameter determines whether the map is panned to bring the
+ annotation on-screen, specifically:
+
+ | `animated` parameter | Effect |
+ |------------------|--------|
+ | `NO`             | The annotation is selected, and the callout is presented. However the map is not panned to bring the annotation or callout onscreen. The presentation of the callout is animated. |
+ | `YES`            | The annotation is selected, and the callout is presented. If the annotation is offscreen *and* is of type `MGLPointAnnotation`, the map is panned so that the annotation and its callout are brought just onscreen. The annotation is *not* centered within the viewport. |
 
  @param annotation The annotation object to select.
- @param animated If `YES`, the callout view is animated into position.
+ @param animated If `YES`, the annotation and callout view are animated on-screen.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation animated:(BOOL)animated;
 
@@ -1286,9 +1329,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1320,7 +1363,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  The returned features may also include features corresponding to annotations.
@@ -1388,9 +1431,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -1423,7 +1466,7 @@ MGL_EXPORT IB_DESIGNABLE
 
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
@@ -1431,8 +1474,8 @@ MGL_EXPORT IB_DESIGNABLE
  style URL to an explicitly versioned style using a convenience method like
  `+[MGLStyle outdoorsStyleURLWithVersion:]`, `MGLMapView`’s “Style URL”
  inspectable in Interface Builder, or a manually constructed `NSURL`. This
- approach also avoids layer identifer name changes that will occur in the default
- style’s layers over time.
+ approach also avoids layer identifer name changes that will occur in the
+ default style’s layers over time.
  
  @note Layer identifiers are not guaranteed to exist across styles or different
     versions of the same style. Applications that use this API must first set
@@ -1462,11 +1505,11 @@ MGL_EXPORT IB_DESIGNABLE
  */
 @property (nonatomic) MGLMapDebugMaskOptions debugMask;
 
-@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((deprecated("Use -debugMask and -setDebugMask:.")));
+@property (nonatomic, getter=isDebugActive) BOOL debugActive __attribute__((unavailable("Use -debugMask and -setDebugMask:.")));
 
-- (void)toggleDebug __attribute__((deprecated("Use -setDebugMask:.")));
+- (void)toggleDebug __attribute__((unavailable("Use -setDebugMask:.")));
 
-- (void)emptyMemoryCache __attribute__((deprecated));
+- (void)emptyMemoryCache __attribute__((unavailable));
 
 @end
 

@@ -8,6 +8,16 @@ namespace mbgl {
 namespace android {
 namespace geojson {
 
+jni::Object<Polygon> Polygon::New(jni::JNIEnv& env, const mbgl::Polygon<double>& polygon) {
+    auto jList = asPointsListsList(env, polygon);
+
+    static auto method = javaClass.GetStaticMethod<jni::Object<Polygon> (jni::Object<java::util::List>)>(env, "fromLngLats");
+    auto jPolygon = javaClass.Call(env, method, jList);
+
+    jni::DeleteLocalRef(env, jList);
+    return jPolygon;
+}
+
 mapbox::geojson::polygon Polygon::convert(jni::JNIEnv &env, jni::Object<Polygon> jPolygon) {
     mapbox::geojson::polygon polygon;
 

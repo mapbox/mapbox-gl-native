@@ -17,8 +17,9 @@ NS_ASSUME_NONNULL_BEGIN
 
  You can add polyline shapes to the map by adding them to an `MGLShapeSource`
  object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s polylines collectively using an `MGLLineStyleLayer` or
- `MGLSymbolStyleLayer` object.
+ `MGLVectorTileSource`’s polylines collectively using an `MGLLineStyleLayer` or
+ `MGLSymbolStyleLayer` object. To access a polyline’s attributes, use an
+ `MGLPolylineFeature` object.
 
  Alternatively, you can add a polyline overlay directly to a map view using the
  `-[MGLMapView addAnnotation:]` or `-[MGLMapView addOverlay:]` method. Configure
@@ -74,8 +75,8 @@ MGL_EXPORT
 
  You can add multipolyline shapes to the map by adding them to an
  `MGLShapeSource` object. Configure the appearance of an `MGLShapeSource`’s or
- `MGLVectorSource`’s multipolylines collectively using an `MGLLineStyleLayer` or
- `MGLSymbolStyleLayer` object.
+ `MGLVectorTileSource`’s multipolylines collectively using an
+ `MGLLineStyleLayer` or `MGLSymbolStyleLayer` object.
 
  You cannot add an `MGLMultiPolyline` object directly to a map view using
  `-[MGLMapView addAnnotation:]` or `-[MGLMapView addOverlay:]`. However, you can

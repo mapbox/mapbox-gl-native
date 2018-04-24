@@ -27,10 +27,11 @@
   "QueryRenderedFeaturesBoxHighlightActivity",
   "MultiMapActivity",
   "MapInDialogActivity",
-  "SimpleMapActivity",
   "ManualZoomActivity",
   "MaxMinZoomActivity",
   "ScrollByActivity",
   "ZoomFunctionSymbolLayerActivity",
-  "SymbolGeneratorActivity"
+  "SymbolGeneratorActivity",
+  "TextureViewTransparentBackgroundActivity",
+  "SimpleMapActivity"
 ]

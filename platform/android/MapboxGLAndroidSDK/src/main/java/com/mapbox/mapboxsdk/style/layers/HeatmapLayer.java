@@ -4,10 +4,13 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
 
 import static com.mapbox.mapboxsdk.utils.ColorUtils.rgbaToColor;
 
+import com.google.gson.JsonArray;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.TransitionOptions;
 
 /**
@@ -69,23 +72,38 @@ public class HeatmapLayer extends Layer {
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    */
-  public void setFilter(Filter.Statement filter) {
+  public void setFilter(Expression filter) {
     nativeSetFilter(filter.toArray());
   }
 
   /**
-   * Set a single filter.
+   * Set a single expression filter.
    *
-   * @param filter the filter to set
+   * @param filter the expression filter to set
    * @return This
    */
-  public HeatmapLayer withFilter(Filter.Statement filter) {
+  public HeatmapLayer withFilter(Expression filter) {
     setFilter(filter);
     return this;
+  }
+
+  /**
+   * Get a single expression filter.
+   *
+   * @return the expression filter to get
+   */
+  @Nullable
+  public Expression getFilter() {
+    Expression expression = null;
+    JsonArray array = (JsonArray) nativeGetFilter();
+    if (array != null) {
+      expression = Expression.Converter.convert(array);
+    }
+    return expression;
   }
 
   /**
@@ -168,6 +186,32 @@ public class HeatmapLayer extends Layer {
   }
 
   /**
+   * Get the HeatmapColor property
+   *
+   * @return property wrapper value around String
+   */
+  @SuppressWarnings("unchecked")
+  public PropertyValue<String> getHeatmapColor() {
+    return (PropertyValue<String>) new PropertyValue("heatmap-color", nativeGetHeatmapColor());
+  }
+
+  /**
+   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
+   *
+   * @return int representation of a rgba string color
+   * @throws RuntimeException thrown if property isn't a value
+   */
+  @ColorInt
+  public int getHeatmapColorAsInt() {
+    PropertyValue<String> value = getHeatmapColor();
+    if (value.isValue()) {
+      return rgbaToColor(value.getValue());
+    } else {
+      throw new RuntimeException("heatmap-color was set as a Function");
+    }
+  }
+
+  /**
    * Get the HeatmapOpacity property
    *
    * @return property wrapper value around Float
@@ -208,6 +252,8 @@ public class HeatmapLayer extends Layer {
   private native TransitionOptions nativeGetHeatmapIntensityTransition();
 
   private native void nativeSetHeatmapIntensityTransition(long duration, long delay);
+
+  private native Object nativeGetHeatmapColor();
 
   private native Object nativeGetHeatmapOpacity();
 

@@ -148,6 +148,26 @@ public final class CameraUpdateFactory {
     return new ZoomUpdate(ZoomUpdate.ZOOM_TO, zoom);
   }
 
+  /**
+   * Returns a CameraUpdate that moves the camera viewpoint to a particular bearing.
+   *
+   * @param bearing Bearing to change to
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate bearingTo(double bearing) {
+    return new CameraPositionUpdate(bearing, null, -1, -1);
+  }
+
+  /**
+   * Returns a CameraUpdate that moves the camera viewpoint to a particular tilt.
+   *
+   * @param tilt Tilt to change to
+   * @return CameraUpdate Final Camera Position
+   */
+  public static CameraUpdate tiltTo(double tilt) {
+    return new CameraPositionUpdate(-1, null, tilt, -1);
+  }
+
   //
   // CameraUpdate types
   //

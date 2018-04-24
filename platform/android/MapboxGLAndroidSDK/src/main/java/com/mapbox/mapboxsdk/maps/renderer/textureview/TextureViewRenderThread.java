@@ -53,9 +53,10 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
    */
   @UiThread
   TextureViewRenderThread(@NonNull TextureView textureView, @NonNull TextureViewMapRenderer mapRenderer) {
+    textureView.setOpaque(!mapRenderer.isTranslucentSurface());
     textureView.setSurfaceTextureListener(this);
     this.mapRenderer = mapRenderer;
-    this.eglHolder = new EGLHolder(new WeakReference<>(textureView));
+    this.eglHolder = new EGLHolder(new WeakReference<>(textureView), mapRenderer.isTranslucentSurface());
   }
 
   // SurfaceTextureListener methods
@@ -324,6 +325,7 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
   private static class EGLHolder {
     private static final int EGL_CONTEXT_CLIENT_VERSION = 0x3098;
     private final WeakReference<TextureView> textureViewWeakRef;
+    private boolean translucentSurface;
 
     private EGL10 egl;
     private EGLConfig eglConfig;
@@ -331,8 +333,9 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
     private EGLContext eglContext = EGL10.EGL_NO_CONTEXT;
     private EGLSurface eglSurface = EGL10.EGL_NO_SURFACE;
 
-    EGLHolder(WeakReference<TextureView> textureViewWeakRef) {
+    EGLHolder(WeakReference<TextureView> textureViewWeakRef, boolean translucentSurface) {
       this.textureViewWeakRef = textureViewWeakRef;
+      this.translucentSurface = translucentSurface;
     }
 
     void prepare() {
@@ -357,7 +360,7 @@ class TextureViewRenderThread extends Thread implements TextureView.SurfaceTextu
         eglConfig = null;
         eglContext = EGL10.EGL_NO_CONTEXT;
       } else if (eglContext == EGL10.EGL_NO_CONTEXT) {
-        eglConfig = new EGLConfigChooser().chooseConfig(egl, eglDisplay);
+        eglConfig = new EGLConfigChooser(translucentSurface).chooseConfig(egl, eglDisplay);
         int[] attrib_list = {EGL_CONTEXT_CLIENT_VERSION, 2, EGL10.EGL_NONE};
         eglContext = egl.eglCreateContext(eglDisplay, eglConfig, EGL10.EGL_NO_CONTEXT, attrib_list);
       }

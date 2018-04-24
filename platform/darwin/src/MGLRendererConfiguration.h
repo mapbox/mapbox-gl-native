@@ -11,7 +11,7 @@ NS_ASSUME_NONNULL_BEGIN
 @interface MGLRendererConfiguration : NSObject
 
 /** Returns an instance of the current renderer configuration. */
-+ (instancetype)currentConfiguration;
+@property (class, nonatomic, readonly) MGLRendererConfiguration *currentConfiguration;
 
 /** The file source to use. Defaults to `mbgl::DefaultFileSource` */
 @property (nonatomic, readonly) mbgl::DefaultFileSource *fileSource;

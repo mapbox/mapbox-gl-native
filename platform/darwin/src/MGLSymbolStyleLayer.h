@@ -319,9 +319,10 @@ typedef NS_ENUM(NSUInteger, MGLTextTranslationAnchor) {
  An `MGLSymbolStyleLayer` is a style layer that renders icon and text labels at
  points or along lines on the map.
  
- Use a symbol style layer to configure the visual appearance of labels for
- features in vector tiles loaded by an `MGLVectorSource` object or `MGLShape` or
- `MGLFeature` instances in an `MGLShapeSource` object.
+ Use a symbol style layer to configure the visual appearance of feature labels.
+ These features can come from vector tiles loaded by an `MGLVectorTileSource`
+ object, or they can be `MGLShape` or `MGLFeature` instances in an
+ `MGLShapeSource` or `MGLComputedShapeSource` object.
 
  You can access an existing symbol style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -460,11 +461,15 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *iconIgnorePlacement __attribute__((unavailable("Use iconIgnoresPlacement instead.")));
 
 /**
- Name of image in sprite to use for drawing an image background. Within literal
- values, attribute names enclosed in curly brackets (e.g. `{token}`) are
- replaced with the value of the named attribute. Expressions do not support this
- syntax; for equivalent functionality in expressions, use
- `stringByAppendingString:` and key path expressions.
+ Name of a style image to use for drawing an image background.
+ 
+ Use the `+[MGLStyle setImage:forName:]` method to associate an image with a
+ name that you can set this property to.
+ 
+ Within a constant string value, a feature attribute name enclosed in curly
+ braces (e.g., `{token}`) is replaced with the value of the named attribute.
+ Tokens inside non-constant expressions are ignored; instead, use `mgl_join:`
+ and key path expressions.
  
  This attribute corresponds to the <a
  href="https://www.mapbox.com/mapbox-gl-style-spec/#layout-symbol-icon-image"><code>icon-image</code></a>
@@ -559,14 +564,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `2`. Set this property to `nil` to reset it to the default value.
+ 2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -610,7 +615,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -673,7 +678,7 @@ MGL_EXPORT
  This property is measured in factor of the original icon sizes.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
@@ -684,7 +689,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -853,7 +858,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `45`. Set this property to `nil` to reset it to the default value.
+ 45. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`, and
  `symbolPlacement` is set to an expression that evaluates to `line`. Otherwise,
@@ -885,7 +890,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `10`. Set this property to `nil` to reset it to the default value.
+ 10. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -896,7 +901,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -968,14 +973,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `250`. Set this property to `nil` to reset it to the default value.
+ 250. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `symbolPlacement` is set to an
  expression that evaluates to `line`. Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 1
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -987,10 +992,12 @@ MGL_EXPORT
 @property (nonatomic, null_resettable) NSExpression *symbolSpacing;
 
 /**
- Value to use for a text label. Within literal values, attribute names enclosed
- in curly brackets (e.g. `{token}`) are replaced with the value of the named
- attribute. Expressions do not support this syntax; for equivalent functionality
- in expressions, use `stringByAppendingString:` and key path expressions.
+ Value to use for a text label.
+ 
+ Within a constant string value, a feature attribute name enclosed in curly
+ braces (e.g., `{token}`) is replaced with the value of the named attribute.
+ Tokens inside non-constant expressions are ignored; instead, use `mgl_join:`
+ and key path expressions.
  
  The default value of this property is an expression that evaluates to the empty
  string. Set this property to `nil` to reset it to the default value.
@@ -1122,7 +1129,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `16`. Set this property to `nil` to reset it to the default value.
+ 16. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1133,7 +1140,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1212,7 +1219,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1234,7 +1241,7 @@ MGL_EXPORT
  This property is measured in ems.
  
  The default value of this property is an expression that evaluates to the float
- `1.2`. Set this property to `nil` to reset it to the default value.
+ 1.2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1331,14 +1338,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `2`. Set this property to `nil` to reset it to the default value.
+ 2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1382,7 +1389,7 @@ MGL_EXPORT
  This property is measured in degrees.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
@@ -1463,6 +1470,7 @@ MGL_EXPORT
 
 #pragma mark - Accessing the Paint Attributes
 
+#if TARGET_OS_IPHONE
 /**
  The tint color to apply to the icon. The `iconImageName` property must be set
  to a template image.
@@ -1484,6 +1492,29 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *iconColor;
+#else
+/**
+ The tint color to apply to the icon. The `iconImageName` property must be set
+ to a template image.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *iconColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `iconColor` property.
@@ -1498,14 +1529,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1521,6 +1552,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition iconHaloBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the icon’s halo. The `iconImageName` property must be set to a
  template image.
@@ -1542,6 +1574,29 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *iconHaloColor;
+#else
+/**
+ The color of the icon’s halo. The `iconImageName` property must be set to a
+ template image.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.clearColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `iconImageName` is non-`nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *iconHaloColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `iconHaloColor` property.
@@ -1556,14 +1611,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1583,14 +1638,14 @@ MGL_EXPORT
  The opacity at which the icon will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `iconImageName` is non-`nil`.
  Otherwise, it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1707,6 +1762,7 @@ MGL_EXPORT
 
 @property (nonatomic, null_resettable) NSExpression *iconTranslateAnchor __attribute__((unavailable("Use iconTranslationAnchor instead.")));
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the text will be drawn.
  
@@ -1727,6 +1783,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textColor;
+#else
+/**
+ The color with which the text will be drawn.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `textColor` property.
@@ -1741,14 +1819,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1764,6 +1842,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition textHaloBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color of the text's halo, which helps it stand out from backgrounds.
  
@@ -1784,6 +1863,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *textHaloColor;
+#else
+/**
+ The color of the text's halo, which helps it stand out from backgrounds.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.clearColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `text` is non-`nil`. Otherwise,
+ it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *textHaloColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `textHaloColor` property.
@@ -1799,14 +1900,14 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -1826,14 +1927,14 @@ MGL_EXPORT
  The opacity at which the text will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `text` is non-`nil`. Otherwise,
  it is ignored.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables

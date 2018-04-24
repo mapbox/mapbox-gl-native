@@ -300,7 +300,17 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
             doc += `\n\nThis attribute corresponds to the <a href="https://www.mapbox.com/mapbox-gl-style-spec/#${anchor}"><code>${property.original}</code></a> layout property in the Mapbox Style Specification.`;
         }
         doc += '\n\nYou can set this property to an expression containing any of the following:\n\n';
-        doc += `* Constant ${describeType(property)} values\n`;
+        doc += `* Constant ${describeType(property)} values`;
+        if ('minimum' in property) {
+            if ('maximum' in property) {
+                doc += ` between ${formatNumber(property.minimum)} and ${formatNumber(property.maximum)} inclusive`;
+            } else {
+                doc += ` no less than ${formatNumber(property.minimum)}`;
+            }
+        } else if ('maximum' in property) {
+            doc += ` no greater than ${formatNumber(property.maximum)}`;
+        }
+        doc += '\n';
         if (property.type === 'enum') {
             doc += '* Any of the following constant string values:\n';
             doc += Object.keys(property.values).map(value => '  * `' + value + '`: ' + property.values[value].doc).join('\n') + '\n';
@@ -393,7 +403,7 @@ global.describeValue = function (value, property, layerType) {
         case 'boolean':
             return value ? '`YES`' : '`NO`';
         case 'number':
-            return 'the float `' + value + '`';
+            return 'the float ' + formatNumber(value);
         case 'string':
             if (value === '') {
                 return 'the empty string';
@@ -428,7 +438,7 @@ global.describeValue = function (value, property, layerType) {
             if (color.r === 1 && color.g === 1 && color.b === 1 && color.a === 1) {
                 return '`UIColor.whiteColor`';
             }
-            return 'a `UIColor`' + ` object whose RGB value is ${color.r}, ${color.g}, ${color.b} and whose alpha value is ${color.a}`;
+            return 'a `UIColor`' + ` object whose RGB value is ${formatNumber(color.r)}, ${formatNumber(color.g)}, ${formatNumber(color.b)} and whose alpha value is ${formatNumber(color.a)}`;
         case 'array':
             let units = property.units || '';
             if (units) {
@@ -439,12 +449,12 @@ global.describeValue = function (value, property, layerType) {
                     if (value[0] === 0 && value[1] === 0 && value[2] === 0 && value[3] === 0) {
                         return 'an `NSValue` object containing `UIEdgeInsetsZero`';
                     }
-                    return 'an `NSValue` object containing a `UIEdgeInsets` struct set to' + ` ${value[0]}${units} on the top, ${value[3]}${units} on the left, ${value[2]}${units} on the bottom, and ${value[1]}${units} on the right`;
+                    return 'an `NSValue` object containing a `UIEdgeInsets` struct set to' + ` ${formatNumber(value[0])}${units} on the top, ${formatNumber(value[3])}${units} on the left, ${formatNumber(value[2])}${units} on the bottom, and ${formatNumber(value[1])}${units} on the right`;
                 case 'offset':
                 case 'translate':
-                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${value[0]}${units} rightward and ${value[1]}${units} downward`;
+                    return 'an `NSValue` object containing a `CGVector` struct set to' + ` ${formatNumber(value[0])}${units} rightward and ${formatNumber(value[1])}${units} downward`;
                 case 'position':
-                    return 'an `MGLSphericalPosition` struct set to' + ` ${value[0]} radial, ${value[1]} azimuthal and ${value[2]} polar`;
+                    return 'an `MGLSphericalPosition` struct set to' + ` ${formatNumber(value[0])} radial, ${formatNumber(value[1])} azimuthal and ${formatNumber(value[2])} polar`;
                 default:
                     return 'the array `' + value.join('`, `') + '`';
             }
@@ -452,6 +462,10 @@ global.describeValue = function (value, property, layerType) {
             throw new Error(`unknown type for ${property.name}`);
     }
 };
+
+global.formatNumber = function (num) {
+    return num.toLocaleString().replace('-', '\u2212');
+}
 
 global.propertyDefault = function (property, layerType) {
     if (property.name === 'heatmap-color') {
@@ -612,7 +626,7 @@ const layerH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.h.
 const layerM = ejs.compile(fs.readFileSync('platform/darwin/src/MGLStyleLayer.mm.ejs', 'utf8'), { strict: true});
 const testLayers = ejs.compile(fs.readFileSync('platform/darwin/test/MGLStyleLayerTests.mm.ejs', 'utf8'), { strict: true});
 const forStyleAuthorsMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/For Style Authors.md.ejs', 'utf8'), { strict: true });
-const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Using Style Functions at Runtime.md.ejs', 'utf8'), { strict: true });
+const ddsGuideMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Migrating to Expressions.md.ejs', 'utf8'), { strict: true });
 const templatesMD = ejs.compile(fs.readFileSync('platform/darwin/docs/guides/Tile URL Templates.md.ejs', 'utf8'), { strict: true });
 
 const lightH = ejs.compile(fs.readFileSync('platform/darwin/src/MGLLight.h.ejs', 'utf8'), {strict: true});
@@ -650,13 +664,13 @@ function duplicatePlatformDecls(src) {
     // Look for a documentation comment that contains “MGLColor” or “UIColor”
     // and the subsequent function, method, or property declaration. Try not to
     // match greedily.
-    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\*\/)(\s*[^;]+?\b(?:MGL|NS|UI)(?:Color|EdgeInsets(?:Zero)?)\b[^;]+?;)/g,
+    return src.replace(/(\/\*\*(?:\*[^\/]|[^*])*?\b(?:MGL|NS|UI)Color\b[\s\S]*?\*\/)(\s*.+?;)/g,
                        (match, comment, decl) => {
-        let macosComment = comment.replace(/\b(?:MGL|UI)(Color|EdgeInsets(?:Zero)?)\b/g, 'NS$1')
+        let macosComment = comment.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor')
             // Use the correct indefinite article.
-            .replace(/\ba(\s+`?NS(?:Color|EdgeInsets))\b/gi, 'an$1');
-        let iosDecl = decl.replace(/\bMGL(Color|EdgeInsets)\b/g, 'UI$1');
-        let macosDecl = decl.replace(/\b(?:MGL|UI)(Color|EdgeInsets)\b/g, 'NS$1');
+            .replace(/\ba(\s+`?NSColor)\b/gi, 'an$1');
+        let iosDecl = decl.replace(/\bMGLColor\b/g, 'UIColor');
+        let macosDecl = decl.replace(/\b(?:MGL|UI)Color\b/g, 'NSColor');
         return `\
 #if TARGET_OS_IPHONE
 ${comment}${iosDecl}
@@ -743,10 +757,10 @@ writeIfModified(`platform/macos/docs/guides/For Style Authors.md`, forStyleAutho
     renamedProperties: renamedPropertiesByLayerType,
     layers: layers,
 }));
-writeIfModified(`platform/ios/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/ios/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'iOS',
 }));
-writeIfModified(`platform/macos/docs/guides/Using Style Functions at Runtime.md`, ddsGuideMD({
+writeIfModified(`platform/macos/docs/guides/Migrating to Expressions.md`, ddsGuideMD({
     os: 'macOS',
 }));
 writeIfModified(`platform/ios/docs/guides/Tile URL Templates.md`, templatesMD({

@@ -9,6 +9,7 @@ import java.util.Map;
 
 /**
  * Tile set, allows using TileJson specification as source.
+ * Note that `encoding` is only relevant to `raster-dem` sources, and is not supported in the TileJson spec.
  *
  * @see <a href="https://github.com/mapbox/tilejson-spec/tree/master/2.1.0">The tileset specification</a>
  */
@@ -28,6 +29,7 @@ public class TileSet {
   private Float maxZoom;
   private Float[] bounds;
   private Float[] center;
+  private String encoding;
 
   /**
    * @param tilejson A semver.org style version number. Describes the version of the TileJSON spec that is implemented
@@ -246,6 +248,20 @@ public class TileSet {
     this.bounds = bounds;
   }
 
+  public String getEncoding() {
+    return encoding;
+  }
+
+  /**
+   * Default: "mapbox". The encoding formula for a raster-dem tileset.
+   * Supported values are "mapbox" and "terrarium".
+   *
+   * @param encoding the String encoding formula to set
+   */
+  public void setEncoding(String encoding) {
+    this.encoding = encoding;
+  }
+
   public Float[] getCenter() {
     return center;
   }
@@ -313,6 +329,10 @@ public class TileSet {
     if (center != null) {
       result.put("center", center);
     }
+    if (encoding != null) {
+      result.put("encoding", encoding);
+    }
+
 
     return result;
   }

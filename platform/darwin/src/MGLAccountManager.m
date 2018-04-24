@@ -54,11 +54,6 @@
     return _sharedManager;
 }
 
-+ (BOOL)mapboxMetricsEnabledSettingShownInApp {
-    NSLog(@"mapboxMetricsEnabledSettingShownInApp is no longer necessary; the Mapbox Maps SDK for iOS has changed to always provide a telemetry setting in-app.");
-    return YES;
-}
-
 + (void)setAccessToken:(NSString *)accessToken {
     accessToken = [accessToken stringByTrimmingCharactersInSet:
                    [NSCharacterSet whitespaceAndNewlineCharacterSet]];
@@ -69,9 +64,7 @@
     [MGLAccountManager sharedManager].accessToken = accessToken;
 
 #if TARGET_OS_IPHONE || TARGET_OS_SIMULATOR
-    // Update MGLMapboxEvents
-    // NOTE: This is (likely) the initial setup of MGLMapboxEvents
-    [MGLMapboxEvents sharedManager];
+    [MGLMapboxEvents setupWithAccessToken:accessToken];
 #endif
 }
 

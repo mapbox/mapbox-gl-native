@@ -1,6 +1,7 @@
 #import <Mapbox/Mapbox.h>
 
 #import "NSBundle+MGLAdditions.h"
+#import "MGLVectorTileSource_Private.h"
 
 #import <mbgl/util/default_styles.hpp>
 
@@ -64,12 +65,6 @@
     XCTAssertEqualObjects([MGLStyle darkStyleURL].absoluteString, @(mbgl::util::default_styles::dark.url));
     XCTAssertEqualObjects([MGLStyle satelliteStyleURL].absoluteString, @(mbgl::util::default_styles::satellite.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURL].absoluteString, @(mbgl::util::default_styles::satelliteStreets.url));
-    
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle emeraldStyleURL].absoluteString, @"mapbox://styles/mapbox/emerald-v8");
-    XCTAssertEqualObjects([MGLStyle hybridStyleURL].absoluteString, @"mapbox://styles/mapbox/satellite-hybrid-v8");
-#pragma clang diagnostic pop
 }
 
 - (void)testVersionedStyleURLs {
@@ -99,19 +94,8 @@
                           @(mbgl::util::default_styles::satelliteStreets.url));
     XCTAssertEqualObjects([MGLStyle satelliteStreetsStyleURLWithVersion:99].absoluteString,
                           @"mapbox://styles/mapbox/satellite-streets-v99");
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:mbgl::util::default_styles::trafficDay.currentVersion].absoluteString,
-                          @(mbgl::util::default_styles::trafficDay.url));
-    XCTAssertEqualObjects([MGLStyle trafficDayStyleURLWithVersion:99].absoluteString,
-                          @"mapbox://styles/mapbox/traffic-day-v99");
-    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:mbgl::util::default_styles::trafficNight.currentVersion].absoluteString,
-                          @(mbgl::util::default_styles::trafficNight.url));
-    XCTAssertEqualObjects([MGLStyle trafficNightStyleURLWithVersion:99].absoluteString,
-                          @"mapbox://styles/mapbox/traffic-night-v99");
-#pragma clang diagnostic pop
 
-    static_assert(8 == mbgl::util::default_styles::numOrderedStyles,
+    static_assert(6 == mbgl::util::default_styles::numOrderedStyles,
                   "MGLStyleTests isn’t testing all the styles in mbgl::util::default_styles.");
 }
 
@@ -143,7 +127,7 @@
     NSString *styleHeader = self.stringWithContentsOfStyleHeader;
 
     NSError *versionedMethodError;
-    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*\b)RE");
+    NSString *versionedMethodExpressionString = @(R"RE(^\+\s*\(NSURL\s*\*\s*\)\s*(?!traffic)\w+StyleURLWithVersion\s*:\s*\(\s*NSInteger\s*\)\s*version\s*\b)RE");
     NSRegularExpression *versionedMethodExpression = [NSRegularExpression regularExpressionWithPattern:versionedMethodExpressionString options:NSRegularExpressionAnchorsMatchLines error:&versionedMethodError];
     XCTAssertNil(versionedMethodError, @"Error compiling regular expression to search for versioned methods.");
     NSUInteger numVersionedMethodDeclarations = [versionedMethodExpression numberOfMatchesInString:styleHeader options:0 range:NSMakeRange(0, styleHeader.length)];
@@ -174,89 +158,89 @@
     [self.style addSource:shapeSource];
     XCTAssertThrowsSpecificNamed([self.style addSource:shapeSource], NSException, @"MGLRedundantSourceException");
 
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"rasterSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
-    [self.style addSource:rasterSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:rasterSource], NSException, @"MGLRedundantSourceException");
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"rasterTileSource" configurationURL:[NSURL URLWithString:@".json"] tileSize:42];
+    [self.style addSource:rasterTileSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:rasterTileSource], NSException, @"MGLRedundantSourceException");
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vectorSource" configurationURL:[NSURL URLWithString:@".json"]];
-    [self.style addSource:vectorSource];
-    XCTAssertThrowsSpecificNamed([self.style addSource:vectorSource], NSException, @"MGLRedundantSourceException");
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"vectorTileSource" configurationURL:[NSURL URLWithString:@".json"]];
+    [self.style addSource:vectorTileSource];
+    XCTAssertThrowsSpecificNamed([self.style addSource:vectorTileSource], NSException, @"MGLRedundantSourceException");
 }
 
 - (void)testAddingSourcesWithDuplicateIdentifiers {
-    MGLVectorSource *source1 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
-    MGLVectorSource *source2 = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source1 = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source2 = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
 
     [self.style addSource: source1];
     XCTAssertThrowsSpecificNamed([self.style addSource: source2], NSException, @"MGLRedundantSourceIdentifierException");
 }
 
 - (void)testRemovingSourcesBeforeAddingThem {
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"raster-source" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:rasterSource];
-    [self.style addSource:rasterSource];
-    XCTAssertNotNil([self.style sourceWithIdentifier:rasterSource.identifier]);
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"raster-tile-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:rasterTileSource];
+    [self.style addSource:rasterTileSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:rasterTileSource.identifier]);
 
     MGLShapeSource *shapeSource = [[MGLShapeSource alloc] initWithIdentifier:@"shape-source" shape:nil options:nil];
     [self.style removeSource:shapeSource];
     [self.style addSource:shapeSource];
     XCTAssertNotNil([self.style sourceWithIdentifier:shapeSource.identifier]);
 
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"vector-source" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:vectorSource];
-    [self.style addSource:vectorSource];
-    XCTAssertNotNil([self.style sourceWithIdentifier:vectorSource.identifier]);
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"vector-tile-source" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:vectorTileSource];
+    [self.style addSource:vectorTileSource];
+    XCTAssertNotNil([self.style sourceWithIdentifier:vectorTileSource.identifier]);
 }
 
 - (void)testAddingSourceOfTypeABeforeSourceOfTypeBWithSameIdentifier {
-    // Add a raster source
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style addSource:rasterSource];
+    // Add a raster tile source
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterTileSource];
 
-    // Attempt to remove an image source with the same identifier as the raster source
+    // Attempt to remove an image source with the same identifier as the raster tile source
     MGLImageSource *imageSource = [[MGLImageSource alloc] initWithIdentifier:@"some-identifier" coordinateQuad: { } URL:[NSURL URLWithString:@"http://host/image.png"]];
     [self.style removeSource:imageSource];
-    // The raster source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
+    // The raster tile source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
 
-    // Remove the raster source
-    [self.style removeSource:rasterSource];
+    // Remove the raster tile source
+    [self.style removeSource:rasterTileSource];
 
     // Add the shape source
     [self.style addSource:imageSource];
 
-    // Attempt to remove a vector source with the same identifer as the shape source
-    MGLVectorSource *vectorSource = [[MGLVectorSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style removeSource:vectorSource];
+    // Attempt to remove a vector tile source with the same identifer as the shape source
+    MGLVectorTileSource *vectorTileSource = [[MGLVectorTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style removeSource:vectorTileSource];
     // The image source should still be added
     XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLImageSource class]]);
 
     // Remove the image source
     [self.style removeSource:imageSource];
 
-    // Add the vector source
-    [self.style addSource:vectorSource];
+    // Add the vector tile source
+    [self.style addSource:vectorTileSource];
 
-    // Attempt to remove the previously created raster source that has the same identifer as the shape source
-    [self.style removeSource:rasterSource];
-    // The vector source should still be added
-    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorSource class]]);
+    // Attempt to remove the previously created raster tile source that has the same identifer as the shape source
+    [self.style removeSource:rasterTileSource];
+    // The vector tile source should still be added
+    XCTAssertTrue([[self.style sourceWithIdentifier:imageSource.identifier] isMemberOfClass:[MGLVectorTileSource class]]);
 }
 
 - (void)testRemovingSourceInUse {
-    // Add a raster source
-    MGLRasterSource *rasterSource = [[MGLRasterSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
-    [self.style addSource:rasterSource];
+    // Add a raster tile source
+    MGLRasterTileSource *rasterTileSource = [[MGLRasterTileSource alloc] initWithIdentifier:@"some-identifier" tileURLTemplates:@[] options:nil];
+    [self.style addSource:rasterTileSource];
     
     // Add a layer using it
-    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterSource];
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"fillLayer" source:rasterTileSource];
     [self.style addLayer:fillLayer];
 
-    // Attempt to remove the raster source
-    [self.style removeSource:rasterSource];
+    // Attempt to remove the raster tile source
+    [self.style removeSource:rasterTileSource];
     
     // Ensure it is still there
-    XCTAssertTrue([[self.style sourceWithIdentifier:rasterSource.identifier] isMemberOfClass:[MGLRasterSource class]]);
+    XCTAssertTrue([[self.style sourceWithIdentifier:rasterTileSource.identifier] isMemberOfClass:[MGLRasterTileSource class]]);
 }
 
 - (void)testLayers {
@@ -306,7 +290,7 @@
 
 - (void)testAddingLayersWithDuplicateIdentifiers {
     // Just some source
-    MGLVectorSource *source = [[MGLVectorSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
+    MGLVectorTileSource *source = [[MGLVectorTileSource alloc] initWithIdentifier:@"my-source" configurationURL:[NSURL URLWithString:@"mapbox://mapbox.mapbox-terrain-v2"]];
     [self.style addSource: source];
 
     // Add initial layer
@@ -383,13 +367,6 @@
     return styleHeader;
 }
 
-- (void)testClasses {
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    XCTAssertEqual(self.style.styleClasses.count, 0);
-#pragma clang diagnostic pop
-}
-
 - (void)testImages {
     NSString *imageName = @"TrackingLocationMask";
 #if TARGET_OS_IPHONE
@@ -441,6 +418,47 @@
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer2.identifier);
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer3.identifier);
     XCTAssertEqualObjects(layers[startIndex++].identifier, layer4.identifier);
+}
+
+#pragma mark Localization tests
+
+- (void)testLanguageMatching {
+    {
+        NSArray *preferences = @[@"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"en-US"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"fr"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"fr");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hans"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"zh-Hans");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hans", @"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"zh-Hans");
+    }
+    {
+        NSArray *preferences = @[@"zh-Hant"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
+    {
+        NSArray *preferences = @[@"tlh"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
+    {
+        NSArray *preferences = @[@"tlh", @"en"];
+        XCTAssertEqualObjects([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences], @"en");
+    }
+    {
+        NSArray *preferences = @[@"mul"];
+        XCTAssertNil([MGLVectorTileSource preferredMapboxStreetsLanguageForPreferences:preferences]);
+    }
 }
 
 @end

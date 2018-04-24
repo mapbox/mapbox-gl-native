@@ -67,7 +67,7 @@ public class LatLngBounds implements Parcelable {
     double latCenter = (this.latitudeNorth + this.latitudeSouth) / 2.0;
     double longCenter;
 
-    if (this.longitudeEast > this.longitudeWest) {
+    if (this.longitudeEast >= this.longitudeWest) {
       longCenter = (this.longitudeEast + this.longitudeWest) / 2;
     } else {
       double halfSpan = (GeometryConstants.LONGITUDE_SPAN + this.longitudeEast - this.longitudeWest) / 2.0;
@@ -180,7 +180,7 @@ public class LatLngBounds implements Parcelable {
    */
   public double getLongitudeSpan() {
     double longSpan = Math.abs(this.longitudeEast - this.longitudeWest);
-    if (this.longitudeEast > this.longitudeWest) {
+    if (this.longitudeEast >= this.longitudeWest) {
       return longSpan;
     }
 
@@ -191,7 +191,7 @@ public class LatLngBounds implements Parcelable {
 
   static double getLongitudeSpan(final double longEast, final double longWest) {
     double longSpan = Math.abs(longEast - longWest);
-    if (longEast > longWest) {
+    if (longEast >= longWest) {
       return longSpan;
     }
 
@@ -283,6 +283,8 @@ public class LatLngBounds implements Parcelable {
    * This values of latNorth and latSouth should be in the range of [-90, 90],
    * see {@link GeometryConstants#MIN_LATITUDE} and {@link GeometryConstants#MAX_LATITUDE},
    * otherwise IllegalArgumentException will be thrown.
+   * latNorth should be greater or equal latSouth, otherwise  IllegalArgumentException will be thrown.
+   *
    * <p>
    * This method doesn't recalculate most east or most west boundaries.
    * Note that lonEast and lonWest will be wrapped to be in the range of [-180, 180],
@@ -310,6 +312,10 @@ public class LatLngBounds implements Parcelable {
     if (latNorth > GeometryConstants.MAX_LATITUDE || latNorth < GeometryConstants.MIN_LATITUDE
       || latSouth > GeometryConstants.MAX_LATITUDE || latSouth < GeometryConstants.MIN_LATITUDE) {
       throw new IllegalArgumentException("latitude must be between -90 and 90");
+    }
+
+    if (latNorth < latSouth) {
+      throw new IllegalArgumentException("LatSouth cannot be less than latNorth");
     }
 
     lonEast = LatLng.wrap(lonEast, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
@@ -388,7 +394,7 @@ public class LatLngBounds implements Parcelable {
   }
 
   static boolean containsLongitude(final double eastLon, final double westLon, final double longitude) {
-    if (eastLon > westLon) {
+    if (eastLon >= westLon) {
       return (longitude <= eastLon)
         && (longitude >= westLon);
     }
@@ -438,10 +444,21 @@ public class LatLngBounds implements Parcelable {
    * @return BoundingBox
    */
   public LatLngBounds union(final double latNorth, final double lonEast, final double latSouth, final double lonWest) {
-    return new LatLngBounds((this.latitudeNorth < latNorth) ? latNorth : this.latitudeNorth,
-      (this.longitudeEast < lonEast) ? lonEast : this.longitudeEast,
-      (this.latitudeSouth > latSouth) ? latSouth : this.latitudeSouth,
-      (this.longitudeWest > lonWest) ? lonWest : this.longitudeWest);
+    double north = (this.latitudeNorth < latNorth) ? latNorth : this.latitudeNorth;
+    double south = (this.latitudeSouth > latSouth) ? latSouth : this.latitudeSouth;
+
+    if (LatLngSpan.getLongitudeSpan(lonEast, this.longitudeWest)
+      < LatLngSpan.getLongitudeSpan(this.longitudeEast, lonWest)) {
+      return new LatLngBounds(north,
+        lonEast,
+        south,
+        this.longitudeWest);
+    }
+
+    return new LatLngBounds(north,
+      this.longitudeEast,
+      south,
+      lonWest);
   }
 
   /**

@@ -54,6 +54,17 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
   @SuppressWarnings("JavadocReference")
   private static final int EGL_OPENGL_ES2_BIT = 0x0004;
 
+  private boolean translucentSurface;
+
+  public EGLConfigChooser() {
+    this(false);
+  }
+
+  public EGLConfigChooser(boolean translucentSurface) {
+    super();
+    this.translucentSurface = translucentSurface;
+  }
+
   @Override
   public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display) {
     int[] configAttribs = getConfigAttributes();
@@ -274,7 +285,7 @@ public class EGLConfigChooser implements GLSurfaceView.EGLConfigChooser {
       EGL_RED_SIZE, 5,
       EGL_GREEN_SIZE, 6,
       EGL_BLUE_SIZE, 5,
-      EGL_ALPHA_SIZE, 0,
+      EGL_ALPHA_SIZE, translucentSurface ? 8 : 0,
       EGL_DEPTH_SIZE, 16,
       EGL_STENCIL_SIZE, 8,
       (emulator ? EGL_NONE : EGL_CONFORMANT), EGL_OPENGL_ES2_BIT,

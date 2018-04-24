@@ -397,11 +397,10 @@ MGL_EXPORT IB_DESIGNABLE
  want to animate the change, use the `-setVisibleCoordinateBounds:animated:`
  method instead.
  
- If a longitude is less than −180 degrees or greater than 180 degrees, the visible
- bounds straddles the antimeridian or international date line.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ visible bounds straddles the antimeridian or international date line. For
+ example, if both Tokyo and San Francisco are visible, the visible bounds might
+ extend from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic) MGLCoordinateBounds visibleCoordinateBounds;
 
@@ -409,11 +408,10 @@ MGL_EXPORT IB_DESIGNABLE
  Changes the receiver’s viewport to fit the given coordinate bounds, optionally
  animating the change.
  
- To make the visible bounds go across the antimeridian or international date line,
- specify some longitudes less than −180 degrees or greater than 180 degrees.
- 
- For example, a visible bounds that stretches from Tokyo to San Francisco would have
- coordinates of (35.68476, -220.24257) and (37.78428, -122.41310).
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
 
  @param bounds The bounds that the viewport will show in its entirety.
  @param animated Specify `YES` to animate the change by smoothly scrolling and
@@ -723,16 +721,27 @@ MGL_EXPORT IB_DESIGNABLE
 
  Assigning a new array to this property selects only the first annotation in the
  array.
+
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the map is
+ panned so that the annotation and its callout are brought just onscreen. The
+ annotation is *not* centered within the viewport.
+
+ @note In versions prior to `4.0.0` if the annotation was offscreen it was not
+ selected.
  */
 @property (nonatomic, copy) NS_ARRAY_OF(id <MGLAnnotation>) *selectedAnnotations;
 
 /**
  Selects an annotation and displays a callout popover for it.
 
- If the given annotation is not visible within the current viewport, this method
- has no effect.
+ If the annotation is of type `MGLPointAnnotation` and is offscreen, the map is
+ panned so that the annotation and its callout are brought just onscreen. The
+ annotation is *not* centered within the viewport.
 
  @param annotation The annotation object to select.
+
+ @note In versions prior to `4.0.0` selecting an offscreen annotation did not
+ change the camera.
  */
 - (void)selectAnnotation:(id <MGLAnnotation>)annotation;
 
@@ -866,9 +875,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -900,7 +909,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
@@ -963,9 +972,9 @@ MGL_EXPORT IB_DESIGNABLE
  Each object in the returned array represents a feature rendered by the
  current style and provides access to attributes specified by the relevant map
  content sources. The returned array includes features loaded by
- `MGLShapeSource` and `MGLVectorSource` objects but does not include anything
- from `MGLRasterSource` objects, or from image, video, or canvas sources, which
- are unsupported by this SDK.
+ `MGLShapeSource` and `MGLVectorTileSource` objects but does not include
+ anything from `MGLRasterTileSource` objects, or from video or canvas sources,
+ which are unsupported by this SDK.
 
  The returned features are drawn by a style layer in the current style. For
  example, suppose the current style uses the
@@ -998,7 +1007,7 @@ MGL_EXPORT IB_DESIGNABLE
  
  Only visible features are returned. To obtain features regardless of
  visibility, use the
- `-[MGLVectorSource featuresInSourceLayersWithIdentifiers:predicate:]` and
+ `-[MGLVectorTileSource featuresInSourceLayersWithIdentifiers:predicate:]` and
  `-[MGLShapeSource featuresMatchingPredicate:]` methods on the relevant sources.
 
  @note Layer identifiers are not guaranteed to exist across styles or different
@@ -1060,6 +1069,9 @@ MGL_EXPORT IB_DESIGNABLE
 /**
  Converts a rectangle in the given view’s coordinate system to a geographic
  bounding box.
+ 
+ If a longitude is less than −180 degrees or greater than 180 degrees, the
+ bounding box straddles the antimeridian or international date line.
 
  @param rect The rectangle to convert.
  @param view The view in whose coordinate system the rectangle is expressed.

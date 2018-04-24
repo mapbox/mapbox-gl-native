@@ -4,8 +4,9 @@ import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.gson.JsonArray;
 import com.mapbox.mapboxsdk.exceptions.ConversionException;
-import com.mapbox.mapboxsdk.style.functions.Function;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.utils.ColorUtils;
 
 import timber.log.Timber;
@@ -40,12 +41,27 @@ public class PropertyValue<T> {
   }
 
   /**
-   * Returns if this is a function.
+   * Returns if this is a expression.
    *
-   * @return true if is a function, false if not
+   * @return true if this is a expression, false if not
    */
-  public boolean isFunction() {
-    return !isNull() && value instanceof Function;
+  public boolean isExpression() {
+    return !isNull() && value instanceof JsonArray;
+  }
+
+  /**
+   * Get the expression of the property.
+   *
+   * @return the property expression
+   */
+  @Nullable
+  public Expression getExpression() {
+    if (isExpression()) {
+      return Expression.Converter.convert((JsonArray) value);
+    } else {
+      Timber.w("not a expression, try value");
+      return null;
+    }
   }
 
   /**
@@ -54,18 +70,7 @@ public class PropertyValue<T> {
    * @return true if is a value, false if not
    */
   public boolean isValue() {
-    return !isNull() && !isFunction();
-  }
-
-  @Nullable
-  public Function<?, T> getFunction() {
-    if (isFunction()) {
-      // noinspection unchecked
-      return (Function<?, T>) value;
-    } else {
-      Timber.w("not a function, try value");
-      return null;
-    }
+    return !isNull() && !isExpression();
   }
 
   /**
@@ -77,7 +82,7 @@ public class PropertyValue<T> {
   public T getValue() {
     if (isValue()) {
       // noinspection unchecked
-      return (T) value;
+      return value;
     } else {
       Timber.w("not a value, try function");
       return null;

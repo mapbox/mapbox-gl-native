@@ -11,12 +11,15 @@ import com.mapbox.geojson.Point;
 import com.mapbox.mapboxsdk.maps.MapView;
 import com.mapbox.mapboxsdk.maps.MapboxMap;
 import com.mapbox.mapboxsdk.style.layers.CircleLayer;
-import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.sources.GeoJsonSource;
 import com.mapbox.mapboxsdk.testapp.R;
 
-
 import java.util.List;
+
+import static com.mapbox.mapboxsdk.style.expressions.Expression.eq;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.get;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.literal;
+import static com.mapbox.mapboxsdk.style.expressions.Expression.neq;
 
 /**
  * Test activity showcasing using the query source features API to query feature counts
@@ -30,8 +33,6 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_query_source_features);
-
-    final float density = getResources().getDisplayMetrics().density;
 
     // Initialize map as normal
     mapView = (MapView) findViewById(R.id.mapView);
@@ -47,12 +48,12 @@ public class QuerySourceFeaturesActivity extends AppCompatActivity {
         }));
       mapboxMap.addSource(source);
 
-      mapboxMap.addLayer(new CircleLayer("test-layer", source.getId()).withFilter(Filter.neq("key1", "value1")));
+      mapboxMap.addLayer(new CircleLayer("test-layer", source.getId()).withFilter(neq(get("key1"), literal("value1"))));
 
       // Add a click listener
       mapboxMap.setOnMapClickListener(point -> {
         // Query
-        List<Feature> features = source.querySourceFeatures(Filter.eq("key1", "value1"));
+        List<Feature> features = source.querySourceFeatures(eq(get("key1"), literal("value1")));
         Toast.makeText(QuerySourceFeaturesActivity.this, String.format("Found %s features",
           features.size()), Toast.LENGTH_SHORT).show();
       });

@@ -8,9 +8,7 @@ package com.mapbox.mapboxsdk.style.layers;
 
 import android.support.annotation.ColorInt;
 
-import com.mapbox.mapboxsdk.style.functions.CameraFunction;
 import com.mapbox.mapboxsdk.style.expressions.Expression;
-import com.mapbox.mapboxsdk.style.functions.Function;
 
 import java.util.Locale;
 
@@ -29,18 +27,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> visibility(@Property.VISIBILITY String value) {
     return new LayoutPropertyValue<>("visibility", value);
-  }
-
-  /**
-   * Set the property visibility.
-   *
-   * @param <T> the function input type
-   * @param function the visibility function
-   * @return property wrapper around a String function
-   */
-  @Deprecated
-  public static <T> PropertyValue<Function<T, String>> visibility(Function<T, String> function) {
-    return new LayoutPropertyValue<>("visibility", function);
   }
 
 <% for (const property of paintProperties) { -%>
@@ -76,35 +62,6 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", expression);
   }
 
-<% if (supportsPropertyFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
-   *
-   * @param <T> the function input type
-   * @param function a wrapper function for <%- propertyType(property) %>
-   * @return property wrapper around a <%- propertyType(property) %> function
-   */
-  @Deprecated
-  public static <T> PropertyValue<Function<T, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<T, <%- propertyType(property) %>> function) {
-    return new PaintPropertyValue<>("<%-  property.name %>", function);
-  }
-
-<% } else if (supportsZoomFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
-   *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for <%- propertyType(property) %>
-   * @return property wrapper around a <%- propertyType(property) %> function
-   */
-  @Deprecated
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(CameraFunction<Z, <%- propertyType(property) %>> function) {
-    return new PaintPropertyValue<>("<%-  property.name %>", function);
-  }
-
-<% } -%>
 <% } -%>
 <% for (const property of layoutProperties) { -%>
   /**
@@ -127,33 +84,6 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
 
-<% if (supportsPropertyFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
-   *
-   * @param <T> the function input type
-   * @param function a wrapper function for <%- propertyType(property) %>
-   * @return property wrapper around a <%- propertyType(property) %> function
-   */
-  public static <T> PropertyValue<Function<T, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(Function<T, <%- propertyType(property) %>> function) {
-    return new LayoutPropertyValue<>("<%-  property.name %>", function);
-  }
-
-<% } else if (supportsZoomFunction(property)) { -%>
-
-  /**
-   * <%- propertyFactoryMethodDoc(property) %>
-   *
-   * @param <Z> the zoom parameter type
-   * @param function a wrapper {@link CameraFunction} for <%- propertyType(property) %>
-   * @return property wrapper around a <%- propertyType(property) %> function
-   */
-  public static <Z extends Number> PropertyValue<CameraFunction<Z, <%- propertyType(property) %>>> <%- camelizeWithLeadingLowercase(property.name) %>(CameraFunction<Z, <%- propertyType(property) %>> function) {
-    return new LayoutPropertyValue<>("<%-  property.name %>", function);
-  }
-
-<% } -%>
 <% } -%>
   public static String colorToRgbaString(@ColorInt int value) {
     return String.format(Locale.US,"rgba(%d, %d, %d, %d)",

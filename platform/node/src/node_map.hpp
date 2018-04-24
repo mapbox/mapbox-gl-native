@@ -50,6 +50,7 @@ public:
     static void RemoveLayer(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void AddImage(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void RemoveImage(const Nan::FunctionCallbackInfo<v8::Value>&);
+    static void SetLayerZoomRange(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetLayoutProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetPaintProperty(const Nan::FunctionCallbackInfo<v8::Value>&);
     static void SetFilter(const Nan::FunctionCallbackInfo<v8::Value>&);

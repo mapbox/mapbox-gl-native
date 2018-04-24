@@ -1,0 +1,43 @@
+{
+  "version": 8,
+  "name": "Land",
+  "metadata": {
+    "mapbox:autocomposite": true,
+  },
+  "sources": {
+    "composite": {
+      "url": "mapbox://mapbox.mapbox-terrain-v2",
+      "type": "vector"
+    }
+  },
+  "sprite": "mapbox://sprites/mapbox/mapbox-terrain-v2",
+  "glyphs": "mapbox://fonts/mapbox/{fontstack}/{range}.pbf",
+  "layers": [
+    {
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "fill",
+      "source": "composite",
+      "id": "admin",
+      "paint": {
+        "fill-color": "hsl(359, 100%, 50%)",
+        "fill-opacity": 1
+      },
+      "source-layer": "landcover"
+    },
+    {
+      "layout": {
+        "visibility": "visible"
+      },
+      "type": "fill",
+      "source": "composite",
+      "id": "layer-0",
+      "paint": {
+        "fill-opacity": 1,
+        "fill-color": "hsl(359, 100%, 50%)"
+      },
+      "source-layer": "Layer_0"
+    }
+  ]
+}

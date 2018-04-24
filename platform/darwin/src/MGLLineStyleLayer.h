@@ -78,9 +78,10 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  polylines on the map.
  
  Use a line style layer to configure the visual appearance of polyline or
- multipolyline features in vector tiles loaded by an `MGLVectorSource` object or
- `MGLPolyline`, `MGLPolylineFeature`, `MGLMultiPolyline`, or
- `MGLMultiPolylineFeature` instances in an `MGLShapeSource` object.
+ multipolyline features. These features can come from vector tiles loaded by an
+ `MGLVectorTileSource` object, or they can be `MGLPolyline`,
+ `MGLPolylineFeature`, `MGLMultiPolyline`, or `MGLMultiPolylineFeature`
+ instances in an `MGLShapeSource` or `MGLComputedShapeSource` object.
 
  You can access an existing line style layer using the
  `-[MGLStyle layerWithIdentifier:]` method if you know its identifier;
@@ -93,7 +94,7 @@ typedef NS_ENUM(NSUInteger, MGLLineTranslationAnchor) {
  ```swift
  let layer = MGLLineStyleLayer(identifier: "trails-path", source: trails)
  layer.sourceLayerIdentifier = "trails"
- layer.lineWidth = NSExpression(format: "FUNCTION($zoomLevel, 'mgl_interpolateWithCurveType:parameters:stops:', 'exponential', 1.5, %@)",
+ layer.lineWidth = NSExpression(format: "mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'exponential', 1.5, %@)",
                                 [14: 2,
                                  18: 20])
  layer.lineColor = NSExpression(forConstantValue: UIColor.brown)
@@ -179,7 +180,7 @@ MGL_EXPORT
  Used to automatically convert miter joins to bevel joins for sharp angles.
  
  The default value of this property is an expression that evaluates to the float
- `2`. Set this property to `nil` to reset it to the default value.
+ 2. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `lineJoin` is set to an
  expression that evaluates to `miter`. Otherwise, it is ignored.
@@ -201,7 +202,7 @@ MGL_EXPORT
  Used to automatically convert round joins to miter joins for shallow angles.
  
  The default value of this property is an expression that evaluates to the float
- `1.05`. Set this property to `nil` to reset it to the default value.
+ 1.05. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `lineJoin` is set to an
  expression that evaluates to `round`. Otherwise, it is ignored.
@@ -227,11 +228,11 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -247,6 +248,7 @@ MGL_EXPORT
 */
 @property (nonatomic) MGLTransition lineBlurTransition;
 
+#if TARGET_OS_IPHONE
 /**
  The color with which the line will be drawn.
  
@@ -267,6 +269,28 @@ MGL_EXPORT
  feature attributes
  */
 @property (nonatomic, null_resettable) NSExpression *lineColor;
+#else
+/**
+ The color with which the line will be drawn.
+ 
+ The default value of this property is an expression that evaluates to
+ `NSColor.blackColor`. Set this property to `nil` to reset it to the default
+ value.
+ 
+ This property is only applied to the style if `linePattern` is set to `nil`.
+ Otherwise, it is ignored.
+ 
+ You can set this property to an expression containing any of the following:
+ 
+ * Constant `NSColor` values
+ * Predefined functions, including mathematical and string operators
+ * Conditional expressions
+ * Variable assignments and references to assigned variables
+ * Interpolation and step functions applied to the `$zoomLevel` variable and/or
+ feature attributes
+ */
+@property (nonatomic, null_resettable) NSExpression *lineColor;
+#endif
 
 /**
  The transition affecting any changes to this layer’s `lineColor` property.
@@ -291,7 +315,7 @@ MGL_EXPORT
  
  You can set this property to an expression containing any of the following:
  
- * Constant array values
+ * Constant array values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -319,11 +343,11 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -348,7 +372,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `0`. Set this property to `nil` to reset it to the default value.
+ 0. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -372,11 +396,11 @@ MGL_EXPORT
  The opacity at which the line will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values between 0 and 1 inclusive
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables
@@ -518,11 +542,11 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- `1`. Set this property to `nil` to reset it to the default value.
+ 1. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
- * Constant numeric values
+ * Constant numeric values no less than 0
  * Predefined functions, including mathematical and string operators
  * Conditional expressions
  * Variable assignments and references to assigned variables

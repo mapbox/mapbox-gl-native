@@ -24,8 +24,8 @@ import com.mapbox.mapboxsdk.geometry.LatLngBounds;
 import com.mapbox.mapboxsdk.geometry.ProjectedMeters;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.style.expressions.Expression;
 import com.mapbox.mapboxsdk.style.layers.CannotAddLayerException;
-import com.mapbox.mapboxsdk.style.layers.Filter;
 import com.mapbox.mapboxsdk.style.layers.Layer;
 import com.mapbox.mapboxsdk.style.light.Light;
 import com.mapbox.mapboxsdk.style.sources.CannotAddSourceException;
@@ -229,18 +229,28 @@ final class NativeMapView {
     return nativeGetLatLng().wrap();
   }
 
-  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds) {
+  public CameraPosition getCameraForLatLngBounds(LatLngBounds latLngBounds, int[] padding) {
     if (isDestroyedOn("getCameraForLatLngBounds")) {
       return null;
     }
-    return nativeGetCameraForLatLngBounds(latLngBounds);
+    return nativeGetCameraForLatLngBounds(
+      latLngBounds,
+      padding[1] / pixelRatio,
+      padding[0] / pixelRatio,
+      padding[3] / pixelRatio,
+      padding[2] / pixelRatio);
   }
 
-  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing) {
+  public CameraPosition getCameraForGeometry(Geometry geometry, double bearing, int[] padding) {
     if (isDestroyedOn("getCameraForGeometry")) {
       return null;
     }
-    return nativeGetCameraForGeometry(geometry, bearing);
+    return nativeGetCameraForGeometry(
+      geometry, bearing,
+      padding[1] / pixelRatio,
+      padding[0] / pixelRatio,
+      padding[3] / pixelRatio,
+      padding[2] / pixelRatio);
   }
 
   public void resetPosition() {
@@ -758,20 +768,8 @@ final class NativeMapView {
       return;
     }
 
-    // Check/correct config
-    if (image.getConfig() != Bitmap.Config.ARGB_8888) {
-      image = image.copy(Bitmap.Config.ARGB_8888, false);
-    }
-
-    // Get pixels
-    ByteBuffer buffer = ByteBuffer.allocate(image.getByteCount());
-    image.copyPixelsToBuffer(buffer);
-
     // Determine pixel ratio
-    float density = image.getDensity() == Bitmap.DENSITY_NONE ? Bitmap.DENSITY_NONE : image.getDensity();
-    float pixelRatio = density / DisplayMetrics.DENSITY_DEFAULT;
-
-    nativeAddImage(name, image.getWidth(), image.getHeight(), pixelRatio, buffer.array());
+    nativeAddImage(name, image, image.getDensity() / DisplayMetrics.DENSITY_DEFAULT);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {
@@ -801,7 +799,7 @@ final class NativeMapView {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull PointF coordinates,
                                              @Nullable String[] layerIds,
-                                             @Nullable Filter.Statement filter) {
+                                             @Nullable Expression filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
@@ -813,7 +811,7 @@ final class NativeMapView {
   @NonNull
   public List<Feature> queryRenderedFeatures(@NonNull RectF coordinates,
                                              @Nullable String[] layerIds,
-                                             @Nullable Filter.Statement filter) {
+                                             @Nullable Expression filter) {
     if (isDestroyedOn("queryRenderedFeatures")) {
       return new ArrayList<>();
     }
@@ -908,9 +906,11 @@ final class NativeMapView {
 
   private native LatLng nativeGetLatLng();
 
-  private native CameraPosition nativeGetCameraForLatLngBounds(LatLngBounds latLngBounds);
+  private native CameraPosition nativeGetCameraForLatLngBounds(
+    LatLngBounds latLngBounds, double top, double left, double bottom, double right);
 
-  private native CameraPosition nativeGetCameraForGeometry(Geometry geometry, double bearing);
+  private native CameraPosition nativeGetCameraForGeometry(
+    Geometry geometry, double bearing, double top, double left, double bottom, double right);
 
   private native void nativeResetPosition();
 
@@ -1032,8 +1032,7 @@ final class NativeMapView {
 
   private native void nativeRemoveSource(Source source, long sourcePtr);
 
-  private native void nativeAddImage(String name, int width, int height, float pixelRatio,
-                                     byte[] array);
+  private native void nativeAddImage(String name, Bitmap bitmap, float pixelRatio);
 
   private native void nativeAddImages(Image[] images);
 

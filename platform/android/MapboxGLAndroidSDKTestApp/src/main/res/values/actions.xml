@@ -2,14 +2,7 @@
 <resources>
     <string name="menuitem_title_concurrent_infowindow">Concurrent Open InfoWindows</string>
     <string name="menuitem_title_deselect_markers_on_tap">Deselect Markers On Tap</string>
-    <string name="menuitem_title_tracking_mode_dismiss_on_gesture">Dismiss location tracking on gesture</string>
-    <string name="menuitem_title_bearing_mode_dismiss_on_gesture">Dismiss bearing tracking on gesture</string>
     <string name="menuitem_title_reset">Reset</string>
-    <string name="menuitem_title_rotate_gesture_enabled">Enable rotate gestures</string>
-    <string name="menuitem_title_scroll_gesture_enabled">Enable scroll gestures</string>
-    <string name="menuitem_title_change_location_source_lost">Change to LOST location source</string>
-    <string name="menuitem_title_change_location_source_mock">Change to mock location source</string>
-    <string name="menuitem_title_change_location_source_null">Reset location source to null</string>
     <string name="menuitem_change_icon_overlap">Toggle icon overlap</string>
     <string name="menuitem_filter">Filter layer</string>
     <string name="menuitem_change_location">Change location</string>
@@ -21,10 +14,6 @@
     <string name="button_camera_move">Move</string>
     <string name="button_camera_ease">Ease</string>
     <string name="button_camera_animate">Animate</string>
-    <string name="button_user_dot_default">Default</string>
-    <string name="button_user_dot_tint">Tint dot</string>
-    <string name="button_user_accuracy_ring_tint">Tint ring</string>
-    <string name="button_user_transparent_tint">tran</string>
     <string name="button_open_dialog">Open dialog</string>
     <string name="button_download_region">Download region</string>
     <string name="button_list_regions">List regions</string>
@@ -73,7 +62,6 @@
     <string name="add_a_composite_categorical_function">Add a composite, categorical function</string>
     <string name="add_a_composite_exponential_function">Add a composite, exponential function</string>
     <string name="add_a_composite_interval_function">Add a composite, interval function</string>
-    <string name="my_location_tracking">My Location Tracking</string>
     <string name="bangalore">Bangalore</string>
     <string name="list_all_layers_in_the_style">List all layers in the style</string>
     <string name="list_all_sources_in_the_style">List all sources in the style</string>

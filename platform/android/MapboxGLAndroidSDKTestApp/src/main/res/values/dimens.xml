@@ -6,6 +6,5 @@
     <dimen name="map_padding_bottom">256dp</dimen>
     <dimen name="map_padding_right">32dp</dimen>
     <dimen name="map_padding_top">0dp</dimen>
-    <dimen name="locationview_background_drawable_padding">2dp</dimen>
     <dimen name="navigation_drawer_width">240dp</dimen>
 </resources>

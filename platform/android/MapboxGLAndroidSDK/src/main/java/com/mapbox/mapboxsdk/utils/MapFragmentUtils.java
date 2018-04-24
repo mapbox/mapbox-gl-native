@@ -1,11 +1,8 @@
 package com.mapbox.mapboxsdk.utils;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.v4.content.ContextCompat;
 
-import com.mapbox.mapboxsdk.R;
 import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.maps.MapboxMapOptions;
 
@@ -44,25 +41,6 @@ public class MapFragmentUtils {
     } else {
       // load default options
       options = MapboxMapOptions.createFromAttributes(context, null);
-    }
-    options = loadDefaultMyLocationViewDrawables(context, options);
-    return options;
-  }
-
-  private static MapboxMapOptions loadDefaultMyLocationViewDrawables(Context context, MapboxMapOptions options) {
-    Drawable foregroundDrawable = options.getMyLocationForegroundDrawable();
-    Drawable foregroundBearingDrawable = options.getMyLocationForegroundBearingDrawable();
-    if (foregroundDrawable == null || foregroundBearingDrawable == null) {
-      if (foregroundDrawable == null) {
-        foregroundDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_default);
-      }
-      if (foregroundBearingDrawable == null) {
-        foregroundBearingDrawable = ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_icon_bearing);
-      }
-      options.myLocationForegroundDrawables(foregroundDrawable, foregroundBearingDrawable);
-    }
-    if (options.getMyLocationBackgroundDrawable() == null) {
-      options.myLocationBackgroundDrawable(ContextCompat.getDrawable(context, R.drawable.mapbox_mylocation_bg_shape));
     }
     return options;
   }

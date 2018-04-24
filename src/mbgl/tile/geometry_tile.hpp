@@ -65,33 +65,21 @@ public:
 
     class LayoutResult {
     public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+        std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
         std::unique_ptr<FeatureIndex> featureIndex;
-        std::unique_ptr<GeometryTileData> tileData;
-
-        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets_,
-                     std::unique_ptr<FeatureIndex> featureIndex_,
-                     std::unique_ptr<GeometryTileData> tileData_)
-            : nonSymbolBuckets(std::move(nonSymbolBuckets_)),
-              featureIndex(std::move(featureIndex_)),
-              tileData(std::move(tileData_)) {}
-    };
-    void onLayout(LayoutResult, uint64_t correlationID);
-
-    class PlacementResult {
-    public:
-        std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
         optional<AlphaImage> glyphAtlasImage;
         optional<PremultipliedImage> iconAtlasImage;
 
-        PlacementResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets_,
-                        optional<AlphaImage> glyphAtlasImage_,
-                        optional<PremultipliedImage> iconAtlasImage_)
-            : symbolBuckets(std::move(symbolBuckets_)),
+        LayoutResult(std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets_,
+                     std::unique_ptr<FeatureIndex> featureIndex_,
+                     optional<AlphaImage> glyphAtlasImage_,
+                     optional<PremultipliedImage> iconAtlasImage_)
+            : buckets(std::move(buckets_)),
+              featureIndex(std::move(featureIndex_)),
               glyphAtlasImage(std::move(glyphAtlasImage_)),
               iconAtlasImage(std::move(iconAtlasImage_)) {}
     };
-    void onPlacement(PlacementResult, uint64_t correlationID);
+    void onLayout(LayoutResult, uint64_t correlationID);
 
     void onError(std::exception_ptr, uint64_t correlationID);
     
@@ -104,7 +92,7 @@ public:
     
 protected:
     const GeometryTileData* getData() {
-        return data.get();
+        return featureIndex ? featureIndex->getData() : nullptr;
     }
 
 private:
@@ -123,16 +111,13 @@ private:
 
     uint64_t correlationID = 0;
 
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> nonSymbolBuckets;
+    std::unordered_map<std::string, std::shared_ptr<Bucket>> buckets;
+    
+    optional<std::unique_ptr<FeatureIndex>> featureIndexPendingCommit;
     std::unique_ptr<FeatureIndex> featureIndex;
-    std::unique_ptr<FeatureIndex> pendingFeatureIndex;
-    std::unique_ptr<const GeometryTileData> data;
-    std::unique_ptr<const GeometryTileData> pendingData;
 
     optional<AlphaImage> glyphAtlasImage;
     optional<PremultipliedImage> iconAtlasImage;
-
-    std::unordered_map<std::string, std::shared_ptr<Bucket>> symbolBuckets;
 
     const MapMode mode;
     

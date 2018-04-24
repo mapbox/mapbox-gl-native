@@ -106,3 +106,19 @@ CGPoint MGLPointRounded(CGPoint point) {
 #endif
     return CGPointMake(round(point.x * scaleFactor) / scaleFactor, round(point.y * scaleFactor) / scaleFactor);
 }
+
+MGLMapPoint MGLMapPointForCoordinate(CLLocationCoordinate2D coordinate, double zoomLevel) {
+    mbgl::Point<double> projectedCoordinate = mbgl::Projection::project(MGLLatLngFromLocationCoordinate2D(coordinate), std::pow(2.0, zoomLevel));
+    return MGLMapPointMake(projectedCoordinate.x, projectedCoordinate.y, zoomLevel);
+}
+
+MGLMatrix4 MGLMatrix4Make(std::array<double, 16>  array) {
+    MGLMatrix4 mat4 = {
+        .m00 = array[0], .m01 = array[1], .m02 = array[2], .m03 = array[3],
+        .m10 = array[4], .m11 = array[5], .m12 = array[6], .m13 = array[7],
+        .m20 = array[8], .m21 = array[9], .m22 = array[10], .m23 = array[11],
+        .m30 = array[12], .m31 = array[13], .m32 = array[14], .m33 = array[15]
+    };
+    return mat4;
+}
+

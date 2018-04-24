@@ -15,11 +15,8 @@
 		0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
 		07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */; };
-		07D8C6FC1F67560400381808 /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */; };
 		07D8C6FF1F67562C00381808 /* MGLComputedShapeSourceTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */; };
-		07D947521F67488800E37934 /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		07D947531F67488E00E37934 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */; };
-		07D947541F67489200E37934 /* MGLAbstractShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */; };
+		07D947531F67488E00E37934 /* MGLComputedShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */; };
 		16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */; };
 		16376B331FFDB4B40000563E /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B321FFDB4B40000563E /* AppDelegate.m */; };
 		16376B3B1FFDB4B40000563E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 16376B3A1FFDB4B40000563E /* Assets.xcassets */; };
@@ -27,7 +24,6 @@
 		16376B411FFDB4B40000563E /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B401FFDB4B40000563E /* main.m */; };
 		16376B471FFDB92B0000563E /* one-liner.json in Resources */ = {isa = PBXBuildFile; fileRef = DA35D0871E1A6309007DED41 /* one-liner.json */; };
 		16376B491FFEED010000563E /* MGLMapViewLayoutTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */; };
-		165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		170C437C2029D96F00863DF0 /* MGLHeatmapColorTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43782028D49800863DF0 /* MGLHeatmapColorTests.mm */; };
 		170C437D2029D97900863DF0 /* MGLHeatmapStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 170C43792028D49800863DF0 /* MGLHeatmapStyleLayerTests.mm */; };
 		1753ED421E53CE6F00A9FD90 /* MGLConversion.h in Headers */ = {isa = PBXBuildFile; fileRef = 1753ED411E53CE6F00A9FD90 /* MGLConversion.h */; };
@@ -44,10 +40,10 @@
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
 		30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
-		350098BB1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		350098BD1D480108004B2AF0 /* MGLVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorSource.mm */; };
-		350098BE1D480108004B2AF0 /* MGLVectorSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorSource.mm */; };
+		350098BB1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorTileSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		350098BC1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098B91D480108004B2AF0 /* MGLVectorTileSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		350098BD1D480108004B2AF0 /* MGLVectorTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorTileSource.mm */; };
+		350098BE1D480108004B2AF0 /* MGLVectorTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098BA1D480108004B2AF0 /* MGLVectorTileSource.mm */; };
 		350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098DA1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h */; };
 		350098DD1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 350098DA1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h */; };
 		350098DE1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 350098DB1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm */; };
@@ -57,7 +53,7 @@
 		3510FFEC1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFE91D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm */; };
 		3510FFED1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFE91D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm */; };
 		3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; };
+		3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3510FFF21D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */; };
 		3510FFF31D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */; };
 		3510FFF91D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFF71D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h */; };
@@ -117,10 +113,10 @@
 		3566C7671D4A77BA008152BC /* MGLShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7641D4A77BA008152BC /* MGLShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3566C7681D4A77BA008152BC /* MGLShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C7651D4A77BA008152BC /* MGLShapeSource.mm */; };
 		3566C7691D4A77BA008152BC /* MGLShapeSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C7651D4A77BA008152BC /* MGLShapeSource.mm */; };
-		3566C76C1D4A8DFA008152BC /* MGLRasterSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3566C76D1D4A8DFA008152BC /* MGLRasterSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3566C76E1D4A8DFA008152BC /* MGLRasterSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C76B1D4A8DFA008152BC /* MGLRasterSource.mm */; };
-		3566C76F1D4A8DFA008152BC /* MGLRasterSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C76B1D4A8DFA008152BC /* MGLRasterSource.mm */; };
+		3566C76C1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C76A1D4A8DFA008152BC /* MGLRasterTileSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3566C76D1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C76A1D4A8DFA008152BC /* MGLRasterTileSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		3566C76E1D4A8DFA008152BC /* MGLRasterTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C76B1D4A8DFA008152BC /* MGLRasterTileSource.mm */; };
+		3566C76F1D4A8DFA008152BC /* MGLRasterTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3566C76B1D4A8DFA008152BC /* MGLRasterTileSource.mm */; };
 		3566C7711D4A9198008152BC /* MGLSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7701D4A9198008152BC /* MGLSource_Private.h */; };
 		3566C7721D4A9198008152BC /* MGLSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 3566C7701D4A9198008152BC /* MGLSource_Private.h */; };
 		357579801D501E09000B822E /* MGLFillStyleLayerTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3575797F1D501E09000B822E /* MGLFillStyleLayerTests.mm */; };
@@ -187,13 +183,77 @@
 		404C26E51D89B877000AA13D /* MGLTileSource.mm in Sources */ = {isa = PBXBuildFile; fileRef = 404C26E11D89B877000AA13D /* MGLTileSource.mm */; };
 		404C26E71D89C55D000AA13D /* MGLTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSource_Private.h */; };
 		404C26E81D89C55D000AA13D /* MGLTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 404C26E61D89C515000AA13D /* MGLTileSource_Private.h */; };
-		40599F0C1DEE1B7600182B5D /* api_mapbox_staging.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F001DEE1B2400182B5D /* api_mapbox_staging.der */; };
-		40599F0D1DEE1B7A00182B5D /* api_mapbox_com-digicert_2016.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */; };
-		40599F0E1DEE1B7E00182B5D /* api_mapbox_com-geotrust_2016.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */; };
+		406E99B91FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */; };
+		406E99BA1FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */; };
+		406E99BB1FFF006C00D9FFCC /* MMEUINavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */; };
+		406E99BC1FFF006D00D9FFCC /* MMEUINavigation.m in Sources */ = {isa = PBXBuildFile; fileRef = 406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */; };
+		40834BE61FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */; };
+		40834BE71FE05E1800C1BD0D /* MMEAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */; };
+		40834BE81FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */; };
+		40834BE91FE05E1800C1BD0D /* MMECommonEventData.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCE1FE05D7100C1BD0D /* MMECommonEventData.m */; };
+		40834BEA1FE05E1800C1BD0D /* MMEConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC01FE05D6E00C1BD0D /* MMEConstants.m */; };
+		40834BEB1FE05E1800C1BD0D /* MMEDependencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB41FE05D6D00C1BD0D /* MMEDependencyManager.m */; };
+		40834BEC1FE05E1800C1BD0D /* MMEEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC71FE05D7000C1BD0D /* MMEEvent.m */; };
+		40834BED1FE05E1800C1BD0D /* MMEEventLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */; };
+		40834BEE1FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */; };
+		40834BEF1FE05E1800C1BD0D /* MMEEventsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */; };
+		40834BF01FE05E1800C1BD0D /* MMELocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB81FE05D6D00C1BD0D /* MMELocationManager.m */; };
+		40834BF11FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */; };
+		40834BF21FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */; };
+		40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */; };
+		40834BF41FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */; };
+		40834BF51FE05E1800C1BD0D /* MMETypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBD1FE05D6E00C1BD0D /* MMETypes.m */; };
+		40834BF61FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */; };
+		40834BF71FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */; };
+		40834BF81FE05E1800C1BD0D /* NSData+MMEGZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */; };
+		40834BF91FE05E1800C1BD0D /* MMEReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCD1FE05D7100C1BD0D /* MMEReachability.m */; };
+		40834BFA1FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */; };
+		40834BFB1FE05E1800C1BD0D /* MMEAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */; };
+		40834BFC1FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */; };
+		40834BFD1FE05E1800C1BD0D /* MMECommonEventData.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCE1FE05D7100C1BD0D /* MMECommonEventData.m */; };
+		40834BFE1FE05E1800C1BD0D /* MMEConstants.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC01FE05D6E00C1BD0D /* MMEConstants.m */; };
+		40834BFF1FE05E1800C1BD0D /* MMEDependencyManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB41FE05D6D00C1BD0D /* MMEDependencyManager.m */; };
+		40834C001FE05E1800C1BD0D /* MMEEvent.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC71FE05D7000C1BD0D /* MMEEvent.m */; };
+		40834C011FE05E1800C1BD0D /* MMEEventLogger.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */; };
+		40834C021FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */; };
+		40834C031FE05E1800C1BD0D /* MMEEventsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */; };
+		40834C041FE05E1800C1BD0D /* MMELocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB81FE05D6D00C1BD0D /* MMELocationManager.m */; };
+		40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */; };
+		40834C061FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */; };
+		40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */; };
+		40834C081FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */; };
+		40834C091FE05E1800C1BD0D /* MMETypes.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BBD1FE05D6E00C1BD0D /* MMETypes.m */; };
+		40834C0A1FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */; };
+		40834C0B1FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */; };
+		40834C0C1FE05E1800C1BD0D /* NSData+MMEGZIP.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */; };
+		40834C0D1FE05E1800C1BD0D /* MMEReachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834BCD1FE05D7100C1BD0D /* MMEReachability.m */; };
+		40834C401FE05F7500C1BD0D /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C101FE05F3600C1BD0D /* configuration_utils.m */; };
+		40834C411FE05F7500C1BD0D /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C141FE05F3600C1BD0D /* parse_configuration.m */; };
+		40834C421FE05F7500C1BD0D /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C171FE05F3600C1BD0D /* ssl_pin_verifier.m */; };
+		40834C431FE05F7500C1BD0D /* TSKSPKIHashCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1A1FE05F3600C1BD0D /* TSKSPKIHashCache.m */; };
+		40834C441FE05F7500C1BD0D /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1D1FE05F3600C1BD0D /* reporting_utils.m */; };
+		40834C451FE05F7500C1BD0D /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1F1FE05F3600C1BD0D /* TSKBackgroundReporter.m */; };
+		40834C461FE05F7500C1BD0D /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C211FE05F3600C1BD0D /* TSKPinFailureReport.m */; };
+		40834C471FE05F7500C1BD0D /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C231FE05F3600C1BD0D /* TSKReportsRateLimiter.m */; };
+		40834C481FE05F7500C1BD0D /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C251FE05F3600C1BD0D /* vendor_identifier.m */; };
+		40834C491FE05F7500C1BD0D /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C271FE05F3600C1BD0D /* TrustKit.m */; };
+		40834C4A1FE05F7500C1BD0D /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C2A1FE05F3600C1BD0D /* TSKPinningValidator.m */; };
+		40834C4B1FE05F7500C1BD0D /* TSKPinningValidatorResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C2E1FE05F3600C1BD0D /* TSKPinningValidatorResult.m */; };
+		40834C4C1FE05F7500C1BD0D /* TSKTrustKitConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C311FE05F3600C1BD0D /* TSKTrustKitConfig.m */; };
+		40834C4D1FE05F7600C1BD0D /* configuration_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C101FE05F3600C1BD0D /* configuration_utils.m */; };
+		40834C4E1FE05F7600C1BD0D /* parse_configuration.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C141FE05F3600C1BD0D /* parse_configuration.m */; };
+		40834C4F1FE05F7600C1BD0D /* ssl_pin_verifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C171FE05F3600C1BD0D /* ssl_pin_verifier.m */; };
+		40834C501FE05F7600C1BD0D /* TSKSPKIHashCache.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1A1FE05F3600C1BD0D /* TSKSPKIHashCache.m */; };
+		40834C511FE05F7600C1BD0D /* reporting_utils.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1D1FE05F3600C1BD0D /* reporting_utils.m */; };
+		40834C521FE05F7600C1BD0D /* TSKBackgroundReporter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C1F1FE05F3600C1BD0D /* TSKBackgroundReporter.m */; };
+		40834C531FE05F7600C1BD0D /* TSKPinFailureReport.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C211FE05F3600C1BD0D /* TSKPinFailureReport.m */; };
+		40834C541FE05F7600C1BD0D /* TSKReportsRateLimiter.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C231FE05F3600C1BD0D /* TSKReportsRateLimiter.m */; };
+		40834C551FE05F7600C1BD0D /* vendor_identifier.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C251FE05F3600C1BD0D /* vendor_identifier.m */; };
+		40834C561FE05F7600C1BD0D /* TrustKit.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C271FE05F3600C1BD0D /* TrustKit.m */; };
+		40834C571FE05F7600C1BD0D /* TSKPinningValidator.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C2A1FE05F3600C1BD0D /* TSKPinningValidator.m */; };
+		40834C581FE05F7600C1BD0D /* TSKPinningValidatorResult.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C2E1FE05F3600C1BD0D /* TSKPinningValidatorResult.m */; };
+		40834C591FE05F7600C1BD0D /* TSKTrustKitConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = 40834C311FE05F3600C1BD0D /* TSKTrustKitConfig.m */; };
 		4085AF091D933DEA00F11B22 /* MGLTileSetTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */; };
-		408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F001DEE1B2400182B5D /* api_mapbox_staging.der */; };
-		408982EA1DEE208B00754016 /* api_mapbox_com-digicert_2016.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */; };
-		408982EB1DEE209100754016 /* api_mapbox_com-geotrust_2016.der in Resources */ = {isa = PBXBuildFile; fileRef = 40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */; };
 		408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 408AA8551DAEDA0800022900 /* NSDictionary+MGLAdditions.h */; };
 		408AA8581DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */; };
 		408AA8591DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */; };
@@ -201,10 +261,6 @@
 		409F43FD1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 409F43FC1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift */; };
 		40CF6DBB1DAC3C6600A4D18B /* MGLShape_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */; };
 		40CFA6511D7875BB008103BD /* MGLShapeSourceTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 40CFA6501D787579008103BD /* MGLShapeSourceTests.mm */; };
-		40EA6BC11EF4599600FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */ = {isa = PBXBuildFile; fileRef = 40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */; };
-		40EA6BC21EF4599700FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */ = {isa = PBXBuildFile; fileRef = 40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */; };
-		40EA6BC31EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */ = {isa = PBXBuildFile; fileRef = 40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */; };
-		40EA6BC41EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */ = {isa = PBXBuildFile; fileRef = 40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */; };
 		40EDA1C01CFE0E0200D9EA68 /* MGLAnnotationContainerView.h in Headers */ = {isa = PBXBuildFile; fileRef = 40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */; };
 		40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */; };
 		40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */ = {isa = PBXBuildFile; fileRef = 40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */; };
@@ -253,6 +309,7 @@
 		9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
 		9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
 		9654C1291FFC1CCD00DB6A19 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
+		9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */; };
 		966FCF4C1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
 		966FCF4E1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
 		966FCF4F1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 966FCF4B1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m */; };
@@ -269,7 +326,7 @@
 		96E516E12000551100A02306 /* MGLMultiPoint_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848041CBAFA6200AB86E3 /* MGLMultiPoint_Private.h */; };
 		96E516E22000551900A02306 /* MGLPointCollection_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 4049C2AB1DB6E05500B3F799 /* MGLPointCollection_Private.h */; };
 		96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8847FF1CBAFA6200AB86E3 /* MGLAccountManager_Private.h */; };
-		96E516E42000560B00A02306 /* MGLAbstractShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */; };
+		96E516E42000560B00A02306 /* MGLComputedShapeSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */; };
 		96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848061CBAFA6200AB86E3 /* MGLOfflinePack_Private.h */; };
 		96E516E62000560B00A02306 /* MGLOfflineRegion_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848081CBAFA6200AB86E3 /* MGLOfflineRegion_Private.h */; };
 		96E516E72000560B00A02306 /* MGLOfflineStorage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848091CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h */; };
@@ -279,7 +336,6 @@
 		96E516EB2000560B00A02306 /* MGLUserLocation_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA88484B1CBAFB9800AB86E3 /* MGLUserLocation_Private.h */; };
 		96E516EC2000560B00A02306 /* MGLUserLocationAnnotationView_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 359F57451D2FDBD5005217F1 /* MGLUserLocationAnnotationView_Private.h */; };
 		96E516ED200058A200A02306 /* MGLComputedShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		96E516EE2000590900A02306 /* MGLAbstractShapeSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E516EF2000594F00A02306 /* NSArray+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 400532FF1DB0862B0069F638 /* NSArray+MGLAdditions.h */; };
 		96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848121CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h */; };
 		96E516F12000596800A02306 /* NSString+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848171CBAFA6200AB86E3 /* NSString+MGLAdditions.h */; };
@@ -294,8 +350,6 @@
 		96E516FA20005A3D00A02306 /* MGLUserLocationHeadingArrowLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF501F3C321000F2B6DE /* MGLUserLocationHeadingArrowLayer.h */; };
 		96E516FB20005A4000A02306 /* MGLUserLocationHeadingBeamLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 966FCF4A1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.h */; };
 		96E516FC20005A4400A02306 /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
-		96E516FD20005A4700A02306 /* MGLAPIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */; };
-		96E516FE20005A4C00A02306 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */; };
 		96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; };
 		96E5170020005A6100A02306 /* Fabric.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848831CBB033F00AB86E3 /* Fabric.h */; };
 		96E5170120005A6400A02306 /* Fabric+FABKits.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848821CBB033F00AB86E3 /* Fabric+FABKits.h */; };
@@ -307,8 +361,12 @@
 		AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */; };
 		AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
 		AC518E04201BB56100EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
+		CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */ = {isa = PBXBuildFile; fileRef = CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */; };
 		CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CA55CD42202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */ = {isa = PBXBuildFile; fileRef = CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; };
+		CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA4A26961CB6E795000B7809 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		DA00FC8E1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */ = {isa = PBXBuildFile; fileRef = DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */; };
@@ -425,12 +483,8 @@
 		DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848391CBAFB8500AB86E3 /* MGLUserLocation.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		DA88484F1CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848401CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h */; };
 		DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848411CBAFB9800AB86E3 /* MGLAnnotationImage.m */; };
-		DA8848511CBAFB9800AB86E3 /* MGLAPIClient.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */; };
-		DA8848521CBAFB9800AB86E3 /* MGLAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848431CBAFB9800AB86E3 /* MGLAPIClient.m */; };
 		DA8848531CBAFB9800AB86E3 /* MGLCompactCalloutView.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848441CBAFB9800AB86E3 /* MGLCompactCalloutView.h */; };
 		DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
-		DA8848551CBAFB9800AB86E3 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */; };
-		DA8848561CBAFB9800AB86E3 /* MGLLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */; };
 		DA8848571CBAFB9800AB86E3 /* MGLMapboxEvents.h in Headers */ = {isa = PBXBuildFile; fileRef = DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */; };
 		DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */; };
 		DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */; };
@@ -456,6 +510,8 @@
 		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
 		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
 		DA89633A1CC549A100684375 /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963361CC549A100684375 /* tiles */; };
+		DA9EA82B201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		DA9EA82C201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */; };
 		DAA32CC31E4C6B65006F8D24 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		DAA4E4081CBB6C9500178DFB /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		DAA4E4091CBB6C9500178DFB /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -476,9 +532,7 @@
 		DAA4E42A1CBB730400178DFB /* NSProcessInfo+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848161CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m */; };
 		DAA4E42B1CBB730400178DFB /* NSString+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848181CBAFA6200AB86E3 /* NSString+MGLAdditions.m */; };
 		DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848411CBAFB9800AB86E3 /* MGLAnnotationImage.m */; };
-		DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848431CBAFB9800AB86E3 /* MGLAPIClient.m */; };
 		DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */; };
-		DAA4E4301CBB730400178DFB /* MGLLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */; };
 		DAA4E4311CBB730400178DFB /* MGLMapboxEvents.m in Sources */ = {isa = PBXBuildFile; fileRef = DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */; };
 		DAA4E4321CBB730400178DFB /* MGLMapView.mm in Sources */ = {isa = PBXBuildFile; fileRef = DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */; };
 		DAA4E4331CBB730400178DFB /* MGLUserLocation.m in Sources */ = {isa = PBXBuildFile; fileRef = DA88484C1CBAFB9800AB86E3 /* MGLUserLocation.m */; };
@@ -540,10 +594,10 @@
 		DAED38651D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */; };
 		DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */; };
 		DAEDC4341D603417000224FF /* MGLAttributionInfoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */; };
-		DAF0D8101DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D80F1DFE0EA000B28378 /* MGLRasterSource_Private.h */; };
-		DAF0D8111DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D80F1DFE0EA000B28378 /* MGLRasterSource_Private.h */; };
-		DAF0D8131DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8121DFE0EC500B28378 /* MGLVectorSource_Private.h */; };
-		DAF0D8141DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8121DFE0EC500B28378 /* MGLVectorSource_Private.h */; };
+		DAF0D8101DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D80F1DFE0EA000B28378 /* MGLRasterTileSource_Private.h */; };
+		DAF0D8111DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D80F1DFE0EA000B28378 /* MGLRasterTileSource_Private.h */; };
+		DAF0D8131DFE0EC500B28378 /* MGLVectorTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8121DFE0EC500B28378 /* MGLVectorTileSource_Private.h */; };
+		DAF0D8141DFE0EC500B28378 /* MGLVectorTileSource_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8121DFE0EC500B28378 /* MGLVectorTileSource_Private.h */; };
 		DAF0D8181DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8171DFE6B2800B28378 /* MGLAttributionInfo_Private.h */; };
 		DAF0D8191DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = DAF0D8171DFE6B2800B28378 /* MGLAttributionInfo_Private.h */; };
 		DAF25719201901E200367EF5 /* MGLHillshadeStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = DAF25717201901E100367EF5 /* MGLHillshadeStyleLayer.mm */; };
@@ -576,6 +630,13 @@
 			proxyType = 1;
 			remoteGlobalIDString = DA8847D11CBAF91600AB86E3;
 			remoteInfo = dynamic;
+		};
+		CABE5DAB2072FA660003AF3C /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = DA1DC9421CB6C1C2006E619F /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 16376B2E1FFDB4B40000563E;
+			remoteInfo = "Integration Test Harness";
 		};
 		DA25D5C71CCDA0C100607828 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -622,6 +683,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		CAA69DA6206DCD0E007279CD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CAA69DA5206DCD0E007279CD /* Mapbox.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		DA4A269A1CB6F5D3000B7809 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -662,9 +734,7 @@
 		0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource.h; sourceTree = "<group>"; };
 		0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLComputedShapeSource.mm; sourceTree = "<group>"; };
 		07D8C6FD1F67562800381808 /* MGLComputedShapeSourceTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLComputedShapeSourceTests.m; path = ../../darwin/test/MGLComputedShapeSourceTests.m; sourceTree = "<group>"; };
-		07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource_Private.h; sourceTree = "<group>"; };
-		07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAbstractShapeSource.h; sourceTree = "<group>"; };
-		07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAbstractShapeSource.mm; sourceTree = "<group>"; };
+		07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLComputedShapeSource_Private.h; sourceTree = "<group>"; };
 		16376B071FFD9DAF0000563E /* integration.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = integration.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBGLIntegrationTests.m; sourceTree = "<group>"; };
 		16376B0B1FFD9DAF0000563E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -689,8 +759,8 @@
 		20DABE8A1DF78149007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Root.strings"; sourceTree = "<group>"; };
 		30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "UIImage+MGLAdditions.h"; path = "src/UIImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = "UIImage+MGLAdditions.mm"; path = "src/UIImage+MGLAdditions.mm"; sourceTree = SOURCE_ROOT; };
-		350098B91D480108004B2AF0 /* MGLVectorSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorSource.h; sourceTree = "<group>"; };
-		350098BA1D480108004B2AF0 /* MGLVectorSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLVectorSource.mm; sourceTree = "<group>"; };
+		350098B91D480108004B2AF0 /* MGLVectorTileSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorTileSource.h; sourceTree = "<group>"; };
+		350098BA1D480108004B2AF0 /* MGLVectorTileSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLVectorTileSource.mm; sourceTree = "<group>"; };
 		350098DA1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSValue+MGLStyleAttributeAdditions.h"; sourceTree = "<group>"; };
 		350098DB1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSValue+MGLStyleAttributeAdditions.mm"; sourceTree = "<group>"; };
 		3510FFE81D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSComparisonPredicate+MGLAdditions.h"; sourceTree = "<group>"; };
@@ -730,8 +800,8 @@
 		355ADFFC1E9281DA00F3939D /* MGLScaleBar.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLScaleBar.mm; sourceTree = "<group>"; };
 		3566C7641D4A77BA008152BC /* MGLShapeSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource.h; sourceTree = "<group>"; };
 		3566C7651D4A77BA008152BC /* MGLShapeSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeSource.mm; sourceTree = "<group>"; };
-		3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterSource.h; sourceTree = "<group>"; };
-		3566C76B1D4A8DFA008152BC /* MGLRasterSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLRasterSource.mm; sourceTree = "<group>"; };
+		3566C76A1D4A8DFA008152BC /* MGLRasterTileSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterTileSource.h; sourceTree = "<group>"; };
+		3566C76B1D4A8DFA008152BC /* MGLRasterTileSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLRasterTileSource.mm; sourceTree = "<group>"; };
 		3566C7701D4A9198008152BC /* MGLSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLSource_Private.h; sourceTree = "<group>"; };
 		3575797F1D501E09000B822E /* MGLFillStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLFillStyleLayerTests.mm; path = ../../darwin/test/MGLFillStyleLayerTests.mm; sourceTree = "<group>"; };
 		357579821D502AE6000B822E /* MGLRasterStyleLayerTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLRasterStyleLayerTests.mm; path = ../../darwin/test/MGLRasterStyleLayerTests.mm; sourceTree = "<group>"; };
@@ -776,9 +846,84 @@
 		404C26E01D89B877000AA13D /* MGLTileSource.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource.h; sourceTree = "<group>"; };
 		404C26E11D89B877000AA13D /* MGLTileSource.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLTileSource.mm; sourceTree = "<group>"; };
 		404C26E61D89C515000AA13D /* MGLTileSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLTileSource_Private.h; sourceTree = "<group>"; };
-		40599F001DEE1B2400182B5D /* api_mapbox_staging.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = api_mapbox_staging.der; sourceTree = "<group>"; };
-		40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-digicert_2016.der"; sourceTree = "<group>"; };
-		40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-geotrust_2016.der"; sourceTree = "<group>"; };
+		406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventLogReportViewController.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogReportViewController.m"; sourceTree = SOURCE_ROOT; };
+		406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEUINavigation.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUINavigation.m"; sourceTree = SOURCE_ROOT; };
+		406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUINavigation.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUINavigation.h"; sourceTree = SOURCE_ROOT; };
+		406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventLogReportViewController.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogReportViewController.h"; sourceTree = SOURCE_ROOT; };
+		40834AEF1FDF4F0100C1BD0D /* Mapbox-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Mapbox-Prefix.pch"; path = "src/Mapbox-Prefix.pch"; sourceTree = SOURCE_ROOT; };
+		40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsManager.h"; sourceTree = SOURCE_ROOT; };
+		40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsManager.m"; sourceTree = SOURCE_ROOT; };
+		40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEAPIClient.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.m"; sourceTree = SOURCE_ROOT; };
+		40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventLogger.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogger.h"; sourceTree = SOURCE_ROOT; };
+		40834BA71FE05D6B00C1BD0D /* MMETrustKitWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMETrustKitWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitWrapper.h"; sourceTree = SOURCE_ROOT; };
+		40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMENSURLSessionWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.h"; sourceTree = SOURCE_ROOT; };
+		40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEAPIClient.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEAPIClient.h"; sourceTree = SOURCE_ROOT; };
+		40834BAC1FE05D6C00C1BD0D /* MapboxMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MapboxMobileEvents.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MapboxMobileEvents.h"; sourceTree = SOURCE_ROOT; };
+		40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEUniqueIdentifier.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUniqueIdentifier.m"; sourceTree = SOURCE_ROOT; };
+		40834BAE1FE05D6C00C1BD0D /* MMECommonEventData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMECommonEventData.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMECommonEventData.h"; sourceTree = SOURCE_ROOT; };
+		40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "NSData+MMEGZIP.m"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/NSData+MMEGZIP.m"; sourceTree = SOURCE_ROOT; };
+		40834BB01FE05D6C00C1BD0D /* MMEConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEConstants.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConstants.h"; sourceTree = SOURCE_ROOT; };
+		40834BB11FE05D6D00C1BD0D /* MMEDependencyManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEDependencyManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDependencyManager.h"; sourceTree = SOURCE_ROOT; };
+		40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventsConfiguration.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsConfiguration.m"; sourceTree = SOURCE_ROOT; };
+		40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMELocationManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.h"; sourceTree = SOURCE_ROOT; };
+		40834BB41FE05D6D00C1BD0D /* MMEDependencyManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEDependencyManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEDependencyManager.m"; sourceTree = SOURCE_ROOT; };
+		40834BB51FE05D6D00C1BD0D /* MMECategoryLoader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMECategoryLoader.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMECategoryLoader.h"; sourceTree = SOURCE_ROOT; };
+		40834BB61FE05D6D00C1BD0D /* MMETypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMETypes.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETypes.h"; sourceTree = SOURCE_ROOT; };
+		40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEventLogger.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventLogger.m"; sourceTree = SOURCE_ROOT; };
+		40834BB81FE05D6D00C1BD0D /* MMELocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMELocationManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMELocationManager.m"; sourceTree = SOURCE_ROOT; };
+		40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMETimerManager.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.m"; sourceTree = SOURCE_ROOT; };
+		40834BBA1FE05D6E00C1BD0D /* MMEEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEvent.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEvent.h"; sourceTree = SOURCE_ROOT; };
+		40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEEventsConfiguration.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEventsConfiguration.h"; sourceTree = SOURCE_ROOT; };
+		40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMENSDateWrapper.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.m"; sourceTree = SOURCE_ROOT; };
+		40834BBD1FE05D6E00C1BD0D /* MMETypes.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMETypes.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETypes.m"; sourceTree = SOURCE_ROOT; };
+		40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUIApplicationWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUIApplicationWrapper.h"; sourceTree = SOURCE_ROOT; };
+		40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEUniqueIdentifier.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUniqueIdentifier.h"; sourceTree = SOURCE_ROOT; };
+		40834BC01FE05D6E00C1BD0D /* MMEConstants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEConstants.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEConstants.m"; sourceTree = SOURCE_ROOT; };
+		40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMETrustKitWrapper.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETrustKitWrapper.m"; sourceTree = SOURCE_ROOT; };
+		40834BC21FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "CLLocation+MMEMobileEvents.h"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/CLLocation+MMEMobileEvents.h"; sourceTree = SOURCE_ROOT; };
+		40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "CLLocation+MMEMobileEvents.m"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/CLLocation+MMEMobileEvents.m"; sourceTree = SOURCE_ROOT; };
+		40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMECategoryLoader.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMECategoryLoader.m"; sourceTree = SOURCE_ROOT; };
+		40834BC51FE05D6F00C1BD0D /* MMENSDateWrapper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMENSDateWrapper.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENSDateWrapper.h"; sourceTree = SOURCE_ROOT; };
+		40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMENSURLSessionWrapper.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENSURLSessionWrapper.m"; sourceTree = SOURCE_ROOT; };
+		40834BC71FE05D7000C1BD0D /* MMEEvent.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEEvent.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEEvent.m"; sourceTree = SOURCE_ROOT; };
+		40834BC81FE05D7000C1BD0D /* MMENamespacedDependencies.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMENamespacedDependencies.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMENamespacedDependencies.h"; sourceTree = SOURCE_ROOT; };
+		40834BC91FE05D7000C1BD0D /* MMETimerManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMETimerManager.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMETimerManager.h"; sourceTree = SOURCE_ROOT; };
+		40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEUIApplicationWrapper.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMEUIApplicationWrapper.m"; sourceTree = SOURCE_ROOT; };
+		40834BCC1FE05D7100C1BD0D /* MMEReachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MMEReachability.h; path = "vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/MMEReachability.h"; sourceTree = SOURCE_ROOT; };
+		40834BCD1FE05D7100C1BD0D /* MMEReachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMEReachability.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/Reachability/MMEReachability.m"; sourceTree = SOURCE_ROOT; };
+		40834BCE1FE05D7100C1BD0D /* MMECommonEventData.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MMECommonEventData.m; path = "vendor/mapbox-events-ios/MapboxMobileEvents/MMECommonEventData.m"; sourceTree = SOURCE_ROOT; };
+		40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSData+MMEGZIP.h"; path = "vendor/mapbox-events-ios/MapboxMobileEvents/NSData+MMEGZIP.h"; sourceTree = SOURCE_ROOT; };
+		40834C0F1FE05F3600C1BD0D /* configuration_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = configuration_utils.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/configuration_utils.h"; sourceTree = SOURCE_ROOT; };
+		40834C101FE05F3600C1BD0D /* configuration_utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = configuration_utils.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/configuration_utils.m"; sourceTree = SOURCE_ROOT; };
+		40834C131FE05F3600C1BD0D /* parse_configuration.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = parse_configuration.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/parse_configuration.h"; sourceTree = SOURCE_ROOT; };
+		40834C141FE05F3600C1BD0D /* parse_configuration.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = parse_configuration.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/parse_configuration.m"; sourceTree = SOURCE_ROOT; };
+		40834C161FE05F3600C1BD0D /* ssl_pin_verifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ssl_pin_verifier.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning/ssl_pin_verifier.h"; sourceTree = SOURCE_ROOT; };
+		40834C171FE05F3600C1BD0D /* ssl_pin_verifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = ssl_pin_verifier.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning/ssl_pin_verifier.m"; sourceTree = SOURCE_ROOT; };
+		40834C181FE05F3600C1BD0D /* TSKPublicKeyAlgorithm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPublicKeyAlgorithm.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning/TSKPublicKeyAlgorithm.h"; sourceTree = SOURCE_ROOT; };
+		40834C191FE05F3600C1BD0D /* TSKSPKIHashCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKSPKIHashCache.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning/TSKSPKIHashCache.h"; sourceTree = SOURCE_ROOT; };
+		40834C1A1FE05F3600C1BD0D /* TSKSPKIHashCache.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKSPKIHashCache.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning/TSKSPKIHashCache.m"; sourceTree = SOURCE_ROOT; };
+		40834C1C1FE05F3600C1BD0D /* reporting_utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = reporting_utils.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/reporting_utils.h"; sourceTree = SOURCE_ROOT; };
+		40834C1D1FE05F3600C1BD0D /* reporting_utils.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = reporting_utils.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/reporting_utils.m"; sourceTree = SOURCE_ROOT; };
+		40834C1E1FE05F3600C1BD0D /* TSKBackgroundReporter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKBackgroundReporter.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKBackgroundReporter.h"; sourceTree = SOURCE_ROOT; };
+		40834C1F1FE05F3600C1BD0D /* TSKBackgroundReporter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKBackgroundReporter.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKBackgroundReporter.m"; sourceTree = SOURCE_ROOT; };
+		40834C201FE05F3600C1BD0D /* TSKPinFailureReport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPinFailureReport.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKPinFailureReport.h"; sourceTree = SOURCE_ROOT; };
+		40834C211FE05F3600C1BD0D /* TSKPinFailureReport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKPinFailureReport.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKPinFailureReport.m"; sourceTree = SOURCE_ROOT; };
+		40834C221FE05F3600C1BD0D /* TSKReportsRateLimiter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKReportsRateLimiter.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKReportsRateLimiter.h"; sourceTree = SOURCE_ROOT; };
+		40834C231FE05F3600C1BD0D /* TSKReportsRateLimiter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKReportsRateLimiter.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/TSKReportsRateLimiter.m"; sourceTree = SOURCE_ROOT; };
+		40834C241FE05F3600C1BD0D /* vendor_identifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vendor_identifier.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/vendor_identifier.h"; sourceTree = SOURCE_ROOT; };
+		40834C251FE05F3600C1BD0D /* vendor_identifier.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = vendor_identifier.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting/vendor_identifier.m"; sourceTree = SOURCE_ROOT; };
+		40834C261FE05F3600C1BD0D /* TrustKit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TrustKit.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TrustKit.h"; sourceTree = SOURCE_ROOT; };
+		40834C271FE05F3600C1BD0D /* TrustKit.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TrustKit.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/TrustKit.m"; sourceTree = SOURCE_ROOT; };
+		40834C281FE05F3600C1BD0D /* TSKLog.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKLog.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKLog.h"; sourceTree = SOURCE_ROOT; };
+		40834C291FE05F3600C1BD0D /* TSKPinningValidator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPinningValidator.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidator.h"; sourceTree = SOURCE_ROOT; };
+		40834C2A1FE05F3600C1BD0D /* TSKPinningValidator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKPinningValidator.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidator.m"; sourceTree = SOURCE_ROOT; };
+		40834C2B1FE05F3600C1BD0D /* TSKPinningValidator_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPinningValidator_Private.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidator_Private.h"; sourceTree = SOURCE_ROOT; };
+		40834C2C1FE05F3600C1BD0D /* TSKPinningValidatorCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPinningValidatorCallback.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidatorCallback.h"; sourceTree = SOURCE_ROOT; };
+		40834C2D1FE05F3600C1BD0D /* TSKPinningValidatorResult.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKPinningValidatorResult.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidatorResult.h"; sourceTree = SOURCE_ROOT; };
+		40834C2E1FE05F3600C1BD0D /* TSKPinningValidatorResult.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKPinningValidatorResult.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKPinningValidatorResult.m"; sourceTree = SOURCE_ROOT; };
+		40834C2F1FE05F3600C1BD0D /* TSKTrustDecision.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKTrustDecision.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKTrustDecision.h"; sourceTree = SOURCE_ROOT; };
+		40834C301FE05F3600C1BD0D /* TSKTrustKitConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TSKTrustKitConfig.h; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKTrustKitConfig.h"; sourceTree = SOURCE_ROOT; };
+		40834C311FE05F3600C1BD0D /* TSKTrustKitConfig.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = TSKTrustKitConfig.m; path = "vendor/mapbox-events-ios/vendor/TrustKit/TSKTrustKitConfig.m"; sourceTree = SOURCE_ROOT; };
 		4085AF081D933DEA00F11B22 /* MGLTileSetTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLTileSetTests.mm; path = ../../darwin/test/MGLTileSetTests.mm; sourceTree = "<group>"; };
 		408AA8551DAEDA0800022900 /* NSDictionary+MGLAdditions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NSDictionary+MGLAdditions.h"; sourceTree = "<group>"; };
 		408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSDictionary+MGLAdditions.mm"; sourceTree = "<group>"; };
@@ -786,8 +931,6 @@
 		409F43FC1E9E781C0048729D /* MGLMapViewDelegateIntegrationTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MGLMapViewDelegateIntegrationTests.swift; sourceTree = "<group>"; };
 		40CF6DBA1DAC3C1800A4D18B /* MGLShape_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShape_Private.h; sourceTree = "<group>"; };
 		40CFA6501D787579008103BD /* MGLShapeSourceTests.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLShapeSourceTests.mm; path = ../../darwin/test/MGLShapeSourceTests.mm; sourceTree = "<group>"; };
-		40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-digicert_2017.der"; sourceTree = "<group>"; };
-		40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_com-geotrust_2017.der"; sourceTree = "<group>"; };
 		40EDA1BD1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationContainerView.h; sourceTree = "<group>"; };
 		40EDA1BE1CFE0D4A00D9EA68 /* MGLAnnotationContainerView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationContainerView.m; sourceTree = "<group>"; };
 		40F8876F1D7A1DB8008ECB67 /* MGLShapeSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeSource_Private.h; sourceTree = "<group>"; };
@@ -825,6 +968,7 @@
 		9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.objcpp; fileEncoding = 4; path = MGLSDKUpdateChecker.mm; sourceTree = "<group>"; };
 		9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolyline_Private.h; sourceTree = "<group>"; };
 		9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLPolygon_Private.h; sourceTree = "<group>"; };
+		9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewScaleBarTests.m; sourceTree = "<group>"; };
 		9660916B1E5BBFD700A9A03B /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916C1E5BBFD900A9A03B /* pl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = pl; path = pl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		9660916D1E5BBFDB00A9A03B /* ru */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = ru; path = ru.lproj/Localizable.strings; sourceTree = "<group>"; };
@@ -847,6 +991,8 @@
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
+		CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLMapViewIntegrationTest.m; sourceTree = "<group>"; };
+		CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLMapViewIntegrationTest.h; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
 		DA00FC8C1D5EEB0D009AABC8 /* MGLAttributionInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo.h; sourceTree = "<group>"; };
 		DA00FC8D1D5EEB0D009AABC8 /* MGLAttributionInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLAttributionInfo.mm; sourceTree = "<group>"; };
@@ -1002,12 +1148,8 @@
 		DA8848391CBAFB8500AB86E3 /* MGLUserLocation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLUserLocation.h; sourceTree = "<group>"; };
 		DA8848401CBAFB9800AB86E3 /* MGLAnnotationImage_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAnnotationImage_Private.h; sourceTree = "<group>"; };
 		DA8848411CBAFB9800AB86E3 /* MGLAnnotationImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAnnotationImage.m; sourceTree = "<group>"; };
-		DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAPIClient.h; sourceTree = "<group>"; };
-		DA8848431CBAFB9800AB86E3 /* MGLAPIClient.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLAPIClient.m; sourceTree = "<group>"; };
 		DA8848441CBAFB9800AB86E3 /* MGLCompactCalloutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCompactCalloutView.h; sourceTree = "<group>"; };
 		DA8848451CBAFB9800AB86E3 /* MGLCompactCalloutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLCompactCalloutView.m; sourceTree = "<group>"; };
-		DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLocationManager.h; sourceTree = "<group>"; };
-		DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLLocationManager.m; sourceTree = "<group>"; };
 		DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLMapboxEvents.h; sourceTree = "<group>"; };
 		DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MGLMapboxEvents.m; sourceTree = "<group>"; };
 		DA88484A1CBAFB9800AB86E3 /* MGLMapView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLMapView.mm; sourceTree = "<group>"; };
@@ -1035,10 +1177,16 @@
 		DA8F25B91D51D2570010E6B5 /* MGLStyleLayerTests.mm.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; name = MGLStyleLayerTests.mm.ejs; path = ../test/MGLStyleLayerTests.mm.ejs; sourceTree = "<group>"; };
 		DA8F25BA1D51D2570010E6B5 /* MGLStyleLayer.h.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.h.ejs; sourceTree = "<group>"; };
 		DA8F25BB1D51D2570010E6B5 /* MGLStyleLayer.mm.ejs */ = {isa = PBXFileReference; lastKnownFileType = text; path = MGLStyleLayer.mm.ejs; sourceTree = "<group>"; };
+		DA93409B208562EB0059919A /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		DA93409C2085630C0059919A /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "pt-PT"; path = "pt-PT.lproj/Foundation.stringsdict"; sourceTree = "<group>"; };
+		DA93409D208563220059919A /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Localizable.strings"; sourceTree = "<group>"; };
+		DA93409E208563360059919A /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "pt-PT"; path = "pt-PT.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
+		DA93409F208563440059919A /* pt-PT */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-PT"; path = "pt-PT.lproj/Root.strings"; sourceTree = "<group>"; };
 		DA9C012B1E4C7AD900C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "pt-BR"; path = "pt-BR.lproj/Localizable.stringsdict"; sourceTree = "<group>"; };
 		DA9C012C1E4C7ADB00C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "pt-BR"; path = "pt-BR.lproj/Foundation.stringsdict"; sourceTree = "<group>"; };
 		DA9C012D1E4C7B1F00C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DA9C012E1E4C7B6100C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Root.strings"; sourceTree = "<group>"; };
+		DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAA32CA11E4C44DB006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DAA32CA21E4C44DD006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAA32CA31E4C44F1006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Foundation.strings; sourceTree = "<group>"; };
@@ -1087,6 +1235,12 @@
 		DAD1656B1CF41981001FF4B9 /* MGLFeature.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLFeature.mm; sourceTree = "<group>"; };
 		DAD165761CF4CDFF001FF4B9 /* MGLShapeCollection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLShapeCollection.h; sourceTree = "<group>"; };
 		DAD165771CF4CDFF001FF4B9 /* MGLShapeCollection.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLShapeCollection.mm; sourceTree = "<group>"; };
+		DAD88E07202ACFE800AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAD88E08202AD01300AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Foundation.strings; sourceTree = "<group>"; };
+		DAD88E09202AD01F00AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = da; path = da.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
+		DAD88E0A202AD03C00AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Localizable.strings; sourceTree = "<group>"; };
+		DAD88E0B202AD04D00AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = da; path = da.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
+		DAD88E0C202AD06500AAA536 /* da */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = da; path = da.lproj/Root.strings; sourceTree = "<group>"; };
 		DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLNSStringAdditionsTests.m; path = ../../darwin/test/MGLNSStringAdditionsTests.m; sourceTree = "<group>"; };
 		DAE8CCAD1E6E8C70009B5CB0 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Localizable.strings; sourceTree = "<group>"; };
 		DAE8CCAE1E6E8C76009B5CB0 /* nl */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = nl; path = nl.lproj/Root.strings; sourceTree = "<group>"; };
@@ -1094,8 +1248,8 @@
 		DAED38611D62D0FC00D7640F /* NSURL+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAED38621D62D0FC00D7640F /* NSURL+MGLAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+MGLAdditions.m"; sourceTree = "<group>"; };
 		DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = MGLAttributionInfoTests.m; path = ../../darwin/test/MGLAttributionInfoTests.m; sourceTree = "<group>"; };
-		DAF0D80F1DFE0EA000B28378 /* MGLRasterSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterSource_Private.h; sourceTree = "<group>"; };
-		DAF0D8121DFE0EC500B28378 /* MGLVectorSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorSource_Private.h; sourceTree = "<group>"; };
+		DAF0D80F1DFE0EA000B28378 /* MGLRasterTileSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLRasterTileSource_Private.h; sourceTree = "<group>"; };
+		DAF0D8121DFE0EC500B28378 /* MGLVectorTileSource_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLVectorTileSource_Private.h; sourceTree = "<group>"; };
 		DAF0D8171DFE6B2800B28378 /* MGLAttributionInfo_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLAttributionInfo_Private.h; sourceTree = "<group>"; };
 		DAF25717201901E100367EF5 /* MGLHillshadeStyleLayer.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLHillshadeStyleLayer.mm; sourceTree = "<group>"; };
 		DAF25718201901E200367EF5 /* MGLHillshadeStyleLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLHillshadeStyleLayer.h; sourceTree = "<group>"; };
@@ -1121,7 +1275,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				165D0CE720005419009A3C66 /* Mapbox.framework in Frameworks */,
+				CABE5DAD2072FAB40003AF3C /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1129,6 +1283,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CAA69DA4206DCD0E007279CD /* Mapbox.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1188,6 +1343,8 @@
 			children = (
 				16376B091FFD9DAF0000563E /* MBGLIntegrationTests.m */,
 				16376B0B1FFD9DAF0000563E /* Info.plist */,
+				CA0C27932076CA19001CE5B7 /* MGLMapViewIntegrationTest.m */,
+				CA0C27952076CA50001CE5B7 /* MGLMapViewIntegrationTest.h */,
 			);
 			path = "Integration Tests";
 			sourceTree = "<group>";
@@ -1208,16 +1365,14 @@
 		35136D491D4277EA00C20EFD /* Sources */ = {
 			isa = PBXGroup;
 			children = (
-				07D9474F1F67487E00E37934 /* MGLAbstractShapeSource.h */,
-				07D9474E1F67487E00E37934 /* MGLAbstractShapeSource_Private.h */,
-				07D947501F67487E00E37934 /* MGLAbstractShapeSource.mm */,
 				0778DD401F67555F00A73B34 /* MGLComputedShapeSource.h */,
+				07D9474E1F67487E00E37934 /* MGLComputedShapeSource_Private.h */,
 				0778DD411F67555F00A73B34 /* MGLComputedShapeSource.mm */,
 				071BBAFC1EE75CD4001FB02A /* MGLImageSource.h */,
 				071BBAFD1EE75CD4001FB02A /* MGLImageSource.mm */,
-				3566C76A1D4A8DFA008152BC /* MGLRasterSource.h */,
-				DAF0D80F1DFE0EA000B28378 /* MGLRasterSource_Private.h */,
-				3566C76B1D4A8DFA008152BC /* MGLRasterSource.mm */,
+				3566C76A1D4A8DFA008152BC /* MGLRasterTileSource.h */,
+				DAF0D80F1DFE0EA000B28378 /* MGLRasterTileSource_Private.h */,
+				3566C76B1D4A8DFA008152BC /* MGLRasterTileSource.mm */,
 				DACA86242019218500E9693A /* MGLRasterDEMSource.h */,
 				DACA86252019218500E9693A /* MGLRasterDEMSource.mm */,
 				3566C7641D4A77BA008152BC /* MGLShapeSource.h */,
@@ -1229,9 +1384,9 @@
 				404C26E01D89B877000AA13D /* MGLTileSource.h */,
 				404C26E61D89C515000AA13D /* MGLTileSource_Private.h */,
 				404C26E11D89B877000AA13D /* MGLTileSource.mm */,
-				350098B91D480108004B2AF0 /* MGLVectorSource.h */,
-				DAF0D8121DFE0EC500B28378 /* MGLVectorSource_Private.h */,
-				350098BA1D480108004B2AF0 /* MGLVectorSource.mm */,
+				350098B91D480108004B2AF0 /* MGLVectorTileSource.h */,
+				DAF0D8121DFE0EC500B28378 /* MGLVectorTileSource_Private.h */,
+				350098BA1D480108004B2AF0 /* MGLVectorTileSource.mm */,
 			);
 			name = Sources;
 			sourceTree = "<group>";
@@ -1367,6 +1522,137 @@
 			);
 			name = "Test Helpers";
 			sourceTree = "<group>";
+		};
+		40834BA11FE05CFD00C1BD0D /* Development */ = {
+			isa = PBXGroup;
+			children = (
+				9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */,
+				9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */,
+			);
+			name = Development;
+			sourceTree = "<group>";
+		};
+		40834BA21FE05D3100C1BD0D /* Runtime */ = {
+			isa = PBXGroup;
+			children = (
+				40834BC81FE05D7000C1BD0D /* MMENamespacedDependencies.h */,
+				40834BAC1FE05D6C00C1BD0D /* MapboxMobileEvents.h */,
+				DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */,
+				DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */,
+				40834BC21FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.h */,
+				40834BC31FE05D6F00C1BD0D /* CLLocation+MMEMobileEvents.m */,
+				40834BAB1FE05D6C00C1BD0D /* MMEAPIClient.h */,
+				40834BA51FE05D6B00C1BD0D /* MMEAPIClient.m */,
+				40834BB51FE05D6D00C1BD0D /* MMECategoryLoader.h */,
+				40834BC41FE05D6F00C1BD0D /* MMECategoryLoader.m */,
+				40834BAE1FE05D6C00C1BD0D /* MMECommonEventData.h */,
+				40834BCE1FE05D7100C1BD0D /* MMECommonEventData.m */,
+				40834BB01FE05D6C00C1BD0D /* MMEConstants.h */,
+				40834BC01FE05D6E00C1BD0D /* MMEConstants.m */,
+				40834BB11FE05D6D00C1BD0D /* MMEDependencyManager.h */,
+				40834BB41FE05D6D00C1BD0D /* MMEDependencyManager.m */,
+				40834BBA1FE05D6E00C1BD0D /* MMEEvent.h */,
+				40834BC71FE05D7000C1BD0D /* MMEEvent.m */,
+				40834BA61FE05D6B00C1BD0D /* MMEEventLogger.h */,
+				40834BB71FE05D6D00C1BD0D /* MMEEventLogger.m */,
+				406E99B51FFEFED600D9FFCC /* MMEEventLogReportViewController.h */,
+				406E99B11FFEFED500D9FFCC /* MMEEventLogReportViewController.m */,
+				40834BBB1FE05D6E00C1BD0D /* MMEEventsConfiguration.h */,
+				40834BB21FE05D6D00C1BD0D /* MMEEventsConfiguration.m */,
+				40834BA31FE05D6B00C1BD0D /* MMEEventsManager.h */,
+				40834BA41FE05D6B00C1BD0D /* MMEEventsManager.m */,
+				40834BB31FE05D6D00C1BD0D /* MMELocationManager.h */,
+				40834BB81FE05D6D00C1BD0D /* MMELocationManager.m */,
+				40834BC51FE05D6F00C1BD0D /* MMENSDateWrapper.h */,
+				40834BBC1FE05D6E00C1BD0D /* MMENSDateWrapper.m */,
+				40834BAA1FE05D6C00C1BD0D /* MMENSURLSessionWrapper.h */,
+				40834BC61FE05D7000C1BD0D /* MMENSURLSessionWrapper.m */,
+				40834BC91FE05D7000C1BD0D /* MMETimerManager.h */,
+				40834BB91FE05D6E00C1BD0D /* MMETimerManager.m */,
+				40834BA71FE05D6B00C1BD0D /* MMETrustKitWrapper.h */,
+				40834BC11FE05D6F00C1BD0D /* MMETrustKitWrapper.m */,
+				40834BB61FE05D6D00C1BD0D /* MMETypes.h */,
+				40834BBD1FE05D6E00C1BD0D /* MMETypes.m */,
+				40834BBE1FE05D6E00C1BD0D /* MMEUIApplicationWrapper.h */,
+				40834BCA1FE05D7000C1BD0D /* MMEUIApplicationWrapper.m */,
+				406E99B31FFEFED600D9FFCC /* MMEUINavigation.h */,
+				406E99B21FFEFED500D9FFCC /* MMEUINavigation.m */,
+				40834BBF1FE05D6E00C1BD0D /* MMEUniqueIdentifier.h */,
+				40834BAD1FE05D6C00C1BD0D /* MMEUniqueIdentifier.m */,
+				40834BCF1FE05D7100C1BD0D /* NSData+MMEGZIP.h */,
+				40834BAF1FE05D6C00C1BD0D /* NSData+MMEGZIP.m */,
+				40834BCB1FE05D7100C1BD0D /* Reachability */,
+				40834C0E1FE05F3600C1BD0D /* TrustKit */,
+			);
+			name = Runtime;
+			sourceTree = "<group>";
+		};
+		40834BCB1FE05D7100C1BD0D /* Reachability */ = {
+			isa = PBXGroup;
+			children = (
+				40834BCC1FE05D7100C1BD0D /* MMEReachability.h */,
+				40834BCD1FE05D7100C1BD0D /* MMEReachability.m */,
+			);
+			name = Reachability;
+			path = "vendor/mapbox-events-ios/MapboxMobileEvents/Reachability";
+			sourceTree = SOURCE_ROOT;
+		};
+		40834C0E1FE05F3600C1BD0D /* TrustKit */ = {
+			isa = PBXGroup;
+			children = (
+				40834C0F1FE05F3600C1BD0D /* configuration_utils.h */,
+				40834C101FE05F3600C1BD0D /* configuration_utils.m */,
+				40834C131FE05F3600C1BD0D /* parse_configuration.h */,
+				40834C141FE05F3600C1BD0D /* parse_configuration.m */,
+				40834C151FE05F3600C1BD0D /* Pinning */,
+				40834C1B1FE05F3600C1BD0D /* Reporting */,
+				40834C261FE05F3600C1BD0D /* TrustKit.h */,
+				40834C271FE05F3600C1BD0D /* TrustKit.m */,
+				40834C281FE05F3600C1BD0D /* TSKLog.h */,
+				40834C291FE05F3600C1BD0D /* TSKPinningValidator.h */,
+				40834C2A1FE05F3600C1BD0D /* TSKPinningValidator.m */,
+				40834C2B1FE05F3600C1BD0D /* TSKPinningValidator_Private.h */,
+				40834C2C1FE05F3600C1BD0D /* TSKPinningValidatorCallback.h */,
+				40834C2D1FE05F3600C1BD0D /* TSKPinningValidatorResult.h */,
+				40834C2E1FE05F3600C1BD0D /* TSKPinningValidatorResult.m */,
+				40834C2F1FE05F3600C1BD0D /* TSKTrustDecision.h */,
+				40834C301FE05F3600C1BD0D /* TSKTrustKitConfig.h */,
+				40834C311FE05F3600C1BD0D /* TSKTrustKitConfig.m */,
+			);
+			name = TrustKit;
+			path = "vendor/mapbox-events-ios/vendor/TrustKit";
+			sourceTree = SOURCE_ROOT;
+		};
+		40834C151FE05F3600C1BD0D /* Pinning */ = {
+			isa = PBXGroup;
+			children = (
+				40834C161FE05F3600C1BD0D /* ssl_pin_verifier.h */,
+				40834C171FE05F3600C1BD0D /* ssl_pin_verifier.m */,
+				40834C181FE05F3600C1BD0D /* TSKPublicKeyAlgorithm.h */,
+				40834C191FE05F3600C1BD0D /* TSKSPKIHashCache.h */,
+				40834C1A1FE05F3600C1BD0D /* TSKSPKIHashCache.m */,
+			);
+			name = Pinning;
+			path = "vendor/mapbox-events-ios/vendor/TrustKit/Pinning";
+			sourceTree = SOURCE_ROOT;
+		};
+		40834C1B1FE05F3600C1BD0D /* Reporting */ = {
+			isa = PBXGroup;
+			children = (
+				40834C1C1FE05F3600C1BD0D /* reporting_utils.h */,
+				40834C1D1FE05F3600C1BD0D /* reporting_utils.m */,
+				40834C1E1FE05F3600C1BD0D /* TSKBackgroundReporter.h */,
+				40834C1F1FE05F3600C1BD0D /* TSKBackgroundReporter.m */,
+				40834C201FE05F3600C1BD0D /* TSKPinFailureReport.h */,
+				40834C211FE05F3600C1BD0D /* TSKPinFailureReport.m */,
+				40834C221FE05F3600C1BD0D /* TSKReportsRateLimiter.h */,
+				40834C231FE05F3600C1BD0D /* TSKReportsRateLimiter.m */,
+				40834C241FE05F3600C1BD0D /* vendor_identifier.h */,
+				40834C251FE05F3600C1BD0D /* vendor_identifier.m */,
+			);
+			name = Reporting;
+			path = "vendor/mapbox-events-ios/vendor/TrustKit/Reporting";
+			sourceTree = SOURCE_ROOT;
 		};
 		409F43FB1E9E77D10048729D /* Swift Integration */ = {
 			isa = PBXGroup;
@@ -1512,24 +1798,25 @@
 				4031ACFD1E9FD26900A3EA26 /* Test Helpers */,
 				409F43FB1E9E77D10048729D /* Swift Integration */,
 				357579811D502AD4000B822E /* Styling */,
-				DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */,
 				353D23951D0B0DFE002BE09D /* MGLAnnotationViewTests.m */,
+				DAEDC4331D603417000224FF /* MGLAttributionInfoTests.m */,
 				DA35A2C31CCA9F8300E826B2 /* MGLClockDirectionFormatterTests.m */,
 				35D9DDE11DA25EEC00DAAD69 /* MGLCodingTests.m */,
 				DA35A2C41CCA9F8300E826B2 /* MGLCompassDirectionFormatterTests.m */,
 				DA35A2A91CCA058D00E826B2 /* MGLCoordinateFormatterTests.m */,
+				3598544C1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m */,
 				6407D66F1E0085FD00F6A9C3 /* MGLDocumentationExampleTests.swift */,
 				DA1F8F3C1EBD287B00367E42 /* MGLDocumentationGuideTests.swift */,
 				DD58A4C51D822BD000E1F038 /* MGLExpressionTests.mm */,
-				3598544C1E1D38AA00B29F84 /* MGLDistanceFormatterTests.m */,
 				DA0CD58F1CF56F6A00A5F5A5 /* MGLFeatureTests.mm */,
 				DA2E885C1CC0382C00F24E7B /* MGLGeometryTests.mm */,
 				DA5DB1291FABF1EE001C2326 /* MGLMapAccessibilityElementTests.m */,
 				16376B481FFEED010000563E /* MGLMapViewLayoutTests.m */,
+				9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */,
 				35E208A61D24210F00EC9A46 /* MGLNSDataAdditionsTests.m */,
 				1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */,
-				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
 				96036A0520059BBA00510F3D /* MGLNSOrthographyAdditionsTests.m */,
+				DAE7DEC11E245455007505A6 /* MGLNSStringAdditionsTests.m */,
 				DA2E885D1CC0382C00F24E7B /* MGLOfflinePackTests.m */,
 				DA2E885E1CC0382C00F24E7B /* MGLOfflineRegionTests.m */,
 				55E2AD121E5B125400E8C587 /* MGLOfflineStorageTests.mm */,
@@ -1548,6 +1835,7 @@
 			isa = PBXGroup;
 			children = (
 				DA88485E1CBAFC2E00AB86E3 /* Mapbox.h */,
+				40834AEF1FDF4F0100C1BD0D /* Mapbox-Prefix.pch */,
 				DA8847DE1CBAFA3E00AB86E3 /* Foundation */,
 				DA8F25BC1D51D2570010E6B5 /* Foundation Templates */,
 				DA8933B91CCD2C6700E68420 /* Foundation Resources */,
@@ -1627,11 +1915,6 @@
 				DA89339F1CCC951200E68420 /* Localizable.strings */,
 				DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */,
 				DA8933EF1CCD387900E68420 /* strip-frameworks.sh */,
-				40599F001DEE1B2400182B5D /* api_mapbox_staging.der */,
-				40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */,
-				40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */,
-				40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */,
-				40EA6BBE1EF4598900FCCDA2 /* api_mapbox_com-geotrust_2017.der */,
 			);
 			name = "Kit Resources";
 			path = resources;
@@ -1813,6 +2096,7 @@
 				408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */,
 				DA8848141CBAFA6200AB86E3 /* NSException+MGLAdditions.h */,
 				3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */,
+				DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */,
 				DAC25FCB200FD83E009BE98E /* NSExpression+MGLPrivateAdditions.h */,
 				3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */,
 				35B82BF61D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h */,
@@ -1864,16 +2148,10 @@
 		DAD165851CF4D08B001FF4B9 /* Telemetry */ = {
 			isa = PBXGroup;
 			children = (
-				DA8848421CBAFB9800AB86E3 /* MGLAPIClient.h */,
-				DA8848431CBAFB9800AB86E3 /* MGLAPIClient.m */,
-				DA8848461CBAFB9800AB86E3 /* MGLLocationManager.h */,
-				DA8848471CBAFB9800AB86E3 /* MGLLocationManager.m */,
-				DA8848481CBAFB9800AB86E3 /* MGLMapboxEvents.h */,
-				DA8848491CBAFB9800AB86E3 /* MGLMapboxEvents.m */,
-				9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */,
-				9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */,
 				AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */,
 				AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */,
+				40834BA21FE05D3100C1BD0D /* Runtime */,
+				40834BA11FE05CFD00C1BD0D /* Development */,
 			);
 			name = Telemetry;
 			sourceTree = "<group>";
@@ -1901,14 +2179,13 @@
 				DA88482C1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.h in Headers */,
 				357FE2DD1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,
 				35D13AB71D3D15E300AFB4E0 /* MGLStyleLayer.h in Headers */,
-				07D947531F67488E00E37934 /* MGLAbstractShapeSource_Private.h in Headers */,
+				07D947531F67488E00E37934 /* MGLComputedShapeSource_Private.h in Headers */,
 				9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */,
 				40F887701D7A1E58008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				350098DC1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.h in Headers */,
 				DA8848231CBAFA6200AB86E3 /* MGLOfflineStorage_Private.h in Headers */,
 				404326891D5B9B27007111BD /* MGLAnnotationContainerView_Private.h in Headers */,
 				CA55CD41202C16AA00CE7095 /* MGLCameraChangeReason.h in Headers */,
-				1FB7DAAF1F2A4DBD00410606 /* MGLVectorSource+MGLAdditions.h in Headers */,
 				DA88483B1CBAFB8500AB86E3 /* MGLCalloutView.h in Headers */,
 				35E0CFE61D3E501500188327 /* MGLStyle_Private.h in Headers */,
 				3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
@@ -1919,10 +2196,9 @@
 				DA88485A1CBAFB9800AB86E3 /* MGLUserLocation_Private.h in Headers */,
 				966FCF531F3C322400F2B6DE /* MGLUserLocationHeadingArrowLayer.h in Headers */,
 				DA27C24F1CBB4C11000B0ECD /* MGLAccountManager_Private.h in Headers */,
-				07D947521F67488800E37934 /* MGLAbstractShapeSource.h in Headers */,
 				DA8847FC1CBAFA5100AB86E3 /* MGLStyle.h in Headers */,
 				DD9BE4F71EB263C50079A3AF /* UIViewController+MGLAdditions.h in Headers */,
-				DAF0D8131DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */,
+				DAF0D8131DFE0EC500B28378 /* MGLVectorTileSource_Private.h in Headers */,
 				354B83961D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
 				DA8847F01CBAFA5100AB86E3 /* MGLAnnotation.h in Headers */,
 				400533011DB0862B0069F638 /* NSArray+MGLAdditions.h in Headers */,
@@ -1935,7 +2211,6 @@
 				FA68F14A1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
 				353933FB1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
 				DA8847EF1CBAFA5100AB86E3 /* MGLAccountManager.h in Headers */,
-				DA8848511CBAFB9800AB86E3 /* MGLAPIClient.h in Headers */,
 				DA35A2C91CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
 				3510FFEA1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.h in Headers */,
 				DA6408DB1DA4E7D300908C90 /* MGLVectorStyleLayer.h in Headers */,
@@ -1952,7 +2227,6 @@
 				071BBB031EE76146001FB02A /* MGLImageSource.h in Headers */,
 				DA8847F41CBAFA5100AB86E3 /* MGLOfflinePack.h in Headers */,
 				DA88482E1CBAFA6200AB86E3 /* NSException+MGLAdditions.h in Headers */,
-				DA8848551CBAFB9800AB86E3 /* MGLLocationManager.h in Headers */,
 				96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */,
 				408AA8571DAEDA1700022900 /* NSDictionary+MGLAdditions.h in Headers */,
 				DA88483F1CBAFB8500AB86E3 /* MGLUserLocation.h in Headers */,
@@ -1977,7 +2251,7 @@
 				DA8847F11CBAFA5100AB86E3 /* MGLGeometry.h in Headers */,
 				DA8848221CBAFA6200AB86E3 /* MGLOfflineRegion_Private.h in Headers */,
 				35136D4C1D4277FC00C20EFD /* MGLSource.h in Headers */,
-				3566C76C1D4A8DFA008152BC /* MGLRasterSource.h in Headers */,
+				3566C76C1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */,
 				DA8847F91CBAFA5100AB86E3 /* MGLPolygon.h in Headers */,
 				4049C2AC1DB6E05500B3F799 /* MGLPointCollection_Private.h in Headers */,
 				DA8847F81CBAFA5100AB86E3 /* MGLPointAnnotation.h in Headers */,
@@ -2012,9 +2286,10 @@
 				DA8848841CBB033F00AB86E3 /* FABAttributes.h in Headers */,
 				DA8847FD1CBAFA5100AB86E3 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA88482F1CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.h in Headers */,
+				DA9EA82B201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */,
 				DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */,
-				DAF0D8101DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */,
-				350098BB1D480108004B2AF0 /* MGLVectorSource.h in Headers */,
+				DAF0D8101DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */,
+				350098BB1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */,
 				DA8847F61CBAFA5100AB86E3 /* MGLOfflineStorage.h in Headers */,
 				DAD1656E1CF41981001FF4B9 /* MGLFeature_Private.h in Headers */,
 				DA88483C1CBAFB8500AB86E3 /* MGLMapView.h in Headers */,
@@ -2026,22 +2301,22 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				96E516FE20005A4C00A02306 /* MGLLocationManager.h in Headers */,
 				556660CA1E1BF3A900E2C41B /* MGLFoundation.h in Headers */,
 				96E516ED200058A200A02306 /* MGLComputedShapeSource.h in Headers */,
 				35B82BF91D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h in Headers */,
 				96E5170020005A6100A02306 /* Fabric.h in Headers */,
 				DA35A2CA1CCAAAD200E826B2 /* NSValue+MGLAdditions.h in Headers */,
-				350098BC1D480108004B2AF0 /* MGLVectorSource.h in Headers */,
+				350098BC1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */,
 				FA68F14B1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.h in Headers */,
 				96E516DE200054F700A02306 /* MGLGeometry_Private.h in Headers */,
 				353933FC1D3FB7C0003F57D7 /* MGLRasterStyleLayer.h in Headers */,
-				3566C76D1D4A8DFA008152BC /* MGLRasterSource.h in Headers */,
+				3566C76D1D4A8DFA008152BC /* MGLRasterTileSource.h in Headers */,
 				DAED38641D62D0FC00D7640F /* NSURL+MGLAdditions.h in Headers */,
 				DABFB85E1CBE99E500D62B32 /* MGLAnnotation.h in Headers */,
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */,
 				96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */,
+				DA9EA82C201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */,
 				96036A02200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */,
 				DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
@@ -2065,7 +2340,7 @@
 				DAAF722E1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
 				DABFB8661CBE99E500D62B32 /* MGLPointAnnotation.h in Headers */,
 				96E5170220005A6600A02306 /* FABAttributes.h in Headers */,
-				96E516E42000560B00A02306 /* MGLAbstractShapeSource_Private.h in Headers */,
+				96E516E42000560B00A02306 /* MGLComputedShapeSource_Private.h in Headers */,
 				96E516E92000560B00A02306 /* MGLAnnotationImage_Private.h in Headers */,
 				96E516E52000560B00A02306 /* MGLOfflinePack_Private.h in Headers */,
 				DD9BE4F91EB263D20079A3AF /* UIViewController+MGLAdditions.h in Headers */,
@@ -2091,7 +2366,6 @@
 				3510FFFA1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */,
 				DA72620C1DEEE3480043BB89 /* MGLOpenGLStyleLayer.h in Headers */,
 				35CE61831D4165D9004F2359 /* UIColor+MGLAdditions.h in Headers */,
-				96E516EE2000590900A02306 /* MGLAbstractShapeSource.h in Headers */,
 				96E516F32000597100A02306 /* NSDictionary+MGLAdditions.h in Headers */,
 				96E516F02000595800A02306 /* NSBundle+MGLAdditions.h in Headers */,
 				96E516F920005A3500A02306 /* MGLFaux3DUserLocationAnnotationView.h in Headers */,
@@ -2118,14 +2392,14 @@
 				40F887711D7A1E59008ECB67 /* MGLShapeSource_Private.h in Headers */,
 				DABFB8631CBE99E500D62B32 /* MGLOfflineRegion.h in Headers */,
 				DA35A2B21CCA141D00E826B2 /* MGLCompassDirectionFormatter.h in Headers */,
-				DAF0D8141DFE0EC500B28378 /* MGLVectorSource_Private.h in Headers */,
+				DAF0D8141DFE0EC500B28378 /* MGLVectorTileSource_Private.h in Headers */,
 				8989B17D201A48EB0081CF59 /* MGLHeatmapStyleLayer.h in Headers */,
 				DABFB8731CBE9A9900D62B32 /* Mapbox.h in Headers */,
 				357FE2DE1E02D2B20068B753 /* NSCoder+MGLAdditions.h in Headers */,
 				1753ED431E53CE6F00A9FD90 /* MGLConversion.h in Headers */,
 				DAC25FCD200FD83F009BE98E /* NSExpression+MGLPrivateAdditions.h in Headers */,
 				354B83971D2E873E005D9406 /* MGLUserLocationAnnotationView.h in Headers */,
-				DAF0D8111DFE0EA000B28378 /* MGLRasterSource_Private.h in Headers */,
+				DAF0D8111DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */,
 				96E516FF20005A4F00A02306 /* MGLMapboxEvents.h in Headers */,
 				DABFB86B1CBE99E500D62B32 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */,
@@ -2153,7 +2427,6 @@
 				DAF0D8191DFE6B2800B28378 /* MGLAttributionInfo_Private.h in Headers */,
 				DABFB86A1CBE99E500D62B32 /* MGLStyle.h in Headers */,
 				DA00FC8F1D5EEB0D009AABC8 /* MGLAttributionInfo.h in Headers */,
-				96E516FD20005A4700A02306 /* MGLAPIClient.h in Headers */,
 				96E5170320005A6800A02306 /* FABKitProtocol.h in Headers */,
 				96E516E12000551100A02306 /* MGLMultiPoint_Private.h in Headers */,
 				3EA934623AD0000B7D99C3FB /* MGLRendererConfiguration.h in Headers */,
@@ -2176,6 +2449,7 @@
 			);
 			dependencies = (
 				165D0CE620005351009A3C66 /* PBXTargetDependency */,
+				CABE5DAC2072FA660003AF3C /* PBXTargetDependency */,
 			);
 			name = integration;
 			productName = "integration-tests";
@@ -2189,6 +2463,7 @@
 				16376B2B1FFDB4B40000563E /* Sources */,
 				16376B2C1FFDB4B40000563E /* Frameworks */,
 				16376B2D1FFDB4B40000563E /* Resources */,
+				CAA69DA6206DCD0E007279CD /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -2396,6 +2671,8 @@
 				bg,
 				ar,
 				he,
+				da,
+				"pt-PT",
 			);
 			mainGroup = DA1DC9411CB6C1C2006E619F;
 			productRefGroup = DA1DC94B1CB6C1C2006E619F /* Products */;
@@ -2481,11 +2758,6 @@
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
-				40EA6BC11EF4599600FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
-				408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */,
-				408982EA1DEE208B00754016 /* api_mapbox_com-digicert_2016.der in Resources */,
-				40EA6BC31EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */,
-				408982EB1DEE209100754016 /* api_mapbox_com-geotrust_2016.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2497,12 +2769,7 @@
 				DA8933DB1CCD31D400E68420 /* Foundation.strings in Resources */,
 				960D0C371ECF5AAF008E151F /* Images.xcassets in Resources */,
 				DA8933DC1CCD31D400E68420 /* Foundation.stringsdict in Resources */,
-				40EA6BC41EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */,
 				DAC49C5D1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
-				40599F0C1DEE1B7600182B5D /* api_mapbox_staging.der in Resources */,
-				40599F0D1DEE1B7A00182B5D /* api_mapbox_com-digicert_2016.der in Resources */,
-				40599F0E1DEE1B7E00182B5D /* api_mapbox_com-geotrust_2016.der in Resources */,
-				40EA6BC21EF4599700FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2527,6 +2794,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				16376B0A1FFD9DAF0000563E /* MBGLIntegrationTests.m in Sources */,
+				CA0C27942076CA19001CE5B7 /* MGLMapViewIntegrationTest.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2587,6 +2855,7 @@
 				1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */,
 				DD58A4C61D822BD000E1F038 /* MGLExpressionTests.mm in Sources */,
 				3575798B1D502B0C000B822E /* MGLBackgroundStyleLayerTests.mm in Sources */,
+				9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */,
 				409D0A0D1ED614CE00C95D0C /* MGLAnnotationViewIntegrationTests.swift in Sources */,
 				DA2E88621CC0382C00F24E7B /* MGLOfflinePackTests.m in Sources */,
 				55E2AD131E5B125400E8C587 /* MGLOfflineStorageTests.mm in Sources */,
@@ -2612,81 +2881,114 @@
 			files = (
 				35136D391D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFEC1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
+				40834C431FE05F7500C1BD0D /* TSKSPKIHashCache.m in Sources */,
 				DAED38651D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
+				40834BEC1FE05E1800C1BD0D /* MMEEvent.m in Sources */,
 				9620BB3A1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */,
 				354B83981D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
+				40834BEE1FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */,
 				DA88485D1CBAFB9800AB86E3 /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DAD165701CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C11CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
+				40834C481FE05F7500C1BD0D /* vendor_identifier.m in Sources */,
 				DA8848541CBAFB9800AB86E3 /* MGLCompactCalloutView.m in Sources */,
+				40834BEB1FE05E1800C1BD0D /* MMEDependencyManager.m in Sources */,
+				40834C411FE05F7500C1BD0D /* parse_configuration.m in Sources */,
 				DA8848251CBAFA6200AB86E3 /* MGLPointAnnotation.mm in Sources */,
+				40834BEA1FE05E1800C1BD0D /* MMEConstants.m in Sources */,
 				929EFFAB1F56DCD4003A77D5 /* MGLAnnotationView.mm in Sources */,
 				35136D3C1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
 				DD9BE4F81EB263C50079A3AF /* UIViewController+MGLAdditions.m in Sources */,
 				350098DE1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
 				DA6408DD1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */,
+				40834BF71FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */,
 				3566C7681D4A77BA008152BC /* MGLShapeSource.mm in Sources */,
+				40834C4A1FE05F7500C1BD0D /* TSKPinningValidator.m in Sources */,
 				400533021DB0862B0069F638 /* NSArray+MGLAdditions.mm in Sources */,
 				96036A03200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
+				40834BF31FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
 				35136D421D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				3538AA1F1D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
+				40834BF11FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
+				40834C461FE05F7500C1BD0D /* TSKPinFailureReport.m in Sources */,
+				406E99B91FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
+				40834BE61FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
 				DA00FC901D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
 				DA88482D1CBAFA6200AB86E3 /* NSBundle+MGLAdditions.m in Sources */,
+				406E99BB1FFF006C00D9FFCC /* MMEUINavigation.m in Sources */,
 				966FCF541F3C323300F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */,
+				40834BE81FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */,
 				DA88485B1CBAFB9800AB86E3 /* MGLUserLocation.m in Sources */,
 				927FBD011F4DB05500F8BF1F /* MGLMapSnapshotter.mm in Sources */,
-				350098BD1D480108004B2AF0 /* MGLVectorSource.mm in Sources */,
-				3566C76E1D4A8DFA008152BC /* MGLRasterSource.mm in Sources */,
+				350098BD1D480108004B2AF0 /* MGLVectorTileSource.mm in Sources */,
+				3566C76E1D4A8DFA008152BC /* MGLRasterTileSource.mm in Sources */,
 				DA88488C1CBB037E00AB86E3 /* SMCalloutView.m in Sources */,
 				35136D4E1D4277FC00C20EFD /* MGLSource.mm in Sources */,
 				1F06668D1EC64F8E001C16D7 /* MGLLight.mm in Sources */,
 				DA35A2B81CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
 				DAD1657A1CF4CDFF001FF4B9 /* MGLShapeCollection.mm in Sources */,
 				DAF25719201901E200367EF5 /* MGLHillshadeStyleLayer.mm in Sources */,
+				40834BF51FE05E1800C1BD0D /* MMETypes.m in Sources */,
 				35136D451D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
+				40834C491FE05F7500C1BD0D /* TrustKit.m in Sources */,
 				35599DED1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
 				DA8848211CBAFA6200AB86E3 /* MGLOfflinePack.mm in Sources */,
 				0778DD441F67556C00A73B34 /* MGLComputedShapeSource.mm in Sources */,
 				3557F7B21E1D27D300CCA5E6 /* MGLDistanceFormatter.m in Sources */,
+				40834C4B1FE05F7500C1BD0D /* TSKPinningValidatorResult.m in Sources */,
+				40834BE71FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
 				DA8848591CBAFB9800AB86E3 /* MGLMapView.mm in Sources */,
 				DA8848501CBAFB9800AB86E3 /* MGLAnnotationImage.m in Sources */,
+				40834BF01FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
 				DA8848281CBAFA6200AB86E3 /* MGLShape.mm in Sources */,
 				DA35A2B31CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				DD0902A91DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
 				35D13AB91D3D15E300AFB4E0 /* MGLStyleLayer.mm in Sources */,
+				40834C4C1FE05F7500C1BD0D /* TSKTrustKitConfig.m in Sources */,
 				DA35A2CB1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
 				071BBB001EE7613F001FB02A /* MGLImageSource.mm in Sources */,
 				DA8848321CBAFA6200AB86E3 /* NSString+MGLAdditions.m in Sources */,
+				40834C441FE05F7500C1BD0D /* reporting_utils.m in Sources */,
 				408AA8581DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DA35A2A11CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
 				35305D481D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
+				40834BF61FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */,
 				DA8848291CBAFA6200AB86E3 /* MGLStyle.mm in Sources */,
 				357FE2DF1E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */,
+				40834BF81FE05E1800C1BD0D /* NSData+MMEGZIP.m in Sources */,
 				DA88481C1CBAFA6200AB86E3 /* MGLGeometry.mm in Sources */,
 				558DE7A21E5615E400C7916D /* MGLFoundation.mm in Sources */,
+				40834BE91FE05E1800C1BD0D /* MMECommonEventData.m in Sources */,
 				3510FFF21D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */,
 				DA88481F1CBAFA6200AB86E3 /* MGLMultiPoint.mm in Sources */,
 				DA88482B1CBAFA6200AB86E3 /* MGLTypes.m in Sources */,
 				FA68F14D1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				404C26E41D89B877000AA13D /* MGLTileSource.mm in Sources */,
-				07D947541F67489200E37934 /* MGLAbstractShapeSource.mm in Sources */,
 				355AE0011E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
+				40834C451FE05F7500C1BD0D /* TSKBackgroundReporter.m in Sources */,
 				DA88481D1CBAFA6200AB86E3 /* MGLMapCamera.mm in Sources */,
 				DACA86282019218600E9693A /* MGLRasterDEMSource.mm in Sources */,
 				DA8848261CBAFA6200AB86E3 /* MGLPolygon.mm in Sources */,
 				35B82BFA1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
-				DA8848521CBAFB9800AB86E3 /* MGLAPIClient.m in Sources */,
+				40834C401FE05F7500C1BD0D /* configuration_utils.m in Sources */,
+				40834BF91FE05E1800C1BD0D /* MMEReachability.m in Sources */,
+				40834BF21FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */,
+				40834C471FE05F7500C1BD0D /* TSKReportsRateLimiter.m in Sources */,
 				966FCF4E1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */,
 				8989B17E201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */,
 				DA8848301CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.m in Sources */,
+				40834BED1FE05E1800C1BD0D /* MMEEventLogger.m in Sources */,
 				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
+				40834BF41FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */,
+				40834BEF1FE05E1800C1BD0D /* MMEEventsManager.m in Sources */,
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DA8848241CBAFA6200AB86E3 /* MGLOfflineStorage.mm in Sources */,
 				DA88482A1CBAFA6200AB86E3 /* MGLTilePyramidOfflineRegion.mm in Sources */,
 				4049C29F1DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
 				35136D3F1D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DA704CC41F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
+				40834C421FE05F7500C1BD0D /* ssl_pin_verifier.m in Sources */,
 				DA72620D1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DA88481A1CBAFA6200AB86E3 /* MGLAccountManager.m in Sources */,
 				3510FFFB1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
@@ -2694,7 +2996,6 @@
 				DA8848271CBAFA6200AB86E3 /* MGLPolyline.mm in Sources */,
 				DA8848581CBAFB9800AB86E3 /* MGLMapboxEvents.m in Sources */,
 				35CE61841D4165D9004F2359 /* UIColor+MGLAdditions.mm in Sources */,
-				DA8848561CBAFB9800AB86E3 /* MGLLocationManager.m in Sources */,
 				3EA93369F61CF70AFA50465D /* MGLRendererConfiguration.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2705,31 +3006,46 @@
 			files = (
 				35136D3A1D42271A00C20EFD /* MGLBackgroundStyleLayer.mm in Sources */,
 				3510FFED1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */,
+				40834C501FE05F7600C1BD0D /* TSKSPKIHashCache.m in Sources */,
 				354B83991D2E873E005D9406 /* MGLUserLocationAnnotationView.m in Sources */,
+				40834C001FE05E1800C1BD0D /* MMEEvent.m in Sources */,
 				9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */,
 				DAA4E4221CBB730400178DFB /* MGLPointAnnotation.mm in Sources */,
+				40834C021FE05E1800C1BD0D /* MMEEventsConfiguration.m in Sources */,
 				DAED38661D62D0FC00D7640F /* NSURL+MGLAdditions.m in Sources */,
 				DAD165711CF41981001FF4B9 /* MGLFeature.mm in Sources */,
 				30E5781A1DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */,
 				40EDA1C21CFE0E0500D9EA68 /* MGLAnnotationContainerView.m in Sources */,
+				40834C551FE05F7600C1BD0D /* vendor_identifier.m in Sources */,
 				DAA4E4291CBB730400178DFB /* NSBundle+MGLAdditions.m in Sources */,
-				DAA4E42E1CBB730400178DFB /* MGLAPIClient.m in Sources */,
+				40834BFF1FE05E1800C1BD0D /* MMEDependencyManager.m in Sources */,
+				40834C4E1FE05F7600C1BD0D /* parse_configuration.m in Sources */,
+				40834BFE1FE05E1800C1BD0D /* MMEConstants.m in Sources */,
 				35136D3D1D42272500C20EFD /* MGLCircleStyleLayer.mm in Sources */,
 				DD9BE4FA1EB263F40079A3AF /* UIViewController+MGLAdditions.m in Sources */,
 				350098DF1D484E60004B2AF0 /* NSValue+MGLStyleAttributeAdditions.mm in Sources */,
 				DA6408DE1DA4E7D300908C90 /* MGLVectorStyleLayer.m in Sources */,
 				3566C7691D4A77BA008152BC /* MGLShapeSource.mm in Sources */,
+				40834C0B1FE05E1800C1BD0D /* MMEUniqueIdentifier.m in Sources */,
 				400533031DB086490069F638 /* NSArray+MGLAdditions.mm in Sources */,
+				40834C571FE05F7600C1BD0D /* TSKPinningValidator.m in Sources */,
 				35136D431D42274500C20EFD /* MGLRasterStyleLayer.mm in Sources */,
 				96036A04200565C700510F3D /* NSOrthography+MGLAdditions.m in Sources */,
+				40834C071FE05E1800C1BD0D /* MMETimerManager.m in Sources */,
 				3538AA201D542239008EC33D /* MGLForegroundStyleLayer.mm in Sources */,
 				DA00FC911D5EEB0D009AABC8 /* MGLAttributionInfo.mm in Sources */,
+				40834C051FE05E1800C1BD0D /* MMENSDateWrapper.m in Sources */,
+				40834C531FE05F7600C1BD0D /* TSKPinFailureReport.m in Sources */,
+				40834BFA1FE05E1800C1BD0D /* CLLocation+MMEMobileEvents.m in Sources */,
+				406E99BA1FFEFF1B00D9FFCC /* MMEEventLogReportViewController.m in Sources */,
 				DAA4E4201CBB730400178DFB /* MGLOfflinePack.mm in Sources */,
 				966FCF551F3C323500F2B6DE /* MGLUserLocationHeadingArrowLayer.m in Sources */,
 				DAA4E4331CBB730400178DFB /* MGLUserLocation.m in Sources */,
+				406E99BC1FFF006D00D9FFCC /* MMEUINavigation.m in Sources */,
+				40834BFC1FE05E1800C1BD0D /* MMECategoryLoader.m in Sources */,
 				927FBD021F4DB05500F8BF1F /* MGLMapSnapshotter.mm in Sources */,
-				350098BE1D480108004B2AF0 /* MGLVectorSource.mm in Sources */,
-				3566C76F1D4A8DFA008152BC /* MGLRasterSource.mm in Sources */,
+				350098BE1D480108004B2AF0 /* MGLVectorTileSource.mm in Sources */,
+				3566C76F1D4A8DFA008152BC /* MGLRasterTileSource.mm in Sources */,
 				DAA4E4351CBB730400178DFB /* SMCalloutView.m in Sources */,
 				35136D4F1D4277FC00C20EFD /* MGLSource.mm in Sources */,
 				DA35A2B91CCA9A5D00E826B2 /* MGLClockDirectionFormatter.m in Sources */,
@@ -2737,27 +3053,36 @@
 				DAA4E4251CBB730400178DFB /* MGLShape.mm in Sources */,
 				35136D461D42275100C20EFD /* MGLSymbolStyleLayer.mm in Sources */,
 				DAF2571A201901E200367EF5 /* MGLHillshadeStyleLayer.mm in Sources */,
+				40834C091FE05E1800C1BD0D /* MMETypes.m in Sources */,
 				35599DEE1D46F14E0048254D /* MGLStyleValue.mm in Sources */,
+				40834C561FE05F7600C1BD0D /* TrustKit.m in Sources */,
 				DAA4E42B1CBB730400178DFB /* NSString+MGLAdditions.m in Sources */,
 				DAA4E4261CBB730400178DFB /* MGLStyle.mm in Sources */,
 				DAA32CC31E4C6B65006F8D24 /* MGLDistanceFormatter.m in Sources */,
 				DAA4E41D1CBB730400178DFB /* MGLGeometry.mm in Sources */,
+				40834C581FE05F7600C1BD0D /* TSKPinningValidatorResult.m in Sources */,
+				40834BFB1FE05E1800C1BD0D /* MMEAPIClient.m in Sources */,
 				DAA4E41F1CBB730400178DFB /* MGLMultiPoint.mm in Sources */,
 				DD0902AA1DB1929D00C5BDCE /* MGLNetworkConfiguration.m in Sources */,
+				40834C041FE05E1800C1BD0D /* MMELocationManager.m in Sources */,
 				DA35A2B41CCA141D00E826B2 /* MGLCompassDirectionFormatter.m in Sources */,
 				35D13ABA1D3D15E300AFB4E0 /* MGLStyleLayer.mm in Sources */,
 				071BBAFF1EE7613E001FB02A /* MGLImageSource.mm in Sources */,
 				DA35A2CC1CCAAAD200E826B2 /* NSValue+MGLAdditions.m in Sources */,
+				40834C591FE05F7600C1BD0D /* TSKTrustKitConfig.m in Sources */,
 				408AA8591DAEDA1E00022900 /* NSDictionary+MGLAdditions.mm in Sources */,
 				DAA4E4281CBB730400178DFB /* MGLTypes.m in Sources */,
 				DA35A2A21CC9E95F00E826B2 /* MGLCoordinateFormatter.m in Sources */,
+				40834C511FE05F7600C1BD0D /* reporting_utils.m in Sources */,
 				35305D491D22AA680007D005 /* NSData+MGLAdditions.mm in Sources */,
 				357FE2E01E02D2B20068B753 /* NSCoder+MGLAdditions.mm in Sources */,
 				DAA4E42D1CBB730400178DFB /* MGLAnnotationImage.m in Sources */,
+				40834C0A1FE05E1800C1BD0D /* MMEUIApplicationWrapper.m in Sources */,
 				558DE7A31E5615E400C7916D /* MGLFoundation.mm in Sources */,
 				3510FFF31D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */,
-				DAA4E4301CBB730400178DFB /* MGLLocationManager.m in Sources */,
+				40834C0C1FE05E1800C1BD0D /* NSData+MMEGZIP.m in Sources */,
 				DAA4E4321CBB730400178DFB /* MGLMapView.mm in Sources */,
+				40834BFD1FE05E1800C1BD0D /* MMECommonEventData.m in Sources */,
 				DAA4E41E1CBB730400178DFB /* MGLMapCamera.mm in Sources */,
 				FA68F14E1E9D656600F9F6C2 /* MGLFillExtrusionStyleLayer.mm in Sources */,
 				1F7454921ECBB42C00021D39 /* MGLLight.mm in Sources */,
@@ -2765,21 +3090,29 @@
 				355AE0021E9281DA00F3939D /* MGLScaleBar.mm in Sources */,
 				4018B1C81CDC287F00F666AF /* MGLAnnotationView.mm in Sources */,
 				07D8C6FB1F67560100381808 /* MGLComputedShapeSource.mm in Sources */,
+				40834C521FE05F7600C1BD0D /* TSKBackgroundReporter.m in Sources */,
 				DAA4E4341CBB730400178DFB /* MGLFaux3DUserLocationAnnotationView.m in Sources */,
 				DACA86292019218600E9693A /* MGLRasterDEMSource.mm in Sources */,
 				35B82BFB1D6C5F8400B1B721 /* NSPredicate+MGLAdditions.mm in Sources */,
+				40834C4D1FE05F7600C1BD0D /* configuration_utils.m in Sources */,
+				40834C0D1FE05E1800C1BD0D /* MMEReachability.m in Sources */,
+				40834C061FE05E1800C1BD0D /* MMENSURLSessionWrapper.m in Sources */,
+				40834C541FE05F7600C1BD0D /* TSKReportsRateLimiter.m in Sources */,
 				DAA4E4311CBB730400178DFB /* MGLMapboxEvents.m in Sources */,
 				966FCF4F1F3A5C9200F2B6DE /* MGLUserLocationHeadingBeamLayer.m in Sources */,
 				DAA4E4231CBB730400178DFB /* MGLPolygon.mm in Sources */,
 				8989B17F201A48EB0081CF59 /* MGLHeatmapStyleLayer.mm in Sources */,
 				353AFA171D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
+				40834C011FE05E1800C1BD0D /* MMEEventLogger.m in Sources */,
 				35D13AC61D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
+				40834C081FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */,
+				40834C031FE05E1800C1BD0D /* MMEEventsManager.m in Sources */,
 				DAA4E42A1CBB730400178DFB /* NSProcessInfo+MGLAdditions.m in Sources */,
 				DAA4E4211CBB730400178DFB /* MGLOfflineStorage.mm in Sources */,
 				4049C2A01DB6CD6C00B3F799 /* MGLPointCollection.mm in Sources */,
-				07D8C6FC1F67560400381808 /* MGLAbstractShapeSource.mm in Sources */,
 				35136D401D42273000C20EFD /* MGLLineStyleLayer.mm in Sources */,
 				DA704CC51F65A475004B3F28 /* MGLMapAccessibilityElement.mm in Sources */,
+				40834C4F1FE05F7600C1BD0D /* ssl_pin_verifier.m in Sources */,
 				DA72620E1DEEE3480043BB89 /* MGLOpenGLStyleLayer.mm in Sources */,
 				DAA4E42F1CBB730400178DFB /* MGLCompactCalloutView.m in Sources */,
 				3510FFFC1D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.mm in Sources */,
@@ -2810,6 +3143,11 @@
 			isa = PBXTargetDependency;
 			target = DA8847D11CBAF91600AB86E3 /* dynamic */;
 			targetProxy = 165D0CE520005351009A3C66 /* PBXContainerItemProxy */;
+		};
+		CABE5DAC2072FA660003AF3C /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 16376B2E1FFDB4B40000563E /* Integration Test Harness */;
+			targetProxy = CABE5DAB2072FA660003AF3C /* PBXContainerItemProxy */;
 		};
 		DA25D5C81CCDA0C100607828 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -2876,6 +3214,8 @@
 				DA3389651FA3EE1B001EA329 /* bg */,
 				DA80E9601FE84AD90065FC9B /* ar */,
 				DACBC60B20118ABE00C4D7E2 /* he */,
+				DAD88E07202ACFE800AAA536 /* da */,
+				DA93409B208562EB0059919A /* pt-PT */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2902,6 +3242,8 @@
 				DACCD9C81F1F473700BB09A1 /* hu */,
 				DA33896A1FA3EE58001EA329 /* bg */,
 				DACBC60E20118AFE00C4D7E2 /* he */,
+				DAD88E0C202AD06500AAA536 /* da */,
+				DA93409F208563440059919A /* pt-PT */,
 			);
 			name = Root.strings;
 			sourceTree = "<group>";
@@ -2926,6 +3268,8 @@
 				DA5C09BB1EFC486C0056B178 /* hu */,
 				DA3389681FA3EE48001EA329 /* bg */,
 				DACBC60D20118ADE00C4D7E2 /* he */,
+				DAD88E0A202AD03C00AAA536 /* da */,
+				DA93409D208563220059919A /* pt-PT */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
@@ -2948,6 +3292,7 @@
 				DA33895F1FA3EAB7001EA329 /* pt-BR */,
 				DA3389661FA3EE28001EA329 /* bg */,
 				DACBC60C20118AD000C4D7E2 /* he */,
+				DAD88E08202AD01300AAA536 /* da */,
 			);
 			name = Foundation.strings;
 			sourceTree = "<group>";
@@ -2970,6 +3315,8 @@
 				DA3389671FA3EE2F001EA329 /* bg */,
 				DA33896B1FA3EF4A001EA329 /* hu */,
 				DA80E9611FE84AEF0065FC9B /* ar */,
+				DAD88E09202AD01F00AAA536 /* da */,
+				DA93409C2085630C0059919A /* pt-PT */,
 			);
 			name = Foundation.stringsdict;
 			sourceTree = "<group>";
@@ -2998,6 +3345,8 @@
 				DA704CBC1F637405004B3F28 /* uk */,
 				DA704CBD1F63746E004B3F28 /* zh-Hant */,
 				DA3389691FA3EE50001EA329 /* bg */,
+				DAD88E0B202AD04D00AAA536 /* da */,
+				DA93409E208563360059919A /* pt-PT */,
 			);
 			name = Localizable.stringsdict;
 			sourceTree = "<group>";
@@ -3328,6 +3677,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "$SRCROOT/src/Mapbox-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
@@ -3370,6 +3720,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_PREFIX_HEADER = "$SRCROOT/src/Mapbox-Prefix.pch";
 				HEADER_SEARCH_PATHS = (
 					"$(mbgl_core_INCLUDE_DIRECTORIES)",
 					"$(mbgl_filesource_INCLUDE_DIRECTORIES)",
