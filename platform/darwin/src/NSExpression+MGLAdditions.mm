@@ -1218,7 +1218,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         case NSAnyKeyExpressionType:
         case NSBlockExpressionType:
             [NSException raise:NSInvalidArgumentException
-                        format:@"Expression type %lu not yet implemented.", self.expressionType];
+                        format:@"Expression type %lu not yet implemented.", (unsigned long)self.expressionType];
     }
     
     // NSKeyPathSpecifierExpression
@@ -1240,11 +1240,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     if (self.arguments.count < expectedArgumentCount) {
         [NSException raise:NSInvalidArgumentException format:
          @"Too few arguments to ‘%@’ function; expected %lu arguments.",
-         self.function, expectedArgumentCount];
+         self.function, (unsigned long)expectedArgumentCount];
     } else if (self.arguments.count > expectedArgumentCount) {
         [NSException raise:NSInvalidArgumentException format:
          @"%lu unexpected arguments to ‘%@’ function; expected %lu arguments.",
-         self.arguments.count - expectedArgumentCount, self.function, expectedArgumentCount];
+         self.arguments.count - (unsigned long)expectedArgumentCount, self.function, (unsigned long)expectedArgumentCount];
     }
     
     BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_interpolate:withCurveType:parameters:stops:"];

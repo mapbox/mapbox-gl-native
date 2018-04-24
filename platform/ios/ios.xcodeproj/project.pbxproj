@@ -53,7 +53,6 @@
 		3510FFEC1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFE91D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm */; };
 		3510FFED1D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFE91D6D9C7A00F413B2 /* NSComparisonPredicate+MGLAdditions.mm */; };
 		3510FFF01D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3510FFF21D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */; };
 		3510FFF31D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */; };
 		3510FFF91D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFF71D6DCC4700F413B2 /* NSCompoundPredicate+MGLAdditions.h */; };
@@ -307,6 +306,7 @@
 		9620BB391E69FE1700705A1D /* MGLSDKUpdateChecker.h in Headers */ = {isa = PBXBuildFile; fileRef = 9620BB361E69FE1700705A1D /* MGLSDKUpdateChecker.h */; };
 		9620BB3A1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
 		9620BB3B1E69FE1700705A1D /* MGLSDKUpdateChecker.mm in Sources */ = {isa = PBXBuildFile; fileRef = 9620BB371E69FE1700705A1D /* MGLSDKUpdateChecker.mm */; };
+		9621F2502091020E005B3800 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		9654C1261FFC1AB900DB6A19 /* MGLPolyline_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1251FFC1AB900DB6A19 /* MGLPolyline_Private.h */; };
 		9654C1291FFC1CCD00DB6A19 /* MGLPolygon_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 9654C1271FFC1CC000DB6A19 /* MGLPolygon_Private.h */; };
 		9658C155204761FC00D8A674 /* MGLMapViewScaleBarTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 9658C154204761FC00D8A674 /* MGLMapViewScaleBarTests.m */; };
@@ -511,8 +511,6 @@
 		DA8963381CC549A100684375 /* sprites in Resources */ = {isa = PBXBuildFile; fileRef = DA8963341CC549A100684375 /* sprites */; };
 		DA8963391CC549A100684375 /* styles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963351CC549A100684375 /* styles */; };
 		DA89633A1CC549A100684375 /* tiles in Resources */ = {isa = PBXBuildFile; fileRef = DA8963361CC549A100684375 /* tiles */; };
-		DA9EA82B201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		DA9EA82C201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */; };
 		DAA32CC31E4C6B65006F8D24 /* MGLDistanceFormatter.m in Sources */ = {isa = PBXBuildFile; fileRef = 3557F7AF1E1D27D300CCA5E6 /* MGLDistanceFormatter.m */; };
 		DAA4E4081CBB6C9500178DFB /* Mapbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; };
 		DAA4E4091CBB6C9500178DFB /* Mapbox.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = DA8847D21CBAF91600AB86E3 /* Mapbox.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
@@ -1188,7 +1186,6 @@
 		DA9C012C1E4C7ADB00C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = "pt-BR"; path = "pt-BR.lproj/Foundation.stringsdict"; sourceTree = "<group>"; };
 		DA9C012D1E4C7B1F00C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		DA9C012E1E4C7B6100C4742A /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Root.strings"; sourceTree = "<group>"; };
-		DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		DAA32CA11E4C44DB006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Foundation.stringsdict; sourceTree = "<group>"; };
 		DAA32CA21E4C44DD006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.stringsdict; name = de; path = de.lproj/Localizable.stringsdict; sourceTree = "<group>"; };
 		DAA32CA31E4C44F1006F8D24 /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Foundation.strings; sourceTree = "<group>"; };
@@ -2099,7 +2096,6 @@
 				408AA8561DAEDA0800022900 /* NSDictionary+MGLAdditions.mm */,
 				DA8848141CBAFA6200AB86E3 /* NSException+MGLAdditions.h */,
 				3510FFEE1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h */,
-				DA9EA82A201C0C0B00F9874D /* NSExpression+MGLAdditions.h */,
 				DAC25FCB200FD83E009BE98E /* NSExpression+MGLPrivateAdditions.h */,
 				3510FFEF1D6D9D8C00F413B2 /* NSExpression+MGLAdditions.mm */,
 				35B82BF61D6C5F8400B1B721 /* NSPredicate+MGLAdditions.h */,
@@ -2289,7 +2285,6 @@
 				DA8848841CBB033F00AB86E3 /* FABAttributes.h in Headers */,
 				DA8847FD1CBAFA5100AB86E3 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				DA88482F1CBAFA6200AB86E3 /* NSProcessInfo+MGLAdditions.h in Headers */,
-				DA9EA82B201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */,
 				DA8848601CBAFC2E00AB86E3 /* Mapbox.h in Headers */,
 				DAF0D8101DFE0EA000B28378 /* MGLRasterTileSource_Private.h in Headers */,
 				350098BB1D480108004B2AF0 /* MGLVectorTileSource.h in Headers */,
@@ -2319,7 +2314,6 @@
 				DABFB8641CBE99E500D62B32 /* MGLOfflineStorage.h in Headers */,
 				96E516E32000552A00A02306 /* MGLAccountManager_Private.h in Headers */,
 				96E5170420005A6B00A02306 /* SMCalloutView.h in Headers */,
-				DA9EA82C201C0C0C00F9874D /* NSExpression+MGLAdditions.h in Headers */,
 				96036A02200565C700510F3D /* NSOrthography+MGLAdditions.h in Headers */,
 				DAD165791CF4CDFF001FF4B9 /* MGLShapeCollection.h in Headers */,
 				4049C29E1DB6CD6C00B3F799 /* MGLPointCollection.h in Headers */,
@@ -2329,7 +2323,6 @@
 				96E516F6200059EC00A02306 /* MGLRendererFrontend.h in Headers */,
 				071BBB041EE76147001FB02A /* MGLImageSource.h in Headers */,
 				DABFB8611CBE99E500D62B32 /* MGLMultiPoint.h in Headers */,
-				3510FFF11D6D9D8C00F413B2 /* NSExpression+MGLAdditions.h in Headers */,
 				35D3A1E71E9BE7EC002B38EE /* MGLScaleBar.h in Headers */,
 				96E516EF2000594F00A02306 /* NSArray+MGLAdditions.h in Headers */,
 				96E516F12000596800A02306 /* NSString+MGLAdditions.h in Headers */,
@@ -2434,6 +2427,7 @@
 				96E516E12000551100A02306 /* MGLMultiPoint_Private.h in Headers */,
 				3EA934623AD0000B7D99C3FB /* MGLRendererConfiguration.h in Headers */,
 				DACA86272019218600E9693A /* MGLRasterDEMSource.h in Headers */,
+				9621F2502091020E005B3800 /* NSExpression+MGLAdditions.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2609,7 +2603,7 @@
 			isa = PBXProject;
 			attributes = {
 				CLASSPREFIX = MBX;
-				LastUpgradeCheck = 0910;
+				LastUpgradeCheck = 0930;
 				ORGANIZATIONNAME = Mapbox;
 				TargetAttributes = {
 					16376B061FFD9DAF0000563E = {
@@ -3474,6 +3468,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -3481,6 +3476,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
@@ -3533,6 +3529,7 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_COMMA = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
 				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
@@ -3540,6 +3537,7 @@
 				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
