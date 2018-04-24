@@ -8,7 +8,7 @@
 
 ### Other
 
-* Fixed an issue where selecting an onscreen annotation could move the map (seen with equivalent iOS version in [ios-sdk-examples](https://github.com/mapbox/ios-sdk-examples)). ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
+* Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 
 ## 0.7.0 - April 19, 2018
 
