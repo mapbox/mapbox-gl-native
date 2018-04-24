@@ -4290,6 +4290,15 @@ public:
         moveOnscreen = [self isBringingAnnotationOnscreenSupportedForAnnotation:annotation animated:animateSelection];
     }
 
+    // If we have an invalid positioning rect, we need to provide a suitable default.
+    // This (currently) happens if you select an annotation that has NOT yet been
+    // added. See https://github.com/mapbox/mapbox-gl-native/issues/11476
+    if (CGRectIsNull(calloutPositioningRect)) {
+        CLLocationCoordinate2D origin = annotation.coordinate;
+        CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
+        calloutPositioningRect = { .origin = originPoint, .size = CGSizeZero };
+    }
+
     CGRect expandedPositioningRect = UIEdgeInsetsInsetRect(calloutPositioningRect, MGLMapViewOffscreenAnnotationPadding);
 
     // Used for callout positioning, and moving offscreen annotations onscreen.
@@ -4442,7 +4451,11 @@ public:
 {
     MGLAnnotationTag annotationTag = [self annotationTagForAnnotation:annotation];
     CGRect positioningRect = [self positioningRectForCalloutForAnnotationWithTag:annotationTag];
-    
+
+    if (CGRectIsNull(positioningRect)) {
+        return positioningRect;
+    }
+
     // For annotations which `coordinate` falls offscreen it will use the current tap point as anchor instead.
     if ( ! CGRectIntersectsRect(positioningRect, self.bounds) && annotation != self.userLocation)
     {
@@ -4462,15 +4475,15 @@ public:
     id <MGLAnnotation> annotation = [self annotationWithTag:annotationTag];
     if ( ! annotation)
     {
-        return CGRectZero;
+        return CGRectNull;
     }
     
     if ([annotation isKindOfClass:[MGLMultiPoint class]]) {
         CLLocationCoordinate2D origin = annotation.coordinate;
         CGPoint originPoint = [self convertCoordinate:origin toPointToView:self];
         return CGRectMake(originPoint.x, originPoint.y, MGLAnnotationImagePaddingForHitTest, MGLAnnotationImagePaddingForHitTest);
-        
     }
+    
     UIImage *image = [self imageOfAnnotationWithTag:annotationTag].image;
     if ( ! image)
     {
@@ -5742,6 +5755,8 @@ public:
         {
             rect = annotationView.frame;
         }
+
+        NSAssert(!CGRectIsNull(rect), @"Positioning rect should not be CGRectNull by this point");
 
         CGPoint point = CGPointMake(CGRectGetMidX(rect), CGRectGetMinY(rect));
 
