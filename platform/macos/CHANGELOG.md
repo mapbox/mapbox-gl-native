@@ -6,6 +6,10 @@
 
 * Deprecated `+[NSExpression featurePropertiesVariableExpression]` use `+[NSExpression featureAttributesVariableExpression]` instead. ([#11748](https://github.com/mapbox/mapbox-gl-native/pull/11748))
 
+### Other
+
+* Fixed an issue where selecting an onscreen annotation could move the map (seen with equivalent iOS version in [ios-sdk-examples](https://github.com/mapbox/ios-sdk-examples)). ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
+
 ## 0.7.0 - April 19, 2018
 
 The 0.7._x_ series of releases will be the last to support macOS 10.10. The minimum macOS deployment version will increase to macOS 10.11.0 in a future release.
