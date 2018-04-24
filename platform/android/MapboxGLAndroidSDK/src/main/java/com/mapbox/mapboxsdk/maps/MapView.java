@@ -49,6 +49,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
@@ -73,9 +74,10 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
 public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private final MapCallback mapCallback = new MapCallback();
-  private MapboxMap mapboxMap;
+  private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
   private NativeMapView nativeMapView;
+  private MapboxMap mapboxMap;
   private MapboxMapOptions mapboxMapOptions;
   private MapRenderer mapRenderer;
   private boolean destroyed;
@@ -137,7 +139,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private void initialiseMap() {
     Context context = getContext();
-    addOnMapChangedListener(mapCallback);
+    nativeMapView.addOnMapChangedListener(mapCallback);
 
     // callback for focal point invalidation
     final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator();
@@ -305,6 +307,17 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     }
 
     nativeMapView = new NativeMapView(getContext(), this, mapRenderer);
+    nativeMapView.addOnMapChangedListener(new OnMapChangedListener() {
+      @Override
+      public void onMapChanged(int change) {
+        // dispatch events to external listeners
+        if (!onMapChangedListeners.isEmpty()) {
+          for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+            onMapChangedListener.onMapChanged(change);
+          }
+        }
+      }
+    });
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
 
@@ -586,7 +599,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   public void addOnMapChangedListener(@Nullable OnMapChangedListener listener) {
     if (listener != null) {
-      nativeMapView.addOnMapChangedListener(listener);
+      onMapChangedListeners.add(listener);
     }
   }
 
@@ -597,8 +610,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    * @see MapView#addOnMapChangedListener(OnMapChangedListener)
    */
   public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null) {
-      nativeMapView.removeOnMapChangedListener(listener);
+    if (listener != null && onMapChangedListeners.contains(listener)) {
+      onMapChangedListeners.remove(listener);
     }
   }
 
