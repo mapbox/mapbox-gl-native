@@ -11,30 +11,25 @@ namespace style {
 namespace conversion {
     
 static bool isExpression(const Convertible& filter);
-    std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& values, Error& error);
+std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& values, Error& error);
 
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
-    
-    optional<std::unique_ptr<expression::Expression>> expression;
-    
     if (isExpression(value)) {
         expression::ParsingContext parsingContext(expression::type::Boolean);
         expression::ParseResult parseResult = parsingContext.parseExpression(value);
         if (!parseResult) {
             error = { parsingContext.getCombinedErrors() };
             return {};
+        } else {
+            return { Filter(std::move(parseResult)) };
         }
-        expression = std::move(*parseResult);
     } else {
-        expression = convertLegacyFilter(value, error);
+        return Filter(convertLegacyFilter(value, error));
     }
-    
-    if (!expression) return {};
-    else return { Filter { std::move(*expression) } };
 }
 
 // This is a port from https://github.com/mapbox/mapbox-gl-js/blob/master/src/style-spec/feature_filter/index.js
-static bool isExpression(const Convertible& filter) {
+bool isExpression(const Convertible& filter) {
     if (!isArray(filter) || arrayLength(filter) == 0) {
         return false;
     }

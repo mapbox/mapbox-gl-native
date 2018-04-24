@@ -16,9 +16,9 @@ class Filter {
 public:
     std::shared_ptr<const expression::Expression> expression;
     
-    Filter():expression({}) {}
+    Filter() : expression({}) {}
     
-    Filter(expression::ParseResult parseResult):expression(std::move(*parseResult)) {}
+    Filter(expression::ParseResult parseResult) : expression(std::move(*parseResult)) {}
     
     bool operator()(const expression::EvaluationContext& context) const;
 
