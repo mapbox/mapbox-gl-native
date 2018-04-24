@@ -100,9 +100,10 @@ final class NativeMapView {
   }
 
   public void destroy() {
-    nativeDestroy();
-    viewCallback = null;
     destroyed = true;
+    onMapChangedListeners.clear();
+    viewCallback = null;
+    nativeDestroy();
   }
 
   public void update() {
