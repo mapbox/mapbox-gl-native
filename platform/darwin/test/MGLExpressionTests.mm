@@ -832,6 +832,33 @@ using namespace std::string_literals;
                                                                      MGLConstantExpression(@8),
                                                                      MGLConstantExpression(@7)]];
         NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, MGLConstantExpression(@"FIRST")]];
+        NSArray *jsonExpression = @[@"at", @0, @[ @"literal", @[@9, @8, @7]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+    }
+    {
+        NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, MGLConstantExpression(@"LAST")]];
+        NSArray *jsonExpression = @[@"at", @2, @[ @"literal", @[@9, @8, @7]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+    }
+    {
+        NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
+                                                             arguments:@[array, MGLConstantExpression(@"SIZE")]];
+        NSArray *jsonExpression = @[@"length", @[ @"literal", @[@9, @8, @7]]];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+    }
+    {
+        NSExpression *array = [NSExpression expressionForAggregate:@[MGLConstantExpression(@9),
+                                                                     MGLConstantExpression(@8),
+                                                                     MGLConstantExpression(@7)]];
+        NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
                                                              arguments:@[array, MGLConstantExpression(@1)]];
         NSArray *jsonExpression = @[@"at", @1, @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
