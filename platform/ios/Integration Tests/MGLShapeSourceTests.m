@@ -36,6 +36,8 @@
     [self.style addLayer:layer];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
 
     __weak typeof(self) weakself = self;
     __block NSInteger delegateCallCount = 0;
@@ -62,8 +64,7 @@
             shapeSource.shape = nil;
         }
 
-        [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
+        [expectation fulfill];
     };
 
     // setCenterCoordinate is NOT animated here.
@@ -94,6 +95,8 @@
     [self.style addLayer:layer];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
 
     __block NSInteger delegateCallCount = 0;
     __weak typeof(self) weakself = self;
@@ -111,8 +114,7 @@
             MGLTestFail(weakself);
         }
 
-        [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
+        [expectation fulfill];
     };
 
     // Should take MGLAnimationDuration seconds (0.3)

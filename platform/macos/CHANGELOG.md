@@ -13,6 +13,7 @@
 ### Other changes
 
 * Unknown tokens in URLs are now preserved, rather than replaced with an empty string. ([#11787](https://github.com/mapbox/mapbox-gl-native/issues/11787))
+* Adjusted when and how the camera transition update and finish callbacks are called, fixing recursion bugs. ([#5833](https://github.com/mapbox/mapbox-gl-native/issues/5833), [#11180](https://github.com/mapbox/mapbox-gl-native/issues/11180))
 
 ## 0.7.1
 

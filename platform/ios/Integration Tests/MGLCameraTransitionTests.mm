@@ -9,9 +9,10 @@
 - (void)testSetAndResetNorthWithDispatchAsyncInDelegateMethod {
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 2;
+    expectation.assertForOverFulfill = YES;
 
     __weak typeof(self) weakself = self;
-    __block NSInteger delegateCallCount = 0;
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
@@ -19,7 +20,7 @@
 
         if (!strongSelf) return;
 
-        delegateCallCount++;
+        [expectation fulfill];
 
         MGLTestAssert(strongSelf, mapView.userTrackingMode != MGLUserTrackingModeFollowWithHeading);
         if (mapView.direction != 0.0) {
@@ -27,26 +28,22 @@
                 [mapView resetNorth];
             });
         }
-
-        [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
     [self.mapView setDirection:90 animated:YES];
 
     // loop, render, and wait
     [self waitForExpectations:@[expectation] timeout:1.5];
-
-    XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
 
 
 - (void)testSetAndResetNorthInDelegateMethod {
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 2;
+    expectation.assertForOverFulfill = YES;
 
     __weak typeof(self) weakself = self;
-    __block NSInteger delegateCallCount = 0;
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
 
@@ -54,22 +51,17 @@
 
         if (!strongSelf) return;
 
-        delegateCallCount++;
+        [expectation fulfill];
 
         MGLTestAssert(strongSelf, mapView.userTrackingMode != MGLUserTrackingModeFollowWithHeading);
         if (mapView.direction != 0.0) {
             NSLog(@"Reset to north");
             [mapView resetNorth];
         }
-
-        [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
     };
 
     [self.mapView setDirection:90 animated:YES];
     [self waitForExpectations:@[expectation] timeout:1.5];
-
-    XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
 
 
@@ -111,6 +103,8 @@
 - (void)testSetCenterCoordinateInDelegateMethod {
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 2;
+    expectation.assertForOverFulfill = YES;
 
     __weak typeof(self) weakself = self;
     __block NSInteger delegateCallCount = 0;
@@ -177,15 +171,12 @@
 
         delegateCallCount++;
 
-        [NSObject cancelPreviousPerformRequestsWithTarget:expectation selector:@selector(fulfill) object:nil];
-        [expectation performSelector:@selector(fulfill) withObject:nil afterDelay:0.5];
+        [expectation fulfill];
     };
 
     // Should take MGLAnimationDuration seconds (0.3)
     [self.mapView setCenterCoordinate:target zoomLevel:15.0 animated:YES];
     [self waitForExpectations:@[expectation] timeout:1.5];
-
-    XCTAssert(delegateCallCount == 2, @"Expecting 2 regionDidChange callbacks, got %ld", delegateCallCount); // Once for the setDirection and once for the reset north
 }
 
 - (void)testFlyToCameraInDelegateMethod {
@@ -194,6 +185,8 @@
 
     __weak typeof(self) weakself = self;
     __block NSInteger delegateCallCount = 0;
+    expectation.expectedFulfillmentCount = 3;
+    expectation.assertForOverFulfill = YES;
 
     CLLocationCoordinate2D target = CLLocationCoordinate2DMake(40.0, 40.0);
     CLLocationCoordinate2D target2 = CLLocationCoordinate2DMake(30.0, 30.0);
@@ -277,6 +270,8 @@
         }
 
         delegateCallCount++;
+
+        [expectation fulfill];
     };
 
     // Should take MGLAnimationDuration
