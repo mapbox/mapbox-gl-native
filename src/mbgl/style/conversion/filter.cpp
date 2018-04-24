@@ -124,13 +124,18 @@ std::unique_ptr<expression::Expression> convertLegacyComparisonFilter(const Conv
     }
 }
     
-std::unique_ptr<expression::Expression> convertLegacyHasFilter(std::string property, Error& error) {
-    if (property == "$type") {
+std::unique_ptr<expression::Expression> convertLegacyHasFilter(const Convertible& values, Error& error) {
+    optional<std::string> property = toString(arrayMember(values, 1));
+    
+    if (!property) {
+        error = { "filter property must be a string" };
+        return {};
+    } else if (*property == "$type") {
         return std::make_unique<expression::Literal>(true);
-    } else if (property == "$id") {
+    } else if (*property == "$id") {
         return createExpression("filter-has-id", std::vector<std::unique_ptr<expression::Expression>>(), error);
     } else {
-        return createExpression("filter-has", std::make_unique<expression::Literal>(property), error);
+        return createExpression("filter-has", std::make_unique<expression::Literal>(*property), error);
     }
 }
 
@@ -184,8 +189,8 @@ std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& v
             *op == "none" ? createExpression("!", createExpression("any", convertLegacyFilterArray(values, error, 1), error), error) :
             *op == "in" ? convertLegacyInFilter(values, error) :
             *op == "!in" ? createExpression("!", convertLegacyInFilter(values, error), error) :
-            *op == "has" ? convertLegacyHasFilter(*toString(arrayMember(values, 1)), error) :
-            *op == "!has" ? createExpression("!", convertLegacyHasFilter(*toString(arrayMember(values, 1)), error), error) :
+            *op == "has" ? convertLegacyHasFilter(values, error) :
+            *op == "!has" ? createExpression("!", convertLegacyHasFilter(values, error), error) :
            std::make_unique<expression::Literal>(true)
         );
     }
