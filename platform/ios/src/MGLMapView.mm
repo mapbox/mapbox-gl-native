@@ -4570,6 +4570,8 @@ public:
         return;
     }
 
+    __weak __typeof__(self) weakSelf = self;
+
     // The user location callout view initially points to the user location
     // annotation’s implicit (visual) frame, which is offset from the
     // annotation’s explicit frame. Now the callout view needs to rendezvous
@@ -4583,10 +4585,16 @@ public:
                                  UIViewAnimationOptionBeginFromCurrentState)
                      animations:^
      {
+         __typeof__(self) strongSelf = weakSelf;
+         if ( ! strongSelf)
+         {
+             return;
+         }
+
          calloutView.frame = CGRectOffset(calloutView.frame,
-                                          _initialImplicitCalloutViewOffset.x,
-                                          _initialImplicitCalloutViewOffset.y);
-         _initialImplicitCalloutViewOffset = CGPointZero;
+                                          strongSelf->_initialImplicitCalloutViewOffset.x,
+                                          strongSelf->_initialImplicitCalloutViewOffset.y);
+         strongSelf->_initialImplicitCalloutViewOffset = CGPointZero;
      }
                      completion:NULL];
 }

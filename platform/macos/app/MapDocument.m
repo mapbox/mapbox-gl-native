@@ -93,9 +93,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     BOOL _isTouringWorld;
     BOOL _isShowingPolygonAndPolylineAnnotations;
     BOOL _isShowingAnimatedAnnotation;
-    
-    // Snapshotter
-    MGLMapSnapshotter* snapshotter;
+
+    MGLMapSnapshotter *_snapshotter;
 }
 
 #pragma mark Lifecycle
@@ -185,17 +184,23 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
     options.zoomLevel = self.mapView.zoomLevel;
     
     // Create and start the snapshotter
-    snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
-    [snapshotter startWithCompletionHandler:^(MGLMapSnapshot *snapshot, NSError *error) {
+    __weak __typeof__(self) weakSelf = self;
+    _snapshotter = [[MGLMapSnapshotter alloc] initWithOptions:options];
+    [_snapshotter startWithCompletionHandler:^(MGLMapSnapshot *snapshot, NSError *error) {
+        __typeof__(self) strongSelf = weakSelf;
+        if (!strongSelf) {
+            return;
+        }
+
         if (error) {
             NSLog(@"Could not load snapshot: %@", error.localizedDescription);
         } else {
             // Set the default name for the file and show the panel.
             NSSavePanel *panel = [NSSavePanel savePanel];
-            panel.nameFieldStringValue = [self.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
+            panel.nameFieldStringValue = [strongSelf.mapView.styleURL.lastPathComponent.stringByDeletingPathExtension stringByAppendingPathExtension:@"png"];
             panel.allowedFileTypes = [@[(NSString *)kUTTypePNG] arrayByAddingObjectsFromArray:[NSBitmapImageRep imageUnfilteredTypes]];
             
-            [panel beginSheetModalForWindow:self.window completionHandler:^(NSInteger result) {
+            [panel beginSheetModalForWindow:strongSelf.window completionHandler:^(NSInteger result) {
                 if (result == NSFileHandlingPanelOKButton) {
                     // Write the contents in the new format.
                     NSURL *fileURL = panel.URL;
@@ -232,7 +237,8 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
             }];
 
         }
-        snapshotter = nil;
+
+        strongSelf->_snapshotter = nil;
     }];
 }
 
@@ -1179,7 +1185,7 @@ NS_ARRAY_OF(id <MGLAnnotation>) *MBXFlattenedShapes(NS_ARRAY_OF(id <MGLAnnotatio
         return YES;
     }
     if (menuItem.action == @selector(takeSnapshot:)) {
-        return !(snapshotter && [snapshotter isLoading]);
+        return !(_snapshotter && [_snapshotter isLoading]);
     }
     return NO;
 }
