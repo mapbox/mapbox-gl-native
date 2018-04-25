@@ -78,10 +78,15 @@ final class NativeMapView {
   //
 
   public NativeMapView(final Context context, final ViewCallback viewCallback, final MapRenderer mapRenderer) {
+    this(context, context.getResources().getDisplayMetrics().density, viewCallback, mapRenderer);
+  }
+
+  public NativeMapView(final Context context, float pixelRatio,
+                       final ViewCallback viewCallback, final MapRenderer mapRenderer) {
     this.mapRenderer = mapRenderer;
     this.viewCallback = viewCallback;
     this.fileSource = FileSource.getInstance(context);
-    this.pixelRatio = context.getResources().getDisplayMetrics().density;
+    this.pixelRatio = pixelRatio;
     nativeInitialize(this, fileSource, mapRenderer, pixelRatio);
   }
 
