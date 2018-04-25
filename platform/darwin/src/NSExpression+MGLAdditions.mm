@@ -665,11 +665,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 }
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
-    if (@available(iOS 9.0, *)) {
-        return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
-    } else {
-        return [NSExpression expressionForFunction:@"MGL_IF" arguments:@[[NSExpression expressionWithFormat:@"%@", conditionPredicate], trueExpression, falseExpression]];
-    }
+    return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
 }
 
 + (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression *)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression *)stops {
@@ -920,12 +916,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     [arguments addObject:[NSExpression expressionWithMGLJSONObject:argumentObjects[index]]];
                 }
             }
-            
-            if (@available(iOS 9.0, *)) {
-                if (arguments.count == 3) {
-                    NSPredicate *conditional = [arguments.firstObject constantValue];
-                    return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
-                }
+
+            if (arguments.count == 3) {
+                NSPredicate *conditional = [arguments.firstObject constantValue];
+                return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
             }
             return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
@@ -1444,16 +1438,14 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
         }
             
         case NSConditionalExpressionType: {
-            if (@available(iOS 9.0, *)) {
-                NSExpression *trueExpression = self.trueExpression;
-                NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
-                NSExpression *falseExpression = self.falseExpression;
-                NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
-                if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
-                    return [NSExpression expressionForConditional:self.predicate
-                                                   trueExpression:localizedTrueExpression
-                                                  falseExpression:localizedFalseExpression];
-                }
+            NSExpression *trueExpression = self.trueExpression;
+            NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
+            NSExpression *falseExpression = self.falseExpression;
+            NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
+            if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
+                return [NSExpression expressionForConditional:self.predicate
+                                               trueExpression:localizedTrueExpression
+                                              falseExpression:localizedFalseExpression];
             }
             return self;
         }
