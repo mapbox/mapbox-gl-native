@@ -28,7 +28,7 @@ public class LatLngBounds implements Parcelable {
   /**
    * Construct a new LatLngBounds based on its corners, given in NESW
    * order.
-   *
+   * <p>
    * If eastern longitude is smaller than the western one, bounds will include antimeridian.
    * For example, if the NE point is (10, -170) and the SW point is (-10, 170), then bounds will span over 20 degrees
    * and cross the antimeridian.
@@ -44,6 +44,11 @@ public class LatLngBounds implements Parcelable {
     this.longitudeEast = eastLongitude;
     this.latitudeSouth = southLatitude;
     this.longitudeWest = westLongitude;
+  }
+
+  LatLngBounds(LatLngBounds latLngBounds) {
+    this(latLngBounds.latitudeNorth, latLngBounds.longitudeEast,
+      latLngBounds.latitudeSouth, latLngBounds.longitudeWest);
   }
 
   /**
@@ -75,7 +80,6 @@ public class LatLngBounds implements Parcelable {
       if (longCenter >= GeometryConstants.MAX_LONGITUDE) {
         longCenter = this.longitudeEast - halfSpan;
       }
-      return new LatLng(latCenter, longCenter);
     }
 
     return new LatLng(latCenter, longCenter);
@@ -188,7 +192,6 @@ public class LatLngBounds implements Parcelable {
     return GeometryConstants.LONGITUDE_SPAN - longSpan;
   }
 
-
   static double getLongitudeSpan(final double longEast, final double longWest) {
     double longSpan = Math.abs(longEast - longWest);
     if (longEast >= longWest) {
@@ -197,6 +200,25 @@ public class LatLngBounds implements Parcelable {
 
     // shortest span contains antimeridian
     return GeometryConstants.LONGITUDE_SPAN - longSpan;
+  }
+
+  /**
+   * If bounds cross the antimeridian, unwrap west longitude for the shortest path.
+   *
+   * @return unwrapped bounds
+   */
+  public LatLngBounds unwrapBounds() {
+    double unwrapedLonWest = longitudeWest;
+    if (longitudeEast < longitudeWest) {
+      if (longitudeWest > 0 && longitudeEast < 0) {
+        unwrapedLonWest -= GeometryConstants.LONGITUDE_SPAN;
+      } else if (longitudeWest < 0 && longitudeEast > 0) {
+        unwrapedLonWest += GeometryConstants.LONGITUDE_SPAN;
+      }
+      return unwrapped(latitudeNorth, longitudeEast, latitudeSouth, unwrapedLonWest);
+    } else {
+      return new LatLngBounds(this);
+    }
   }
 
   /**
@@ -279,12 +301,11 @@ public class LatLngBounds implements Parcelable {
 
   /**
    * Constructs a LatLngBounds from doubles representing a LatLng pair.
-   *
+   * <p>
    * This values of latNorth and latSouth should be in the range of [-90, 90],
    * see {@link GeometryConstants#MIN_LATITUDE} and {@link GeometryConstants#MAX_LATITUDE},
    * otherwise IllegalArgumentException will be thrown.
    * latNorth should be greater or equal latSouth, otherwise  IllegalArgumentException will be thrown.
-   *
    * <p>
    * This method doesn't recalculate most east or most west boundaries.
    * Note that lonEast and lonWest will be wrapped to be in the range of [-180, 180],
@@ -318,9 +339,17 @@ public class LatLngBounds implements Parcelable {
       throw new IllegalArgumentException("LatSouth cannot be less than latNorth");
     }
 
+    return wrapped(latNorth, lonEast, latSouth, lonWest);
+  }
+
+  static LatLngBounds wrapped(double latNorth, double lonEast, double latSouth, double lonWest) {
     lonEast = LatLng.wrap(lonEast, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
     lonWest = LatLng.wrap(lonWest, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
 
+    return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
+  }
+
+  static LatLngBounds unwrapped(double latNorth, double lonEast, double latSouth, double lonWest) {
     return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
   }
 
@@ -335,14 +364,14 @@ public class LatLngBounds implements Parcelable {
 
   /**
    * Constructs a LatLngBounds from a Tile identifier.
-   *
+   * <p>
    * Returned bounds will have latitude in the range of Mercator projection.
-   * @see GeometryConstants#MIN_MERCATOR_LATITUDE
-   * @see GeometryConstants#MAX_MERCATOR_LATITUDE
    *
    * @param z Tile zoom level.
    * @param x Tile X coordinate.
    * @param y Tile Y coordinate.
+   * @see GeometryConstants#MIN_MERCATOR_LATITUDE
+   * @see GeometryConstants#MAX_MERCATOR_LATITUDE
    */
   public static LatLngBounds from(int z, int x, int y) {
     return new LatLngBounds(lat_(z, y), lon_(z, x + 1), lat_(z, y + 1), lon_(z, x));
