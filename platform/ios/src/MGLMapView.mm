@@ -624,18 +624,8 @@ public:
     UIGraphicsBeginImageContextWithOptions(scaleImage.size, NO, [UIScreen mainScreen].scale);
     [scaleImage drawInRect:{ CGPointZero, scaleImage.size }];
 
-    CGFloat northSize = 11;
-    UIFont *northFont;
-    if ([UIFont respondsToSelector:@selector(systemFontOfSize:weight:)])
-    {
-        northFont = [UIFont systemFontOfSize:northSize weight:UIFontWeightUltraLight];
-    }
-    else
-    {
-        northFont = [UIFont systemFontOfSize:northSize];
-    }
     NSAttributedString *north = [[NSAttributedString alloc] initWithString:NSLocalizedStringWithDefaultValue(@"COMPASS_NORTH", nil, nil, @"N", @"Compass abbreviation for north") attributes:@{
-        NSFontAttributeName: northFont,
+        NSFontAttributeName: [UIFont systemFontOfSize:11 weight:UIFontWeightUltraLight],
         NSForegroundColorAttributeName: [UIColor whiteColor],
     }];
     CGRect stringRect = CGRectMake((scaleImage.size.width - north.size.width) / 2,
