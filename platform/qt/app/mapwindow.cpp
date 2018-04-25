@@ -22,6 +22,13 @@ MapWindow::MapWindow(const QMapboxGLSettings &settings)
     setWindowIcon(QIcon(":icon.png"));
 }
 
+MapWindow::~MapWindow()
+{
+    // Make sure we have a valid context so we
+    // can delete the QMapboxGL.
+    makeCurrent();
+}
+
 void MapWindow::selfTest()
 {
     if (m_bearingAnimation) {
