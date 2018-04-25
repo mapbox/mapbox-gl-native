@@ -128,7 +128,7 @@ void stringify(Writer& writer, const FeatureIdentifier& id) {
 template <class Writer>
 void stringify(Writer& writer, const Filter& filter) {
     if (!filter.expression) writer.Null();
-    else stringify(writer, filter.expression->serialize());
+    else stringify(writer, (*filter.expression)->serialize());
 }
 
 template <class Writer>

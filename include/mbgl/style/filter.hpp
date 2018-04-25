@@ -14,11 +14,13 @@ namespace style {
     
 class Filter {
 public:
-    std::shared_ptr<const expression::Expression> expression;
+    optional<std::shared_ptr<const expression::Expression>> expression;
     
-    Filter() : expression({}) {}
+    Filter() : expression() {}
     
-    Filter(expression::ParseResult parseResult) : expression(std::move(*parseResult)) {}
+    Filter(expression::ParseResult _expression) : expression(std::move(*_expression)) {
+        assert(!expression || *expression != nullptr);
+    }
     
     bool operator()(const expression::EvaluationContext& context) const;
 

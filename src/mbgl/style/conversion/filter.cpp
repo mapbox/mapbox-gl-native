@@ -10,13 +10,15 @@ namespace mbgl {
 namespace style {
 namespace conversion {
     
+using namespace mbgl::style::expression;
+    
 static bool isExpression(const Convertible& filter);
-std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& values, Error& error);
+std::unique_ptr<Expression> convertLegacyFilter(const Convertible& values, Error& error);
 
 optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& error) const {
     if (isExpression(value)) {
-        expression::ParsingContext parsingContext(expression::type::Boolean);
-        expression::ParseResult parseResult = parsingContext.parseExpression(value);
+        ParsingContext parsingContext(type::Boolean);
+        ParseResult parseResult = parsingContext.parseExpression(value);
         if (!parseResult) {
             error = { parsingContext.getCombinedErrors() };
             return {};
@@ -24,7 +26,8 @@ optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& 
             return { Filter(std::move(parseResult)) };
         }
     } else {
-        return Filter(convertLegacyFilter(value, error));
+        std::unique_ptr<Expression> expression = convertLegacyFilter(value, error);
+        return Filter(expression ? optional<std::unique_ptr<Expression>>(std::move(expression)) : optional<std::unique_ptr<Expression>>() );
     }
 }
 
@@ -64,16 +67,16 @@ bool isExpression(const Convertible& filter) {
     }
 }
     
-std::unique_ptr<expression::Expression> createExpression(std::string op, std::vector<std::unique_ptr<expression::Expression>> args, Error& error) {
+std::unique_ptr<Expression> createExpression(std::string op, std::vector<std::unique_ptr<Expression>> args, Error& error) {
     if (op == "any") {
-        return std::make_unique<expression::Any>(std::move(args));
+        return std::make_unique<Any>(std::move(args));
         
     } else if (op == "all") {
-        return std::make_unique<expression::All>(std::move(args));
+        return std::make_unique<All>(std::move(args));
 
     } else {
-        expression::ParsingContext parsingContext(expression::type::Boolean);
-        expression::ParseResult parseResult = createCompoundExpression(op, std::move(args), parsingContext);
+        ParsingContext parsingContext(type::Boolean);
+        ParseResult parseResult = createCompoundExpression(op, std::move(args), parsingContext);
         if (!parseResult) {
             error = { parsingContext.getCombinedErrors() };
             return {};
@@ -83,15 +86,15 @@ std::unique_ptr<expression::Expression> createExpression(std::string op, std::ve
     }
 }
 
-std::unique_ptr<expression::Expression> createExpression(std::string op, std::unique_ptr<expression::Expression> expression, Error& error) {
-    std::vector<std::unique_ptr<expression::Expression>> args;
+std::unique_ptr<Expression> createExpression(std::string op, std::unique_ptr<Expression> expression, Error& error) {
+    std::vector<std::unique_ptr<Expression>> args;
     args.push_back(std::move(expression));
     return createExpression(op, std::move(args), error);
 }
 
-std::unique_ptr<expression::Expression> convertLiteral(const Convertible& convertible, Error& error) {
-    expression::ParsingContext parsingContext;
-    expression::ParseResult parseResult = expression::Literal::parse(convertible, parsingContext);
+std::unique_ptr<Expression> convertLiteral(const Convertible& convertible, Error& error) {
+    ParsingContext parsingContext;
+    ParseResult parseResult = Literal::parse(convertible, parsingContext);
     if (parseResult) {
         return std::move(*parseResult);
     } else {
@@ -100,15 +103,15 @@ std::unique_ptr<expression::Expression> convertLiteral(const Convertible& conver
     }
 }
 
-std::vector<std::unique_ptr<expression::Expression>> convertLiteralArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
-    std::vector<std::unique_ptr<expression::Expression>> output;
+std::vector<std::unique_ptr<Expression>> convertLiteralArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
+    std::vector<std::unique_ptr<Expression>> output;
     for (std::size_t i = startIndex; i < arrayLength(input); i++) {
         output.push_back(convertLiteral(arrayMember(input, i), error));
     }
     return output;
 }
 
-std::unique_ptr<expression::Expression> convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
+std::unique_ptr<Expression> convertLegacyComparisonFilter(const Convertible& values, Error& error, optional<std::string> opOverride = {}) {
     optional<std::string> op = opOverride ? opOverride : toString(arrayMember(values, 0));
     optional<std::string> property = toString(arrayMember(values, 1));
     
@@ -124,29 +127,29 @@ std::unique_ptr<expression::Expression> convertLegacyComparisonFilter(const Conv
     }
 }
     
-std::unique_ptr<expression::Expression> convertLegacyHasFilter(const Convertible& values, Error& error) {
+std::unique_ptr<Expression> convertLegacyHasFilter(const Convertible& values, Error& error) {
     optional<std::string> property = toString(arrayMember(values, 1));
     
     if (!property) {
         error = { "filter property must be a string" };
         return {};
     } else if (*property == "$type") {
-        return std::make_unique<expression::Literal>(true);
+        return std::make_unique<Literal>(true);
     } else if (*property == "$id") {
-        return createExpression("filter-has-id", std::vector<std::unique_ptr<expression::Expression>>(), error);
+        return createExpression("filter-has-id", std::vector<std::unique_ptr<Expression>>(), error);
     } else {
-        return createExpression("filter-has", std::make_unique<expression::Literal>(*property), error);
+        return createExpression("filter-has", std::make_unique<Literal>(*property), error);
     }
 }
 
-std::unique_ptr<expression::Expression> convertLegacyInFilter(const Convertible& values, Error& error) {
+std::unique_ptr<Expression> convertLegacyInFilter(const Convertible& values, Error& error) {
     optional<std::string> property = toString(arrayMember(values, 1));
     
     if (!property) {
         error = { "filter property must be a string" };
         return {};
     } else if (arrayLength(values) == 0) {
-        return std::make_unique<expression::Literal>(false);
+        return std::make_unique<Literal>(false);
     } else if (*property == "$type") {
         return createExpression("filter-type-in", convertLiteralArray(values, error, 2), error);
     } else if (*property == "id") {
@@ -156,17 +159,17 @@ std::unique_ptr<expression::Expression> convertLegacyInFilter(const Convertible&
     }
 }
 
-std::vector<std::unique_ptr<expression::Expression>> convertLegacyFilterArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
-    std::vector<std::unique_ptr<expression::Expression>> output;
+std::vector<std::unique_ptr<Expression>> convertLegacyFilterArray(const Convertible &input, Error& error, std::size_t startIndex = 0) {
+    std::vector<std::unique_ptr<Expression>> output;
     for (std::size_t i = startIndex; i < arrayLength(input); i++) {
         output.push_back(convertLegacyFilter(arrayMember(input, i), error));
     }
     return output;
 }
     
-std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& values, Error& error) {
+std::unique_ptr<Expression> convertLegacyFilter(const Convertible& values, Error& error) {
     if (isUndefined(values)) {
-        return std::make_unique<expression::Literal>(true);
+        return std::make_unique<Literal>(true);
     }
     
     optional<std::string> op = toString(arrayMember(values, 0));
@@ -175,7 +178,7 @@ std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& v
         error = { "filter operator must be a string" };
         return {};
     } else if (arrayLength(values) <= 1) {
-        return std::make_unique<expression::Literal>(*op != "any");
+        return std::make_unique<Literal>(*op != "any");
     } else {
         return (
             *op == "==" ||
@@ -191,7 +194,7 @@ std::unique_ptr<expression::Expression> convertLegacyFilter(const Convertible& v
             *op == "!in" ? createExpression("!", convertLegacyInFilter(values, error), error) :
             *op == "has" ? convertLegacyHasFilter(values, error) :
             *op == "!has" ? createExpression("!", convertLegacyHasFilter(values, error), error) :
-           std::make_unique<expression::Literal>(true)
+            std::make_unique<Literal>(true)
         );
     }
 }
