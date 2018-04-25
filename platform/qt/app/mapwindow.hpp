@@ -29,6 +29,7 @@ class MapWindow : public QGLWidget
 
 public:
     MapWindow(const QMapboxGLSettings &);
+    ~MapWindow();
 
     void selfTest();
 
