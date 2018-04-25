@@ -12,6 +12,7 @@ QT += network-private \
 QMAKE_CXXFLAGS += \
     -DNDEBUG \
     -DQT_IMAGE_DECODERS \
+    -DQT_BUILD_MAPBOXGL_LIB \
     -DRAPIDJSON_HAS_STDSTRING=1 \
     -DMBGL_USE_GLES2 \
     -D__QT__ \
