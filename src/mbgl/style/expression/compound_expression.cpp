@@ -3,6 +3,7 @@
 #include <mbgl/style/expression/util.hpp>
 #include <mbgl/tile/geometry_tile_data.hpp>
 #include <mbgl/math/log2.hpp>
+#include <mbgl/util/i18n.hpp>
 #include <mbgl/util/ignore.hpp>
 #include <mbgl/util/string.hpp>
 #include <mbgl/util/platform.hpp>
@@ -379,6 +380,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     
     define("!", [](bool e) -> Result<bool> { return !e; });
     
+    define("is-supported-script", [](const std::string& x) -> Result<bool> {
+        return util::i18n::isStringInSupportedScript(x);
+    });
+
     define("upcase", [](const std::string& input) -> Result<std::string> {
         return platform::uppercase(input);
     });
