@@ -43,7 +43,7 @@ uint64_t OfflineTilePyramidRegionDefinition::tileCount(style::SourceType type, u
     const Range<uint8_t> clampedZoomRange = coveringZoomRange(type, tileSize, zoomRange);
     unsigned long result = 0;;
     for (uint8_t z = clampedZoomRange.min; z <= clampedZoomRange.max; z++) {
-        result +=  util::tileCount(bounds, z, tileSize);
+        result +=  util::tileCount(bounds, z);
     }
 
     return result;

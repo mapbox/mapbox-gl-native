@@ -7,6 +7,7 @@
 #include <mbgl/programs/programs.hpp>
 #include <mbgl/programs/background_program.hpp>
 #include <mbgl/util/tile_cover.hpp>
+#include <mbgl/map/transform_state.hpp>
 
 namespace mbgl {
 
