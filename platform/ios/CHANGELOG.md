@@ -15,6 +15,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 * Reduce per-frame render CPU time ([#11811](https://github.com/mapbox/mapbox-gl-native/issues/11811))
 * Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
+* Fixed an issue preventing `[MGLOverlay overlayBounds]` return an empty box for coordinates that straddle the antimeridian. ([#11783](https://github.com/mapbox/mapbox-gl-native/pull/11783))
 
 ## 4.0.0 - April 19, 2018
 
