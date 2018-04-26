@@ -842,7 +842,7 @@ using namespace std::string_literals;
                                                                      MGLConstantExpression(@7)]];
         NSExpression *expression = [NSExpression expressionForFunction:@"objectFrom:withIndex:"
                                                              arguments:@[array, MGLConstantExpression(@"LAST")]];
-        NSArray *jsonExpression = @[@"at", @2, @[ @"literal", @[@9, @8, @7]]];
+        NSArray *jsonExpression = @[@"at", @[@"-",  @[@"length", @[ @"literal", @[@9, @8, @7]]], @1], @[ @"literal", @[@9, @8, @7]]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
     }
     {

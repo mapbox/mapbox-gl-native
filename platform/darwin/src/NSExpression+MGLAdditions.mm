@@ -1106,9 +1106,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     if ([value isEqualToString:@"FIRST"]) {
                         index = [NSExpression expressionForConstantValue:@0].mgl_jsonExpressionObject;
                     } else if ([value isEqualToString:@"LAST"]) {
-                        NSExpression *count = [NSExpression expressionWithFormat:@"count(%@) - 1", self.arguments[0]];
-                        id last = [count expressionValueWithObject:nil context:nil];
-                        index = [NSExpression expressionForConstantValue:last].mgl_jsonExpressionObject;
+                        index = [NSExpression expressionWithFormat:@"count(%@) - 1", self.arguments[0]].mgl_jsonExpressionObject;
                     } else if ([value isEqualToString:@"SIZE"]) {
                         return [NSExpression expressionWithFormat:@"count(%@)", self.arguments[0]].mgl_jsonExpressionObject;
                     }
