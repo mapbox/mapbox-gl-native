@@ -403,7 +403,7 @@ static NSArray * const MGLTokenizedFunctions = @[
  
  If no replacements take place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
+NSArray<NSExpression *> *MGLCollectionByReplacingTokensWithKeyPaths(NSArray<NSExpression *> *collection) {
     __block NSMutableArray *upgradedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
@@ -424,7 +424,7 @@ NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY
  If no replacements take place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
+NSDictionary<NSNumber *, NSExpression *> *MGLStopDictionaryByReplacingTokensWithKeyPaths(NSDictionary<NSNumber *, NSExpression *> *stops) {
     __block NSMutableDictionary *upgradedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
@@ -1353,7 +1353,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
  
  If no localization takes place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) *collection, NSLocale * _Nullable locale) {
+NSArray<NSExpression *> *MGLLocalizedCollection(NSArray<NSExpression *> *collection, NSLocale * _Nullable locale) {
     __block NSMutableArray *localizedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *localizedItem = [item mgl_expressionLocalizedIntoLocale:locale];
@@ -1373,7 +1373,7 @@ NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) 
  If no localization takes place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
+NSDictionary<NSNumber *, NSExpression *> *MGLLocalizedStopDictionary(NSDictionary<NSNumber *, NSExpression *> *stops, NSLocale * _Nullable locale) {
     __block NSMutableDictionary *localizedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {

@@ -149,7 +149,7 @@ public:
 @property (nonatomic, readwrite) MGLStyle *style;
 
 /// Mapping from reusable identifiers to annotation images.
-@property (nonatomic) NS_MUTABLE_DICTIONARY_OF(NSString *, MGLAnnotationImage *) *annotationImagesByIdentifier;
+@property (nonatomic) NSMutableDictionary<NSString *, MGLAnnotationImage *> *annotationImagesByIdentifier;
 /// Currently shown popover representing the selected annotation.
 @property (nonatomic) NSPopover *calloutForSelectedAnnotation;
 
@@ -611,7 +611,7 @@ public:
 
 #pragma mark Style
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingStyle {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingStyle {
     return [NSSet setWithObject:@"styleURL"];
 }
 
@@ -965,7 +965,7 @@ public:
 
 #pragma mark Viewport
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCenterCoordinate {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCenterCoordinate {
     return [NSSet setWithObjects:@"latitude", @"longitude", @"camera", nil];
 }
 
@@ -1015,7 +1015,7 @@ public:
     _pendingLongitude = pendingLongitude;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingZoomLevel {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingZoomLevel {
     return [NSSet setWithObject:@"camera"];
 }
 
@@ -1083,7 +1083,7 @@ public:
     }
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingDirection {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingDirection {
     return [NSSet setWithObject:@"camera"];
 }
 
@@ -1107,7 +1107,7 @@ public:
     [self setDirection:_mbglMap->getBearing() + delta animated:animated];
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCamera {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCamera {
     return [NSSet setWithObjects:@"latitude", @"longitude", @"centerCoordinate", @"zoomLevel", @"direction", nil];
 }
 
@@ -1765,7 +1765,7 @@ public:
 
 #pragma mark Annotations
 
-- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)annotations {
+- (nullable NSArray<id <MGLAnnotation>> *)annotations {
     if (_annotationContextsByAnnotationTag.empty()) {
         return nil;
     }
@@ -1781,12 +1781,12 @@ public:
     return [NSArray arrayWithObjects:&annotations[0] count:annotations.size()];
 }
 
-- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotations
+- (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotations
 {
     return [self visibleFeaturesInRect:self.bounds];
 }
 
-- (nullable NS_ARRAY_OF(id <MGLAnnotation>) *)visibleAnnotationsInRect:(CGRect)rect
+- (nullable NSArray<id <MGLAnnotation>> *)visibleAnnotationsInRect:(CGRect)rect
 {
     if (_annotationContextsByAnnotationTag.empty())
     {
@@ -1852,7 +1852,7 @@ public:
     }
 }
 
-- (void)addAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations {
+- (void)addAnnotations:(NSArray<id <MGLAnnotation>> *)annotations {
     if (!annotations) {
         return;
     }
@@ -1987,7 +1987,7 @@ public:
     }
 }
 
-- (void)removeAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations {
+- (void)removeAnnotations:(NSArray<id <MGLAnnotation>> *)annotations {
     if (!annotations) {
         return;
     }
@@ -2192,12 +2192,12 @@ public:
     [self didChangeValueForKey:@"selectedAnnotations"];
 }
 
-- (NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
+- (NSArray<id <MGLAnnotation>> *)selectedAnnotations {
     id <MGLAnnotation> selectedAnnotation = self.selectedAnnotation;
     return selectedAnnotation ? @[selectedAnnotation] : @[];
 }
 
-- (void)setSelectedAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)selectedAnnotations {
+- (void)setSelectedAnnotations:(NSArray<id <MGLAnnotation>> *)selectedAnnotations {
     if (!selectedAnnotations.count) {
         return;
     }
@@ -2330,7 +2330,7 @@ public:
     }
 }
 
-- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations animated:(BOOL)animated {
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations animated:(BOOL)animated {
     CGFloat maximumPadding = 100;
     CGFloat yPadding = (NSHeight(self.bounds) / 5 <= maximumPadding) ? (NSHeight(self.bounds) / 5) : maximumPadding;
     CGFloat xPadding = (NSWidth(self.bounds) / 5 <= maximumPadding) ? (NSWidth(self.bounds) / 5) : maximumPadding;
@@ -2340,7 +2340,7 @@ public:
     [self showAnnotations:annotations edgePadding:edgeInsets animated:animated];
 }
 
-- (void)showAnnotations:(NS_ARRAY_OF(id <MGLAnnotation>) *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
+- (void)showAnnotations:(NSArray<id <MGLAnnotation>> *)annotations edgePadding:(NSEdgeInsets)insets animated:(BOOL)animated {
     if ( ! annotations || ! annotations.count) return;
 
     mbgl::LatLngBounds bounds = mbgl::LatLngBounds::empty();
@@ -2537,11 +2537,11 @@ public:
 
 #pragma mark Overlays
 
-- (nonnull NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+- (nonnull NSArray<id <MGLOverlay>> *)overlays
 {
     if (self.annotations == nil) { return @[]; }
 
-    NS_MUTABLE_ARRAY_OF(id <MGLOverlay>) *mutableOverlays = [NSMutableArray array];
+    NSMutableArray<id <MGLOverlay>> *mutableOverlays = [NSMutableArray array];
 
     [self.annotations enumerateObjectsUsingBlock:^(id<MGLAnnotation>  _Nonnull annotation, NSUInteger idx, BOOL * _Nonnull stop) {
         if ([annotation conformsToProtocol:@protocol(MGLOverlay)])
@@ -2557,7 +2557,7 @@ public:
     [self addOverlays:@[overlay]];
 }
 
-- (void)addOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays
+- (void)addOverlays:(NSArray<id <MGLOverlay>> *)overlays
 {
 #if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
@@ -2571,7 +2571,7 @@ public:
     [self removeOverlays:@[overlay]];
 }
 
-- (void)removeOverlays:(NS_ARRAY_OF(id <MGLOverlay>) *)overlays {
+- (void)removeOverlays:(NSArray<id <MGLOverlay>> *)overlays {
 #if DEBUG
     for (id <MGLOverlay> overlay in overlays) {
         NSAssert([overlay conformsToProtocol:@protocol(MGLOverlay)], @"Overlay does not conform to MGLOverlay");
@@ -2652,15 +2652,15 @@ public:
 
 #pragma mark Data
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(NSPoint)point {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(NSPoint)point {
     return [self visibleFeaturesAtPoint:point inStyleLayersWithIdentifiers:nil];
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(CGPoint)point inStyleLayersWithIdentifiers:(NSSet<NSString *> *)styleLayerIdentifiers {
     return [self visibleFeaturesAtPoint:point inStyleLayersWithIdentifiers:styleLayerIdentifiers predicate:nil];
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesAtPoint:(NSPoint)point inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(NSPredicate *)predicate {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesAtPoint:(NSPoint)point inStyleLayersWithIdentifiers:(NSSet<NSString *> *)styleLayerIdentifiers predicate:(NSPredicate *)predicate {
     // Cocoa origin is at the lower-left corner.
     mbgl::ScreenCoordinate screenCoordinate = { point.x, NSHeight(self.bounds) - point.y };
 
@@ -2683,15 +2683,15 @@ public:
     return MGLFeaturesFromMBGLFeatures(features);
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(NSRect)rect {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(NSRect)rect {
     return [self visibleFeaturesInRect:rect inStyleLayersWithIdentifiers:nil];
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(CGRect)rect inStyleLayersWithIdentifiers:(NSSet<NSString *> *)styleLayerIdentifiers {
     return [self visibleFeaturesInRect:rect inStyleLayersWithIdentifiers:styleLayerIdentifiers predicate:nil];
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)visibleFeaturesInRect:(NSRect)rect inStyleLayersWithIdentifiers:(NS_SET_OF(NSString *) *)styleLayerIdentifiers predicate:(NSPredicate *)predicate {
+- (NSArray<id <MGLFeature>> *)visibleFeaturesInRect:(NSRect)rect inStyleLayersWithIdentifiers:(NSSet<NSString *> *)styleLayerIdentifiers predicate:(NSPredicate *)predicate {
     // Cocoa origin is at the lower-left corner.
     mbgl::ScreenBox screenBox = {
         { NSMinX(rect), NSHeight(self.bounds) - NSMaxY(rect) },

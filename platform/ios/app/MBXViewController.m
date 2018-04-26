@@ -1527,7 +1527,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     [self continueWorldTourWithRemainingAnnotations:annotations];
 }
 
-- (void)continueWorldTourWithRemainingAnnotations:(NS_MUTABLE_ARRAY_OF(MGLPointAnnotation *) *)annotations
+- (void)continueWorldTourWithRemainingAnnotations:(NSMutableArray<MGLPointAnnotation *> *)annotations
 {
     MGLPointAnnotation *nextAnnotation = annotations.firstObject;
     if (!nextAnnotation || !_isTouringWorld)

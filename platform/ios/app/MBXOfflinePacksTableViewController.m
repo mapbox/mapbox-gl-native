@@ -45,7 +45,7 @@ static NSString * const MBXOfflinePacksTableViewActiveCellReuseIdentifier = @"Ac
     [[NSNotificationCenter defaultCenter] removeObserver:self];
 }
 
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NS_DICTIONARY_OF(NSString *, id) *)change context:(void *)context {
+- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary<NSString *, id> *)change context:(void *)context {
     if ([keyPath isEqualToString:@"packs"]) {
         NSKeyValueChange changeKind = [change[NSKeyValueChangeKindKey] unsignedIntegerValue];
         NSIndexSet *indices = change[NSKeyValueChangeIndexesKey];

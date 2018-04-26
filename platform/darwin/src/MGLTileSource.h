@@ -212,7 +212,7 @@ MGL_EXPORT
  configuration URL, this array is also empty until the configuration JSON file
  is loaded.
  */
-@property (nonatomic, copy, readonly) NS_ARRAY_OF(MGLAttributionInfo *) *attributionInfos;
+@property (nonatomic, copy, readonly) NSArray<MGLAttributionInfo *> *attributionInfos;
 
 @end
 

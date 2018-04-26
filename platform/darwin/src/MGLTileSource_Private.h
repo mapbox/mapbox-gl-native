@@ -28,11 +28,11 @@ namespace mbgl {
  @param fontSize The default text size in points, or 0 to use the default.
  @param linkColor The default link color, or `nil` to use the default.
  */
-- (NS_ARRAY_OF(MGLAttributionInfo *) *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
+- (NSArray<MGLAttributionInfo *> *)attributionInfosWithFontSize:(CGFloat)fontSize linkColor:(nullable MGLColor *)linkColor;
 
 @end
 
 MGL_EXPORT
-mbgl::Tileset MGLTileSetFromTileURLTemplates(NS_ARRAY_OF(NSString *) *tileURLTemplates, NS_DICTIONARY_OF(MGLTileSourceOption, id) * _Nullable options);
+mbgl::Tileset MGLTileSetFromTileURLTemplates(NSArray<NSString *> *tileURLTemplates, NSDictionary<MGLTileSourceOption, id> * _Nullable options);
 
 NS_ASSUME_NONNULL_END

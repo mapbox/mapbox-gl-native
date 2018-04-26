@@ -38,7 +38,7 @@
     };
     features.push_back(mbgl::Feature { polygon });
 
-    NS_ARRAY_OF(MGLShape <MGLFeature> *) *shapes = MGLFeaturesFromMBGLFeatures(features);
+    NSArray<MGLShape <MGLFeature> *> *shapes = MGLFeaturesFromMBGLFeatures(features);
     XCTAssertEqual(shapes.count, 3, @"All features should be converted into shapes");
 
     MGLPointFeature *pointShape = (MGLPointFeature *)shapes[0];
@@ -69,7 +69,7 @@
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(4, 4)]);
     XCTAssertEqualObjects([NSValue valueWithMGLCoordinate:polygonCoordinates[3]],
                           [NSValue valueWithMGLCoordinate:CLLocationCoordinate2DMake(4, 1)]);
-    NS_ARRAY_OF(MGLPolygon *) *interiorPolygons = polygonShape.interiorPolygons;
+    NSArray<MGLPolygon *> *interiorPolygons = polygonShape.interiorPolygons;
     XCTAssertEqual(interiorPolygons.count, 1);
     MGLPolygon *interiorPolygon = interiorPolygons.firstObject;
     XCTAssertEqual(interiorPolygon.pointCount, 4);
@@ -103,7 +103,7 @@
     vector.push_back(true);
     features.push_back(pointFeature);
 
-    NS_ARRAY_OF(MGLShape <MGLFeature> *) *shapes = MGLFeaturesFromMBGLFeatures(features);
+    NSArray<MGLShape <MGLFeature> *> *shapes = MGLFeaturesFromMBGLFeatures(features);
     XCTAssertEqual(shapes.count, 1, @"All features should be converted into shapes");
 
     MGLShape <MGLFeature> *shape = shapes.firstObject;
