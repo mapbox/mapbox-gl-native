@@ -158,7 +158,7 @@ namespace android {
 
         Filter filter = layer.accept(GetFilterEvaluator());
         if (filter.expression) {
-            mbgl::Value expressionValue = filter.expression.get()->serialize();
+            mbgl::Value expressionValue = filter.expression.get().get()->serialize();
             return gson::JsonElement::New(env, expressionValue);
         } else {
             return jni::Object<gson::JsonElement>();
