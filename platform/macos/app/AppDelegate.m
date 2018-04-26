@@ -161,7 +161,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     for (NSString *param in [url.query componentsSeparatedByString:@"&"]) {
         NSArray *parts = [param componentsSeparatedByString:@"="];
         if (parts.count >= 2) {
-            params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            params[parts[0]] = [parts[1] stringByRemovingPercentEncoding];
         }
     }
 
