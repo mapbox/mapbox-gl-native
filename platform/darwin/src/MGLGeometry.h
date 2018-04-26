@@ -174,6 +174,17 @@ NS_INLINE MGLCoordinateBounds MGLCoordinateBoundsOffset(MGLCoordinateBounds boun
 }
 
 /**
+ YES if the coordinate is valid or NO if it is not.
+ Considers extended coordinates.
+ */
+NS_INLINE BOOL MGLLocationCoordinate2DIsValid(CLLocationCoordinate2D coordinate) {
+    return (coordinate.latitude  <= 90.0  &&
+            coordinate.latitude  >= -90.0  &&
+            coordinate.longitude <= 360.0 &&
+            coordinate.longitude >= -360.0);
+}
+
+/**
  Returns `YES` if the coordinate bounds covers no area.
 
  @note A bounds may be empty but have a non-zero coordinate span (e.g., when its

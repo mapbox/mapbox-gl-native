@@ -30,6 +30,11 @@ NS_ASSUME_NONNULL_BEGIN
  This property contains the smallest rectangle that completely encompasses the
  overlay. Implementers of this protocol must set this area when implementing
  their overlay class, and after setting it, you must not change it.
+ 
+ To bring both sides of the antimeridian or international date line into view,
+ specify some longitudes less than −180 degrees or greater than 180 degrees. For
+ example, to show both Tokyo and San Francisco simultaneously, you could set the
+ visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic, readonly) MGLCoordinateBounds overlayBounds;
 
