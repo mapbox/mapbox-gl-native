@@ -37,6 +37,11 @@
                BlueprintName = "integration"
                ReferencedContainer = "container:ios.xcodeproj">
             </BuildableReference>
+            <SkippedTests>
+               <Test
+                  Identifier = "MBCameraTransitionTests/testContinuallyResettingNorthInIsChanging">
+               </Test>
+            </SkippedTests>
          </TestableReference>
       </Testables>
       <MacroExpansion>

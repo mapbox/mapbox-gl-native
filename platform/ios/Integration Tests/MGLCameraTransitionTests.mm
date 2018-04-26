@@ -64,6 +64,84 @@
     [self waitForExpectations:@[expectation] timeout:1.5];
 }
 
+- (void)testInterruptingAndResetNorthOnlyOnceInIsChanging {
+
+    // Reset to non-zero, prior to testing
+    [self.mapView setDirection:45 animated:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
+
+    __weak typeof(self) weakself = self;
+    __block BOOL startedReset = NO;
+    __block BOOL finishedReset = NO;
+
+    self.regionIsChanging = ^(MGLMapView *mapView) {
+        MBCameraTransitionTests *strongSelf = weakself;
+        if (!strongSelf) return;
+
+        if (!startedReset) {
+            NSLog(@"Reset to north, interrupting the previous transition");
+            startedReset = YES;
+            [mapView resetNorth];
+            finishedReset = YES;
+        }
+    };
+
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
+        MBCameraTransitionTests *strongSelf = weakself;
+        if (!strongSelf) return;
+
+        MGLTestAssert(strongSelf, startedReset);
+
+        if (finishedReset) {
+            MGLTestAssert(strongSelf, !(reason & MGLCameraChangeReasonTransitionCancelled));
+            [expectation fulfill];
+        }
+        else {
+            MGLTestAssert(strongSelf, reason & MGLCameraChangeReasonTransitionCancelled);
+        }
+    };
+
+    [self.mapView setDirection:90 animated:YES];
+    [self waitForExpectations:@[expectation] timeout:1.5];
+
+    XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
+}
+
+- (void)testContinuallyResettingNorthInIsChanging {
+
+    // Reset to non-zero, prior to testing
+    [self.mapView setDirection:45 animated:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 1;
+    expectation.assertForOverFulfill = YES;
+
+    __weak typeof(self) weakself = self;
+
+    self.regionIsChanging = ^(MGLMapView *mapView) {
+        MBCameraTransitionTests *strongSelf = weakself;
+        if (!strongSelf) return;
+
+        [mapView resetNorth];
+    };
+
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
+        MBCameraTransitionTests *strongSelf = weakself;
+        if (!strongSelf) return;
+
+        MGLTestAssert(strongSelf, reason & MGLCameraChangeReasonTransitionCancelled);
+    };
+
+    [self.mapView setDirection:90 animated:YES];
+    [self waitForExpectations:@[expectation] timeout:1.5];
+
+    XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
+}
+
+
 
 - (void)testSetCenterCancelsTransitions {
     XCTestExpectation *cameraIsInDCExpectation = [self expectationWithDescription:@"camera reset to DC"];
