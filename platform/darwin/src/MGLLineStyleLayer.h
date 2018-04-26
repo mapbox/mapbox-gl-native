@@ -302,7 +302,10 @@ MGL_EXPORT
 /**
  Specifies the lengths of the alternating dashes and gaps that form the dash
  pattern. The lengths are later scaled by the line width. To convert a dash
- length to points, multiply the length by the current line width.
+ length to points, multiply the length by the current line width. Note that
+ GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to
+ the expected scale. Also note that zoom-dependent expressions will be evaluated
+ only at integer zoom levels.
  
  This property is measured in line widths.
  
