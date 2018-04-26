@@ -1258,9 +1258,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         NSArray *controlPoints = [self.arguments[curveTypeIndex + 1].collection mgl_jsonExpressionObject];
         [interpolationArray addObjectsFromArray:controlPoints];
     }
+
+    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[curveTypeIndex + 2].constantValue;
+
+    if (stops.count == 0) {
+        [NSException raise:NSInvalidArgumentException format:@"‘stops‘ dictionary argument to ‘%@’ function must not be empty.", self.function];
+    }
+
     NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"interpolate", interpolationArray, nil];
     [expressionObject addObject:(isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject];
-    NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[curveTypeIndex + 2].constantValue;
     for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
         [expressionObject addObject:key];
         [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];
@@ -1272,8 +1278,14 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     BOOL isAftermarketFunction = [self.function isEqualToString:@"mgl_step:from:stops:"];
     NSUInteger minimumIndex = isAftermarketFunction ? 1 : 0;
     id minimum = self.arguments[minimumIndex].mgl_jsonExpressionObject;
-    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, minimum, nil];
     NSDictionary<NSNumber *, NSExpression *> *stops = self.arguments[minimumIndex + 1].constantValue;
+
+    if (stops.count == 0) {
+        [NSException raise:NSInvalidArgumentException format:@"‘stops‘ dictionary argument to ‘%@’ function must not be empty.", self.function];
+    }
+
+    NSMutableArray *expressionObject = [NSMutableArray arrayWithObjects:@"step", (isAftermarketFunction ? self.arguments.firstObject : self.operand).mgl_jsonExpressionObject, minimum, nil];
+
     for (NSNumber *key in [stops.allKeys sortedArrayUsingSelector:@selector(compare:)]) {
         [expressionObject addObject:key];
         [expressionObject addObject:[stops[key] mgl_jsonExpressionObject]];

@@ -710,6 +710,16 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+        NSDictionary *stops = @{};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:(x, 'cubic-bezier', { 0.42, 0, 0.58, 1 }, %@)", stops];
+        XCTAssertThrowsSpecificNamed(expression.mgl_jsonExpressionObject, NSException, NSInvalidArgumentException);
+    }
+    {
+        NSDictionary *stops = @{};
+        NSExpression *expression = [NSExpression expressionWithFormat:@"mgl_step:from:stops:($zoomLevel, 11, %@)", stops];
+        XCTAssertThrowsSpecificNamed(expression.mgl_jsonExpressionObject, NSException, NSInvalidArgumentException);
+    }
 }
 
 - (void)testMatchExpressionObject {
