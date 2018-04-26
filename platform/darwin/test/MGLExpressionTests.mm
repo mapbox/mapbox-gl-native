@@ -680,8 +680,8 @@ using namespace std::string_literals;
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
     {
-        NSExpression *expression = [NSExpression expressionWithFormat:@"CAST(x, 'MGLColor')"];
-        NSArray *jsonExpression = @[@"to-color", @[@"get", @"x"]];
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_FUNCTION('to-color', x, y, z)"];
+        NSArray *jsonExpression = @[@"to-color", @[@"get", @"x"], @[@"get", @"y"], @[@"get", @"z"]];
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
     }
     {
@@ -690,6 +690,7 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+
 }
 
 - (void)testInterpolationExpressionObject {

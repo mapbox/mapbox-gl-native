@@ -804,11 +804,16 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
         } else if ([op isEqualToString:@"to-color"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            
+            if (argumentObjects.count == 1) {
 #if TARGET_OS_IPHONE
-            return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
 #else
-            return [NSExpression expressionWithFormat:@"CAST(%@, 'NSColor')", operand];
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'NSColor')", operand];
 #endif
+            }
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
             
         } else if ([op isEqualToString:@"to-rgba"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
