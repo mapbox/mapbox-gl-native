@@ -26,7 +26,7 @@
 + (instancetype)mgl_predicateWithFilter:(mbgl::style::Filter)filter
 {
     if (filter.expression) {
-        id jsonObject = MGLJSONObjectFromMBGLExpression(*filter.expression);
+        id jsonObject = MGLJSONObjectFromMBGLExpression(**filter.expression);
         return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
     } else {
         return nil;
