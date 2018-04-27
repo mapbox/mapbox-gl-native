@@ -4,6 +4,10 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## master
 
+### Packaging
+
+* The minimum deployment target for this SDK is now iOS 9.0. ([#11776](https://github.com/mapbox/mapbox-gl-native/pull/11776))
+
 ### Style layers
 
 * Deprecated `+[NSExpression featurePropertiesVariableExpression]` use `+[NSExpression featureAttributesVariableExpression]` instead. ([#11748](https://github.com/mapbox/mapbox-gl-native/pull/11748))

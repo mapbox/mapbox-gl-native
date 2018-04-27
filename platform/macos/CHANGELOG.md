@@ -1,5 +1,11 @@
 # Changelog for Mapbox Maps SDK for macOS
 
+## master
+
+### Packaging
+
+* The minimum deployment target for this SDK is now macOS 10.11.0. ([#11776](https://github.com/mapbox/mapbox-gl-native/pull/11776))
+
 ## 0.7.1
 
 ### Style layers

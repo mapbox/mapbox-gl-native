@@ -29,7 +29,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     }
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfResourcesCompleted {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCountOfResourcesCompleted {
     return [NSSet setWithObjects:@"progress", nil];
 }
 
@@ -37,7 +37,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     return self.progress.countOfResourcesCompleted;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfResourcesExpected {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCountOfResourcesExpected {
     return [NSSet setWithObjects:@"progress", nil];
 }
 
@@ -45,7 +45,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     return self.progress.countOfResourcesExpected;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfBytesCompleted {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCountOfBytesCompleted {
     return [NSSet setWithObjects:@"progress", nil];
 }
 
@@ -53,7 +53,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     return self.progress.countOfBytesCompleted;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfTilesCompleted {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCountOfTilesCompleted {
     return [NSSet setWithObjects:@"progress", nil];
 }
 
@@ -61,7 +61,7 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
     return self.progress.countOfTilesCompleted;
 }
 
-+ (NS_SET_OF(NSString *) *)keyPathsForValuesAffectingCountOfTileBytesCompleted {
++ (NSSet<NSString *> *)keyPathsForValuesAffectingCountOfTileBytesCompleted {
     return [NSSet setWithObjects:@"progress", nil];
 }
 
@@ -157,11 +157,11 @@ NSString * const MGLLastMapDebugMaskDefaultsKey = @"MGLLastMapDebugMask";
 - (void)handleGetURLEvent:(NSAppleEventDescriptor *)event withReplyEvent:(NSAppleEventDescriptor *)replyEvent {
     // mapboxgl://?center=29.95,-90.066667&zoom=14&bearing=45&pitch=30
     NSURL *url = [NSURL URLWithString:[event paramDescriptorForKeyword:keyDirectObject].stringValue];
-    NS_MUTABLE_DICTIONARY_OF(NSString *, NSString *) *params = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary<NSString *, NSString *> *params = [[NSMutableDictionary alloc] init];
     for (NSString *param in [url.query componentsSeparatedByString:@"&"]) {
         NSArray *parts = [param componentsSeparatedByString:@"="];
         if (parts.count >= 2) {
-            params[parts[0]] = [parts[1] stringByReplacingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+            params[parts[0]] = [parts[1] stringByRemovingPercentEncoding];
         }
     }
 

@@ -13,7 +13,7 @@
 const MGLShapeSourceOption MGLShapeSourceOptionWrapsCoordinates = @"MGLShapeSourceOptionWrapsCoordinates";
 const MGLShapeSourceOption MGLShapeSourceOptionClipsCoordinates = @"MGLShapeSourceOptionClipsCoordinates";
 
-mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
+mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
     mbgl::style::CustomGeometrySource::Options sourceOptions;
 
     if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
@@ -148,7 +148,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
 
 @implementation MGLComputedShapeSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     NSOperationQueue *requestQueue = [[NSOperationQueue alloc] init];
     requestQueue.name = [NSString stringWithFormat:@"mgl.MGLComputedShapeSource.%@", identifier];
     requestQueue.qualityOfService = NSQualityOfServiceUtility;
@@ -176,7 +176,7 @@ mbgl::style::CustomGeometrySource::Options MBGLCustomGeometrySourceOptionsFromDi
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier dataSource:(id<MGLComputedShapeSourceDataSource>)dataSource options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     if (self = [self initWithIdentifier:identifier options:options]) {
         [self setDataSource:dataSource];
     }

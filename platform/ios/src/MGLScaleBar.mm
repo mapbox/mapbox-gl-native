@@ -178,12 +178,7 @@ static const CGFloat MGLFeetPerMeter = 3.28084;
 #pragma mark - Convenience methods
 
 - (BOOL)usesRightToLeftLayout {
-    // semanticContentAttribute is iOS 9+
-    if ([self.superview respondsToSelector:@selector(semanticContentAttribute)]) {
-        return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
-    } else {
-        return UIApplication.sharedApplication.userInterfaceLayoutDirection == UIUserInterfaceLayoutDirectionRightToLeft;
-    }
+    return [UIView userInterfaceLayoutDirectionForSemanticContentAttribute:self.superview.semanticContentAttribute] == UIUserInterfaceLayoutDirectionRightToLeft;
 }
 
 - (BOOL)usesMetricSystem {

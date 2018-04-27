@@ -14,7 +14,7 @@
 
 @interface NSString (MGLStyleLayerTestAdditions)
 
-@property (nonatomic, readonly, copy) NS_ARRAY_OF(NSString *) *lexicalClasses;
+@property (nonatomic, readonly, copy) NSArray<NSString *> *lexicalClasses;
 @property (nonatomic, readonly, copy) NSString *lemma;
 
 @end

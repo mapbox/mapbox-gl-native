@@ -21,7 +21,7 @@ const MGLShapeSourceOption MGLShapeSourceOptionMaximumZoomLevelForClustering = @
 const MGLShapeSourceOption MGLShapeSourceOptionMinimumZoomLevel = @"MGLShapeSourceOptionMinimumZoomLevel";
 const MGLShapeSourceOption MGLShapeSourceOptionSimplificationTolerance = @"MGLShapeSourceOptionSimplificationTolerance";
 
-mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *options) {
+mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NSDictionary<MGLShapeSourceOption, id> *options) {
     auto geoJSONOptions = mbgl::style::GeoJSONOptions();
 
     if (NSNumber *value = options[MGLShapeSourceOptionMinimumZoomLevel]) {
@@ -92,7 +92,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
 
 @implementation MGLShapeSource
 
-- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NS_DICTIONARY_OF(NSString *, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(NSDictionary<NSString *, id> *)options {
     auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
     auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
     if (self = [super initWithPendingSource:std::move(source)]) {
@@ -101,7 +101,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(NSDictionary<MGLShapeSourceOption, id> *)options {
     auto geoJSONOptions = MGLGeoJSONOptionsFromDictionary(options);
     auto source = std::make_unique<mbgl::style::GeoJSONSource>(identifier.UTF8String, geoJSONOptions);
     if (self = [super initWithPendingSource:std::move(source)]) {
@@ -110,7 +110,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
     return self;
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier features:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)features options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<MGLShape<MGLFeature> *> *)features options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options {
     for (id <MGLFeature> feature in features) {
         if (![feature conformsToProtocol:@protocol(MGLFeature)]) {
             [NSException raise:NSInvalidArgumentException format:@"The object %@ included in the features argument does not conform to the MGLFeature protocol.", feature];
@@ -120,7 +120,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
     return [self initWithIdentifier:identifier shape:shapeCollectionFeature options:options];
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NS_ARRAY_OF(MGLShape *) *)shapes options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NSArray<MGLShape *> *)shapes options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options {
     MGLShapeCollection *shapeCollection = [MGLShapeCollection shapeCollectionWithShapes:shapes];
     return [self initWithIdentifier:identifier shape:shapeCollection options:options];
 }
@@ -153,7 +153,7 @@ mbgl::style::GeoJSONOptions MGLGeoJSONOptionsFromDictionary(NS_DICTIONARY_OF(MGL
             NSStringFromClass([self class]), (void *)self, self.identifier, self.URL, self.shape];
 }
 
-- (NS_ARRAY_OF(id <MGLFeature>) *)featuresMatchingPredicate:(nullable NSPredicate *)predicate {
+- (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate {
     
     mbgl::optional<mbgl::style::Filter> optionalFilter;
     if (predicate) {

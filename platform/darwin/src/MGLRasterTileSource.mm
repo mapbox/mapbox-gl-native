@@ -44,7 +44,7 @@ static const CGFloat MGLRasterTileSourceRetinaTileSize = 512;
                                                        uint16_t(round(tileSize)));
 }
 
-- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NS_ARRAY_OF(NSString *) *)tileURLTemplates options:(nullable NS_DICTIONARY_OF(MGLTileSourceOption, id) *)options {
+- (instancetype)initWithIdentifier:(NSString *)identifier tileURLTemplates:(NSArray<NSString *> *)tileURLTemplates options:(nullable NSDictionary<MGLTileSourceOption, id> *)options {
     mbgl::Tileset tileSet = MGLTileSetFromTileURLTemplates(tileURLTemplates, options);
 
     uint16_t tileSize = MGLRasterTileSourceRetinaTileSize;

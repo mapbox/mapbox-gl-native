@@ -33,7 +33,7 @@
 }
 
 - (void)testPropertyName:(NSString *)name isBoolean:(BOOL)isBoolean {
-    NS_MUTABLE_ARRAY_OF(NSString *) *components = [name componentsSeparatedByString:@"-"].mutableCopy;
+    NSMutableArray<NSString *> *components = [name componentsSeparatedByString:@"-"].mutableCopy;
     if (isBoolean) {
         if ([components.firstObject isEqualToString:@"is"]) {
             [components removeObjectAtIndex:0];
@@ -67,7 +67,7 @@
 
 @implementation NSString (MGLStyleLayerTestAdditions)
 
-- (NS_ARRAY_OF(NSString *) *)lexicalClasses {
+- (NSArray<NSString *> *)lexicalClasses {
     NSOrthography *orthography = [NSOrthography orthographyWithDominantScript:@"Latn"
                                                                   languageMap:@{@"Latn": @[@"en"]}];
     NSLinguisticTaggerOptions options = (NSLinguisticTaggerOmitPunctuation
