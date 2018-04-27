@@ -6,7 +6,7 @@
 
 * Deprecated `+[NSExpression featurePropertiesVariableExpression]` use `+[NSExpression featureAttributesVariableExpression]` instead. ([#11748](https://github.com/mapbox/mapbox-gl-native/pull/11748))
 
-### Other
+### Other changes
 
 * Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 
