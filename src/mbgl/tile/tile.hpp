@@ -57,11 +57,14 @@ public:
             const GeometryCoordinates& queryGeometry,
             const TransformState&,
             const std::vector<const RenderLayer*>&,
-            const RenderedQueryOptions& options);
+            const RenderedQueryOptions& options,
+            const mat4& projMatrix);
 
     virtual void querySourceFeatures(
             std::vector<Feature>& result,
             const SourceQueryOptions&);
+
+    virtual float getQueryPadding(const std::vector<const RenderLayer*>&);
 
     void setTriedCache();
 

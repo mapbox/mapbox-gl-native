@@ -89,15 +89,33 @@ QThreadStorage<std::shared_ptr<mbgl::util::RunLoop>> loop;
 
 std::shared_ptr<mbgl::DefaultFileSource> sharedDefaultFileSource(
         const std::string& cachePath, const std::string& assetRoot, uint64_t maximumCacheSize) {
-    static std::weak_ptr<mbgl::DefaultFileSource> weak;
-    auto fs = weak.lock();
+    static std::mutex mutex;
+    static std::unordered_map<std::string, std::weak_ptr<mbgl::DefaultFileSource>> fileSources;
 
-    if (!fs) {
-        weak = fs = std::make_shared<mbgl::DefaultFileSource>(
-                cachePath, assetRoot, maximumCacheSize);
+    std::lock_guard<std::mutex> lock(mutex);
+
+    // Purge entries no longer in use.
+    for (auto it = fileSources.begin(); it != fileSources.end();) {
+        if (!it->second.lock()) {
+            it = fileSources.erase(it);
+        } else {
+            ++it;
+        }
     }
 
-    return fs;
+    // Return an existing FileSource if available.
+    auto sharedFileSource = fileSources.find(cachePath);
+    if (sharedFileSource != fileSources.end()) {
+        return sharedFileSource->second.lock();
+    }
+
+    // New path, create a new FileSource.
+    auto newFileSource = std::make_shared<mbgl::DefaultFileSource>(
+        cachePath, assetRoot, maximumCacheSize);
+
+    fileSources[cachePath] = newFileSource;
+
+    return newFileSource;
 }
 
 // Conversion helper functions.
@@ -141,10 +159,9 @@ std::unique_ptr<mbgl::style::Image> toStyleImage(const QString &id, const QImage
     QMapboxGLSettings is used to configure QMapboxGL at the moment of its creation.
     Once created, the QMapboxGLSettings of a QMapboxGL can no longer be changed.
 
-    Cache-related settings are shared between all QMapboxGL instances because different
-    maps will share the same cache database file. The first map to configure cache properties
-    such as size and path will force the configuration to all newly instantiated QMapboxGL
-    objects.
+    Cache-related settings are shared between all QMapboxGL instances using the same cache path.
+    The first map to configure cache properties such as size will force the configuration
+    to all newly instantiated QMapboxGL objects using the same cache in the same process.
 
     \since 4.7
 */

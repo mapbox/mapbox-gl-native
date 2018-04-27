@@ -22,8 +22,9 @@ public:
             const GeometryCoordinates&,
             const GeometryTileFeature&,
             const float,
+            const TransformState&,
             const float,
-            const float) const override;
+            const mat4&) const override;
 
     void updateColorRamp();
 

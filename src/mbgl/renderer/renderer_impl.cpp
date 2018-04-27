@@ -704,10 +704,13 @@ std::vector<Feature> Renderer::Impl::queryRenderedFeatures(const ScreenLineStrin
         sourceIDs.emplace(layer->baseImpl->source);
     }
 
+    mat4 projMatrix;
+    transformState.getProjMatrix(projMatrix);
+
     std::unordered_map<std::string, std::vector<Feature>> resultsByLayer;
     for (const auto& sourceID : sourceIDs) {
         if (RenderSource* renderSource = getRenderSource(sourceID)) {
-            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options);
+            auto sourceResults = renderSource->queryRenderedFeatures(geometry, transformState, layers, options, projMatrix);
             std::move(sourceResults.begin(), sourceResults.end(), std::inserter(resultsByLayer, resultsByLayer.begin()));
         }
     }

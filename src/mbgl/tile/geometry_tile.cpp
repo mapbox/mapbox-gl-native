@@ -201,33 +201,43 @@ Bucket* GeometryTile::getBucket(const Layer::Impl& layer) const {
     return it->second.get();
 }
 
+float GeometryTile::getQueryPadding(const std::vector<const RenderLayer*>& layers) {
+    float queryPadding = 0;
+    for (const RenderLayer* layer : layers) {
+        auto bucket = getBucket(*layer->baseImpl);
+        if (bucket && bucket->hasData()) {
+            queryPadding = std::max(queryPadding, bucket->getQueryRadius(*layer));
+        }
+    }
+    return queryPadding;
+}
+
 void GeometryTile::queryRenderedFeatures(
     std::unordered_map<std::string, std::vector<Feature>>& result,
     const GeometryCoordinates& queryGeometry,
     const TransformState& transformState,
     const std::vector<const RenderLayer*>& layers,
-    const RenderedQueryOptions& options) {
+    const RenderedQueryOptions& options,
+    const mat4& projMatrix) {
 
     if (!getData()) return;
 
-    // Determine the additional radius needed factoring in property functions
-    float additionalRadius = 0;
-    for (const RenderLayer* layer : layers) {
-        auto bucket = getBucket(*layer->baseImpl);
-        if (bucket) {
-            additionalRadius = std::max(additionalRadius, bucket->getQueryRadius(*layer));
-        }
-    }
+    const float queryPadding = getQueryPadding(layers);
+
+    mat4 posMatrix;
+    transformState.matrixFor(posMatrix, id.toUnwrapped());
+    matrix::multiply(posMatrix, projMatrix, posMatrix);
 
     latestFeatureIndex->query(result,
                               queryGeometry,
-                              transformState.getAngle(),
+                              transformState,
+                              posMatrix,
                               util::tileSize * id.overscaleFactor(),
                               std::pow(2, transformState.getZoom() - id.overscaledZ),
                               options,
                               id.toUnwrapped(),
                               layers,
-                              additionalRadius);
+                              queryPadding * transformState.maxPitchScaleFactor());
 }
 
 void GeometryTile::querySourceFeatures(
