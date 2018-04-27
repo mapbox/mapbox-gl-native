@@ -116,23 +116,17 @@
     [self.mapView setDirection:45 animated:NO];
 
     XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
-    expectation.expectedFulfillmentCount = 1;
+    expectation.expectedFulfillmentCount = 2;
     expectation.assertForOverFulfill = YES;
 
     __weak typeof(self) weakself = self;
 
     self.regionIsChanging = ^(MGLMapView *mapView) {
-        MBCameraTransitionTests *strongSelf = weakself;
-        if (!strongSelf) return;
-
         [mapView resetNorth];
     };
 
     self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
-        MBCameraTransitionTests *strongSelf = weakself;
-        if (!strongSelf) return;
-
-        MGLTestAssert(strongSelf, reason & MGLCameraChangeReasonTransitionCancelled);
+        [expectation fulfill];
     };
 
     [self.mapView setDirection:90 animated:YES];
@@ -142,6 +136,30 @@
 }
 
 
+- (void)testContinuallySettingCoordinateInIsChanging {
+
+    // Reset to non-zero, prior to testing
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(0.0, 0.0) animated:NO];
+
+    XCTestExpectation *expectation = [self expectationWithDescription:@"regionDidChange expectation"];
+    expectation.expectedFulfillmentCount = 2;
+    expectation.assertForOverFulfill = YES;
+
+    __weak typeof(self) weakself = self;
+
+    self.regionIsChanging = ^(MGLMapView *mapView) {
+        [weakself.mapView setCenterCoordinate:CLLocationCoordinate2DMake(-40.0, -40.0) animated:YES];
+    };
+
+    self.regionDidChange = ^(MGLMapView *mapView, MGLCameraChangeReason reason, BOOL animated) {
+        [expectation fulfill];
+    };
+
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(40.0, 40.0) animated:YES];
+    [self waitForExpectations:@[expectation] timeout:1.5];
+
+    XCTAssertEqualWithAccuracy(self.mapView.direction, 0.0, 0.001, @"Camera should have reset to north. %0.3f", self.mapView.direction);
+}
 
 - (void)testSetCenterCancelsTransitions {
     XCTestExpectation *cameraIsInDCExpectation = [self expectationWithDescription:@"camera reset to DC"];
