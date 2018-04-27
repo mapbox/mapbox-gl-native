@@ -119,8 +119,6 @@
     expectation.expectedFulfillmentCount = 2;
     expectation.assertForOverFulfill = YES;
 
-    __weak typeof(self) weakself = self;
-
     self.regionIsChanging = ^(MGLMapView *mapView) {
         [mapView resetNorth];
     };
