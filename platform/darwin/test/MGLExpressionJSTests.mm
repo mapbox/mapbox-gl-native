@@ -159,7 +159,7 @@ NSSet *testsToSkip = [NSSet setWithObjects:
 - (void)runTestsNamed:(NSString *)testName withDictionary:(NSDictionary *)testcase {
     NSArray *inputs = testcase[@"inputs"];
 
-    NSExpression *exp = [NSExpression mgl_expressionWithJSONObject:testcase[@"expression"]];
+    NSExpression *exp = [NSExpression expressionWithMGLJSONObject:testcase[@"expression"]];
 
     for (int i = 0; i < inputs.count; i++) {
         NSArray *input = inputs[i];
