@@ -59,6 +59,19 @@ NSSet *testsToSkip = [NSSet setWithObjects:
     @"/properties",
     @"/id",
     @"/at",
+    @"is-supported-script/default", //Mapbox GL function expressions lack underlying Objective-C implementations."
+    @"collator/accent-lt-en",
+    @"collator/base-default-locale",
+    @"collator/accent-not-equals-en",
+    @"collator/variant-gteq-en",
+    @"collator/case-not-equals-en",
+    @"collator/case-omitted-en",
+    @"collator/diacritic-omitted-en",
+    @"collator/base-gt-en",
+    @"collator/accent-equals-de",
+    @"collator/variant-equals-en",
+    @"collator/case-lteq-en",
+    @"collator/base-equals-en",
 
     /* unmet dependencies */
     @"get/from-literal", // number
@@ -78,6 +91,7 @@ NSSet *testsToSkip = [NSSet setWithObjects:
     /* failures */
     @"concat/basic", // ((expressionValue) equal to (expectedValue)) failed: ("ab") is not equal to ("abc")
     @"concat/arity-0", // *** -[NSArray subarrayWithRange:]: range {1, 18446744073709551615} extends beyond bounds for empty array
+    @"constant-folding/var", // Can't get value for 'a' in bindings { }.
     @"heatmap-density/basic", // Can't get value for 'heatmapDensity' in bindings { }.
     @"literal/nested-array", // -[__NSCFNumber isEqualToString:]: unrecognized selector sent to instance 0xb000000000000033
     @"literal/multiple-args", // ((expressionValue) equal to (expectedValue)) failed: ("{ }") is not equal to ("(null)")
