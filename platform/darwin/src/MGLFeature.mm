@@ -233,7 +233,7 @@ MGL_DEFINE_FEATURE_IS_EQUAL();
 
 @dynamic shapes;
 
-+ (instancetype)shapeCollectionWithShapes:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)shapes {
++ (instancetype)shapeCollectionWithShapes:(NSArray<MGLShape<MGLFeature> *> *)shapes {
     return [super shapeCollectionWithShapes:shapes];
 }
 
@@ -373,7 +373,7 @@ public:
     }
 };
 
-NS_ARRAY_OF(MGLShape <MGLFeature> *) *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
+NSArray<MGLShape <MGLFeature> *> *MGLFeaturesFromMBGLFeatures(const std::vector<mbgl::Feature> &features) {
     NSMutableArray *shapes = [NSMutableArray arrayWithCapacity:features.size()];
     for (const auto &feature : features) {
         [shapes addObject:MGLFeatureFromMBGLFeature(feature)];
@@ -414,7 +414,7 @@ mbgl::Feature mbglFeature(mbgl::Feature feature, id identifier, NSDictionary *at
     return feature;
 }
 
-NS_DICTIONARY_OF(NSString *, id) *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
+NSDictionary<NSString *, id> *NSDictionaryFeatureForGeometry(NSDictionary *geometry, NSDictionary *attributes, id identifier) {
     NSMutableDictionary *feature = [@{@"type": @"Feature",
                                       @"properties": (attributes) ?: [NSNull null],
                                       @"geometry": geometry} mutableCopy];

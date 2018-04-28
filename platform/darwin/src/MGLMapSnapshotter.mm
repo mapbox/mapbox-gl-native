@@ -89,7 +89,7 @@ const CGFloat MGLSnapshotterMinimumPixelSize = 64;
     std::shared_ptr<mbgl::ThreadPool> _mbglThreadPool;
     std::unique_ptr<mbgl::MapSnapshotter> _mbglMapSnapshotter;
     std::unique_ptr<mbgl::Actor<mbgl::MapSnapshotter::Callback>> _snapshotCallback;
-    NS_ARRAY_OF(MGLAttributionInfo *) *_attributionInfo;
+    NSArray<MGLAttributionInfo *> *_attributionInfo;
     
 }
 

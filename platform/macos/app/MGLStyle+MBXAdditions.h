@@ -2,6 +2,6 @@
 
 @interface MGLStyle (MBXAdditions)
 
-@property (nonatomic, strong) NS_ARRAY_OF(__kindof MGLStyleLayer *) *reversedLayers;
+@property (nonatomic, strong) NSArray<__kindof MGLStyleLayer *> *reversedLayers;
 
 @end

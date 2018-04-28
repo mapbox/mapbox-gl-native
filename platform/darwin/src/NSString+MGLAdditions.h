@@ -26,9 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 
  Only supports scripts for languages used by Mapbox Streets.
 
- On iOS 8 or older, this will method will always return the untransliterated
- receiver.
-
  @param script The four-letter code representing the name of the script, as
     specified by ISO 15924.
  */

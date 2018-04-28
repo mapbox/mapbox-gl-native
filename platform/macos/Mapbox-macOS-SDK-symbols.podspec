@@ -20,7 +20,7 @@ Pod::Spec.new do |m|
   }
 
   m.platform              = :osx
-  m.osx.deployment_target = '10.10'
+  m.osx.deployment_target = '10.11'
 
   m.requires_arc = true
 

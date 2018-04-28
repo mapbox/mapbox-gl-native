@@ -403,7 +403,7 @@ static NSArray * const MGLTokenizedFunctions = @[
  
  If no replacements take place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY_OF(NSExpression *) *collection) {
+NSArray<NSExpression *> *MGLCollectionByReplacingTokensWithKeyPaths(NSArray<NSExpression *> *collection) {
     __block NSMutableArray *upgradedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *upgradedItem = item.mgl_expressionByReplacingTokensWithKeyPaths;
@@ -424,7 +424,7 @@ NS_ARRAY_OF(NSExpression *) *MGLCollectionByReplacingTokensWithKeyPaths(NS_ARRAY
  If no replacements take place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokensWithKeyPaths(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops) {
+NSDictionary<NSNumber *, NSExpression *> *MGLStopDictionaryByReplacingTokensWithKeyPaths(NSDictionary<NSNumber *, NSExpression *> *stops) {
     __block NSMutableDictionary *upgradedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
@@ -665,11 +665,7 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLStopDictionaryByReplacingTokens
 }
 
 + (instancetype)mgl_expressionForConditional:(nonnull NSPredicate *)conditionPredicate trueExpression:(nonnull NSExpression *)trueExpression falseExpresssion:(nonnull NSExpression *)falseExpression {
-    if (@available(iOS 9.0, *)) {
-        return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
-    } else {
-        return [NSExpression expressionForFunction:@"MGL_IF" arguments:@[[NSExpression expressionWithFormat:@"%@", conditionPredicate], trueExpression, falseExpression]];
-    }
+    return [NSExpression expressionForConditional:conditionPredicate trueExpression:trueExpression falseExpression:falseExpression];
 }
 
 + (instancetype)mgl_expressionForSteppingExpression:(nonnull NSExpression *)steppingExpression fromExpression:(nonnull NSExpression *)minimumExpression stops:(nonnull NSExpression *)stops {
@@ -920,12 +916,10 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     [arguments addObject:[NSExpression expressionWithMGLJSONObject:argumentObjects[index]]];
                 }
             }
-            
-            if (@available(iOS 9.0, *)) {
-                if (arguments.count == 3) {
-                    NSPredicate *conditional = [arguments.firstObject constantValue];
-                    return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
-                }
+
+            if (arguments.count == 3) {
+                NSPredicate *conditional = [arguments.firstObject constantValue];
+                return [NSExpression expressionForConditional:conditional trueExpression:arguments[1] falseExpression:arguments[2]];
             }
             return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
@@ -1359,7 +1353,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
  
  If no localization takes place, this method returns the original collection.
  */
-NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) *collection, NSLocale * _Nullable locale) {
+NSArray<NSExpression *> *MGLLocalizedCollection(NSArray<NSExpression *> *collection, NSLocale * _Nullable locale) {
     __block NSMutableArray *localizedCollection;
     [collection enumerateObjectsUsingBlock:^(NSExpression * _Nonnull item, NSUInteger idx, BOOL * _Nonnull stop) {
         NSExpression *localizedItem = [item mgl_expressionLocalizedIntoLocale:locale];
@@ -1379,7 +1373,7 @@ NS_ARRAY_OF(NSExpression *) *MGLLocalizedCollection(NS_ARRAY_OF(NSExpression *) 
  If no localization takes place, this method returns the original stop
  dictionary.
  */
-NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICTIONARY_OF(NSNumber *, NSExpression *) *stops, NSLocale * _Nullable locale) {
+NSDictionary<NSNumber *, NSExpression *> *MGLLocalizedStopDictionary(NSDictionary<NSNumber *, NSExpression *> *stops, NSLocale * _Nullable locale) {
     __block NSMutableDictionary *localizedStops;
     [stops enumerateKeysAndObjectsUsingBlock:^(id _Nonnull zoomLevel, NSExpression * _Nonnull value, BOOL * _Nonnull stop) {
         if (![value isKindOfClass:[NSExpression class]]) {
@@ -1444,16 +1438,14 @@ NS_DICTIONARY_OF(NSNumber *, NSExpression *) *MGLLocalizedStopDictionary(NS_DICT
         }
             
         case NSConditionalExpressionType: {
-            if (@available(iOS 9.0, *)) {
-                NSExpression *trueExpression = self.trueExpression;
-                NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
-                NSExpression *falseExpression = self.falseExpression;
-                NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
-                if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
-                    return [NSExpression expressionForConditional:self.predicate
-                                                   trueExpression:localizedTrueExpression
-                                                  falseExpression:localizedFalseExpression];
-                }
+            NSExpression *trueExpression = self.trueExpression;
+            NSExpression *localizedTrueExpression = [trueExpression mgl_expressionLocalizedIntoLocale:locale];
+            NSExpression *falseExpression = self.falseExpression;
+            NSExpression *localizedFalseExpression = [falseExpression mgl_expressionLocalizedIntoLocale:locale];
+            if (localizedTrueExpression != trueExpression || localizedFalseExpression != falseExpression) {
+                return [NSExpression expressionForConditional:self.predicate
+                                               trueExpression:localizedTrueExpression
+                                              falseExpression:localizedFalseExpression];
             }
             return self;
         }

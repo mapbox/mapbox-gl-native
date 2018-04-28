@@ -17,7 +17,7 @@
         @"<a class=\"mapbox-improve-map\" href=\"https://www.mapbox.com/map-feedback/\" target=\"_blank\">Improve this map</a>",
     };
 
-    NS_MUTABLE_ARRAY_OF(MGLAttributionInfo *) *infos = [NSMutableArray array];
+    NSMutableArray<MGLAttributionInfo *> *infos = [NSMutableArray array];
     for (NSUInteger i = 0; i < sizeof(htmlStrings) / sizeof(htmlStrings[0]); i++) {
         NSArray *subinfos = [MGLAttributionInfo attributionInfosFromHTMLString:htmlStrings[i]
                                                                       fontSize:0
@@ -67,7 +67,7 @@
 
     CGFloat fontSize = 72;
     MGLColor *color = [MGLColor redColor];
-    NS_MUTABLE_ARRAY_OF(MGLAttributionInfo *) *infos = [NSMutableArray array];
+    NSMutableArray<MGLAttributionInfo *> *infos = [NSMutableArray array];
     for (NSUInteger i = 0; i < sizeof(htmlStrings) / sizeof(htmlStrings[0]); i++) {
         NSArray *subinfos = [MGLAttributionInfo attributionInfosFromHTMLString:htmlStrings[i]
                                                                       fontSize:72
@@ -109,7 +109,7 @@
         @"Hello World",
     };
 
-    NS_MUTABLE_ARRAY_OF(MGLAttributionInfo *) *infos = [NSMutableArray array];
+    NSMutableArray<MGLAttributionInfo *> *infos = [NSMutableArray array];
     for (NSUInteger i = 0; i < sizeof(htmlStrings) / sizeof(htmlStrings[0]); i++) {
         NSArray *subinfos = [MGLAttributionInfo attributionInfosFromHTMLString:htmlStrings[i]
                                                                       fontSize:0

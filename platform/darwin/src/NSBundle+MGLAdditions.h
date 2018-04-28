@@ -34,7 +34,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 + (nullable NSString *)mgl_frameworkBundleIdentifier;
 
-+ (nullable NS_DICTIONARY_OF(NSString *, id) *)mgl_frameworkInfoDictionary;
++ (nullable NSDictionary<NSString *, id> *)mgl_frameworkInfoDictionary;
 
 + (nullable NSString *)mgl_applicationBundleIdentifier;
 

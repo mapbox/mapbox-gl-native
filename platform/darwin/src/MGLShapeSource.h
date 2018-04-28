@@ -154,7 +154,7 @@ MGL_EXPORT
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier URL:(NSURL *)url options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a shape source with an identifier, a shape, and dictionary of options
@@ -183,7 +183,7 @@ MGL_EXPORT
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options NS_DESIGNATED_INITIALIZER;
+- (instancetype)initWithIdentifier:(NSString *)identifier shape:(nullable MGLShape *)shape options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options NS_DESIGNATED_INITIALIZER;
 
 /**
  Returns a shape source with an identifier, an array of features, and a dictionary
@@ -210,7 +210,7 @@ MGL_EXPORT
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier features:(NS_ARRAY_OF(MGLShape<MGLFeature> *) *)features options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options;
+- (instancetype)initWithIdentifier:(NSString *)identifier features:(NSArray<MGLShape<MGLFeature> *> *)features options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options;
 
 /**
  Returns a shape source with an identifier, an array of shapes, and a dictionary of
@@ -238,7 +238,7 @@ MGL_EXPORT
  @param options An `NSDictionary` of options for this source.
  @return An initialized shape source.
  */
-- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NS_ARRAY_OF(MGLShape *) *)shapes options:(nullable NS_DICTIONARY_OF(MGLShapeSourceOption, id) *)options;
+- (instancetype)initWithIdentifier:(NSString *)identifier shapes:(NSArray<MGLShape *> *)shapes options:(nullable NSDictionary<MGLShapeSourceOption, id> *)options;
 
 #pragma mark Accessing a Source’s Content
 
@@ -291,7 +291,7 @@ MGL_EXPORT
  @return An array of objects conforming to the `MGLFeature` protocol that
     represent features in the source that match the predicate.
  */
-- (NS_ARRAY_OF(id <MGLFeature>) *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
+- (NSArray<id <MGLFeature>> *)featuresMatchingPredicate:(nullable NSPredicate *)predicate;
 
 @end
 
