@@ -25,7 +25,7 @@ public:
     IndexedSubfeature(std::size_t index_, std::string sourceLayerName_, std::string bucketName_, size_t sortIndex_)
         : index(index_)
         , sourceLayerName(std::move(sourceLayerName_))
-        , bucketName(std::move(bucketName_))
+        , bucketLeaderID(std::move(bucketName_))
         , sortIndex(sortIndex_)
         , bucketInstanceId(0)
     {}
@@ -34,13 +34,13 @@ public:
     IndexedSubfeature(const IndexedSubfeature& other, uint32_t bucketInstanceId_)
         : index(other.index)
         , sourceLayerName(other.sourceLayerName)
-        , bucketName(other.bucketName)
+        , bucketLeaderID(other.bucketLeaderID)
         , sortIndex(other.sortIndex)
         , bucketInstanceId(bucketInstanceId_)
     {}
     size_t index;
     std::string sourceLayerName;
-    std::string bucketName;
+    std::string bucketLeaderID;
     size_t sortIndex;
 
     // Only used for symbol features
@@ -53,7 +53,7 @@ public:
 
     const GeometryTileData* getData() { return tileData.get(); }
     
-    void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketName);
+    void insert(const GeometryCollection&, std::size_t index, const std::string& sourceLayerName, const std::string& bucketLeaderID);
 
     void query(
             std::unordered_map<std::string, std::vector<Feature>>& result,
@@ -74,7 +74,7 @@ public:
             const float bearing,
             const float pixelsToTileUnits);
 
-    void setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs);
+    void setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs);
     
     std::unordered_map<std::string, std::vector<Feature>> lookupSymbolFeatures(
            const std::vector<IndexedSubfeature>& symbolFeatures,

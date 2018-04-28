@@ -43,7 +43,7 @@ public:
     std::map<std::string,
         std::pair<style::IconPaintProperties::PossiblyEvaluated, style::TextPaintProperties::PossiblyEvaluated>> layerPaintProperties;
 
-    const std::string bucketName;
+    const std::string bucketLeaderID;
     std::vector<SymbolInstance> symbolInstances;
 
 private:

@@ -42,7 +42,7 @@ SymbolLayout::SymbolLayout(const BucketParameters& parameters,
                            std::unique_ptr<GeometryTileLayer> sourceLayer_,
                            ImageDependencies& imageDependencies,
                            GlyphDependencies& glyphDependencies)
-    : bucketName(layers.at(0)->getID()),
+    : bucketLeaderID(layers.at(0)->getID()),
       sourceLayer(std::move(sourceLayer_)),
       overscaling(parameters.tileID.overscaleFactor()),
       zoom(parameters.tileID.overscaledZ),
@@ -294,7 +294,7 @@ void SymbolLayout::addFeature(const std::size_t index,
                                                   : layout.get<SymbolPlacement>();
 
     const float textRepeatDistance = symbolSpacing / 2;
-    IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketName, symbolInstances.size());
+    IndexedSubfeature indexedFeature(feature.index, sourceLayer->getName(), bucketLeaderID, symbolInstances.size());
 
     auto addSymbolInstance = [&] (const GeometryCoordinates& line, Anchor& anchor) {
         // https://github.com/mapbox/vector-tile-spec/tree/master/2.1#41-layers
@@ -420,7 +420,7 @@ std::unique_ptr<SymbolBucket> SymbolLayout::place(const bool showCollisionBoxes)
     const bool mayOverlap = layout.get<TextAllowOverlap>() || layout.get<IconAllowOverlap>() ||
         layout.get<TextIgnorePlacement>() || layout.get<IconIgnorePlacement>();
     
-    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, std::move(symbolInstances));
+    auto bucket = std::make_unique<SymbolBucket>(layout, layerPaintProperties, textSize, iconSize, zoom, sdfIcons, iconsNeedLinear, mayOverlap, bucketLeaderID, std::move(symbolInstances));
 
     for (SymbolInstance &symbolInstance : bucket->symbolInstances) {
 
