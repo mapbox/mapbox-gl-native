@@ -11,7 +11,22 @@ mason_use(benchmark VERSION 1.2.0)
 mason_use(icu VERSION 58.1-min-size)
 mason_use(args VERSION 6.2.0 HEADER_ONLY)
 
-include(cmake/loop-uv.cmake)
+add_library(mbgl-loop-uv STATIC
+    platform/default/async_task.cpp
+    platform/default/run_loop.cpp
+    platform/default/timer.cpp
+)
+
+target_include_directories(mbgl-loop-uv
+    PRIVATE include
+    PRIVATE src
+)
+
+target_link_libraries(mbgl-loop-uv
+    PRIVATE mbgl-core
+)
+
+target_add_mason_package(mbgl-loop-uv PUBLIC libuv)
 
 macro(mbgl_platform_core)
     target_add_mason_package(mbgl-core PUBLIC mesa)
@@ -110,8 +125,6 @@ macro(mbgl_platform_glfw)
         PRIVATE mbgl-loop-uv
     )
 
-    target_add_mason_package(mbgl-glfw PUBLIC libuv)
-
     add_custom_command(
         TARGET mbgl-glfw POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy
@@ -126,8 +139,6 @@ macro(mbgl_platform_render)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
-
-    target_add_mason_package(mbgl-render PUBLIC libuv)
 endmacro()
 
 
@@ -136,8 +147,6 @@ macro(mbgl_platform_offline)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
-
-    target_add_mason_package(mbgl-offline PUBLIC libuv)
 endmacro()
 
 
@@ -160,8 +169,6 @@ macro(mbgl_platform_test)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
-
-    target_add_mason_package(mbgl-test PUBLIC libuv)
 endmacro()
 
 
@@ -180,8 +187,6 @@ macro(mbgl_platform_benchmark)
         PRIVATE mbgl-filesource
         PRIVATE mbgl-loop-uv
     )
-
-    target_add_mason_package(mbgl-benchmark PUBLIC libuv)
 endmacro()
 
 
