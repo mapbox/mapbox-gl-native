@@ -18,16 +18,34 @@ The Mapbox Maps SDK for iOS requires:
 * Xcode 9.1 or higher to compile from source
 * Xcode 8.0 or higher to integrate the compiled framework into an application
 
-### Building the SDK
+Before building, follow these steps to install prerequisites:
 
-1. [Install core dependencies](../../INSTALL.md).
-
+1. Install [Xcode](https://developer.apple.com/xcode/)
+1. Launch Xcode and install any updates
+1. Install [Homebrew](http://brew.sh)
+1. Install [Node.js](https://nodejs.org/), [CMake](https://cmake.org/), and [ccache](https://ccache.samba.org):
+   ```
+   brew install node cmake ccache
+   ```
+1. Install [xcpretty](https://github.com/supermarin/xcpretty) (optional, used for prettifying command line builds):
+   ```
+   [sudo] gem install xcpretty
+   ```
 1. Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
-
    ```
    [sudo] gem install jazzy
    ```
 
+### Building the SDK
+
+1. Clone the git repository:
+   ```
+   git clone https://github.com/mapbox/mapbox-gl-native.git
+   cd mapbox-gl-native
+   ```
+   Note that this repository uses Git submodules. They'll be automatically checked out when you first run a `make` command,
+   but are not updated automatically. We recommended that you run `git submodule update` after pulling down new commits to
+   this repository.
 1. Run `make iframework BUILDTYPE=Release`. The packaging script will produce a `build/ios/pkg/` folder containing:
   - a `dynamic` folder containing a dynamically-linked fat framework with debug symbols for devices and the iOS Simulator
   - a `documentation` folder with HTML API documentation
