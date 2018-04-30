@@ -817,7 +817,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
         } else if ([op isEqualToString:@"to-rgba"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
-            return [NSExpression expressionWithFormat:@"CAST(%@, 'NSArray')", operand];
+            return [NSExpression expressionWithFormat:@"CAST(noindex(%@), 'NSArray')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.lastObject];
@@ -1191,7 +1191,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 }
 #endif
                 else if ([type isEqualToString:@"NSArray"]) {
-                    return @[@"to-rgba", object];
+                    NSExpression *operand = self.arguments.firstObject;
+                    if ([operand expressionType] == NSFunctionExpressionType ) {
+                        operand = self.arguments.firstObject.arguments.firstObject;
+                    }
+                    if (([operand expressionType] != NSConstantValueExpressionType) ||
+                        ([operand expressionType] == NSConstantValueExpressionType &&
+                         [[operand constantValue] isKindOfClass:[MGLColor class]])) {
+                        return @[@"to-rgba", object];
+                    }
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];

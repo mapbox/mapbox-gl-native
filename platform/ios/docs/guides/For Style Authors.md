@@ -357,7 +357,7 @@ In style specification | Method, function, or predicate type | Format string syn
 `upcase`               | `uppercase:` | `uppercase('Elysian Fields')`
 `rgb`                  | `+[UIColor colorWithRed:green:blue:alpha:]` |
 `rgba`                 | `+[UIColor colorWithRed:green:blue:alpha:]` |
-`to-rgba`              | | `CAST(var, 'NSArray')`
+`to-rgba`              | | `CAST(noindex(var), 'NSArray')`
 `-`                    | `from:subtract:` | `2 - 1`
 `*`                    | `multiply:by:` | `1 * 2`
 `/`                    | `divide:by:` | `1 / 2`
