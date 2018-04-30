@@ -29,6 +29,7 @@ MapRenderer::MapRenderer(jni::JNIEnv& _env, jni::Object<MapRenderer> obj,
 MapRenderer::~MapRenderer() = default;
 
 void MapRenderer::reset() {
+    destroyed = true;
     // Make sure to destroy the renderer on the GL Thread
     auto self = ActorRef<MapRenderer>(*this, mailbox);
     self.ask(&MapRenderer::resetRenderer).wait();
@@ -88,8 +89,10 @@ void MapRenderer::requestSnapshot(SnapshotCallback callback) {
     self.invoke(
             &MapRenderer::scheduleSnapshot,
             std::make_unique<SnapshotCallback>([&, callback=std::move(callback), runloop=util::RunLoop::Get()](PremultipliedImage image) {
-                runloop->invoke([callback=std::move(callback), image=std::move(image)]() mutable {
-                    callback(std::move(image));
+                runloop->invoke([callback=std::move(callback), image=std::move(image), renderer=std::move(this)]() mutable {
+                    if (renderer && !renderer->destroyed) {
+                        callback(std::move(image));
+                    }
                 });
                 snapshotCallback.reset();
             })
@@ -136,7 +139,7 @@ void MapRenderer::render(JNIEnv&) {
     renderer->render(*params);
 
     // Deliver the snapshot if requested
-    if (snapshotCallback && !paused) {
+    if (snapshotCallback) {
         snapshotCallback->operator()(backend->readFramebuffer());
         snapshotCallback.reset();
     }
@@ -174,14 +177,6 @@ void MapRenderer::onSurfaceChanged(JNIEnv&, jint width, jint height) {
     requestRender();
 }
 
-void MapRenderer::onResume(JNIEnv&) {
-    paused = false;
-}
-
-void MapRenderer::onPause(JNIEnv&) {
-    paused = true;
-}
-
 // Static methods //
 
 jni::Class<MapRenderer> MapRenderer::javaClass;
@@ -200,11 +195,7 @@ void MapRenderer::registerNative(jni::JNIEnv& env) {
                                          METHOD(&MapRenderer::onSurfaceCreated,
                                                 "nativeOnSurfaceCreated"),
                                          METHOD(&MapRenderer::onSurfaceChanged,
-                                                "nativeOnSurfaceChanged"),
-                                         METHOD(&MapRenderer::onResume,
-                                                "nativeOnResume"),
-                                         METHOD(&MapRenderer::onPause,
-                                                "nativeOnPause"));
+                                                "nativeOnSurfaceChanged"));
 }
 
 MapRenderer& MapRenderer::getNativePeer(JNIEnv& env, jni::Object<MapRenderer> jObject) {
