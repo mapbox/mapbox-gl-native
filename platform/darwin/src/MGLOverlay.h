@@ -31,10 +31,10 @@ NS_ASSUME_NONNULL_BEGIN
  overlay. Implementers of this protocol must set this area when implementing
  their overlay class, and after setting it, you must not change it.
  
- To bring both sides of the antimeridian or international date line into view,
- specify some longitudes less than −180 degrees or greater than 180 degrees. For
- example, to show both Tokyo and San Francisco simultaneously, you could set the
- visible bounds to extend from (35.68476, −220.24257) to (37.78428, −122.41310).
+ If this overlay spans the antimeridian, its bounds may extend west of −180 degrees
+ longitude or east of 180 degrees longitude. For example, an overlay covering the
+ Pacific Ocean from Tokyo to San Francisco might have a bounds extending
+ from (35.68476, −220.24257) to (37.78428, −122.41310).
  */
 @property (nonatomic, readonly) MGLCoordinateBounds overlayBounds;
 
