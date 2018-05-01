@@ -524,7 +524,6 @@ public class LatLngBoundsTest {
     LatLngBounds.from(0, Double.POSITIVE_INFINITY, -20, -20);
   }
 
-
   @Test
   public void testConstructorChecksSouthLatitudeNaN() {
     exception.expect(IllegalArgumentException.class);
@@ -543,7 +542,7 @@ public class LatLngBoundsTest {
   public void testConstructorChecksSouthLatitudeGreaterThan90() {
     exception.expect(IllegalArgumentException.class);
     exception.expectMessage("latitude must be between -90 and 90");
-    LatLngBounds.from(20, 20,95, 0);
+    LatLngBounds.from(20, 20, 95, 0);
   }
 
   @Test
