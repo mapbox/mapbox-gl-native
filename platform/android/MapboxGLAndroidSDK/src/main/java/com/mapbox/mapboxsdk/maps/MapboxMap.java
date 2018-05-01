@@ -1550,7 +1550,7 @@ public final class MapboxMap {
    * @param padding      the padding to apply to the bounds
    * @return the camera position that fits the bounds and padding
    */
-  public CameraPosition getCameraForLatLngBounds(@Nullable LatLngBounds latLngBounds, int[] padding) {
+  public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds, int[] padding) {
     // get padded camera position from LatLngBounds
     return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding);
   }
