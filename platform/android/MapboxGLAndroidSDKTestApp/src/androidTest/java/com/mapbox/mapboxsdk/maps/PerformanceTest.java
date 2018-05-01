@@ -1,6 +1,8 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.Manifest;
 import android.support.test.espresso.UiController;
+import android.support.test.rule.GrantPermissionRule;
 
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdate;
@@ -8,7 +10,10 @@ import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
 import com.mapbox.mapboxsdk.geometry.LatLng;
 import com.mapbox.mapboxsdk.testapp.activity.BaseActivityTest;
 import com.mapbox.mapboxsdk.testapp.activity.espresso.EspressoTestActivity;
+import com.mapbox.mapboxsdk.testrule.EnableLogcatDump;
+import com.mapbox.mapboxsdk.testrule.EnablePostTestDumpsys;
 
+import org.junit.Rule;
 import org.junit.Test;
 
 import static com.mapbox.mapboxsdk.testapp.action.MapboxMapAction.invoke;
@@ -26,6 +31,32 @@ public class PerformanceTest extends BaseActivityTest {
   protected Class getActivityClass() {
     return EspressoTestActivity.class;
   }
+
+//  @Rule
+//  public EnableTestTracing enableTestTracing = new EnableTestTracing();
+
+  //  @Rule
+//  public EnablePerTestTraceFile enablePerTestTraceFile = new EnablePerTestTraceFile();
+  @Rule
+  public GrantPermissionRule readPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_EXTERNAL_STORAGE);
+
+  @Rule
+  public GrantPermissionRule writePermissionRule = GrantPermissionRule.grant(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+
+  @Rule
+  public GrantPermissionRule dumpPermissionRule = GrantPermissionRule.grant(Manifest.permission.DUMP);
+
+  @Rule
+  public GrantPermissionRule logPermissionRule = GrantPermissionRule.grant(Manifest.permission.READ_LOGS);
+
+  @Rule
+  public GrantPermissionRule usagePermissionRule = GrantPermissionRule.grant(Manifest.permission.PACKAGE_USAGE_STATS);
+
+  @Rule
+  public EnablePostTestDumpsys enablePostTestDumpsys = new EnablePostTestDumpsys();
+
+  @Rule
+  public EnableLogcatDump enableLogcatDump = new EnableLogcatDump();
 
   @Test
   public void runPerformanceTest() {
