@@ -19,10 +19,10 @@ custom_categories:
     children:
       - Adding Markers to a Map
       - Runtime Styling
-      - Migrating to Expressions
       - Working with Mapbox Studio
       - Working with GeoJSON Data
       - Predicates and Expressions
+      - Migrating to Expressions
       - For Style Authors
       - Tile URL Templates
       - Info.plist Keys
