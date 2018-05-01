@@ -913,7 +913,7 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             
             for (NSUInteger index = 0; index < argumentObjects.count; index++) {
                 if (index % 2 == 0 && index != argumentObjects.count - 1) {
-                    NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:argumentObjects[index]];
+                    NSPredicate *predicate = [NSPredicate predicateWithMGLJSONObject:argumentObjects[index]];
                     NSExpression *argument = [NSExpression expressionForConstantValue:predicate];
                     [arguments addObject:argument];
                 } else {

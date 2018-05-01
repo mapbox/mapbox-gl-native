@@ -1,4 +1,4 @@
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
@@ -200,11 +200,11 @@ public:
     
     NSPredicate *operator()(mbgl::style::ExpressionFilter filter) {
         id jsonObject = MGLJSONObjectFromMBGLExpression(*filter.expression);
-        return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
+        return [NSPredicate predicateWithMGLJSONObject:jsonObject];
     }
 };
 
-@implementation NSPredicate (MGLAdditions)
+@implementation NSPredicate (MGLPrivateAdditions)
 
 - (mbgl::style::Filter)mgl_filter
 {
@@ -230,18 +230,18 @@ public:
 
 @end
 
-@implementation NSPredicate (MGLExpressionAdditions)
+@implementation NSPredicate (MGLAdditions)
 
 NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
     NSMutableArray *subpredicates = [NSMutableArray arrayWithCapacity:objects.count];
     for (id object in objects) {
-        NSPredicate *predicate = [NSPredicate mgl_predicateWithJSONObject:object];
+        NSPredicate *predicate = [NSPredicate predicateWithMGLJSONObject:object];
         [subpredicates addObject:predicate];
     }
     return subpredicates;
 }
 
-+ (instancetype)mgl_predicateWithJSONObject:(id)object {
++ (instancetype)predicateWithMGLJSONObject:(id)object {
     if ([object isEqual:@YES]) {
         return [NSPredicate predicateWithValue:YES];
     }
@@ -359,6 +359,10 @@ NSArray *MGLSubpredicatesWithJSONObjects(NSArray *objects) {
                 format:@"Unrecognized predicate type."];
     return nil;
 }
+
+@end
+
+@implementation NSPredicate (MGLExpressionAdditions)
 
 - (id)mgl_if:(id)firstValue, ... {
 

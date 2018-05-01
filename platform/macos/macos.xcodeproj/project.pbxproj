@@ -23,6 +23,7 @@
 		1F7454AB1ED1DDBD00021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */; };
 		1F95931B1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */; };
 		1F9EF4061FBA1B0E0063FBB0 /* mapbox_helmet.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */; };
+		1FC481852098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */; };
 		30E5781B1DAA857E0050F07E /* NSImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */; };
 		3508EC641D749D39009B0EE4 /* NSExpression+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3508EC651D749D39009B0EE4 /* NSExpression+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */; };
@@ -37,7 +38,7 @@
 		3527428D1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3527428B1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3527428E1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3527428C1D4C24AB00A1ECE6 /* MGLCircleStyleLayer.mm */; };
 		352742A11D4C25BD00A1ECE6 /* MGLStyleValue.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3527429E1D4C25BD00A1ECE6 /* MGLStyleValue.mm */; };
-		3529039B1D6C63B80002C7DF /* NSPredicate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 352903991D6C63B80002C7DF /* NSPredicate+MGLAdditions.h */; };
+		3529039B1D6C63B80002C7DF /* NSPredicate+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 352903991D6C63B80002C7DF /* NSPredicate+MGLAdditions.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		3529039C1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 3529039A1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm */; };
 		3537CA741D3F93A600380318 /* MGLStyle_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 3537CA731D3F93A600380318 /* MGLStyle_Private.h */; };
 		3538AA231D542685008EC33D /* MGLStyleLayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 3538AA211D542685008EC33D /* MGLStyleLayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -309,6 +310,7 @@
 		1F7454AA1ED1DDBD00021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931A1E6DE2B600D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
 		1F9EF4051FBA1B0D0063FBB0 /* mapbox_helmet.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = mapbox_helmet.pdf; sourceTree = "<group>"; };
+		1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSPredicate+MGLPrivateAdditions.h"; sourceTree = "<group>"; };
 		30E578141DAA7D920050F07E /* NSImage+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "NSImage+MGLAdditions.h"; path = "src/NSImage+MGLAdditions.h"; sourceTree = SOURCE_ROOT; };
 		3508EC621D749D39009B0EE4 /* NSExpression+MGLAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSExpression+MGLAdditions.h"; sourceTree = "<group>"; };
 		3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = "NSExpression+MGLAdditions.mm"; sourceTree = "<group>"; };
@@ -1034,6 +1036,7 @@
 				3508EC631D749D39009B0EE4 /* NSExpression+MGLAdditions.mm */,
 				352903991D6C63B80002C7DF /* NSPredicate+MGLAdditions.h */,
 				3529039A1D6C63B80002C7DF /* NSPredicate+MGLAdditions.mm */,
+				1FC481842098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h */,
 				DAE6C3801CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.h */,
 				DAE6C3811CC31E2A00DB3429 /* NSProcessInfo+MGLAdditions.m */,
 				DAE6C3821CC31E2A00DB3429 /* NSString+MGLAdditions.h */,
@@ -1218,6 +1221,7 @@
 				DAE6C3631CC31E0400DB3429 /* MGLPointAnnotation.h in Headers */,
 				DAC2ABC51CC6D343006D18C4 /* MGLAnnotationImage_Private.h in Headers */,
 				DAE6C35F1CC31E0400DB3429 /* MGLOfflinePack.h in Headers */,
+				1FC481852098F323000D09B4 /* NSPredicate+MGLPrivateAdditions.h in Headers */,
 				DAE6C39C1CC31E2A00DB3429 /* NSString+MGLAdditions.h in Headers */,
 				3529039B1D6C63B80002C7DF /* NSPredicate+MGLAdditions.h in Headers */,
 				DA8F25971D51CAC70010E6B5 /* MGLVectorTileSource.h in Headers */,

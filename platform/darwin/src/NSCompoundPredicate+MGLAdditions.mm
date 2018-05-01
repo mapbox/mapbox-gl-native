@@ -2,7 +2,7 @@
 
 #import "MGLStyleValue_Private.h"
 
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSExpression+MGLPrivateAdditions.h"
 
 #include <mbgl/style/conversion/property_value.hpp>
