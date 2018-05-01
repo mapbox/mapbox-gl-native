@@ -4,23 +4,9 @@ This document explains how to build the Mapbox Maps SDK for macOS from source. I
 
 ## Requirements
 
-The Mapbox Maps SDK for macOS and the macosapp demo application run on macOS 10.10.0 or above.
-
-The Mapbox Maps SDK for macOS requires Xcode 8.0 or above.
+See the "Requirements" section in [INSTALL.md](INSTALL.md).
 
 ## Building the SDK
-
-1. [Install core dependencies](../../INSTALL.md).
-1. Run `make xproj`.
-1. Switch to the “dynamic” or “macosapp” scheme. The former builds just the Cocoa framework, while the latter also builds a Cocoa demo application based on it.
-
-### Packaging builds
-
-Install [jazzy](https://github.com/realm/jazzy) for generating API documentation:
-
-```bash
-[sudo] gem install jazzy
-```
 
 Build and package the SDK by using one of the following commands:
 

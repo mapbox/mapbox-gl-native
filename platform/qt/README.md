@@ -17,9 +17,7 @@ See the Mapbox Qt landing page for more details: https://www.mapbox.com/qt/
 
 #### Linux
 
-For Linux (tested on Ubuntu) desktop, together with these [build
-instructions](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/linux#build),
-you also need:
+For Linux (tested on Ubuntu) desktop, together with these [build instructions](../linux/README.md), you also need:
 
 ```
 $ sudo apt-get install qt5-default
@@ -55,8 +53,7 @@ At runtime, you will also need installed:
 
 ### Build instructions
 
-Public API headers
-can be found in the [platform/qt/include](https://github.com/mapbox/mapbox-gl-native/tree/master/platform/qt/include) directory.
+Public API headers can be found in the [platform/qt/include](qt/include) directory.
 
 #### Linux and macOS
 
