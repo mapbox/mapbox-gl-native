@@ -280,7 +280,7 @@ Each property representing a layout or paint attribute is set to an
 but you create the former using a very different syntax. `NSExpression`’s format
 string syntax is reminiscent of a spreadsheet formula or an expression in a
 database query. See the
-“[Predicates and Expressions](Predicates and Expressions.md)” guide for an
+“[Predicates and Expressions](predicates-and-expressions.html)” guide for an
 overview of the expression support in this SDK. This SDK no longer supports
 style functions; use expressions instead.
 
@@ -412,5 +412,5 @@ In style JSON             | In the format string
 `["any", f0, …, fn]`      | `p0 OR … OR pn`
 `["none", f0, …, fn]`     | `NOT (p0 OR … OR pn)`
 
-See the “[Predicates and Expressions](Predicates and Expressions.md)” guide for
+See the “[Predicates and Expressions](predicates-and-expressions.html)” guide for
 a full description of the supported operators and operand types.
