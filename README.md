@@ -19,7 +19,7 @@ Additional Mapbox GL Native–based libraries for **hybrid applications** are de
 
 | Toolkit                                  | Android | iOS | Developer   |
 | ---------------------------------------- | --------|-----|------------ |
-| [React Native](https://github.com/mapbox/react-native-mapbox-gl/) ([npm](https://www.npmjs.com/package/react-native-mapbox-gl)) | :white_check_mark: | :white_check_mark: | Mapbox |
+| [React Native](https://github.com/mapbox/react-native-mapbox-gl/) ([npm](https://www.npmjs.com/package/@mapbox/react-native-mapbox-gl)) | :white_check_mark: | :white_check_mark: | Mapbox |
 | [Apache Cordova](http://plugins.telerik.com/cordova/plugin/mapbox/) ([npm](https://www.npmjs.com/package/cordova-plugin-mapbox)) | :white_check_mark: | :white_check_mark: | Telerik |
 | [NativeScript](https://market.nativescript.org/plugins/nativescript-mapbox/) ([npm](https://www.npmjs.com/package/nativescript-mapbox/)) | :white_check_mark: | :white_check_mark: | Telerik |
 | [Xamarin](https://components.xamarin.com/view/mapboxsdk/) | :white_check_mark: | :white_check_mark: | Xamarin |
