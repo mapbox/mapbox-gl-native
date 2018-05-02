@@ -52,6 +52,7 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", value);
   }
 
+<% if (isDataDriven(property)) { -%>
   /**
    * <%- propertyFactoryMethodDoc(property) %>
    *
@@ -62,6 +63,7 @@ public class PropertyFactory {
     return new PaintPropertyValue<>("<%-  property.name %>", expression);
   }
 
+<% } -%>
 <% } -%>
 <% for (const property of layoutProperties) { -%>
   /**
@@ -74,6 +76,7 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
 
+<% if (isDataDriven(property)) { -%>
   /**
    * <%- propertyFactoryMethodDoc(property) %>
    *
@@ -84,6 +87,7 @@ public class PropertyFactory {
     return new LayoutPropertyValue<>("<%-  property.name %>", value);
   }
 
+<% } -%>
 <% } -%>
   public static String colorToRgbaString(@ColorInt int value) {
     return String.format(Locale.US,"rgba(%d, %d, %d, %d)",
