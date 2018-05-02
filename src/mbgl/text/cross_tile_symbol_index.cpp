@@ -62,7 +62,7 @@ CrossTileSymbolLayerIndex::CrossTileSymbolLayerIndex() {
 }
 
 bool CrossTileSymbolLayerIndex::addBucket(const OverscaledTileID& tileID, SymbolBucket& bucket, uint32_t& maxCrossTileID) {
-    auto thisZoomIndexes = indexes[tileID.overscaledZ];
+    const auto& thisZoomIndexes = indexes[tileID.overscaledZ];
     auto previousIndex = thisZoomIndexes.find(tileID);
     if (previousIndex != thisZoomIndexes.end()) {
         if (previousIndex->second.bucketInstanceId == bucket.bucketInstanceId) {
