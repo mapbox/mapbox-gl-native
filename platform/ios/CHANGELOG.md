@@ -2,6 +2,10 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
+## 3.7.7
+
+* Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
+
 ## 3.7.6 - March 12, 2018
 
 * Fixed an issue where full-resolution tiles could fail to replace lower-resolution placeholders. ([#11227](https://github.com/mapbox/mapbox-gl-native/pull/11227))
