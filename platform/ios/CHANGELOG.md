@@ -14,6 +14,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where `-[MGLMapView metersPerPixelAtLatitude:]` was removed, but not marked as unavailable. ([#11765](https://github.com/mapbox/mapbox-gl-native/pull/11765))
 * Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 * Reduce per-frame render CPU time ([#11811](https://github.com/mapbox/mapbox-gl-native/issues/11811))
+* Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
 
 ## 4.0.0 - April 19, 2018
 
