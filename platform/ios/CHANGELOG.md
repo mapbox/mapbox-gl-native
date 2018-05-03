@@ -4,7 +4,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 3.7.7 - May 3, 2018
 
-* Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
+* Fixed a crash when removing an `MGLOfflinePack`. ([#11821](https://github.com/mapbox/mapbox-gl-native/issues/11821))
 
 ## 4.0.0 - April 19, 2018
 
