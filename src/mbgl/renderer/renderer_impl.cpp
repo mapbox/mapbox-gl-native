@@ -495,7 +495,9 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
         static const ClippingMaskProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
         for (const auto& clipID : parameters.clipIDGenerator.getClipIDs()) {
-            parameters.staticData.programs.clippingMask.draw(
+            auto& program = parameters.staticData.programs.clippingMask;
+
+            program.draw(
                 parameters.context,
                 gl::Triangles(),
                 gl::DepthMode::disabled(),
@@ -508,15 +510,21 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     gl::StencilMode::Replace
                 },
                 gl::ColorMode::disabled(),
-                ClippingMaskProgram::UniformValues {
-                    uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
-                },
-                parameters.staticData.tileVertexBuffer,
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                paintAttributeData,
-                properties,
-                parameters.state.getZoom(),
+                program.computeAllUniformValues(
+                    ClippingMaskProgram::UniformValues {
+                        uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
+                    },
+                    paintAttributeData,
+                    properties,
+                    parameters.state.getZoom()
+                ),
+                program.computeAllAttributeBindings(
+                    parameters.staticData.tileVertexBuffer,
+                    paintAttributeData,
+                    properties
+                ),
                 "clipping"
             );
         }
