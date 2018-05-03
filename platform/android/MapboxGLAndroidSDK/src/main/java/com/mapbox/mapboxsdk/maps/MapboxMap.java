@@ -1540,12 +1540,7 @@ public final class MapboxMap {
    * @param latLngBounds the bounds to constrain the map with
    */
   public void setLatLngBoundsForCameraTarget(@Nullable LatLngBounds latLngBounds) {
-    if (latLngBounds == null) {
-      nativeMapView.setLatLngBounds(latLngBounds);
-    } else {
-      //unwrapping the bounds to generate the right convex hull in core
-      nativeMapView.setLatLngBounds(latLngBounds.unwrapBounds());
-    }
+    nativeMapView.setLatLngBounds(latLngBounds);
   }
 
   /**
@@ -1556,8 +1551,8 @@ public final class MapboxMap {
    * @return the camera position that fits the bounds and padding
    */
   public CameraPosition getCameraForLatLngBounds(@NonNull LatLngBounds latLngBounds, int[] padding) {
-    // get padded camera position from LatLngBounds, unwrapping the bounds to generate the right convex hull in core
-    return nativeMapView.getCameraForLatLngBounds(latLngBounds.unwrapBounds(), padding);
+    // get padded camera position from LatLngBounds
+    return nativeMapView.getCameraForLatLngBounds(latLngBounds, padding);
   }
 
   /**

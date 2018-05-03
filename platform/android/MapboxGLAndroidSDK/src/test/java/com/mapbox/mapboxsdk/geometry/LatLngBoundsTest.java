@@ -565,23 +565,4 @@ public class LatLngBoundsTest {
     exception.expectMessage("LatSouth cannot be less than latNorth");
     LatLngBounds.from(0, 20, 20, 0);
   }
-
-  @Test
-  public void testCopyConstructor() {
-    LatLngBounds bounds = LatLngBounds.from(50, 10, -20, -30);
-    LatLngBounds copyBounds = new LatLngBounds(bounds);
-    assertEquals(bounds, copyBounds);
-  }
-
-  @Test
-  public void testUnwrapBounds() {
-    LatLngBounds bounds = LatLngBounds.from(16.5, -172.8, -35.127709, 172.6);
-    LatLngBounds unwrappedBounds = bounds.unwrapBounds();
-    assertEquals(bounds.getCenter().wrap(), unwrappedBounds.getCenter().wrap());
-    assertEquals(bounds.getSpan(), unwrappedBounds.getSpan());
-    assertTrue(unwrappedBounds.getLonEast() < 0 && unwrappedBounds.getLonWest() < 0);
-
-    LatLngBounds bounds2 = LatLngBounds.from(16.5, -162.8, -35.127709, -177.4);
-    assertEquals(bounds2, bounds2.unwrapBounds());
-  }
 }

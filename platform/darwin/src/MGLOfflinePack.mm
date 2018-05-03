@@ -227,19 +227,22 @@ NSError *MGLErrorFromResponseError(mbgl::Response::Error error) {
 @end
 
 void MBGLOfflineRegionObserver::statusChanged(mbgl::OfflineRegionStatus status) {
+    __weak MGLOfflinePack *weakPack = pack;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [pack offlineRegionStatusDidChange:status];
+        [weakPack offlineRegionStatusDidChange:status];
     });
 }
 
 void MBGLOfflineRegionObserver::responseError(mbgl::Response::Error error) {
+    __weak MGLOfflinePack *weakPack = pack;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [pack didReceiveError:MGLErrorFromResponseError(error)];
+        [weakPack didReceiveError:MGLErrorFromResponseError(error)];
     });
 }
 
 void MBGLOfflineRegionObserver::mapboxTileCountLimitExceeded(uint64_t limit) {
+    __weak MGLOfflinePack *weakPack = pack;
     dispatch_async(dispatch_get_main_queue(), ^{
-        [pack didReceiveMaximumAllowedMapboxTiles:limit];
+        [weakPack didReceiveMaximumAllowedMapboxTiles:limit];
     });
 }

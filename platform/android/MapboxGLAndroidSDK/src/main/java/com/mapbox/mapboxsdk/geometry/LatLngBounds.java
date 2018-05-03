@@ -46,11 +46,6 @@ public class LatLngBounds implements Parcelable {
     this.longitudeWest = westLongitude;
   }
 
-  LatLngBounds(LatLngBounds latLngBounds) {
-    this(latLngBounds.latitudeNorth, latLngBounds.longitudeEast,
-      latLngBounds.latitudeSouth, latLngBounds.longitudeWest);
-  }
-
   /**
    * Returns the world bounds.
    *
@@ -203,25 +198,6 @@ public class LatLngBounds implements Parcelable {
   }
 
   /**
-   * If bounds cross the antimeridian, unwrap west longitude for the shortest path.
-   *
-   * @return unwrapped bounds
-   */
-  public LatLngBounds unwrapBounds() {
-    double unwrapedLonWest = longitudeWest;
-    if (longitudeEast < longitudeWest) {
-      if (longitudeWest > 0 && longitudeEast < 0) {
-        unwrapedLonWest -= GeometryConstants.LONGITUDE_SPAN;
-      } else if (longitudeWest < 0 && longitudeEast > 0) {
-        unwrapedLonWest += GeometryConstants.LONGITUDE_SPAN;
-      }
-      return unwrapped(latitudeNorth, longitudeEast, latitudeSouth, unwrapedLonWest);
-    } else {
-      return new LatLngBounds(this);
-    }
-  }
-
-  /**
    * Validate if LatLngBounds is empty, determined if absolute distance is
    *
    * @return boolean indicating if span is empty
@@ -339,17 +315,9 @@ public class LatLngBounds implements Parcelable {
       throw new IllegalArgumentException("LatSouth cannot be less than latNorth");
     }
 
-    return wrapped(latNorth, lonEast, latSouth, lonWest);
-  }
-
-  static LatLngBounds wrapped(double latNorth, double lonEast, double latSouth, double lonWest) {
     lonEast = LatLng.wrap(lonEast, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
     lonWest = LatLng.wrap(lonWest, GeometryConstants.MIN_LONGITUDE, GeometryConstants.MAX_LONGITUDE);
 
-    return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
-  }
-
-  static LatLngBounds unwrapped(double latNorth, double lonEast, double latSouth, double lonWest) {
     return new LatLngBounds(latNorth, lonEast, latSouth, lonWest);
   }
 
