@@ -5,6 +5,7 @@
 #import "MBXOfflinePacksTableViewController.h"
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
+#import "LimeGreenStyleLayer.h"
 #import "MBXEmbeddedMapViewController.h"
 
 #import <Mapbox/Mapbox.h>
@@ -82,6 +83,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
     MBXSettingsRuntimeStylingRasterTileSource,
     MBXSettingsRuntimeStylingImageSource,
     MBXSettingsRuntimeStylingRouteLine,
+    MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer,
     MBXSettingsRuntimeStylingDDSPolygon,
     MBXSettingsRuntimeStylingCustomLatLonGrid,
 };
@@ -371,6 +373,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 @"Style Raster Tile Source",
                 @"Style Image Source",
                 @"Add Route Line",
+                @"Add Lime Green Triangle Layer",
                 @"Dynamically Style Polygon",
                 @"Add Custom Lat/Lon Grid",
             ]];
@@ -558,6 +561,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                     break;
                 case MBXSettingsRuntimeStylingRouteLine:
                     [self styleRouteLine];
+                    break;
+                case MBXSettingsRuntimeStylingAddLimeGreenTriangleLayer:
+                    [self styleAddLimeGreenTriangleLayer];
                     break;
                 case MBXSettingsRuntimeStylingDDSPolygon:
                     [self stylePolygonWithDDS];
@@ -1441,6 +1447,12 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     routeLayer.lineCap = [NSExpression expressionForConstantValue:@"round"];
     routeLayer.lineJoin = [NSExpression expressionForConstantValue:@"round"];
     [self.mapView.style addLayer:routeLayer];
+}
+
+- (void)styleAddLimeGreenTriangleLayer
+{
+    LimeGreenStyleLayer *layer = [[LimeGreenStyleLayer alloc] initWithIdentifier:@"mbx-custom"];
+    [self.mapView.style addLayer:layer];
 }
 
 - (void)stylePolygonWithDDS {
