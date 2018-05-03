@@ -29,7 +29,7 @@ namespace detail {
     Signature<R (const EvaluationContext&, Params...)>:
     Wraps an evaluate function that needs to access the expression evaluation
     parameters in addition to its subexpressions, i.e.,
-    (const EvaluationParams& const T0&, const T1&, ...) -> Result<U>.  Needed
+    (const EvaluationParams&, const T0&, const T1&, ...) -> Result<U>.  Needed
     for expressions like ["zoom"], ["get", key], etc.
     
     In each of the above evaluate signatures, T0, T1, etc. are the types of
@@ -42,7 +42,7 @@ struct Signature;
 template <class R, class... Params>
 struct Signature<R (Params...)> : SignatureBase {
     using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
-    
+
     Signature(R (*evaluate_)(Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -54,7 +54,7 @@ struct Signature<R (Params...)> : SignatureBase {
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
-    
+
     std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
         typename Signature::Args argsArray;
         std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
@@ -79,7 +79,7 @@ private:
 template <class R, typename T>
 struct Signature<R (const Varargs<T>&)> : SignatureBase {
     using Args = std::vector<std::unique_ptr<Expression>>;
-    
+
     Signature(R (*evaluate_)(const Varargs<T>&), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -88,11 +88,11 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
         ),
         evaluate(evaluate_)
     {}
-    
+
     std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override  {
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(args));
     };
-    
+
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         Varargs<T> evaluated;
         evaluated.reserve(args.size());
@@ -114,7 +114,7 @@ struct Signature<R (const Varargs<T>&)> : SignatureBase {
 template <class R, class... Params>
 struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
     using Args = std::array<std::unique_ptr<Expression>, sizeof...(Params)>;
-    
+
     Signature(R (*evaluate_)(const EvaluationContext&, Params...), std::string name_) :
         SignatureBase(
             valueTypeToExpressionType<std::decay_t<typename R::Value>>(),
@@ -123,17 +123,17 @@ struct Signature<R (const EvaluationContext&, Params...)> : SignatureBase {
         ),
         evaluate(evaluate_)
     {}
-    
+
     std::unique_ptr<Expression> makeExpression(std::vector<std::unique_ptr<Expression>> args) const override {
         typename Signature::Args argsArray;
         std::copy_n(std::make_move_iterator(args.begin()), sizeof...(Params), argsArray.begin());
         return std::make_unique<CompoundExpression<Signature>>(name, *this, std::move(argsArray));
     }
-    
+
     EvaluationResult apply(const EvaluationContext& evaluationParameters, const Args& args) const {
         return applyImpl(evaluationParameters, args, std::index_sequence_for<Params...>{});
     }
-    
+
 private:
     template <std::size_t ...I>
     EvaluationResult applyImpl(const EvaluationContext& evaluationParameters, const Args& args, std::index_sequence<I...>) const {
@@ -214,7 +214,7 @@ template <typename Fn>
 static std::unique_ptr<detail::SignatureBase> makeSignature(Fn evaluateFunction, std::string name) {
     return std::make_unique<detail::Signature<Fn>>(evaluateFunction, std::move(name));
 }
-    
+
 Value featureIdAsExpressionValue(EvaluationContext params) {
     assert(params.feature);
     auto id = params.feature->getID();
@@ -223,33 +223,50 @@ Value featureIdAsExpressionValue(EvaluationContext params) {
         return toExpressionValue(mbgl::Value(idid));
     });
 };
-    
+
 Value featurePropertyAsExpressionValue(EvaluationContext params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
     return property ? toExpressionValue(*property) : Null;
 };
-    
+
 optional<std::string> featureTypeAsString(FeatureType type) {
-    if (type == FeatureType::Point) return optional<std::string>("Point");
-    else if (type == FeatureType::LineString) return optional<std::string>("LineString");
-    else if (type == FeatureType::Polygon) return optional<std::string>("Polygon");
-    else if (type == FeatureType::Unknown) return optional<std::string>("Unknown");
-    else return optional<std::string>();
+    switch(type) {
+    case FeatureType::Point:
+        return optional<std::string>("Point");
+    case FeatureType::LineString:
+        return optional<std::string>("LineString");
+    case FeatureType::Polygon:
+        return optional<std::string>("Polygon");
+    case FeatureType::Unknown:
+        return optional<std::string>("Unknown");
+    default:
+        return {};
+    }
 };
-    
+
 optional<double> featurePropertyAsDouble(EvaluationContext params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
-    if (!property) return optional<double>();
+    if (!property) return {};
     return property->match(
         [](double value) { return value; },
-        [](uint64_t value) { return optional<double>(value); },
-        [](int64_t value) { return optional<double>(value); },
+        [](uint64_t value) { return optional<double>(static_cast<double>(value)); },
+        [](int64_t value) { return optional<double>(static_cast<double>(value)); },
         [](auto) { return optional<double>(); }
     );
 };
-    
+
+optional<std::string> featurePropertyAsString(EvaluationContext params, const std::string& key) {
+    assert(params.feature);
+    auto property = params.feature->getValue(key);
+    if (!property) return {};
+    return property->match(
+        [](std::string value) { return value; },
+        [](auto) { return optional<std::string>(); }
+    );
+};
+
 optional<double> featureIdAsDouble(EvaluationContext params) {
     assert(params.feature);
     auto id = params.feature->getID();
@@ -262,18 +279,28 @@ optional<double> featureIdAsDouble(EvaluationContext params) {
     );
 };
 
+optional<std::string> featureIdAsString(EvaluationContext params) {
+    assert(params.feature);
+    auto id = params.feature->getID();
+    if (!id) return optional<std::string>();
+    return id->match(
+        [](std::string value) { return value; },
+        [](auto) { return optional<std::string>(); }
+    );
+};
+
 std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initializeDefinitions() {
     std::unordered_map<std::string, CompoundExpressionRegistry::Definition> definitions;
     auto define = [&](std::string name, auto fn) {
         definitions[name].push_back(makeSignature(fn, name));
     };
-    
+
     define("e", []() -> Result<double> { return 2.718281828459045; });
     define("pi", []() -> Result<double> { return 3.141592653589793; });
     define("ln2", []() -> Result<double> { return 0.6931471805599453; });
 
     define("typeof", [](const Value& v) -> Result<std::string> { return toString(typeOf(v)); });
-    
+
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(
             [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
@@ -281,10 +308,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             [](const auto& v) -> Result<std::string> { return stringify(v); }
         );
     });
-    
+
     define("to-boolean", [](const Value& v) -> Result<bool> {
         return v.match(
-            [&] (double f) { return (bool)f; },
+            [&] (double f) { return static_cast<bool>(f); },
             [&] (const std::string& s) { return s.length() > 0; },
             [&] (bool b) { return b; },
             [&] (const NullValue&) { return false; },
@@ -294,10 +321,10 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("to-rgba", [](const Color& color) -> Result<std::array<double, 4>> {
         return color.toArray();
     });
-    
+
     define("rgba", rgba);
     define("rgb", [](double r, double g, double b) { return rgba(r, g, b, 1.0f); });
-    
+
     define("zoom", [](const EvaluationContext& params) -> Result<double> {
         if (!params.zoom) {
             return EvaluationError {
@@ -306,7 +333,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return *(params.zoom);
     });
-    
+
     define("heatmap-density", [](const EvaluationContext& params) -> Result<double> {
         if (!params.heatmapDensity) {
             return EvaluationError {
@@ -322,7 +349,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
                 "Feature data is unavailable in the current evaluation context."
             };
         }
-        
+
         return params.feature->getValue(key) ? true : false;
     });
     define("has", [](const std::string& key, const std::unordered_map<std::string, Value>& object) -> Result<bool> {
@@ -348,7 +375,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return object.at(key);
     });
-    
+
     define("properties", [](const EvaluationContext& params) -> Result<std::unordered_map<std::string, Value>> {
         if (!params.feature) {
             return EvaluationError {
@@ -362,14 +389,14 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return result;
     });
-    
+
     define("geometry-type", [](const EvaluationContext& params) -> Result<std::string> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
             };
         }
-    
+
         auto type = params.feature->getType();
         if (type == FeatureType::Point) {
             return "Point";
@@ -381,14 +408,14 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             return "Unknown";
         }
     });
-    
+
     define("id", [](const EvaluationContext& params) -> Result<Value> {
         if (!params.feature) {
             return EvaluationError {
                 "Feature data is unavailable in the current evaluation context."
             };
         }
-    
+
         auto id = params.feature->getID();
         if (!id) {
             return Null;
@@ -399,7 +426,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
             }
         );
     });
-    
+
     define("+", [](const Varargs<double>& args) -> Result<double> {
         double sum = 0.0f;
         for (auto arg : args) {
@@ -429,7 +456,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("asin", [](double x) -> Result<double> { return asin(x); });
     define("acos", [](double x) -> Result<double> { return acos(x); });
     define("atan", [](double x) -> Result<double> { return atan(x); });
-    
+
     define("min", [](const Varargs<double>& args) -> Result<double> {
         double result = std::numeric_limits<double>::infinity();
         for (double arg : args) {
@@ -444,7 +471,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         }
         return result;
     });
-    
+
     define("round", [](double x) -> Result<double> { return std::round(x); });
     define("floor", [](double x) -> Result<double> { return std::floor(x); });
     define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
@@ -458,9 +485,9 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("<", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs < rhs; });
     define("<=", [](double lhs, double rhs) -> Result<bool> { return lhs <= rhs; });
     define("<=", [](const std::string& lhs, const std::string& rhs) -> Result<bool> { return lhs <= rhs; });
-    
+
     define("!", [](bool e) -> Result<bool> { return !e; });
-    
+
     define("upcase", [](const std::string& input) -> Result<std::string> {
         return platform::uppercase(input);
     });
@@ -477,11 +504,12 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
     define("error", [](const std::string& input) -> Result<type::ErrorType> {
         return EvaluationError { input };
     });
-    
+
+    // Legacy Filters
     define("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
         return lhs == featurePropertyAsExpressionValue(params, key);
     });
-    
+
     define("filter-id-==", [](const EvaluationContext& params, const Value &lhs) -> Result<bool> {
         return lhs == featureIdAsExpressionValue(params);
     });
@@ -495,9 +523,19 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         auto rhs = featurePropertyAsDouble(params, key);
         return rhs ? rhs < lhs : false;
     });
-    
+
+    define("filter-<", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsString(params, key);
+        return rhs ? rhs < lhs : false;
+    });
+
     define("filter-id-<", [](const EvaluationContext& params, double lhs) -> Result<bool> {
         auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs < lhs : false;
+    });
+
+    define("filter-id-<", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
+        auto rhs = featureIdAsString(params);
         return rhs ? rhs < lhs : false;
     });
 
@@ -506,28 +544,58 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return rhs ? rhs > lhs : false;
     });
 
+    define("filter->", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsString(params, key);
+        return rhs ? rhs > lhs : false;
+    });
+
     define("filter-id->", [](const EvaluationContext& params, double lhs) -> Result<bool> {
         auto rhs = featureIdAsDouble(params);
         return rhs ? rhs > lhs : false;
     });
-    
+
+    define("filter-id->", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
+        auto rhs = featureIdAsString(params);
+        return rhs ? rhs > lhs : false;
+    });
+
     define("filter-<=", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
         auto rhs = featurePropertyAsDouble(params, key);
         return rhs ? rhs <= lhs : false;
     });
     
+    define("filter-<=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsString(params, key);
+        return rhs ? rhs <= lhs : false;
+    });
+
     define("filter-id-<=", [](const EvaluationContext& params, double lhs) -> Result<bool> {
         auto rhs = featureIdAsDouble(params);
         return rhs ? rhs <= lhs : false;
     });
     
+    define("filter-id-<=", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
+        auto rhs = featureIdAsString(params);
+        return rhs ? rhs <= lhs : false;
+    });
+
     define("filter->=", [](const EvaluationContext& params, const std::string& key, double lhs) -> Result<bool> {
         auto rhs = featurePropertyAsDouble(params, key);
         return rhs ? rhs >= lhs : false;
     });
     
+    define("filter->=", [](const EvaluationContext& params, const std::string& key, std::string lhs) -> Result<bool> {
+        auto rhs = featurePropertyAsString(params, key);
+        return rhs ? rhs >= lhs : false;
+    });
+
     define("filter-id->=", [](const EvaluationContext& params, double lhs) -> Result<bool> {
         auto rhs = featureIdAsDouble(params);
+        return rhs ? rhs >= lhs : false;
+    });
+
+    define("filter-id->=", [](const EvaluationContext& params, std::string lhs) -> Result<bool> {
+        auto rhs = featureIdAsString(params);
         return rhs ? rhs >= lhs : false;
     });
 
@@ -558,7 +626,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         auto value = featurePropertyAsExpressionValue(params, varargs[0].get<std::string>());
         return std::find(varargs.begin() + 1, varargs.end(), value) != varargs.end();
     });
-    
+
     return definitions;
 }
 
@@ -577,7 +645,7 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
         return ParseResult();
     }
     const CompoundExpressionRegistry::Definition& definition = it->second;
-    
+
     auto length = arrayLength(value);
 
     // Check if we have a single signature with the correct number of
@@ -603,14 +671,14 @@ ParseResult parseCompoundExpression(const std::string name, const Convertible& v
     args.reserve(length - 1);
     for (std::size_t i = 1; i < length; i++) {
         optional<type::Type> expected;
-        
+
         if (singleMatchingSignature) {
             expected = definition[*singleMatchingSignature]->params.match(
                 [](const VarargsType& varargs) { return varargs.type; },
                 [&](const std::vector<type::Type>& params_) { return params_[i - 1]; }
             );
         }
-    
+
         auto parsed = ctx.parse(arrayMember(value, i), i, expected);
         if (!parsed) {
             return parsed;
@@ -637,7 +705,7 @@ ParseResult createCompoundExpression(const Definition& definition,
     
     for (const std::unique_ptr<detail::SignatureBase>& signature : definition) {
         signatureContext.clearErrors();
-        
+
         if (signature->params.is<std::vector<type::Type>>()) {
             const std::vector<type::Type>& params = signature->params.get<std::vector<type::Type>>();
             if (params.size() != args.size()) {
@@ -665,12 +733,12 @@ ParseResult createCompoundExpression(const Definition& definition,
                 }
             }
         }
-        
+
         if (signatureContext.getErrors().size() == 0) {
             return ParseResult(signature->makeExpression(std::move(args)));
         }
     }
-    
+
     if (definition.size() == 1) {
         ctx.appendErrors(std::move(signatureContext));
     } else {
@@ -703,14 +771,14 @@ ParseResult createCompoundExpression(const Definition& definition,
         }
         ctx.error("Expected arguments of type " + signatures + ", but found (" + actualTypes + ") instead.");
     }
-    
+
     return ParseResult();
 }
-    
+
 ParseResult createCompoundExpression(const std::string& name, ParsingContext& ctx) {
     return createCompoundExpression(name, std::vector<std::unique_ptr<Expression>>(), ctx);
 }
-    
+
 ParseResult createCompoundExpression(const std::string& name,
                                      std::unique_ptr<Expression> arg1,
                                      ParsingContext& ctx) {

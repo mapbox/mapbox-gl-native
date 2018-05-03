@@ -36,7 +36,7 @@ template <typename T>
 struct Varargs : std::vector<T> { using std::vector<T>::vector; };
 
 namespace detail {
-// Base class for the Signature<Fn> structs that are used to determine the
+// Base class for the Signature<Fn> structs that are used to determine
 // each CompoundExpression definition's type::Type data from the type of its
 // "evaluate" function.
 struct SignatureBase {

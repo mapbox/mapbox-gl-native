@@ -152,7 +152,7 @@ std::unique_ptr<Expression> convertLegacyInFilter(const Convertible& values, Err
         return std::make_unique<Literal>(false);
     } else if (*property == "$type") {
         return createExpression("filter-type-in", convertLiteralArray(values, error, 2), error);
-    } else if (*property == "id") {
+    } else if (*property == "$id") {
         return createExpression("filter-id-in", convertLiteralArray(values, error, 2), error);
     } else {
         return createExpression("filter-in", convertLiteralArray(values, error, 1), error);

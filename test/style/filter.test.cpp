@@ -61,6 +61,14 @@ TEST(Filter, InType) {
     ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::Polygon));
 }
 
+TEST(Filter, InID) {
+    auto f = R"(["in", "$id", "123", "1234", 1234])";
+    ASSERT_FALSE(filter(f));
+    ASSERT_TRUE(filter(f, {{}}, { uint64_t(1234) }));
+    ASSERT_TRUE(filter(f, {{}}, { std::string("1234") }));
+    ASSERT_FALSE(filter(f, {{}}, { std::string("4321") }));
+}
+
 TEST(Filter, Any) {
     ASSERT_FALSE(filter("[\"any\"]"));
     ASSERT_TRUE(filter("[\"any\", [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
@@ -87,6 +95,7 @@ TEST(Filter, Has) {
     ASSERT_TRUE(filter("[\"has\", \"foo\"]", {{ std::string("foo"), int64_t(0) }}));
     ASSERT_TRUE(filter("[\"has\", \"foo\"]", {{ std::string("foo"), false }}));
     ASSERT_FALSE(filter("[\"has\", \"foo\"]"));
+    ASSERT_FALSE(filter("[\"has\", \"$id\"]"));
 }
 
 TEST(Filter, NotHas) {
@@ -100,7 +109,11 @@ TEST(Filter, ID) {
     FeatureIdentifier id1 { uint64_t{ 1234 } };
     ASSERT_TRUE(filter("[\"==\", \"$id\", 1234]", {{}}, id1));
     ASSERT_FALSE(filter("[\"==\", \"$id\", \"1234\"]", {{}}, id1));
-    
+
+    FeatureIdentifier id2 { std::string{ "1" } };
+    ASSERT_FALSE(filter("[\"<\", \"$id\", \"0\"]", {{}}, id2));
+    ASSERT_TRUE(filter("[\"<\", \"$id\", \"1234\"]", {{}}, id2));
+
     ASSERT_FALSE(filter("[\"==\", \"$id\", 1234]", {{ "id", uint64_t(1234) }}));
 }
 
@@ -112,6 +125,18 @@ TEST(Filter, Expression) {
 TEST(Filter, PropertyExpression) {
     ASSERT_TRUE(filter("[\"==\", [\"get\", \"two\"], 2]", {{"two", int64_t(2)}}));
     ASSERT_FALSE(filter("[\"==\", [\"get\", \"two\"], 4]", {{"two", int64_t(2)}}));
+}
+
+TEST(Filter, LegacyProperty) {
+    ASSERT_TRUE(filter("[\"<=\", \"two\", 2]", {{"two", int64_t(2)}}));
+    ASSERT_FALSE(filter("[\"==\", \"two\", 4]", {{"two", int64_t(2)}}));
+
+    ASSERT_FALSE(filter("[\"<=\", \"two\", \"2\"]", {{"two", int64_t(2)}}));
+    ASSERT_FALSE(filter("[\"==\", \"bool\", false]", {{"two", true}}));
+
+    ASSERT_TRUE(filter("[\"<=\", \"two\", \"2\"]", {{"two", std::string("2")}}));
+    ASSERT_FALSE(filter("[\"<\", \"two\", \"1\"]", {{"two", std::string("2")}}));
+    ASSERT_FALSE(filter("[\"==\", \"two\", 4]", {{"two", std::string("2")}}));
 }
 
 TEST(Filter, ZoomExpressionNested) {
