@@ -69,7 +69,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
             gl::ColorMode::unblended(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            programInstance.allUniformValues(
+            programInstance.computeAllUniformValues(
                 DebugProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrix },
                     uniforms::u_color::Value{ Color::red() }
@@ -78,7 +78,7 @@ void RenderImageSource::finishRender(PaintParameters& parameters) {
                 properties,
                 parameters.state.getZoom()
             ),
-            programInstance.allAttributeBindings(
+            programInstance.computeAllAttributeBindings(
                 parameters.staticData.tileVertexBuffer,
                 paintAttributeData,
                 properties

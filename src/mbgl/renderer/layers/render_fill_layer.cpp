@@ -73,7 +73,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-                const auto allUniformValues = programInstance.allUniformValues(
+                const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillProgram::UniformValues {
                         uniforms::u_matrix::Value{
                             tile.translatedMatrix(evaluated.get<FillTranslate>(),
@@ -86,7 +86,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated,
                     parameters.state.getZoom()
                 );
-                const auto allAttributeBindings = programInstance.allAttributeBindings(
+                const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                     *bucket.vertexBuffer,
                     paintPropertyBinders,
                     evaluated
@@ -158,7 +158,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
 
                 const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-                const auto allUniformValues = programInstance.allUniformValues(
+                const auto allUniformValues = programInstance.computeAllUniformValues(
                     FillPatternUniforms::values(
                         tile.translatedMatrix(evaluated.get<FillTranslate>(),
                                               evaluated.get<FillTranslateAnchor>(),
@@ -175,7 +175,7 @@ void RenderFillLayer::render(PaintParameters& parameters, RenderSource*) {
                     evaluated,
                     parameters.state.getZoom()
                 );
-                const auto allAttributeBindings = programInstance.allAttributeBindings(
+                const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                     *bucket.vertexBuffer,
                     paintPropertyBinders,
                     evaluated

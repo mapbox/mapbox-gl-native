@@ -63,7 +63,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
 
         auto& programInstance = parameters.programs.circle.get(evaluated);
    
-        const auto allUniformValues = programInstance.allUniformValues(
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             CircleProgram::UniformValues {
                 uniforms::u_matrix::Value{
                     tile.translatedMatrix(evaluated.get<CircleTranslate>(),
@@ -83,7 +83,7 @@ void RenderCircleLayer::render(PaintParameters& parameters, RenderSource*) {
             evaluated,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = programInstance.allAttributeBindings(
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             *bucket.vertexBuffer,
             paintPropertyBinders,
             evaluated

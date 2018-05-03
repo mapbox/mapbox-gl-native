@@ -66,13 +66,13 @@ void RenderLineLayer::render(PaintParameters& parameters, RenderSource*) {
 
             const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
 
-            const auto allUniformValues = programInstance.allUniformValues(
+            const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 paintPropertyBinders,
                 evaluated,
                 parameters.state.getZoom()
             );
-            const auto allAttributeBindings = programInstance.allAttributeBindings(
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 *bucket.vertexBuffer,
                 paintPropertyBinders,
                 evaluated

@@ -96,7 +96,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
             auto& programInstance = parameters.programs.heatmap.get(evaluated);
        
-            const auto allUniformValues = programInstance.allUniformValues(
+            const auto allUniformValues = programInstance.computeAllUniformValues(
                 HeatmapProgram::UniformValues {
                     uniforms::u_intensity::Value{ evaluated.get<style::HeatmapIntensity>() },
                     uniforms::u_matrix::Value{ tile.matrix },
@@ -106,7 +106,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
                 evaluated,
                 parameters.state.getZoom()
             );
-            const auto allAttributeBindings = programInstance.allAttributeBindings(
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 *bucket.vertexBuffer,
                 paintPropertyBinders,
                 evaluated
@@ -142,7 +142,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
 
         auto& programInstance = parameters.programs.heatmapTexture;
 
-        const auto allUniformValues = programInstance.allUniformValues(
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             HeatmapTextureProgram::UniformValues{
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
@@ -153,7 +153,7 @@ void RenderHeatmapLayer::render(PaintParameters& parameters, RenderSource*) {
             properties,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = programInstance.allAttributeBindings(
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
             paintAttributeData,
             properties

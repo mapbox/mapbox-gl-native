@@ -90,14 +90,14 @@ void RenderSymbolLayer::render(PaintParameters& parameters, RenderSource*) {
         {
             auto& programInstance = program.get(paintProperties);
 
-            const auto allUniformValues = programInstance.allUniformValues(
+            const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 *symbolSizeBinder,
                 binders,
                 paintProperties,
                 parameters.state.getZoom()
             );
-            const auto allAttributeBindings = programInstance.allAttributeBindings(
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 *buffers.vertexBuffer,
                 *buffers.dynamicVertexBuffer,
                 *buffers.opacityVertexBuffer,

@@ -50,13 +50,13 @@ void RenderBackgroundLayer::render(PaintParameters& parameters, RenderSource*) {
     const BackgroundProgram::PaintPropertyBinders paintAttributeData(properties, 0);
 
     auto draw = [&](auto& program, auto&& uniformValues) {
-        const auto allUniformValues = program.allUniformValues(
+        const auto allUniformValues = program.computeAllUniformValues(
             std::move(uniformValues),
             paintAttributeData,
             properties,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = program.allAttributeBindings(
+        const auto allAttributeBindings = program.computeAllAttributeBindings(
             parameters.staticData.tileVertexBuffer,
             paintAttributeData,
             properties

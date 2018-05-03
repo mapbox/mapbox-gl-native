@@ -68,17 +68,17 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         parameters.context.setStencilMode(gl::StencilMode::disabled());
         parameters.context.clear(Color{ 0.0f, 0.0f, 0.0f, 0.0f }, depthClearValue, {});
 
-        auto draw = [&](auto& programInstance, const auto& bucket, auto&& uniformValues) {
-            const auto& paintPropertyBinders = bucket.paintPropertyBinders.at(getID());
+        auto draw = [&](auto& programInstance, const auto& tileBucket, auto&& uniformValues) {
+            const auto& paintPropertyBinders = tileBucket.paintPropertyBinders.at(getID());
 
-            const auto allUniformValues = programInstance.allUniformValues(
+            const auto allUniformValues = programInstance.computeAllUniformValues(
                 std::move(uniformValues),
                 paintPropertyBinders,
                 evaluated,
                 parameters.state.getZoom()
             );
-            const auto allAttributeBindings = programInstance.allAttributeBindings(
-                *bucket.vertexBuffer,
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
+                *tileBucket.vertexBuffer,
                 paintPropertyBinders,
                 evaluated
             );
@@ -91,8 +91,8 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
                 parameters.depthModeFor3D(gl::DepthMode::ReadWrite),
                 gl::StencilMode::disabled(),
                 parameters.colorModeForRenderPass(),
-                *bucket.indexBuffer,
-                bucket.triangleSegments,
+                *tileBucket.indexBuffer,
+                tileBucket.triangleSegments,
                 allUniformValues,
                 allAttributeBindings,
                 getID());
@@ -162,7 +162,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
         
         auto& programInstance = parameters.programs.extrusionTexture;
 
-        const auto allUniformValues = programInstance.allUniformValues(
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             ExtrusionTextureProgram::UniformValues{
                 uniforms::u_matrix::Value{ viewportMat }, uniforms::u_world::Value{ size },
                 uniforms::u_image::Value{ 0 },
@@ -172,7 +172,7 @@ void RenderFillExtrusionLayer::render(PaintParameters& parameters, RenderSource*
             properties,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = programInstance.allAttributeBindings(
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             parameters.staticData.extrusionTextureVertexBuffer,
             paintAttributeData,
             properties

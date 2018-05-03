@@ -87,7 +87,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 tile.expires, parameters.debugOptions, parameters.context);
         }
 
-        const auto allAttributeBindings = program.allAttributeBindings(
+        const auto allAttributeBindings = program.computeAllAttributeBindings(
             *tile.debugBucket->vertexBuffer,
             paintAttributeData,
             properties
@@ -101,7 +101,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::ColorMode::unblended(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            program.allUniformValues(
+            program.computeAllUniformValues(
                 DebugProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrix },
                     uniforms::u_color::Value{ Color::white() }
@@ -122,7 +122,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::ColorMode::unblended(),
             *tile.debugBucket->indexBuffer,
             tile.debugBucket->segments,
-            program.allUniformValues(
+            program.computeAllUniformValues(
                 DebugProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrix },
                     uniforms::u_color::Value{ Color::black() }
@@ -145,7 +145,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
             gl::ColorMode::unblended(),
             parameters.staticData.tileBorderIndexBuffer,
             parameters.staticData.tileBorderSegments,
-            program.allUniformValues(
+            program.computeAllUniformValues(
                 DebugProgram::UniformValues {
                     uniforms::u_matrix::Value{ matrix },
                     uniforms::u_color::Value{ Color::red() }
@@ -154,7 +154,7 @@ void RenderTile::finishRender(PaintParameters& parameters) {
                 properties,
                 parameters.state.getZoom()
             ),
-            program.allAttributeBindings(
+            program.computeAllAttributeBindings(
                 parameters.staticData.tileVertexBuffer,
                 paintAttributeData,
                 properties

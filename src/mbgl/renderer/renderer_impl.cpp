@@ -512,7 +512,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                 gl::ColorMode::disabled(),
                 parameters.staticData.quadTriangleIndexBuffer,
                 parameters.staticData.tileTriangleSegments,
-                program.allUniformValues(
+                program.computeAllUniformValues(
                     ClippingMaskProgram::UniformValues {
                         uniforms::u_matrix::Value{ parameters.matrixForTile(clipID.first) },
                     },
@@ -520,7 +520,7 @@ void Renderer::Impl::render(const UpdateParameters& updateParameters) {
                     properties,
                     parameters.state.getZoom()
                 ),
-                program.allAttributeBindings(
+                program.computeAllAttributeBindings(
                     parameters.staticData.tileVertexBuffer,
                     paintAttributeData,
                     properties

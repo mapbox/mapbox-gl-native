@@ -278,7 +278,7 @@ public:
             Shaders::fragmentSource)) {
     }
 
-    static typename AllUniforms::Values allUniformValues(
+    static typename AllUniforms::Values computeAllUniformValues(
         const UniformValues& uniformValues,
         const SymbolSizeBinder& symbolSizeBinder,
         const PaintPropertyBinders& paintPropertyBinders,
@@ -288,7 +288,7 @@ public:
             .concat(paintPropertyBinders.uniformValues(currentZoom, currentProperties));
     }
 
-    static typename Attributes::Bindings allAttributeBindings(
+    static typename Attributes::Bindings computeAllAttributeBindings(
         const gl::VertexBuffer<LayoutVertex>& layoutVertexBuffer,
         const gl::VertexBuffer<SymbolDynamicLayoutAttributes::Vertex>& dynamicLayoutVertexBuffer,
         const gl::VertexBuffer<SymbolOpacityAttributes::Vertex>& opacityVertexBuffer,

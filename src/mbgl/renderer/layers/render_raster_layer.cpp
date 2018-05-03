@@ -81,7 +81,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
                      const auto& segments) {
         auto& programInstance = parameters.programs.raster;
 
-        const auto allUniformValues = programInstance.allUniformValues(
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             RasterProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image0::Value{ 0 },
@@ -101,7 +101,7 @@ void RenderRasterLayer::render(PaintParameters& parameters, RenderSource* source
             evaluated,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = programInstance.allAttributeBindings(
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             vertexBuffer,
             paintAttributeData,
             evaluated

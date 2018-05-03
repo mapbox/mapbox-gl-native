@@ -73,7 +73,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
 
         const HillshadeProgram::PaintPropertyBinders paintAttributeData{ evaluated, 0 };
 
-        const auto allUniformValues = programInstance.allUniformValues(
+        const auto allUniformValues = programInstance.computeAllUniformValues(
             HillshadeProgram::UniformValues {
                 uniforms::u_matrix::Value{ matrix },
                 uniforms::u_image::Value{ 0 },
@@ -87,7 +87,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             evaluated,
             parameters.state.getZoom()
         );
-        const auto allAttributeBindings = programInstance.allAttributeBindings(
+        const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
             vertexBuffer,
             paintAttributeData,
             evaluated
@@ -131,7 +131,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
             
             auto& programInstance = parameters.programs.hillshadePrepare;
 
-            const auto allUniformValues = programInstance.allUniformValues(
+            const auto allUniformValues = programInstance.computeAllUniformValues(
                 HillshadePrepareProgram::UniformValues {
                     uniforms::u_matrix::Value { mat },
                     uniforms::u_dimension::Value { {{uint16_t(tilesize * 2), uint16_t(tilesize * 2) }} },
@@ -143,7 +143,7 @@ void RenderHillshadeLayer::render(PaintParameters& parameters, RenderSource* src
                 properties,
                 parameters.state.getZoom()
             );
-            const auto allAttributeBindings = programInstance.allAttributeBindings(
+            const auto allAttributeBindings = programInstance.computeAllAttributeBindings(
                 parameters.staticData.rasterVertexBuffer,
                 paintAttributeData,
                 properties
