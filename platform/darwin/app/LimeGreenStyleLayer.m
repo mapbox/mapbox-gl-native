@@ -1,12 +1,5 @@
 #import "LimeGreenStyleLayer.h"
-
-#if TARGET_OS_IPHONE
-    #include <OpenGLES/ES2/gl.h>
-    #include <OpenGLES/ES2/glext.h>
-#elif TARGET_OS_OSX
-    #include <OpenGL/gl.h>
-    #include <OpenGL/glext.h>
-#endif
+@import GLKit;
 
 @implementation LimeGreenStyleLayer {
     GLuint _program;
