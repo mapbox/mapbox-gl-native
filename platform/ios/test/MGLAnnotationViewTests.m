@@ -210,7 +210,8 @@ static NSString * const MGLTestAnnotationReuseIdentifer = @"MGLTestAnnotationReu
     XCTAssertEqual(view.dragState, MGLAnnotationViewDragStateNone);
 }
 
-MGL_PENDING_TEST(testAnnotationViewInitWithFrame)
+- (void)testAnnotationViewInitWithFramePENDING {
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
     CGRect frame = CGRectMake(10.0, 10.0, 100.0, 100.0);
     MGLAnnotationView *view = [[MGLAnnotationView alloc] initWithFrame:frame];
     [self checkDefaultPropertiesForAnnotationView:view];
@@ -221,7 +222,8 @@ MGL_PENDING_TEST(testAnnotationViewInitWithFrame)
     [self checkDefaultPropertiesForAnnotationView:view];
 }
 
-MGL_PENDING_TEST(testSelectingADisabledAnnotationView)
+- (void)testSelectingADisabledAnnotationViewPENDING {
+    MGL_CHECK_IF_PENDING_TEST_SHOULD_RUN();
     self.prepareAnnotationView = ^(MGLAnnotationView *view) {
         view.enabled = NO;
     };
