@@ -2,7 +2,7 @@
 
 Mapbox welcomes participation and contributions from everyone. Please read [CONTRIBUTING.md](../../CONTRIBUTING.md) to get started.
 
-## 3.7.7
+## 3.7.7 - May 3, 2018
 
 * Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
 
