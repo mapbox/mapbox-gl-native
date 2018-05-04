@@ -106,5 +106,8 @@
   "render-tests/combinations/fill-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/line-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/raster-translucent--fill-extrusion-translucent": "needs investigation",
-  "render-tests/combinations/symbol-translucent--fill-extrusion-translucent": "needs investigation"
+  "render-tests/combinations/symbol-translucent--fill-extrusion-translucent": "needs investigation",
+  "render-tests/feature-state/composite-expression": "needs issue",
+  "render-tests/feature-state/data-expression": "needs issue",
+  "render-tests/feature-state/vector-source": "needs issue"
 }
