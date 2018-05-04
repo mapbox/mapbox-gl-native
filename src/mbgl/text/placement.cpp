@@ -56,6 +56,11 @@ void Placement::placeLayer(RenderSymbolLayer& symbolLayer, const mat4& projMatri
         auto bucket = geometryTile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        
+        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+            // Only place this layer if it's the "group leader" for the bucket
+            continue;
+        }
 
         auto& layout = symbolBucket.layout;
 
@@ -230,6 +235,10 @@ void Placement::updateLayerOpacities(RenderSymbolLayer& symbolLayer) {
         auto bucket = renderTile.tile.getBucket(*symbolLayer.baseImpl);
         assert(dynamic_cast<SymbolBucket*>(bucket));
         SymbolBucket& symbolBucket = *reinterpret_cast<SymbolBucket*>(bucket);
+        if (symbolBucket.bucketLeaderID != symbolLayer.getID()) {
+            // Only update opacities this layer if it's the "group leader" for the bucket
+            continue;
+        }
         updateBucketOpacities(symbolBucket, seenCrossTileIDs);
     }
 }

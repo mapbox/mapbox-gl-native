@@ -25,14 +25,14 @@ FeatureIndex::FeatureIndex(std::unique_ptr<const GeometryTileData> tileData_)
 void FeatureIndex::insert(const GeometryCollection& geometries,
                           std::size_t index,
                           const std::string& sourceLayerName,
-                          const std::string& bucketName) {
+                          const std::string& bucketLeaderID) {
     for (const auto& ring : geometries) {
         auto envelope = mapbox::geometry::envelope(ring);
         if (envelope.min.x < util::EXTENT &&
             envelope.min.y < util::EXTENT &&
             envelope.max.x >= 0 &&
             envelope.max.y >= 0) {
-            grid.insert(IndexedSubfeature(index, sourceLayerName, bucketName, sortIndex++),
+            grid.insert(IndexedSubfeature(index, sourceLayerName, bucketLeaderID, sortIndex++),
                         {convertPoint<float>(envelope.min), convertPoint<float>(envelope.max)});
         }
     }
@@ -141,7 +141,7 @@ void FeatureIndex::addFeature(
     std::unique_ptr<GeometryTileLayer> sourceLayer;
     std::unique_ptr<GeometryTileFeature> geometryTileFeature;
 
-    for (const std::string& layerID : bucketLayerIDs.at(indexedFeature.bucketName)) {
+    for (const std::string& layerID : bucketLayerIDs.at(indexedFeature.bucketLeaderID)) {
         const RenderLayer* renderLayer = getRenderLayer(layerID);
         if (!renderLayer) {
             continue;
@@ -190,8 +190,8 @@ optional<GeometryCoordinates> FeatureIndex::translateQueryGeometry(
     return translated;
 }
 
-void FeatureIndex::setBucketLayerIDs(const std::string& bucketName, const std::vector<std::string>& layerIDs) {
-    bucketLayerIDs[bucketName] = layerIDs;
+void FeatureIndex::setBucketLayerIDs(const std::string& bucketLeaderID, const std::vector<std::string>& layerIDs) {
+    bucketLayerIDs[bucketLeaderID] = layerIDs;
 }
 
 } // namespace mbgl
