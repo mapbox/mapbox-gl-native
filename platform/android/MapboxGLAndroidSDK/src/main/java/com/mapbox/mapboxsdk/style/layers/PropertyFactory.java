@@ -36,16 +36,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Whether or not the fill should be antialiased.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillAntialias(Expression expression) {
-    return new PaintPropertyValue<>("fill-antialias", expression);
-  }
-
-  /**
    * The opacity of the entire fill layer. In contrast to the {@link PropertyFactory#fillColor}, this value will also affect the 1px stroke around the fill, if the stroke is used.
    *
    * @param value a Float value
@@ -136,16 +126,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillTranslate(Expression expression) {
-    return new PaintPropertyValue<>("fill-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#fillTranslate}.
    *
    * @param value a String value
@@ -156,16 +136,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the frame of reference for {@link PropertyFactory#fillTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("fill-translate-anchor", expression);
-  }
-
-  /**
    * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
@@ -173,16 +143,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> fillPattern(String value) {
     return new PaintPropertyValue<>("fill-pattern", value);
-  }
-
-  /**
-   * Name of image in sprite to use for drawing image fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillPattern(Expression expression) {
-    return new PaintPropertyValue<>("fill-pattern", expression);
   }
 
   /**
@@ -246,16 +206,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> lineTranslate(Expression expression) {
-    return new PaintPropertyValue<>("line-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#lineTranslate}.
    *
    * @param value a String value
@@ -263,16 +213,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> lineTranslateAnchor(@Property.LINE_TRANSLATE_ANCHOR String value) {
     return new PaintPropertyValue<>("line-translate-anchor", value);
-  }
-
-  /**
-   * Controls the frame of reference for {@link PropertyFactory#lineTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> lineTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("line-translate-anchor", expression);
   }
 
   /**
@@ -366,16 +306,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Specifies the lengths of the alternating dashes and gaps that form the dash pattern. The lengths are later scaled by the line width. To convert a dash length to density-independent pixels, multiply the length by the current line width. Note that GeoJSON sources with `lineMetrics: true` specified won't render dashed lines to the expected scale. Also note that zoom-dependent expressions will be evaluated only at integer zoom levels.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> lineDasharray(Expression expression) {
-    return new PaintPropertyValue<>("line-dasharray", expression);
-  }
-
-  /**
    * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
@@ -383,16 +313,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> linePattern(String value) {
     return new PaintPropertyValue<>("line-pattern", value);
-  }
-
-  /**
-   * Name of image in sprite to use for drawing image lines. For seamless patterns, image width must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> linePattern(Expression expression) {
-    return new PaintPropertyValue<>("line-pattern", expression);
   }
 
   /**
@@ -526,16 +446,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Distance that the icon's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> iconTranslate(Expression expression) {
-    return new PaintPropertyValue<>("icon-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#iconTranslate}.
    *
    * @param value a String value
@@ -543,16 +453,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> iconTranslateAnchor(@Property.ICON_TRANSLATE_ANCHOR String value) {
     return new PaintPropertyValue<>("icon-translate-anchor", value);
-  }
-
-  /**
-   * Controls the frame of reference for {@link PropertyFactory#iconTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> iconTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("icon-translate-anchor", expression);
   }
 
   /**
@@ -686,16 +586,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Distance that the text's anchor is moved from its original placement. Positive values indicate right and down, while negative values indicate left and up.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> textTranslate(Expression expression) {
-    return new PaintPropertyValue<>("text-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#textTranslate}.
    *
    * @param value a String value
@@ -703,16 +593,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> textTranslateAnchor(@Property.TEXT_TRANSLATE_ANCHOR String value) {
     return new PaintPropertyValue<>("text-translate-anchor", value);
-  }
-
-  /**
-   * Controls the frame of reference for {@link PropertyFactory#textTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> textTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("text-translate-anchor", expression);
   }
 
   /**
@@ -816,16 +696,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The geometry's offset. Values are [x, y] where negatives indicate left and up, respectively.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> circleTranslate(Expression expression) {
-    return new PaintPropertyValue<>("circle-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#circleTranslate}.
    *
    * @param value a String value
@@ -833,16 +703,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> circleTranslateAnchor(@Property.CIRCLE_TRANSLATE_ANCHOR String value) {
     return new PaintPropertyValue<>("circle-translate-anchor", value);
-  }
-
-  /**
-   * Controls the frame of reference for {@link PropertyFactory#circleTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> circleTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("circle-translate-anchor", expression);
   }
 
   /**
@@ -856,16 +716,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the scaling behavior of the circle when the map is pitched.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> circlePitchScale(Expression expression) {
-    return new PaintPropertyValue<>("circle-pitch-scale", expression);
-  }
-
-  /**
    * Orientation of circle when map is pitched.
    *
    * @param value a String value
@@ -873,16 +723,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> circlePitchAlignment(@Property.CIRCLE_PITCH_ALIGNMENT String value) {
     return new PaintPropertyValue<>("circle-pitch-alignment", value);
-  }
-
-  /**
-   * Orientation of circle when map is pitched.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> circlePitchAlignment(Expression expression) {
-    return new PaintPropertyValue<>("circle-pitch-alignment", expression);
   }
 
   /**
@@ -1006,16 +846,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Similar to {@link PropertyFactory#heatmapWeight} but controls the intensity of the heatmap globally. Primarily used for adjusting the heatmap based on zoom level.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> heatmapIntensity(Expression expression) {
-    return new PaintPropertyValue<>("heatmap-intensity", expression);
-  }
-
-  /**
    * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
    *
    * @param value a int color value
@@ -1036,16 +866,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Defines the color of each pixel based on its density value in a heatmap.  Should be an expression that uses `["heatmap-density"]` as input.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> heatmapColor(Expression expression) {
-    return new PaintPropertyValue<>("heatmap-color", expression);
-  }
-
-  /**
    * The global opacity at which the heatmap layer will be drawn.
    *
    * @param value a Float value
@@ -1056,16 +876,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The global opacity at which the heatmap layer will be drawn.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> heatmapOpacity(Expression expression) {
-    return new PaintPropertyValue<>("heatmap-opacity", expression);
-  }
-
-  /**
    * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
    *
    * @param value a Float value
@@ -1073,16 +883,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> fillExtrusionOpacity(Float value) {
     return new PaintPropertyValue<>("fill-extrusion-opacity", value);
-  }
-
-  /**
-   * The opacity of the entire fill extrusion layer. This is rendered on a per-layer, not per-feature, basis, and data-driven styling is not available.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillExtrusionOpacity(Expression expression) {
-    return new PaintPropertyValue<>("fill-extrusion-opacity", expression);
   }
 
   /**
@@ -1126,16 +926,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The geometry's offset. Values are [x, y] where negatives indicate left and up (on the flat plane), respectively.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillExtrusionTranslate(Expression expression) {
-    return new PaintPropertyValue<>("fill-extrusion-translate", expression);
-  }
-
-  /**
    * Controls the frame of reference for {@link PropertyFactory#fillExtrusionTranslate}.
    *
    * @param value a String value
@@ -1146,16 +936,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Controls the frame of reference for {@link PropertyFactory#fillExtrusionTranslate}.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillExtrusionTranslateAnchor(Expression expression) {
-    return new PaintPropertyValue<>("fill-extrusion-translate-anchor", expression);
-  }
-
-  /**
    * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
@@ -1163,16 +943,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> fillExtrusionPattern(String value) {
     return new PaintPropertyValue<>("fill-extrusion-pattern", value);
-  }
-
-  /**
-   * Name of image in sprite to use for drawing images on extruded fills. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> fillExtrusionPattern(Expression expression) {
-    return new PaintPropertyValue<>("fill-extrusion-pattern", expression);
   }
 
   /**
@@ -1226,16 +996,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The opacity at which the image will be drawn.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterOpacity(Expression expression) {
-    return new PaintPropertyValue<>("raster-opacity", expression);
-  }
-
-  /**
    * Rotates hues around the color wheel.
    *
    * @param value a Float value
@@ -1243,16 +1003,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> rasterHueRotate(Float value) {
     return new PaintPropertyValue<>("raster-hue-rotate", value);
-  }
-
-  /**
-   * Rotates hues around the color wheel.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterHueRotate(Expression expression) {
-    return new PaintPropertyValue<>("raster-hue-rotate", expression);
   }
 
   /**
@@ -1266,16 +1016,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Increase or reduce the brightness of the image. The value is the minimum brightness.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterBrightnessMin(Expression expression) {
-    return new PaintPropertyValue<>("raster-brightness-min", expression);
-  }
-
-  /**
    * Increase or reduce the brightness of the image. The value is the maximum brightness.
    *
    * @param value a Float value
@@ -1283,16 +1023,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> rasterBrightnessMax(Float value) {
     return new PaintPropertyValue<>("raster-brightness-max", value);
-  }
-
-  /**
-   * Increase or reduce the brightness of the image. The value is the maximum brightness.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterBrightnessMax(Expression expression) {
-    return new PaintPropertyValue<>("raster-brightness-max", expression);
   }
 
   /**
@@ -1306,16 +1036,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Increase or reduce the saturation of the image.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterSaturation(Expression expression) {
-    return new PaintPropertyValue<>("raster-saturation", expression);
-  }
-
-  /**
    * Increase or reduce the contrast of the image.
    *
    * @param value a Float value
@@ -1323,16 +1043,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> rasterContrast(Float value) {
     return new PaintPropertyValue<>("raster-contrast", value);
-  }
-
-  /**
-   * Increase or reduce the contrast of the image.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterContrast(Expression expression) {
-    return new PaintPropertyValue<>("raster-contrast", expression);
   }
 
   /**
@@ -1346,16 +1056,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Fade duration when a new tile is added.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> rasterFadeDuration(Expression expression) {
-    return new PaintPropertyValue<>("raster-fade-duration", expression);
-  }
-
-  /**
    * The direction of the light source used to generate the hillshading with 0 as the top of the viewport if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `viewport` and due north if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `map`.
    *
    * @param value a Float value
@@ -1363,16 +1063,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> hillshadeIlluminationDirection(Float value) {
     return new PaintPropertyValue<>("hillshade-illumination-direction", value);
-  }
-
-  /**
-   * The direction of the light source used to generate the hillshading with 0 as the top of the viewport if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `viewport` and due north if {@link Property.HILLSHADE_ILLUMINATION_ANCHOR} is set to `map`.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeIlluminationDirection(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-illumination-direction", expression);
   }
 
   /**
@@ -1386,16 +1076,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Direction of light source when map is rotated.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeIlluminationAnchor(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-illumination-anchor", expression);
-  }
-
-  /**
    * Intensity of the hillshade
    *
    * @param value a Float value
@@ -1403,16 +1083,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<Float> hillshadeExaggeration(Float value) {
     return new PaintPropertyValue<>("hillshade-exaggeration", value);
-  }
-
-  /**
-   * Intensity of the hillshade
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeExaggeration(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-exaggeration", expression);
   }
 
   /**
@@ -1436,16 +1106,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The shading color of areas that face away from the light source.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeShadowColor(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-shadow-color", expression);
-  }
-
-  /**
    * The shading color of areas that faces towards the light source.
    *
    * @param value a int color value
@@ -1463,16 +1123,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> hillshadeHighlightColor(String value) {
     return new PaintPropertyValue<>("hillshade-highlight-color", value);
-  }
-
-  /**
-   * The shading color of areas that faces towards the light source.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeHighlightColor(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-highlight-color", expression);
   }
 
   /**
@@ -1496,16 +1146,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The shading color used to accentuate rugged terrain like sharp cliffs and gorges.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> hillshadeAccentColor(Expression expression) {
-    return new PaintPropertyValue<>("hillshade-accent-color", expression);
-  }
-
-  /**
    * The color with which the background will be drawn.
    *
    * @param value a int color value
@@ -1526,16 +1166,6 @@ public class PropertyFactory {
   }
 
   /**
-   * The color with which the background will be drawn.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> backgroundColor(Expression expression) {
-    return new PaintPropertyValue<>("background-color", expression);
-  }
-
-  /**
    * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
    *
    * @param value a String value
@@ -1543,16 +1173,6 @@ public class PropertyFactory {
    */
   public static PropertyValue<String> backgroundPattern(String value) {
     return new PaintPropertyValue<>("background-pattern", value);
-  }
-
-  /**
-   * Name of image in sprite to use for drawing an image background. For seamless patterns, image width and height must be a factor of two (2, 4, 8, ..., 512). Note that zoom-dependent expressions will be evaluated only at integer zoom levels.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> backgroundPattern(Expression expression) {
-    return new PaintPropertyValue<>("background-pattern", expression);
   }
 
   /**
@@ -1566,32 +1186,12 @@ public class PropertyFactory {
   }
 
   /**
-   * The opacity at which the background will be drawn.
-   *
-   * @param expression an expression statement
-   * @return property wrapper around an expression statement
-   */
-  public static PropertyValue<Expression> backgroundOpacity(Expression expression) {
-    return new PaintPropertyValue<>("background-opacity", expression);
-  }
-
-  /**
    * The display of line endings.
    *
    * @param value a String value
    * @return property wrapper around String
    */
   public static PropertyValue<String> lineCap(@Property.LINE_CAP String value) {
-    return new LayoutPropertyValue<>("line-cap", value);
-  }
-
-  /**
-   * The display of line endings.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> lineCap(Expression value) {
     return new LayoutPropertyValue<>("line-cap", value);
   }
 
@@ -1626,32 +1226,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Used to automatically convert miter joins to bevel joins for sharp angles.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> lineMiterLimit(Expression value) {
-    return new LayoutPropertyValue<>("line-miter-limit", value);
-  }
-
-  /**
    * Used to automatically convert round joins to miter joins for shallow angles.
    *
    * @param value a Float value
    * @return property wrapper around Float
    */
   public static PropertyValue<Float> lineRoundLimit(Float value) {
-    return new LayoutPropertyValue<>("line-round-limit", value);
-  }
-
-  /**
-   * Used to automatically convert round joins to miter joins for shallow angles.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> lineRoundLimit(Expression value) {
     return new LayoutPropertyValue<>("line-round-limit", value);
   }
 
@@ -1666,32 +1246,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Label placement relative to its geometry.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> symbolPlacement(Expression value) {
-    return new LayoutPropertyValue<>("symbol-placement", value);
-  }
-
-  /**
    * Distance between two symbol anchors.
    *
    * @param value a Float value
    * @return property wrapper around Float
    */
   public static PropertyValue<Float> symbolSpacing(Float value) {
-    return new LayoutPropertyValue<>("symbol-spacing", value);
-  }
-
-  /**
-   * Distance between two symbol anchors.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> symbolSpacing(Expression value) {
     return new LayoutPropertyValue<>("symbol-spacing", value);
   }
 
@@ -1706,32 +1266,12 @@ public class PropertyFactory {
   }
 
   /**
-   * If true, the symbols will not cross tile edges to avoid mutual collisions. Recommended in layers that don't have enough padding in the vector tile to prevent collisions, or if it is a point symbol layer placed after a line symbol layer.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> symbolAvoidEdges(Expression value) {
-    return new LayoutPropertyValue<>("symbol-avoid-edges", value);
-  }
-
-  /**
    * If true, the icon will be visible even if it collides with other previously drawn symbols.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
   public static PropertyValue<Boolean> iconAllowOverlap(Boolean value) {
-    return new LayoutPropertyValue<>("icon-allow-overlap", value);
-  }
-
-  /**
-   * If true, the icon will be visible even if it collides with other previously drawn symbols.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> iconAllowOverlap(Expression value) {
     return new LayoutPropertyValue<>("icon-allow-overlap", value);
   }
 
@@ -1746,16 +1286,6 @@ public class PropertyFactory {
   }
 
   /**
-   * If true, other symbols can be visible even if they collide with the icon.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> iconIgnorePlacement(Expression value) {
-    return new LayoutPropertyValue<>("icon-ignore-placement", value);
-  }
-
-  /**
    * If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
    *
    * @param value a Boolean value
@@ -1766,32 +1296,12 @@ public class PropertyFactory {
   }
 
   /**
-   * If true, text will display without their corresponding icons when the icon collides with other symbols and the text does not.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> iconOptional(Expression value) {
-    return new LayoutPropertyValue<>("icon-optional", value);
-  }
-
-  /**
    * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of icons.
    *
    * @param value a String value
    * @return property wrapper around String
    */
   public static PropertyValue<String> iconRotationAlignment(@Property.ICON_ROTATION_ALIGNMENT String value) {
-    return new LayoutPropertyValue<>("icon-rotation-alignment", value);
-  }
-
-  /**
-   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of icons.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> iconRotationAlignment(Expression value) {
     return new LayoutPropertyValue<>("icon-rotation-alignment", value);
   }
 
@@ -1826,32 +1336,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Scales the icon to fit around the associated text.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> iconTextFit(Expression value) {
-    return new LayoutPropertyValue<>("icon-text-fit", value);
-  }
-
-  /**
    * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
    *
    * @param value a Float[] value
    * @return property wrapper around Float[]
    */
   public static PropertyValue<Float[]> iconTextFitPadding(Float[] value) {
-    return new LayoutPropertyValue<>("icon-text-fit-padding", value);
-  }
-
-  /**
-   * Size of the additional area added to dimensions determined by {@link Property.ICON_TEXT_FIT}, in clockwise order: top, right, bottom, left.
-   *
-   * @param value a Float[] value
-   * @return property wrapper around Float[]
-   */
-  public static PropertyValue<Expression> iconTextFitPadding(Expression value) {
     return new LayoutPropertyValue<>("icon-text-fit-padding", value);
   }
 
@@ -1906,32 +1396,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Size of the additional area around the icon bounding box used for detecting symbol collisions.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> iconPadding(Expression value) {
-    return new LayoutPropertyValue<>("icon-padding", value);
-  }
-
-  /**
    * If true, the icon may be flipped to prevent it from being rendered upside-down.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
   public static PropertyValue<Boolean> iconKeepUpright(Boolean value) {
-    return new LayoutPropertyValue<>("icon-keep-upright", value);
-  }
-
-  /**
-   * If true, the icon may be flipped to prevent it from being rendered upside-down.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> iconKeepUpright(Expression value) {
     return new LayoutPropertyValue<>("icon-keep-upright", value);
   }
 
@@ -1986,16 +1456,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Orientation of icon when map is pitched.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> iconPitchAlignment(Expression value) {
-    return new LayoutPropertyValue<>("icon-pitch-alignment", value);
-  }
-
-  /**
    * Orientation of text when map is pitched.
    *
    * @param value a String value
@@ -2006,32 +1466,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Orientation of text when map is pitched.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> textPitchAlignment(Expression value) {
-    return new LayoutPropertyValue<>("text-pitch-alignment", value);
-  }
-
-  /**
    * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
    *
    * @param value a String value
    * @return property wrapper around String
    */
   public static PropertyValue<String> textRotationAlignment(@Property.TEXT_ROTATION_ALIGNMENT String value) {
-    return new LayoutPropertyValue<>("text-rotation-alignment", value);
-  }
-
-  /**
-   * In combination with {@link Property.SYMBOL_PLACEMENT}, determines the rotation behavior of the individual glyphs forming the text.
-   *
-   * @param value a String value
-   * @return property wrapper around String
-   */
-  public static PropertyValue<Expression> textRotationAlignment(Expression value) {
     return new LayoutPropertyValue<>("text-rotation-alignment", value);
   }
 
@@ -2126,16 +1566,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Text leading value for multi-line text.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> textLineHeight(Expression value) {
-    return new LayoutPropertyValue<>("text-line-height", value);
-  }
-
-  /**
    * Text tracking amount.
    *
    * @param value a Float value
@@ -2206,16 +1636,6 @@ public class PropertyFactory {
   }
 
   /**
-   * Maximum angle change between adjacent characters.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> textMaxAngle(Expression value) {
-    return new LayoutPropertyValue<>("text-max-angle", value);
-  }
-
-  /**
    * Rotates the text clockwise.
    *
    * @param value a Float value
@@ -2246,32 +1666,12 @@ public class PropertyFactory {
   }
 
   /**
-   * Size of the additional area around the text bounding box used for detecting symbol collisions.
-   *
-   * @param value a Float value
-   * @return property wrapper around Float
-   */
-  public static PropertyValue<Expression> textPadding(Expression value) {
-    return new LayoutPropertyValue<>("text-padding", value);
-  }
-
-  /**
    * If true, the text may be flipped vertically to prevent it from being rendered upside-down.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
   public static PropertyValue<Boolean> textKeepUpright(Boolean value) {
-    return new LayoutPropertyValue<>("text-keep-upright", value);
-  }
-
-  /**
-   * If true, the text may be flipped vertically to prevent it from being rendered upside-down.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> textKeepUpright(Expression value) {
     return new LayoutPropertyValue<>("text-keep-upright", value);
   }
 
@@ -2326,16 +1726,6 @@ public class PropertyFactory {
   }
 
   /**
-   * If true, the text will be visible even if it collides with other previously drawn symbols.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> textAllowOverlap(Expression value) {
-    return new LayoutPropertyValue<>("text-allow-overlap", value);
-  }
-
-  /**
    * If true, other symbols can be visible even if they collide with the text.
    *
    * @param value a Boolean value
@@ -2346,32 +1736,12 @@ public class PropertyFactory {
   }
 
   /**
-   * If true, other symbols can be visible even if they collide with the text.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> textIgnorePlacement(Expression value) {
-    return new LayoutPropertyValue<>("text-ignore-placement", value);
-  }
-
-  /**
    * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
    *
    * @param value a Boolean value
    * @return property wrapper around Boolean
    */
   public static PropertyValue<Boolean> textOptional(Boolean value) {
-    return new LayoutPropertyValue<>("text-optional", value);
-  }
-
-  /**
-   * If true, icons will display without their corresponding text when the text collides with other symbols and the icon does not.
-   *
-   * @param value a Boolean value
-   * @return property wrapper around Boolean
-   */
-  public static PropertyValue<Expression> textOptional(Expression value) {
     return new LayoutPropertyValue<>("text-optional", value);
   }
 
