@@ -16,7 +16,7 @@ function parseCSSColor(str) {
 }
 
 global.isDataDriven = function (property) {
-  return property['property-function'] === true;
+  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
 global.isLightProperty = function (property) {
