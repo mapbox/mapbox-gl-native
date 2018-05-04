@@ -1097,7 +1097,22 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                 NSArray *arguments = self.arguments.mgl_jsonExpressionObject;
                 return [@[@"concat", self.operand.mgl_jsonExpressionObject] arrayByAddingObjectsFromArray:arguments];
             } else if ([function isEqualToString:@"objectFrom:withIndex:"]) {
-                return @[@"at", self.arguments[1].mgl_jsonExpressionObject, self.arguments[0].mgl_jsonExpressionObject];
+                id index = self.arguments[1].mgl_jsonExpressionObject;
+                
+                if ([self.arguments[1] expressionType] == NSConstantValueExpressionType
+                    && [[self.arguments[1] constantValue] isKindOfClass:[NSString class]]) {
+                    id value = self.arguments[1].constantValue;
+                    
+                    if ([value isEqualToString:@"FIRST"]) {
+                        index = [NSExpression expressionForConstantValue:@0].mgl_jsonExpressionObject;
+                    } else if ([value isEqualToString:@"LAST"]) {
+                        index = [NSExpression expressionWithFormat:@"count(%@) - 1", self.arguments[0]].mgl_jsonExpressionObject;
+                    } else if ([value isEqualToString:@"SIZE"]) {
+                        return [NSExpression expressionWithFormat:@"count(%@)", self.arguments[0]].mgl_jsonExpressionObject;
+                    }
+                }
+
+                return @[@"at", index, self.arguments[0].mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"boolValue"]) {
                 return @[@"to-boolean", self.operand.mgl_jsonExpressionObject];
             } else if ([function isEqualToString:@"mgl_number"] ||
