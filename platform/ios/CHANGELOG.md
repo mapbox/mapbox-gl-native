@@ -14,6 +14,7 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 * Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 * Fixed an issue where annotation views could become distorted if `rotatesToMatchCamera` is `YES`. ([#11817](https://github.com/mapbox/mapbox-gl-native/pull/11817))
+* Fixed `MGLAnnotationView.rotatesToMatchCamera` overriding other transforms that might be applied to annotation views that had this property enabled. ([#11842](https://github.com/mapbox/mapbox-gl-native/pull/11842))
 
 ### Other changes
 
