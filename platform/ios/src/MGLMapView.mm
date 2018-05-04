@@ -5725,10 +5725,12 @@ public:
                 if (annotationView.layer.animationKeys.count > 0) {
                     continue;
                 }
+
                 // Move the annotation view far out of view to the left
-                CGRect adjustedFrame = annotationView.frame;
-                adjustedFrame.origin.x = -CGRectGetWidth(self.frame) * 10.0;
-                annotationView.frame = adjustedFrame;
+                CGPoint adjustedCenter = annotationView.center;
+                adjustedCenter.x = -CGRectGetWidth(self.frame) * 10.0;
+                annotationView.center = adjustedCenter;
+
                 [self enqueueAnnotationViewForAnnotationContext:annotationContext];
             }
         }
