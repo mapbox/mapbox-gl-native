@@ -247,6 +247,10 @@
 		968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */ = {isa = PBXBuildFile; fileRef = 3557F7AE1E1D27D300CCA5E6 /* MGLDistanceFormatter.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		96E027231E57C76E004B8E66 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 96E027251E57C76E004B8E66 /* Localizable.strings */; };
 		96F3F73C1F57124B003E2D2C /* MGLUserLocationHeadingIndicator.h in Headers */ = {isa = PBXBuildFile; fileRef = 96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */; };
+		AC0C15F3209D0E6900B65675 /* api_mapbox_cn-geotrust_2018.der in Resources */ = {isa = PBXBuildFile; fileRef = AC0C15F1209D0E3600B65675 /* api_mapbox_cn-geotrust_2018.der */; };
+		AC0C15F4209D0E7000B65675 /* api_mapbox_cn-geotrust_2018.der in Resources */ = {isa = PBXBuildFile; fileRef = AC0C15F1209D0E3600B65675 /* api_mapbox_cn-geotrust_2018.der */; };
+		AC0C15F5209D0E7200B65675 /* api_mapbox_cn-digicert_2018.der in Resources */ = {isa = PBXBuildFile; fileRef = AC0C15F2209D0E6000B65675 /* api_mapbox_cn-digicert_2018.der */; };
+		AC0C15F6209D0E7300B65675 /* api_mapbox_cn-digicert_2018.der in Resources */ = {isa = PBXBuildFile; fileRef = AC0C15F2209D0E6000B65675 /* api_mapbox_cn-digicert_2018.der */; };
 		AC518DFF201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */; };
 		AC518E00201BB55A00EBC820 /* MGLTelemetryConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */; };
 		AC518E03201BB56000EBC820 /* MGLTelemetryConfig.m in Sources */ = {isa = PBXBuildFile; fileRef = AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */; };
@@ -756,6 +760,8 @@
 		96E0272D1E57C7E6004B8E66 /* vi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = vi; path = vi.lproj/Localizable.strings; sourceTree = "<group>"; };
 		96E0272E1E57C7E7004B8E66 /* pt-BR */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "pt-BR"; path = "pt-BR.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		96F3F73B1F5711F1003E2D2C /* MGLUserLocationHeadingIndicator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLUserLocationHeadingIndicator.h; sourceTree = "<group>"; };
+		AC0C15F1209D0E3600B65675 /* api_mapbox_cn-geotrust_2018.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_cn-geotrust_2018.der"; sourceTree = "<group>"; };
+		AC0C15F2209D0E6000B65675 /* api_mapbox_cn-digicert_2018.der */ = {isa = PBXFileReference; lastKnownFileType = file; path = "api_mapbox_cn-digicert_2018.der"; sourceTree = "<group>"; };
 		AC518DFD201BB55A00EBC820 /* MGLTelemetryConfig.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLTelemetryConfig.h; sourceTree = "<group>"; };
 		AC518DFE201BB55A00EBC820 /* MGLTelemetryConfig.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLTelemetryConfig.m; sourceTree = "<group>"; };
 		CA55CD3E202C16AA00CE7095 /* MGLCameraChangeReason.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLCameraChangeReason.h; sourceTree = "<group>"; };
@@ -1479,6 +1485,8 @@
 				DAC49C5F1CD02BC9009E1AA3 /* Localizable.stringsdict */,
 				DA8933EF1CCD387900E68420 /* strip-frameworks.sh */,
 				40599F001DEE1B2400182B5D /* api_mapbox_staging.der */,
+				AC0C15F2209D0E6000B65675 /* api_mapbox_cn-digicert_2018.der */,
+				AC0C15F1209D0E3600B65675 /* api_mapbox_cn-geotrust_2018.der */,
 				40599F011DEE1B2400182B5D /* api_mapbox_com-digicert_2016.der */,
 				40599F021DEE1B2400182B5D /* api_mapbox_com-geotrust_2016.der */,
 				40EA6BBD1EF4598900FCCDA2 /* api_mapbox_com-digicert_2017.der */,
@@ -2225,12 +2233,14 @@
 			files = (
 				DA8933BC1CCD2CA100E68420 /* Foundation.strings in Resources */,
 				DA8933A31CCC95B000E68420 /* Localizable.strings in Resources */,
+				AC0C15F5209D0E7200B65675 /* api_mapbox_cn-digicert_2018.der in Resources */,
 				960D0C361ECF5AAF008E151F /* Images.xcassets in Resources */,
 				DA8933F01CCD387900E68420 /* strip-frameworks.sh in Resources */,
 				DAC49C5C1CD02BC9009E1AA3 /* Localizable.stringsdict in Resources */,
 				DA8933BF1CCD2CAD00E68420 /* Foundation.stringsdict in Resources */,
 				40EA6BC11EF4599600FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
 				408982E91DEE208200754016 /* api_mapbox_staging.der in Resources */,
+				AC0C15F3209D0E6900B65675 /* api_mapbox_cn-geotrust_2018.der in Resources */,
 				408982EA1DEE208B00754016 /* api_mapbox_com-digicert_2016.der in Resources */,
 				40EA6BC31EF4599D00FCCDA2 /* api_mapbox_com-geotrust_2017.der in Resources */,
 				408982EB1DEE209100754016 /* api_mapbox_com-geotrust_2016.der in Resources */,
@@ -2241,6 +2251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AC0C15F4209D0E7000B65675 /* api_mapbox_cn-geotrust_2018.der in Resources */,
 				DA8933E01CCD31DF00E68420 /* Localizable.strings in Resources */,
 				DA8933DB1CCD31D400E68420 /* Foundation.strings in Resources */,
 				960D0C371ECF5AAF008E151F /* Images.xcassets in Resources */,
@@ -2250,6 +2261,7 @@
 				40599F0C1DEE1B7600182B5D /* api_mapbox_staging.der in Resources */,
 				40599F0D1DEE1B7A00182B5D /* api_mapbox_com-digicert_2016.der in Resources */,
 				40599F0E1DEE1B7E00182B5D /* api_mapbox_com-geotrust_2016.der in Resources */,
+				AC0C15F6209D0E7300B65675 /* api_mapbox_cn-digicert_2018.der in Resources */,
 				40EA6BC21EF4599700FCCDA2 /* api_mapbox_com-digicert_2017.der in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
