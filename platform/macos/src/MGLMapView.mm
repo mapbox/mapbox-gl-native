@@ -58,7 +58,7 @@
 #import "NSURL+MGLAdditions.h"
 #import "NSColor+MGLAdditions.h"
 #import "NSImage+MGLAdditions.h"
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 
 #import <QuartzCore/QuartzCore.h>
 #import <OpenGL/gl.h>

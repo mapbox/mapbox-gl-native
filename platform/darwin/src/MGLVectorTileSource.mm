@@ -6,7 +6,7 @@
 #import "MGLStyle_Private.h"
 #import "MGLMapView_Private.h"
 
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 #import "NSURL+MGLAdditions.h"
 
 #include <mbgl/map/map.hpp>
