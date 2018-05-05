@@ -29,22 +29,24 @@ import com.mapbox.mapboxsdk.storage.FileSource;
 import timber.log.Timber;
 
 /**
- * The map snapshotter creates a large of the map, rendered
- * off the UI thread. The snapshotter itself must be used on
- * the UI thread (for access to the main looper)
+ * Use MapSnapshotter to create static map images, rendered in the background.
+ * <br>
+ * MapSnapshotter itself must be used on the UI thread (for access to the main looper).
+ * <br>
+ * For an example of using MapSnapshotter, see <a href="https://github.com/mapbox/mapbox-gl-native/blob/e423ef5609cd738c07180d11744d4a45ffb3f82f/platform/android/MapboxGLAndroidSDKTestApp/src/main/java/com/mapbox/mapboxsdk/testapp/activity/snapshot/MapSnapshotterActivity.java" target="_blank">MapSnapshotterActivity.java</a>
  */
 @UiThread
 public class MapSnapshotter {
 
   /**
-   * Get notified on snapshot completion.
+   * Callback interface for receiving notification on snapshot completion.
    *
    * @see MapSnapshotter#start(SnapshotReadyCallback, ErrorHandler)
    */
   public interface SnapshotReadyCallback {
 
     /**
-     * Called when the snapshot is complete.
+     * Called on the UI thread when the snapshot is complete.
      *
      * @param snapshot the snapshot
      */
@@ -53,16 +55,14 @@ public class MapSnapshotter {
   }
 
   /**
-   * Can be used to get notified of errors
-   * in snapshot generation
+   * Optional interface for handling errors encountered during snapshot generation.
    *
    * @see MapSnapshotter#start(SnapshotReadyCallback, ErrorHandler)
    */
   public interface ErrorHandler {
 
     /**
-     * Called on error. Snapshotting will not
-     * continue
+     * Called on error. No further snapshotting activity will happen until next call to {@link MapSnapshotter#start}.
      *
      * @param error the error message
      */
@@ -79,7 +79,11 @@ public class MapSnapshotter {
   private ErrorHandler errorHandler;
 
   /**
-   * MapSnapshotter options
+   * Specifies the parameters for drawing a static map image using MapSnapshotter.
+   * <br><br>
+   * The width and height of the image must be specified.<br>
+   * Set the Mapbox Style to use with the {@link Options#withStyle(String)} method.<br>
+   * Set the camera position for the snapshot with {@link Options#withCameraPosition(CameraPosition)}.
    */
   public static class Options {
     private float pixelRatio = 1;
@@ -91,8 +95,8 @@ public class MapSnapshotter {
     private boolean showLogo = true;
 
     /**
-     * @param width  the width of the image
-     * @param height the height of the image
+     * @param width  The width of the image, in pixels
+     * @param height The height of the image, in pixels
      */
     public Options(int width, int height) {
       if (width == 0 || height == 0) {
@@ -104,7 +108,7 @@ public class MapSnapshotter {
 
     /**
      * @param url The style URL to use
-     * @return the mutated {@link Options}
+     * @return The mutated {@link Options}
      */
     public Options withStyle(String url) {
       this.styleUrl = url;
@@ -112,9 +116,10 @@ public class MapSnapshotter {
     }
 
     /**
-     * @param region the region to show in the snapshot.
-     *               This is applied after the camera position
-     * @return the mutated {@link Options}
+     * @param region The region to show in the snapshot.
+     *               If the {@link CameraPosition} is also set,
+     *               the camera position will be overridden to match the specified region.
+     * @return The mutated {@link Options}
      */
     public Options withRegion(LatLngBounds region) {
       this.region = region;
@@ -122,8 +127,8 @@ public class MapSnapshotter {
     }
 
     /**
-     * @param pixelRatio the pixel ratio to use (default: 1)
-     * @return the mutated {@link Options}
+     * @param pixelRatio The pixel ratio to use (default: 1)
+     * @return The mutated {@link Options}
      */
     public Options withPixelRatio(float pixelRatio) {
       this.pixelRatio = pixelRatio;
@@ -131,10 +136,9 @@ public class MapSnapshotter {
     }
 
     /**
-     * @param cameraPosition The camera position to use,
-     *                       the {@link CameraPosition#target} is overridden
-     *                       by region if set in conjunction.
-     * @return the mutated {@link Options}
+     * @param cameraPosition The {@link CameraPosition} to use for the snapshot.
+     *                       Setting a {@link LatLngBounds} region will override the camera position.
+     * @return The mutated {@link Options}
      */
     public Options withCameraPosition(CameraPosition cameraPosition) {
       this.cameraPosition = cameraPosition;
@@ -142,8 +146,8 @@ public class MapSnapshotter {
     }
 
     /**
-     * @param showLogo The flag indicating to show the Mapbox logo.
-     * @return the mutated {@link Options}
+     * @param showLogo Flag indicating whether to show the Mapbox logo.
+     * @return The mutated {@link Options}
      */
     public Options withLogo(boolean showLogo) {
       this.showLogo = showLogo;
@@ -151,28 +155,28 @@ public class MapSnapshotter {
     }
 
     /**
-     * @return the width of the image
+     * @return The width of the image
      */
     public int getWidth() {
       return width;
     }
 
     /**
-     * @return the height of the image
+     * @return The height of the image
      */
     public int getHeight() {
       return height;
     }
 
     /**
-     * @return the pixel ratio
+     * @return The pixel ratio of the resulting image
      */
     public float getPixelRatio() {
       return pixelRatio;
     }
 
     /**
-     * @return the region
+     * @return The region to include in the map, specified as {@link LatLngBounds}
      */
     @Nullable
     public LatLngBounds getRegion() {
@@ -180,14 +184,14 @@ public class MapSnapshotter {
     }
 
     /**
-     * @return the style url
+     * @return The style URL
      */
     public String getStyleUrl() {
       return styleUrl;
     }
 
     /**
-     * @return the camera position
+     * @return The {@link CameraPosition}
      */
     @Nullable
     public CameraPosition getCameraPosition() {
@@ -196,11 +200,11 @@ public class MapSnapshotter {
   }
 
   /**
-   * Creates the Map snapshotter, but doesn't start rendering or
-   * loading yet.
+   * Creates the MapSnapshotter, but doesn't start rendering or
+   * loading tiles. Use {@link Options} to configure the initial state of the map.
    *
-   * @param context the Context that is or contains the Application context
-   * @param options the options to use for the snapshot
+   * @param context The Context that is or contains the Application context
+   * @param options The {@link Options} to use for the snapshot
    */
   public MapSnapshotter(@NonNull Context context, @NonNull Options options) {
     this.context = context.getApplicationContext();
@@ -214,9 +218,11 @@ public class MapSnapshotter {
 
   /**
    * Starts loading and rendering the snapshot. The callback will be fired
-   * on the calling thread.
+   * on the calling thread. Starting another snapshot before the current one has
+   * finished will generate an error. Do not modify snapshot options while a snapshot
+   * is in progress.
    *
-   * @param callback the callback to use when the snapshot is ready
+   * @param callback The callback to use when the snapshot is ready
    */
   public void start(@NonNull SnapshotReadyCallback callback) {
     this.start(callback, null);
@@ -224,10 +230,12 @@ public class MapSnapshotter {
 
   /**
    * Starts loading and rendering the snapshot. The callbacks will be fired
-   * on the calling thread.
+   * on the calling thread. Starting another snapshot before the current one has
+   * finished will generate an error. Do not modify snapshot options while a snapshot
+   * is in progress.
    *
-   * @param callback     the callback to use when the snapshot is ready
-   * @param errorHandler the error handler to use on snapshot errors
+   * @param callback     The callback to use when the snapshot is ready
+   * @param errorHandler The error handler to use on snapshot errors
    */
   public void start(@NonNull SnapshotReadyCallback callback, ErrorHandler errorHandler) {
     if (this.callback != null) {
@@ -240,38 +248,43 @@ public class MapSnapshotter {
   }
 
   /**
-   * Updates the snapshotter with a new size
+   * Updates the MapSnapshotter with a new size
    *
-   * @param width  the width
-   * @param height the height
+   * @param width  The width
+   * @param height The height
    */
   public native void setSize(int width, int height);
 
   /**
-   * Updates the snapshotter with a new {@link CameraPosition}
+   * Updates the MapSnapshotter with a new {@link CameraPosition}
    *
-   * @param cameraPosition the camera position
+   * @param cameraPosition The camera position
    */
   public native void setCameraPosition(CameraPosition cameraPosition);
 
   /**
-   * Updates the snapshotter with a new {@link LatLngBounds}
+   * Updates the MapSnapshotter with a new {@link LatLngBounds}.
+   * The map's camera position will be updated to fit the region,
+   * overriding any previously set camera position.
    *
-   * @param region the region
+   * @param region The region
    */
   public native void setRegion(LatLngBounds region);
 
   /**
-   * Updates the snapshotter with a new style url
+   * Updates the MapSnapshotter with a new style url
    *
-   * @param styleUrl the style url
+   * @param styleUrl The style url
    */
   public native void setStyleUrl(String styleUrl);
 
 
   /**
-   * Must be called in on the thread
-   * the object was created on.
+   * Cancel an in-progress snapshot request, allowing the MapSnapshotter to be re-used.
+   * This will not cancel background network requests for map tiles: they will continue
+   * to completion and the resulting tiles will be stored in the application's shared
+   * tile cache.
+   * Must be called in on the thread the MapSnapshotter was created on.
    */
   public void cancel() {
     reset();
@@ -283,7 +296,7 @@ public class MapSnapshotter {
    *
    * @param mapSnapshot the map snapshot to draw the overlay on
    */
-  protected void addOverlay(MapSnapshot mapSnapshot) {
+  private void addOverlay(MapSnapshot mapSnapshot) {
     Bitmap snapshot = mapSnapshot.getBitmap();
     Canvas canvas = new Canvas(snapshot);
     int margin = (int) context.getResources().getDisplayMetrics().density * LOGO_MARGIN_DP;
@@ -429,7 +442,7 @@ public class MapSnapshotter {
    *
    * @param snapshot the generated snapshot
    */
-  protected void onSnapshotReady(final MapSnapshot snapshot) {
+  private void onSnapshotReady(final MapSnapshot snapshot) {
     new Handler().post(new Runnable() {
       @Override
       public void run() {
@@ -448,27 +461,27 @@ public class MapSnapshotter {
    *
    * @param reason the exception string
    */
-  protected void onSnapshotFailed(String reason) {
+  private void onSnapshotFailed(String reason) {
     if (errorHandler != null) {
       errorHandler.onError(reason);
       reset();
     }
   }
 
-  protected void reset() {
+  private void reset() {
     callback = null;
     errorHandler = null;
   }
 
-  protected native void nativeInitialize(MapSnapshotter mapSnapshotter,
+  private native void nativeInitialize(MapSnapshotter mapSnapshotter,
                                          FileSource fileSource, float pixelRatio,
                                          int width, int height, String styleUrl,
                                          LatLngBounds region, CameraPosition position,
                                          boolean showLogo, String programCacheDir);
 
-  protected native void nativeStart();
+  private native void nativeStart();
 
-  protected native void nativeCancel();
+  private native void nativeCancel();
 
   @Override
   protected native void finalize() throws Throwable;

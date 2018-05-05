@@ -2047,7 +2047,10 @@ public final class MapboxMap {
   //
 
   /**
-   * Takes a snapshot of the map.
+   * Renders a snapshot of the current map state as a {@link Bitmap}.
+   * Rendering does not wait for tiles to load or for animations to finish.
+   * To render a single static map image in the background, consider using
+   * {@link com.mapbox.mapboxsdk.snapshotter.MapSnapshotter}
    *
    * @param callback Callback method invoked when the snapshot is taken.
    */
