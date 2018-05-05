@@ -2,6 +2,22 @@
 include(cmake/NodeJS.cmake)
 nodejs_init()
 
+add_library(mbgl-loop-node STATIC
+    platform/default/async_task.cpp
+    platform/default/run_loop.cpp
+    platform/default/timer.cpp
+)
+
+target_include_directories(mbgl-loop-node
+    PRIVATE include
+    PRIVATE src
+)
+
+target_include_directories(mbgl-loop-node PUBLIC ${NODEJS_INCLUDE_DIRS})
+
+create_source_groups(mbgl-loop-node)
+xcode_create_scheme(TARGET mbgl-loop-node)
+
 add_nodejs_module(mbgl-node
     platform/node/src/node_mapbox_gl_native.cpp
 )
@@ -31,13 +47,9 @@ target_include_directories(mbgl-node
     PRIVATE platform/default
 )
 
-# Use node-provided uv.h. This is not part of loop-uv.cmake because loop-uv.cmake is also
-# used by linux/config.cmake, where we need to use headers provided by mason's libuv.
-target_include_directories(mbgl-loop-uv PUBLIC ${NODEJS_INCLUDE_DIRS})
-
 target_link_libraries(mbgl-node
     PRIVATE mbgl-core
-    PRIVATE mbgl-loop-uv
+    PRIVATE mbgl-loop-node
 )
 
 target_add_mason_package(mbgl-node PRIVATE geojson)
