@@ -22,6 +22,9 @@
   "query-tests/geometry/polygon": "needs investigation",
   "query-tests/world-wrapping/box": "skip - needs issue",
   "query-tests/world-wrapping/point": "skip - needs issue",
+  "query-tests/circle-radius/feature-state": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "query-tests/feature-state/default": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "query-tests/regressions/mapbox-gl-js#6555": "skip - no querySourceFeatures in mbgl-node; needs issue",
   "render-tests/background-color/transition": "https://github.com/mapbox/mapbox-gl-native/issues/10619",
   "render-tests/debug/collision": "https://github.com/mapbox/mapbox-gl-native/issues/3841",
   "render-tests/debug/collision-lines": "https://github.com/mapbox/mapbox-gl-native/issues/10412",
@@ -107,7 +110,7 @@
   "render-tests/combinations/line-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/raster-translucent--fill-extrusion-translucent": "needs investigation",
   "render-tests/combinations/symbol-translucent--fill-extrusion-translucent": "needs investigation",
-  "render-tests/feature-state/composite-expression": "needs issue",
-  "render-tests/feature-state/data-expression": "needs issue",
-  "render-tests/feature-state/vector-source": "needs issue"
+  "render-tests/feature-state/composite-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "render-tests/feature-state/data-expression": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue",
+  "render-tests/feature-state/vector-source": "skip - port https://github.com/mapbox/mapbox-gl-js/pull/6263 - needs issue"
 }
