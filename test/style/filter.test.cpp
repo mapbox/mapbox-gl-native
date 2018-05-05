@@ -27,6 +27,17 @@ bool filter(const char * json,
     return (*filter)(context);
 }
 
+void invalidFilter(const char * json) {
+    conversion::Error error;
+    optional<Filter> filter = conversion::convertJSON<Filter>(json, error);
+    EXPECT_FALSE(bool(filter));
+    EXPECT_NE(error.message, "");
+}
+
+TEST(Filter, EqualsInvalid) {
+    invalidFilter("[\"==\", \"foo\", null]");
+    invalidFilter("[\"==\", \"foo\", [1, 2]]");
+}
 TEST(Filter, EqualsString) {
     auto f = R"(["==", "foo", "bar"])";
     ASSERT_TRUE(filter(f, {{ "foo", std::string("bar") }}));
@@ -52,6 +63,12 @@ TEST(Filter, EqualsType) {
     auto f = R"(["==", "$type", "LineString"])";
     ASSERT_FALSE(filter(f, {{}}, {}, FeatureType::Point, {}));
     ASSERT_TRUE(filter(f, {{}}, {}, FeatureType::LineString, {}));
+    ASSERT_FALSE(filter(f, {{}}, {}, FeatureType::Point, {}));
+
+    invalidFilter("[\"==\", \"$type\"]");
+    invalidFilter("[\"==\", \"$type\", null]");
+    invalidFilter("[\"==\", \"$type\", \"foo\", 1]");
+    invalidFilter("[\"==\", \"$type\", \"foo\", \"Point\"]");
 }
 
 TEST(Filter, InType) {
@@ -76,11 +93,25 @@ TEST(Filter, Any) {
     ASSERT_TRUE(filter("[\"any\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
+TEST(Filter, AnyExpression) {
+    ASSERT_FALSE(filter("[\"any\"]"));
+    ASSERT_TRUE(filter("[\"any\", true]"));
+    ASSERT_TRUE(filter("[\"any\",true, false]"));
+    ASSERT_TRUE(filter("[\"any\", true, true]"));
+}
+
 TEST(Filter, All) {
     ASSERT_TRUE(filter("[\"all\"]", {{}}));
     ASSERT_TRUE(filter("[\"all\", [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
     ASSERT_FALSE(filter("[\"all\", [\"==\", \"foo\", 0]]", {{ std::string("foo"), int64_t(1) }}));
     ASSERT_FALSE(filter("[\"all\", [\"==\", \"foo\", 0], [\"==\", \"foo\", 1]]", {{ std::string("foo"), int64_t(1) }}));
+}
+
+TEST(Filter, AllExpression) {
+    ASSERT_TRUE(filter("[\"all\"]"));
+    ASSERT_TRUE(filter("[\"all\", true]"));
+    ASSERT_FALSE(filter("[\"all\",true, false]"));
+    ASSERT_TRUE(filter("[\"any\", true, true]"));
 }
 
 TEST(Filter, None) {

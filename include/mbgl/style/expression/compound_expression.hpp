@@ -137,18 +137,17 @@ ParseResult parseCompoundExpression(const std::string name, const mbgl::style::c
 ParseResult createCompoundExpression(const CompoundExpressionRegistry::Definition& definition,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx);
-    
+
 ParseResult createCompoundExpression(const std::string& name,
                                      std::vector<std::unique_ptr<Expression>> args,
                                      ParsingContext& ctx);
-    
+// Convenience method for use expressions that have 0, 1, or 2 args.
 ParseResult createCompoundExpression(const std::string& name, ParsingContext& ctx);
 
 ParseResult createCompoundExpression(const std::string& name,
                                      std::unique_ptr<Expression> arg1,
                                      ParsingContext& ctx);
 
-    
 ParseResult createCompoundExpression(const std::string& name,
                                      std::unique_ptr<Expression> arg1,
                                      std::unique_ptr<Expression> arg2,

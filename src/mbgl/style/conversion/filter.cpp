@@ -27,7 +27,8 @@ optional<Filter> Converter<Filter>::operator()(const Convertible& value, Error& 
         }
     } else {
         std::unique_ptr<Expression> expression = convertLegacyFilter(value, error);
-        return Filter(expression ? optional<std::unique_ptr<Expression>>(std::move(expression)) : optional<std::unique_ptr<Expression>>() );
+        if (!expression) return {};
+        return Filter(optional<std::unique_ptr<Expression>>(std::move(expression)));
     }
 }
 

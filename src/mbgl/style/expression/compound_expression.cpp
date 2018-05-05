@@ -18,7 +18,7 @@ namespace detail {
     The Signature<Fn> structs are wrappers around an "evaluate()" function whose
     purpose is to extract the necessary Type data from the evaluate function's
     type.  There are three key (partial) specializations:
-    
+ 
     Signature<R (Params...)>:
     Wraps a simple evaluate function (const T0&, const T1&, ...) -> Result<U>
  
@@ -31,7 +31,7 @@ namespace detail {
     parameters in addition to its subexpressions, i.e.,
     (const EvaluationParams&, const T0&, const T1&, ...) -> Result<U>.  Needed
     for expressions like ["zoom"], ["get", key], etc.
-    
+ 
     In each of the above evaluate signatures, T0, T1, etc. are the types of
     the successfully evaluated subexpressions.
 */
