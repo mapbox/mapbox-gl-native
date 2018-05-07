@@ -2,6 +2,12 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+/// The default base URL for Mapbox APIs other than the telemetry API.
+extern NSString * const MGLDefaultMapboxAPIBaseURL;
+
+/// The PRC base URL for Mapbox APIs other than the telemetry API.
+extern NSString * const MGLChinaMapboxAPIBaseURL;
+
 /**
  The MGLNetworkConfiguration object provides a global way to set a base API URL for
  retrieval of map data, styles, and other resources.
