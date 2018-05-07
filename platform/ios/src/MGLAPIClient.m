@@ -22,7 +22,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 @property (nonatomic, copy) NSData *digicertCert_2017;
 @property (nonatomic, copy) NSData *geoTrustCert_2017;
 @property (nonatomic, copy) NSData *digicertCert_cn_2018;
-//@property (nonatomic, copy) NSData *geoTrustCert_cn_2018;
+@property (nonatomic, copy) NSData *geoTrustCert_cn_2018;
 @property (nonatomic, copy) NSData *testServerCert;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic) BOOL usesTestServer;
@@ -119,8 +119,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     self.geoTrustCert_2017 = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_com-digicert_2017"];
     self.digicertCert_2017 = certificate;
-//    [self loadCertificate:&certificate withResource:@"api_mapbox_cn-geotrust_2018"];
-//    self.geoTrustCert_cn_2018 = certificate;
+    [self loadCertificate:&certificate withResource:@"api_mapbox_cn-geotrust_2018"];
+    self.geoTrustCert_cn_2018 = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_cn-digicert_2018"];
     self.digicertCert_cn_2018 = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_staging"];
@@ -194,9 +194,9 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_2017 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             }
-//            if (!found) {
-//                found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
-//            }
+            if (!found) {
+                found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
+            }
             
             // If challenge can't be completed with any of the above certs, then try the test server if the app is configured to use the test server
             if (!found && _usesTestServer) {
