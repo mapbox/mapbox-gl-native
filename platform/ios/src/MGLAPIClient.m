@@ -22,7 +22,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 @property (nonatomic, copy) NSData *digicertCert_2017;
 @property (nonatomic, copy) NSData *geoTrustCert_2017;
 @property (nonatomic, copy) NSData *digicertCert_cn_2018;
-@property (nonatomic, copy) NSData *geoTrustCert_cn_2018;
+//@property (nonatomic, copy) NSData *geoTrustCert_cn_2018;
 @property (nonatomic, copy) NSData *testServerCert;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic) BOOL usesTestServer;
@@ -180,7 +180,7 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             // Look for a pinned certificate in the server's certificate chain
             CFIndex numKeys = SecTrustGetCertificateCount(serverTrust);
             
-            // Check certs in the following order: digicert 2016, digicert 2017, geotrust 2016, geotrust 2017
+            // Check certs in the following order: digicert 2016, digicert 2017, digicert CN 2018, geotrust 2016, geotrust 2017, geotrust CN 2018
             found = [self evaluateCertificateWithCertificateData:self.digicertCert_2016 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.digicertCert_2017 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
@@ -194,9 +194,9 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_2017 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             }
-            if (!found) {
-                found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
-            }
+//            if (!found) {
+//                found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
+//            }
             
             // If challenge can't be completed with any of the above certs, then try the test server if the app is configured to use the test server
             if (!found && _usesTestServer) {
