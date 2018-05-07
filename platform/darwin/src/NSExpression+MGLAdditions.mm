@@ -802,6 +802,22 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         } else if ([op isEqualToString:@"to-string"] || [op isEqualToString:@"string"]) {
             NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
             return [NSExpression expressionWithFormat:@"CAST(%@, 'NSString')", operand];
+        } else if ([op isEqualToString:@"to-color"]) {
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            
+            if (argumentObjects.count == 1) {
+#if TARGET_OS_IPHONE
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'UIColor')", operand];
+#else
+                return [NSExpression expressionWithFormat:@"CAST(%@, 'NSColor')", operand];
+#endif
+            }
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
+            
+        } else if ([op isEqualToString:@"to-rgba"]) {
+            NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.firstObject];
+            return [NSExpression expressionWithFormat:@"CAST(noindex(%@), 'NSArray')", operand];
         } else if ([op isEqualToString:@"get"]) {
             if (argumentObjects.count == 2) {
                 NSExpression *operand = [NSExpression expressionWithMGLJSONObject:argumentObjects.lastObject];
@@ -1164,6 +1180,26 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
                     return @[@"to-string", object];
                 } else if ([type isEqualToString:@"NSNumber"]) {
                     return @[@"to-number", object];
+                }
+#if TARGET_OS_IPHONE
+                else if ([type isEqualToString:@"UIColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
+                }
+#else
+                else if ([type isEqualToString:@"NSColor"] || [type isEqualToString:@"MGLColor"]) {
+                    return @[@"to-color", object];
+                }
+#endif
+                else if ([type isEqualToString:@"NSArray"]) {
+                    NSExpression *operand = self.arguments.firstObject;
+                    if ([operand expressionType] == NSFunctionExpressionType ) {
+                        operand = self.arguments.firstObject.arguments.firstObject;
+                    }
+                    if (([operand expressionType] != NSConstantValueExpressionType) ||
+                        ([operand expressionType] == NSConstantValueExpressionType &&
+                         [[operand constantValue] isKindOfClass:[MGLColor class]])) {
+                        return @[@"to-rgba", object];
+                    }
                 }
                 [NSException raise:NSInvalidArgumentException
                             format:@"Casting expression to %@ not yet implemented.", type];

@@ -70,6 +70,8 @@ path or variable into a matching type:
 
 * To cast a value to a number, use `CAST(key, 'NSNumber')`.
 * To cast a value to a string, use `CAST(key, 'NSString')`.
+* To cast a value to a color, use `CAST(key, 'UIColor')` on iOS and `CAST(key, 'NSColor')` on macOS.
+* To cast an `NSColor` or `UIColor` object to an array, use `CAST(noindex(color), 'NSArray')`.
 
 For details about the predicate format string syntax, consult the “Predicate
 Format String Syntax” chapter of the
