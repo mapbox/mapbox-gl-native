@@ -1,5 +1,8 @@
 #import "MGLNetworkConfiguration.h"
 
+NSString * const MGLDefaultMapboxAPIBaseURL = @"https://api.mapbox.com";
+NSString * const MGLChinaMapboxAPIBaseURL = @"https://api.mapbox.cn";
+
 @implementation MGLNetworkConfiguration
 
 + (void)load {

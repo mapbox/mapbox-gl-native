@@ -2,9 +2,11 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSData+MGLAdditions.h"
 #import "MGLAccountManager.h"
+#import "MGLNetworkConfiguration.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
-static NSString * const MGLAPIClientBaseURL = @"https://events.mapbox.cn";
+static NSString * const MGLAPIClientBaseURL = @"https://events.mapbox.com";
+static NSString * const MGLAPIClientChinaBaseURL = @"https://events.mapbox.cn";
 static NSString * const MGLAPIClientEventsPath = @"events/v2";
 
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
@@ -104,6 +106,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     if (testServerURL && [testServerURL.scheme isEqualToString:@"https"]) {
         self.baseURL = testServerURL;
         self.usesTestServer = YES;
+    } else if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"] isEqualToString:MGLChinaMapboxAPIBaseURL]) {
+        self.baseURL = [NSURL URLWithString:MGLAPIClientChinaBaseURL];
     } else {
         self.baseURL = [NSURL URLWithString:MGLAPIClientBaseURL];
     }
