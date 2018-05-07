@@ -2,9 +2,11 @@
 #import "NSBundle+MGLAdditions.h"
 #import "NSData+MGLAdditions.h"
 #import "MGLAccountManager.h"
+#import "MGLNetworkConfiguration.h"
 
 static NSString * const MGLAPIClientUserAgentBase = @"MapboxEventsiOS";
 static NSString * const MGLAPIClientBaseURL = @"https://events.mapbox.com";
+static NSString * const MGLAPIClientChinaBaseURL = @"https://events.mapbox.cn";
 static NSString * const MGLAPIClientEventsPath = @"events/v2";
 
 static NSString * const MGLAPIClientHeaderFieldUserAgentKey = @"User-Agent";
@@ -21,6 +23,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
 @property (nonatomic, copy) NSData *geoTrustCert_2016;
 @property (nonatomic, copy) NSData *digicertCert_2017;
 @property (nonatomic, copy) NSData *geoTrustCert_2017;
+@property (nonatomic, copy) NSData *digicertCert_cn_2018;
+@property (nonatomic, copy) NSData *geoTrustCert_cn_2018;
 @property (nonatomic, copy) NSData *testServerCert;
 @property (nonatomic, copy) NSString *userAgent;
 @property (nonatomic) BOOL usesTestServer;
@@ -102,6 +106,8 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     if (testServerURL && [testServerURL.scheme isEqualToString:@"https"]) {
         self.baseURL = testServerURL;
         self.usesTestServer = YES;
+    } else if ([[[NSBundle mainBundle] objectForInfoDictionaryKey:@"MGLMapboxAPIBaseURL"] isEqualToString:MGLChinaMapboxAPIBaseURL]) {
+        self.baseURL = [NSURL URLWithString:MGLAPIClientChinaBaseURL];
     } else {
         self.baseURL = [NSURL URLWithString:MGLAPIClientBaseURL];
     }
@@ -117,6 +123,10 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
     self.geoTrustCert_2017 = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_com-digicert_2017"];
     self.digicertCert_2017 = certificate;
+    [self loadCertificate:&certificate withResource:@"api_mapbox_cn-geotrust_2018"];
+    self.geoTrustCert_cn_2018 = certificate;
+    [self loadCertificate:&certificate withResource:@"api_mapbox_cn-digicert_2018"];
+    self.digicertCert_cn_2018 = certificate;
     [self loadCertificate:&certificate withResource:@"api_mapbox_staging"];
     self.testServerCert = certificate;
 }
@@ -174,16 +184,22 @@ static NSString * const MGLAPIClientHTTPMethodPost = @"POST";
             // Look for a pinned certificate in the server's certificate chain
             CFIndex numKeys = SecTrustGetCertificateCount(serverTrust);
             
-            // Check certs in the following order: digicert 2016, digicert 2017, geotrust 2016, geotrust 2017
+            // Check certs in the following order: digicert 2016, digicert 2017, digicert CN 2018, geotrust 2016, geotrust 2017, geotrust CN 2018
             found = [self evaluateCertificateWithCertificateData:self.digicertCert_2016 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.digicertCert_2017 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
+            }
+            if (!found) {
+                found = [self evaluateCertificateWithCertificateData:self.digicertCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             }
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_2016 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             }
             if (!found) {
                 found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_2017 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
+            }
+            if (!found) {
+                found = [self evaluateCertificateWithCertificateData:self.geoTrustCert_cn_2018 keyCount:numKeys serverTrust:serverTrust challenge:challenge completionHandler:completionHandler];
             }
             
             // If challenge can't be completed with any of the above certs, then try the test server if the app is configured to use the test server
