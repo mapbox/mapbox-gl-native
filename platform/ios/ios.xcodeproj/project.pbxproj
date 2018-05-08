@@ -36,6 +36,12 @@
 		1F7454971ECD450D00021D39 /* MGLLight_Private.h in Headers */ = {isa = PBXBuildFile; fileRef = 1F7454941ECD450D00021D39 /* MGLLight_Private.h */; };
 		1F7454A91ED08AB400021D39 /* MGLLightTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F7454A61ED08AB400021D39 /* MGLLightTest.mm */; };
 		1F95931D1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */; };
+		1FFCB53E20A1015C003F9D50 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FFCB53C20A1015C003F9D50 /* MGLLocationManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1FFCB53F20A1015C003F9D50 /* MGLLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFCB53D20A1015C003F9D50 /* MGLLocationManager.m */; };
+		1FFDF91220A50B160063BB80 /* MGLLocationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 1FFCB53C20A1015C003F9D50 /* MGLLocationManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1FFDF91520A5E82E0063BB80 /* MBXCustomLocationManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 1FFDF91420A5E82E0063BB80 /* MBXCustomLocationManager.m */; };
+		1FFDF91720A637460063BB80 /* coordinates.json in Resources */ = {isa = PBXBuildFile; fileRef = 1FFDF91620A637460063BB80 /* coordinates.json */; };
+		1FFDF91920A63C4A0063BB80 /* white_house_lvl_0.geojson in Resources */ = {isa = PBXBuildFile; fileRef = 1FFDF91820A63C4A0063BB80 /* white_house_lvl_0.geojson */; };
 		30E578171DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578181DAA85520050F07E /* UIImage+MGLAdditions.h in Headers */ = {isa = PBXBuildFile; fileRef = 30E578111DAA7D690050F07E /* UIImage+MGLAdditions.h */; };
 		30E578191DAA855E0050F07E /* UIImage+MGLAdditions.mm in Sources */ = {isa = PBXBuildFile; fileRef = 30E578121DAA7D690050F07E /* UIImage+MGLAdditions.mm */; };
@@ -754,6 +760,12 @@
 		1F7454941ECD450D00021D39 /* MGLLight_Private.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MGLLight_Private.h; sourceTree = "<group>"; };
 		1F7454A61ED08AB400021D39 /* MGLLightTest.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLLightTest.mm; path = ../../darwin/test/MGLLightTest.mm; sourceTree = "<group>"; };
 		1F95931C1E6DE2E900D5B294 /* MGLNSDateAdditionsTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MGLNSDateAdditionsTests.mm; path = ../../darwin/test/MGLNSDateAdditionsTests.mm; sourceTree = "<group>"; };
+		1FFCB53C20A1015C003F9D50 /* MGLLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MGLLocationManager.h; sourceTree = "<group>"; };
+		1FFCB53D20A1015C003F9D50 /* MGLLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MGLLocationManager.m; sourceTree = "<group>"; };
+		1FFDF91320A5E82E0063BB80 /* MBXCustomLocationManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MBXCustomLocationManager.h; sourceTree = "<group>"; };
+		1FFDF91420A5E82E0063BB80 /* MBXCustomLocationManager.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MBXCustomLocationManager.m; sourceTree = "<group>"; };
+		1FFDF91620A637460063BB80 /* coordinates.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = coordinates.json; sourceTree = "<group>"; };
+		1FFDF91820A63C4A0063BB80 /* white_house_lvl_0.geojson */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = white_house_lvl_0.geojson; sourceTree = "<group>"; };
 		20DABE861DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Foundation.strings"; sourceTree = "<group>"; };
 		20DABE881DF78148007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		20DABE8A1DF78149007AC5FF /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Root.strings"; sourceTree = "<group>"; };
@@ -1682,6 +1694,8 @@
 				DA1DC96C1CB6C6CE006E619F /* points.geojson */,
 				DA1DC96D1CB6C6CE006E619F /* polyline.geojson */,
 				DA1DC96F1CB6C6CE006E619F /* threestates.geojson */,
+				1FFDF91820A63C4A0063BB80 /* white_house_lvl_0.geojson */,
+				1FFDF91620A637460063BB80 /* coordinates.json */,
 				DD4823721D94AE6C00EB71B7 /* fill_filter_style.json */,
 				DD4823731D94AE6C00EB71B7 /* line_filter_style.json */,
 				DD4823741D94AE6C00EB71B7 /* numeric_filter_style.json */,
@@ -1747,6 +1761,8 @@
 				96E027251E57C76E004B8E66 /* Localizable.strings */,
 				9604FC341F313A5E003EEA02 /* Fixtures */,
 				DA1DC94D1CB6C1C2006E619F /* Supporting Files */,
+				1FFDF91320A5E82E0063BB80 /* MBXCustomLocationManager.h */,
+				1FFDF91420A5E82E0063BB80 /* MBXCustomLocationManager.m */,
 			);
 			name = "Demo App";
 			path = app;
@@ -1881,6 +1897,8 @@
 				DA8847EE1CBAFA5100AB86E3 /* MGLTypes.h */,
 				DA8848111CBAFA6200AB86E3 /* MGLTypes.m */,
 				35E1A4D71D74336F007AA97F /* MGLValueEvaluator.h */,
+				1FFCB53C20A1015C003F9D50 /* MGLLocationManager.h */,
+				1FFCB53D20A1015C003F9D50 /* MGLLocationManager.m */,
 			);
 			name = Foundation;
 			path = ../darwin/src;
@@ -2221,6 +2239,7 @@
 				0778DD431F67556700A73B34 /* MGLComputedShapeSource.h in Headers */,
 				DA8848311CBAFA6200AB86E3 /* NSString+MGLAdditions.h in Headers */,
 				DACA86262019218600E9693A /* MGLRasterDEMSource.h in Headers */,
+				1FFCB53E20A1015C003F9D50 /* MGLLocationManager.h in Headers */,
 				353933F81D3FB79F003F57D7 /* MGLLineStyleLayer.h in Headers */,
 				92F2C3ED1F0E3C3A00268EC0 /* MGLRendererFrontend.h in Headers */,
 				DAAF722D1DA903C700312FA4 /* MGLStyleValue_Private.h in Headers */,
@@ -2404,6 +2423,7 @@
 				DABFB86B1CBE99E500D62B32 /* MGLTilePyramidOfflineRegion.h in Headers */,
 				968F36B51E4D128D003A5522 /* MGLDistanceFormatter.h in Headers */,
 				4018B1CB1CDC288E00F666AF /* MGLAnnotationView.h in Headers */,
+				1FFDF91220A50B160063BB80 /* MGLLocationManager.h in Headers */,
 				DABFB85F1CBE99E500D62B32 /* MGLGeometry.h in Headers */,
 				96E516E02000550C00A02306 /* MGLFeature_Private.h in Headers */,
 				353933F61D3FB785003F57D7 /* MGLBackgroundStyleLayer.h in Headers */,
@@ -2723,8 +2743,10 @@
 				DA821D071CCC6D59007508D4 /* Main.storyboard in Resources */,
 				DA1DC9731CB6C6CE006E619F /* threestates.geojson in Resources */,
 				DA821D061CCC6D59007508D4 /* LaunchScreen.storyboard in Resources */,
+				1FFDF91720A637460063BB80 /* coordinates.json in Resources */,
 				96E027231E57C76E004B8E66 /* Localizable.strings in Resources */,
 				DD4823751D94AE6C00EB71B7 /* fill_filter_style.json in Resources */,
+				1FFDF91920A63C4A0063BB80 /* white_house_lvl_0.geojson in Resources */,
 				DA1DC99F1CB6E088006E619F /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2820,6 +2842,7 @@
 				DA1DC99B1CB6E064006E619F /* MBXViewController.m in Sources */,
 				40FDA76B1CCAAA6800442548 /* MBXAnnotationView.m in Sources */,
 				632281DF1E6F855900D75A5D /* MBXEmbeddedMapViewController.m in Sources */,
+				1FFDF91520A5E82E0063BB80 /* MBXCustomLocationManager.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2981,6 +3004,7 @@
 				40834BED1FE05E1800C1BD0D /* MMEEventLogger.m in Sources */,
 				353AFA161D65AB17005A69F4 /* NSDate+MGLAdditions.mm in Sources */,
 				40834BF41FE05E1800C1BD0D /* MMETrustKitWrapper.m in Sources */,
+				1FFCB53F20A1015C003F9D50 /* MGLLocationManager.m in Sources */,
 				40834BEF1FE05E1800C1BD0D /* MMEEventsManager.m in Sources */,
 				35D13AC51D3D19DD00AFB4E0 /* MGLFillStyleLayer.mm in Sources */,
 				DA8848241CBAFA6200AB86E3 /* MGLOfflineStorage.mm in Sources */,
