@@ -271,10 +271,6 @@ global.isDataDriven = function (property) {
   return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
 };
 
-global.isInterpolable = function(property) {
-  return property.expression && property.expression.interpolated;
-}
-
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
 };

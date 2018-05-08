@@ -318,7 +318,8 @@ global.propertyDoc = function (propertyName, property, layerType, kind) {
         doc += '* Predefined functions, including mathematical and string operators\n' +
             '* Conditional expressions\n' +
             '* Variable assignments and references to assigned variables\n';
-        const inputVariable = property.name === 'heatmap-color' ? '$heatmapDensity' : '$zoomLevel';
+        const inputVariable = property.expression && property['property-type'] === 'color-ramp' ?
+            '$' + camelizeWithLeadingLowercase(property.expression.parameters[0]) : '$zoomLevel';
         if (isDataDriven(property)) {
             doc += `* Interpolation and step functions applied to the \`${inputVariable}\` variable and/or feature attributes\n`;
         } else if (property.expression && property.expression.interpolated) {
