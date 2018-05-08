@@ -34,9 +34,16 @@ void invalidFilter(const char * json) {
     EXPECT_NE(error.message, "");
 }
 
-TEST(Filter, EqualsInvalid) {
-    invalidFilter("[\"==\", \"foo\", null]");
-    invalidFilter("[\"==\", \"foo\", [1, 2]]");
+TEST(Filter, EqualsNull) {
+    auto f = R"(["==", "foo", null])";
+    ASSERT_TRUE(filter(f, {{ "foo", mapbox::geometry::null_value }}));
+
+    ASSERT_FALSE(filter(f, {{ "foo", int64_t(0) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", int64_t(1) }}));
+    ASSERT_FALSE(filter(f, {{ "foo", std::string("0") }}));
+    ASSERT_FALSE(filter(f, {{ "foo", true }}));
+    ASSERT_FALSE(filter(f, {{ "foo", false }}));
+    ASSERT_FALSE(filter(f, {{ }}));
 }
 TEST(Filter, EqualsString) {
     auto f = R"(["==", "foo", "bar"])";
@@ -95,9 +102,9 @@ TEST(Filter, Any) {
 
 TEST(Filter, AnyExpression) {
     ASSERT_FALSE(filter("[\"any\"]"));
-    ASSERT_TRUE(filter("[\"any\", true]"));
-    ASSERT_TRUE(filter("[\"any\",true, false]"));
-    ASSERT_TRUE(filter("[\"any\", true, true]"));
+    ASSERT_TRUE(filter("[\"any\", [\"==\", [\"get\", \"foo\"], 1]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"any\", [\"==\", [\"get\", \"foo\"], 0]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_TRUE(filter("[\"any\", [\"==\", [\"get\", \"foo\"], 0], [\"==\", [\"get\", \"foo\"], 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
 TEST(Filter, All) {
@@ -108,10 +115,9 @@ TEST(Filter, All) {
 }
 
 TEST(Filter, AllExpression) {
-    ASSERT_TRUE(filter("[\"all\"]"));
-    ASSERT_TRUE(filter("[\"all\", true]"));
-    ASSERT_FALSE(filter("[\"all\",true, false]"));
-    ASSERT_TRUE(filter("[\"any\", true, true]"));
+    ASSERT_TRUE(filter("[\"all\", [\"==\", [\"get\", \"foo\"], 1]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"all\", [\"==\", [\"get\", \"foo\"], 0]]", {{ std::string("foo"), int64_t(1) }}));
+    ASSERT_FALSE(filter("[\"all\", [\"==\", [\"get\", \"foo\"], 0], [\"==\", [\"get\", \"foo\"], 1]]", {{ std::string("foo"), int64_t(1) }}));
 }
 
 TEST(Filter, None) {

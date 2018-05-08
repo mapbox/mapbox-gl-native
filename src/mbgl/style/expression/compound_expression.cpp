@@ -224,10 +224,10 @@ Value featureIdAsExpressionValue(EvaluationContext params) {
     });
 };
 
-Value featurePropertyAsExpressionValue(EvaluationContext params, const std::string& key) {
+optional<Value> featurePropertyAsExpressionValue(EvaluationContext params, const std::string& key) {
     assert(params.feature);
     auto property = params.feature->getValue(key);
-    return property ? toExpressionValue(*property) : Null;
+    return property ? toExpressionValue(*property) : optional<Value>();
 };
 
 optional<std::string> featureTypeAsString(FeatureType type) {
@@ -507,7 +507,8 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
     // Legacy Filters
     define("filter-==", [](const EvaluationContext& params, const std::string& key, const Value &lhs) -> Result<bool> {
-        return lhs == featurePropertyAsExpressionValue(params, key);
+        const auto rhs = featurePropertyAsExpressionValue(params, key);
+        return rhs ? lhs == *rhs : false;
     });
 
     define("filter-id-==", [](const EvaluationContext& params, const Value &lhs) -> Result<bool> {
@@ -624,7 +625,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         if (varargs.size() < 2) return false;
         assert(varargs[0].is<std::string>());
         auto value = featurePropertyAsExpressionValue(params, varargs[0].get<std::string>());
-        return std::find(varargs.begin() + 1, varargs.end(), value) != varargs.end();
+        return value ? std::find(varargs.begin() + 1, varargs.end(), *value) != varargs.end() : false;
     });
 
     return definitions;
