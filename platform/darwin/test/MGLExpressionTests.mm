@@ -777,6 +777,12 @@ using namespace std::string_literals;
         XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
         XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
     }
+    {
+        NSExpression *expression = [NSExpression expressionWithFormat:@"MGL_MATCH(x, {'a', 'A'}, 'Apple', {'b', 'B'}, 'Banana', 'Kumquat')"];
+        NSArray *jsonExpression =  @[@"match", @[@"get", @"x"], @[@"a", @"A"], @"Apple", @[@"b", @"B"], @"Banana", @"Kumquat"];
+        XCTAssertEqualObjects(expression.mgl_jsonExpressionObject, jsonExpression);
+        XCTAssertEqualObjects([NSExpression expressionWithMGLJSONObject:jsonExpression], expression);
+    }
 }
 
 - (void)testCoalesceExpressionObject {

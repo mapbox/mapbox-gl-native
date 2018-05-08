@@ -763,6 +763,11 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
         NSArray *array = (NSArray *)object;
         NSString *op = array.firstObject;
         
+        if (![op isKindOfClass:[NSString class]]) {
+            NSArray *subexpressions = MGLSubexpressionsWithJSONObjects(array);
+            return [NSExpression expressionForFunction:@"MGL_FUNCTION" arguments:subexpressions];
+        }
+        
         NSArray *argumentObjects = [array subarrayWithRange:NSMakeRange(1, array.count - 1)];
         
         NSString *functionName = MGLFunctionNamesByExpressionOperator[op];
@@ -940,9 +945,13 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
             return [NSExpression expressionForFunction:@"MGL_IF" arguments:arguments];
         } else if ([op isEqualToString:@"match"]) {
             NSMutableArray *optionsArray = [NSMutableArray array];
-            NSEnumerator *optionsEnumerator = argumentObjects.objectEnumerator;
-            while (id object = optionsEnumerator.nextObject) {
-                NSExpression *option = [NSExpression expressionWithMGLJSONObject:object];
+            
+            for (NSUInteger index = 0; index < argumentObjects.count; index++) {
+                NSExpression *option = [NSExpression expressionWithMGLJSONObject:argumentObjects[index]];
+                // match operators with arrays as matching values should not parse arrays as generic functions.
+                if (index > 0 && index < argumentObjects.count - 1 && !(index % 2 == 0) && [argumentObjects[index] isKindOfClass:[NSArray class]]) {
+                    option = [NSExpression expressionForAggregate:MGLSubexpressionsWithJSONObjects(argumentObjects[index])];
+                }
                 [optionsArray addObject:option];
             }
         
@@ -1346,7 +1355,15 @@ NSArray *MGLSubexpressionsWithJSONObjects(NSArray *objects) {
     NSArray<NSExpression *> *arguments = isAftermarketFunction ? self.arguments : self.arguments[minimumIndex].constantValue;
     
     for (NSUInteger index = minimumIndex; index < arguments.count; index++) {
-        [expressionObject addObject:arguments[index].mgl_jsonExpressionObject];
+        NSArray *argumentObject = arguments[index].mgl_jsonExpressionObject;
+        // match operators with arrays as matching values should not parse arrays using the literal operator.
+        if (index > 0 && index < arguments.count - 1 && !(index % 2 == 0)
+            && (arguments[index].expressionType == NSAggregateExpressionType ||
+                (arguments[index].expressionType == NSConstantValueExpressionType && [arguments[index].constantValue isKindOfClass:[NSArray class]]))) {
+            
+            argumentObject = argumentObject.count == 2 ? argumentObject[1] : argumentObject;
+        }
+        [expressionObject addObject:argumentObject];
     }
     
     return expressionObject;
