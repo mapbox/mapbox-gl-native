@@ -267,19 +267,17 @@ global.propertyValueDoc = function (property, value) {
     return doc;
 };
 
-global.isDataDriven = function (property) {
-  return property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven';
-};
-
 global.isLightProperty = function (property) {
   return property['light-property'] === true;
 };
 
 global.propertyValueType = function (property) {
-  if (isDataDriven(property)) {
-    return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
-  } else {
-    return `PropertyValue<${evaluatedType(property)}>`;
+  switch (property['property-type']) {
+    case 'data-driven':
+    case 'cross-faded-data-driven':
+      return `DataDrivenPropertyValue<${evaluatedType(property)}>`;
+    default:
+      return `PropertyValue<${evaluatedType(property)}>`;
   }
 };
 
