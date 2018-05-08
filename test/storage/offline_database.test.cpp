@@ -66,7 +66,7 @@ TEST(OfflineDatabase, TEST_REQUIRES_WRITE(SchemaVersion)) {
     std::string path("test/fixtures/offline_database/offline.db");
 
     {
-        mapbox::sqlite::Database db{ path, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite };
+        mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::Create | mapbox::sqlite::ReadWrite);
         db.exec("PRAGMA user_version = 1");
     }
 
@@ -599,7 +599,7 @@ TEST(OfflineDatabase, OfflineMapboxTileCount) {
 }
 
 static int databasePageCount(const std::string& path) {
-    mapbox::sqlite::Database db{ path, mapbox::sqlite::ReadOnly };
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     mapbox::sqlite::Statement stmt{ db, "pragma page_count" };
     mapbox::sqlite::Query query{ stmt };
     query.run();
@@ -607,7 +607,7 @@ static int databasePageCount(const std::string& path) {
 }
 
 static int databaseUserVersion(const std::string& path) {
-    mapbox::sqlite::Database db{ path, mapbox::sqlite::ReadOnly };
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     mapbox::sqlite::Statement stmt{ db, "pragma user_version" };
     mapbox::sqlite::Query query{ stmt };
     query.run();
@@ -615,7 +615,7 @@ static int databaseUserVersion(const std::string& path) {
 }
 
 static std::string databaseJournalMode(const std::string& path) {
-    mapbox::sqlite::Database db{ path, mapbox::sqlite::ReadOnly };
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     mapbox::sqlite::Statement stmt{ db, "pragma journal_mode" };
     mapbox::sqlite::Query query{ stmt };
     query.run();
@@ -623,7 +623,7 @@ static std::string databaseJournalMode(const std::string& path) {
 }
 
 static int databaseSyncMode(const std::string& path) {
-    mapbox::sqlite::Database db{ path, mapbox::sqlite::ReadOnly };
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     mapbox::sqlite::Statement stmt{ db, "pragma synchronous" };
     mapbox::sqlite::Query query{ stmt };
     query.run();
@@ -631,7 +631,7 @@ static int databaseSyncMode(const std::string& path) {
 }
 
 static std::vector<std::string> databaseTableColumns(const std::string& path, const std::string& name) {
-    mapbox::sqlite::Database db{ path, mapbox::sqlite::ReadOnly };
+    mapbox::sqlite::Database db = mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadOnly);
     const auto sql = std::string("pragma table_info(") + name + ")";
     mapbox::sqlite::Statement stmt{ db, sql.c_str() };
     mapbox::sqlite::Query query{ stmt };
