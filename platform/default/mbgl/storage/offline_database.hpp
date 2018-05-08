@@ -59,7 +59,6 @@ public:
     uint64_t getOfflineMapboxTileCount();
 
 private:
-    void connect(int flags);
     int userVersion();
     void ensureSchema();
     void removeExisting();

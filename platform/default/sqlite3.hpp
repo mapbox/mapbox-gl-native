@@ -5,6 +5,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <memory>
+#include <mapbox/variant.hpp>
 
 namespace mapbox {
 namespace sqlite {
@@ -71,11 +72,14 @@ class Query;
 
 class Database {
 private:
+    Database(std::unique_ptr<DatabaseImpl>);
     Database(const Database &) = delete;
     Database &operator=(const Database &) = delete;
 
 public:
-    Database(const std::string &filename, int flags = 0);
+    static mapbox::util::variant<Database, Exception> tryOpen(const std::string &filename, int flags = 0);
+    static Database open(const std::string &filename, int flags = 0);
+
     Database(Database &&);
     ~Database();
     Database &operator=(Database &&);

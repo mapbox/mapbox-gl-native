@@ -52,15 +52,6 @@ void checkDatabaseError(const QSqlDatabase &db) {
     }
 }
 
-void checkDatabaseOpenError(const QSqlDatabase &db) {
-    // Assume every error when opening the data as CANTOPEN. Qt
-    // always returns -1 for `nativeErrorCode()` on database errors.
-    QSqlError lastError = db.lastError();
-    if (lastError.type() != QSqlError::NoError) {
-        throw Exception { ResultCode::CantOpen, "Error opening the database." };
-    }
-}
-
 namespace {
     QString incrementCounter() {
         static QAtomicInt count = 0;
@@ -70,32 +61,9 @@ namespace {
 
 class DatabaseImpl {
 public:
-    DatabaseImpl(const char* filename, int flags)
-        : connectionName(QString::number(uint64_t(QThread::currentThread())) + incrementCounter())
+    DatabaseImpl(QString connectionName_)
+        : connectionName(std::move(connectionName_))
     {
-        if (!QSqlDatabase::drivers().contains("QSQLITE")) {
-            throw Exception { ResultCode::CantOpen, "SQLite driver not found." };
-        }
-
-        assert(!QSqlDatabase::contains(connectionName));
-        auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
-
-        QString connectOptions = db.connectOptions();
-        if (flags & OpenFlag::ReadOnly) {
-            if (!connectOptions.isEmpty()) connectOptions.append(';');
-            connectOptions.append("QSQLITE_OPEN_READONLY");
-        }
-        if (flags & OpenFlag::SharedCache) {
-            if (!connectOptions.isEmpty()) connectOptions.append(';');
-            connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
-        }
-
-        db.setConnectOptions(connectOptions);
-        db.setDatabaseName(QString(filename));
-
-        if (!db.open()) {
-            checkDatabaseOpenError(db);
-        }
     }
 
     ~DatabaseImpl() {
@@ -127,11 +95,50 @@ public:
 template <typename T>
 using optional = std::experimental::optional<T>;
 
+mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &filename, int flags) {
+    if (!QSqlDatabase::drivers().contains("QSQLITE")) {
+        return Exception { ResultCode::CantOpen, "SQLite driver not found." };
+    }
 
-Database::Database(const std::string& file, int flags)
-        : impl(std::make_unique<DatabaseImpl>(file.c_str(), flags)) {
-    assert(impl);
+    QString connectionName = QString::number(uint64_t(QThread::currentThread())) + incrementCounter();
+
+    assert(!QSqlDatabase::contains(connectionName));
+    auto db = QSqlDatabase::addDatabase("QSQLITE", connectionName);
+
+    QString connectOptions = db.connectOptions();
+    if (flags & OpenFlag::ReadOnly) {
+        if (!connectOptions.isEmpty()) connectOptions.append(';');
+        connectOptions.append("QSQLITE_OPEN_READONLY");
+    }
+    if (flags & OpenFlag::SharedCache) {
+        if (!connectOptions.isEmpty()) connectOptions.append(';');
+        connectOptions.append("QSQLITE_ENABLE_SHARED_CACHE");
+    }
+
+    db.setConnectOptions(connectOptions);
+    db.setDatabaseName(QString(filename.c_str()));
+
+    if (!db.open()) {
+        // Assume every error when opening the data as CANTOPEN. Qt
+        // always returns -1 for `nativeErrorCode()` on database errors.
+        return Exception { ResultCode::CantOpen, "Error opening the database." };
+    }
+
+    return Database(std::make_unique<DatabaseImpl>(connectionName));
 }
+
+Database Database::open(const std::string &filename, int flags) {
+    auto result = tryOpen(filename, flags);
+    if (result.is<Exception>()) {
+        throw result.get<Exception>();
+    } else {
+        return std::move(result.get<Database>());
+    }
+}
+
+Database::Database(std::unique_ptr<DatabaseImpl> impl_)
+    : impl(std::move(impl_))
+{}
 
 Database::Database(Database &&other)
         : impl(std::move(other.impl)) {
@@ -165,7 +172,9 @@ void Database::setBusyTimeout(std::chrono::milliseconds timeout) {
     }
     db.setConnectOptions(connectOptions);
     if (!db.open()) {
-        checkDatabaseOpenError(db);
+        // Assume every error when opening the data as CANTOPEN. Qt
+        // always returns -1 for `nativeErrorCode()` on database errors.
+        throw Exception { ResultCode::CantOpen, "Error opening the database." };
     }
 }
 
