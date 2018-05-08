@@ -20,6 +20,7 @@ gradle/configuration.gradle
 
 # Token file
 MapboxGLAndroidSDKTestApp/src/main/res/values/developer-config.xml
+MapboxGLDownstreamTestApp/src/main/res/values/developer-config.xml
 
 # Twitter Fabric / Crashlytics
 fabric.properties
