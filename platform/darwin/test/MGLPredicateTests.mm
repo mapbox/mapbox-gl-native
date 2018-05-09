@@ -24,7 +24,7 @@ namespace mbgl {
 @implementation MGLPredicateTests
 
 - (void)testPredication {
-    XCTAssertNil([NSPredicate mgl_predicateWithFilter:mbgl::style::NullFilter()]);
+    XCTAssertNil([NSPredicate mgl_predicateWithFilter:mbgl::style::Filter()]);
     
     {
         mbgl::style::EqualsFilter filter = { .key = "a", .value = std::string("b") };
