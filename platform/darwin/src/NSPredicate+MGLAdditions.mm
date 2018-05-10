@@ -1,11 +1,11 @@
-#import "NSPredicate+MGLAdditions.h"
+#import "NSPredicate+MGLPrivateAdditions.h"
 
 #import "MGLValueEvaluator.h"
 #import "MGLStyleValue_Private.h"
 
 #include <mbgl/style/conversion/filter.hpp>
 
-@implementation NSPredicate (MGLAdditions)
+@implementation NSPredicate (MGLPrivateAdditions)
 
 - (mbgl::style::Filter)mgl_filter
 {
@@ -27,7 +27,7 @@
 {
     if (filter.expression) {
         id jsonObject = MGLJSONObjectFromMBGLExpression(**filter.expression);
-        return [NSPredicate mgl_predicateWithJSONObject:jsonObject];
+        return [NSPredicate predicateWithMGLJSONObject:jsonObject];
     } else {
         return nil;
     }
