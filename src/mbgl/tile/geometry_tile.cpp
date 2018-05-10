@@ -16,7 +16,6 @@
 #include <mbgl/storage/file_source.hpp>
 #include <mbgl/geometry/feature_index.hpp>
 #include <mbgl/map/transform_state.hpp>
-#include <mbgl/style/filter_evaluator.hpp>
 #include <mbgl/util/logging.hpp>
 #include <mbgl/actor/scheduler.hpp>
 

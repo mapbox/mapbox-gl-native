@@ -56,7 +56,7 @@
 {
     MGLAssertStyleLayerIsValid();
 
-    self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::NullFilter());
+    self.rawLayer->setFilter(predicate ? predicate.mgl_filter : mbgl::style::Filter());
 }
 
 - (NSPredicate *)predicate
