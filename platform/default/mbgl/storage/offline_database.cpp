@@ -27,44 +27,58 @@ OfflineDatabase::~OfflineDatabase() {
     }
 }
 
-void OfflineDatabase::connect(int flags) {
-    db = std::make_unique<mapbox::sqlite::Database>(path.c_str(), flags);
-    db->setBusyTimeout(Milliseconds::max());
-    db->exec("PRAGMA foreign_keys = ON");
-}
-
 void OfflineDatabase::ensureSchema() {
     if (path != ":memory:") {
-        try {
-            connect(mapbox::sqlite::ReadWrite);
-
-            switch (userVersion()) {
-            case 0: break; // cache-only database; ok to delete
-            case 1: break; // cache-only database; ok to delete
-            case 2: migrateToVersion3(); // fall through
-            case 3: // no-op and fall through
-            case 4: migrateToVersion5(); // fall through
-            case 5: migrateToVersion6(); // fall through
-            case 6: return;
-            default: break; // downgrade, delete the database
-            }
-
-            removeExisting();
-            connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-        } catch (mapbox::sqlite::Exception& ex) {
-            if (ex.code != mapbox::sqlite::ResultCode::CantOpen && ex.code != mapbox::sqlite::ResultCode::NotADB) {
+        auto result = mapbox::sqlite::Database::tryOpen(path, mapbox::sqlite::ReadWrite);
+        if (result.is<mapbox::sqlite::Exception>()) {
+            const auto& ex = result.get<mapbox::sqlite::Exception>();
+            if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
+                // Corrupted; blow it away.
+                removeExisting();
+            } else if (ex.code == mapbox::sqlite::ResultCode::CantOpen) {
+                // Doesn't exist yet.
+            } else {
                 Log::Error(Event::Database, "Unexpected error connecting to database: %s", ex.what());
-                throw;
+                throw ex;
             }
-
+        } else {
             try {
+                db = std::make_unique<mapbox::sqlite::Database>(std::move(result.get<mapbox::sqlite::Database>()));
+                db->setBusyTimeout(Milliseconds::max());
+                db->exec("PRAGMA foreign_keys = ON");
+
+                switch (userVersion()) {
+                case 0:
+                case 1:
+                    // cache-only database; ok to delete
+                    removeExisting();
+                    break;
+                case 2:
+                    migrateToVersion3();
+                    // fall through
+                case 3:
+                case 4:
+                    migrateToVersion5();
+                    // fall through
+                case 5:
+                    migrateToVersion6();
+                    // fall through
+                case 6:
+                    // happy path; we're done
+                    return;
+                default:
+                    // downgrade, delete the database
+                    removeExisting();
+                    break;
+                }
+            } catch (const mapbox::sqlite::Exception& ex) {
+                // Unfortunately, SQLITE_NOTADB is not always reported upon opening the database.
+                // Apparently sometimes it is delayed until the first read operation.
                 if (ex.code == mapbox::sqlite::ResultCode::NotADB) {
                     removeExisting();
+                } else {
+                    throw;
                 }
-                connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-            } catch (...) {
-                Log::Error(Event::Database, "Unexpected error creating database: %s", util::toString(std::current_exception()).c_str());
-                throw;
             }
         }
     }
@@ -72,9 +86,9 @@ void OfflineDatabase::ensureSchema() {
     try {
         #include "offline_schema.cpp.include"
 
-        connect(mapbox::sqlite::ReadWrite | mapbox::sqlite::Create);
-
-        // If you change the schema you must write a migration from the previous version.
+        db = std::make_unique<mapbox::sqlite::Database>(mapbox::sqlite::Database::open(path, mapbox::sqlite::ReadWrite | mapbox::sqlite::Create));
+        db->setBusyTimeout(Milliseconds::max());
+        db->exec("PRAGMA foreign_keys = ON");
         db->exec("PRAGMA auto_vacuum = INCREMENTAL");
         db->exec("PRAGMA journal_mode = DELETE");
         db->exec("PRAGMA synchronous = FULL");
@@ -93,6 +107,7 @@ int OfflineDatabase::userVersion() {
 void OfflineDatabase::removeExisting() {
     Log::Warning(Event::Database, "Removing existing incompatible offline database");
 
+    statements.clear();
     db.reset();
 
     try {

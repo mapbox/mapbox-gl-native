@@ -14,27 +14,20 @@ namespace sqlite {
 
 class DatabaseImpl {
 public:
-    DatabaseImpl(const char* filename, int flags)
+    DatabaseImpl(sqlite3* db_)
+        : db(db_)
     {
-        const int error = sqlite3_open_v2(filename, &db, flags, nullptr);
-        if (error != SQLITE_OK) {
-            const auto message = sqlite3_errmsg(db);
-            db = nullptr;
-            throw Exception { error, message };
-        }
     }
 
     ~DatabaseImpl()
     {
-        if (!db) return;
-
         const int error = sqlite3_close(db);
         if (error != SQLITE_OK) {
             mbgl::Log::Error(mbgl::Event::Database, "%s (Code %i)", sqlite3_errmsg(db), error);
         }
     }
 
-    sqlite3* db = nullptr;
+    sqlite3* db;
 };
 
 class StatementImpl {
@@ -164,10 +157,28 @@ const static bool sqliteVersionCheck __attribute__((unused)) = []() {
     return true;
 }();
 
-Database::Database(const std::string &filename, int flags)
-    : impl(std::make_unique<DatabaseImpl>(filename.c_str(), flags))
-{
+mapbox::util::variant<Database, Exception> Database::tryOpen(const std::string &filename, int flags) {
+    sqlite3* db = nullptr;
+    const int error = sqlite3_open_v2(filename.c_str(), &db, flags, nullptr);
+    if (error != SQLITE_OK) {
+        const auto message = sqlite3_errmsg(db);
+        return Exception { error, message };
+    }
+    return Database(std::make_unique<DatabaseImpl>(db));
 }
+
+Database Database::open(const std::string &filename, int flags) {
+    auto result = tryOpen(filename, flags);
+    if (result.is<Exception>()) {
+        throw result.get<Exception>();
+    } else {
+        return std::move(result.get<Database>());
+    }
+}
+
+Database::Database(std::unique_ptr<DatabaseImpl> impl_)
+    : impl(std::move(impl_))
+{}
 
 Database::Database(Database &&other)
     : impl(std::move(other.impl)) {}
