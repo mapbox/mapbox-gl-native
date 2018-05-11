@@ -4,10 +4,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 
 ## 4.0.1
 
+### Packaging
+
+* Re-added support for 32-bit simulators (i386) to work around an issue in CocoaPods. ([#11891](https://github.com/mapbox/mapbox-gl-native/pull/11891))
+
 ### Style layers
 
 * Deprecated `+[NSExpression featurePropertiesVariableExpression]` use `+[NSExpression featureAttributesVariableExpression]` instead. ([#11748](https://github.com/mapbox/mapbox-gl-native/pull/11748))
-* Added `FISRT`, `LAST`, and `SIZE` symbolic array subscripting support to expressions. ([#11770](https://github.com/mapbox/mapbox-gl-native/pull/11770))
+* Added `FIRST`, `LAST`, and `SIZE` symbolic array subscripting support to expressions. ([#11770](https://github.com/mapbox/mapbox-gl-native/pull/11770))
 
 
 ### Annotations
