@@ -187,8 +187,8 @@ MGL_EXPORT
  Intensity of lighting (on a scale from 0 to 1). Higher numbers will present as
  more extreme contrast.
  
- The default value of this property is an expression that evaluates to the float
- 0.5.
+ The default value of this property is an expression that evaluates to the
+ float 0.5.
  
  You can set this property to an expression containing any of the following:
  

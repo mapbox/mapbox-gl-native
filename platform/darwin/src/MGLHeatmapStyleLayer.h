@@ -115,8 +115,8 @@ MGL_EXPORT
  Similar to `heatmapWeight` but controls the intensity of the heatmap globally.
  Primarily used for adjusting the heatmap based on zoom level.
  
- The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float 1.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -141,8 +141,8 @@ MGL_EXPORT
 /**
  The global opacity at which the heatmap layer will be drawn.
  
- The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float 1.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -170,8 +170,8 @@ MGL_EXPORT
  
  This property is measured in points.
  
- The default value of this property is an expression that evaluates to the float
- 30. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float 30.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -196,8 +196,8 @@ MGL_EXPORT
  of 10 would be equivalent to having 10 points of weight 1 in the same spot.
  Especially useful when combined with clustering.
  
- The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float 1.
+ Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
