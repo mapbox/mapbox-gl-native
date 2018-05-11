@@ -403,7 +403,7 @@ global.describeValue = function (value, property, layerType) {
         case 'boolean':
             return value ? '`YES`' : '`NO`';
         case 'number':
-            return 'the float ' + formatNumber(value);
+            return 'the float ' + '`' + formatNumber(value) + '`';
         case 'string':
             if (value === '') {
                 return 'the empty string';

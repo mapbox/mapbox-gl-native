@@ -77,8 +77,8 @@ MGL_EXPORT
  
  This property is measured in meters.
  
- The default value of this property is an expression that evaluates to the float 0.
- Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  This property is only applied to the style if `fillExtrusionHeight` is
  non-`nil`. Otherwise, it is ignored.
@@ -163,8 +163,8 @@ MGL_EXPORT
  
  This property is measured in meters.
  
- The default value of this property is an expression that evaluates to the float 0.
- Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -188,8 +188,8 @@ MGL_EXPORT
  The opacity of the entire fill extrusion layer. This is rendered on a
  per-layer, not per-feature, basis, and data-driven styling is not available.
  
- The default value of this property is an expression that evaluates to the float 1.
- Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  

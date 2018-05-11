@@ -129,8 +129,8 @@ MGL_EXPORT
 /**
  Intensity of the hillshade
  
- The default value of this property is an expression that evaluates to the float 0.5.
- Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `0.5`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -231,8 +231,8 @@ MGL_EXPORT
  `MGLHillshadeIlluminationAnchorViewport` and due north if
  `hillshadeIlluminationAnchor` is set to `MGLHillshadeIlluminationAnchorMap`.
  
- The default value of this property is an expression that evaluates to the float 335.
- Set this property to `nil` to reset it to the default value.
+ The default value of this property is an expression that evaluates to the float
+ `335`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
