@@ -772,8 +772,9 @@ final class NativeMapView {
       return;
     }
 
-    // Determine pixel ratio
-    nativeAddImage(name, image, image.getDensity() / DisplayMetrics.DENSITY_DEFAULT);
+    // Determine pixel ratio, cast to float to avoid rounding, see mapbox-gl-native/issues/11809
+    float pixelRatio = (float) image.getDensity() / DisplayMetrics.DENSITY_DEFAULT;
+    nativeAddImage(name, image, pixelRatio);
   }
 
   public void addImages(@NonNull HashMap<String, Bitmap> bitmapHashMap) {

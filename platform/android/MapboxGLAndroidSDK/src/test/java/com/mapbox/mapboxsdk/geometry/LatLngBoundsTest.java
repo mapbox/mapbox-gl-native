@@ -357,6 +357,58 @@ public class LatLngBoundsTest {
   }
 
   @Test
+  public void intersectNorthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    LatLngBounds intersectLatLngBounds =
+      LatLngBounds.from(10, 10, 0, 0)
+        .intersect(200, 200, 0, 0);
+  }
+
+  @Test
+  public void intersectSouthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    LatLngBounds intersectLatLngBounds =
+      LatLngBounds.from(0, 0, -10, -10)
+        .intersect(0, 0, -200, -200);
+  }
+
+  @Test
+  public void intersectSouthLessThanNorthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("LatSouth cannot be less than latNorth");
+
+    LatLngBounds intersectLatLngBounds =
+      LatLngBounds.from(10, 10, 0, 0)
+        .intersect(0, 200, 20, 0);
+  }
+
+
+  @Test
+  public void intersectEastWrapCheck() {
+
+    LatLngBounds latLngBounds1 = LatLngBounds.from(10, -150, 0, 0);
+    LatLngBounds latLngBounds2 = LatLngBounds.from(90, 200, 0, 0);
+
+    LatLngBounds intersectLatLngBounds = LatLngBounds.from(10, -160, 0, 0);
+
+    assertEquals(latLngBounds1.intersect(latLngBounds2), intersectLatLngBounds);
+    assertEquals(latLngBounds2.intersect(latLngBounds1), intersectLatLngBounds);
+  }
+
+  @Test
+  public void intersectWestWrapCheck() {
+    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, 150);
+    LatLngBounds latLngBounds2 = LatLngBounds.from(0, 0, -90, -200);
+
+    LatLngBounds intersectLatLngBounds = LatLngBounds.from(0, 0, -10, 160);
+
+    assertEquals(latLngBounds1.intersect(latLngBounds2), intersectLatLngBounds);
+    assertEquals(latLngBounds2.intersect(latLngBounds1), intersectLatLngBounds);
+  }
+
+  @Test
   public void innerUnion() {
     LatLngBounds latLngBounds = new LatLngBounds.Builder()
       .include(new LatLng(1, 1))
@@ -391,14 +443,176 @@ public class LatLngBoundsTest {
       .include(new LatLng(-10, -160))
       .build();
 
-    assertEquals("outer union should match",
-      latLngBounds1.union(latLngBounds2),
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1,
       new LatLngBounds.Builder()
         .include(new LatLng(10, 160))
         .include(new LatLng(-10, -160))
         .build());
+
+    assertEquals(union1, union2);
   }
 
+  @Test
+  public void unionOverDateLine2() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, 170))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, 165))
+      .include(new LatLng(-10, -160))
+      .build();
+
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1,
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+
+    assertEquals(union1, union2);
+  }
+
+  @Test
+  public void unionOverDateLine3() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, -165))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, -170))
+      .include(new LatLng(-10, -160))
+      .build();
+
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1,
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+
+    assertEquals(union1, union2);
+  }
+
+  @Test
+  public void unionOverDateLine4() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, -160))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, -170))
+      .include(new LatLng(-10, -175))
+      .build();
+
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1,
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+
+    assertEquals(union1, union2);
+  }
+
+  @Test
+  public void unionOverDateLine5() {
+    LatLngBounds latLngBounds1 = new LatLngBounds.Builder()
+      .include(new LatLng(10, -160))
+      .include(new LatLng(0, 160))
+      .build();
+
+    LatLngBounds latLngBounds2 = new LatLngBounds.Builder()
+      .include(new LatLng(0, 170))
+      .include(new LatLng(-10, 175))
+      .build();
+
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1,
+      new LatLngBounds.Builder()
+        .include(new LatLng(10, 160))
+        .include(new LatLng(-10, -160))
+        .build());
+
+    assertEquals(union1, union2);
+  }
+
+  @Test
+  public void unionOverDateLineReturnWorldLonSpan() {
+    LatLngBounds latLngBounds1 = LatLngBounds.from(10, -160, -10, -10);
+    LatLngBounds latLngBounds2 =  LatLngBounds.from(10, 10, -10, 160);
+
+    LatLngBounds union1 = latLngBounds1.union(latLngBounds2);
+    LatLngBounds union2 = latLngBounds2.union(latLngBounds1);
+
+    assertEquals(union1, union2);
+    assertEquals(union1, LatLngBounds.from(10, 180, -10, -180));
+  }
+
+  @Test
+  public void unionNorthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    LatLngBounds unionLatLngBounds =
+      LatLngBounds.from(10, 10, 0, 0)
+      .union(200, 200, 0, 0);
+  }
+
+  @Test
+  public void unionSouthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("latitude must be between -90 and 90");
+    LatLngBounds unionLatLngBounds =
+      LatLngBounds.from(0, 0, -10, -10)
+        .union(0, 0, -200, -200);
+  }
+
+  @Test
+  public void unionSouthLessThanNorthCheck() {
+    exception.expect(IllegalArgumentException.class);
+    exception.expectMessage("LatSouth cannot be less than latNorth");
+
+    LatLngBounds unionLatLngBounds =
+      LatLngBounds.from(10, 10, 0, 0)
+        .union(0, 200, 20, 0);
+  }
+
+
+  @Test
+  public void unionEastWrapCheck() {
+
+    LatLngBounds latLngBounds1 = LatLngBounds.from(10, 10, 0, 0);
+    LatLngBounds latLngBounds2 = LatLngBounds.from(90, 200, 0, 0);
+    LatLngBounds unionLatLngBounds = LatLngBounds.from(90, -160, 0, 0);
+
+    assertEquals(latLngBounds1.union(latLngBounds2), unionLatLngBounds);
+    assertEquals(latLngBounds2.union(latLngBounds1), unionLatLngBounds);
+  }
+
+  @Test
+  public void unionWestWrapCheck() {
+    LatLngBounds latLngBounds1 = LatLngBounds.from(0, 0, -10, -10);
+    LatLngBounds latLngBounds2 = LatLngBounds.from(0, 0, -90, -200);
+
+    LatLngBounds unionLatLngBounds = LatLngBounds.from(0, 0, -90, 160);
+
+    assertEquals(latLngBounds1.union(latLngBounds2), unionLatLngBounds);
+    assertEquals(latLngBounds2.union(latLngBounds1), unionLatLngBounds);
+  }
 
   @Test
   public void northWest() {
