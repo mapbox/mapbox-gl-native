@@ -30,6 +30,14 @@ Mapbox welcomes participation and contributions from everyone. Please read [CONT
 * Fixed an issue where an `MGLOverlay` object straddling the antimeridian had an empty `MGLOverlay.overlayBounds` value. ([#11783](https://github.com/mapbox/mapbox-gl-native/pull/11783))
 * Fixed an issue where certain colors were being misrepresented in `NSExpression` obtained from `MGLStyleLayer` getters. ([#11725](https://github.com/mapbox/mapbox-gl-native/pull/11725))
 
+## 3.7.8 - May 7, 2018
+
+* Improved compatibility with Mapbox China APIs. ([#11845](https://github.com/mapbox/mapbox-gl-native/pull/11845))
+
+## 3.7.7 - May 3, 2018
+
+* Fixed a crash when removing an `MGLOfflinePack`. ([#11821](https://github.com/mapbox/mapbox-gl-native/issues/11821))
+
 ## 4.0.0 - April 19, 2018
 
 The 4.0._x_ series of releases will be the last to support iOS 8. The minimum iOS deployment version will increase to iOS 9.0 in a future release.
