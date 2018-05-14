@@ -11,6 +11,7 @@ ext {
             mapboxServices : '3.1.0',
             mapboxTelemetry: '3.1.1',
             mapboxGestures : '0.2.0',
+            archLifecycle  : '1.1.0',
             supportLib     : '27.1.1',
             espresso       : '3.0.2',
             testRunner     : '1.0.2',
@@ -23,34 +24,37 @@ ext {
     ]
 
     dependenciesList = [
-            mapboxJavaServices    : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
-            mapboxJavaGeoJSON     : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
-            mapboxAndroidTelemetry: "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
-            mapboxAndroidGestures : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
+            mapboxJavaServices      : "com.mapbox.mapboxsdk:mapbox-sdk-services:${versions.mapboxServices}",
+            mapboxJavaGeoJSON       : "com.mapbox.mapboxsdk:mapbox-sdk-geojson:${versions.mapboxServices}",
+            mapboxAndroidTelemetry  : "com.mapbox.mapboxsdk:mapbox-android-telemetry:${versions.mapboxTelemetry}",
+            mapboxAndroidGestures   : "com.mapbox.mapboxsdk:mapbox-android-gestures:${versions.mapboxGestures}",
 
             // for testApp
-            mapboxJavaTurf        : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
+            mapboxJavaTurf          : "com.mapbox.mapboxsdk:mapbox-sdk-turf:${versions.mapboxServices}",
 
-            junit                 : "junit:junit:${versions.junit}",
-            mockito               : "org.mockito:mockito-core:${versions.mockito}",
-            robolectric           : "org.robolectric:robolectric:${versions.robolectric}",
+            junit                   : "junit:junit:${versions.junit}",
+            mockito                 : "org.mockito:mockito-core:${versions.mockito}",
+            robolectric             : "org.robolectric:robolectric:${versions.robolectric}",
 
-            testRunner            : "com.android.support.test:runner:${versions.testRunner}",
-            testRules             : "com.android.support.test:rules:${versions.testRunner}",
-            testEspressoCore      : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
-            testEspressoIntents   : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
-            testEspressoContrib   : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
+            testRunner              : "com.android.support.test:runner:${versions.testRunner}",
+            testRules               : "com.android.support.test:rules:${versions.testRunner}",
+            testEspressoCore        : "com.android.support.test.espresso:espresso-core:${versions.espresso}",
+            testEspressoIntents     : "com.android.support.test.espresso:espresso-intents:${versions.espresso}",
+            testEspressoContrib     : "com.android.support.test.espresso:espresso-contrib:${versions.espresso}",
 
-            supportAnnotations    : "com.android.support:support-annotations:${versions.supportLib}",
-            supportAppcompatV7    : "com.android.support:appcompat-v7:${versions.supportLib}",
-            supportFragmentV4     : "com.android.support:support-fragment:${versions.supportLib}",
-            supportDesign         : "com.android.support:design:${versions.supportLib}",
-            supportRecyclerView   : "com.android.support:recyclerview-v7:${versions.supportLib}",
+            supportAnnotations      : "com.android.support:support-annotations:${versions.supportLib}",
+            supportAppcompatV7      : "com.android.support:appcompat-v7:${versions.supportLib}",
+            supportFragmentV4       : "com.android.support:support-fragment:${versions.supportLib}",
+            supportDesign           : "com.android.support:design:${versions.supportLib}",
+            supportRecyclerView     : "com.android.support:recyclerview-v7:${versions.supportLib}",
 
-            gmsLocation           : 'com.google.android.gms:play-services-location:11.0.4',
-            timber                : "com.jakewharton.timber:timber:${versions.timber}",
-            okhttp3               : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
-            leakCanaryDebug       : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
-            leakCanaryRelease     : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}"
+            archLifecycleExtensions : "android.arch.lifecycle:extensions:${versions.archLifecycle}",
+            archLifecycleAnnotations: "android.arch.lifecycle:common-java8:${versions.archLifecycle}",
+
+            gmsLocation             : 'com.google.android.gms:play-services-location:11.0.4',
+            timber                  : "com.jakewharton.timber:timber:${versions.timber}",
+            okhttp3                 : "com.squareup.okhttp3:okhttp:${versions.okhttp}",
+            leakCanaryDebug         : "com.squareup.leakcanary:leakcanary-android:${versions.leakCanary}",
+            leakCanaryRelease       : "com.squareup.leakcanary:leakcanary-android-no-op:${versions.leakCanary}"
     ]
 }
