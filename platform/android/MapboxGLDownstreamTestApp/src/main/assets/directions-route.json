@@ -1,0 +1,3795 @@
+{
+  "waypoints": [
+    {
+      "location": [
+        -74.037424,
+        40.777247
+      ],
+      "name": ""
+    },
+    {
+      "location": [
+        -73.912029,
+        40.680148
+      ],
+      "name": "MacDougal Street"
+    }
+  ],
+  "routes": [
+    {
+      "legs": [
+        {
+          "steps": [
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "entry": [
+                    true
+                  ],
+                  "location": [
+                    -74.037424,
+                    40.777247
+                  ],
+                  "bearings": [
+                    312
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -74.037658,
+                    40.777646
+                  ],
+                  "bearings": [
+                    165,
+                    300,
+                    345
+                  ]
+                }
+              ],
+              "geometry": "}`zwlA~i{elCyBnDcTbHiGrBaKr@mC\\",
+              "duration": 43.1,
+              "distance": 94.8,
+              "name": "",
+              "weight": 171,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 312,
+                "location": [
+                  -74.037424,
+                  40.777247
+                ],
+                "type": "depart",
+                "bearing_before": 0,
+                "modifier": "left",
+                "instruction": "Head northwest"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -74.037757,
+                    40.778043
+                  ],
+                  "bearings": [
+                    105,
+                    165,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "ur{wlAx~{elCkCfG",
+              "duration": 9.9,
+              "distance": 13.6,
+              "name": "34th Street",
+              "weight": 13.6,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 303,
+                "location": [
+                  -74.037757,
+                  40.778043
+                ],
+                "type": "turn",
+                "bearing_before": 350,
+                "modifier": "left",
+                "instruction": "Turn left onto 34th Street"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -74.037889,
+                    40.778113
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -74.038432,
+                    40.777316
+                  ],
+                  "bearings": [
+                    30,
+                    165,
+                    210
+                  ]
+                }
+              ],
+              "geometry": "aw{wlA`g|elCv@b@`o@x_@fq@b]jd@tTt`@t\\",
+              "duration": 53.4,
+              "distance": 342.7,
+              "name": "Liberty Avenue",
+              "weight": 53.4,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 206,
+                "location": [
+                  -74.037889,
+                  40.778113
+                ],
+                "type": "turn",
+                "bearing_before": 303,
+                "modifier": "left",
+                "instruction": "Turn left onto Liberty Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -74.039736,
+                    40.775375
+                  ],
+                  "bearings": [
+                    15,
+                    30,
+                    195
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -74.039816,
+                    40.775018
+                  ],
+                  "bearings": [
+                    15,
+                    195,
+                    300
+                  ]
+                }
+              ],
+              "maneuver": {
+                "bearing_after": 188,
+                "location": [
+                  -74.039736,
+                  40.775375
+                ],
+                "type": "turn",
+                "bearing_before": 212,
+                "modifier": "straight",
+                "instruction": "Go straight onto Paterson Plank Road (CR 681)"
+              },
+              "duration": 19,
+              "distance": 120.3,
+              "name": "Paterson Plank Road (CR 681)",
+              "geometry": "}kvwlAnz_flChU~CbObBh[~D",
+              "ref": "CR 681",
+              "weight": 19,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -74.039962,
+                    40.774307
+                  ],
+                  "bearings": [
+                    15,
+                    105,
+                    195
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.039538,
+                    40.774252
+                  ],
+                  "bearings": [
+                    75,
+                    120,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "eitwlArh`flCjAyJb@sGAaE[sCq@iDuAsCwAqCmBaCkFeFuQkK",
+              "duration": 19.700000000000003,
+              "distance": 128,
+              "name": "Columbia Avenue",
+              "weight": 19.700000000000003,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 104,
+                "location": [
+                  -74.039962,
+                  40.774307
+                ],
+                "type": "turn",
+                "bearing_before": 188,
+                "modifier": "left",
+                "instruction": "Turn left onto Columbia Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    false,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.038854,
+                    40.77485
+                  ],
+                  "bearings": [
+                    0,
+                    60,
+                    210
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.038577,
+                    40.77492
+                  ],
+                  "bearings": [
+                    120,
+                    270,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.037412,
+                    40.774415
+                  ],
+                  "bearings": [
+                    120,
+                    165,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.037104,
+                    40.774277
+                  ],
+                  "bearings": [
+                    120,
+                    270,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.036872,
+                    40.774184
+                  ],
+                  "bearings": [
+                    105,
+                    120,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.035043,
+                    40.773613
+                  ],
+                  "bearings": [
+                    120,
+                    150,
+                    285,
+                    330
+                  ]
+                }
+              ],
+              "geometry": "ckuwlAjc~elCcB}Dq@kBH_GnQoh@`Li^vCeItAeEd@{AxDoMtb@iqBrIw[",
+              "duration": 49.5,
+              "distance": 401,
+              "name": "30th Street",
+              "weight": 49.5,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 54,
+                "location": [
+                  -74.038854,
+                  40.77485
+                ],
+                "type": "turn",
+                "bearing_before": 25,
+                "modifier": "right",
+                "instruction": "Turn right onto 30th Street"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.034583,
+                    40.773443
+                  ],
+                  "bearings": [
+                    75,
+                    120,
+                    285,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "esrwlAlxuelCpPsh@jWk}@",
+              "duration": 7.9,
+              "distance": 158.8,
+              "name": "",
+              "weight": 7.9,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 118,
+                "location": [
+                  -74.034583,
+                  40.773443
+                ],
+                "type": "on ramp",
+                "bearing_before": 115,
+                "modifier": "straight",
+                "instruction": "Take the ramp"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.032919,
+                    40.772772
+                  ],
+                  "bearings": [
+                    122,
+                    297,
+                    303
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.026127,
+                    40.769737
+                  ],
+                  "bearings": [
+                    120,
+                    135,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.02158,
+                    40.76746
+                  ],
+                  "bearings": [
+                    157,
+                    326,
+                    332
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.024552,
+                    40.763594
+                  ],
+                  "bearings": [
+                    15,
+                    180
+                  ]
+                }
+              ],
+              "maneuver": {
+                "bearing_after": 120,
+                "location": [
+                  -74.032919,
+                  40.772772
+                ],
+                "type": "merge",
+                "bearing_before": 116,
+                "modifier": "slight left",
+                "instruction": "Merge left onto NJ 495"
+              },
+              "duration": 121.9,
+              "distance": 2025.7,
+              "name": "NJ 495",
+              "geometry": "giqwlAlprelCtZuy@f^a`At[sy@pSik@xRqm@f`@opAl[wdApN}f@rZe}@lT{o@pc@gqAdC_HpCiGtCcF`DmEjDaEzDoDvDsCrD{BtDcBdEwAvDaAnDo@xD]jDSdEC~DH`F^nI~@lL|AvLjBjLjBpLvBtLbCvZbHrKvCfLdDtKbDbLvDrKvDhLjEdI~CtErBlFpCdEpChDlCrDfE|CrFtBbGxA`Hv@tHPhGIhGc@nGcAdG{AvFmBvEkCjE}CnDoDtCuDpB}CfAaDh@eDHgDY_Ds@qCmAeC_BmCgCgHaJ{P_RcEyD}D}CsWuM",
+              "ref": "NJ 495",
+              "weight": 121.9,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -74.023483,
+                    40.764906
+                  ],
+                  "bearings": [
+                    15,
+                    30,
+                    180,
+                    210
+                  ]
+                }
+              ],
+              "maneuver": {
+                "bearing_after": 26,
+                "location": [
+                  -74.023483,
+                  40.764906
+                ],
+                "type": "fork",
+                "bearing_before": 23,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork onto Lincoln Tunnel access (NJ 495)"
+              },
+              "duration": 115.9,
+              "distance": 1361.9,
+              "name": "Lincoln Tunnel access (NJ 495)",
+              "geometry": "s}awlAtb`elCk|@qi@}EmDoEqDiE{DwDoEaE{GuDmIcDmJsCeKiBwKmAkMc@oNAyMRyNx@{LvAsMxBoLrCyJfwFioQpEsN",
+              "ref": "NJ 495",
+              "weight": 115.9,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -74.009981,
+                    40.762456
+                  ],
+                  "bearings": [
+                    120,
+                    300
+                  ]
+                }
+              ],
+              "maneuver": {
+                "bearing_after": 118,
+                "location": [
+                  -74.009981,
+                  40.762456
+                ],
+                "type": "new name",
+                "bearing_before": 118,
+                "modifier": "straight",
+                "instruction": "Continue straight onto Lincoln Tunnel (NY 495)"
+              },
+              "duration": 178.4,
+              "distance": 1238.6,
+              "name": "Lincoln Tunnel (NY 495)",
+              "geometry": "od}vlAxvedlCn`Ia~VpBmHdBwHrAwIx@mH",
+              "ref": "NY 495",
+              "weight": 178.4,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.997078,
+                    40.757133
+                  ],
+                  "bearings": [
+                    105,
+                    120,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "ywrvlAjplclCdCeLv@gFlAmGbA_FjAgExHyU",
+              "duration": 15.1,
+              "distance": 96.7,
+              "name": "Dyer Avenue",
+              "weight": 15.1,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 112,
+                "location": [
+                  -73.997078,
+                  40.757133
+                ],
+                "type": "fork",
+                "bearing_before": 104,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork onto Dyer Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.996039,
+                    40.75677
+                  ],
+                  "bearings": [
+                    105,
+                    135,
+                    300
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.996494,
+                    40.755402
+                  ],
+                  "bearings": [
+                    30,
+                    60,
+                    210
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.996661,
+                    40.755211
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    270,
+                    300
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.997152,
+                    40.754619
+                  ],
+                  "bearings": [
+                    30,
+                    45,
+                    120,
+                    210,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "carvlAlojclChBcDnAuAjBsAtDqAhFa@|Dd@dEfBdr@`e@lErDnDxC~c@t]bi@b\\",
+              "duration": 70.5,
+              "distance": 360.5,
+              "name": "Dyer Avenue",
+              "weight": 70.5,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 129,
+                "location": [
+                  -73.996039,
+                  40.75677
+                ],
+                "type": "fork",
+                "bearing_before": 119,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork onto Dyer Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.997618,
+                    40.753945
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.996324,
+                    40.753406
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.99346,
+                    40.752196
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.992694,
+                    40.751874
+                  ],
+                  "bearings": [
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.990617,
+                    40.751
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.987765,
+                    40.749792
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.98456,
+                    40.748439
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.982957,
+                    40.747765
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.981449,
+                    40.747123
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "qplvlAbrmclCt`@{oAbBqEni@adB~\\kfAbS{n@ru@y`Cz|@mpCdDiKn@uBl@}Bj@kBJ]z@eCz@kCfB{F|AiF|AqEljAqqDzZkaAfMy`@bg@g}AtCwJ",
+              "duration": 339.5,
+              "distance": 1577.4,
+              "name": "West 34th Street",
+              "weight": 337.5,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 118,
+                "location": [
+                  -73.997618,
+                  40.753945
+                ],
+                "type": "end of road",
+                "bearing_before": 206,
+                "modifier": "left",
+                "instruction": "Turn left onto West 34th Street"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.981261,
+                    40.747048
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.980761,
+                    40.747716
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "oa_vlAxsmblC{E{D{a@kXwe@e[",
+              "duration": 30.599999999999998,
+              "distance": 164.2,
+              "name": "Park Avenue",
+              "weight": 30.599999999999998,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 29,
+                "location": [
+                  -73.981261,
+                  40.747048
+                ],
+                "type": "turn",
+                "bearing_before": 116,
+                "modifier": "left",
+                "instruction": "Turn left onto Park Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.98031,
+                    40.748336
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    false,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.978788,
+                    40.747684
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.977812,
+                    40.747273
+                  ],
+                  "bearings": [
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.977146,
+                    40.746996
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 5,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.974927,
+                    40.746068
+                  ],
+                  "bearings": [
+                    30,
+                    75,
+                    90,
+                    120,
+                    210,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "_ravlAjxkblCvg@c~AtX_|@hPsh@~Rgn@lCoI|Jw[tPsi@|BqHjBmFhBmF",
+              "duration": 138.5,
+              "distance": 542.4,
+              "name": "East 36th Street",
+              "weight": 138.5,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 118,
+                "location": [
+                  -73.98031,
+                  40.748336
+                ],
+                "type": "turn",
+                "bearing_before": 28,
+                "modifier": "right",
+                "instruction": "Turn right onto East 36th Street"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.974689,
+                    40.745961
+                  ],
+                  "bearings": [
+                    105,
+                    120,
+                    300
+                  ]
+                }
+              ],
+              "geometry": "q}|ulA`y`blCbB_KtBqV",
+              "duration": 9.9,
+              "distance": 49.5,
+              "name": "",
+              "weight": 9.9,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 104,
+                "location": [
+                  -73.974689,
+                  40.745961
+                ],
+                "type": "on ramp",
+                "bearing_before": 119,
+                "modifier": "slight left",
+                "instruction": "Take the ramp on the left"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.97412,
+                    40.745852
+                  ],
+                  "bearings": [
+                    90,
+                    120,
+                    255,
+                    285
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.97308,
+                    40.745573
+                  ],
+                  "bearings": [
+                    90,
+                    270,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "wv|ulAnu_blCfEuPpEmQjAiH`AcKDmFJyFc@oLmAoG",
+              "duration": 15.9,
+              "distance": 134.9,
+              "name": "",
+              "weight": 15.9,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 113,
+                "location": [
+                  -73.97412,
+                  40.745852
+                ],
+                "type": "fork",
+                "bearing_before": 101,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.972603,
+                    40.745624
+                  ],
+                  "bearings": [
+                    72,
+                    265,
+                    267
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.954069,
+                    40.741426
+                  ],
+                  "bearings": [
+                    90,
+                    270
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.954034,
+                    40.741423
+                  ],
+                  "bearings": [
+                    75,
+                    105,
+                    270
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.953927,
+                    40.741412
+                  ],
+                  "bearings": [
+                    98,
+                    103,
+                    278
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.952418,
+                    40.741258
+                  ],
+                  "bearings": [
+                    90,
+                    120,
+                    285
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.952147,
+                    40.741269
+                  ],
+                  "bearings": [
+                    75,
+                    105,
+                    270
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.951466,
+                    40.741382
+                  ],
+                  "bearings": [
+                    75,
+                    258,
+                    260
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.951104,
+                    40.741455
+                  ],
+                  "bearings": [
+                    75,
+                    255,
+                    261
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.950672,
+                    40.741543
+                  ],
+                  "bearings": [
+                    75,
+                    240,
+                    255
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.93208,
+                    40.737057
+                  ],
+                  "bearings": [
+                    102,
+                    108,
+                    282
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.920389,
+                    40.732789
+                  ],
+                  "bearings": [
+                    134,
+                    308,
+                    316
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.901354,
+                    40.725811
+                  ],
+                  "bearings": [
+                    90,
+                    270,
+                    285
+                  ]
+                }
+              ],
+              "maneuver": {
+                "bearing_after": 71,
+                "location": [
+                  -73.972603,
+                  40.745624
+                ],
+                "type": "new name",
+                "bearing_before": 84,
+                "modifier": "straight",
+                "instruction": "Continue straight onto I 495"
+              },
+              "duration": 505.3,
+              "distance": 8147.5,
+              "name": "I 495",
+              "geometry": "oh|ulAtv|alCiAiHgC_OmIqQkJ{KsMyJuk@g`@gPeNaP{SsGeNsEaTkAmQAkTf@kXrIgh@rHaXhQu^rgHgrM|Pa^dKmb@jEib@fQuzAhFki@lDy^lAe_@iC}t@DeATuEpGyqALqCR}EU}OuCc\\kAmLqCsUoD_Zy@wKy@aVNc\\n@kM~@aIzS{lB`UomBrEo]zEeY`HkZzI_\\he@g{Aj}@{qCtLka@pIu]hGo[|Fo`@pEa_@zDqe@jByXzBqa@nAwP~A_RjQi{AzQ}oBpOuaBtFmj@jm@ojFtFe_@vHe_@dI_\\lLg`@tNia@tJySxJeRbNuT|p@q_AxEwGlZub@pOmThQkXlP}Z`Pu]jLy\\rJm_@bHo]rKym@xL{q@vJug@dIac@lJai@rZuoBzGi`@tIa`@jKm]dMe]vNwZnq@_pA|DsHne@m}@tKcUfSsd@xN}`@dL{a@pJcd@bHed@rEee@lJcoBfCwU`DmcAxGu_BxHwgBrHafB`Ciq@Zoe@]kZaBcc@eDgb@sFab@aIud@}Ju`@cKa[yMm\\ez@sbBmKiU_M{Z{GkScLgd@",
+              "ref": "I 495",
+              "weight": 505.3,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.886444,
+                    40.727973
+                  ],
+                  "bearings": [
+                    70,
+                    78,
+                    245
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.883611,
+                    40.72828
+                  ],
+                  "bearings": [
+                    90,
+                    255,
+                    270
+                  ]
+                }
+              ],
+              "geometry": "iyytlAvmt|kC{E{h@eCq[qC}m@qBuz@cGowA_A{_@aBec@qCe_@",
+              "maneuver": {
+                "bearing_after": 77,
+                "location": [
+                  -73.886444,
+                  40.727973
+                ],
+                "type": "off ramp",
+                "bearing_before": 64,
+                "modifier": "slight right",
+                "instruction": "Take the ramp on the right towards Woodhaven Boulevard"
+              },
+              "duration": 28.5,
+              "distance": 499.6,
+              "destinations": "Woodhaven Boulevard, NY 25 (Queens Boulevard)",
+              "name": "",
+              "weight": 28.5,
+              "mode": "driving"
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.880575,
+                    40.728564
+                  ],
+                  "bearings": [
+                    69,
+                    76,
+                    259
+                  ]
+                }
+              ],
+              "geometry": "g~ztlA|~h|kCsG}k@eJgc@wLy]iS}i@gNec@gOgi@yQk}@ek@ymC",
+              "duration": 77.3,
+              "distance": 650.1,
+              "name": "",
+              "weight": 77.3,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 74,
+                "location": [
+                  -73.880575,
+                  40.728564
+                ],
+                "type": "fork",
+                "bearing_before": 78,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.873558,
+                    40.730938
+                  ],
+                  "bearings": [
+                    69,
+                    78,
+                    248
+                  ]
+                }
+              ],
+              "geometry": "sr_ulAjh{{kCcFqj@aCe[McCS{DOiIFmKTeI",
+              "duration": 25.9,
+              "distance": 156.9,
+              "name": "",
+              "weight": 25.9,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 77,
+                "location": [
+                  -73.873558,
+                  40.730938
+                ],
+                "type": "fork",
+                "bearing_before": 67,
+                "modifier": "slight right",
+                "instruction": "Keep right at the fork"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "right"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "right"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.871723,
+                    40.731127
+                  ],
+                  "bearings": [
+                    15,
+                    90,
+                    180,
+                    270
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.87175,
+                    40.730902
+                  ],
+                  "bearings": [
+                    0,
+                    90,
+                    180,
+                    270
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.871756,
+                    40.730818
+                  ],
+                  "bearings": [
+                    0,
+                    180,
+                    270
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.87168,
+                    40.730045
+                  ],
+                  "bearings": [
+                    0,
+                    180,
+                    225
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.871493,
+                    40.729176
+                  ],
+                  "bearings": [
+                    165,
+                    240,
+                    345
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "straight"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.871238,
+                    40.728306
+                  ],
+                  "bearings": [
+                    75,
+                    165,
+                    225,
+                    345
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.871101,
+                    40.727834
+                  ],
+                  "bearings": [
+                    45,
+                    165,
+                    210,
+                    345
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 2,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.870318,
+                    40.726159
+                  ],
+                  "bearings": [
+                    75,
+                    165,
+                    345
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.869804,
+                    40.725107
+                  ],
+                  "bearings": [
+                    150,
+                    240,
+                    345
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.869373,
+                    40.724389
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.868873,
+                    40.723788
+                  ],
+                  "bearings": [
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.868362,
+                    40.72321
+                  ],
+                  "bearings": [
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.86777,
+                    40.722612
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    240,
+                    315
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.867235,
+                    40.722019
+                  ],
+                  "bearings": [
+                    150,
+                    240,
+                    315
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.866713,
+                    40.721432
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 0,
+                  "in": 2,
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.86617,
+                    40.720834
+                  ],
+                  "bearings": [
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.865636,
+                    40.720249
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    240,
+                    330
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 2,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.863714,
+                    40.718221
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    330
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 2,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.861977,
+                    40.716505
+                  ],
+                  "bearings": [
+                    60,
+                    135,
+                    315
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 2,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.859826,
+                    40.71397
+                  ],
+                  "bearings": [
+                    75,
+                    180,
+                    345
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859825,
+                    40.713308
+                  ],
+                  "bearings": [
+                    0,
+                    75,
+                    180,
+                    240
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859872,
+                    40.711864
+                  ],
+                  "bearings": [
+                    0,
+                    105,
+                    180,
+                    285
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859896,
+                    40.711585
+                  ],
+                  "bearings": [
+                    0,
+                    180,
+                    240
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859762,
+                    40.710624
+                  ],
+                  "bearings": [
+                    0,
+                    165,
+                    255
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.859714,
+                    40.710378
+                  ],
+                  "bearings": [
+                    90,
+                    180,
+                    210,
+                    345
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 3,
+                  "lanes": [
+                    {
+                      "valid": false,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "straight"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "straight"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    true,
+                    false,
+                    false
+                  ],
+                  "location": [
+                    -73.858287,
+                    40.705558
+                  ],
+                  "bearings": [
+                    60,
+                    135,
+                    240,
+                    330
+                  ]
+                }
+              ],
+              "geometry": "m~_ulAtuw{kC`Mt@fDJho@wC|RmBja@gGze@kJnNqCn\\qG|f@uQjk@wSjSoHv`Ac_@lNgHl\\uPpd@g^dT{P|MaMnFeEvF}FbU{UhUoQvM}MlQmOfQeOjd@}`@pc@k`@dRmQ~a@yb@`e@ab@tGwFxXaVjd@ka@db@ed@bSoTpMoNxa@ee@ja@id@b`@kc@xDqCpZgJ~GuBvLaBna@@zEC|k@GhFN~d@tAlPn@`{@kGjN_Bl^kDxd@wChl@qDzs@uEvUyApYiDbJuCvJ}CxRoJxh@qd@jc@gp@f\\qg@",
+              "duration": 272.7,
+              "distance": 3328.1,
+              "name": "Woodhaven Boulevard",
+              "weight": 272.7,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 184,
+                "location": [
+                  -73.871723,
+                  40.731127
+                ],
+                "type": "turn",
+                "bearing_before": 92,
+                "modifier": "right",
+                "instruction": "Turn right onto Woodhaven Boulevard"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 3,
+                  "entry": [
+                    true,
+                    true,
+                    true,
+                    false
+                  ],
+                  "location": [
+                    -73.85685,
+                    40.704508
+                  ],
+                  "bearings": [
+                    60,
+                    120,
+                    240,
+                    315
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.8569,
+                    40.704486
+                  ],
+                  "bearings": [
+                    60,
+                    135,
+                    240,
+                    315
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859144,
+                    40.703485
+                  ],
+                  "bearings": [
+                    60,
+                    150,
+                    240,
+                    330
+                  ]
+                }
+              ],
+              "geometry": "w~kslAbtzzkCj@bBp}@fkCnV|r@",
+              "duration": 56.3,
+              "distance": 306,
+              "name": "81st Road",
+              "weight": 57.7,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 239,
+                "location": [
+                  -73.85685,
+                  40.704508
+                ],
+                "type": "turn",
+                "bearing_before": 132,
+                "modifier": "right",
+                "instruction": "Turn right onto 81st Road"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.859975,
+                    40.703109
+                  ],
+                  "bearings": [
+                    60,
+                    105,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "igislAlw`{kCsAtWaAnR",
+              "duration": 13.5,
+              "distance": 60.2,
+              "name": "Myrtle Avenue",
+              "weight": 13.5,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 277,
+                "location": [
+                  -73.859975,
+                  40.703109
+                ],
+                "type": "turn",
+                "bearing_before": 239,
+                "modifier": "straight",
+                "instruction": "Go straight onto Myrtle Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.860682,
+                    40.703184
+                  ],
+                  "bearings": [
+                    105,
+                    195,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "_lislArcb{kCrIpBvIlFzEnIzB|R?hQ",
+              "duration": 11.9,
+              "distance": 112.3,
+              "name": "",
+              "weight": 11.9,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 194,
+                "location": [
+                  -73.860682,
+                  40.703184
+                ],
+                "type": "on ramp",
+                "bearing_before": 277,
+                "modifier": "left",
+                "instruction": "Take the ramp on the left"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.861638,
+                    40.70267
+                  ],
+                  "bearings": [
+                    90,
+                    105,
+                    285
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.867076,
+                    40.702183
+                  ],
+                  "bearings": [
+                    60,
+                    225,
+                    240
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.867853,
+                    40.701617
+                  ],
+                  "bearings": [
+                    15,
+                    45,
+                    210
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.879177,
+                    40.692627
+                  ],
+                  "bearings": [
+                    75,
+                    255,
+                    270
+                  ]
+                },
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.887935,
+                    40.690962
+                  ],
+                  "bearings": [
+                    77,
+                    254,
+                    259
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.890251,
+                    40.689914
+                  ],
+                  "bearings": [
+                    26,
+                    35,
+                    213
+                  ]
+                }
+              ],
+              "geometry": "{khslAj_d{kCeDbX_Epj@cA~f@\\xh@vBrl@vCt`@hEb]|E`ZhIb\\lFhNhBlGhQzY`PtTnI`HdTbOtO~FzRzEz`@dGvTrDtYtF`P~FtQpKlMbLpL|ObJtP|HhSpDhOfDdRvDx_@|R~tBhErS|FlPjHxM~KjOlf@dg@vXx]|G~I|FbGhMrHvKvD`InDnFbEjEnE`E`HdNbe@xDnL~ElHlE|EbGdDrGhBjGz@vIXbFV|Fz@bDbBxCrDfEvGzBnFzA`Hn@pJlCzh@rG`nAjGhsA~BdX`Jbj@~YjgB~Mp}@jIxl@jMbgAfDx]bFp`@tBrQnDlQlCbKdEtLdJ`QbGzIdI|I`HlGfQpNpaClgBxq@fi@rd@da@tg@ph@nj@fj@l`@t]tZlVj[rSp`@bXnKdE|K~CrQzC",
+              "duration": 212.29999999999998,
+              "distance": 4096.7,
+              "name": "Jackie Robinson Parkway",
+              "weight": 212.29999999999998,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 284,
+                "location": [
+                  -73.861638,
+                  40.70267
+                ],
+                "type": "merge",
+                "bearing_before": 268,
+                "modifier": "slight left",
+                "instruction": "Merge left onto Jackie Robinson Parkway"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.896606,
+                    40.682097
+                  ],
+                  "bearings": [
+                    15,
+                    180,
+                    195
+                  ]
+                }
+              ],
+              "geometry": "af`rlAzhh}kCbKfCv|@zJ|VfHxNbOjVx_@",
+              "duration": 18.7,
+              "distance": 274.1,
+              "name": "",
+              "weight": 18.7,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 194,
+                "location": [
+                  -73.896606,
+                  40.682097
+                ],
+                "type": "off ramp",
+                "bearing_before": 189,
+                "modifier": "slight right",
+                "instruction": "Take the ramp on the right"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.897795,
+                    40.679905
+                  ],
+                  "bearings": [
+                    45,
+                    60,
+                    240
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.898899,
+                    40.679561
+                  ],
+                  "bearings": [
+                    75,
+                    90,
+                    180,
+                    270
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.899582,
+                    40.679548
+                  ],
+                  "bearings": [
+                    90,
+                    240,
+                    255,
+                    285
+                  ]
+                }
+              ],
+              "geometry": "a}{qlAdsj}kCrHdWzJxk@Xti@aGbhA",
+              "duration": 40,
+              "distance": 258.3,
+              "name": "Highland Boulevard",
+              "weight": 40,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 241,
+                "location": [
+                  -73.897795,
+                  40.679905
+                ],
+                "type": "new name",
+                "bearing_before": 226,
+                "modifier": "straight",
+                "instruction": "Continue straight onto Highland Boulevard"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.900752,
+                    40.679677
+                  ],
+                  "bearings": [
+                    105,
+                    120,
+                    300
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.902622,
+                    40.680664
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 3,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.903371,
+                    40.681092
+                  ],
+                  "bearings": [
+                    30,
+                    120,
+                    210,
+                    300
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.904022,
+                    40.681447
+                  ],
+                  "bearings": [
+                    120,
+                    210,
+                    315
+                  ]
+                }
+              ],
+              "geometry": "yn{qlA~kp}kCu|@zsBwYxm@aF~KcNtZ{BrE",
+              "duration": 68.7,
+              "distance": 350.2,
+              "name": "Bushwick Avenue",
+              "weight": 68.7,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 303,
+                "location": [
+                  -73.900752,
+                  40.679677
+                ],
+                "type": "turn",
+                "bearing_before": 277,
+                "modifier": "straight",
+                "instruction": "Go straight onto Bushwick Avenue"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 2,
+                  "in": 1,
+                  "lanes": [
+                    {
+                      "valid": true,
+                      "indications": [
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": true,
+                      "indications": [
+                        "straight",
+                        "left"
+                      ]
+                    },
+                    {
+                      "valid": false,
+                      "indications": [
+                        "none"
+                      ]
+                    }
+                  ],
+                  "entry": [
+                    true,
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.904128,
+                    40.681509
+                  ],
+                  "bearings": [
+                    30,
+                    135,
+                    210,
+                    315
+                  ]
+                }
+              ],
+              "geometry": "ia_rlA~~v}kCnpAboAzFxF",
+              "duration": 22.8,
+              "distance": 198.5,
+              "name": "Eastern Parkway",
+              "weight": 22.8,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 216,
+                "location": [
+                  -73.904128,
+                  40.681509
+                ],
+                "type": "turn",
+                "bearing_before": 306,
+                "modifier": "left",
+                "instruction": "Turn left onto Eastern Parkway"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 3,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.905535,
+                    40.680079
+                  ],
+                  "bearings": [
+                    30,
+                    135,
+                    225,
+                    300
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.905659,
+                    40.680141
+                  ],
+                  "bearings": [
+                    120,
+                    255,
+                    315
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 1,
+                  "entry": [
+                    true,
+                    false,
+                    true
+                  ],
+                  "location": [
+                    -73.906282,
+                    40.680507
+                  ],
+                  "bearings": [
+                    30,
+                    135,
+                    315
+                  ]
+                }
+              ],
+              "geometry": "}g|qlA|vy}kC{BvF{U|e@sMfW",
+              "duration": 20.8,
+              "distance": 120.8,
+              "name": "Broadway",
+              "weight": 20.8,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 302,
+                "location": [
+                  -73.905535,
+                  40.680079
+                ],
+                "type": "turn",
+                "bearing_before": 216,
+                "modifier": "right",
+                "instruction": "Turn right onto Broadway"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "out": 1,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.90667,
+                    40.680741
+                  ],
+                  "bearings": [
+                    135,
+                    270,
+                    315
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.908571,
+                    40.680554
+                  ],
+                  "bearings": [
+                    90,
+                    165,
+                    255,
+                    345
+                  ]
+                },
+                {
+                  "out": 2,
+                  "in": 0,
+                  "entry": [
+                    false,
+                    true,
+                    true,
+                    true
+                  ],
+                  "location": [
+                    -73.911225,
+                    40.68024
+                  ],
+                  "bearings": [
+                    75,
+                    165,
+                    255,
+                    345
+                  ]
+                }
+              ],
+              "geometry": "iq}qlAz}{}kCtJxuBrRzdDvDfq@",
+              "duration": 84.10000000000001,
+              "distance": 456.8,
+              "name": "MacDougal Street",
+              "weight": 84.10000000000001,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 261,
+                "location": [
+                  -73.90667,
+                  40.680741
+                ],
+                "type": "turn",
+                "bearing_before": 307,
+                "modifier": "left",
+                "instruction": "Turn left onto MacDougal Street"
+              }
+            },
+            {
+              "intersections": [
+                {
+                  "in": 0,
+                  "entry": [
+                    true
+                  ],
+                  "location": [
+                    -73.912029,
+                    40.680148
+                  ],
+                  "bearings": [
+                    81
+                  ]
+                }
+              ],
+              "geometry": "gl|qlAxlf~kC",
+              "duration": 0,
+              "distance": 0,
+              "name": "MacDougal Street",
+              "weight": 0,
+              "mode": "driving",
+              "maneuver": {
+                "bearing_after": 0,
+                "location": [
+                  -73.912029,
+                  40.680148
+                ],
+                "type": "arrive",
+                "bearing_before": 261,
+                "modifier": "right",
+                "instruction": "You have arrived at your destination, on the right"
+              }
+            }
+          ],
+          "weight": 2828.5,
+          "distance": 27827,
+          "annotation": {
+            "congestion": [
+              "unknown",
+              "unknown",
+              "unknown",
+              "unknown",
+              "unknown",
+              "unknown",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "moderate",
+              "moderate",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "low",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "moderate",
+              "low",
+              "moderate",
+              "moderate",
+              "heavy",
+              "moderate",
+              "heavy",
+              "heavy",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "low",
+              "moderate",
+              "moderate",
+              "heavy",
+              "moderate",
+              "heavy",
+              "moderate",
+              "moderate",
+              "heavy",
+              "low",
+              "low",
+              "unknown",
+              "low",
+              "low",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "moderate",
+              "moderate",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "moderate",
+              "low",
+              "heavy",
+              "unknown",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "low",
+              "heavy",
+              "heavy",
+              "moderate",
+              "low",
+              "low",
+              "severe",
+              "low",
+              "moderate",
+              "low",
+              "moderate",
+              "moderate",
+              "low",
+              "low",
+              "low"
+            ]
+          },
+          "summary": "Long Island Expressway, Woodhaven Boulevard",
+          "duration": 2697.5
+        }
+      ],
+      "weight_name": "routability",
+      "geometry": "}`zwlA~i{elCyBnDcTbHiGrBaKr@mC\\kCfGv@b@`o@x_@fq@b]jd@tTt`@t\\hU~CbObBh[~DjAyJb@sGAaE[sCq@iDuAsCwAqCmBaCkFeFuQkKcB}Dq@kBH_GnQoh@`Li^vCeItAeEd@{AxDoMtb@iqBrIw[pPsh@jWk}@tZuy@f^a`At[sy@pSik@xRqm@f`@opAl[wdApN}f@rZe}@lT{o@pc@gqAdC_HpCiGtCcF`DmEjDaEzDoDvDsCrD{BtDcBdEwAvDaAnDo@xD]jDSdEC~DH`F^nI~@lL|AvLjBjLjBpLvBtLbCvZbHrKvCfLdDtKbDbLvDrKvDhLjEdI~CtErBlFpCdEpChDlCrDfE|CrFtBbGxA`Hv@tHPhGIhGc@nGcAdG{AvFmBvEkCjE}CnDoDtCuDpB}CfAaDh@eDHgDY_Ds@qCmAeC_BmCgCgHaJ{P_RcEyD}D}CsWuMk|@qi@}EmDoEqDiE{DwDoEaE{GuDmIcDmJsCeKiBwKmAkMc@oNAyMRyNx@{LvAsMxBoLrCyJfwFioQpEsNn`Ia~VpBmHdBwHrAwIx@mHdCeLv@gFlAmGbA_FjAgExHyUhBcDnAuAjBsAtDqAhFa@|Dd@dEfBdr@`e@lErDnDxC~c@t]bi@b\\t`@{oAbBqEni@adB~\\kfAbS{n@ru@y`Cz|@mpCdDiKn@uBl@}Bj@kBJ]z@eCz@kCfB{F|AiF|AqEljAqqDzZkaAfMy`@bg@g}AtCwJ{E{D{a@kXwe@e[vg@c~AtX_|@hPsh@~Rgn@lCoI|Jw[tPsi@|BqHjBmFhBmFbB_KtBqVfEuPpEmQjAiH`AcKDmFJyFc@oLmAoGiAiHgC_OmIqQkJ{KsMyJuk@g`@gPeNaP{SsGeNsEaTkAmQAkTf@kXrIgh@rHaXhQu^rgHgrM|Pa^dKmb@jEib@fQuzAhFki@lDy^lAe_@iC}t@DeATuEpGyqALqCR}EU}OuCc\\kAmLqCsUoD_Zy@wKy@aVNc\\n@kM~@aIzS{lB`UomBrEo]zEeY`HkZzI_\\he@g{Aj}@{qCtLka@pIu]hGo[|Fo`@pEa_@zDqe@jByXzBqa@nAwP~A_RjQi{AzQ}oBpOuaBtFmj@jm@ojFtFe_@vHe_@dI_\\lLg`@tNia@tJySxJeRbNuT|p@q_AxEwGlZub@pOmThQkXlP}Z`Pu]jLy\\rJm_@bHo]rKym@xL{q@vJug@dIac@lJai@rZuoBzGi`@tIa`@jKm]dMe]vNwZnq@_pA|DsHne@m}@tKcUfSsd@xN}`@dL{a@pJcd@bHed@rEee@lJcoBfCwU`DmcAxGu_BxHwgBrHafB`Ciq@Zoe@]kZaBcc@eDgb@sFab@aIud@}Ju`@cKa[yMm\\ez@sbBmKiU_M{Z{GkScLgd@{E{h@eCq[qC}m@qBuz@cGowA_A{_@aBec@qCe_@sG}k@eJgc@wLy]iS}i@gNec@gOgi@yQk}@ek@ymCcFqj@aCe[McCS{DOiIFmKTeI`Mt@fDJho@wC|RmBja@gGze@kJnNqCn\\qG|f@uQjk@wSjSoHv`Ac_@lNgHl\\uPpd@g^dT{P|MaMnFeEvF}FbU{UhUoQvM}MlQmOfQeOjd@}`@pc@k`@dRmQ~a@yb@`e@ab@tGwFxXaVjd@ka@db@ed@bSoTpMoNxa@ee@ja@id@b`@kc@xDqCpZgJ~GuBvLaBna@@zEC|k@GhFN~d@tAlPn@`{@kGjN_Bl^kDxd@wChl@qDzs@uEvUyApYiDbJuCvJ}CxRoJxh@qd@jc@gp@f\\qg@j@bBp}@fkCnV|r@sAtWaAnRrIpBvIlFzEnIzB|R?hQeDbX_Epj@cA~f@\\xh@vBrl@vCt`@hEb]|E`ZhIb\\lFhNhBlGhQzY`PtTnI`HdTbOtO~FzRzEz`@dGvTrDtYtF`P~FtQpKlMbLpL|ObJtP|HhSpDhOfDdRvDx_@|R~tBhErS|FlPjHxM~KjOlf@dg@vXx]|G~I|FbGhMrHvKvD`InDnFbEjEnE`E`HdNbe@xDnL~ElHlE|EbGdDrGhBjGz@vIXbFV|Fz@bDbBxCrDfEvGzBnFzA`Hn@pJlCzh@rG`nAjGhsA~BdX`Jbj@~YjgB~Mp}@jIxl@jMbgAfDx]bFp`@tBrQnDlQlCbKdEtLdJ`QbGzIdI|I`HlGfQpNpaClgBxq@fi@rd@da@tg@ph@nj@fj@l`@t]tZlVj[rSp`@bXnKdE|K~CrQzCbKfCv|@zJ|VfHxNbOjVx_@rHdWzJxk@Xti@aGbhAu|@zsBwYxm@aF~KcNtZ{BrEnpAboAzFxF{BvF{U|e@sMfWtJxuBrRzdDvDfq@",
+      "weight": 2828.5,
+      "distance": 27827,
+      "duration": 2697.5
+    }
+  ],
+  "code": "Ok"
+}
