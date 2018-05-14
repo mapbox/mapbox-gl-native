@@ -303,6 +303,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
 
     define("to-string", [](const Value& value) -> Result<std::string> {
         return value.match(
+            [](const NullValue&) -> Result<std::string> { return std::string(); },
             [](const Color& c) -> Result<std::string> { return c.stringify(); }, // avoid quoting
             [](const std::string& s) -> Result<std::string> { return s; }, // avoid quoting
             [](const auto& v) -> Result<std::string> { return stringify(v); }
