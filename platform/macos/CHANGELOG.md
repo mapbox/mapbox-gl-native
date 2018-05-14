@@ -13,6 +13,7 @@
 
 * Fixed an issue where selecting an onscreen annotation could move the map unintentionally. ([#11731](https://github.com/mapbox/mapbox-gl-native/pull/11731))
 * Fixed a crash when removing an `MGLOfflinePack`. ([#6092](https://github.com/mapbox/mapbox-gl-native/issues/6092))
+* If English is the first language listed in the user’s Preferred Languages setting, `-[MGLStyle localizeLabelsIntoLocale:]` no longer prioritizes other languages over English. ([#11907](https://github.com/mapbox/mapbox-gl-native/pull/11907))
 * Fixed an issue where an `MGLOverlay` object straddling the antimeridian had an empty `MGLOverlay.overlayBounds` value. ([#11783](https://github.com/mapbox/mapbox-gl-native/pull/11783))
 * Fixed an issue where certain colors were being misrepresented in `NSExpression` obtained from `MGLStyleLayer` getters. ([#11725](https://github.com/mapbox/mapbox-gl-native/pull/11725))
 
