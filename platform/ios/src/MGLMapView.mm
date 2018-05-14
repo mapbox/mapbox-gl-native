@@ -184,7 +184,7 @@ public:
 
 @interface MGLMapView () <UIGestureRecognizerDelegate,
                           GLKViewDelegate,
-                          CLLocationManagerDelegate,
+                          MGLLocationManagerDelegate,
                           MGLSMCalloutViewDelegate,
                           MGLCalloutViewDelegate,
                           MGLMultiPointDelegate,
@@ -225,7 +225,7 @@ public:
 
 /// Indicates how thoroughly the map view is tracking the user location.
 @property (nonatomic) MGLUserTrackingState userTrackingState;
-@property (nonatomic) CLLocationManager *locationManager;
+
 @property (nonatomic) CGFloat scale;
 @property (nonatomic) CGFloat angle;
 @property (nonatomic) CGFloat quickZoomStart;
@@ -4653,13 +4653,20 @@ public:
 
 #pragma mark - User Location -
 
+- (void)setLocationManager:(id<MGLLocationManager>)locationManager
+{
+    _locationManager = locationManager;
+    [_locationManager setDelegate:self];
+    [self validateLocationServices];
+}
+
 - (void)validateLocationServices
 {
     BOOL shouldEnableLocationServices = self.showsUserLocation && !self.dormant;
 
     if (shouldEnableLocationServices && ! self.locationManager)
     {
-        self.locationManager = [[CLLocationManager alloc] init];
+        self.locationManager = [[MGLAppleLocationManager alloc] init];
 
         if ([CLLocationManager authorizationStatus] == kCLAuthorizationStatusNotDetermined)
         {
@@ -4692,7 +4699,7 @@ public:
             }
         }
 
-        self.locationManager.delegate = self;
+        [self.locationManager setDelegate:self];
         [self.locationManager startUpdatingLocation];
 
         [self validateUserHeadingUpdating];
@@ -4701,7 +4708,7 @@ public:
     {
         [self.locationManager stopUpdatingLocation];
         [self.locationManager stopUpdatingHeading];
-        self.locationManager.delegate = nil;
+        [self.locationManager setDelegate:nil];
         self.locationManager = nil;
     }
 }
@@ -4932,12 +4939,12 @@ public:
     }
 }
 
-- (void)locationManager:(CLLocationManager *)manager didUpdateLocations:(NSArray *)locations
+- (void)locationManager:(id<MGLLocationManager>)manager didUpdateLocations:(NSArray *)locations
 {
     [self locationManager:manager didUpdateLocations:locations animated:YES];
 }
 
-- (void)locationManager:(__unused CLLocationManager *)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
+- (void)locationManager:(__unused id<MGLLocationManager>)manager didUpdateLocations:(NSArray *)locations animated:(BOOL)animated
 {
     CLLocation *oldLocation = self.userLocation.location;
     CLLocation *newLocation = locations.lastObject;
@@ -5251,7 +5258,7 @@ public:
         // loop... so don't do that. rdar://34059173
         if (self.locationManager.headingOrientation != orientation)
         {
-            self.locationManager.headingOrientation = orientation;
+            [self.locationManager setHeadingOrientation:orientation];
         }
     }
 }

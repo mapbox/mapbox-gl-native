@@ -2,7 +2,7 @@
 #import "MGLMapCamera.h"
 
 #import <UIKit/UIKit.h>
-#import <CoreLocation/CoreLocation.h>
+#import "MGLLocationManager.h"
 
 #import "MGLFoundation.h"
 #import "MGLTypes.h"
@@ -295,6 +295,8 @@ MGL_EXPORT IB_DESIGNABLE
 - (void)removeStyleClass:(NSString *)styleClass __attribute__((unavailable("Support for style classes has been removed.")));
 
 #pragma mark Displaying the User’s Location
+
+@property(nonatomic, strong, nullable) id<MGLLocationManager> locationManager;
 
 /**
  A Boolean value indicating whether the map may display the user location.

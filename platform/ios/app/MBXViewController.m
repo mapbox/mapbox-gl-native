@@ -6,6 +6,7 @@
 #import "MBXAnnotationView.h"
 #import "MBXUserLocationAnnotationView.h"
 #import "MBXEmbeddedMapViewController.h"
+#import "MBXCustomLocationManager.h"
 
 #import <Mapbox/Mapbox.h>
 
@@ -250,6 +251,9 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
         self.showZoomLevelEnabled = YES;
         [self updateHUD];
     }
+    
+    self.mapView.locationManager = [[MBXCustomLocationManager alloc] init];
+    [self.mapView.locationManager startUpdatingLocation];
 }
 
 - (UIInterfaceOrientationMask)supportedInterfaceOrientations
@@ -1987,6 +1991,19 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     // that a device with an English-language locale is already effectively
     // using locale-based country labels.
     _localizingLabels = [[self bestLanguageForUser] isEqualToString:@"en"];
+    
+    NSString *filePath = [[NSBundle bundleForClass:self.class] pathForResource:@"white_house_lvl_0" ofType:@"geojson"];
+    NSURL *geoJSONURL = [NSURL fileURLWithPath:filePath];
+    MGLShapeSource *source = [[MGLShapeSource alloc] initWithIdentifier:@"white-house" URL:geoJSONURL options:nil];
+    [self.mapView.style addSource:source];
+    
+    MGLFillStyleLayer *fillLayer = [[MGLFillStyleLayer alloc] initWithIdentifier:@"indoor-building-fil" source:source];
+    fillLayer.fillColor = [NSExpression expressionForConstantValue:[UIColor whiteColor]];
+    [self.mapView.style addLayer:fillLayer];
+    
+    MGLLineStyleLayer *lineFillLayer = [[MGLLineStyleLayer alloc] initWithIdentifier:@"indoor-building-line" source:source];
+    lineFillLayer.lineColor = [NSExpression expressionForConstantValue:[UIColor blackColor]];
+    [self.mapView.style addLayer:lineFillLayer];
 }
 
 - (BOOL)mapView:(MGLMapView *)mapView shouldChangeFromCamera:(MGLMapCamera *)oldCamera toCamera:(MGLMapCamera *)newCamera {
