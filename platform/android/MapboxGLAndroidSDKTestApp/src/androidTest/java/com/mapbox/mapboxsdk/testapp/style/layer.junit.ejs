@@ -150,7 +150,7 @@ public class <%- camelize(type) %>LayerTest extends BaseActivityTest {
       assertEquals((<%- propertyType(property) %>) layer.get<%- camelize(property.name) %>().getValue(), (<%- propertyType(property) %>) <%- defaultValueJava(property) %>);
     });
   }
-<% if (isDataDriven(property)) { -%>
+<% if (property['property-type'] === 'data-driven' || property['property-type'] === 'cross-faded-data-driven') { -%>
 <% if (!(property.name.endsWith("-font")||property.name.endsWith("-offset"))) { -%>
 
   @Test
