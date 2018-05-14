@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.MutableLiveData;
+import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -28,21 +30,19 @@ import com.mapbox.mapboxsdk.utils.ColorUtils;
 /**
  * Settings for the user interface of a MapboxMap. To obtain this interface, call getUiSettings().
  */
-public final class UiSettings {
+public final class UiSettings extends ViewModel {
 
-  private final FocalPointChangeListener focalPointChangeListener;
-  private final Projection projection;
-  private final CompassView compassView;
-  private final int[] compassMargins = new int[4];
+  private Projection projection; // TODO: 14.05.18 clear projection during maps destroy?
 
-  private final ImageView attributionsView;
+  private CompassView compassView;
+  private ImageView attributionsView;
+  private View logoView;
+  private float pixelRatio;
+  private int[] compassMargins = new int[4];
+  private final int[] logoMargins = new int[4];
   private final int[] attributionsMargins = new int[4];
   private AttributionDialogManager attributionDialogManager;
 
-  private final View logoView;
-  private final int[] logoMargins = new int[4];
-
-  private float pixelRatio;
 
   private boolean rotateGesturesEnabled = true;
 
@@ -65,12 +65,11 @@ public final class UiSettings {
 
   private boolean deselectMarkersOnTap = true;
 
-  private PointF userProvidedFocalPoint;
+  private MutableLiveData<PointF> userProvidedFocalPoint;
 
-  UiSettings(@NonNull Projection projection, @NonNull FocalPointChangeListener listener,
-             @NonNull CompassView compassView, @NonNull ImageView attributionsView, @NonNull View logoView) {
+  void initialiseViews(@NonNull Projection projection, @NonNull CompassView compassView,
+                       @NonNull ImageView attributionsView, @NonNull View logoView) {
     this.projection = projection;
-    this.focalPointChangeListener = listener;
     this.compassView = compassView;
     this.attributionsView = attributionsView;
     this.logoView = logoView;
@@ -79,7 +78,7 @@ public final class UiSettings {
     }
   }
 
-  void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
+  void initialiseOptions(@NonNull Context context, @NonNull MapboxMapOptions options) {
     Resources resources = context.getResources();
     initialiseGestures(options);
     initialiseCompass(options, resources);
@@ -967,8 +966,7 @@ public final class UiSettings {
    * @param focalPoint the focal point to be used.
    */
   public void setFocalPoint(@Nullable PointF focalPoint) {
-    this.userProvidedFocalPoint = focalPoint;
-    focalPointChangeListener.onFocalPointChanged(focalPoint);
+    userProvidedFocalPoint.postValue(focalPoint);
   }
 
   /**
@@ -977,6 +975,15 @@ public final class UiSettings {
    * @return The focal point
    */
   public PointF getFocalPoint() {
+    return userProvidedFocalPoint.getValue();
+  }
+
+  /**
+   * Returns {@link MutableLiveData} object of the focal point.
+   *
+   * @return observable focal point object
+   */
+  public MutableLiveData<PointF> getFocalPointObservable() {
     return userProvidedFocalPoint;
   }
 

@@ -24,9 +24,6 @@ public class UiSettingsTest {
   Projection projection = mock(Projection.class);
 
   @InjectMocks
-  FocalPointChangeListener focalPointChangeListener = mock(FocalPointChangeListener.class);
-
-  @InjectMocks
   CompassView compassView = mock(CompassView.class);
 
   @InjectMocks
@@ -42,7 +39,8 @@ public class UiSettingsTest {
 
   @Before
   public void beforeTest() {
-    uiSettings = new UiSettings(projection, focalPointChangeListener, compassView, imageView, logoView);
+    uiSettings = new UiSettings();
+    uiSettings.initialiseViews(projection, compassView, imageView, logoView);
   }
 
   @Test

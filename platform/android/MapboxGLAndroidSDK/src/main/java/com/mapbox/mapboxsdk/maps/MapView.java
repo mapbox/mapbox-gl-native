@@ -1,5 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.LifecycleOwner;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
@@ -11,6 +13,7 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.UiThread;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.util.LongSparseArray;
 import android.util.AttributeSet;
 import android.view.KeyEvent;
@@ -145,10 +148,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     Context context = getContext();
     nativeMapView.addOnMapChangedListener(mapCallback);
 
-    // callback for focal point invalidation
-    final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator();
-    focalPointInvalidator.addListener(createFocalPointChangeListener());
-
     // callback for registering touch listeners
     GesturesManagerInteractionListener registerTouchListener = new GesturesManagerInteractionListener();
 
@@ -157,7 +156,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
     // setup components for MapboxMap creation
     Projection proj = new Projection(nativeMapView);
-    UiSettings uiSettings = new UiSettings(proj, focalPointInvalidator, compassView, attrView, logoView);
+
+    UiSettings uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
+    uiSettings.initialiseViews(proj, compassView, attrView, logoView);
+    uiSettings.getFocalPointObservable().observe((LifecycleOwner) context, point -> this.focalPoint = point);
+
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     IconManager iconManager = new IconManager(nativeMapView);
@@ -208,15 +211,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     } else {
       mapboxMap.onRestoreInstanceState(savedInstanceState);
     }
-  }
-
-  private FocalPointChangeListener createFocalPointChangeListener() {
-    return new FocalPointChangeListener() {
-      @Override
-      public void onFocalPointChanged(PointF pointF) {
-        focalPoint = pointF;
-      }
-    };
   }
 
   private MapboxMap.OnCompassAnimationListener createCompassAnimationListener(final CameraChangeDispatcher

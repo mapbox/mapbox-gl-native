@@ -89,7 +89,7 @@ public final class MapboxMap {
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
     transform.initialise(this, options);
-    uiSettings.initialise(context, options);
+    uiSettings.initialiseOptions(context, options);
 
     // Map configuration
     setDebugActive(options.getDebugActive());
