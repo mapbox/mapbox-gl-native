@@ -114,7 +114,7 @@ public final class MapboxMap {
    */
   void onStop() {
   }
-
+// TODO: 15.05.18 cleanup mapbx map save state
   /**
    * Called when the hosting Activity/Fragment is going to be destroyed and map state needs to be saved.
    *
@@ -124,7 +124,6 @@ public final class MapboxMap {
     outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
     outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
     outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
-    uiSettings.onSaveInstanceState(outState);
   }
 
   /**
@@ -134,8 +133,6 @@ public final class MapboxMap {
    */
   void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
     final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
-
-    uiSettings.onRestoreInstanceState(savedInstanceState);
 
     if (cameraPosition != null) {
       moveCamera(CameraUpdateFactory.newCameraPosition(
@@ -184,7 +181,7 @@ public final class MapboxMap {
   void onUpdateFullyRendered() {
     CameraPosition cameraPosition = transform.invalidateCameraPosition();
     if (cameraPosition != null) {
-      uiSettings.update(cameraPosition);
+      uiSettings.updateCompass(cameraPosition);
     }
   }
 

@@ -1,14 +1,18 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.core.executor.testing.InstantTaskExecutorRule;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.view.Gravity;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.ImageView;
 
-import com.mapbox.mapboxsdk.maps.widgets.CompassView;
+import com.mapbox.mapboxsdk.R;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.InjectMocks;
 
 import static org.junit.Assert.assertEquals;
@@ -18,29 +22,41 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+@RunWith(JUnit4.class)
 public class UiSettingsTest {
+
+  @Rule
+  public InstantTaskExecutorRule instantExecutorRule = new InstantTaskExecutorRule();
 
   @InjectMocks
   Projection projection = mock(Projection.class);
 
   @InjectMocks
-  CompassView compassView = mock(CompassView.class);
+  Context context = mock(Context.class);
 
   @InjectMocks
-  ImageView imageView = mock(ImageView.class);
+  Resources resources = mock(Resources.class);
 
   @InjectMocks
-  ImageView logoView = mock(ImageView.class);
-
-  @InjectMocks
-  FrameLayout.LayoutParams layoutParams = mock(FrameLayout.LayoutParams.class);
+  PackageManager packageManager = mock(PackageManager.class);
 
   private UiSettings uiSettings;
 
   @Before
   public void beforeTest() {
+    when(context.getResources()).thenReturn(resources);
+    when(resources.getDimension(R.dimen.mapbox_four_dp)).thenReturn(25f);
+    when(context.getPackageManager()).thenReturn(packageManager);
+    when(packageManager.hasSystemFeature(PackageManager.FEATURE_TOUCHSCREEN_MULTITOUCH)).thenReturn(true);
+
+    MapboxMapOptions options = new MapboxMapOptions();
     uiSettings = new UiSettings();
-    uiSettings.initialiseViews(projection, compassView, imageView, logoView);
+    uiSettings.initialiseProjection(projection);
+    uiSettings.initialiseGestures(options);
+    uiSettings.initialiseCompass(options, resources);
+    uiSettings.initialiseLogo(options, resources);
+    uiSettings.initialiseAttribution(context, options);
+    uiSettings.initialiseZoomControl(context);
   }
 
   @Test
@@ -50,7 +66,6 @@ public class UiSettingsTest {
 
   @Test
   public void testCompassEnabled() {
-    when(compassView.isEnabled()).thenReturn(true);
     uiSettings.setCompassEnabled(true);
     assertEquals("Compass should be enabled", true, uiSettings.isCompassEnabled());
   }
@@ -63,20 +78,12 @@ public class UiSettingsTest {
 
   @Test
   public void testCompassGravity() {
-    when(compassView.getLayoutParams()).thenReturn(layoutParams);
-    layoutParams.gravity = Gravity.START;
     uiSettings.setCompassGravity(Gravity.START);
     assertEquals("Compass gravity should be same", Gravity.START, uiSettings.getCompassGravity());
   }
 
   @Test
   public void testCompassMargins() {
-    when(projection.getContentPadding()).thenReturn(new int[] {0, 0, 0, 0});
-    when(compassView.getLayoutParams()).thenReturn(layoutParams);
-    layoutParams.leftMargin = 1;
-    layoutParams.topMargin = 2;
-    layoutParams.rightMargin = 3;
-    layoutParams.bottomMargin = 4;
     uiSettings.setCompassMargins(1, 2, 3, 4);
     assertTrue("Compass margin left should be same", uiSettings.getCompassMarginLeft() == 1);
     assertTrue("Compass margin top should be same", uiSettings.getCompassMarginTop() == 2);
@@ -86,10 +93,8 @@ public class UiSettingsTest {
 
   @Test
   public void testCompassFadeWhenFacingNorth() {
-    when(compassView.isFadeCompassViewFacingNorth()).thenReturn(true);
     assertTrue("Compass should fade when facing north by default.", uiSettings.isCompassFadeWhenFacingNorth());
     uiSettings.setCompassFadeFacingNorth(false);
-    when(compassView.isFadeCompassViewFacingNorth()).thenReturn(false);
     assertFalse("Compass fading should be disabled", uiSettings.isCompassFadeWhenFacingNorth());
   }
 
@@ -101,27 +106,18 @@ public class UiSettingsTest {
 
   @Test
   public void testLogoDisabled() {
-    when(logoView.getVisibility()).thenReturn(View.GONE);
     uiSettings.setLogoEnabled(false);
     assertEquals("Logo should be disabled", false, uiSettings.isLogoEnabled());
   }
 
   @Test
   public void testLogoGravity() {
-    layoutParams.gravity = Gravity.END;
-    when(logoView.getLayoutParams()).thenReturn(layoutParams);
     uiSettings.setLogoGravity(Gravity.END);
     assertEquals("Logo gravity should be same", Gravity.END, uiSettings.getLogoGravity());
   }
 
   @Test
   public void testLogoMargins() {
-    when(projection.getContentPadding()).thenReturn(new int[] {0, 0, 0, 0});
-    when(logoView.getLayoutParams()).thenReturn(layoutParams);
-    layoutParams.leftMargin = 1;
-    layoutParams.topMargin = 2;
-    layoutParams.rightMargin = 3;
-    layoutParams.bottomMargin = 4;
     uiSettings.setLogoMargins(1, 2, 3, 4);
     assertTrue("Compass margin left should be same", uiSettings.getLogoMarginLeft() == 1);
     assertTrue("Compass margin top should be same", uiSettings.getLogoMarginTop() == 2);
@@ -131,34 +127,24 @@ public class UiSettingsTest {
 
   @Test
   public void testAttributionEnabled() {
-    when(imageView.getVisibility()).thenReturn(View.VISIBLE);
     uiSettings.setAttributionEnabled(true);
     assertEquals("Attribution should be enabled", true, uiSettings.isAttributionEnabled());
   }
 
   @Test
   public void testAttributionDisabled() {
-    when(imageView.getVisibility()).thenReturn(View.GONE);
     uiSettings.setAttributionEnabled(false);
     assertEquals("Attribution should be disabled", false, uiSettings.isAttributionEnabled());
   }
 
   @Test
   public void testAttributionGravity() {
-    when(imageView.getLayoutParams()).thenReturn(layoutParams);
-    layoutParams.gravity = Gravity.END;
     uiSettings.setAttributionGravity(Gravity.END);
     assertEquals("Attribution gravity should be same", Gravity.END, uiSettings.getAttributionGravity());
   }
 
   @Test
   public void testAttributionMargins() {
-    when(imageView.getLayoutParams()).thenReturn(layoutParams);
-    when(projection.getContentPadding()).thenReturn(new int[] {0, 0, 0, 0});
-    layoutParams.leftMargin = 1;
-    layoutParams.topMargin = 2;
-    layoutParams.rightMargin = 3;
-    layoutParams.bottomMargin = 4;
     uiSettings.setAttributionMargins(1, 2, 3, 4);
     assertTrue("Attribution margin left should be same", uiSettings.getAttributionMarginLeft() == 1);
     assertTrue("Attribution margin top should be same", uiSettings.getAttributionMarginTop() == 2);

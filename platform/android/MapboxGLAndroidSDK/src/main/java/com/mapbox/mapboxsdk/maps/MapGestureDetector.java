@@ -82,6 +82,7 @@ final class MapGestureDetector {
    * User-set focal point.
    */
   private PointF focalPoint;
+  private float screenDensity;
 
   private AndroidGesturesManager gesturesManager;
   private boolean executeDoubleTap;
@@ -106,6 +107,8 @@ final class MapGestureDetector {
 
     // Checking for context != null for testing purposes
     if (context != null) {
+      screenDensity = context.getResources().getDisplayMetrics().density;
+
       // Initialize gestures manager
       AndroidGesturesManager androidGesturesManager = new AndroidGesturesManager(context);
       initializeGesturesManager(androidGesturesManager, true);
@@ -400,8 +403,6 @@ final class MapGestureDetector {
       if (!uiSettings.isFlingVelocityAnimationEnabled()) {
         return false;
       }
-
-      float screenDensity = uiSettings.getPixelRatio();
 
       // calculate velocity vector for xy dimensions, independent from screen size
       double velocityXY = Math.hypot(velocityX / screenDensity, velocityY / screenDensity);

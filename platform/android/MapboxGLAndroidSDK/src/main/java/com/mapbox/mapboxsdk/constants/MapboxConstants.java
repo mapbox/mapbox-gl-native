@@ -120,40 +120,7 @@ public class MapboxConstants {
   // Save instance state keys
   public static final String STATE_HAS_SAVED_STATE = "mapbox_savedState";
   public static final String STATE_CAMERA_POSITION = "mapbox_cameraPosition";
-  public static final String STATE_ZOOM_ENABLED = "mapbox_zoomEnabled";
-  public static final String STATE_SCROLL_ENABLED = "mapbox_scrollEnabled";
-  public static final String STATE_ROTATE_ENABLED = "mapbox_rotateEnabled";
-  public static final String STATE_TILT_ENABLED = "mapbox_tiltEnabled";
-  public static final String STATE_ZOOM_CONTROLS_ENABLED = "mapbox_zoomControlsEnabled";
-  public static final String STATE_DOUBLE_TAP_ENABLED = "mapbox_doubleTapEnabled";
   public static final String STATE_DEBUG_ACTIVE = "mapbox_debugActive";
   public static final String STATE_STYLE_URL = "mapbox_styleUrl";
-  public static final String STATE_COMPASS_ENABLED = "mapbox_compassEnabled";
-  public static final String STATE_COMPASS_GRAVITY = "mapbox_compassGravity";
-  public static final String STATE_COMPASS_MARGIN_LEFT = "mapbox_compassMarginLeft";
-  public static final String STATE_COMPASS_MARGIN_TOP = "mapbox_compassMarginTop";
-  public static final String STATE_COMPASS_MARGIN_RIGHT = "mapbox_compassMarginRight";
-  public static final String STATE_COMPASS_MARGIN_BOTTOM = "mapbox_compassMarginBottom";
-  public static final String STATE_COMPASS_FADE_WHEN_FACING_NORTH = "mapbox_compassFade";
-  public static final String STATE_COMPASS_IMAGE_BITMAP = "mapbox_compassImage";
-  public static final String STATE_LOGO_GRAVITY = "mapbox_logoGravity";
-  public static final String STATE_LOGO_MARGIN_LEFT = "mapbox_logoMarginLeft";
-  public static final String STATE_LOGO_MARGIN_TOP = "mapbox_logoMarginTop";
-  public static final String STATE_LOGO_MARGIN_RIGHT = "mapbox_logoMarginRight";
-  public static final String STATE_LOGO_MARGIN_BOTTOM = "mapbox_logoMarginBottom";
-  public static final String STATE_LOGO_ENABLED = "mapbox_logoEnabled";
-  public static final String STATE_ATTRIBUTION_GRAVITY = "mapbox_attrGravity";
-  public static final String STATE_ATTRIBUTION_MARGIN_LEFT = "mapbox_attrMarginLeft";
-  public static final String STATE_ATTRIBUTION_MARGIN_TOP = "mapbox_attrMarginTop";
-  public static final String STATE_ATTRIBUTION_MARGIN_RIGHT = "mapbox_attrMarginRight";
-  public static final String STATE_ATTRIBUTION_MARGIN_BOTTOM = "mapbox_atrrMarginBottom";
-  public static final String STATE_ATTRIBUTION_ENABLED = "mapbox_atrrEnabled";
-  public static final String STATE_DESELECT_MARKER_ON_TAP = "mapbox_deselectMarkerOnTap";
-  public static final String STATE_USER_FOCAL_POINT = "mapbox_userFocalPoint";
-  public static final String STATE_SCALE_ANIMATION_ENABLED = "mapbox_scaleAnimationEnabled";
-  public static final String STATE_ROTATE_ANIMATION_ENABLED = "mapbox_rotateAnimationEnabled";
-  public static final String STATE_FLING_ANIMATION_ENABLED = "mapbox_flingAnimationEnabled";
-  public static final String STATE_INCREASE_ROTATE_THRESHOLD = "mapbox_increaseRotateThreshold";
-  public static final String STATE_INCREASE_SCALE_THRESHOLD = "mapbox_increaseScaleThreshold";
 
 }

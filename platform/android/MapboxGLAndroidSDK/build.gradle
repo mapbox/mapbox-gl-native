@@ -17,6 +17,7 @@ dependencies {
     testImplementation dependenciesList.junit
     testImplementation dependenciesList.mockito
     testImplementation dependenciesList.robolectric
+    testImplementation dependenciesList.archCoreTesting
 }
 
 android {
