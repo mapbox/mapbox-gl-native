@@ -116,7 +116,7 @@ MGL_EXPORT
  Primarily used for adjusting the heatmap based on zoom level.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -142,7 +142,7 @@ MGL_EXPORT
  The global opacity at which the heatmap layer will be drawn.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -171,7 +171,7 @@ MGL_EXPORT
  This property is measured in points.
  
  The default value of this property is an expression that evaluates to the float
- 30. Set this property to `nil` to reset it to the default value.
+ `30`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
@@ -197,7 +197,7 @@ MGL_EXPORT
  Especially useful when combined with clustering.
  
  The default value of this property is an expression that evaluates to the float
- 1. Set this property to `nil` to reset it to the default value.
+ `1`. Set this property to `nil` to reset it to the default value.
  
  You can set this property to an expression containing any of the following:
  
