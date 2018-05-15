@@ -364,7 +364,7 @@ std::unordered_map<std::string, CompoundExpressionRegistry::Definition> initiali
         return result;
     });
     
-    define("round", [](double x) -> Result<double> { return std::round(x); });
+    define("round", [](double x) -> Result<double> { return ::round(x); });
     define("floor", [](double x) -> Result<double> { return std::floor(x); });
     define("ceil", [](double x) -> Result<double> { return std::ceil(x); });
     define("abs", [](double x) -> Result<double> { return std::abs(x); });

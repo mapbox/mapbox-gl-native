@@ -71,13 +71,12 @@
             { 18, mbgl::style::LineCapType::Square },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::LineCapType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineCap(), propertyValue,
                        @"Setting lineCap to a camera expression should update line-cap.");
         XCTAssertEqualObjects(layer.lineCap, functionExpression,
                               @"lineCap should round-trip camera expressions.");
 
-                              
 
         layer.lineCap = nil;
         XCTAssertTrue(rawLayer->getLineCap().isUndefined(),
@@ -115,13 +114,12 @@
             { 18, mbgl::style::LineJoinType::Miter },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::LineJoinType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineJoin(), propertyValue,
                        @"Setting lineJoin to a camera expression should update line-join.");
         XCTAssertEqualObjects(layer.lineJoin, functionExpression,
                               @"lineJoin should round-trip camera expressions.");
 
-                              
 
         layer.lineJoin = nil;
         XCTAssertTrue(rawLayer->getLineJoin().isUndefined(),
@@ -153,13 +151,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineMiterLimit(), propertyValue,
                        @"Setting lineMiterLimit to a camera expression should update line-miter-limit.");
         XCTAssertEqualObjects(layer.lineMiterLimit, functionExpression,
                               @"lineMiterLimit should round-trip camera expressions.");
 
-                              
 
         layer.lineMiterLimit = nil;
         XCTAssertTrue(rawLayer->getLineMiterLimit().isUndefined(),
@@ -197,13 +194,12 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineRoundLimit(), propertyValue,
                        @"Setting lineRoundLimit to a camera expression should update line-round-limit.");
         XCTAssertEqualObjects(layer.lineRoundLimit, functionExpression,
                               @"lineRoundLimit should round-trip camera expressions.");
 
-                              
 
         layer.lineRoundLimit = nil;
         XCTAssertTrue(rawLayer->getLineRoundLimit().isUndefined(),
@@ -241,7 +237,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineBlur(), propertyValue,
                        @"Setting lineBlur to a camera expression should update line-blur.");
         XCTAssertEqualObjects(layer.lineBlur, functionExpression,
@@ -272,7 +268,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineBlur, pedanticFunctionExpression,
                               @"lineBlur should round-trip camera-data expressions.");
-                              
 
         layer.lineBlur = nil;
         XCTAssertTrue(rawLayer->getLineBlur().isUndefined(),
@@ -313,7 +308,7 @@
             { 18, { 1, 0, 0, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::Color> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineColor(), propertyValue,
                        @"Setting lineColor to a camera expression should update line-color.");
         XCTAssertEqualObjects(layer.lineColor, functionExpression,
@@ -344,7 +339,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineColor, pedanticFunctionExpression,
                               @"lineColor should round-trip camera-data expressions.");
-                              
 
         layer.lineColor = nil;
         XCTAssertTrue(rawLayer->getLineColor().isUndefined(),
@@ -385,13 +379,12 @@
             { 18, {1, 2} },
         }};
         propertyValue = mbgl::style::CameraFunction<std::vector<float>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineDasharray(), propertyValue,
                        @"Setting lineDashPattern to a camera expression should update line-dasharray.");
         XCTAssertEqualObjects(layer.lineDashPattern, functionExpression,
                               @"lineDashPattern should round-trip camera expressions.");
 
-                              
 
         layer.lineDashPattern = nil;
         XCTAssertTrue(rawLayer->getLineDasharray().isUndefined(),
@@ -429,7 +422,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineGapWidth(), propertyValue,
                        @"Setting lineGapWidth to a camera expression should update line-gap-width.");
         XCTAssertEqualObjects(layer.lineGapWidth, functionExpression,
@@ -460,7 +453,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineGapWidth, pedanticFunctionExpression,
                               @"lineGapWidth should round-trip camera-data expressions.");
-                              
 
         layer.lineGapWidth = nil;
         XCTAssertTrue(rawLayer->getLineGapWidth().isUndefined(),
@@ -501,7 +493,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineOffset(), propertyValue,
                        @"Setting lineOffset to a camera expression should update line-offset.");
         XCTAssertEqualObjects(layer.lineOffset, functionExpression,
@@ -532,7 +524,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineOffset, pedanticFunctionExpression,
                               @"lineOffset should round-trip camera-data expressions.");
-                              
 
         layer.lineOffset = nil;
         XCTAssertTrue(rawLayer->getLineOffset().isUndefined(),
@@ -573,7 +564,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineOpacity(), propertyValue,
                        @"Setting lineOpacity to a camera expression should update line-opacity.");
         XCTAssertEqualObjects(layer.lineOpacity, functionExpression,
@@ -604,7 +595,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineOpacity, pedanticFunctionExpression,
                               @"lineOpacity should round-trip camera-data expressions.");
-                              
 
         layer.lineOpacity = nil;
         XCTAssertTrue(rawLayer->getLineOpacity().isUndefined(),
@@ -645,13 +635,12 @@
             { 18, "Line Pattern" },
         }};
         propertyValue = mbgl::style::CameraFunction<std::string> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLinePattern(), propertyValue,
                        @"Setting linePattern to a camera expression should update line-pattern.");
         XCTAssertEqualObjects(layer.linePattern, functionExpression,
                               @"linePattern should round-trip camera expressions.");
 
-                              
 
         layer.linePattern = nil;
         XCTAssertTrue(rawLayer->getLinePattern().isUndefined(),
@@ -704,13 +693,12 @@
             { 18, { 1, 1 } },
         }};
         propertyValue = mbgl::style::CameraFunction<std::array<float, 2>> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineTranslate(), propertyValue,
                        @"Setting lineTranslation to a camera expression should update line-translate.");
         XCTAssertEqualObjects(layer.lineTranslation, functionExpression,
                               @"lineTranslation should round-trip camera expressions.");
 
-                              
 
         layer.lineTranslation = nil;
         XCTAssertTrue(rawLayer->getLineTranslate().isUndefined(),
@@ -748,13 +736,12 @@
             { 18, mbgl::style::TranslateAnchorType::Viewport },
         }};
         propertyValue = mbgl::style::CameraFunction<mbgl::style::TranslateAnchorType> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineTranslateAnchor(), propertyValue,
                        @"Setting lineTranslationAnchor to a camera expression should update line-translate-anchor.");
         XCTAssertEqualObjects(layer.lineTranslationAnchor, functionExpression,
                               @"lineTranslationAnchor should round-trip camera expressions.");
 
-                              
 
         layer.lineTranslationAnchor = nil;
         XCTAssertTrue(rawLayer->getLineTranslateAnchor().isUndefined(),
@@ -792,7 +779,7 @@
             { 18, 0xff },
         }};
         propertyValue = mbgl::style::CameraFunction<float> { intervalStops };
-        
+
         XCTAssertEqual(rawLayer->getLineWidth(), propertyValue,
                        @"Setting lineWidth to a camera expression should update line-width.");
         XCTAssertEqualObjects(layer.lineWidth, functionExpression,
@@ -823,7 +810,6 @@
         pedanticFunctionExpression = [NSExpression expressionWithFormat:@"mgl_interpolate:withCurveType:parameters:stops:($zoomLevel, 'linear', nil, %@)", @{@10: pedanticFunctionExpression}];
         XCTAssertEqualObjects(layer.lineWidth, pedanticFunctionExpression,
                               @"lineWidth should round-trip camera-data expressions.");
-                              
 
         layer.lineWidth = nil;
         XCTAssertTrue(rawLayer->getLineWidth().isUndefined(),

@@ -1,6 +1,7 @@
 package com.mapbox.mapboxsdk.maps;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.opengl.GLSurfaceView;
 import android.os.Build;
@@ -40,6 +41,7 @@ import com.mapbox.mapboxsdk.maps.renderer.textureview.TextureViewMapRenderer;
 import com.mapbox.mapboxsdk.maps.widgets.CompassView;
 import com.mapbox.mapboxsdk.net.ConnectivityReceiver;
 import com.mapbox.mapboxsdk.storage.FileSource;
+import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -51,8 +53,6 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
-
-import timber.log.Timber;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -71,13 +71,15 @@ import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
  * <strong>Warning:</strong> Please note that you are responsible for getting permission to use the map data,
  * and for ensuring your use adheres to the relevant terms of use.
  */
-public class MapView extends FrameLayout {
+public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
 
   private final MapCallback mapCallback = new MapCallback();
-  private MapboxMap mapboxMap;
+  private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
 
   private NativeMapView nativeMapView;
+  private MapboxMap mapboxMap;
   private MapboxMapOptions mapboxMapOptions;
+  private MapRenderer mapRenderer;
   private boolean destroyed;
   private boolean hasSurface;
 
@@ -90,9 +92,6 @@ public class MapView extends FrameLayout {
   private MapKeyListener mapKeyListener;
   private MapZoomButtonController mapZoomButtonController;
   private Bundle savedInstanceState;
-  private final CopyOnWriteArrayList<OnMapChangedListener> onMapChangedListeners = new CopyOnWriteArrayList<>();
-
-  private MapRenderer mapRenderer;
 
   @UiThread
   public MapView(@NonNull Context context) {
@@ -140,7 +139,7 @@ public class MapView extends FrameLayout {
 
   private void initialiseMap() {
     Context context = getContext();
-    addOnMapChangedListener(mapCallback);
+    nativeMapView.addOnMapChangedListener(mapCallback);
 
     // callback for focal point invalidation
     final FocalPointInvalidator focalPointInvalidator = new FocalPointInvalidator();
@@ -307,7 +306,18 @@ public class MapView extends FrameLayout {
       addView(glSurfaceView, 0);
     }
 
-    nativeMapView = new NativeMapView(this, mapRenderer);
+    nativeMapView = new NativeMapView(getContext(), this, mapRenderer);
+    nativeMapView.addOnMapChangedListener(new OnMapChangedListener() {
+      @Override
+      public void onMapChanged(int change) {
+        // dispatch events to external listeners
+        if (!onMapChangedListeners.isEmpty()) {
+          for (OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
+            onMapChangedListener.onMapChanged(change);
+          }
+        }
+      }
+    });
     nativeMapView.resizeView(getMeasuredWidth(), getMeasuredHeight());
   }
 
@@ -400,6 +410,7 @@ public class MapView extends FrameLayout {
   @UiThread
   public void onDestroy() {
     destroyed = true;
+    onMapChangedListeners.clear();
     mapCallback.clearOnMapReadyCallbacks();
 
     if (nativeMapView != null && hasSurface) {
@@ -566,18 +577,17 @@ public class MapView extends FrameLayout {
   }
 
   //
-  // Map events
+  // ViewCallback
   //
 
-  void onMapChange(int rawChange) {
-    for (MapView.OnMapChangedListener onMapChangedListener : onMapChangedListeners) {
-      try {
-        onMapChangedListener.onMapChanged(rawChange);
-      } catch (RuntimeException err) {
-        Timber.e(err, "Exception in MapView.OnMapChangedListener");
-      }
-    }
+  @Override
+  public Bitmap getViewContent() {
+    return BitmapUtils.createBitmapFromView(this);
   }
+
+  //
+  // Map events
+  //
 
   /**
    * <p>
@@ -601,7 +611,7 @@ public class MapView extends FrameLayout {
    * @see MapView#addOnMapChangedListener(OnMapChangedListener)
    */
   public void removeOnMapChangedListener(@Nullable OnMapChangedListener listener) {
-    if (listener != null) {
+    if (listener != null && onMapChangedListeners.contains(listener)) {
       onMapChangedListeners.remove(listener);
     }
   }
