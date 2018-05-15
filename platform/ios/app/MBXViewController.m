@@ -91,6 +91,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsRuntimeStylingRows) {
 typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousShowReuseQueueStats = 0,
     MBXSettingsMiscellaneousWorldTour,
+    MBXSettingsMiscellaneousRandomTour,
     MBXSettingsMiscellaneousShowZoomLevel,
     MBXSettingsMiscellaneousScrollView,
     MBXSettingsMiscellaneousToggleTwoMaps,
@@ -100,6 +101,65 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     MBXSettingsMiscellaneousPrintLogFile,
     MBXSettingsMiscellaneousDeleteLogFile,
 };
+
+// Utility methods
+CLLocationCoordinate2D coordinateCentered(CLLocationCoordinate2D origin, CLLocationDegrees bearing, CLLocationDistance distance) {
+
+    // Convert to radians
+    double multiplier      = M_PI / 180.0;
+    double sourceLatitude  = multiplier * origin.latitude;
+    double sourceLongitude = multiplier * origin.longitude;
+    bearing *= multiplier;
+    distance /= 6378137.0;
+
+    // Pulled from MGLRadianCoordinateAtDistanceFacingDirection:
+    double latitude = asin((sin(sourceLatitude) * cos(distance)) +
+                           (cos(sourceLatitude) * sin(distance) * cos(bearing)));
+
+    double longitude = sourceLongitude + atan2((sin(bearing) * sin(distance) * cos(sourceLatitude)),
+                                               cos(distance) - (sin(sourceLatitude) * sin(latitude)));
+
+    CLLocationCoordinate2D result;
+    result.latitude  = fmin(85.0, fmax(-85.0, (latitude / multiplier)));
+    result.longitude = longitude / multiplier;
+    return result;
+}
+
+CLLocationCoordinate2D randomWorldCoordinate() {
+
+    static const struct {
+        CLLocationCoordinate2D coordinate;
+        CLLocationDistance radius;
+    } landmasses[] = {
+        // Rough land masses
+        {{ 38.328531,   94.778736 },    4100000 },  // Asia
+        {{ 1.477244,    18.138111 },    4100000 },  // Africa
+        {{ 52.310059,   22.295425 },    2000000 },  // Europe
+        {{ 42.344216,   -96.532700 },   3000000 },  // N America
+        {{ -11.537273,  -57.035181 },   2220000 },  // S America
+        {{ -20.997030,  134.660541 },   2220000 },  // Australia
+
+        // A few cities
+        {{ 51.504787,   -0.106977 },    33000 },    // London
+        {{ 37.740186,   -122.437086 },  8500 },     // SF
+        {{ 52.509978,   13.406510 },    12000 },    // Berlin
+        {{ 12.966246,   77.586505 },    19000 }     // Bengaluru
+    };
+
+    NSInteger index                   = drand48() * (sizeof(landmasses)/sizeof(landmasses[0]));
+    CLLocationCoordinate2D coordinate = landmasses[index].coordinate;
+    CLLocationDistance radius         = landmasses[index].radius;
+
+    // Now create a world coord
+    CLLocationDegrees heading          = drand48()*360.0;
+    CLLocationDistance dist            = drand48()*radius;
+    CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, dist);
+    return newLocation;
+}
+
+
+
+
 
 @interface MBXDroppedPinAnnotation : MGLPointAnnotation
 @end
@@ -136,13 +196,11 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 @property (nonatomic) BOOL reuseQueueStatsEnabled;
 @property (nonatomic) BOOL showZoomLevelEnabled;
 @property (nonatomic) BOOL shouldLimitCameraChanges;
-
+@property (nonatomic) BOOL randomWalk;
 @end
 
 @interface MGLMapView (MBXViewController)
-
 @property (nonatomic) NSDictionary *annotationViewReuseQueueByIdentifier;
-
 @end
 
 @implementation MBXViewController
@@ -277,6 +335,8 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (IBAction)showSettings:(__unused id)sender
 {
+    self.randomWalk = NO;
+
     UITableViewController *settingsViewController = [[UITableViewController alloc] initWithStyle:UITableViewStyleGrouped];
     settingsViewController.tableView.delegate = self;
     settingsViewController.tableView.dataSource = self;
@@ -377,6 +437,7 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
             [settingsTitles addObjectsFromArray:@[
                 [NSString stringWithFormat:@"%@ Reuse Queue Stats", (_reuseQueueStatsEnabled ? @"Hide" :@"Show")],
                 @"Start World Tour",
+                @"Random Tour",
                 [NSString stringWithFormat:@"%@ Zoom/Pitch/Direction Label", (_showZoomLevelEnabled ? @"Hide" :@"Show")],
                 @"Embedded Map View",
                 [NSString stringWithFormat:@"%@ Second Map", ([self.view viewWithTag:2] == nil ? @"Show" : @"Hide")],
@@ -580,6 +641,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
                 case MBXSettingsMiscellaneousWorldTour:
                     [self startWorldTour];
                     break;
+                case MBXSettingsMiscellaneousRandomTour:
+                    [self randomWorldTour];
+                    break;
+
                 case MBXSettingsMiscellaneousPrintLogFile:
                     [self printTelemetryLogFile];
                     break;
@@ -1681,6 +1746,75 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
     return filePath;
 }
 
+#pragma mark - Random World Tour
+
+- (void)addAnnotations:(NSInteger)numAnnotations aroundCoordinate:(CLLocationCoordinate2D)coordinate radius:(CLLocationDistance)radius {
+    NSMutableArray *annotations = [[NSMutableArray alloc] initWithCapacity:numAnnotations];
+    for (NSInteger i = 0; i<numAnnotations; i++) {
+
+        CLLocationDegrees heading          = drand48()*360.0;
+        CLLocationDistance dist            = drand48()*radius;
+        CLLocationCoordinate2D newLocation = coordinateCentered(coordinate, heading, dist);
+
+        MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
+        annotation.coordinate = newLocation;
+        [annotations addObject:annotation];
+    }
+    [self.mapView addAnnotations:annotations];
+}
+
+- (void)randomWorldTour {
+    // Consistent initial conditions (consider setting these by test params)
+    srand48(0);
+    [self.mapView removeAnnotations:self.mapView.annotations];
+    [self.mapView setCenterCoordinate:CLLocationCoordinate2DMake(31, -100) zoomLevel:3 animated:NO];
+
+    [self _randomWorldTourInternal];
+}
+
+- (void)_randomWorldTourInternal {
+
+    self.randomWalk = YES;
+
+    // Remove all annotations
+    NSTimeInterval duration = 16.0;
+    __weak MBXViewController *weakSelf = self;
+
+    // Remove old annotations, half-way through the flight.
+    NSArray *annotationsToRemove = [self.mapView.annotations copy];
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(duration * 0.5 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        [weakSelf.mapView removeAnnotations:annotationsToRemove];
+    });
+
+    MBXDroppedPinAnnotation *annotation = [[MBXDroppedPinAnnotation alloc] init];
+    annotation.coordinate = randomWorldCoordinate();
+    [self.mapView addAnnotation:annotation];
+
+    // Add annotations around that coord
+    [self addAnnotations:50 aroundCoordinate:annotation.coordinate radius:100000.0]; // 100km
+
+    MGLMapCamera *camera = [MGLMapCamera cameraLookingAtCenterCoordinate:annotation.coordinate
+                                                            fromDistance:10000.0
+                                                                   pitch:drand48()*60.0
+                                                                 heading:drand48()*360];
+    [self.mapView flyToCamera:camera
+                 withDuration:duration
+                 peakAltitude:2000000.0
+            completionHandler:^{
+                // This completion handler is currently called BEFORE the
+                // region did change delegate method, and we don't have a "reason"
+                // so we can't tell if the motion was cancelled. We use the delegate
+                // for that, and set self.randomWalk. But since we want a delay
+                // anyway, we can just check later. Not ideal though..
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    MBXViewController *strongSelf = weakSelf;
+                    if (strongSelf.randomWalk) {
+                        [strongSelf _randomWorldTourInternal];
+                    }
+                });
+            }];
+}
+
 #pragma mark - User Actions
 
 - (IBAction)handleLongPress:(UILongPressGestureRecognizer *)longPress
@@ -2033,6 +2167,10 @@ typedef NS_ENUM(NSInteger, MBXSettingsMiscellaneousRows) {
 
 - (void)mapView:(MGLMapView *)mapView regionDidChangeWithReason:(MGLCameraChangeReason)reason animated:(BOOL)animated
 {
+    if (reason != MGLCameraChangeReasonProgrammatic) {
+        self.randomWalk = NO;
+    }
+
     [self updateHUD];
 }
 
