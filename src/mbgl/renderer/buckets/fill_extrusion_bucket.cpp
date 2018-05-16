@@ -84,7 +84,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
             if (nVertices == 0)
                 continue;
 
-            auto edgeDistance = 0;
+            std::size_t edgeDistance = 0;
 
             for (uint32_t i = 0; i < nVertices; i++) {
                 const auto& p1 = ring[i];
@@ -102,7 +102,7 @@ void FillExtrusionBucket::addFeature(const GeometryTileFeature& feature,
 
                     const Point<double> perp = util::unit(util::perp(d1 - d2));
                     const auto dist = util::dist<int16_t>(d1, d2);
-                    if (dist > std::numeric_limits<int16_t>::max()) {
+                    if (edgeDistance + dist > std::numeric_limits<int16_t>::max()) {
                         edgeDistance = 0;
                     }
 
