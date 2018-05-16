@@ -1,10 +1,10 @@
 package com.mapbox.mapboxsdk.maps;
 
+import android.arch.lifecycle.LifecycleOwner;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.PointF;
 import android.graphics.RectF;
-import android.os.Bundle;
 import android.support.annotation.FloatRange;
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
@@ -65,6 +65,7 @@ public final class MapboxMap {
 
   private final NativeMapView nativeMapView;
 
+  private MapSettings mapSettings;
   private final UiSettings uiSettings;
   private final Projection projection;
   private final Transform transform;
@@ -75,11 +76,12 @@ public final class MapboxMap {
 
   private MapboxMap.OnFpsChangedListener onFpsChangedListener;
 
-  MapboxMap(NativeMapView map, Transform transform, UiSettings ui, Projection projection,
-            OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
+  MapboxMap(NativeMapView map, Transform transform, UiSettings uiSettings, MapSettings mapSettings,
+            Projection projection, OnGesturesManagerInteractionListener listener, AnnotationManager annotations,
             CameraChangeDispatcher cameraChangeDispatcher) {
     this.nativeMapView = map;
-    this.uiSettings = ui;
+    this.uiSettings = uiSettings;
+    this.mapSettings = mapSettings;
     this.projection = projection;
     this.annotationManager = annotations.bind(this);
     this.transform = transform;
@@ -88,14 +90,20 @@ public final class MapboxMap {
   }
 
   void initialise(@NonNull Context context, @NonNull MapboxMapOptions options) {
-    transform.initialise(this, options);
+    mapSettings.initialiseOptions(options);
     uiSettings.initialiseOptions(context, options);
 
-    // Map configuration
-    setDebugActive(options.getDebugActive());
-    setApiBaseUrl(options);
-    setStyleUrl(options);
-    setPrefetchesTiles(options);
+    initialiseCameraPosition();
+  }
+
+  void initialiseSettingsObservers(@NonNull Context context) {
+    LifecycleOwner lifecycleOwner = (LifecycleOwner) context;
+    mapSettings.getMinZoomObservable().observe(lifecycleOwner, transform::setMinZoom);
+    mapSettings.getMaxZoomObservable().observe(lifecycleOwner, transform::setMaxZoom);
+    mapSettings.isDebugModeObservable().observe(lifecycleOwner, nativeMapView::setDebug);
+    mapSettings.getPrefetchesTilesObservable().observe(lifecycleOwner, nativeMapView::setPrefetchesTiles);
+    mapSettings.getApiBaseUrlObservable().observe(lifecycleOwner, nativeMapView::setApiBaseUrl);
+    mapSettings.getStyleUrlObservable().observe(lifecycleOwner, nativeMapView::setStyleUrl);
   }
 
   /**
@@ -103,10 +111,6 @@ public final class MapboxMap {
    */
   void onStart() {
     nativeMapView.update();
-    if (TextUtils.isEmpty(nativeMapView.getStyleUrl()) && TextUtils.isEmpty(nativeMapView.getStyleJson())) {
-      // if user hasn't loaded a Style yet
-      nativeMapView.setStyleUrl(Style.MAPBOX_STREETS);
-    }
   }
 
   /**
@@ -114,37 +118,20 @@ public final class MapboxMap {
    */
   void onStop() {
   }
-// TODO: 15.05.18 cleanup mapbx map save state
-  /**
-   * Called when the hosting Activity/Fragment is going to be destroyed and map state needs to be saved.
-   *
-   * @param outState the bundle to save the state to.
-   */
-  void onSaveInstanceState(@NonNull Bundle outState) {
-    outState.putParcelable(MapboxConstants.STATE_CAMERA_POSITION, transform.getCameraPosition());
-    outState.putBoolean(MapboxConstants.STATE_DEBUG_ACTIVE, nativeMapView.getDebug());
-    outState.putString(MapboxConstants.STATE_STYLE_URL, nativeMapView.getStyleUrl());
-  }
 
   /**
    * Called when the hosting Activity/Fragment is recreated and map state needs to be restored.
-   *
-   * @param savedInstanceState the bundle containing the saved state
    */
-  void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
-    final CameraPosition cameraPosition = savedInstanceState.getParcelable(MapboxConstants.STATE_CAMERA_POSITION);
+  void onRestoreInstanceState() {
+    initialiseCameraPosition();
+  }
 
+  private void initialiseCameraPosition() {
+    final CameraPosition cameraPosition = mapSettings.getLastCameraPosition();
     if (cameraPosition != null) {
       moveCamera(CameraUpdateFactory.newCameraPosition(
         new CameraPosition.Builder(cameraPosition).build())
       );
-    }
-
-    nativeMapView.setDebug(savedInstanceState.getBoolean(MapboxConstants.STATE_DEBUG_ACTIVE));
-
-    final String styleUrl = savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL);
-    if (!TextUtils.isEmpty(styleUrl)) {
-      nativeMapView.setStyleUrl(savedInstanceState.getString(MapboxConstants.STATE_STYLE_URL));
     }
   }
 
@@ -180,6 +167,7 @@ public final class MapboxMap {
    */
   void onUpdateFullyRendered() {
     CameraPosition cameraPosition = transform.invalidateCameraPosition();
+    mapSettings.setLastCameraPosition(cameraPosition);
     if (cameraPosition != null) {
       uiSettings.updateCompass(cameraPosition);
     }
@@ -230,22 +218,13 @@ public final class MapboxMap {
   }
 
   /**
-   * Sets tile pre-fetching from MapboxOptions.
-   *
-   * @param options the options object
-   */
-  private void setPrefetchesTiles(@NonNull MapboxMapOptions options) {
-    setPrefetchesTiles(options.getPrefetchesTiles());
-  }
-
-  /**
    * Enable or disable tile pre-fetching. Pre-fetching makes sure that a low-resolution
    * tile is rendered as soon as possible at the expense of a little bandwidth.
    *
    * @param enable true to enable
    */
   public void setPrefetchesTiles(boolean enable) {
-    nativeMapView.setPrefetchesTiles(enable);
+    mapSettings.setPrefetchesTiles(enable);
   }
 
   /**
@@ -255,7 +234,7 @@ public final class MapboxMap {
    * @see MapboxMap#setPrefetchesTiles(boolean)
    */
   public boolean getPrefetchesTiles() {
-    return nativeMapView.getPrefetchesTiles();
+    return mapSettings.getPrefetchesTiles();
   }
 
   /**
@@ -484,7 +463,7 @@ public final class MapboxMap {
    */
   public void setMinZoomPreference(
     @FloatRange(from = MapboxConstants.MINIMUM_ZOOM, to = MapboxConstants.MAXIMUM_ZOOM) double minZoom) {
-    transform.setMinZoom(minZoom);
+    mapSettings.setMinZoom(minZoom);
   }
 
   /**
@@ -495,7 +474,7 @@ public final class MapboxMap {
    * @return The minimum zoom level.
    */
   public double getMinZoomLevel() {
-    return transform.getMinZoom();
+    return mapSettings.getMinZoom();
   }
 
   //
@@ -514,7 +493,7 @@ public final class MapboxMap {
    */
   public void setMaxZoomPreference(@FloatRange(from = MapboxConstants.MINIMUM_ZOOM,
     to = MapboxConstants.MAXIMUM_ZOOM) double maxZoom) {
-    transform.setMaxZoom(maxZoom);
+    mapSettings.setMaxZoom(maxZoom);
   }
 
   /**
@@ -525,7 +504,7 @@ public final class MapboxMap {
    * @return The maximum zoom level.
    */
   public double getMaxZoomLevel() {
-    return transform.getMaxZoom();
+    return mapSettings.getMaxZoom();
   }
 
   //
@@ -882,7 +861,7 @@ public final class MapboxMap {
    * @return If true, map debug information is currently shown.
    */
   public boolean isDebugActive() {
-    return nativeMapView.getDebug();
+    return mapSettings.isDebugMode();
   }
 
   /**
@@ -894,7 +873,7 @@ public final class MapboxMap {
    * @param debugActive If true, map debug information is shown.
    */
   public void setDebugActive(boolean debugActive) {
-    nativeMapView.setDebug(debugActive);
+    mapSettings.setDebugMode(debugActive);
   }
 
   /**
@@ -907,18 +886,7 @@ public final class MapboxMap {
    * @see #isDebugActive()
    */
   public void cycleDebugOptions() {
-    nativeMapView.cycleDebugOptions();
-  }
-
-  //
-  // API endpoint config
-  //
-
-  private void setApiBaseUrl(@NonNull MapboxMapOptions options) {
-    String apiBaseUrl = options.getApiBaseUrl();
-    if (!TextUtils.isEmpty(apiBaseUrl)) {
-      nativeMapView.setApiBaseUrl(apiBaseUrl);
-    }
+    mapSettings.setDebugMode(!mapSettings.isDebugMode());
   }
 
   //
@@ -999,7 +967,7 @@ public final class MapboxMap {
         }
       });
     }
-    nativeMapView.setStyleUrl(url);
+    mapSettings.setStyleUrl(url);
   }
 
   /**

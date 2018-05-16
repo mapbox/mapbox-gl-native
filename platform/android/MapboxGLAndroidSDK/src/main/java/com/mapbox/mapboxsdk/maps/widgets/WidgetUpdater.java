@@ -30,14 +30,10 @@ public final class WidgetUpdater {
     this.compassView = compassView;
     this.attributionView = attributionView;
     this.logoView = logoView;
-
     uiSettings = ViewModelProviders.of((FragmentActivity) context).get(UiSettings.class);
-    initialiseCompassObservableSettings(context);
-    initialiseAttributionObservableSettings(context);
-    initialiseLogoObservableSettings(context);
   }
 
-  private void initialiseCompassObservableSettings(Context context) {
+  public void initialiseCompassObservableSettings(Context context) {
     LifecycleOwner lifecycleOwner = (LifecycleOwner) context;
 
     // gravity
@@ -62,7 +58,7 @@ public final class WidgetUpdater {
     uiSettings.getCompassRotationObservable().observe(lifecycleOwner, compassView::updateBearing);
   }
 
-  private void initialiseAttributionObservableSettings(Context context) {
+  public void initialiseAttributionObservableSettings(Context context) {
     LifecycleOwner lifecycleOwner = (LifecycleOwner) context;
 
     // gravity
@@ -89,7 +85,7 @@ public final class WidgetUpdater {
       ViewUtils.setViewMargins(attributionView, margins[0], margins[1], margins[2], margins[3]));
   }
 
-  private void initialiseLogoObservableSettings(Context context) {
+  public void initialiseLogoObservableSettings(Context context) {
     LifecycleOwner lifecycleOwner = (LifecycleOwner) context;
 
     // gravity

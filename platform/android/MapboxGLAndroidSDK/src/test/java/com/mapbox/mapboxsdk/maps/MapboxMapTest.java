@@ -19,6 +19,7 @@ public class MapboxMapTest {
     mapboxMap = new MapboxMap(mock(NativeMapView.class),
       mock(Transform.class),
       mock(UiSettings.class),
+      mock(MapSettings.class),
       mock(Projection.class),
       mock(MapboxMap.OnGesturesManagerInteractionListener.class),
       mock(AnnotationManager.class),

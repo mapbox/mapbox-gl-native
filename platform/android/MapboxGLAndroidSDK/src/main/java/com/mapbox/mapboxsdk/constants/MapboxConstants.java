@@ -116,11 +116,4 @@ public class MapboxConstants {
    * Fragment Argument Key for MapboxMapOptions
    */
   public static final String FRAG_ARG_MAPBOXMAPOPTIONS = "MapboxMapOptions";
-
-  // Save instance state keys
-  public static final String STATE_HAS_SAVED_STATE = "mapbox_savedState";
-  public static final String STATE_CAMERA_POSITION = "mapbox_cameraPosition";
-  public static final String STATE_DEBUG_ACTIVE = "mapbox_debugActive";
-  public static final String STATE_STYLE_URL = "mapbox_styleUrl";
-
 }

@@ -26,6 +26,7 @@ import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.ZoomButtonsController;
+
 import com.mapbox.android.gestures.AndroidGesturesManager;
 import com.mapbox.android.telemetry.AppUserTurnstile;
 import com.mapbox.android.telemetry.Event;
@@ -37,7 +38,6 @@ import com.mapbox.mapboxsdk.annotations.Annotation;
 import com.mapbox.mapboxsdk.annotations.MarkerViewManager;
 import com.mapbox.mapboxsdk.camera.CameraPosition;
 import com.mapbox.mapboxsdk.camera.CameraUpdateFactory;
-import com.mapbox.mapboxsdk.constants.MapboxConstants;
 import com.mapbox.mapboxsdk.constants.Style;
 import com.mapbox.mapboxsdk.maps.renderer.MapRenderer;
 import com.mapbox.mapboxsdk.maps.renderer.glsurfaceview.GLSurfaceViewMapRenderer;
@@ -50,8 +50,6 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition;
 import com.mapbox.mapboxsdk.storage.FileSource;
 import com.mapbox.mapboxsdk.utils.BitmapUtils;
 
-import javax.microedition.khronos.egl.EGLConfig;
-import javax.microedition.khronos.opengles.GL10;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -59,6 +57,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+
+import javax.microedition.khronos.egl.EGLConfig;
+import javax.microedition.khronos.opengles.GL10;
 
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_MAP_NORTH_ANIMATION;
 import static com.mapbox.mapboxsdk.maps.widgets.CompassView.TIME_WAIT_IDLE;
@@ -89,13 +90,14 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   private boolean destroyed;
   private boolean hasSurface;
 
+  private MapSettings mapSettings;
   private UiSettings uiSettings;
+
   private CompassView compassView;
   private PointF focalPoint;
   private ImageView attrView;
   private AttributionClickListener attributionClickListener;
   private ImageView logoView;
-  private WidgetUpdater widgetUpdater;
 
   private MapGestureDetector mapGestureDetector;
   private MapKeyListener mapKeyListener;
@@ -142,7 +144,10 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     logoView = (ImageView) view.findViewById(R.id.logoView);
 
     // create widget updater
-    widgetUpdater = new WidgetUpdater(context, compassView, attrView, logoView);
+    WidgetUpdater widgetUpdater = new WidgetUpdater(context, compassView, attrView, logoView);
+    widgetUpdater.initialiseCompassObservableSettings(context);
+    widgetUpdater.initialiseAttributionObservableSettings(context);
+    widgetUpdater.initialiseLogoObservableSettings(context);
 
     // add accessibility support
     setContentDescription(context.getString(R.string.mapbox_mapActionDescription));
@@ -168,6 +173,8 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     uiSettings.initialiseProjection(proj);
     uiSettings.getFocalPointObservable().observe((LifecycleOwner) context, point -> this.focalPoint = point);
 
+    mapSettings = ViewModelProviders.of((FragmentActivity) context).get(MapSettings.class);
+
     LongSparseArray<Annotation> annotationsArray = new LongSparseArray<>();
     MarkerViewManager markerViewManager = new MarkerViewManager((ViewGroup) findViewById(R.id.markerViewContainer));
     IconManager iconManager = new IconManager(nativeMapView);
@@ -181,10 +188,11 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     Transform transform = new Transform(nativeMapView, annotationManager.getMarkerViewManager(),
       cameraChangeDispatcher);
 
-    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, proj, registerTouchListener,
+    mapboxMap = new MapboxMap(nativeMapView, transform, uiSettings, mapSettings, proj, registerTouchListener,
       annotationManager, cameraChangeDispatcher);
 
     mapCallback.attachMapboxMap(mapboxMap);
+    mapboxMap.initialiseSettingsObservers(context);
 
     // user input
     mapGestureDetector = new MapGestureDetector(context, transform, proj, uiSettings,
@@ -217,7 +225,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
     if (savedInstanceState == null) {
       mapboxMap.initialise(context, mapboxMapOptions);
     } else {
-      mapboxMap.onRestoreInstanceState(savedInstanceState);
+      mapboxMap.onRestoreInstanceState();
     }
   }
 
@@ -272,6 +280,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
    */
   @UiThread
   public void onCreate(@Nullable Bundle savedInstanceState) {
+    this.savedInstanceState = savedInstanceState;
     if (savedInstanceState == null) {
       MapboxTelemetry telemetry = Telemetry.obtainTelemetry();
       AppUserTurnstile turnstileEvent = new AppUserTurnstile(BuildConfig.MAPBOX_SDK_IDENTIFIER,
@@ -279,8 +288,6 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       telemetry.push(turnstileEvent);
       MapEventFactory mapEventFactory = new MapEventFactory();
       telemetry.push(mapEventFactory.createMapLoadEvent(Event.Type.MAP_LOAD));
-    } else if (savedInstanceState.getBoolean(MapboxConstants.STATE_HAS_SAVED_STATE)) {
-      this.savedInstanceState = savedInstanceState;
     }
   }
 
@@ -342,17 +349,14 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
   }
 
   /**
-   * You must call this method from the parent's Activity#onSaveInstanceState(Bundle)
-   * or Fragment#onSaveInstanceState(Bundle).
-   *
    * @param outState Pass in the parent's outState.
+   * @deprecated Mapbox Maps SDK for Android is using
+   * {@link android.arch.lifecycle.ViewModel} architecture to save state. No need to call this method.
    */
   @UiThread
+  @Deprecated
   public void onSaveInstanceState(@NonNull Bundle outState) {
-    if (mapboxMap != null) {
-      outState.putBoolean(MapboxConstants.STATE_HAS_SAVED_STATE, true);
-      mapboxMap.onSaveInstanceState(outState);
-    }
+    // do nothing
   }
 
   /**
@@ -539,7 +543,7 @@ public class MapView extends FrameLayout implements NativeMapView.ViewCallback {
       mapboxMapOptions.styleUrl(url);
       return;
     }
-    nativeMapView.setStyleUrl(url);
+    mapSettings.setStyleUrl(url);
   }
 
   /**
